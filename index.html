@@ -14,15 +14,12 @@
     --ink-soft: #3a3630;
     --terracotta: #c4734a;
     --sea: #4a7c8a;
-    --sea-light: #6fa3b2;
     --gold: #b89d6a;
     --divider: rgba(26,24,20,0.12);
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   html { scroll-behavior: smooth; font-size: 16px; }
-
   body {
     background: var(--warm-white);
     color: var(--ink);
@@ -31,7 +28,7 @@
     overflow-x: hidden;
   }
 
-  /* ── NAV ── */
+  /* NAV */
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     display: flex; align-items: center; justify-content: space-between;
@@ -53,109 +50,63 @@
     color: var(--ink);
     text-decoration: none;
   }
-  .nav-links {
-    display: flex; gap: 2rem; list-style: none;
+  .nav-logo .sub {
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    opacity: 0.55;
+    font-weight: 300;
+    text-transform: lowercase;
   }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
   .nav-links a {
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    text-decoration: none;
-    transition: color 0.2s;
+    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--ink-soft); text-decoration: none; transition: color 0.2s;
   }
   .nav-links a:hover { color: var(--terracotta); }
   .nav-cta {
-    font-size: 0.68rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--warm-white);
-    background: var(--ink);
-    padding: 0.55rem 1.2rem;
-    text-decoration: none;
-    transition: background 0.2s;
+    font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--warm-white); background: var(--ink);
+    padding: 0.55rem 1.2rem; text-decoration: none; transition: background 0.2s;
   }
   .nav-cta:hover { background: var(--terracotta); }
   .hamburger {
-    display: none;
-    flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none;
+    display: none; flex-direction: column; gap: 5px;
+    cursor: pointer; background: none; border: none;
   }
-  .hamburger span {
-    display: block; width: 24px; height: 1.5px; background: var(--ink); transition: 0.3s;
-  }
+  .hamburger span { display: block; width: 24px; height: 1.5px; background: var(--ink); }
 
-  /* ── HERO ── */
+  /* HERO */
   .hero {
     min-height: 100svh;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: grid; grid-template-columns: 1fr 1fr;
     overflow: hidden;
-    position: relative;
   }
   .hero-text-panel {
     display: flex; flex-direction: column; justify-content: flex-end;
     padding: 8rem 4rem 5rem 4rem;
     background: var(--sand);
-    position: relative; z-index: 2;
   }
   .hero-eyebrow {
-    font-size: 0.65rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--terracotta);
-    margin-bottom: 1.5rem;
+    font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--terracotta); margin-bottom: 1.5rem;
     opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
   }
   .hero-title {
     font-family: 'Cormorant Garamond', serif;
     font-size: clamp(3.5rem, 8vw, 6rem);
-    font-weight: 300;
-    line-height: 0.95;
-    letter-spacing: -0.01em;
-    color: var(--ink);
+    font-weight: 300; line-height: 0.95;
     margin-bottom: 2rem;
     opacity: 0; animation: fadeUp 0.8s 0.35s forwards;
   }
-  .hero-title em {
-    font-style: italic;
-    color: var(--terracotta);
-  }
+  .hero-title em { font-style: italic; color: var(--terracotta); }
   .hero-desc {
-    font-size: 0.88rem;
-    line-height: 1.75;
-    color: var(--ink-soft);
-    max-width: 380px;
-    margin-bottom: 3rem;
+    font-size: 0.88rem; line-height: 1.75; color: var(--ink-soft);
+    max-width: 380px; margin-bottom: 3rem;
     opacity: 0; animation: fadeUp 0.8s 0.5s forwards;
   }
   .hero-actions {
     display: flex; gap: 1rem; flex-wrap: wrap;
     opacity: 0; animation: fadeUp 0.8s 0.65s forwards;
-  }
-  .btn-primary {
-    display: inline-block;
-    font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--warm-white); background: var(--ink);
-    padding: 0.9rem 2rem; text-decoration: none;
-    transition: background 0.2s;
-  }
-  .btn-primary:hover { background: var(--terracotta); }
-  .btn-secondary {
-    display: inline-block;
-    font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--ink); border: 1px solid var(--ink);
-    padding: 0.9rem 2rem; text-decoration: none;
-    transition: all 0.2s;
-  }
-  .btn-secondary:hover { background: var(--ink); color: var(--warm-white); }
-
-  .hero-image-panel {
-    position: relative; overflow: hidden;
-  }
-  .hero-image-panel img {
-    width: 100%; height: 100%; object-fit: cover;
-    transform: scale(1.05);
-    animation: zoomOut 1.4s 0.1s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
   }
   .hero-scroll-indicator {
     position: absolute; bottom: 2.5rem; left: 4rem;
@@ -165,11 +116,32 @@
     opacity: 0; animation: fadeUp 1s 1s forwards;
   }
   .hero-scroll-indicator::before {
-    content: ''; display: block;
-    width: 40px; height: 1px; background: var(--gold);
+    content: ''; display: block; width: 40px; height: 1px; background: var(--gold);
+  }
+  .hero-image-panel { position: relative; overflow: hidden; }
+  .hero-image-panel img {
+    width: 100%; height: 100%; object-fit: cover;
+    transform: scale(1.05);
+    animation: zoomOut 1.4s 0.1s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
   }
 
-  /* ── SECTION BASE ── */
+  /* BUTTONS */
+  .btn-primary {
+    display: inline-block;
+    font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--warm-white); background: var(--ink);
+    padding: 0.9rem 2rem; text-decoration: none; transition: background 0.2s;
+  }
+  .btn-primary:hover { background: var(--terracotta); }
+  .btn-secondary {
+    display: inline-block;
+    font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ink); border: 1px solid var(--ink);
+    padding: 0.9rem 2rem; text-decoration: none; transition: all 0.2s;
+  }
+  .btn-secondary:hover { background: var(--ink); color: var(--warm-white); }
+
+  /* SECTIONS */
   section { padding: 6rem 2rem; }
   .section-inner { max-width: 1200px; margin: 0 auto; }
   .section-label {
@@ -179,160 +151,108 @@
   .section-title {
     font-family: 'Cormorant Garamond', serif;
     font-size: clamp(2rem, 5vw, 3.5rem);
-    font-weight: 300; line-height: 1.1;
-    margin-bottom: 1.5rem;
+    font-weight: 300; line-height: 1.1; margin-bottom: 1.5rem;
   }
   .section-title em { font-style: italic; color: var(--terracotta); }
 
-  /* ── CUCINA ── */
-  .cucina-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 5rem;
-    align-items: center;
-  }
+  /* CUCINA */
+  .cucina-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
   .cucina-body { font-size: 0.9rem; line-height: 1.9; color: var(--ink-soft); }
   .cucina-body p + p { margin-top: 1rem; }
   .cucina-actions { margin-top: 2.5rem; }
-  .cucina-images {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-  }
-  .cucina-images img {
-    width: 100%; aspect-ratio: 3/4; object-fit: cover;
-    transition: transform 0.5s ease;
-  }
+  .cucina-images { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .cucina-images img { width: 100%; aspect-ratio: 3/4; object-fit: cover; transition: transform 0.5s ease; }
   .cucina-images img:first-child { margin-top: 3rem; }
   .cucina-images img:hover { transform: scale(1.02); }
 
-  /* ── QUOTE ── */
+  /* QUOTE */
   .quote-section {
     background: var(--ink);
-    padding: 5rem 2rem;
+    padding: 2.5rem 2rem;
     text-align: center;
   }
   .quote-text {
     font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(1.6rem, 4vw, 3rem);
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
     font-weight: 300; font-style: italic;
-    color: var(--sand);
-    line-height: 1.4;
-    max-width: 800px;
-    margin: 0 auto 1rem;
+    color: var(--sand); line-height: 1.4;
+    max-width: 800px; margin: 0 auto 0.75rem;
   }
   .quote-attr {
     font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase;
     color: var(--gold);
   }
 
-  /* ── CANTINA ── */
-  .cantina-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 5rem;
-    align-items: center;
-  }
+  /* CANTINA */
+  .cantina-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
   .cantina-image { position: relative; }
-  .cantina-image img {
-    width: 100%; aspect-ratio: 2/3; object-fit: cover;
-  }
+  .cantina-image img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
   .cantina-image::after {
-    content: '';
-    position: absolute; top: -1.5rem; left: -1.5rem;
+    content: ''; position: absolute; top: -1.5rem; left: -1.5rem;
     right: 1.5rem; bottom: 1.5rem;
-    border: 1px solid var(--gold);
-    z-index: -1; pointer-events: none;
+    border: 1px solid var(--gold); z-index: -1; pointer-events: none;
   }
 
-  /* ── ORARI & INFO ── */
+  /* INFO */
   .info-grid {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem;
-    padding-top: 3rem;
-    border-top: 1px solid var(--divider);
+    padding-top: 3rem; border-top: 1px solid var(--divider);
   }
   .info-block-label {
     font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase;
     color: var(--gold); margin-bottom: 1rem;
   }
-  .info-block-content {
-    font-size: 0.88rem; line-height: 2; color: var(--ink-soft);
-  }
+  .info-block-content { font-size: 0.88rem; line-height: 2; color: var(--ink-soft); }
   .info-block-content a { color: var(--ink); text-decoration: none; }
   .info-block-content a:hover { color: var(--terracotta); }
 
-  /* ── REGALA ── */
-  .regalo-section {
-    background: var(--sand);
-  }
-  .regalo-inner {
-    max-width: 700px; margin: 0 auto; text-align: center;
-  }
-  .regalo-inner .section-title { margin-bottom: 1rem; }
-  .regalo-body {
-    font-size: 0.9rem; line-height: 1.85; color: var(--ink-soft);
-    margin-bottom: 2.5rem;
-  }
+  /* REGALO */
+  .regalo-section { background: var(--sand); }
+  .regalo-inner { max-width: 700px; margin: 0 auto; text-align: center; }
+  .regalo-body { font-size: 0.9rem; line-height: 1.85; color: var(--ink-soft); margin-bottom: 2.5rem; }
 
-  /* ── CONTATTI ── */
-  .contatti-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start;
-  }
+  /* CONTATTI */
+  .contatti-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
   .form-group { margin-bottom: 1.5rem; }
   .form-group label {
     display: block; font-size: 0.65rem; letter-spacing: 0.2em;
     text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.5rem;
   }
-  .form-group input,
-  .form-group textarea {
+  .form-group input, .form-group textarea {
     width: 100%; padding: 0.85rem 0;
     border: none; border-bottom: 1px solid var(--divider);
     background: transparent; font-family: 'Jost', sans-serif;
-    font-size: 0.9rem; color: var(--ink);
-    outline: none; transition: border-color 0.2s;
-    resize: none;
+    font-size: 0.9rem; color: var(--ink); outline: none;
+    transition: border-color 0.2s; resize: none;
   }
-  .form-group input:focus,
-  .form-group textarea:focus { border-bottom-color: var(--terracotta); }
+  .form-group input:focus, .form-group textarea:focus { border-bottom-color: var(--terracotta); }
   .form-group textarea { min-height: 100px; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
   .form-check { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 2rem; }
   .form-check input[type=checkbox] { margin-top: 2px; accent-color: var(--terracotta); }
-  .form-check label {
-    font-size: 0.75rem; color: var(--ink-soft); line-height: 1.5;
-  }
+  .form-check label { font-size: 0.75rem; color: var(--ink-soft); line-height: 1.5; }
   .form-check label a { color: var(--terracotta); text-decoration: none; }
 
-  /* ── MAP PLACEHOLDER ── */
+  /* MAP */
   .map-area {
-    background: var(--sand);
-    aspect-ratio: 1;
+    background: var(--sand); aspect-ratio: 1;
     display: flex; align-items: center; justify-content: center;
-    flex-direction: column; gap: 1rem;
-    text-align: center;
+    flex-direction: column; gap: 1rem; text-align: center;
   }
   .map-pin {
-    width: 48px; height: 48px;
-    background: var(--terracotta);
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 0.5rem;
+    width: 48px; height: 48px; background: var(--terracotta);
+    border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 0.5rem;
   }
-  .map-pin::after {
-    content: '';
-    width: 18px; height: 18px;
-    background: var(--warm-white);
-    border-radius: 50%;
-  }
-  .map-address {
-    font-size: 0.85rem; line-height: 1.7; color: var(--ink-soft);
-  }
+  .map-pin::after { content: ''; width: 18px; height: 18px; background: var(--warm-white); border-radius: 50%; }
+  .map-address { font-size: 0.85rem; line-height: 1.7; color: var(--ink-soft); }
   .map-address strong {
     display: block; font-size: 0.65rem; letter-spacing: 0.2em;
-    text-transform: uppercase; color: var(--gold);
-    margin-bottom: 0.5rem; font-weight: 400;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 0.5rem; font-weight: 400;
   }
 
-  /* ── FOOTER ── */
-  footer {
-    background: var(--ink); color: var(--sand);
-    padding: 3rem 2rem;
-  }
+  /* FOOTER */
+  footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
   .footer-inner {
     max-width: 1200px; margin: 0 auto;
     display: flex; justify-content: space-between; align-items: center;
@@ -341,87 +261,54 @@
   .footer-logo {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.1rem; letter-spacing: 0.2em;
-    text-transform: uppercase; color: var(--sand);
-    text-decoration: none;
+    text-transform: uppercase; color: var(--sand); text-decoration: none;
   }
   .footer-social { display: flex; gap: 1.5rem; }
   .footer-social a {
-    font-size: 0.65rem; letter-spacing: 0.2em;
-    text-transform: uppercase; color: var(--gold);
-    text-decoration: none; transition: color 0.2s;
+    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold); text-decoration: none; transition: color 0.2s;
   }
   .footer-social a:hover { color: var(--sand); }
-  .footer-copy {
-    font-size: 0.68rem; color: rgba(245,240,232,0.4);
-    letter-spacing: 0.1em;
-  }
+  .footer-copy { font-size: 0.68rem; color: rgba(245,240,232,0.4); letter-spacing: 0.1em; }
 
-  /* ── MOBILE MENU ── */
+  /* MOBILE MENU */
   .mobile-menu {
-    display: none;
-    position: fixed; inset: 0; z-index: 200;
+    display: none; position: fixed; inset: 0; z-index: 200;
     background: var(--warm-white);
-    flex-direction: column; justify-content: center; align-items: center;
-    gap: 2.5rem;
+    flex-direction: column; justify-content: center; align-items: center; gap: 2.5rem;
   }
   .mobile-menu.open { display: flex; }
   .mobile-menu a {
     font-family: 'Cormorant Garamond', serif;
     font-size: 2rem; font-weight: 300; font-style: italic;
-    color: var(--ink); text-decoration: none;
-    transition: color 0.2s;
+    color: var(--ink); text-decoration: none; transition: color 0.2s;
   }
   .mobile-menu a:hover { color: var(--terracotta); }
-  .menu-close {
-    position: absolute; top: 1.5rem; right: 2rem;
-    background: none; border: none; cursor: pointer;
-    font-size: 1.5rem; color: var(--ink);
-  }
+  .menu-close { position: absolute; top: 1.5rem; right: 2rem; background: none; border: none; cursor: pointer; font-size: 1.5rem; color: var(--ink); }
 
-  /* ── ANIMATIONS ── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes zoomOut {
-    from { transform: scale(1.05); }
-    to   { transform: scale(1); }
-  }
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+  @keyframes zoomOut { from { transform:scale(1.05); } to { transform:scale(1); } }
+  .reveal { opacity:0; transform:translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity:1; transform:none; }
 
-  .reveal {
-    opacity: 0; transform: translateY(30px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-  .reveal.visible { opacity: 1; transform: none; }
-
-  /* ── RESPONSIVE ── */
+  /* RESPONSIVE */
   @media (max-width: 900px) {
     nav { padding: 1rem 1.5rem; }
     .nav-links, .nav-cta { display: none; }
     .hamburger { display: flex; }
-
-    .hero { grid-template-columns: 1fr; min-height: 100svh; }
-    .hero-text-panel {
-      padding: 7rem 1.5rem 3rem;
-      order: 2;
-    }
+    .hero { grid-template-columns: 1fr; }
+    .hero-text-panel { padding: 7rem 1.5rem 3rem; order: 2; }
     .hero-image-panel { height: 55vw; min-height: 280px; order: 1; }
     .hero-scroll-indicator { display: none; }
-
-    .cucina-grid,
-    .cantina-grid,
-    .contatti-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .cucina-grid, .cantina-grid, .contatti-grid { grid-template-columns: 1fr; gap: 3rem; }
     .cucina-images { grid-template-columns: 1fr 1fr; }
     .cucina-images img:first-child { margin-top: 0; }
     .cantina-image::after { display: none; }
-
     .info-grid { grid-template-columns: 1fr; gap: 2rem; }
-
     section { padding: 4rem 1.5rem; }
-
     .form-row { grid-template-columns: 1fr; }
     .map-area { aspect-ratio: 4/3; }
-
     .footer-inner { flex-direction: column; text-align: center; }
   }
 </style>
@@ -430,7 +317,7 @@
 
 <!-- NAV -->
 <nav id="main-nav">
-  <a href="#" class="nav-logo">Santamonica <span style="font-size:0.75rem;letter-spacing:0.12em;opacity:0.6;font-weight:300;">sul mare</span></a>
+  <a href="#" class="nav-logo">Santamonica <span class="sub">sul mare</span></a>
   <ul class="nav-links">
     <li><a href="#cucina">Cucina</a></li>
     <li><a href="#cantina">Cantina</a></li>
@@ -454,7 +341,7 @@
 </div>
 
 <!-- HERO -->
-<section class="hero" style="padding:0;">
+<section class="hero" style="padding:0;position:relative;">
   <div class="hero-text-panel">
     <p class="hero-eyebrow">Ristorante · Genova</p>
     <h1 class="hero-title">Cucina <em>viva</em><br>sul mare</h1>
@@ -497,7 +384,7 @@
 <!-- QUOTE -->
 <div class="quote-section">
   <p class="quote-text">"Be nice to people. We're all trying our best."</p>
-  <p class="quote-attr">— Monica & Andrea</p>
+  <p class="quote-attr">— Monica &amp; Andrea</p>
 </div>
 
 <!-- CANTINA -->
@@ -522,14 +409,14 @@
   </div>
 </section>
 
-<!-- REGALA -->
+<!-- REGALO -->
 <section class="regalo-section">
   <div class="section-inner">
     <div class="regalo-inner reveal">
       <p class="section-label">Un dono speciale</p>
       <h2 class="section-title">Buoni <em>regalo</em></h2>
       <p class="regalo-body">Regala un pranzo o una cena al Santamonica. I Buoni Regalo sono utilizzabili tutti i giorni (salvo disponibilità) escluso Sabato e festivi, con validità di 6 mesi dall'acquisto. Contattaci per acquistarlo.</p>
-      <a href="/cdn-cgi/l/email-protection#4033212e34212d2f2e29232127252e2f362100272d21292c6e232f2d7f3335222a2523347d02352f2e2f60122527212c2f6013212e34212d2f2e292321" class="btn-primary">Richiedi un buono</a>
+      <a href="mailto:santamonicagenova@gmail.com?subject=Buono Regalo Santamonica" class="btn-primary">Richiedi un buono</a>
     </div>
   </div>
 </section>
@@ -538,7 +425,7 @@
 <section id="info">
   <div class="section-inner">
     <p class="section-label reveal">Come raggiungerci</p>
-    <h2 class="section-title reveal">Orari & <em>Contatti</em></h2>
+    <h2 class="section-title reveal">Orari &amp; <em>Contatti</em></h2>
     <div class="info-grid reveal" style="transition-delay:0.1s">
       <div>
         <p class="info-block-label">Orari</p>
@@ -555,7 +442,7 @@
           Lungomare Lombardo 27<br>
           16145 Genova — Italy<br><br>
           <a href="tel:+390105533155">+39 010 553 31 55</a><br>
-          <a href="/cdn-cgi/l/email-protection#e497858a9085898b8a8d878583818a8b9285a48389858d88ca878b89"><span class="__cf_email__" data-cfemail="4f3c2e213b2e222021262c2e282a2120392e0f28222e2623612c2022">[email&#160;protected]</span></a>
+          <a href="mailto:santamonicagenova@gmail.com">santamonicagenova@gmail.com</a>
         </div>
       </div>
       <div>
@@ -634,14 +521,12 @@
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-  // Sticky nav
+<script>
   const nav = document.getElementById('main-nav');
   window.addEventListener('scroll', () => {
     nav.classList.toggle('scrolled', window.scrollY > 60);
   });
 
-  // Mobile menu
   const hamburger = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('mobile-menu');
   const menuClose = document.getElementById('menu-close');
@@ -651,12 +536,19 @@
     a.addEventListener('click', () => mobileMenu.classList.remove('open'));
   });
 
-  // Scroll reveal
   const reveals = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
   }, { threshold: 0.12 });
   reveals.forEach(el => observer.observe(el));
 
-  // Form (demo)
-  funct
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type=submit]');
+    btn.textContent = 'Messaggio inviato ✓';
+    btn.style.background = 'var(--sea)';
+    setTimeout(() => { btn.textContent = 'Invia messaggio'; btn.style.background = ''; e.target.reset(); }, 3000);
+  }
+</script>
+</body>
+</html>

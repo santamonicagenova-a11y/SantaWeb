@@ -7,118 +7,172 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root { --sand:#f5f0e8;--warm-white:#faf8f4;--ink:#1a1814;--ink-soft:#3a3630;--terracotta:#c4734a;--sea:#4a7c8a;--gold:#b89d6a;--divider:rgba(26,24,20,0.12); }
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-  html{scroll-behavior:smooth;font-size:16px;}
-  body{background:var(--warm-white);color:var(--ink);font-family:'Jost',sans-serif;font-weight:300;overflow-x:hidden;}
-  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.2rem 2rem;background:transparent;transition:background 0.4s,backdrop-filter 0.4s;}
-  nav.scrolled{background:rgba(250,248,244,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--divider);}
-  .nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:400;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink);text-decoration:none;}
-  .nav-logo .sub{font-size:0.78rem;letter-spacing:0.12em;opacity:0.55;font-weight:300;text-transform:lowercase;}
-  .nav-links{display:flex;gap:2rem;list-style:none;}
-  .nav-links a{font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-soft);text-decoration:none;transition:color 0.2s;}
-  .nav-links a:hover{color:var(--terracotta);}
-  .nav-cta{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--warm-white);background:var(--ink);padding:0.55rem 1.2rem;text-decoration:none;transition:background 0.2s;}
-  .nav-cta:hover{background:var(--terracotta);}
-  .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;}
-  .hamburger span{display:block;width:24px;height:1.5px;background:var(--ink);}
-  .hero{min-height:100svh;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;}
-  .hero-text-panel{display:flex;flex-direction:column;justify-content:flex-end;padding:8rem 4rem 5rem 4rem;background:var(--sand);}
-  .hero-eyebrow{font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--terracotta);margin-bottom:1.5rem;opacity:0;animation:fadeUp 0.8s 0.2s forwards;}
-  .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3.5rem,8vw,6rem);font-weight:300;line-height:0.95;margin-bottom:2rem;opacity:0;animation:fadeUp 0.8s 0.35s forwards;}
-  .hero-title em{font-style:italic;color:var(--terracotta);}
-  .hero-desc{font-size:0.88rem;line-height:1.75;color:var(--ink-soft);max-width:380px;margin-bottom:3rem;opacity:0;animation:fadeUp 0.8s 0.5s forwards;}
-  .hero-actions{display:flex;gap:1rem;flex-wrap:wrap;opacity:0;animation:fadeUp 0.8s 0.65s forwards;}
-  .hero-scroll-indicator{position:absolute;bottom:2.5rem;left:4rem;display:flex;align-items:center;gap:0.8rem;font-size:0.62rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--ink-soft);opacity:0;animation:fadeUp 1s 1s forwards;}
-  .hero-scroll-indicator::before{content:'';display:block;width:40px;height:1px;background:var(--gold);}
-  .hero-image-panel{position:relative;overflow:hidden;}
-  .hero-image-panel img{width:100%;height:100%;object-fit:cover;transform:scale(1.05);animation:zoomOut 1.4s 0.1s cubic-bezier(0.25,0.46,0.45,0.94) forwards;}
-  .btn-primary{display:inline-block;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--warm-white);background:var(--ink);padding:0.9rem 2rem;text-decoration:none;transition:background 0.2s;}
-  .btn-primary:hover{background:var(--terracotta);}
-  .btn-secondary{display:inline-block;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink);border:1px solid var(--ink);padding:0.9rem 2rem;text-decoration:none;transition:all 0.2s;}
-  .btn-secondary:hover{background:var(--ink);color:var(--warm-white);}
-  section{padding:6rem 2rem;}
-  .section-inner{max-width:1200px;margin:0 auto;}
-  .section-label{font-size:0.62rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--terracotta);margin-bottom:1rem;}
-  .section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:300;line-height:1.1;margin-bottom:1.5rem;}
-  .section-title em{font-style:italic;color:var(--terracotta);}
-  .cucina-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;}
-  .cucina-body{font-size:0.9rem;line-height:1.9;color:var(--ink-soft);}
-  .cucina-body p+p{margin-top:1rem;}
-  .cucina-actions{margin-top:2.5rem;}
-  .cucina-images{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
-  .cucina-images img{width:100%;aspect-ratio:3/4;object-fit:cover;transition:transform 0.5s ease;}
-  .cucina-images img:first-child{margin-top:3rem;}
-  .cucina-images img:hover{transform:scale(1.02);}
-  .quote-section{background:var(--ink);padding:2.5rem 2rem;text-align:center;}
-  .quote-text{font-family:'Cormorant Garamond',serif;font-size:clamp(1.4rem,3vw,2.2rem);font-weight:300;font-style:italic;color:var(--sand);line-height:1.4;max-width:800px;margin:0 auto 0.75rem;}
-  .quote-attr{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);}
-  .cantina-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;}
-  .cantina-image{position:relative;}
-  .cantina-image img{width:100%;aspect-ratio:2/3;object-fit:cover;}
-  .cantina-image::after{content:'';position:absolute;top:-1.5rem;left:-1.5rem;right:1.5rem;bottom:1.5rem;border:1px solid var(--gold);z-index:-1;pointer-events:none;}
-  .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3rem;padding-top:3rem;border-top:1px solid var(--divider);}
-  .info-block-label{font-size:0.62rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;}
-  .info-block-content{font-size:0.88rem;line-height:2;color:var(--ink-soft);}
-  .info-block-content a{color:var(--ink);text-decoration:none;}
-  .info-block-content a:hover{color:var(--terracotta);}
-  .regalo-section{background:var(--sand);}
-  .regalo-inner{max-width:700px;margin:0 auto;text-align:center;}
-  .regalo-body{font-size:0.9rem;line-height:1.85;color:var(--ink-soft);margin-bottom:2.5rem;}
-  .contatti-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;}
-  .form-group{margin-bottom:1.5rem;}
-  .form-group label{display:block;font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:0.5rem;}
-  .form-group input,.form-group textarea{width:100%;padding:0.85rem 0;border:none;border-bottom:1px solid var(--divider);background:transparent;font-family:'Jost',sans-serif;font-size:0.9rem;color:var(--ink);outline:none;transition:border-color 0.2s;resize:none;}
-  .form-group input:focus,.form-group textarea:focus{border-bottom-color:var(--terracotta);}
-  .form-group textarea{min-height:100px;}
-  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
-  .form-check{display:flex;align-items:flex-start;gap:0.75rem;margin-bottom:2rem;}
-  .form-check input[type=checkbox]{margin-top:2px;accent-color:var(--terracotta);}
-  .form-check label{font-size:0.75rem;color:var(--ink-soft);line-height:1.5;}
-  .form-check label a{color:var(--terracotta);text-decoration:none;}
-  .form-status{display:none;margin-top:1rem;font-size:0.85rem;padding:0.75rem 1rem;}
-  .form-status.success{display:block;background:#eaf3de;color:#3b6d11;}
-  .form-status.error{display:block;background:#fcebeb;color:#a32d2d;}
-  .map-wrapper{width:100%;border:1px solid var(--divider);}
-  .map-wrapper iframe{width:100%;height:380px;border:none;display:block;}
-  .map-footer{background:var(--sand);padding:1rem 1.2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;border-top:1px solid var(--divider);}
-  .map-footer-addr{font-size:0.82rem;line-height:1.6;color:var(--ink-soft);}
-  .map-footer-label{font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:0.2rem;font-weight:400;}
-  .map-footer-link{font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--terracotta);text-decoration:none;white-space:nowrap;}
-  .map-footer-link:hover{text-decoration:underline;}
-  footer{background:var(--ink);color:var(--sand);padding:3rem 2rem;}
-  .footer-inner{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem;}
-  .footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--sand);text-decoration:none;}
-  .footer-social{display:flex;gap:1.5rem;}
-  .footer-social a{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);text-decoration:none;transition:color 0.2s;}
-  .footer-social a:hover{color:var(--sand);}
-  .footer-copy{font-size:0.68rem;color:rgba(245,240,232,0.4);letter-spacing:0.1em;}
-  .mobile-menu{display:none;position:fixed;inset:0;z-index:200;background:var(--warm-white);flex-direction:column;justify-content:center;align-items:center;gap:2.5rem;}
-  .mobile-menu.open{display:flex;}
-  .mobile-menu a{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;font-style:italic;color:var(--ink);text-decoration:none;transition:color 0.2s;}
-  .mobile-menu a:hover{color:var(--terracotta);}
-  .menu-close{position:absolute;top:1.5rem;right:2rem;background:none;border:none;cursor:pointer;font-size:1.5rem;color:var(--ink);}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
-  @keyframes zoomOut{from{transform:scale(1.05);}to{transform:scale(1);}}
-  .reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease;}
-  .reveal.visible{opacity:1;transform:none;}
-  @media(max-width:900px){
-    nav{padding:1rem 1.5rem;}
-    .nav-links,.nav-cta{display:none;}
-    .hamburger{display:flex;}
-    .hero{grid-template-columns:1fr;}
-    .hero-text-panel{padding:7rem 1.5rem 3rem;order:2;}
-    .hero-image-panel{height:55vw;min-height:280px;order:1;}
-    .hero-scroll-indicator{display:none;}
-    .cucina-grid,.cantina-grid,.contatti-grid{grid-template-columns:1fr;gap:3rem;}
-    .cucina-images{grid-template-columns:1fr 1fr;}
-    .cucina-images img:first-child{margin-top:0;}
-    .cantina-image::after{display:none;}
-    .info-grid{grid-template-columns:1fr;gap:2rem;}
-    section{padding:4rem 1.5rem;}
-    .form-row{grid-template-columns:1fr;}
-    .map-wrapper iframe{height:260px;}
-    .footer-inner{flex-direction:column;text-align:center;}
+  :root {
+    --sand: #f5f0e8;
+    --warm-white: #faf8f4;
+    --ink: #1a1814;
+    --ink-soft: #3a3630;
+    --terracotta: #c4734a;
+    --sea: #4a7c8a;
+    --gold: #b89d6a;
+    --divider: rgba(26,24,20,0.12);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; font-size: 16px; }
+  body { background: var(--warm-white); color: var(--ink); font-family: 'Jost', sans-serif; font-weight: 300; overflow-x: hidden; }
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 2rem; background: transparent; transition: background 0.4s, backdrop-filter 0.4s; }
+  nav.scrolled { background: rgba(250,248,244,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--divider); }
+  .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
+  .nav-logo .sub { font-size: 1rem; letter-spacing: 0.12em; opacity: 0.55; font-weight: 300; text-transform: lowercase; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); text-decoration: none; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--terracotta); }
+  .nav-cta { font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-white); background: var(--ink); padding: 0.55rem 1.2rem; text-decoration: none; transition: background 0.2s; }
+  .nav-cta:hover { background: var(--terracotta); }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; }
+  .hamburger span { display: block; width: 24px; height: 1.5px; background: var(--ink); }
+  .hero { min-height: 100svh; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; }
+  .hero-text-panel { display: flex; flex-direction: column; justify-content: flex-end; padding: 8rem 4rem 5rem 4rem; background: var(--sand); }
+  .hero-eyebrow { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 1.5rem; opacity: 0; animation: fadeUp 0.8s 0.2s forwards; }
+  .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(3.5rem, 8vw, 6rem); font-weight: 300; line-height: 0.95; margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.8s 0.35s forwards; }
+  .hero-title em { font-style: italic; color: var(--terracotta); }
+  .hero-desc { font-size: 0.88rem; line-height: 1.75; color: var(--ink-soft); max-width: 380px; margin-bottom: 3rem; opacity: 0; animation: fadeUp 0.8s 0.5s forwards; }
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.8s 0.65s forwards; }
+  .hero-scroll-indicator { position: absolute; bottom: 2.5rem; left: 4rem; display: flex; align-items: center; gap: 0.8rem; font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--ink-soft); opacity: 0; animation: fadeUp 1s 1s forwards; }
+  .hero-scroll-indicator::before { content: ''; display: block; width: 40px; height: 1px; background: var(--gold); }
+  .hero-image-panel { position: relative; overflow: hidden; }
+  .hero-image-panel img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.05); animation: zoomOut 1.4s 0.1s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
+  .btn-primary { display: inline-block; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-white); background: var(--ink); padding: 0.9rem 2rem; text-decoration: none; transition: background 0.2s; }
+  .btn-primary:hover { background: var(--terracotta); }
+  .btn-secondary { display: inline-block; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); border: 1px solid var(--ink); padding: 0.9rem 2rem; text-decoration: none; transition: all 0.2s; }
+  .btn-secondary:hover { background: var(--ink); color: var(--warm-white); }
+  section { padding: 6rem 2rem; }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+  .section-label { font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 1rem; }
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 300; line-height: 1.1; margin-bottom: 1.5rem; }
+  .section-title em { font-style: italic; color: var(--terracotta); }
+  .cucina-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+  .cucina-body { font-size: 0.9rem; line-height: 1.9; color: var(--ink-soft); }
+  .cucina-body p + p { margin-top: 1rem; }
+  .cucina-actions { margin-top: 2.5rem; }
+  .cucina-images { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .cucina-images img { width: 100%; aspect-ratio: 3/4; object-fit: cover; transition: transform 0.5s ease; }
+  .cucina-images img:first-child { margin-top: 3rem; }
+  .cucina-images img:hover { transform: scale(1.02); }
+  .quote-section { background: var(--ink); padding: 2.5rem 2rem; text-align: center; }
+  .quote-text { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.4rem, 3vw, 2.2rem); font-weight: 300; font-style: italic; color: var(--sand); line-height: 1.4; max-width: 800px; margin: 0 auto 0.75rem; }
+  .quote-attr { font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); }
+  .cantina-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+  .cantina-image { position: relative; }
+  .cantina-image img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+  .cantina-image::after { content: ''; position: absolute; top: -1.5rem; left: -1.5rem; right: 1.5rem; bottom: 1.5rem; border: 1px solid var(--gold); z-index: -1; pointer-events: none; }
+  .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; padding-top: 3rem; border-top: 1px solid var(--divider); }
+  .info-block-label { font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+  .info-block-content { font-size: 0.88rem; line-height: 2; color: var(--ink-soft); }
+  .info-block-content a { color: var(--ink); text-decoration: none; }
+  .info-block-content a:hover { color: var(--terracotta); }
+  .regalo-section { background: var(--sand); }
+  .regalo-inner { max-width: 700px; margin: 0 auto; text-align: center; }
+  .regalo-body { font-size: 0.9rem; line-height: 1.85; color: var(--ink-soft); margin-bottom: 2.5rem; }
+  .contatti-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
+  .form-group { margin-bottom: 1.5rem; }
+  .form-group label { display: block; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.5rem; }
+  .form-group input, .form-group textarea { width: 100%; padding: 0.85rem 0; border: none; border-bottom: 1px solid var(--divider); background: transparent; font-family: 'Jost', sans-serif; font-size: 0.9rem; color: var(--ink); outline: none; transition: border-color 0.2s; resize: none; }
+  .form-group input:focus, .form-group textarea:focus { border-bottom-color: var(--terracotta); }
+  .form-group textarea { min-height: 100px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .form-check { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 2rem; }
+  .form-check input[type=checkbox] { margin-top: 2px; accent-color: var(--terracotta); }
+  .form-check label { font-size: 0.75rem; color: var(--ink-soft); line-height: 1.5; }
+  .form-check label a { color: var(--terracotta); text-decoration: none; }
+  .form-status { display: none; margin-top: 1rem; font-size: 0.85rem; padding: 0.75rem 1rem; }
+  .form-status.success { display: block; background: #eaf3de; color: #3b6d11; }
+  .form-status.error { display: block; background: #fcebeb; color: #a32d2d; }
+  .map-wrapper { width: 100%; }
+  .map-wrapper iframe { width: 100%; height: 380px; border: none; display: block; }
+  .map-bar { background: var(--sand); padding: 1rem 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; border-top: 1px solid var(--divider); }
+  .map-bar-address { font-size: 0.82rem; line-height: 1.6; color: var(--ink-soft); }
+  .map-bar-label { display: block; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); font-weight: 400; margin-bottom: 0.2rem; }
+  .map-bar-link { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--terracotta); text-decoration: none; white-space: nowrap; }
+  .map-bar-link:hover { text-decoration: underline; }
+  footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
+  .footer-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
+  .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sand); text-decoration: none; }
+  .footer-social { display: flex; gap: 1.5rem; }
+  .footer-social a { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); text-decoration: none; transition: color 0.2s; }
+  .footer-social a:hover { color: var(--sand); }
+  .footer-copy { font-size: 0.68rem; color: rgba(245,240,232,0.4); letter-spacing: 0.1em; }
+  .mobile-menu { display: none; position: fixed; inset: 0; z-index: 200; background: var(--warm-white); flex-direction: column; justify-content: center; align-items: center; gap: 2.5rem; }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; font-style: italic; color: var(--ink); text-decoration: none; transition: color 0.2s; }
+  .mobile-menu a:hover { color: var(--terracotta); }
+  .menu-close { position: absolute; top: 1.5rem; right: 2rem; background: none; border: none; cursor: pointer; font-size: 1.5rem; color: var(--ink); }
+  #cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: var(--ink); padding: 1.2rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; border-top: 2px solid var(--terracotta); transform: translateY(100%); transition: transform 0.4s ease; }
+  #cookie-banner.visible { transform: translateY(0); }
+  #cookie-banner p { font-size: 0.78rem; line-height: 1.6; color: rgba(245,240,232,0.85); max-width: 700px; }
+  #cookie-banner a { color: var(--gold); text-decoration: underline; }
+  .cookie-actions { display: flex; gap: 0.75rem; flex-shrink: 0; }
+  .cookie-btn { font-family: 'Jost', sans-serif; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.6rem 1.2rem; border: none; cursor: pointer; transition: background 0.2s; }
+  .cookie-accept { background: var(--terracotta); color: var(--warm-white); }
+  .cookie-accept:hover { background: #b5633d; }
+  .cookie-decline { background: transparent; color: rgba(245,240,232,0.6); border: 1px solid rgba(245,240,232,0.25); }
+  .cookie-decline:hover { color: var(--sand); border-color: rgba(245,240,232,0.5); }
+
+  /* GALLERIA */
+  .galleria-section { background: var(--ink); padding: 6rem 2rem; }
+  .galleria-section .section-label { color: var(--gold); }
+  .galleria-section .section-title { color: var(--sand); }
+  .galleria-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: auto auto; gap: 0.75rem; margin-top: 3rem; }
+  .galleria-item { overflow: hidden; cursor: pointer; }
+  .galleria-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s ease; }
+  .galleria-item:hover img { transform: scale(1.04); }
+  .galleria-item.grande { grid-column: span 2; }
+  .galleria-item { aspect-ratio: 1; }
+  .galleria-item.grande { aspect-ratio: 2/1; }
+
+  /* LIGHTBOX */
+  #lightbox { position: fixed; inset: 0; z-index: 600; background: rgba(26,24,20,0.95); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 2rem; }
+  #lightbox.visible { opacity: 1; pointer-events: all; }
+  #lightbox img { max-width: 90vw; max-height: 88vh; object-fit: contain; }
+  #lightbox-close { position: absolute; top: 1.5rem; right: 2rem; background: none; border: none; color: var(--sand); font-size: 1.5rem; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
+  #lightbox-close:hover { opacity: 1; }
+  #lightbox-prev, #lightbox-next { position: absolute; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--sand); font-size: 2rem; cursor: pointer; opacity: 0.5; transition: opacity 0.2s; padding: 1rem; }
+  #lightbox-prev { left: 1rem; }
+  #lightbox-next { right: 1rem; }
+  #lightbox-prev:hover, #lightbox-next:hover { opacity: 1; }
+
+  @media (max-width: 900px) {
+    .galleria-grid { grid-template-columns: repeat(2, 1fr); }
+    .galleria-item.grande { grid-column: span 2; aspect-ratio: 3/2; }
+  }
+  @media (max-width: 600px) {
+    .galleria-grid { grid-template-columns: 1fr; }
+    .galleria-item.grande { grid-column: span 1; aspect-ratio: 4/3; }
+  }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+  @keyframes zoomOut { from { transform: scale(1.05); } to { transform: scale(1); } }
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links, .nav-cta { display: none; }
+    .hamburger { display: flex; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-text-panel { padding: 7rem 1.5rem 3rem; order: 2; }
+    .hero-image-panel { height: 55vw; min-height: 280px; order: 1; }
+    .hero-scroll-indicator { display: none; }
+    .cucina-grid, .cantina-grid, .contatti-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .cucina-images { grid-template-columns: 1fr 1fr; }
+    .cucina-images img:first-child { margin-top: 0; }
+    .cantina-image::after { display: none; }
+    .info-grid { grid-template-columns: 1fr; gap: 2rem; }
+    section { padding: 4rem 1.5rem; }
+    .form-row { grid-template-columns: 1fr; }
+    .footer-inner { flex-direction: column; text-align: center; }
+    #cookie-banner { flex-direction: column; align-items: flex-start; }
+    .cookie-actions { width: 100%; }
+    .cookie-btn { flex: 1; text-align: center; }
   }
 </style>
 </head>
@@ -137,7 +191,7 @@
 </nav>
 
 <div class="mobile-menu" id="mobile-menu">
-  <button class="menu-close" id="menu-close">&#10005;</button>
+  <button class="menu-close" id="menu-close">&#x2715;</button>
   <a href="#cucina" class="mobile-link">Cucina</a>
   <a href="#cantina" class="mobile-link">Cantina</a>
   <a href="#info" class="mobile-link">Info &amp; Orari</a>
@@ -184,6 +238,39 @@
   </div>
 </section>
 
+<!-- GALLERIA -->
+<section class="galleria-section" id="galleria">
+  <div class="section-inner">
+    <p class="section-label reveal">La nostra cucina</p>
+    <h2 class="section-title reveal">Ogni piatto,<br><em>una storia</em></h2>
+    <div class="galleria-grid">
+      <div class="galleria-item grande reveal" onclick="openLightbox(0)">
+        <img src="img/piatto-pesce.jpg" alt="Pesce alla griglia con salsa e verdure">
+      </div>
+      <div class="galleria-item reveal" onclick="openLightbox(1)" style="transition-delay:0.1s">
+        <img src="img/piatto-tonno.jpg" alt="Tonno scottato con salse">
+      </div>
+      <div class="galleria-item reveal" onclick="openLightbox(2)" style="transition-delay:0.15s">
+        <img src="img/piatto-pasta.jpg" alt="Pasta fresca fatta in casa">
+      </div>
+      <div class="galleria-item reveal" onclick="openLightbox(3)" style="transition-delay:0.2s">
+        <img src="img/piatto-carne.jpg" alt="Secondo con salsa ricca">
+      </div>
+      <div class="galleria-item grande reveal" onclick="openLightbox(4)" style="transition-delay:0.25s">
+        <img src="img/piatto-dessert.jpg" alt="Dessert con frutti di bosco e salsa">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIGHTBOX -->
+<div id="lightbox">
+  <button id="lightbox-close" onclick="closeLightbox()">&#x2715;</button>
+  <button id="lightbox-prev" onclick="changeLightbox(-1)">&#x2039;</button>
+  <img id="lightbox-img" src="" alt="">
+  <button id="lightbox-next" onclick="changeLightbox(1)">&#x203a;</button>
+</div>
+
 <div class="quote-section">
   <p class="quote-text">&ldquo;Be nice to people. We&rsquo;re all trying our best.&rdquo;</p>
   <p class="quote-attr">&mdash; Monica &amp; Andrea</p>
@@ -216,7 +303,7 @@
       <p class="section-label">Un dono speciale</p>
       <h2 class="section-title">Buoni <em>regalo</em></h2>
       <p class="regalo-body">Regala un pranzo o una cena al Santamonica. I Buoni Regalo sono utilizzabili tutti i giorni (salvo disponibilit&agrave;) escluso Sabato e festivi, con validit&agrave; di 6 mesi dall&rsquo;acquisto. Contattaci per acquistarlo.</p>
-      <a href="mailto:santamonicagenova@gmail.com?subject=Buono Regalo Santamonica" class="btn-primary">Richiedi un buono</a>
+      <a href="/cdn-cgi/l/email-protection#91e2f0ffe5f0fcfefff8f2f0f6f4fffee7f0d1f6fcf0f8fdbff2fefcaee2e4f3fbf4f2e5acd3e4fefffeb1c3f4f6f0fdfeb1c2f0ffe5f0fcfefff8f2f0" class="btn-primary">Richiedi un buono</a>
     </div>
   </div>
 </section>
@@ -229,9 +316,12 @@
       <div>
         <p class="info-block-label">Orari</p>
         <div class="info-block-content">
-          Marted&igrave;<br><strong style="color:var(--ink);font-weight:400">19:30 &ndash; 22:30</strong><br><br>
-          Mercoled&igrave; &ndash; Sabato<br><strong style="color:var(--ink);font-weight:400">12:30 &ndash; 14:30 &nbsp;/&nbsp; 19:30 &ndash; 22:30</strong><br><br>
-          Domenica<br><strong style="color:var(--ink);font-weight:400">12:30 &ndash; 14:30</strong><br><br>
+          Marted&igrave;<br>
+          <strong style="color:var(--ink);font-weight:400">19:30 &ndash; 22:30</strong><br><br>
+          Mercoled&igrave; &ndash; Sabato<br>
+          <strong style="color:var(--ink);font-weight:400">12:30 &ndash; 14:30 &nbsp;/&nbsp; 19:30 &ndash; 22:30</strong><br><br>
+          Domenica<br>
+          <strong style="color:var(--ink);font-weight:400">12:30 &ndash; 14:30</strong><br><br>
           <em style="font-size:0.78rem">Luned&igrave; chiuso</em>
         </div>
       </div>
@@ -240,14 +330,14 @@
         <div class="info-block-content">
           Lungomare Lombardo 27<br>16145 Genova &mdash; Italy<br><br>
           <a href="tel:+390105533155">+39 010 553 31 55</a><br>
-          <a href="mailto:santamonicagenova@gmail.com">santamonicagenova@gmail.com</a>
+          <a href="/cdn-cgi/l/email-protection#2251434c56434f4d4c4b414345474c4d544362454f434b4e0c414d4f"><span class="__cf_email__" data-cfemail="7b081a150f1a16141512181a1c1e15140d1a3b1c161a121755181416">[email&#160;protected]</span></a>
         </div>
       </div>
       <div>
         <p class="info-block-label">Note</p>
         <div class="info-block-content">
           Si prega di segnalare eventuali allergie o intolleranze al momento della prenotazione.<br><br>
-          &#128062; Accettiamo animali di tutte le taglie.
+          &#x1F43E; Accettiamo animali di tutte le taglie.
         </div>
       </div>
     </div>
@@ -295,13 +385,19 @@
       </div>
       <div class="reveal" style="transition-delay:0.15s">
         <div class="map-wrapper">
-          <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=8.960702%2C44.387346%2C8.968702%2C44.395346&layer=mapnik&marker=44.391346%2C8.964702" loading="lazy" title="Mappa Santamonica Genova"></iframe>
-          <div class="map-footer">
-            <div class="map-footer-addr">
-              <span class="map-footer-label">Santamonica sul mare</span>
+          <iframe
+            src="https://www.openstreetmap.org/export/embed.html?bbox=8.960702%2C44.387346%2C8.968702%2C44.395346&layer=mapnik&marker=44.391346%2C8.964702"
+            height="380"
+            allowfullscreen
+            loading="lazy"
+            title="Mappa Santamonica Genova">
+          </iframe>
+          <div class="map-bar">
+            <div class="map-bar-address">
+              <span class="map-bar-label">Santamonica</span>
               Lungomare Lombardo 27 &mdash; Genova
             </div>
-            <a href="https://www.openstreetmap.org/?mlat=44.391346&mlon=8.964702#map=17/44.391346/8.964702" target="_blank" class="map-footer-link">Apri in Maps &rarr;</a>
+            <a href="https://www.openstreetmap.org/?mlat=44.391346&mlon=8.964702#map=17/44.391346/8.964702" target="_blank" class="map-bar-link">Apri in Maps &rarr;</a>
           </div>
         </div>
       </div>
@@ -320,42 +416,153 @@
   </div>
 </footer>
 
-<script>
-  const nav = document.getElementById('main-nav');
-  window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 60); });
-  const hamburger = document.getElementById('hamburger');
-  const mobileMenu = document.getElementById('mobile-menu');
-  const menuClose = document.getElementById('menu-close');
-  hamburger.addEventListener('click', () => mobileMenu.classList.add('open'));
-  menuClose.addEventListener('click', () => mobileMenu.classList.remove('open'));
-  document.querySelectorAll('.mobile-link').forEach(a => { a.addEventListener('click', () => mobileMenu.classList.remove('open')); });
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+<!-- POPUP PRENOTAZIONE -->
+<div id="booking-overlay" role="dialog" aria-modal="true" aria-label="Prenota un tavolo">
+  <div id="booking-popup">
+    <button class="popup-close" id="popup-close" aria-label="Chiudi">&#x2715;</button>
+    <span class="popup-label">Prenota ora</span>
+    <h2>Un tavolo <em>sul mare</em></h2>
+    <p>Siamo aperti dal marted&igrave; alla domenica. Prenota il tuo tavolo e vivi un&rsquo;esperienza di cucina ligure autentica.</p>
+    <div class="popup-actions">
+      <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" class="btn-primary" style="text-align:center;" onclick="closePopup()">Prenota su TheFork</a>
+      <button class="popup-skip" id="popup-skip">Magari un&rsquo;altra volta</button>
+    </div>
+  </div>
+</div>
+
+<div id="cookie-banner" role="dialog" aria-label="Consenso cookie">
+  <p>Questo sito utilizza cookie tecnici necessari al funzionamento e, previo consenso, cookie analitici (Google Analytics) per migliorare l&rsquo;esperienza di navigazione. Leggi la nostra <a href="/privacy-policy">Privacy Policy</a> e <a href="/cookies">Cookie Policy</a>.</p>
+  <div class="cookie-actions">
+    <button class="cookie-btn cookie-decline" id="cookie-decline">Solo necessari</button>
+    <button class="cookie-btn cookie-accept" id="cookie-accept">Accetta tutti</button>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+
+  // Popup prenotazione
+  var popupShown = sessionStorage.getItem('popup-shown');
+  if (!popupShown) {
+    setTimeout(function() {
+      document.getElementById('booking-overlay').classList.add('visible');
+      sessionStorage.setItem('popup-shown', '1');
+    }, 5000);
+  }
+  function closePopup() {
+    document.getElementById('booking-overlay').classList.remove('visible');
+  }
+  document.getElementById('popup-close').addEventListener('click', closePopup);
+  document.getElementById('popup-skip').addEventListener('click', closePopup);
+  document.getElementById('booking-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closePopup();
+  });
+
+
+  // Lightbox
+  var galleryImages = [
+    { src: 'img/piatto-pesce.jpg', alt: 'Pesce alla griglia' },
+    { src: 'img/piatto-tonno.jpg', alt: 'Tonno scottato' },
+    { src: 'img/piatto-pasta.jpg', alt: 'Pasta fresca' },
+    { src: 'img/piatto-carne.jpg', alt: 'Secondo piatto' },
+    { src: 'img/piatto-dessert.jpg', alt: 'Dessert' }
+  ];
+  var currentImg = 0;
+  function openLightbox(i) {
+    currentImg = i;
+    document.getElementById('lightbox-img').src = galleryImages[i].src;
+    document.getElementById('lightbox-img').alt = galleryImages[i].alt;
+    document.getElementById('lightbox').classList.add('visible');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('visible');
+    document.body.style.overflow = '';
+  }
+  function changeLightbox(dir) {
+    currentImg = (currentImg + dir + galleryImages.length) % galleryImages.length;
+    document.getElementById('lightbox-img').src = galleryImages[currentImg].src;
+    document.getElementById('lightbox-img').alt = galleryImages[currentImg].alt;
+  }
+  document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this) closeLightbox();
+  });
+  document.addEventListener('keydown', function(e) {
+    var lb = document.getElementById('lightbox');
+    if (!lb.classList.contains('visible')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') changeLightbox(-1);
+    if (e.key === 'ArrowRight') changeLightbox(1);
+  });
+
+  var nav = document.getElementById('main-nav');
+  window.addEventListener('scroll', function() {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  document.getElementById('hamburger').addEventListener('click', function() {
+    document.getElementById('mobile-menu').classList.add('open');
+  });
+  document.getElementById('menu-close').addEventListener('click', function() {
+    document.getElementById('mobile-menu').classList.remove('open');
+  });
+  document.querySelectorAll('.mobile-link').forEach(function(a) {
+    a.addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.remove('open');
+    });
+  });
+
+  var reveals = document.querySelectorAll('.reveal');
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+    });
   }, { threshold: 0.12 });
-  reveals.forEach(el => observer.observe(el));
-  const form = document.getElementById('contact-form');
-  const btn = document.getElementById('submit-btn');
-  const status = document.getElementById('form-status');
-  form.addEventListener('submit', async (e) => {
+  reveals.forEach(function(el) { observer.observe(el); });
+
+  var form = document.getElementById('contact-form');
+  var btn = document.getElementById('submit-btn');
+  var status = document.getElementById('form-status');
+  form.addEventListener('submit', async function(e) {
     e.preventDefault();
     btn.textContent = 'Invio in corso...';
     btn.disabled = true;
     status.className = 'form-status';
     try {
-      const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } });
+      var res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
       if (res.ok) {
-        status.textContent = 'Messaggio inviato! Ti risponderemo al piu presto.';
+        status.textContent = 'Messaggio inviato! Ti risponderemo al pi\u00f9 presto.';
         status.className = 'form-status success';
         form.reset();
       } else { throw new Error(); }
-    } catch {
-      status.textContent = 'Errore invio. Scrivici a santamonicagenova@gmail.com';
+    } catch(err) {
+      status.textContent = 'Errore nell\u2019invio. Scrivici a santamonicagenova@gmail.com';
       status.className = 'form-status error';
     }
     btn.textContent = 'Invia messaggio';
     btn.disabled = false;
   });
-</script>
-</body>
-</html>
+
+  function loadGA() {
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-YP71EKXSXX';
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', 'G-YP71EKXSXX', { anonymize_ip: true });
+  }
+
+  var banner = document.getElementById('cookie-banner');
+  var choice = localStorage.getItem('cookie-choice');
+  if (!choice) {
+    setTimeout(function() { banner.classList.add('visible'); }, 1200);
+  } else if (choice === 'accepted') {
+    loadGA();
+  }
+  document.getElementById('cookie-accept').addEventListener('clic

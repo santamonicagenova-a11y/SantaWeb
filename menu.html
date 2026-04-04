@@ -347,85 +347,216 @@
    MENÙ  —  modifica solo qui per aggiornare tutto
    ═══════════════════════════════════════════════════════ */
 const MENU = {
-
   "degustazione": {
     "opzioni": [
-      { "portate": 6, "prezzo": 90, "vini": 60 },
-      { "portate": 7, "prezzo": 110, "vini": 70 }
+      {
+        "portate": 6,
+        "prezzo": 90,
+        "vini": 60
+      },
+      {
+        "portate": 7,
+        "prezzo": 110,
+        "vini": 70
+      }
     ],
     "nota": "Prezzo a persona, menù da considerarsi per l'intero tavolo.",
     "percorsi": {
       "6": [
-        { "nome": "Ali di razza, fave nostrane, mela verde, mandorle", "sostenibile": true },
-        { "nome": "Animella di vitello, sedano rapa, nocciole, fondo di pesce", "sostenibile": true },
-        { "nome": "Tortelli di cinghiale, dashi di orata, cipollina, shiso" },
-        { "nome": "Tubetti “<em>Mancini</em>”, baccalà, kosho di agrumi, borlotti", "sostenibile": true },
-        { "nome": "Ombrina nostrana pescata ad amo, salicornia, indivia belga", "sostenibile": true },
-        { "nome": "Gelato al limone nero, levistico, lime, cracker di latte" }
+        {
+          "nome": "Ali di razza, fave nostrane, mela verde, mandorle",
+          "sostenibile": true
+        },
+        {
+          "nome": "Animella di vitello, sedano rapa, nocciole, fondo di pesce",
+          "sostenibile": true
+        },
+        {
+          "nome": "Tortelli di cinghiale, dashi di orata, cipollina, shiso"
+        },
+        {
+          "nome": "Tubetti “<em>Mancini</em>”, baccalà, kosho di agrumi, borlotti",
+          "sostenibile": true
+        },
+        {
+          "nome": "Ombrina nostrana pescata ad amo, salicornia, indivia belga",
+          "sostenibile": true
+        },
+        {
+          "nome": "Gelato al limone nero, levistico, lime, cracker di latte"
+        }
       ],
       "7": "Menù a mano libera dello Chef"
     }
   },
-
   "sezioni": [
     {
       "titolo": "Crudi",
       "piatti": [
-        { "nome": "Ostriche Fine de Claire", "prezzo": 4, "unita": "cad." },
-        { "nome": "Ostriche Antilope", "prezzo": 7, "unita": "cad." },
-        { "nome": "Ostriche Enrico IV", "prezzo": 8, "unita": "cad." },
-        { "nome": "Scampi nostrani", "prezzo": 17, "unita": "cad.", "sostenibile": true },
-        { "nome": "Gamberi viola nostrani", "prezzo": 11, "unita": "cad.", "sostenibile": true },
-        { "nome": "Selezione solamente di pesci nostrani pescati ad amo", "prezzo": 37, "sostenibile": true, "staccato": true },
-        { "nome": "Degustazione di mare", "prezzo": 80, "sostenibile": true, "staccato": true }
+        {
+          "nome": "Ostriche Fine de Claire",
+          "prezzo": 4,
+          "unita": "cad."
+        },
+        {
+          "nome": "Ostriche Antilope",
+          "prezzo": 7,
+          "unita": "cad."
+        },
+        {
+          "nome": "Ostriche Enrico IV",
+          "prezzo": 8,
+          "unita": "cad."
+        },
+        {
+          "nome": "Scampi nostrani",
+          "prezzo": 17,
+          "unita": "cad.",
+          "sostenibile": true
+        },
+        {
+          "nome": "Gamberi viola nostrani",
+          "prezzo": 11,
+          "unita": "cad.",
+          "sostenibile": true
+        },
+        {
+          "nome": "Selezione solamente di pesci nostrani pescati ad amo",
+          "prezzo": 37,
+          "sostenibile": true,
+          "staccato": true
+        },
+        {
+          "nome": "Degustazione di mare",
+          "prezzo": 80,
+          "sostenibile": true,
+          "staccato": true
+        }
       ]
     },
     {
       "titolo": "Sfiziosi",
       "piatti": [
-        { "nome": "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir", "prezzo": 20, "sostenibile": true },
-        { "nome": "Cavolo cappuccio, miso, lamponi, anacardi", "prezzo": 16 },
-        { "nome": "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce", "prezzo": 22, "sostenibile": true },
-        { "nome": "Ali di razza, fave nostrane, mela verde, mandorle", "prezzo": 24, "sostenibile": true },
-        { "nome": "“Non formaggi”", "prezzo": 22, "descrizione": "(Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla)" }
+        {
+          "nome": "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir",
+          "prezzo": 20,
+          "sostenibile": true
+        },
+        {
+          "nome": "Cavolo cappuccio, miso, lamponi, anacardi",
+          "prezzo": 16
+        },
+        {
+          "nome": "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce",
+          "prezzo": 22,
+          "sostenibile": true
+        },
+        {
+          "nome": "Ali di razza, fave nostrane, mela verde, mandorle",
+          "prezzo": 24,
+          "sostenibile": true
+        },
+        {
+          "nome": "“Non formaggi”",
+          "prezzo": 22,
+          "descrizione": "(Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla)"
+        }
       ]
     },
     {
       "titolo": "Amidi e Carboidrati",
       "piatti": [
-        { "nome": "Spaghettoni quadrati “<em>Mancini</em>”, anemoni di mare, nduja, maggiorana", "prezzo": 32, "sostenibile": true },
-        { "nome": "Tortelli di cinghiale, dashi di orata, cipollina, shiso", "prezzo": 26, "sostenibile": true },
-        { "nome": "Tubetti “<em>Mancini</em>”, baccalà, il nostro kosho di agrumi fermentato, borlotti", "prezzo": 24, "sostenibile": true },
-        { "nome": "Riso “<em>Riserva San Massimo</em>”, ragù di lepre, cime di rapa, Parmigiano Reggiano", "prezzo": 26 }
+        {
+          "nome": "Spaghettoni quadrati “<em>Mancini</em>”, anemoni di mare, nduja, maggiorana",
+          "prezzo": 32,
+          "sostenibile": true
+        },
+        {
+          "nome": "Tortelli di cinghiale, dashi di orata, cipollina, shiso",
+          "prezzo": 26,
+          "sostenibile": true
+        },
+        {
+          "nome": "Tubetti “<em>Mancini</em>”, baccalà, il nostro kosho di agrumi fermentato, borlotti",
+          "prezzo": 24,
+          "sostenibile": true
+        },
+        {
+          "nome": "Riso “<em>Riserva San Massimo</em>”, ragù di lepre, cime di rapa, Parmigiano Reggiano",
+          "prezzo": 26
+        }
       ]
     },
     {
       "titolo": "Non Solo Mare",
       "piatti": [
-        { "nome": "Polpo nostrano, rabarbaro, piselli", "prezzo": 28, "sostenibile": true },
-        { "nome": "Zucchina alla scapece, menta, yogurt, pepe Timut", "prezzo": 18 },
-        { "nome": "Ombrina nostrana pescata ad amo, salicornia, indivia belga", "prezzo": 32, "sostenibile": true },
-        { "nome": "Picanha, cardoncelli, fondo di manzo", "prezzo": 28 }
+        {
+          "nome": "Polpo nostrano, rabarbaro, piselli",
+          "prezzo": 28,
+          "sostenibile": true
+        },
+        {
+          "nome": "Zucchina alla scapece, menta, yogurt, pepe Timut",
+          "prezzo": 18
+        },
+        {
+          "nome": "Ombrina nostrana pescata ad amo, salicornia, indivia belga",
+          "prezzo": 32,
+          "sostenibile": true
+        },
+        {
+          "nome": "Picanha, cardoncelli, fondo di manzo",
+          "prezzo": 28
+        }
       ]
     }
   ],
-
   "pagine": [
-    { "sezioni": ["Crudi", "Sfiziosi"] },
-    { "sezioni": ["Amidi e Carboidrati", "Non Solo Mare"] }
+    {
+      "sezioni": [
+        "Crudi",
+        "Sfiziosi"
+      ]
+    },
+    {
+      "sezioni": [
+        "Amidi e Carboidrati",
+        "Non Solo Mare"
+      ]
+    }
   ],
-
   "orario": {
-    "colSinistra": ["Crudi", "Non Solo Mare"],
-    "colDestra":   ["Amidi e Carboidrati", "Sfiziosi"],
+    "colSinistra": [
+      "Crudi",
+      "Non Solo Mare"
+    ],
+    "colDestra": [
+      "Amidi e Carboidrati",
+      "Sfiziosi"
+    ],
     "separatoreDopo": "Crudi",
     "orarioServizio": [
-      { "giorno": "Martedì",                "fasce": ["19:30 – 22:30"] },
-      { "giorno": "Dal mercoledì al sabato", "fasce": ["12:30 – 14:30", "19:30 – 22:30"] },
-      { "giorno": "Domenica",               "fasce": ["12:30 – 14:30"] }
+      {
+        "giorno": "Martedì",
+        "fasce": [
+          "19:30 – 22:30"
+        ]
+      },
+      {
+        "giorno": "Dal mercoledì al sabato",
+        "fasce": [
+          "12:30 – 14:30",
+          "19:30 – 22:30"
+        ]
+      },
+      {
+        "giorno": "Domenica",
+        "fasce": [
+          "12:30 – 14:30"
+        ]
+      }
     ]
   }
-
 };
 /* ═════════════════════════════════════════════════════════ */
 

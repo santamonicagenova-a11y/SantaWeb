@@ -19,6 +19,15 @@
     .btn-save:hover { opacity:.85; }
     .btn-load { background:transparent; border:1px solid var(--cream); color:var(--cream); }
     .btn-load:hover { background:rgba(255,255,255,.1); }
+    .btn-publish { background:#2d6a4f; color:#fff; }
+    .btn-publish:hover { opacity:.85; }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; align-items:center; justify-content:center; }
+    .modal-overlay.on { display:flex; }
+    .modal { background:#fff; padding:2rem; max-width:440px; width:90%; border:1px solid var(--rule); }
+    .modal h3 { font-size:.8rem; font-weight:500; letter-spacing:.14em; text-transform:uppercase; margin-bottom:1rem; color:var(--stone); }
+    .modal p { font-size:.82rem; line-height:1.6; margin-bottom:1rem; color:var(--stone); }
+    .modal input { width:100%; padding:.4rem .6rem; border:1px solid var(--rule); font-family:'Jost',sans-serif; font-size:.82rem; margin-bottom:.8rem; }
+    .modal-btns { display:flex; gap:.5rem; justify-content:flex-end; }
 
     .intro { max-width:700px; margin:2rem auto; padding:1.5rem 2rem; background:#fff; border:1px solid var(--rule); }
     .intro h2 { font-size:.8rem; font-weight:500; letter-spacing:.14em; text-transform:uppercase; margin-bottom:.8rem; color:var(--stone); }
@@ -62,17 +71,19 @@
     <h1>Admin Menù</h1>
   </div>
   <div class="top-btns">
-    <button class="btn btn-load" onclick="document.getElementById('file-input').click()">↑ Carica menu.html</button>
-    <button class="btn btn-save" onclick="salva()">↓ Scarica menu.html aggiornato</button>
+    <button class="btn btn-load" onclick="caricaDalSito()">↓ Carica dal sito</button>
+    <button class="btn btn-load" onclick="document.getElementById('file-input').click()">↑ Carica da file</button>
+    <button class="btn btn-save" onclick="apriPreview()">⧉ Preview</button>
+    <button class="btn btn-publish" onclick="pubblicaSuGithub()">✦ Pubblica su GitHub</button>
   </div>
 </div>
 
 <div class="intro" id="intro">
   <h2>Come si usa</h2>
-  <p><strong>1.</strong> Clicca il pulsante qui sotto e seleziona il file <code>menu.html</code> dal tuo computer.</p>
+  <p><strong>1.</strong> Clicca <strong>Carica dal sito</strong> per caricare automaticamente il menù attivo, oppure <strong>Carica da file</strong> per selezionarlo dal computer.</p>
   <p><strong>2.</strong> Modifica prezzi, nomi, asterischi.</p>
-  <p><strong>3.</strong> Clicca <em>Scarica menu.html aggiornato</em> in alto — sostituisci il vecchio file.</p>
-  <label for="file-input">↑ Seleziona menu.html</label>
+  <p><strong>3.</strong> Clicca <strong>Preview</strong> per vedere il risultato, poi <strong>Pubblica su GitHub</strong> per aggiornare il sito.</p>
+  <label for="file-input">↑ Carica da file</label>
   <input type="file" id="file-input" accept=".html" onchange="carica(this)" />
   <div class="err" id="err"></div>
 </div>
@@ -226,23 +237,128 @@ function leggi() {
   return m;
 }
 
-function salva() {
-  if (!dati) { alert('Prima carica il file menu.html'); return; }
+var MENU_URL = 'https://santamonicagenova-a11y.github.io/SantaWeb/menu.html';
+var REPO_OWNER = 'santamonicagenova-a11y';
+var REPO_NAME  = 'SantaWeb';
+var MENU_PATH  = 'menu.html';
+var outputCorrente = '';
+
+function costruisciOutput() {
   var m = leggi();
   var sep = '/* ' + '\u2550'.repeat(57) + ' */\n';
   var blocco = 'const MENU = ' + JSON.stringify(m, null, 2) + ';\n' + sep;
-  var output = tplBefore + blocco + tplAfter;
+  return tplBefore + blocco + tplAfter;
+}
 
-  // Apre il menu.html aggiornato in una nuova scheda
+function salva() { apriPreview(); }
+
+function apriPreview() {
+  if (!dati) { alert('Prima carica il menù'); return; }
+  outputCorrente = costruisciOutput();
   var win = window.open('', '_blank');
-  win.document.write(output);
+  win.document.write(outputCorrente);
   win.document.close();
   win.focus();
+}
 
+function caricaDalSito() {
+  var btn = document.querySelector('.btn-load');
+  document.getElementById('err').textContent = '';
+  fetch(MENU_URL + '?nocache=' + Date.now())
+    .then(function(r) {
+      if (!r.ok) throw new Error('Errore HTTP ' + r.status);
+      return r.text();
+    })
+    .then(function(src) {
+      try {
+        analizza(src);
+        document.getElementById('intro').style.display = 'none';
+        document.getElementById('wrap').classList.add('on');
+        costruisci();
+        toast('✓ Menù caricato dal sito');
+      } catch(ex) {
+        document.getElementById('err').textContent = 'Errore: ' + ex.message;
+      }
+    })
+    .catch(function(ex) {
+      document.getElementById('err').textContent = 'Impossibile caricare: ' + ex.message;
+    });
+}
+
+function pubblicaSuGithub() {
+  if (!dati) { alert('Prima carica il menù'); return; }
+  outputCorrente = costruisciOutput();
+  var token = localStorage.getItem('gh_token') || '';
+  document.getElementById('token-input').value = token;
+  document.getElementById('modal-token').classList.add('on');
+}
+
+function chiudiModal() {
+  document.getElementById('modal-token').classList.remove('on');
+}
+
+function confermaPubblica() {
+  var token = document.getElementById('token-input').value.trim();
+  if (!token) { alert('Inserisci il token'); return; }
+  localStorage.setItem('gh_token', token);
+  chiudiModal();
+
+  // Ottieni SHA del file corrente poi aggiorna
+  var apiBase = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + MENU_PATH;
+  var headers = {
+    'Authorization': 'token ' + token,
+    'Accept': 'application/vnd.github.v3+json',
+    'Content-Type': 'application/json'
+  };
+
+  fetch(apiBase, { headers: headers })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var sha = data.sha;
+      var content = btoa(unescape(encodeURIComponent(outputCorrente)));
+      return fetch(apiBase, {
+        method: 'PUT',
+        headers: headers,
+        body: JSON.stringify({
+          message: 'Aggiornamento menù',
+          content: content,
+          sha: sha
+        })
+      });
+    })
+    .then(function(r) {
+      if (r.ok) {
+        toast('✓ Menù pubblicato su GitHub!');
+      } else {
+        return r.json().then(function(e) { throw new Error(e.message); });
+      }
+    })
+    .catch(function(ex) {
+      alert('Errore pubblicazione: ' + ex.message);
+    });
+}
+
+function toast(msg) {
   var t = document.getElementById('toast');
+  t.textContent = msg;
   t.classList.add('on');
-  setTimeout(function(){ t.classList.remove('on'); }, 2500);
+  setTimeout(function(){ t.classList.remove('on'); }, 3000);
 }
 </script>
+<!-- MODALE TOKEN GITHUB -->
+<div class="modal-overlay" id="modal-token">
+  <div class="modal">
+    <h3>Token GitHub</h3>
+    <p>Inserisci il tuo Personal Access Token GitHub con permesso <code>repo</code>.<br>
+    Viene salvato solo nel tuo browser e non condiviso con nessuno.<br>
+    <a href="https://github.com/settings/tokens/new?scopes=repo&description=SantaWeb+Menu+Admin" target="_blank" style="color:var(--rust)">Genera un nuovo token →</a></p>
+    <input type="password" id="token-input" placeholder="ghp_..." />
+    <div class="modal-btns">
+      <button class="btn btn-load" onclick="chiudiModal()" style="border:1px solid var(--ink);color:var(--ink)">Annulla</button>
+      <button class="btn btn-publish" onclick="confermaPubblica()">Pubblica</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

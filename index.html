@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Santamonica — Ristorante Genova</title>
 <meta name="description" content="Ristorante Santamonica sul mare a Genova. Cucina di mare contemporanea, pesce fresco di Camogli, terrazza sul lungomare. Lungomare Lombardo 27.">
 
@@ -41,7 +44,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ── NAV ── */
+/* NAV */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
@@ -71,23 +74,14 @@ nav.scrolled {
   padding: 0.55rem 1.2rem; text-decoration: none; transition: background 0.2s;
 }
 .nav-cta:hover { background: var(--terracotta); }
-.hamburger {
-  display: none; flex-direction: column; gap: 5px;
-  cursor: pointer; background: none; border: none;
-}
-.hamburger span { display: block; width: 24px; height: 1.5px; background: var(--ink); transition: 0.3s; }
+.hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; }
+.hamburger span { display: block; width: 24px; height: 1.5px; background: var(--ink); }
 
-/* ── HERO ── */
-.hero {
-  min-height: 100svh;
-  display: grid; grid-template-columns: 1fr 1fr;
-  overflow: hidden;
-}
+/* HERO */
+.hero { min-height: 100svh; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; }
 .hero-text-panel {
   display: flex; flex-direction: column; justify-content: flex-end;
-  padding: 8rem 4rem 5rem;
-  background: var(--sand);
-  position: relative; z-index: 2;
+  padding: 8rem 4rem 5rem; background: var(--sand); position: relative; z-index: 2;
 }
 .hero-eyebrow {
   font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase;
@@ -97,66 +91,49 @@ nav.scrolled {
 .hero-title {
   font-family: 'Cormorant Garamond', serif;
   font-size: clamp(3.5rem, 8vw, 6rem); font-weight: 300;
-  line-height: 0.95; letter-spacing: -0.01em;
-  color: var(--ink); margin-bottom: 2rem;
+  line-height: 0.95; color: var(--ink); margin-bottom: 2rem;
   opacity: 0; animation: fadeUp 0.8s 0.35s forwards;
 }
 .hero-title em { font-style: italic; color: var(--terracotta); }
 .hero-desc {
-  font-size: 0.88rem; line-height: 1.75;
-  color: var(--ink-soft); max-width: 380px; margin-bottom: 3rem;
+  font-size: 0.88rem; line-height: 1.75; color: var(--ink-soft);
+  max-width: 380px; margin-bottom: 3rem;
   opacity: 0; animation: fadeUp 0.8s 0.5s forwards;
 }
-.hero-actions {
-  display: flex; gap: 1rem; flex-wrap: wrap;
-  opacity: 0; animation: fadeUp 0.8s 0.65s forwards;
-}
+.hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.8s 0.65s forwards; }
 .btn-primary {
-  display: inline-block;
-  font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--warm-white); background: var(--ink);
-  padding: 0.9rem 2rem; text-decoration: none; transition: background 0.2s;
+  display: inline-block; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--warm-white); background: var(--ink); padding: 0.9rem 2rem;
+  text-decoration: none; transition: background 0.2s;
 }
 .btn-primary:hover { background: var(--terracotta); }
 .btn-secondary {
-  display: inline-block;
-  font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--ink); border: 1px solid var(--ink);
-  padding: 0.9rem 2rem; text-decoration: none; transition: all 0.2s;
+  display: inline-block; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink); border: 1px solid var(--ink); padding: 0.9rem 2rem;
+  text-decoration: none; transition: all 0.2s;
 }
 .btn-secondary:hover { background: var(--ink); color: var(--warm-white); }
 .hero-image-panel { position: relative; overflow: hidden; }
 .hero-image-panel img {
   width: 100%; height: 100%; object-fit: cover;
-  transform: scale(1.05);
-  animation: zoomOut 1.4s 0.1s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
+  transform: scale(1.05); animation: zoomOut 1.4s 0.1s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
 }
 .hero-scroll-indicator {
   position: absolute; bottom: 2.5rem; left: 4rem;
   display: flex; align-items: center; gap: 0.8rem;
-  font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase;
-  color: var(--ink-soft);
+  font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--ink-soft);
   opacity: 0; animation: fadeUp 1s 1s forwards;
 }
-.hero-scroll-indicator::before {
-  content: ''; display: block; width: 40px; height: 1px; background: var(--gold);
-}
+.hero-scroll-indicator::before { content: ''; display: block; width: 40px; height: 1px; background: var(--gold); }
 
-/* ── SECTIONS ── */
+/* SECTIONS */
 section { padding: 6rem 2rem; }
 .section-inner { max-width: 1200px; margin: 0 auto; }
-.section-label {
-  font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase;
-  color: var(--terracotta); margin-bottom: 1rem;
-}
-.section-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 300; line-height: 1.1;
-  margin-bottom: 1.5rem;
-}
+.section-label { font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 1rem; }
+.section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 300; line-height: 1.1; margin-bottom: 1.5rem; }
 .section-title em { font-style: italic; color: var(--terracotta); }
 
-/* ── CUCINA ── */
+/* CUCINA */
 .cucina-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
 .cucina-body { font-size: 0.9rem; line-height: 1.9; color: var(--ink-soft); }
 .cucina-body p + p { margin-top: 1rem; }
@@ -166,16 +143,15 @@ section { padding: 6rem 2rem; }
 .cucina-images img:first-child { margin-top: 3rem; }
 .cucina-images img:hover { transform: scale(1.02); }
 
-/* ── QUOTE ── */
+/* QUOTE */
 .quote-section { background: var(--ink); padding: 5rem 2rem; text-align: center; }
 .quote-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(1.6rem, 4vw, 3rem); font-weight: 300; font-style: italic;
-  color: var(--sand); line-height: 1.4; max-width: 800px; margin: 0 auto 1rem;
+  font-family: 'Cormorant Garamond', serif; font-size: clamp(1.6rem, 4vw, 3rem);
+  font-weight: 300; font-style: italic; color: var(--sand); line-height: 1.4; max-width: 800px; margin: 0 auto 1rem;
 }
 .quote-attr { font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); }
 
-/* ── CANTINA ── */
+/* CANTINA */
 .cantina-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
 .cantina-image { position: relative; }
 .cantina-image img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
@@ -184,26 +160,20 @@ section { padding: 6rem 2rem; }
   border: 1px solid var(--gold); z-index: -1; pointer-events: none;
 }
 
-/* ── MENÙ LINK ── */
+/* MENU */
 .menu-section { background: var(--sand); }
 .menu-inner { max-width: 700px; margin: 0 auto; text-align: center; }
 .menu-inner .section-title { margin-bottom: 1rem; }
 .menu-body { font-size: 0.9rem; line-height: 1.85; color: var(--ink-soft); margin-bottom: 2.5rem; }
 
-/* ── INFO ── */
-.info-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem;
-  padding-top: 3rem; border-top: 1px solid var(--divider);
-}
-.info-block-label {
-  font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase;
-  color: var(--gold); margin-bottom: 1rem;
-}
+/* INFO */
+.info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; padding-top: 3rem; border-top: 1px solid var(--divider); }
+.info-block-label { font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
 .info-block-content { font-size: 0.88rem; line-height: 2; color: var(--ink-soft); }
 .info-block-content a { color: var(--ink); text-decoration: none; }
 .info-block-content a:hover { color: var(--terracotta); }
 
-/* ── REGALO ── */
+/* REGALO */
 .regalo-section { background: var(--ink); }
 .regalo-inner { max-width: 700px; margin: 0 auto; text-align: center; }
 .regalo-inner .section-title { margin-bottom: 1rem; color: var(--sand); }
@@ -211,81 +181,48 @@ section { padding: 6rem 2rem; }
 .regalo-inner .section-label { color: var(--gold); }
 .regalo-body { font-size: 0.9rem; line-height: 1.85; color: rgba(245,240,232,0.7); margin-bottom: 2.5rem; }
 
-/* ── CONTATTI ── */
+/* CONTATTI */
 .contatti-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
 .form-group { margin-bottom: 1.5rem; }
-.form-group label {
-  display: block; font-size: 0.65rem; letter-spacing: 0.2em;
-  text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.5rem;
+.form-group label { display: block; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.5rem; }
+.form-group input, .form-group textarea {
+  width: 100%; padding: 0.85rem 0; border: none; border-bottom: 1px solid var(--divider);
+  background: transparent; font-family: 'Jost', sans-serif; font-size: 0.9rem; color: var(--ink);
+  outline: none; transition: border-color 0.2s; resize: none;
 }
-.form-group input,
-.form-group textarea {
-  width: 100%; padding: 0.85rem 0;
-  border: none; border-bottom: 1px solid var(--divider);
-  background: transparent; font-family: 'Jost', sans-serif;
-  font-size: 0.9rem; color: var(--ink); outline: none;
-  transition: border-color 0.2s; resize: none;
-}
-.form-group input:focus,
-.form-group textarea:focus { border-bottom-color: var(--terracotta); }
+.form-group input:focus, .form-group textarea:focus { border-bottom-color: var(--terracotta); }
 .form-group textarea { min-height: 100px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
 .form-check { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 2rem; }
 .form-check input[type=checkbox] { margin-top: 2px; accent-color: var(--terracotta); flex-shrink: 0; }
 .form-check label { font-size: 0.75rem; color: var(--ink-soft); line-height: 1.5; }
 .form-check label a { color: var(--terracotta); text-decoration: none; }
-.form-success {
-  display: none; padding: 1rem; background: #eaf4ee;
-  border-left: 3px solid #2d6a4f; font-size: 0.85rem; color: #2d6a4f; margin-top: 1rem;
-}
+.form-success { display: none; padding: 1rem; background: #eaf4ee; border-left: 3px solid #2d6a4f; font-size: 0.85rem; color: #2d6a4f; margin-top: 1rem; }
 
-/* ── MAPPA ── */
-#map {
-  width: 100%; height: 100%; min-height: 420px;
-  background: var(--sand);
-}
+/* MAPPA */
+#map { width: 100%; height: 100%; min-height: 420px; background: var(--sand); }
 
-/* ── FOOTER ── */
+/* FOOTER */
 footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
-.footer-inner {
-  max-width: 1200px; margin: 0 auto;
-  display: flex; justify-content: space-between; align-items: center;
-  flex-wrap: wrap; gap: 1.5rem;
-}
-.footer-logo {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.1rem; letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--sand); text-decoration: none;
-}
+.footer-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
+.footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sand); text-decoration: none; }
 .footer-social { display: flex; gap: 1.5rem; }
-.footer-social a {
-  font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--gold); text-decoration: none; transition: color 0.2s;
-}
+.footer-social a { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); text-decoration: none; transition: color 0.2s; }
 .footer-social a:hover { color: var(--sand); }
 .footer-copy { font-size: 0.68rem; color: rgba(245,240,232,0.4); letter-spacing: 0.1em; }
 
-/* ── MOBILE MENU ── */
-.mobile-menu {
-  display: none; position: fixed; inset: 0; z-index: 200;
-  background: var(--warm-white);
-  flex-direction: column; justify-content: center; align-items: center; gap: 2.5rem;
-}
+/* MOBILE MENU */
+.mobile-menu { display: none; position: fixed; inset: 0; z-index: 200; background: var(--warm-white); flex-direction: column; justify-content: center; align-items: center; gap: 2.5rem; }
 .mobile-menu.open { display: flex; }
-.mobile-menu a {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 2rem; font-weight: 300; font-style: italic;
-  color: var(--ink); text-decoration: none; transition: color 0.2s;
-}
+.mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; font-style: italic; color: var(--ink); text-decoration: none; transition: color 0.2s; }
 .mobile-menu a:hover { color: var(--terracotta); }
 .menu-close { position: absolute; top: 1.5rem; right: 2rem; background: none; border: none; cursor: pointer; font-size: 1.5rem; color: var(--ink); }
 
-/* ── COOKIE BANNER ── */
+/* COOKIE BANNER */
 #cookie-banner {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
   background: var(--ink); color: var(--sand);
-  padding: 1.2rem 2rem;
-  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.2rem 2rem; display: flex; align-items: center; justify-content: space-between;
   gap: 1.5rem; flex-wrap: wrap;
   transform: translateY(100%); transition: transform 0.4s;
 }
@@ -293,26 +230,17 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
 #cookie-banner p { font-size: 0.78rem; line-height: 1.55; color: rgba(245,240,232,0.8); max-width: 700px; }
 #cookie-banner p a { color: var(--gold); text-decoration: none; }
 .cookie-btns { display: flex; gap: 0.75rem; flex-shrink: 0; }
-.cookie-btns button {
-  font-family: 'Jost', sans-serif; font-size: 0.68rem; letter-spacing: 0.15em;
-  text-transform: uppercase; padding: 0.5rem 1.2rem; cursor: pointer; border: none;
-}
+.cookie-btns button { font-family: 'Jost', sans-serif; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.5rem 1.2rem; cursor: pointer; border: none; }
 #cookie-accept { background: var(--terracotta); color: #fff; }
 #cookie-refuse { background: transparent; color: rgba(245,240,232,0.6); border: 1px solid rgba(245,240,232,0.25) !important; }
 
-/* ── ANIMATIONS ── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes zoomOut {
-  from { transform: scale(1.05); }
-  to   { transform: scale(1); }
-}
+/* ANIMATIONS */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes zoomOut { from { transform: scale(1.05); } to { transform: scale(1); } }
 .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
 .reveal.visible { opacity: 1; transform: none; }
 
-/* ── RESPONSIVE ── */
+/* RESPONSIVE */
 @media (max-width: 900px) {
   nav { padding: 1rem 1.5rem; }
   .nav-links, .nav-cta { display: none; }
@@ -338,7 +266,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
 
 <!-- COOKIE BANNER -->
 <div id="cookie-banner">
-  <p>Questo sito utilizza cookie tecnici per il corretto funzionamento e, previo consenso, cookie di analisi (Google Analytics). Leggi la nostra <a href="#" onclick="return false">Privacy Policy</a>.</p>
+  <p>Questo sito utilizza cookie tecnici e, previo consenso, cookie di analisi (Google Analytics). <a href="#" onclick="return false">Privacy Policy</a>.</p>
   <div class="cookie-btns">
     <button id="cookie-refuse">Solo necessari</button>
     <button id="cookie-accept">Accetta tutti</button>
@@ -441,7 +369,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
   </div>
 </section>
 
-<!-- MENÙ -->
+<!-- MENU -->
 <section id="menu" class="menu-section">
   <div class="section-inner">
     <div class="menu-inner reveal">
@@ -477,7 +405,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
           Lungomare Lombardo 27<br>
           16145 Genova — Italy<br><br>
           <a href="tel:+390105533155">+39 010 553 31 55</a><br>
-          <a href="/cdn-cgi/l/email-protection#0370626d77626e6c6d6a606264666d6c756243646e626a6f2d606c6e"><span class="__cf_email__" data-cfemail="88fbe9e6fce9e5e7e6e1ebe9efede6e7fee9c8efe5e9e1e4a6ebe7e5">[email&#160;protected]</span></a>
+          <a href="mailto:santamonicagenova@gmail.com">santamonicagenova@gmail.com</a>
         </div>
       </div>
       <div>
@@ -498,7 +426,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
       <p class="section-label">Un dono speciale</p>
       <h2 class="section-title">Buoni <em>regalo</em></h2>
       <p class="regalo-body">Regala un pranzo o una cena al Santamonica. I Buoni Regalo sono utilizzabili tutti i giorni (salvo disponibilità) escluso Sabato e festivi, con validità di 6 mesi dall'acquisto. Contattaci per acquistarlo.</p>
-      <a href="/cdn-cgi/l/email-protection#9ceffdf2e8fdf1f3f2f5fffdfbf9f2f3eafddcfbf1fdf5f0b2fff3f1a3efe9fef6f9ffe8a1dee9f3f2f3b9aeaccef9fbfdf0f3b9aeaccffdf2e8fdf1f3f2f5fffd" class="btn-primary" style="background:var(--terracotta)">Richiedi un buono</a>
+      <a href="mailto:santamonicagenova@gmail.com?subject=Buono%20Regalo%20Santamonica" class="btn-primary" style="background:var(--terracotta)">Richiedi un buono</a>
     </div>
   </div>
 </section>
@@ -537,7 +465,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
           </div>
           <div class="form-check">
             <input type="checkbox" id="privacy" name="privacy" required>
-            <label for="privacy">Accetto la <a href="#">Privacy Policy</a> e il trattamento dei dati per ricevere risposta al mio messaggio.</label>
+            <label for="privacy">Accetto la <a href="#">Privacy Policy</a> e il trattamento dei dati per ricevere risposta.</label>
           </div>
           <button type="submit" class="btn-primary" style="cursor:pointer;font-family:'Jost',sans-serif;border:none;">Invia messaggio</button>
           <div class="form-success" id="form-success">✓ Messaggio inviato. Ti risponderemo presto!</div>
@@ -562,13 +490,13 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// ── NAV SCROLL ──
+// NAV
 const nav = document.getElementById('main-nav');
 window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
 
-// ── MOBILE MENU ──
+// MOBILE MENU
 const hamburger = document.getElementById('hamburger');
 const mobileMenu = document.getElementById('mobile-menu');
 const menuClose  = document.getElementById('menu-close');
@@ -576,17 +504,16 @@ hamburger.addEventListener('click', () => mobileMenu.classList.add('open'));
 menuClose.addEventListener('click', () => mobileMenu.classList.remove('open'));
 document.querySelectorAll('.mobile-link').forEach(a => a.addEventListener('click', () => mobileMenu.classList.remove('open')));
 
-// ── SCROLL REVEAL ──
+// SCROLL REVEAL
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); } });
 }, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-// ── MAPPA OPENSTREETMAP ──
+// MAPPA
 const map = L.map('map', { scrollWheelZoom: false }).setView([44.3913353, 8.9646575], 17);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
-  maxZoom: 19
+  attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>', maxZoom: 19
 }).addTo(map);
 const icon = L.divIcon({
   className: '',
@@ -594,39 +521,37 @@ const icon = L.divIcon({
   iconSize: [14,14], iconAnchor: [7,7]
 });
 L.marker([44.3913353, 8.9646575], {icon}).addTo(map)
-  .bindPopup('<strong>Santamonica</strong><br>Lungomare Lombardo 27<br>Genova')
-  .openPopup();
+  .bindPopup('<strong>Santamonica</strong><br>Lungomare Lombardo 27<br>Genova').openPopup();
 
-// ── FORM FORMSPREE ──
+// FORM
 const form = document.getElementById('contact-form');
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const btn = form.querySelector('button[type=submit]');
-  btn.textContent = 'Invio in corso…';
-  btn.disabled = true;
+  btn.textContent = 'Invio in corso…'; btn.disabled = true;
   try {
-    const res = await fetch(form.action, {
-      method: 'POST',
-      body: new FormData(form),
-      headers: { 'Accept': 'application/json' }
-    });
+    const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } });
     if (res.ok) {
       form.reset();
       document.getElementById('form-success').style.display = 'block';
       btn.textContent = 'Invia messaggio';
-    } else {
-      btn.textContent = 'Errore — riprova';
-    }
-  } catch {
-    btn.textContent = 'Errore — riprova';
-  }
+    } else { btn.textContent = 'Errore — riprova'; }
+  } catch { btn.textContent = 'Errore — riprova'; }
   btn.disabled = false;
 });
 
-// ── COOKIE BANNER ──
+// COOKIE
 const banner = document.getElementById('cookie-banner');
-if (!localStorage.getItem('cookie_choice')) {
-  setTimeout(() => banner.classList.add('show'), 800);
-}
+if (!localStorage.getItem('cookie_choice')) { setTimeout(() => banner.classList.add('show'), 800); }
 document.getElementById('cookie-accept').addEventListener('click', () => {
-  localStor
+  localStorage.setItem('cookie_choice', 'all');
+  banner.classList.remove('show');
+});
+document.getElementById('cookie-refuse').addEventListener('click', () => {
+  localStorage.setItem('cookie_choice', 'essential');
+  banner.classList.remove('show');
+  window['ga-disable-G-YP71EKXSXX'] = true;
+});
+</script>
+</body>
+</html>

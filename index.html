@@ -477,7 +477,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
           Lungomare Lombardo 27<br>
           16145 Genova — Italy<br><br>
           <a href="tel:+390105533155">+39 010 553 31 55</a><br>
-          <a href="mailto:santamonicagenova@gmail.com">santamonicagenova@gmail.com</a>
+          <a href="/cdn-cgi/l/email-protection#0370626d77626e6c6d6a606264666d6c756243646e626a6f2d606c6e"><span class="__cf_email__" data-cfemail="88fbe9e6fce9e5e7e6e1ebe9efede6e7fee9c8efe5e9e1e4a6ebe7e5">[email&#160;protected]</span></a>
         </div>
       </div>
       <div>
@@ -498,7 +498,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
       <p class="section-label">Un dono speciale</p>
       <h2 class="section-title">Buoni <em>regalo</em></h2>
       <p class="regalo-body">Regala un pranzo o una cena al Santamonica. I Buoni Regalo sono utilizzabili tutti i giorni (salvo disponibilità) escluso Sabato e festivi, con validità di 6 mesi dall'acquisto. Contattaci per acquistarlo.</p>
-      <a href="mailto:santamonicagenova@gmail.com?subject=Buono%20Regalo%20Santamonica" class="btn-primary" style="background:var(--terracotta)">Richiedi un buono</a>
+      <a href="/cdn-cgi/l/email-protection#9ceffdf2e8fdf1f3f2f5fffdfbf9f2f3eafddcfbf1fdf5f0b2fff3f1a3efe9fef6f9ffe8a1dee9f3f2f3b9aeaccef9fbfdf0f3b9aeaccffdf2e8fdf1f3f2f5fffd" class="btn-primary" style="background:var(--terracotta)">Richiedi un buono</a>
     </div>
   </div>
 </section>
@@ -510,7 +510,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
       <div class="reveal">
         <p class="section-label">Scrivici</p>
         <h2 class="section-title">Manda un <em>messaggio</em></h2>
-        <form id="contact-form" action="https://formspree.io/f/santamonicagenova" method="POST">
+        <form id="contact-form" action="https://formspree.io/f/mkopjnvq" method="POST">
           <div class="form-row">
             <div class="form-group">
               <label for="nome">Nome</label>
@@ -562,7 +562,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
   </div>
 </footer>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 // ── NAV SCROLL ──
 const nav = document.getElementById('main-nav');
@@ -583,7 +583,7 @@ const observer = new IntersectionObserver((entries) => {
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
 // ── MAPPA OPENSTREETMAP ──
-const map = L.map('map', { scrollWheelZoom: false }).setView([44.3928, 8.9672], 16);
+const map = L.map('map', { scrollWheelZoom: false }).setView([44.3913353, 8.9646575], 17);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
   maxZoom: 19
@@ -593,7 +593,7 @@ const icon = L.divIcon({
   html: '<div style="width:14px;height:14px;background:#c4734a;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3)"></div>',
   iconSize: [14,14], iconAnchor: [7,7]
 });
-L.marker([44.3928, 8.9672], {icon}).addTo(map)
+L.marker([44.3913353, 8.9646575], {icon}).addTo(map)
   .bindPopup('<strong>Santamonica</strong><br>Lungomare Lombardo 27<br>Genova')
   .openPopup();
 
@@ -629,15 +629,4 @@ if (!localStorage.getItem('cookie_choice')) {
   setTimeout(() => banner.classList.add('show'), 800);
 }
 document.getElementById('cookie-accept').addEventListener('click', () => {
-  localStorage.setItem('cookie_choice', 'all');
-  banner.classList.remove('show');
-});
-document.getElementById('cookie-refuse').addEventListener('click', () => {
-  localStorage.setItem('cookie_choice', 'essential');
-  banner.classList.remove('show');
-  // Disabilita GA se rifiutato
-  window['ga-disable-G-YP71EKXSXX'] = true;
-});
-</script>
-</body>
-</html>
+  localStor

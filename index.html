@@ -405,7 +405,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
           Lungomare Lombardo 27<br>
           16145 Genova — Italy<br><br>
           <a href="tel:+390105533155">+39 010 553 31 55</a><br>
-          <a href="mailto:santamonicagenova@gmail.com">santamonicagenova@gmail.com</a>
+          <a href="/cdn-cgi/l/email-protection#b0c3d1dec4d1dddfded9d3d1d7d5dedfc6d1f0d7ddd1d9dc9ed3dfdd"><span class="__cf_email__" data-cfemail="6516040b1104080a0b0c060402000b0a1304250208040c094b060a08">[email&#160;protected]</span></a>
         </div>
       </div>
       <div>
@@ -426,7 +426,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
       <p class="section-label">Un dono speciale</p>
       <h2 class="section-title">Buoni <em>regalo</em></h2>
       <p class="regalo-body">Regala un pranzo o una cena al Santamonica. I Buoni Regalo sono utilizzabili tutti i giorni (salvo disponibilità) escluso Sabato e festivi, con validità di 6 mesi dall'acquisto. Contattaci per acquistarlo.</p>
-      <a href="mailto:santamonicagenova@gmail.com?subject=Buono%20Regalo%20Santamonica" class="btn-primary" style="background:var(--terracotta)">Richiedi un buono</a>
+      <a href="/cdn-cgi/l/email-protection#c5b6a4abb1a4a8aaabaca6a4a2a0abaab3a485a2a8a4aca9eba6aaa8fab6b0a7afa0a6b1f887b0aaabaae0f7f597a0a2a4a9aae0f7f596a4abb1a4a8aaabaca6a4" class="btn-primary" style="background:var(--terracotta)">Richiedi un buono</a>
     </div>
   </div>
 </section>
@@ -481,7 +481,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
 <!-- FOOTER -->
 <footer>
   <div class="footer-inner">
-    <a href="#" class="footer-logo">Santamonica</a>
+    <a href="#" class="footer-logo" id="footer-logo">Santamonica</a>
     <div class="footer-social">
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
@@ -490,7 +490,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
   </div>
 </footer>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 // NAV
 const nav = document.getElementById('main-nav');
@@ -512,8 +512,9 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
 // MAPPA
 const map = L.map('map', { scrollWheelZoom: false }).setView([44.3913353, 8.9646575], 17);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>', maxZoom: 19
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a> © <a href="https://carto.com">CARTO</a>',
+  subdomains: 'abcd', maxZoom: 19
 }).addTo(map);
 const icon = L.divIcon({
   className: '',
@@ -540,18 +541,22 @@ form.addEventListener('submit', async (e) => {
   btn.disabled = false;
 });
 
+// ACCESSO ADMIN NASCOSTO — 5 click sul logo in footer
+(function() {
+  var clicks = 0, timer;
+  document.getElementById('footer-logo').addEventListener('click', function(e) {
+    e.preventDefault();
+    clicks++;
+    clearTimeout(timer);
+    timer = setTimeout(function() { clicks = 0; }, 2000);
+    if (clicks >= 5) {
+      clicks = 0;
+      window.open('https://santamonicagenova-a11y.github.io/SantaWeb/menu-admin.html', '_blank');
+    }
+  });
+})();
+
 // COOKIE
 const banner = document.getElementById('cookie-banner');
 if (!localStorage.getItem('cookie_choice')) { setTimeout(() => banner.classList.add('show'), 800); }
-document.getElementById('cookie-accept').addEventListener('click', () => {
-  localStorage.setItem('cookie_choice', 'all');
-  banner.classList.remove('show');
-});
-document.getElementById('cookie-refuse').addEventListener('click', () => {
-  localStorage.setItem('cookie_choice', 'essential');
-  banner.classList.remove('show');
-  window['ga-disable-G-YP71EKXSXX'] = true;
-});
-</script>
-</body>
-</html>
+document.getElementById('cookie-accept').addEventListe

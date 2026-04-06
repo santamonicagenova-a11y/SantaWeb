@@ -234,11 +234,14 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
 #cookie-accept { background: var(--terracotta); color: #fff; }
 #cookie-refuse { background: transparent; color: rgba(245,240,232,0.6); border: 1px solid rgba(245,240,232,0.25) !important; }
 
+/* Fallback: se JS è lento, mostra il contenuto dopo l'animazione CSS */
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1 !important; transform: none !important; } }
+
 /* ANIMATIONS */
 @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes zoomOut { from { transform: scale(1.05); } to { transform: scale(1); } }
-.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
-.reveal.visible { opacity: 1; transform: none; }
+.reveal { opacity: 1; transform: none; }
+
 
 /* RESPONSIVE */
 @media (max-width: 900px) {
@@ -321,7 +324,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
 <section id="cucina">
   <div class="section-inner">
     <div class="cucina-grid">
-      <div class="reveal">
+      <div class="reveal visible">
         <p class="section-label">La nostra proposta</p>
         <h2 class="section-title">Cucina <em>del territorio</em></h2>
         <div class="cucina-body">
@@ -354,7 +357,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
       <div class="cantina-image reveal">
         <img src="https://static.wixstatic.com/media/461837_b23457903272448a817a539cb9aadc62~mv2.jpeg" alt="Cantina vini Santamonica">
       </div>
-      <div class="reveal" style="transition-delay:0.15s">
+      <div class="reveal visible" style="transition-delay:0.15s">
         <p class="section-label">I nostri vini</p>
         <h2 class="section-title">Una <em>cantina</em> ligure</h2>
         <div class="cucina-body">
@@ -435,7 +438,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
 <section id="contatti" style="background:var(--sand);">
   <div class="section-inner">
     <div class="contatti-grid">
-      <div class="reveal">
+      <div class="reveal visible">
         <p class="section-label">Scrivici</p>
         <h2 class="section-title">Manda un <em>messaggio</em></h2>
         <form id="contact-form" action="https://formspree.io/f/mkopjnvq" method="POST">
@@ -471,7 +474,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
           <div class="form-success" id="form-success">✓ Messaggio inviato. Ti risponderemo presto!</div>
         </form>
       </div>
-      <div class="reveal" style="transition-delay:0.15s">
+      <div class="reveal visible" style="transition-delay:0.15s">
         <div id="map"></div>
       </div>
     </div>
@@ -505,10 +508,13 @@ menuClose.addEventListener('click', () => mobileMenu.classList.remove('open'));
 document.querySelectorAll('.mobile-link').forEach(a => a.addEventListener('click', () => mobileMenu.classList.remove('open')));
 
 // SCROLL REVEAL
+const revealEls = document.querySelectorAll('.reveal');
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); } });
-}, { threshold: 0.12 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+}, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
+revealEls.forEach(el => observer.observe(el));
+// Fallback: rendi tutto visibile dopo 1.5s
+setTimeout(() => revealEls.forEach(el => el.classList.add('visible')), 1500);
 
 // MAPPA
 const map = L.map('map', { scrollWheelZoom: false }).setView([44.3913353, 8.9646575], 17);

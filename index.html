@@ -550,6 +550,14 @@ form.addEventListener('submit', async (e) => {
 // ACCESSO ADMIN NASCOSTO — 5 click sul logo in footer
 (function() {
   var clicks = 0, timer;
+  // Link nascosto che verrà usato per navigare
+  var adminLink = document.createElement('a');
+  adminLink.href = 'https://santamonicagenova-a11y.github.io/SantaWeb/menu-admin.html';
+  adminLink.target = '_blank';
+  adminLink.rel = 'noopener';
+  adminLink.style.display = 'none';
+  document.body.appendChild(adminLink);
+
   document.getElementById('footer-logo').addEventListener('click', function(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -558,7 +566,7 @@ form.addEventListener('submit', async (e) => {
     timer = setTimeout(function() { clicks = 0; }, 2000);
     if (clicks >= 5) {
       clicks = 0;
-      window.open('https://santamonicagenova-a11y.github.io/SantaWeb/menu-admin.html', '_blank');
+      adminLink.click(); // click diretto sul link — non bloccato dai browser
     }
   });
 })();

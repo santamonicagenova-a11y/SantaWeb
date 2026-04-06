@@ -484,7 +484,7 @@ footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
 <!-- FOOTER -->
 <footer>
   <div class="footer-inner">
-    <a href="#" class="footer-logo" id="footer-logo">Santamonica</a>
+    <a href="javascript:void(0)" class="footer-logo" id="footer-logo">Santamonica</a>
     <div class="footer-social">
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
@@ -552,6 +552,7 @@ form.addEventListener('submit', async (e) => {
   var clicks = 0, timer;
   document.getElementById('footer-logo').addEventListener('click', function(e) {
     e.preventDefault();
+    e.stopPropagation();
     clicks++;
     clearTimeout(timer);
     timer = setTimeout(function() { clicks = 0; }, 2000);

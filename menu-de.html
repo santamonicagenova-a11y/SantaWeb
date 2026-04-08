@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Speisekarte — Santamonica</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
@@ -28,6 +31,43 @@
     /* ══════════════════════════════════════
        BARRA CONTROLLI
     ══════════════════════════════════════ */
+    .ctrl-bar {
+      text-align: center;
+      padding: .9rem 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--cream);
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      gap: .7rem;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .ctrl-btn {
+      padding: .4rem 1.3rem;
+      background: transparent;
+      border: 1px solid var(--ink);
+      font-family: 'Jost', sans-serif;
+      font-size: .68rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      color: var(--ink);
+      transition: background .2s, color .2s;
+    }
+    .ctrl-btn:hover, .ctrl-btn.active {
+      background: var(--ink);
+      color: var(--cream);
+    }
+    .ctrl-sep {
+      width: 1px;
+      height: 1.4rem;
+      background: var(--rule);
+    }
+
     /* ══════════════════════════════════════
        PAGINA  (shared)
     ══════════════════════════════════════ */
@@ -311,6 +351,7 @@
     @media print {
       @page { size: A4 portrait; margin: 0; }
       body { background: white; }
+      .ctrl-bar { display: none; }
 
       /* carta: 3 pagine */
       #layout-carta .pg {
@@ -338,6 +379,14 @@
 </head>
 <body>
 
+<!-- ── BARRA CONTROLLI ── -->
+<div class="ctrl-bar">
+  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout('carta')">☞ Menù alla carta (3 pag.)</button>
+  <div class="ctrl-sep"></div>
+  <button class="ctrl-btn" id="btn-orario" onclick="showLayout('orario')">☞ Foglio orario (1 pag.)</button>
+  <div class="ctrl-sep"></div>
+  <button class="ctrl-btn" onclick="window.print()">✦ Stampa / Salva PDF</button>
+</div>
 
 <div id="layout-carta"></div>
 <div id="layout-orario"></div>
@@ -394,7 +443,7 @@ const MENU = {
       "titolo": "Crudi",
       "piatti": [
         {
-          "nome": "Ostriche Fine de Claire n. 1",
+          "nome": "Fine de Claire Austern",
           "prezzo": 4,
           "unita": "Stk."
         },
@@ -444,9 +493,8 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Gamberi viola alla puttanesca",
-          "prezzo": 25,
-          "sostenibile": true
+          "nome": "Weißkohl, Miso, Himbeeren, Cashewnüsse",
+          "prezzo": 16
         },
         {
           "nome": "Kalbsbries, Knollensellerie, Haselnüsse, Fischfondreduktion",
@@ -572,7 +620,9 @@ const NOTE_CARTA = `
   Die Liste der Allergene finden Sie auf der letzten Seite dieser Speisekarte.
 `;
 
-const NOTE_ORARIO = `Um die Qualität konstant zu halten, werden frische Fischprodukte schockgefrostet und mit dem Symbol * gekennzeichnet.`;
+const NOTE_ORARIO = `Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche
+delle materie prime i prodotti acquistati freschi vengono abbattuti e congelati.
+Um die Qualität konstant zu halten, werden frische Fischprodukte schockgefrostet und mit dem Symbol * gekennzeichnet.`;
 
 function getSez(titolo) {
   return MENU.sezioni.find(s => s.titolo === titolo);
@@ -590,9 +640,10 @@ function buildPiatto(p) {
 }
 
 function buildSezione(s) {
+  const label = s.titolo_display || s.titolo;
   return `
     <div class="sezione">
-      <div class="sezione-titolo">${s.titolo}</div>
+      <div class="sezione-titolo">${label}</div>
       ${s.piatti.map(buildPiatto).join('')}
     </div>`;
 }
@@ -626,7 +677,7 @@ function buildDegu(degu) {
     <div class="degu">
       <div class="degu-titolo">Degustationsmenü</div>
       <div class="degu-prezzi">${optsHtml}</div>
-      <div class="degu-nota">${degu.nota.replace("l'intero tavolo", "<strong>l\u2019intero tavolo</strong>")}</div>
+      <div class="degu-nota">${degu.nota.replace("den gesamten Tisch", "<strong>den gesamten Tisch</strong>")}</div>
       ${percorsiHtml}
     </div>`;
 }
@@ -679,7 +730,7 @@ function buildOrarioColonna(titoli, sepDopo) {
     return `
       <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
         <div class="orario-sez">
-          <div class="orario-sez-titolo">${s.titolo}</div>
+          <div class="orario-sez-titolo">${s.titolo_display || s.titolo}</div>
           ${piatti}
         </div>
       </div>${sep}`;

@@ -20,6 +20,11 @@
     .btn-load { background:transparent; border:1px solid var(--cream); color:var(--cream); }
     .btn-load:hover { background:rgba(255,255,255,.1); }
     .btn-publish { background:#2d6a4f; color:#fff; }
+    .preview-wrap { position:relative; display:inline-block; }
+    .preview-menu { display:none; position:absolute; top:100%; left:0; background:var(--ink); min-width:140px; z-index:200; margin-top:2px; }
+    .preview-menu a { display:block; padding:.5rem 1rem; font-size:.7rem; letter-spacing:.1em; color:var(--cream); cursor:pointer; white-space:nowrap; }
+    .preview-menu a:hover { background:var(--rust); }
+    .preview-menu.open { display:block; }
     .btn-publish:hover { opacity:.85; }
     .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; align-items:center; justify-content:center; }
     .modal-overlay.on { display:flex; }
@@ -73,8 +78,18 @@
   <div class="top-btns">
     <button class="btn btn-load" onclick="caricaDalSito()">↓ Carica dal sito</button>
     <button class="btn btn-load" onclick="document.getElementById('file-input').click()">↑ Carica da file</button>
-    <button class="btn btn-save" onclick="apriPreview()">⧉ Preview</button>
+    <div class="preview-wrap">
+      <button class="btn btn-save" onclick="togglePreviewMenu(event)">⧉ Preview ▾</button>
+      <div class="preview-menu" id="preview-menu">
+        <a onclick="apriPreview('it')">🇮🇹 Italiano</a>
+        <a onclick="apriPreview('en')">🇬🇧 English</a>
+        <a onclick="apriPreview('fr')">🇫🇷 Français</a>
+        <a onclick="apriPreview('de')">🇩🇪 Deutsch</a>
+        <a onclick="apriPreview('es')">🇪🇸 Español</a>
+      </div>
+    </div>
     <button class="btn btn-publish" onclick="pubblicaSuGithub()">✦ Pubblica su GitHub</button>
+    <button class="btn btn-load" onclick="resetToken()" title="Cambia token GitHub" style="font-size:.6rem;padding:.45rem .7rem;opacity:.7">🔑</button>
   </div>
 </div>
 
@@ -83,7 +98,6 @@
   <p><strong>1.</strong> Clicca <strong>Carica dal sito</strong> per caricare automaticamente il menù attivo, oppure <strong>Carica da file</strong> per selezionarlo dal computer.</p>
   <p><strong>2.</strong> Modifica prezzi, nomi, asterischi.</p>
   <p><strong>3.</strong> Clicca <strong>Preview</strong> per vedere il risultato, poi <strong>Pubblica su GitHub</strong> per aggiornare il sito.</p>
-  <label for="file-input">↑ Carica da file</label>
   <input type="file" id="file-input" accept=".html" onchange="carica(this)" />
   <div class="err" id="err"></div>
 </div>
@@ -252,11 +266,28 @@ function costruisciOutput() {
 
 function salva() { apriPreview(); }
 
-function apriPreview() {
+function togglePreviewMenu(e) {
+  e.stopPropagation();
+  document.getElementById('preview-menu').classList.toggle('open');
+}
+document.addEventListener('click', function() {
+  var m = document.getElementById('preview-menu');
+  if (m) m.classList.remove('open');
+});
+
+function apriPreview(lang) {
   if (!dati) { alert('Prima carica il menù'); return; }
+  document.getElementById('preview-menu').classList.remove('open');
   outputCorrente = costruisciOutput();
+  var html;
+  if (!lang || lang === 'it') {
+    html = outputCorrente;
+  } else {
+    var t = TRANSLATIONS[lang];
+    html = costruisciHtmlTradotto(lang, t);
+  }
   var win = window.open('', '_blank');
-  win.document.write(outputCorrente);
+  win.document.write(html);
   win.document.close();
   win.focus();
 }
@@ -289,7 +320,18 @@ function pubblicaSuGithub() {
   if (!dati) { alert('Prima carica il menù'); return; }
   outputCorrente = costruisciOutput();
   var token = localStorage.getItem('gh_token') || '';
-  document.getElementById('token-input').value = token;
+  if (token) {
+    // Token già salvato — pubblica direttamente senza mostrare il modale
+    eseguiPubblicazione(token);
+  } else {
+    document.getElementById('token-input').value = '';
+    document.getElementById('modal-token').classList.add('on');
+  }
+}
+
+function resetToken() {
+  localStorage.removeItem('gh_token');
+  document.getElementById('token-input').value = '';
   document.getElementById('modal-token').classList.add('on');
 }
 
@@ -297,45 +339,143 @@ function chiudiModal() {
   document.getElementById('modal-token').classList.remove('on');
 }
 
+var TRANSLATIONS = {"en": {"lang": "en", "lang_label": "English", "title": "Menu — Santamonica", "degu_titolo": "Tasting Menu", "degu_portate_label": "courses", "degu_vini_label": "wine pairing", "degu_nota": "Price per person, menu to be shared by the whole table.", "degu_intero_tavolo": "the whole table", "percorso_7": "Chef's free interpretation menu", "note_carta_1": "To maintain consistent quality and organoleptic characteristics of raw ingredients, fresh fish products are blast-frozen after purchase. These products are marked with the symbol * for clear and transparent customer information.", "note_carta_2": "The list of allergens is available on the last page of this menu.", "note_ospite_titolo": "Guest notes", "note_orario": "To maintain consistent quality standards and organoleptic characteristics, fresh fish products are blast-frozen. These products are marked with the symbol: *", "orario_titolo": "OPENING HOURS:", "titolo_degustazione": "Tasting Menu", "sezioni": {"Crudi": "Raw", "Sfiziosi": "Starters", "Amidi e Carboidrati": "Pasta & Grains", "Non Solo Mare": "Not Only Sea"}, "unita": {"cad.": "ea."}, "piatti": {"Ali di razza, fave nostrane, mela verde, mandorle": "Skate wing, local broad beans, green apple, almonds", "Animella di vitello, sedano rapa, nocciole, fondo di pesce": "Veal sweetbread, celeriac, hazelnuts, fish stock", "Tortelli di cinghiale, dashi di orata, cipollina, shiso": "Wild boar tortelli, sea bream dashi, spring onion, shiso", "Tubetti “<em>Mancini</em>”, baccalà, kosho di agrumi, borlotti": "Tubetti “<em>Mancini</em>”, salt cod, citrus kosho, borlotti beans", "Ombrina nostrana pescata ad amo, salicornia, indivia belga": "Line-caught local meagre, sea purslane, Belgian endive", "Gelato al limone nero, levistico, lime, cracker di latte": "Black lemon ice cream, lovage, lime, milk cracker", "Ostriche Fine de Claire": "Fine de Claire Oysters", "Ostriche Antilope": "Antilope Oysters", "Ostriche Enrico IV": "Enrico IV Oysters", "Scampi nostrani": "Local langoustines", "Gamberi viola nostrani": "Local purple prawns", "Selezione solamente di pesci nostrani pescati ad amo": "Selection of local line-caught fish only", "Degustazione di mare": "Sea tasting", "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir": "Local squid, fresh peas, light bagna cauda, kefir", "Cavolo cappuccio, miso, lamponi, anacardi": "Cabbage, miso, raspberries, cashews", "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce": "Veal sweetbread, celeriac, hazelnuts, fish stock reduction", "“Non formaggi”": "“Not cheese”", "(Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla)": "(Tasting of artisan fake cheeses made with cashews and almond milk)", "Spaghettoni quadrati “<em>Mancini</em>”, anemoni di mare, nduja, maggiorana": "Square spaghettoni “<em>Mancini</em>”, sea anemones, nduja, marjoram", "Tubetti “<em>Mancini</em>”, baccalà, il nostro kosho di agrumi fermentato, borlotti": "Tubetti “<em>Mancini</em>”, salt cod, our fermented citrus kosho, borlotti beans", "Riso “<em>Riserva San Massimo</em>”, ragù di lepre, cime di rapa, Parmigiano Reggiano": "Rice “<em>Riserva San Massimo</em>”, hare ragù, turnip tops, Parmigiano Reggiano", "Polpo nostrano, rabarbaro, piselli": "Local octopus, rhubarb, peas", "Zucchina alla scapece, menta, yogurt, pepe Timut": "Marinated courgette, mint, yogurt, Timut pepper", "Picanha, cardoncelli, fondo di manzo": "Picanha, king oyster mushrooms, beef jus"}, "orario": {"Martedì": "Tuesday", "Dal mercoledì al sabato": "Wednesday to Saturday", "Domenica": "Sunday"}, "links": ["<u>Italian Menu</u>", "<u>Carte en Française</u>", "<u>Speisekarte auf Deutsch</u>", "<u>Carta en Español</u>"]}, "fr": {"lang": "fr", "lang_label": "Français", "title": "Menu — Santamonica", "degu_titolo": "Menu Dégustation", "degu_portate_label": "plats", "degu_vini_label": "accord mets-vins", "degu_nota": "Prix par personne, menu à partager par toute la table.", "degu_intero_tavolo": "toute la table", "percorso_7": "Menu carte blanche du Chef", "note_carta_1": "Pour maintenir constants le niveau qualitatif et les caractéristiques organoleptiques des matières premières, les produits de la mer achetés frais sont surgelés à basse température. Ces produits sont signalés par le symbole * pour une information claire et transparente à la clientèle.", "note_carta_2": "La liste des allergènes est consultable à la dernière page de ce menu.", "note_ospite_titolo": "Note pour nos hôtes", "note_orario": "Pour maintenir constants le niveau qualitatif et les caractéristiques organoleptiques, les produits frais sont surgelés à basse température. Ces produits sont signalés par le symbole : *", "orario_titolo": "HORAIRES D'OUVERTURE :", "titolo_degustazione": "Menu Dégustation", "sezioni": {"Crudi": "Crus", "Sfiziosi": "Entrées", "Amidi e Carboidrati": "Pâtes & Céréales", "Non Solo Mare": "Pas Seulement la Mer"}, "unita": {"cad.": "p."}, "piatti": {"Ali di razza, fave nostrane, mela verde, mandorle": "Aile de raie, fèves locales, pomme verte, amandes", "Animella di vitello, sedano rapa, nocciole, fondo di pesce": "Ris de veau, céleri-rave, noisettes, fond de poisson", "Tortelli di cinghiale, dashi di orata, cipollina, shiso": "Tortelli de sanglier, dashi de dorade, ciboule, shiso", "Tubetti “<em>Mancini</em>”, baccalà, kosho di agrumi, borlotti": "Tubetti “<em>Mancini</em>”, morue, kosho d’agrumes, haricots borlotti", "Ombrina nostrana pescata ad amo, salicornia, indivia belga": "Ombrine locale à la ligne, salicorne, endive belge", "Gelato al limone nero, levistico, lime, cracker di latte": "Glace au citron noir, livèche, citron vert, cracker au lait", "Ostriche Fine de Claire": "Huîtres Fine de Claire", "Ostriche Antilope": "Huîtres Antilope", "Ostriche Enrico IV": "Huîtres Enrico IV", "Scampi nostrani": "Langoustines locales", "Gamberi viola nostrani": "Crevettes violettes locales", "Selezione solamente di pesci nostrani pescati ad amo": "Sélection exclusivement de poissons locaux pêchés à la ligne", "Degustazione di mare": "Dégustation de la mer", "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir": "Calamar local, petits pois frais, bagna cauda légère, kéfir", "Cavolo cappuccio, miso, lamponi, anacardi": "Chou pommé, miso, framboises, noix de cajou", "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce": "Ris de veau, céleri-rave, noisettes, réduction de fond de poisson", "“Non formaggi”": "“Non-fromages”", "(Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla)": "(Dégustation de faux fromages artisanaux à base de noix de cajou et lait d’amande)", "Spaghettoni quadrati “<em>Mancini</em>”, anemoni di mare, nduja, maggiorana": "Spaghettoni carrés “<em>Mancini</em>”, anémones de mer, nduja, marjolaine", "Tubetti “<em>Mancini</em>”, baccalà, il nostro kosho di agrumi fermentato, borlotti": "Tubetti “<em>Mancini</em>”, morue, notre kosho d’agrumes fermenté, borlotti", "Riso “<em>Riserva San Massimo</em>”, ragù di lepre, cime di rapa, Parmigiano Reggiano": "Riz “<em>Riserva San Massimo</em>”, ragû de lièvre, fanes de navet, Parmigiano Reggiano", "Polpo nostrano, rabarbaro, piselli": "Poulpe local, rhubarbe, petits pois", "Zucchina alla scapece, menta, yogurt, pepe Timut": "Courgette en escabèche, menthe, yaourt, poivre Timut", "Picanha, cardoncelli, fondo di manzo": "Picanha, pleurotes du panicaut, jus de bœuf"}, "orario": {"Martedì": "Mardi", "Dal mercoledì al sabato": "Du mercredi au samedi", "Domenica": "Dimanche"}, "links": ["<u>Menu Italiano</u>", "<u>English Menu</u>", "<u>Speisekarte auf Deutsch</u>", "<u>Carta en Español</u>"]}, "de": {"lang": "de", "lang_label": "Deutsch", "title": "Speisekarte — Santamonica", "degu_titolo": "Degustationsmenü", "degu_portate_label": "Gänge", "degu_vini_label": "Weinbegleitung", "degu_nota": "Preis pro Person, Menü für den gesamten Tisch.", "degu_intero_tavolo": "den gesamten Tisch", "percorso_7": "Menü nach freier Wahl des Küchenchefs", "note_carta_1": "Um die Qualität und die organoleptischen Eigenschaften der Rohstoffe konstant zu halten, werden frisch eingekaufte Fischprodukte schockgefrostet. Diese Produkte sind mit dem Symbol * gekennzeichnet.", "note_carta_2": "Die Liste der Allergene finden Sie auf der letzten Seite dieser Speisekarte.", "note_ospite_titolo": "Hinweis für unsere Gäste", "note_orario": "Um die Qualität konstant zu halten, werden frische Fischprodukte schockgefrostet und mit dem Symbol * gekennzeichnet.", "orario_titolo": "ÖFFNUNGSZEITEN:", "titolo_degustazione": "Degustationsmenü", "sezioni": {"Crudi": "Rohkost", "Sfiziosi": "Vorspeisen", "Amidi e Carboidrati": "Pasta & Getreide", "Non Solo Mare": "Nicht Nur Meer"}, "unita": {"cad.": "Stk."}, "piatti": {"Ali di razza, fave nostrane, mela verde, mandorle": "Rochenflügel, heimische Saubohnen, grüner Apfel, Mandeln", "Animella di vitello, sedano rapa, nocciole, fondo di pesce": "Kalbsbries, Knollensellerie, Haselnüsse, Fischfond", "Tortelli di cinghiale, dashi di orata, cipollina, shiso": "Wildschweintortelli, Goldbrassen-Dashi, Frühlingszwiebel, Shiso", "Tubetti “<em>Mancini</em>”, baccalà, kosho di agrumi, borlotti": "Tubetti “<em>Mancini</em>”, Stockfisch, Zitruskosho, Borlottibohnen", "Ombrina nostrana pescata ad amo, salicornia, indivia belga": "Lokal geangelter Umberfisch, Queller, Chicorée", "Gelato al limone nero, levistico, lime, cracker di latte": "Schwarzzitronen-Eis, Liebstöckel, Limette, Milchcracker", "Ostriche Fine de Claire": "Fine de Claire Austern", "Ostriche Antilope": "Antilope Austern", "Ostriche Enrico IV": "Enrico IV Austern", "Scampi nostrani": "Heimische Scampi", "Gamberi viola nostrani": "Heimische Violettgarnelen", "Selezione solamente di pesci nostrani pescati ad amo": "Auswahl ausschließlich heimischer Angelfische", "Degustazione di mare": "Meeresverkostung", "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir": "Heimischer Tintenfisch, frische Erbsen, leichte Bagna Cauda, Kefir", "Cavolo cappuccio, miso, lamponi, anacardi": "Weißkohl, Miso, Himbeeren, Cashewnüsse", "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce": "Kalbsbries, Knollensellerie, Haselnüsse, Fischfondreduktion", "“Non formaggi”": "“Kein Käse”", "(Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla)": "(Verkostung handwerklicher Pseudokäse auf Cashew- und Mandelmilchbasis)", "Spaghettoni quadrati “<em>Mancini</em>”, anemoni di mare, nduja, maggiorana": "Quadratische Spaghettoni “<em>Mancini</em>”, Seeanemonen, Nduja, Majoran", "Tubetti “<em>Mancini</em>”, baccalà, il nostro kosho di agrumi fermentato, borlotti": "Tubetti “<em>Mancini</em>”, Stockfisch, unser fermentiertes Zitruskosho, Borlottibohnen", "Riso “<em>Riserva San Massimo</em>”, ragù di lepre, cime di rapa, Parmigiano Reggiano": "Reis “<em>Riserva San Massimo</em>”, Hasenragù, Steckrübenblätter, Parmigiano Reggiano", "Polpo nostrano, rabarbaro, piselli": "Heimischer Oktopus, Rhabarber, Erbsen", "Zucchina alla scapece, menta, yogurt, pepe Timut": "Marinierte Zucchini, Minze, Joghurt, Timutpfeffer", "Picanha, cardoncelli, fondo di manzo": "Picanha, Königskräuterseitlinge, Rinderjus"}, "orario": {"Martedì": "Dienstag", "Dal mercoledì al sabato": "Mittwoch bis Samstag", "Domenica": "Sonntag"}, "links": ["<u>Menu Italiano</u>", "<u>English Menu</u>", "<u>Carte en Française</u>", "<u>Carta en Español</u>"]}, "es": {"lang": "es", "lang_label": "Español", "title": "Carta — Santamonica", "degu_titolo": "Menú Degustación", "degu_portate_label": "platos", "degu_vini_label": "maridaje de vinos", "degu_nota": "Precio por persona, menú para toda la mesa.", "degu_intero_tavolo": "toda la mesa", "percorso_7": "Menú a libre elección del Chef", "note_carta_1": "Para mantener constantes el nivel cualitativo y las características organolépticas de las materias primas, los productos de pescado comprados frescos se someten a ultracongelación. Estos productos se señalan con el símbolo * para una información clara y transparente.", "note_carta_2": "La lista de alérgenos se puede consultar en la última página de esta carta.", "note_ospite_titolo": "Nota para nuestros huéspedes", "note_orario": "Para mantener constantes el nivel cualitativo y las características organolépticas, los productos frescos se ultracongelan y se señalan con el símbolo: *", "orario_titolo": "HORARIO DE SERVICIO:", "titolo_degustazione": "Menú Degustación", "sezioni": {"Crudi": "Crudos", "Sfiziosi": "Entrantes", "Amidi e Carboidrati": "Pastas & Cereales", "Non Solo Mare": "No Solo Mar"}, "unita": {"cad.": "ud."}, "piatti": {"Ali di razza, fave nostrane, mela verde, mandorle": "Aleta de raya, habas locales, manzana verde, almendras", "Animella di vitello, sedano rapa, nocciole, fondo di pesce": "Mollejas de ternera, apio nabo, avellanas, fondo de pescado", "Tortelli di cinghiale, dashi di orata, cipollina, shiso": "Tortelli de jabalí, dashi de dorada, cebolleta, shiso", "Tubetti “<em>Mancini</em>”, baccalà, kosho di agrumi, borlotti": "Tubetti “<em>Mancini</em>”, bacalao, kosho de cítricos, alubias borlotti", "Ombrina nostrana pescata ad amo, salicornia, indivia belga": "Corvina local de anzuelo, salicornia, endibia belga", "Gelato al limone nero, levistico, lime, cracker di latte": "Helado de limón negro, levístico, lima, cracker de leche", "Ostriche Fine de Claire": "Ostras Fine de Claire", "Ostriche Antilope": "Ostras Antilope", "Ostriche Enrico IV": "Ostras Enrico IV", "Scampi nostrani": "Cigalas locales", "Gamberi viola nostrani": "Gambas violetas locales", "Selezione solamente di pesci nostrani pescati ad amo": "Selección exclusivamente de pescados locales de anzuelo", "Degustazione di mare": "Degustación del mar", "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir": "Calamar local, guisantes frescos, bagna cauda ligera, kéfir", "Cavolo cappuccio, miso, lamponi, anacardi": "Col repollo, miso, frambuesas, anacardos", "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce": "Mollejas de ternera, apio nabo, avellanas, reducción de fondo de pescado", "“Non formaggi”": "“No quesos”", "(Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla)": "(Degustación de falsos quesos artesanales a base de anacardos y leche de almendra)", "Spaghettoni quadrati “<em>Mancini</em>”, anemoni di mare, nduja, maggiorana": "Spaghettoni cuadrados “<em>Mancini</em>”, anémonas de mar, nduja, mejorana", "Tubetti “<em>Mancini</em>”, baccalà, il nostro kosho di agrumi fermentato, borlotti": "Tubetti “<em>Mancini</em>”, bacalao, nuestro kosho de cítricos fermentado, borlotti", "Riso “<em>Riserva San Massimo</em>”, ragù di lepre, cime di rapa, Parmigiano Reggiano": "Arroz “<em>Riserva San Massimo</em>”, ragú de liebre, grelos, Parmigiano Reggiano", "Polpo nostrano, rabarbaro, piselli": "Pulpo local, ruibarbo, guisantes", "Zucchina alla scapece, menta, yogurt, pepe Timut": "Calabacín en escabeche, menta, yogur, pimienta Timut", "Picanha, cardoncelli, fondo di manzo": "Picanha, setas cardoncelli, jugo de ternera"}, "orario": {"Martedì": "Martes", "Dal mercoledì al sabato": "De miércoles a sábado", "Domenica": "Domingo"}, "links": ["<u>Menu Italiano</u>", "<u>English Menu</u>", "<u>Carte en Française</u>", "<u>Speisekarte auf Deutsch</u>"]}};
+
+function costruisciMenuTradotto(menuDati, t) {
+  var m = JSON.parse(JSON.stringify(menuDati));
+  var piatti = t.piatti;
+  function tr(n) { return piatti[n] || n; }
+
+  m.degustazione.nota = t.degu_nota;
+  m.degustazione.percorsi['6'].forEach(function(p){ p.nome = tr(p.nome); });
+  m.degustazione.percorsi['7'] = t.percorso_7;
+
+  m.sezioni.forEach(function(sez) {
+    sez.titolo_display = t.sezioni[sez.titolo] || sez.titolo;
+    sez.piatti.forEach(function(p){
+      p.nome = tr(p.nome);
+      if (p.unita) p.unita = t.unita[p.unita] || p.unita;
+      if (p.descrizione) p.descrizione = tr(p.descrizione);
+    });
+  });
+
+  m.orario.orarioServizio.forEach(function(o){
+    o.giorno = t.orario[o.giorno] || o.giorno;
+  });
+  return m;
+}
+
+function costruisciHtmlTradotto(lang, t) {
+  // Parti dal menu.html italiano già costruito (outputCorrente)
+  // e sostituisci il blocco MENU + i testi fissi
+  var src = outputCorrente;
+  var menuDatiIT = leggi();
+  var m = costruisciMenuTradotto(menuDatiIT, t);
+
+  // Sostituisci il blocco const MENU = {...}
+  var SEP = '/* ' + '\u2550'.repeat(57) + ' */\n';
+  var START = 'const MENU = {';
+  var i1 = src.indexOf(START);
+  var i2 = src.indexOf(SEP, i1) + SEP.length;
+  var newBlock = 'const MENU = ' + JSON.stringify(m, null, 2) + ';\n' + SEP;
+  var html = src.slice(0, i1) + newBlock + src.slice(i2);
+
+  // Attributo lang
+  html = html.replace('<html lang="it">', '<html lang="' + lang + '">');
+
+  // Title
+  html = html.replace(/<title>[^<]*<\/title>/, '<title>' + t.title + '</title>');
+
+  // NOTE_CARTA — sostituisci tutta la riga note_ospite_titolo
+  html = html.replace(/Note per l'ospite<\/span>[^`]*`/,
+    t.note_ospite_titolo + '</span>\n  ' + t.note_carta_1 + '<br>\n  ' + t.note_carta_2 + '\n`');
+
+  // NOTE_ORARIO
+  html = html.replace(/Per mantenere costanti.*?simbolo: \*`/s,
+    t.note_orario + '`');
+
+  // Degu title nel HTML statico
+  html = html.replace('Men\u00f9\u2019 Degustazione', t.titolo_degustazione);
+  html = html.replace('Men&ugrave;&rsquo; Degustazione', t.titolo_degustazione);
+
+  // Portate/vini labels nel JS
+  html = html.replace(
+    /\$\{o\.portate\} portate/g,
+    '${o.portate} ' + t.degu_portate_label
+  );
+  html = html.replace(
+    /eventuale abbinamento vini/g,
+    t.degu_vini_label
+  );
+
+  // Orario titolo
+  html = html.replace('ORARIO DI SERVIZIO:', t.orario_titolo);
+
+  // Links lingue nel foglio orario
+  html = html.replace(
+    /<u><em>English Menu<\/em><\/u><br>\s*<u><em>Carte en Fran[^<]*<\/em><\/u>/,
+    t.links.join('<br>\n            ')
+  );
+
+  return html;
+}
+
+function pubblicaFile(token, headers, path, content) {
+  var apiBase = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + path;
+  return fetch(apiBase, { headers: headers })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var body = {
+        message: 'Aggiornamento menu',
+        content: btoa(unescape(encodeURIComponent(content)))
+      };
+      if (data.sha) body.sha = data.sha;
+      return fetch(apiBase, { method: 'PUT', headers: headers, body: JSON.stringify(body) });
+    });
+}
+
 function confermaPubblica() {
   var token = document.getElementById('token-input').value.trim();
   if (!token) { alert('Inserisci il token'); return; }
   localStorage.setItem('gh_token', token);
   chiudiModal();
+  eseguiPubblicazione(token);
+}
 
-  // Ottieni SHA del file corrente poi aggiorna
-  var apiBase = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + MENU_PATH;
+function eseguiPubblicazione(token) {
+
   var headers = {
     'Authorization': 'token ' + token,
     'Accept': 'application/vnd.github.v3+json',
     'Content-Type': 'application/json'
   };
 
-  fetch(apiBase, { headers: headers })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      var sha = data.sha;
-      var content = btoa(unescape(encodeURIComponent(outputCorrente)));
-      return fetch(apiBase, {
-        method: 'PUT',
-        headers: headers,
-        body: JSON.stringify({
-          message: 'Aggiornamento menù',
-          content: content,
-          sha: sha
-        })
-      });
-    })
-    .then(function(r) {
-      if (r.ok) {
-        toast('✓ Menù pubblicato su GitHub!');
-      } else {
-        return r.json().then(function(e) { throw new Error(e.message); });
-      }
-    })
-    .catch(function(ex) {
-      alert('Errore pubblicazione: ' + ex.message);
-    });
+  // File da pubblicare: IT + 4 traduzioni
+  var files = [{ path: 'menu.html', content: outputCorrente, label: 'Italiano' }];
+  ['en','fr','de','es'].forEach(function(lang) {
+    var t = TRANSLATIONS[lang];
+    var html = costruisciHtmlTradotto(lang, t);
+    files.push({ path: 'menu-' + lang + '.html', content: html, label: lang.toUpperCase() });
+  });
+
+  toast('\u23f3 Pubblicazione in corso\u2026');
+
+  var i = 0;
+  function next() {
+    if (i >= files.length) {
+      toast('\u2713 Pubblicato in 5 lingue!');
+      return;
+    }
+    var f = files[i++];
+    pubblicaFile(token, headers, f.path, f.content)
+      .then(function(r) {
+        if (!r.ok) return r.json().then(function(e){ throw new Error(f.path + ': ' + e.message); });
+        toast('\u2713 ' + f.label + ' (' + i + '/' + files.length + ')');
+        setTimeout(next, 400);
+      })
+      .catch(function(ex) { alert('Errore: ' + ex.message); });
+  }
+  next();
 }
 
 function toast(msg) {
@@ -344,6 +484,7 @@ function toast(msg) {
   t.classList.add('on');
   setTimeout(function(){ t.classList.remove('on'); }, 3000);
 }
+
 </script>
 <!-- MODALE TOKEN GITHUB -->
 <div class="modal-overlay" id="modal-token">

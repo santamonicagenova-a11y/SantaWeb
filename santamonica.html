@@ -14,415 +14,232 @@
     --ink-soft: #3a3630;
     --terracotta: #c4734a;
     --sea: #4a7c8a;
-    --sea-light: #6fa3b2;
     --gold: #b89d6a;
     --divider: rgba(26,24,20,0.12);
   }
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   html { scroll-behavior: smooth; font-size: 16px; }
+  body { background: var(--warm-white); color: var(--ink); font-family: 'Jost', sans-serif; font-weight: 300; overflow-x: hidden; }
 
-  body {
-    background: var(--warm-white);
-    color: var(--ink);
-    font-family: 'Jost', sans-serif;
-    font-weight: 300;
-    overflow-x: hidden;
-  }
-
-  /* ── NAV ── */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 1.2rem 2rem;
-    background: transparent;
-    transition: background 0.4s, backdrop-filter 0.4s;
-  }
-  nav.scrolled {
-    background: rgba(250,248,244,0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--divider);
-  }
-  .nav-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.25rem;
-    font-weight: 400;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--ink);
-    text-decoration: none;
-  }
-  .nav-links {
-    display: flex; gap: 2rem; list-style: none;
-  }
-  .nav-links a {
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 2rem; background: transparent; transition: background 0.4s, backdrop-filter 0.4s; }
+  nav.scrolled { background: rgba(250,248,244,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--divider); }
+  .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
+  .nav-logo .sub { font-size: 1rem; letter-spacing: 0.12em; opacity: 0.55; font-weight: 300; text-transform: lowercase; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); text-decoration: none; transition: color 0.2s; }
   .nav-links a:hover { color: var(--terracotta); }
-  .nav-cta {
-    font-size: 0.68rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--warm-white);
-    background: var(--ink);
-    padding: 0.55rem 1.2rem;
-    text-decoration: none;
-    transition: background 0.2s;
-  }
+  .nav-cta { font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-white); background: var(--ink); padding: 0.55rem 1.2rem; text-decoration: none; transition: background 0.2s; }
   .nav-cta:hover { background: var(--terracotta); }
-  .hamburger {
-    display: none;
-    flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none;
-  }
-  .hamburger span {
-    display: block; width: 24px; height: 1.5px; background: var(--ink); transition: 0.3s;
-  }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; }
+  .hamburger span { display: block; width: 24px; height: 1.5px; background: var(--ink); }
 
-  /* ── HERO ── */
-  .hero {
-    min-height: 100svh;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    overflow: hidden;
-    position: relative;
-  }
-  .hero-text-panel {
-    display: flex; flex-direction: column; justify-content: flex-end;
-    padding: 8rem 4rem 5rem 4rem;
-    background: var(--sand);
-    position: relative; z-index: 2;
-  }
-  .hero-eyebrow {
-    font-size: 0.65rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--terracotta);
-    margin-bottom: 1.5rem;
-    opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
-  }
-  .hero-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(3.5rem, 8vw, 6rem);
-    font-weight: 300;
-    line-height: 0.95;
-    letter-spacing: -0.01em;
-    color: var(--ink);
-    margin-bottom: 2rem;
-    opacity: 0; animation: fadeUp 0.8s 0.35s forwards;
-  }
-  .hero-title em {
-    font-style: italic;
-    color: var(--terracotta);
-  }
-  .hero-desc {
-    font-size: 0.88rem;
-    line-height: 1.75;
-    color: var(--ink-soft);
-    max-width: 380px;
-    margin-bottom: 3rem;
-    opacity: 0; animation: fadeUp 0.8s 0.5s forwards;
-  }
-  .hero-actions {
-    display: flex; gap: 1rem; flex-wrap: wrap;
-    opacity: 0; animation: fadeUp 0.8s 0.65s forwards;
-  }
-  .btn-primary {
-    display: inline-block;
-    font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--warm-white); background: var(--ink);
-    padding: 0.9rem 2rem; text-decoration: none;
-    transition: background 0.2s;
-  }
+  /* HERO */
+  .hero { min-height: 100svh; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; }
+  .hero-text-panel { display: flex; flex-direction: column; justify-content: flex-end; padding: 8rem 4rem 5rem 4rem; background: var(--sand); }
+  .hero-eyebrow { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 1.5rem; opacity: 0; animation: fadeUp 0.8s 0.2s forwards; }
+  .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(3.5rem, 8vw, 6rem); font-weight: 300; line-height: 0.95; margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.8s 0.35s forwards; }
+  .hero-title em { font-style: italic; color: var(--terracotta); }
+  .hero-desc { font-size: 0.88rem; line-height: 1.75; color: var(--ink-soft); max-width: 380px; margin-bottom: 3rem; opacity: 0; animation: fadeUp 0.8s 0.5s forwards; }
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.8s 0.65s forwards; }
+  .hero-scroll-indicator { position: absolute; bottom: 2.5rem; left: 4rem; display: flex; align-items: center; gap: 0.8rem; font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--ink-soft); opacity: 0; animation: fadeUp 1s 1s forwards; }
+  .hero-scroll-indicator::before { content: ''; display: block; width: 40px; height: 1px; background: var(--gold); }
+  .hero-image-panel { position: relative; overflow: hidden; }
+  .hero-image-panel img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.05); animation: zoomOut 1.4s 0.1s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
+
+  /* BUTTONS */
+  .btn-primary { display: inline-block; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-white); background: var(--ink); padding: 0.9rem 2rem; text-decoration: none; transition: background 0.2s; }
   .btn-primary:hover { background: var(--terracotta); }
-  .btn-secondary {
-    display: inline-block;
-    font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--ink); border: 1px solid var(--ink);
-    padding: 0.9rem 2rem; text-decoration: none;
-    transition: all 0.2s;
-  }
+  .btn-secondary { display: inline-block; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); border: 1px solid var(--ink); padding: 0.9rem 2rem; text-decoration: none; transition: all 0.2s; }
   .btn-secondary:hover { background: var(--ink); color: var(--warm-white); }
 
-  .hero-image-panel {
-    position: relative; overflow: hidden;
-  }
-  .hero-image-panel img {
-    width: 100%; height: 100%; object-fit: cover;
-    transform: scale(1.05);
-    animation: zoomOut 1.4s 0.1s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
-  }
-  .hero-scroll-indicator {
-    position: absolute; bottom: 2.5rem; left: 4rem;
-    display: flex; align-items: center; gap: 0.8rem;
-    font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase;
-    color: var(--ink-soft);
-    opacity: 0; animation: fadeUp 1s 1s forwards;
-  }
-  .hero-scroll-indicator::before {
-    content: ''; display: block;
-    width: 40px; height: 1px; background: var(--gold);
-  }
-
-  /* ── SECTION BASE ── */
+  /* SECTIONS */
   section { padding: 6rem 2rem; }
   .section-inner { max-width: 1200px; margin: 0 auto; }
-  .section-label {
-    font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase;
-    color: var(--terracotta); margin-bottom: 1rem;
-  }
-  .section-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    font-weight: 300; line-height: 1.1;
-    margin-bottom: 1.5rem;
-  }
+  .section-label { font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 1rem; }
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 300; line-height: 1.1; margin-bottom: 1.5rem; }
   .section-title em { font-style: italic; color: var(--terracotta); }
 
-  /* ── CUCINA ── */
-  .cucina-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 5rem;
-    align-items: center;
-  }
+  /* CUCINA */
+  .cucina-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
   .cucina-body { font-size: 0.9rem; line-height: 1.9; color: var(--ink-soft); }
   .cucina-body p + p { margin-top: 1rem; }
   .cucina-actions { margin-top: 2.5rem; }
-  .cucina-images {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-  }
-  .cucina-images img {
-    width: 100%; aspect-ratio: 3/4; object-fit: cover;
-    transition: transform 0.5s ease;
-  }
+  .cucina-images { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .cucina-images img { width: 100%; aspect-ratio: 3/4; object-fit: cover; transition: transform 0.5s ease; }
   .cucina-images img:first-child { margin-top: 3rem; }
   .cucina-images img:hover { transform: scale(1.02); }
 
-  /* ── QUOTE ── */
-  .quote-section {
-    background: var(--ink);
-    padding: 5rem 2rem;
-    text-align: center;
-  }
-  .quote-text {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(1.6rem, 4vw, 3rem);
-    font-weight: 300; font-style: italic;
-    color: var(--sand);
-    line-height: 1.4;
-    max-width: 800px;
-    margin: 0 auto 1rem;
-  }
-  .quote-attr {
-    font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase;
-    color: var(--gold);
-  }
+  /* QUOTE */
+  .quote-section { background: var(--ink); padding: 2.5rem 2rem; text-align: center; }
+  .quote-text { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.4rem, 3vw, 2.2rem); font-weight: 300; font-style: italic; color: var(--sand); line-height: 1.4; max-width: 800px; margin: 0 auto 0.75rem; }
+  .quote-attr { font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); }
 
-  /* ── CANTINA ── */
-  .cantina-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 5rem;
-    align-items: center;
-  }
+  /* CANTINA */
+  .cantina-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
   .cantina-image { position: relative; }
-  .cantina-image img {
-    width: 100%; aspect-ratio: 2/3; object-fit: cover;
-  }
-  .cantina-image::after {
-    content: '';
-    position: absolute; top: -1.5rem; left: -1.5rem;
-    right: 1.5rem; bottom: 1.5rem;
-    border: 1px solid var(--gold);
-    z-index: -1; pointer-events: none;
-  }
+  .cantina-image img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+  .cantina-image::after { content: ''; position: absolute; top: -1.5rem; left: -1.5rem; right: 1.5rem; bottom: 1.5rem; border: 1px solid var(--gold); z-index: -1; pointer-events: none; }
 
-  /* ── ORARI & INFO ── */
-  .info-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem;
-    padding-top: 3rem;
-    border-top: 1px solid var(--divider);
-  }
-  .info-block-label {
-    font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase;
-    color: var(--gold); margin-bottom: 1rem;
-  }
-  .info-block-content {
-    font-size: 0.88rem; line-height: 2; color: var(--ink-soft);
-  }
+  /* INFO */
+  .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; padding-top: 3rem; border-top: 1px solid var(--divider); }
+  .info-block-label { font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+  .info-block-content { font-size: 0.88rem; line-height: 2; color: var(--ink-soft); }
   .info-block-content a { color: var(--ink); text-decoration: none; }
   .info-block-content a:hover { color: var(--terracotta); }
 
-  /* ── REGALA ── */
-  .regalo-section {
-    background: var(--sand);
-  }
-  .regalo-inner {
-    max-width: 700px; margin: 0 auto; text-align: center;
-  }
-  .regalo-inner .section-title { margin-bottom: 1rem; }
-  .regalo-body {
-    font-size: 0.9rem; line-height: 1.85; color: var(--ink-soft);
-    margin-bottom: 2.5rem;
-  }
+  /* REGALO */
+  .regalo-section { background: var(--sand); }
+  .regalo-inner { max-width: 700px; margin: 0 auto; text-align: center; }
+  .regalo-body { font-size: 0.9rem; line-height: 1.85; color: var(--ink-soft); margin-bottom: 2.5rem; }
 
-  /* ── CONTATTI ── */
-  .contatti-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start;
-  }
+  /* GALLERIA */
+  .galleria-section { background: var(--ink); padding: 6rem 2rem; }
+  .galleria-section .section-label { color: var(--gold); }
+  .galleria-section .section-title { color: var(--sand); }
+  .galleria-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-top: 3rem; }
+  .galleria-item { overflow: hidden; cursor: pointer; aspect-ratio: 1; }
+  .galleria-item.grande { grid-column: span 2; aspect-ratio: 2/1; }
+  .galleria-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s ease; }
+  .galleria-item:hover img { transform: scale(1.04); }
+
+  /* LIGHTBOX */
+  #lightbox { position: fixed; inset: 0; z-index: 600; background: rgba(26,24,20,0.95); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 2rem; }
+  #lightbox.visible { opacity: 1; pointer-events: all; }
+  #lightbox img { max-width: 90vw; max-height: 88vh; object-fit: contain; }
+  #lightbox-close { position: absolute; top: 1.5rem; right: 2rem; background: none; border: none; color: var(--sand); font-size: 1.5rem; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
+  #lightbox-close:hover { opacity: 1; }
+  #lightbox-prev, #lightbox-next { position: absolute; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--sand); font-size: 2.5rem; cursor: pointer; opacity: 0.5; transition: opacity 0.2s; padding: 1rem; }
+  #lightbox-prev { left: 1rem; }
+  #lightbox-next { right: 1rem; }
+  #lightbox-prev:hover, #lightbox-next:hover { opacity: 1; }
+
+  /* PRENOTAZIONE SPECIALE */
+  .prenota-section { background: var(--sand); padding: 6rem 2rem; }
+  .prenota-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; margin-top: 3rem; }
+  .prenota-intro { font-size: 0.9rem; line-height: 1.9; color: var(--ink-soft); }
+  .prenota-intro p + p { margin-top: 1rem; }
+  .prenota-highlights { margin-top: 2.5rem; display: flex; flex-direction: column; gap: 1.2rem; }
+  .prenota-highlight { display: flex; align-items: flex-start; gap: 1rem; }
+  .prenota-highlight-icon { width: 36px; height: 36px; border: 1px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.9rem; }
+  .prenota-highlight-text { font-size: 0.82rem; color: var(--ink-soft); line-height: 1.6; }
+  .prenota-highlight-text strong { display: block; color: var(--ink); font-weight: 400; margin-bottom: 0.15rem; font-size: 0.85rem; }
+  .prenota-form-box { background: var(--warm-white); padding: 2.5rem; }
+  .prenota-form-box .form-group { margin-bottom: 1.5rem; }
+  .prenota-form-box .form-group label { display: block; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.5rem; }
+  .prenota-form-box .form-group input,
+  .prenota-form-box .form-group textarea,
+  .prenota-form-box .form-group select { width: 100%; padding: 0.85rem 0; border: none; border-bottom: 1px solid var(--divider); background: transparent; font-family: 'Jost', sans-serif; font-size: 0.9rem; color: var(--ink); outline: none; transition: border-color 0.2s; resize: none; appearance: none; -webkit-appearance: none; }
+  .prenota-form-box .form-group input:focus,
+  .prenota-form-box .form-group textarea:focus,
+  .prenota-form-box .form-group select:focus { border-bottom-color: var(--terracotta); }
+  .prenota-form-box .form-group textarea { min-height: 80px; }
+  .prenota-form-box .form-group select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233a3630' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; padding-right: 1.5rem; }
+  .prenota-form-box .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .prenota-form-box .form-status { display: none; margin-top: 1rem; font-size: 0.85rem; padding: 0.75rem 1rem; }
+  .prenota-form-box .form-status.success { display: block; background: #eaf3de; color: #3b6d11; }
+  .prenota-form-box .form-status.error { display: block; background: #fcebeb; color: #a32d2d; }
+
+  /* CONTATTI */
+  .contatti-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
   .form-group { margin-bottom: 1.5rem; }
-  .form-group label {
-    display: block; font-size: 0.65rem; letter-spacing: 0.2em;
-    text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.5rem;
-  }
-  .form-group input,
-  .form-group textarea {
-    width: 100%; padding: 0.85rem 0;
-    border: none; border-bottom: 1px solid var(--divider);
-    background: transparent; font-family: 'Jost', sans-serif;
-    font-size: 0.9rem; color: var(--ink);
-    outline: none; transition: border-color 0.2s;
-    resize: none;
-  }
-  .form-group input:focus,
-  .form-group textarea:focus { border-bottom-color: var(--terracotta); }
+  .form-group label { display: block; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.5rem; }
+  .form-group input, .form-group textarea { width: 100%; padding: 0.85rem 0; border: none; border-bottom: 1px solid var(--divider); background: transparent; font-family: 'Jost', sans-serif; font-size: 0.9rem; color: var(--ink); outline: none; transition: border-color 0.2s; resize: none; }
+  .form-group input:focus, .form-group textarea:focus { border-bottom-color: var(--terracotta); }
   .form-group textarea { min-height: 100px; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
   .form-check { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 2rem; }
   .form-check input[type=checkbox] { margin-top: 2px; accent-color: var(--terracotta); }
-  .form-check label {
-    font-size: 0.75rem; color: var(--ink-soft); line-height: 1.5;
-  }
+  .form-check label { font-size: 0.75rem; color: var(--ink-soft); line-height: 1.5; }
   .form-check label a { color: var(--terracotta); text-decoration: none; }
+  .form-status { display: none; margin-top: 1rem; font-size: 0.85rem; padding: 0.75rem 1rem; }
+  .form-status.success { display: block; background: #eaf3de; color: #3b6d11; }
+  .form-status.error { display: block; background: #fcebeb; color: #a32d2d; }
 
-  /* ── MAP PLACEHOLDER ── */
-  .map-area {
-    background: var(--sand);
-    aspect-ratio: 1;
-    display: flex; align-items: center; justify-content: center;
-    flex-direction: column; gap: 1rem;
-    text-align: center;
-  }
-  .map-pin {
-    width: 48px; height: 48px;
-    background: var(--terracotta);
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 0.5rem;
-  }
-  .map-pin::after {
-    content: '';
-    width: 18px; height: 18px;
-    background: var(--warm-white);
-    border-radius: 50%;
-  }
-  .map-address {
-    font-size: 0.85rem; line-height: 1.7; color: var(--ink-soft);
-  }
-  .map-address strong {
-    display: block; font-size: 0.65rem; letter-spacing: 0.2em;
-    text-transform: uppercase; color: var(--gold);
-    margin-bottom: 0.5rem; font-weight: 400;
-  }
+  /* MAPPA */
+  .map-wrapper { width: 100%; }
+  .map-wrapper iframe { width: 100%; height: 380px; border: none; display: block; }
+  .map-bar { background: var(--sand); padding: 1rem 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; border-top: 1px solid var(--divider); }
+  .map-bar-address { font-size: 0.82rem; line-height: 1.6; color: var(--ink-soft); }
+  .map-bar-label { display: block; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); font-weight: 400; margin-bottom: 0.2rem; }
+  .map-bar-link { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--terracotta); text-decoration: none; white-space: nowrap; }
+  .map-bar-link:hover { text-decoration: underline; }
 
-  /* ── FOOTER ── */
-  footer {
-    background: var(--ink); color: var(--sand);
-    padding: 3rem 2rem;
-  }
-  .footer-inner {
-    max-width: 1200px; margin: 0 auto;
-    display: flex; justify-content: space-between; align-items: center;
-    flex-wrap: wrap; gap: 1.5rem;
-  }
-  .footer-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.1rem; letter-spacing: 0.2em;
-    text-transform: uppercase; color: var(--sand);
-    text-decoration: none;
-  }
+  /* FOOTER */
+  footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
+  .footer-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
+  .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sand); text-decoration: none; }
   .footer-social { display: flex; gap: 1.5rem; }
-  .footer-social a {
-    font-size: 0.65rem; letter-spacing: 0.2em;
-    text-transform: uppercase; color: var(--gold);
-    text-decoration: none; transition: color 0.2s;
-  }
+  .footer-social a { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); text-decoration: none; transition: color 0.2s; }
   .footer-social a:hover { color: var(--sand); }
-  .footer-copy {
-    font-size: 0.68rem; color: rgba(245,240,232,0.4);
-    letter-spacing: 0.1em;
-  }
+  .footer-copy { font-size: 0.68rem; color: rgba(245,240,232,0.4); letter-spacing: 0.1em; }
 
-  /* ── MOBILE MENU ── */
-  .mobile-menu {
-    display: none;
-    position: fixed; inset: 0; z-index: 200;
-    background: var(--warm-white);
-    flex-direction: column; justify-content: center; align-items: center;
-    gap: 2.5rem;
-  }
+  /* MOBILE MENU */
+  .mobile-menu { display: none; position: fixed; inset: 0; z-index: 200; background: var(--warm-white); flex-direction: column; justify-content: center; align-items: center; gap: 2.5rem; }
   .mobile-menu.open { display: flex; }
-  .mobile-menu a {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 2rem; font-weight: 300; font-style: italic;
-    color: var(--ink); text-decoration: none;
-    transition: color 0.2s;
-  }
+  .mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; font-style: italic; color: var(--ink); text-decoration: none; transition: color 0.2s; }
   .mobile-menu a:hover { color: var(--terracotta); }
-  .menu-close {
-    position: absolute; top: 1.5rem; right: 2rem;
-    background: none; border: none; cursor: pointer;
-    font-size: 1.5rem; color: var(--ink);
-  }
+  .menu-close { position: absolute; top: 1.5rem; right: 2rem; background: none; border: none; cursor: pointer; font-size: 1.5rem; color: var(--ink); }
 
-  /* ── ANIMATIONS ── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes zoomOut {
-    from { transform: scale(1.05); }
-    to   { transform: scale(1); }
-  }
+  /* POPUP PRENOTAZIONE */
+  #booking-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(26,24,20,0.75); display: flex; align-items: center; justify-content: center; padding: 1.5rem; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+  #booking-overlay.visible { opacity: 1; pointer-events: all; }
+  #booking-popup { background: var(--warm-white); max-width: 480px; width: 100%; padding: 3rem; position: relative; transform: translateY(24px); transition: transform 0.4s ease; }
+  #booking-overlay.visible #booking-popup { transform: translateY(0); }
+  #booking-popup .popup-label { font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 1rem; display: block; }
+  #booking-popup h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; line-height: 1.1; margin-bottom: 1rem; }
+  #booking-popup h2 em { font-style: italic; color: var(--terracotta); }
+  #booking-popup p { font-size: 0.85rem; line-height: 1.75; color: var(--ink-soft); margin-bottom: 2rem; }
+  #booking-popup .popup-actions { display: flex; flex-direction: column; gap: 0.75rem; }
+  #booking-popup .popup-close { position: absolute; top: 1.2rem; right: 1.2rem; background: none; border: none; cursor: pointer; font-size: 1.1rem; color: var(--ink-soft); padding: 0.25rem; transition: color 0.2s; }
+  #booking-popup .popup-close:hover { color: var(--terracotta); }
+  #booking-popup .popup-skip { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-soft); background: none; border: none; cursor: pointer; text-align: center; padding: 0.4rem; transition: color 0.2s; }
+  #booking-popup .popup-skip:hover { color: var(--ink); }
 
-  .reveal {
-    opacity: 0; transform: translateY(30px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
+  /* COOKIE BANNER */
+  #cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: var(--ink); padding: 1.2rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; border-top: 2px solid var(--terracotta); transform: translateY(100%); transition: transform 0.4s ease; }
+  #cookie-banner.visible { transform: translateY(0); }
+  #cookie-banner p { font-size: 0.78rem; line-height: 1.6; color: rgba(245,240,232,0.85); max-width: 700px; }
+  #cookie-banner a { color: var(--gold); text-decoration: underline; }
+  .cookie-actions { display: flex; gap: 0.75rem; flex-shrink: 0; }
+  .cookie-btn { font-family: 'Jost', sans-serif; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.6rem 1.2rem; border: none; cursor: pointer; transition: background 0.2s; }
+  .cookie-accept { background: var(--terracotta); color: var(--warm-white); }
+  .cookie-accept:hover { background: #b5633d; }
+  .cookie-decline { background: transparent; color: rgba(245,240,232,0.6); border: 1px solid rgba(245,240,232,0.25); }
+  .cookie-decline:hover { color: var(--sand); border-color: rgba(245,240,232,0.5); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+  @keyframes zoomOut { from { transform: scale(1.05); } to { transform: scale(1); } }
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
   .reveal.visible { opacity: 1; transform: none; }
 
-  /* ── RESPONSIVE ── */
+  /* RESPONSIVE */
   @media (max-width: 900px) {
     nav { padding: 1rem 1.5rem; }
     .nav-links, .nav-cta { display: none; }
     .hamburger { display: flex; }
-
-    .hero { grid-template-columns: 1fr; min-height: 100svh; }
-    .hero-text-panel {
-      padding: 7rem 1.5rem 3rem;
-      order: 2;
-    }
+    .hero { grid-template-columns: 1fr; }
+    .hero-text-panel { padding: 7rem 1.5rem 3rem; order: 2; }
     .hero-image-panel { height: 55vw; min-height: 280px; order: 1; }
     .hero-scroll-indicator { display: none; }
-
-    .cucina-grid,
-    .cantina-grid,
-    .contatti-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .cucina-grid, .cantina-grid, .contatti-grid, .prenota-grid { grid-template-columns: 1fr; gap: 3rem; }
     .cucina-images { grid-template-columns: 1fr 1fr; }
     .cucina-images img:first-child { margin-top: 0; }
     .cantina-image::after { display: none; }
-
     .info-grid { grid-template-columns: 1fr; gap: 2rem; }
-
     section { padding: 4rem 1.5rem; }
-
-    .form-row { grid-template-columns: 1fr; }
-    .map-area { aspect-ratio: 4/3; }
-
+    .form-row, .prenota-form-box .form-row { grid-template-columns: 1fr; }
     .footer-inner { flex-direction: column; text-align: center; }
+    .galleria-grid { grid-template-columns: repeat(2, 1fr); }
+    .galleria-item.grande { grid-column: span 2; aspect-ratio: 3/2; }
+    #cookie-banner { flex-direction: column; align-items: flex-start; }
+    .cookie-actions { width: 100%; }
+    .cookie-btn { flex: 1; text-align: center; }
+  }
+  @media (max-width: 600px) {
+    .galleria-grid { grid-template-columns: 1fr; }
+    .galleria-item.grande { grid-column: span 1; aspect-ratio: 4/3; }
   }
 </style>
 </head>
@@ -430,35 +247,37 @@
 
 <!-- NAV -->
 <nav id="main-nav">
-  <a href="#" class="nav-logo">Santamonica</a>
+  <a href="#" class="nav-logo">Santamonica <span class="sub">sul mare</span></a>
   <ul class="nav-links">
     <li><a href="#cucina">Cucina</a></li>
     <li><a href="#cantina">Cantina</a></li>
+    <li><a href="#galleria">Galleria</a></li>
+    <li><a href="#prenota">Evento</a></li>
     <li><a href="#info">Info</a></li>
     <li><a href="#contatti">Contatti</a></li>
   </ul>
   <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" class="nav-cta">Prenota</a>
-  <button class="hamburger" id="hamburger" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
+  <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 
 <!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobile-menu">
-  <button class="menu-close" id="menu-close">✕</button>
+  <button class="menu-close" id="menu-close">&#x2715;</button>
   <a href="#cucina" class="mobile-link">Cucina</a>
   <a href="#cantina" class="mobile-link">Cantina</a>
-  <a href="#info" class="mobile-link">Info & Orari</a>
+  <a href="#galleria" class="mobile-link">Galleria</a>
+  <a href="#prenota" class="mobile-link">Evento speciale</a>
+  <a href="#info" class="mobile-link">Info &amp; Orari</a>
   <a href="#contatti" class="mobile-link">Contatti</a>
   <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" style="font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-style:normal;background:var(--ink);color:var(--warm-white);padding:0.9rem 2.5rem;margin-top:1rem;">Prenota</a>
 </div>
 
 <!-- HERO -->
-<section class="hero" style="padding:0;">
+<section class="hero" style="padding:0;position:relative;">
   <div class="hero-text-panel">
-    <p class="hero-eyebrow">Ristorante · Genova</p>
+    <p class="hero-eyebrow">Ristorante &middot; Genova</p>
     <h1 class="hero-title">Cucina <em>viva</em><br>sul mare</h1>
-    <p class="hero-desc">Un progetto in costante divenire, basato sull'attenzione al gusto e sulla qualità della materia prima. Pesce di Camogli, verdure dell'orto genovese, pasta e pane di nostra produzione.</p>
+    <p class="hero-desc">Un progetto in costante divenire, basato sull&rsquo;attenzione al gusto e sulla qualit&agrave; della materia prima. Pesce di Camogli, verdure dell&rsquo;orto genovese, pasta e pane di nostra produzione.</p>
     <div class="hero-actions">
       <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" class="btn-primary">Prenota un tavolo</a>
       <a href="#cucina" class="btn-secondary">Scopri il menu</a>
@@ -478,12 +297,12 @@
         <p class="section-label">La nostra proposta</p>
         <h2 class="section-title">Cucina <em>del territorio</em></h2>
         <div class="cucina-body">
-          <p>La qualità della materia prima è fondamentale: ci rivolgiamo quanto più possibile a pescatori e produttori locali. Il pesce arriva da Camogli, le verdure da un piccolo orto sulle alture di Genova.</p>
+          <p>La qualit&agrave; della materia prima &egrave; fondamentale: ci rivolgiamo quanto pi&ugrave; possibile a pescatori e produttori locali. Il pesce arriva da Camogli, le verdure da un piccolo orto sulle alture di Genova.</p>
           <p>I nostri piatti sono elaborati ma allo stesso tempo semplici, per valorizzare al meglio i prodotti della Liguria. Pasta fresca, pane, focaccia e dolci sono tutti di nostra produzione.</p>
-          <p>Una cucina elegante, in cui anche l'estetica e il piatto fisico hanno la loro importanza — partendo dalla tradizione per diventare contemporanei.</p>
+          <p>Una cucina elegante, in cui anche l&rsquo;estetica e il piatto fisico hanno la loro importanza &mdash; partendo dalla tradizione per diventare contemporanei.</p>
         </div>
         <div class="cucina-actions">
-          <a href="https://af88bf37-3bfb-460d-a80e-2a0f7ca776ba.filesusr.com/ugd/461837_d635715c48a04d4c96aa2f5de3ce6530.pdf" target="_blank" class="btn-primary">Guarda il menù</a>
+          <a href="https://af88bf37-3bfb-460d-a80e-2a0f7ca776ba.filesusr.com/ugd/461837_d635715c48a04d4c96aa2f5de3ce6530.pdf" target="_blank" class="btn-primary">Guarda il men&ugrave;</a>
         </div>
       </div>
       <div class="cucina-images reveal" style="transition-delay:0.15s">
@@ -496,9 +315,34 @@
 
 <!-- QUOTE -->
 <div class="quote-section">
-  <p class="quote-text">"Be nice to people. We're all trying our best."</p>
-  <p class="quote-attr">— Monica & Andrea</p>
+  <p class="quote-text">&ldquo;Be nice to people. We&rsquo;re all trying our best.&rdquo;</p>
+  <p class="quote-attr">&mdash; Monica &amp; Andrea</p>
 </div>
+
+<!-- GALLERIA -->
+<section class="galleria-section" id="galleria">
+  <div class="section-inner">
+    <p class="section-label reveal">La nostra cucina</p>
+    <h2 class="section-title reveal">Ogni piatto,<br><em>una storia</em></h2>
+    <div class="galleria-grid">
+      <div class="galleria-item grande reveal" onclick="openLightbox(0)">
+        <img src="img/piatto-pesce.jpg" alt="Pesce alla griglia con salsa e verdure">
+      </div>
+      <div class="galleria-item reveal" onclick="openLightbox(1)" style="transition-delay:0.1s">
+        <img src="img/piatto-tonno.jpg" alt="Tonno scottato con salse">
+      </div>
+      <div class="galleria-item reveal" onclick="openLightbox(2)" style="transition-delay:0.15s">
+        <img src="img/piatto-pasta.jpg" alt="Pasta fresca fatta in casa">
+      </div>
+      <div class="galleria-item reveal" onclick="openLightbox(3)" style="transition-delay:0.2s">
+        <img src="img/piatto-carne.jpg" alt="Secondo con salsa ricca">
+      </div>
+      <div class="galleria-item grande reveal" onclick="openLightbox(4)" style="transition-delay:0.25s">
+        <img src="img/piatto-dessert.jpg" alt="Dessert con frutti di bosco e salsa">
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- CANTINA -->
 <section id="cantina">
@@ -511,8 +355,8 @@
         <p class="section-label">I nostri vini</p>
         <h2 class="section-title">Una <em>cantina</em> ligure</h2>
         <div class="cucina-body">
-          <p>Monica, sommelier esperta e appassionata, cura personalmente la carta dei vini. In una ricca proposta di etichette italiane spicca la vasta selezione di bottiglie liguri — abbinamento perfetto al pesce del nostro mare.</p>
-          <p>La crescente richiesta di vini naturali porta il Santamonica a interfacciarsi sempre più con produttori che lavorano l'uva il meno possibile. Un'ampia scelta è disponibile anche a calice.</p>
+          <p>Monica, sommelier esperta e appassionata, cura personalmente la carta dei vini. In una ricca proposta di etichette italiane spicca la vasta selezione di bottiglie liguri &mdash; abbinamento perfetto al pesce del nostro mare.</p>
+          <p>La crescente richiesta di vini naturali porta il Santamonica a interfacciarsi sempre pi&ugrave; con produttori che lavorano l&rsquo;uva il meno possibile. Un&rsquo;ampia scelta &egrave; disponibile anche a calice.</p>
         </div>
         <div class="cucina-actions">
           <a href="https://af88bf37-3bfb-460d-a80e-2a0f7ca776ba.filesusr.com/ugd/461837_66faa32523f248c7982f03a1ccef5164.pdf" target="_blank" class="btn-secondary">Carta dei vini</a>
@@ -522,14 +366,114 @@
   </div>
 </section>
 
-<!-- REGALA -->
+<!-- REGALO -->
 <section class="regalo-section">
   <div class="section-inner">
     <div class="regalo-inner reveal">
       <p class="section-label">Un dono speciale</p>
       <h2 class="section-title">Buoni <em>regalo</em></h2>
-      <p class="regalo-body">Regala un pranzo o una cena al Santamonica. I Buoni Regalo sono utilizzabili tutti i giorni (salvo disponibilità) escluso Sabato e festivi, con validità di 6 mesi dall'acquisto. Contattaci per acquistarlo.</p>
+      <p class="regalo-body">Regala un pranzo o una cena al Santamonica. I Buoni Regalo sono utilizzabili tutti i giorni (salvo disponibilit&agrave;) escluso Sabato e festivi, con validit&agrave; di 6 mesi dall&rsquo;acquisto. Contattaci per acquistarlo.</p>
       <a href="mailto:santamonicagenova@gmail.com?subject=Buono Regalo Santamonica" class="btn-primary">Richiedi un buono</a>
+    </div>
+  </div>
+</section>
+
+<!-- PRENOTAZIONE SPECIALE -->
+<section class="prenota-section" id="prenota">
+  <div class="section-inner">
+    <p class="section-label reveal">Hai qualcosa da festeggiare?</p>
+    <h2 class="section-title reveal">Organizza una serata <em>speciale</em></h2>
+    <div class="prenota-grid">
+      <div class="reveal">
+        <div class="prenota-intro">
+          <p>Che sia un compleanno, un anniversario o una cena aziendale, ci piace sapere in anticipo per prepararci al meglio ad accoglierti.</p>
+          <p>Raccontaci la tua occasione e le tue esigenze: faremo in modo che ogni dettaglio sia curato.</p>
+        </div>
+        <div class="prenota-highlights">
+          <div class="prenota-highlight">
+            <div class="prenota-highlight-icon">&#x1F942;</div>
+            <div class="prenota-highlight-text">
+              <strong>Occasioni speciali</strong>
+              Compleanni, anniversari, proposte di matrimonio &mdash; creiamo l&rsquo;atmosfera giusta.
+            </div>
+          </div>
+          <div class="prenota-highlight">
+            <div class="prenota-highlight-icon">&#x1F33F;</div>
+            <div class="prenota-highlight-text">
+              <strong>Intolleranze e allergie</strong>
+              Segnalacele in anticipo: la cucina si adatta senza compromettere l&rsquo;esperienza.
+            </div>
+          </div>
+          <div class="prenota-highlight">
+            <div class="prenota-highlight-icon">&#x1F4CD;</div>
+            <div class="prenota-highlight-text">
+              <strong>Tavolo preferito</strong>
+              Se hai una preferenza &mdash; vista mare, interno, angolo riservato &mdash; faccelo sapere.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal" style="transition-delay:0.15s">
+        <div class="prenota-form-box">
+          <form id="prenota-form" action="https://formspree.io/f/mkopjnvq" method="POST">
+            <input type="hidden" name="_subject" value="Richiesta prenotazione speciale - Santamonica">
+            <div class="prenota-form-box form-row">
+              <div class="form-group">
+                <label for="p-nome">Nome</label>
+                <input type="text" id="p-nome" name="nome" placeholder="Mario" required>
+              </div>
+              <div class="form-group">
+                <label for="p-tel">Telefono</label>
+                <input type="tel" id="p-tel" name="telefono" placeholder="+39 000 0000000" required>
+              </div>
+            </div>
+            <div class="prenota-form-box form-row">
+              <div class="form-group">
+                <label for="p-data">Data desiderata</label>
+                <input type="date" id="p-data" name="data" required>
+              </div>
+              <div class="form-group">
+                <label for="p-persone">Numero di persone</label>
+                <select id="p-persone" name="persone" required>
+                  <option value="" disabled selected>Seleziona</option>
+                  <option>1 persona</option>
+                  <option>2 persone</option>
+                  <option>3 persone</option>
+                  <option>4 persone</option>
+                  <option>5 persone</option>
+                  <option>6 persone</option>
+                  <option>7&ndash;10 persone</option>
+                  <option>Oltre 10 persone</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="p-occasione">Occasione</label>
+              <select id="p-occasione" name="occasione">
+                <option value="" disabled selected>Seleziona</option>
+                <option>Compleanno</option>
+                <option>Anniversario</option>
+                <option>Proposta di matrimonio</option>
+                <option>Cena di lavoro</option>
+                <option>Cena romantica</option>
+                <option>Altro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="p-intolleranze">Intolleranze o allergie</label>
+              <input type="text" id="p-intolleranze" name="intolleranze" placeholder="Es. glutine, crostacei, lattosio&hellip;">
+            </div>
+            <div class="form-group">
+              <label for="p-richieste">Richieste particolari</label>
+              <textarea id="p-richieste" name="richieste" placeholder="Tavolo con vista mare, men&ugrave; personalizzato, torta&hellip;"></textarea>
+            </div>
+            <div style="margin-top:1.5rem;">
+              <button type="submit" id="prenota-btn" class="btn-primary" style="cursor:pointer;font-family:'Jost',sans-serif;border:none;width:100%;text-align:center;">Invia la richiesta</button>
+            </div>
+            <div class="prenota-form-box form-status" id="prenota-status"></div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -538,22 +482,24 @@
 <section id="info">
   <div class="section-inner">
     <p class="section-label reveal">Come raggiungerci</p>
-    <h2 class="section-title reveal">Orari & <em>Contatti</em></h2>
+    <h2 class="section-title reveal">Orari &amp; <em>Contatti</em></h2>
     <div class="info-grid reveal" style="transition-delay:0.1s">
       <div>
         <p class="info-block-label">Orari</p>
         <div class="info-block-content">
-          Martedì<br><strong style="color:var(--ink);font-weight:400">19:30 – 22:30</strong><br><br>
-          Mercoledì – Sabato<br><strong style="color:var(--ink);font-weight:400">12:30 – 14:30 &nbsp;/&nbsp; 19:30 – 22:30</strong><br><br>
-          Domenica<br><strong style="color:var(--ink);font-weight:400">12:30 – 14:30</strong><br><br>
-          <em style="font-size:0.78rem">Lunedì chiuso</em>
+          Marted&igrave;<br>
+          <strong style="color:var(--ink);font-weight:400">19:30 &ndash; 22:30</strong><br><br>
+          Mercoled&igrave; &ndash; Sabato<br>
+          <strong style="color:var(--ink);font-weight:400">12:30 &ndash; 14:30 &nbsp;/&nbsp; 19:30 &ndash; 22:30</strong><br><br>
+          Domenica<br>
+          <strong style="color:var(--ink);font-weight:400">12:30 &ndash; 14:30</strong><br><br>
+          <em style="font-size:0.78rem">Luned&igrave; chiuso</em>
         </div>
       </div>
       <div>
         <p class="info-block-label">Dove siamo</p>
         <div class="info-block-content">
-          Lungomare Lombardo 27<br>
-          16145 Genova — Italy<br><br>
+          Lungomare Lombardo 27<br>16145 Genova &mdash; Italy<br><br>
           <a href="tel:+390105533155">+39 010 553 31 55</a><br>
           <a href="mailto:santamonicagenova@gmail.com">santamonicagenova@gmail.com</a>
         </div>
@@ -562,7 +508,7 @@
         <p class="info-block-label">Note</p>
         <div class="info-block-content">
           Si prega di segnalare eventuali allergie o intolleranze al momento della prenotazione.<br><br>
-          🐾 Accettiamo animali di tutte le taglie.
+          &#x1F43E; Accettiamo animali di tutte le taglie.
         </div>
       </div>
     </div>
@@ -576,45 +522,51 @@
       <div class="reveal">
         <p class="section-label">Scrivici</p>
         <h2 class="section-title">Manda un <em>messaggio</em></h2>
-        <form id="contact-form" onsubmit="handleSubmit(event)">
+        <form id="contact-form" action="https://formspree.io/f/mkopjnvq" method="POST">
           <div class="form-row">
             <div class="form-group">
               <label for="nome">Nome</label>
-              <input type="text" id="nome" placeholder="Mario" required>
+              <input type="text" id="nome" name="nome" placeholder="Mario" required>
             </div>
             <div class="form-group">
               <label for="cognome">Cognome</label>
-              <input type="text" id="cognome" placeholder="Rossi" required>
+              <input type="text" id="cognome" name="cognome" placeholder="Rossi" required>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
               <label for="email">Email</label>
-              <input type="email" id="email" placeholder="mario@email.com" required>
+              <input type="email" id="email" name="email" placeholder="mario@email.com" required>
             </div>
             <div class="form-group">
               <label for="tel">Telefono</label>
-              <input type="tel" id="tel" placeholder="+39 000 0000000">
+              <input type="tel" id="tel" name="telefono" placeholder="+39 000 0000000">
             </div>
           </div>
           <div class="form-group">
             <label for="msg">Messaggio</label>
-            <textarea id="msg" placeholder="Come possiamo aiutarti?" required></textarea>
+            <textarea id="msg" name="messaggio" placeholder="Come possiamo aiutarti?" required></textarea>
           </div>
           <div class="form-check">
             <input type="checkbox" id="privacy" required>
             <label for="privacy">Accetto la <a href="/privacy-policy">Privacy Policy</a> e i <a href="/cookies">Cookie</a></label>
           </div>
-          <button type="submit" class="btn-primary" style="cursor:pointer;font-family:'Jost',sans-serif;border:none;">Invia messaggio</button>
+          <button type="submit" id="submit-btn" class="btn-primary" style="cursor:pointer;font-family:'Jost',sans-serif;border:none;">Invia messaggio</button>
+          <div class="form-status" id="form-status"></div>
         </form>
       </div>
       <div class="reveal" style="transition-delay:0.15s">
-        <div class="map-area">
-          <div class="map-pin"></div>
-          <div class="map-address">
-            <strong>Santamonica</strong>
-            Lungomare Lombardo 27<br>16145 Genova — Italy<br><br>
-            <a href="https://maps.google.com/?q=Lungomare+Lombardo+27+Genova" target="_blank" style="color:var(--terracotta);text-decoration:none;font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;">Apri in Maps →</a>
+        <div class="map-wrapper">
+          <iframe
+            src="https://www.openstreetmap.org/export/embed.html?bbox=8.960702%2C44.387346%2C8.968702%2C44.395346&layer=mapnik&marker=44.391346%2C8.964702"
+            height="380" allowfullscreen loading="lazy" title="Mappa Santamonica Genova">
+          </iframe>
+          <div class="map-bar">
+            <div class="map-bar-address">
+              <span class="map-bar-label">Santamonica</span>
+              Lungomare Lombardo 27 &mdash; Genova
+            </div>
+            <a href="https://www.openstreetmap.org/?mlat=44.391346&mlon=8.964702#map=17/44.391346/8.964702" target="_blank" class="map-bar-link">Apri in Maps &rarr;</a>
           </div>
         </div>
       </div>
@@ -630,42 +582,196 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">© 2026 Il Giuliano di Andrea Giachino e C sas</p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas</p>
   </div>
 </footer>
 
+<!-- LIGHTBOX -->
+<div id="lightbox">
+  <button id="lightbox-close">&#x2715;</button>
+  <button id="lightbox-prev">&#x2039;</button>
+  <img id="lightbox-img" src="" alt="">
+  <button id="lightbox-next">&#x203a;</button>
+</div>
+
+<!-- POPUP PRENOTAZIONE -->
+<div id="booking-overlay" role="dialog" aria-modal="true">
+  <div id="booking-popup">
+    <button class="popup-close" id="popup-close">&#x2715;</button>
+    <span class="popup-label">Prenota ora</span>
+    <h2>Un tavolo <em>sul mare</em></h2>
+    <p>Siamo aperti dal marted&igrave; alla domenica. Prenota il tuo tavolo e vivi un&rsquo;esperienza di cucina ligure autentica.</p>
+    <div class="popup-actions">
+      <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" class="btn-primary" style="text-align:center;" onclick="closePopup()">Prenota su TheFork</a>
+      <button class="popup-skip" id="popup-skip">Magari un&rsquo;altra volta</button>
+    </div>
+  </div>
+</div>
+
+<!-- COOKIE BANNER -->
+<div id="cookie-banner" role="dialog" aria-label="Consenso cookie">
+  <p>Questo sito utilizza cookie tecnici necessari al funzionamento e, previo consenso, cookie analitici (Google Analytics) per migliorare l&rsquo;esperienza di navigazione. Leggi la nostra <a href="/privacy-policy">Privacy Policy</a> e <a href="/cookies">Cookie Policy</a>.</p>
+  <div class="cookie-actions">
+    <button class="cookie-btn cookie-decline" id="cookie-decline">Solo necessari</button>
+    <button class="cookie-btn cookie-accept" id="cookie-accept">Accetta tutti</button>
+  </div>
+</div>
+
 <script>
-  // Sticky nav
-  const nav = document.getElementById('main-nav');
-  window.addEventListener('scroll', () => {
+  // Nav scroll
+  var nav = document.getElementById('main-nav');
+  window.addEventListener('scroll', function() {
     nav.classList.toggle('scrolled', window.scrollY > 60);
   });
 
   // Mobile menu
-  const hamburger = document.getElementById('hamburger');
-  const mobileMenu = document.getElementById('mobile-menu');
-  const menuClose = document.getElementById('menu-close');
-  hamburger.addEventListener('click', () => mobileMenu.classList.add('open'));
-  menuClose.addEventListener('click', () => mobileMenu.classList.remove('open'));
-  document.querySelectorAll('.mobile-link').forEach(a => {
-    a.addEventListener('click', () => mobileMenu.classList.remove('open'));
+  document.getElementById('hamburger').addEventListener('click', function() {
+    document.getElementById('mobile-menu').classList.add('open');
+  });
+  document.getElementById('menu-close').addEventListener('click', function() {
+    document.getElementById('mobile-menu').classList.remove('open');
+  });
+  document.querySelectorAll('.mobile-link').forEach(function(a) {
+    a.addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.remove('open');
+    });
   });
 
   // Scroll reveal
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+  var reveals = document.querySelectorAll('.reveal');
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+    });
   }, { threshold: 0.12 });
-  reveals.forEach(el => observer.observe(el));
+  reveals.forEach(function(el) { observer.observe(el); });
 
-  // Form (demo)
-  function handleSubmit(e) {
+  // Form contatti
+  var form = document.getElementById('contact-form');
+  var btn = document.getElementById('submit-btn');
+  var status = document.getElementById('form-status');
+  form.addEventListener('submit', async function(e) {
     e.preventDefault();
-    const btn = e.target.querySelector('button[type=submit]');
-    btn.textContent = 'Messaggio inviato ✓';
-    btn.style.background = 'var(--sea)';
-    setTimeout(() => { btn.textContent = 'Invia messaggio'; btn.style.background = ''; e.target.reset(); }, 3000);
+    btn.textContent = 'Invio in corso...';
+    btn.disabled = true;
+    status.className = 'form-status';
+    try {
+      var res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } });
+      if (res.ok) {
+        status.textContent = 'Messaggio inviato! Ti risponderemo al pi\u00f9 presto.';
+        status.className = 'form-status success';
+        form.reset();
+      } else { throw new Error(); }
+    } catch(err) {
+      status.textContent = 'Errore nell\u2019invio. Scrivici a santamonicagenova@gmail.com';
+      status.className = 'form-status error';
+    }
+    btn.textContent = 'Invia messaggio';
+    btn.disabled = false;
+  });
+
+  // Form prenotazione speciale
+  var pForm = document.getElementById('prenota-form');
+  var pBtn = document.getElementById('prenota-btn');
+  var pStatus = document.getElementById('prenota-status');
+  pForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    pBtn.textContent = 'Invio in corso...';
+    pBtn.disabled = true;
+    pStatus.className = 'prenota-form-box form-status';
+    try {
+      var res = await fetch(pForm.action, { method: 'POST', body: new FormData(pForm), headers: { 'Accept': 'application/json' } });
+      if (res.ok) {
+        pStatus.textContent = 'Richiesta inviata! Vi contatteremo entro 24 ore per confermare.';
+        pStatus.className = 'prenota-form-box form-status success';
+        pForm.reset();
+      } else { throw new Error(); }
+    } catch(err) {
+      pStatus.textContent = 'Errore nell\u2019invio. Chiamaci al +39 010 553 31 55';
+      pStatus.className = 'prenota-form-box form-status error';
+    }
+    pBtn.textContent = 'Invia la richiesta';
+    pBtn.disabled = false;
+  });
+
+  // Lightbox
+  var galleryImages = [
+    { src: 'img/piatto-pesce.jpg', alt: 'Pesce alla griglia' },
+    { src: 'img/piatto-tonno.jpg', alt: 'Tonno scottato' },
+    { src: 'img/piatto-pasta.jpg', alt: 'Pasta fresca' },
+    { src: 'img/piatto-carne.jpg', alt: 'Secondo piatto' },
+    { src: 'img/piatto-dessert.jpg', alt: 'Dessert' }
+  ];
+  var currentImg = 0;
+  function openLightbox(i) {
+    currentImg = i;
+    document.getElementById('lightbox-img').src = galleryImages[i].src;
+    document.getElementById('lightbox-img').alt = galleryImages[i].alt;
+    document.getElementById('lightbox').classList.add('visible');
+    document.body.style.overflow = 'hidden';
   }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('visible');
+    document.body.style.overflow = '';
+  }
+  function changeLightbox(dir) {
+    currentImg = (currentImg + dir + galleryImages.length) % galleryImages.length;
+    document.getElementById('lightbox-img').src = galleryImages[currentImg].src;
+    document.getElementById('lightbox-img').alt = galleryImages[currentImg].alt;
+  }
+  document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+  document.getElementById('lightbox-prev').addEventListener('click', function() { changeLightbox(-1); });
+  document.getElementById('lightbox-next').addEventListener('click', function() { changeLightbox(1); });
+  document.getElementById('lightbox').addEventListener('click', function(e) { if (e.target === this) closeLightbox(); });
+  document.addEventListener('keydown', function(e) {
+    if (!document.getElementById('lightbox').classList.contains('visible')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') changeLightbox(-1);
+    if (e.key === 'ArrowRight') changeLightbox(1);
+  });
+
+  // Popup prenotazione
+  function closePopup() { document.getElementById('booking-overlay').classList.remove('visible'); }
+  if (!sessionStorage.getItem('popup-shown')) {
+    setTimeout(function() {
+      document.getElementById('booking-overlay').classList.add('visible');
+      sessionStorage.setItem('popup-shown', '1');
+    }, 5000);
+  }
+  document.getElementById('popup-close').addEventListener('click', closePopup);
+  document.getElementById('popup-skip').addEventListener('click', closePopup);
+  document.getElementById('booking-overlay').addEventListener('click', function(e) { if (e.target === this) closePopup(); });
+
+  // Google Analytics (solo con consenso)
+  function loadGA() {
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-YP71EKXSXX';
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', 'G-YP71EKXSXX', { anonymize_ip: true });
+  }
+
+  // Cookie banner
+  var banner = document.getElementById('cookie-banner');
+  var choice = localStorage.getItem('cookie-choice');
+  if (!choice) {
+    setTimeout(function() { banner.classList.add('visible'); }, 1200);
+  } else if (choice === 'accepted') {
+    loadGA();
+  }
+  document.getElementById('cookie-accept').addEventListener('click', function() {
+    localStorage.setItem('cookie-choice', 'accepted');
+    banner.classList.remove('visible');
+    loadGA();
+  });
+  document.getElementById('cookie-decline').addEventListener('click', function() {
+    localStorage.setItem('cookie-choice', 'declined');
+    banner.classList.remove('visible');
+  });
 </script>
 </body>
 </html>

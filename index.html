@@ -75,24 +75,6 @@
   .quote-text { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.4rem, 3vw, 2.2rem); font-weight: 300; font-style: italic; color: var(--sand); line-height: 1.4; max-width: 800px; margin: 0 auto 0.75rem; }
   .quote-attr { font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); }
 
-  /* CANTINA */
-  .cantina-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
-  .cantina-image { position: relative; }
-  .cantina-image img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
-  .cantina-image::after { content: ''; position: absolute; top: -1.5rem; left: -1.5rem; right: 1.5rem; bottom: 1.5rem; border: 1px solid var(--gold); z-index: -1; pointer-events: none; }
-
-  /* INFO */
-  .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; padding-top: 3rem; border-top: 1px solid var(--divider); }
-  .info-block-label { font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
-  .info-block-content { font-size: 0.88rem; line-height: 2; color: var(--ink-soft); }
-  .info-block-content a { color: var(--ink); text-decoration: none; }
-  .info-block-content a:hover { color: var(--terracotta); }
-
-  /* REGALO */
-  .regalo-section { background: var(--sand); }
-  .regalo-inner { max-width: 700px; margin: 0 auto; text-align: center; }
-  .regalo-body { font-size: 0.9rem; line-height: 1.85; color: var(--ink-soft); margin-bottom: 2.5rem; }
-
   /* GALLERIA */
   .galleria-section { background: var(--ink); padding: 6rem 2rem; }
   .galleria-section .section-label { color: var(--gold); }
@@ -114,6 +96,24 @@
   #lightbox-next { right: 1rem; }
   #lightbox-prev:hover, #lightbox-next:hover { opacity: 1; }
 
+  /* CANTINA */
+  .cantina-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+  .cantina-image { position: relative; }
+  .cantina-image img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
+  .cantina-image::after { content: ''; position: absolute; top: -1.5rem; left: -1.5rem; right: 1.5rem; bottom: 1.5rem; border: 1px solid var(--gold); z-index: -1; pointer-events: none; }
+
+  /* INFO */
+  .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; padding-top: 3rem; border-top: 1px solid var(--divider); }
+  .info-block-label { font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+  .info-block-content { font-size: 0.88rem; line-height: 2; color: var(--ink-soft); }
+  .info-block-content a { color: var(--ink); text-decoration: none; }
+  .info-block-content a:hover { color: var(--terracotta); }
+
+  /* REGALO */
+  .regalo-section { background: var(--sand); }
+  .regalo-inner { max-width: 700px; margin: 0 auto; text-align: center; }
+  .regalo-body { font-size: 0.9rem; line-height: 1.85; color: var(--ink-soft); margin-bottom: 2.5rem; }
+
   /* PRENOTAZIONE SPECIALE */
   .prenota-section { background: var(--sand); padding: 6rem 2rem; }
   .prenota-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; margin-top: 3rem; }
@@ -123,22 +123,22 @@
   .prenota-highlight { display: flex; align-items: flex-start; gap: 1rem; }
   .prenota-highlight-icon { width: 36px; height: 36px; border: 1px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.9rem; }
   .prenota-highlight-text { font-size: 0.82rem; color: var(--ink-soft); line-height: 1.6; }
-  .prenota-highlight-text strong { display: block; color: var(--ink); font-weight: 400; margin-bottom: 0.15rem; font-size: 0.85rem; }
+  .prenota-highlight-text strong { display: block; color: var(--ink); font-weight: 400; margin-bottom: 0.15rem; }
   .prenota-form-box { background: var(--warm-white); padding: 2.5rem; }
-  .prenota-form-box .form-group { margin-bottom: 1.5rem; }
-  .prenota-form-box .form-group label { display: block; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.5rem; }
-  .prenota-form-box .form-group input,
-  .prenota-form-box .form-group textarea,
-  .prenota-form-box .form-group select { width: 100%; padding: 0.85rem 0; border: none; border-bottom: 1px solid var(--divider); background: transparent; font-family: 'Jost', sans-serif; font-size: 0.9rem; color: var(--ink); outline: none; transition: border-color 0.2s; resize: none; appearance: none; -webkit-appearance: none; }
-  .prenota-form-box .form-group input:focus,
-  .prenota-form-box .form-group textarea:focus,
-  .prenota-form-box .form-group select:focus { border-bottom-color: var(--terracotta); }
-  .prenota-form-box .form-group textarea { min-height: 80px; }
-  .prenota-form-box .form-group select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233a3630' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; padding-right: 1.5rem; }
-  .prenota-form-box .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-  .prenota-form-box .form-status { display: none; margin-top: 1rem; font-size: 0.85rem; padding: 0.75rem 1rem; }
-  .prenota-form-box .form-status.success { display: block; background: #eaf3de; color: #3b6d11; }
-  .prenota-form-box .form-status.error { display: block; background: #fcebeb; color: #a32d2d; }
+  .prenota-form-box .pf-group { margin-bottom: 1.5rem; }
+  .prenota-form-box .pf-group label { display: block; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.5rem; }
+  .prenota-form-box .pf-group input,
+  .prenota-form-box .pf-group textarea,
+  .prenota-form-box .pf-group select { width: 100%; padding: 0.85rem 0; border: none; border-bottom: 1px solid var(--divider); background: transparent; font-family: 'Jost', sans-serif; font-size: 0.9rem; color: var(--ink); outline: none; transition: border-color 0.2s; resize: none; appearance: none; -webkit-appearance: none; }
+  .prenota-form-box .pf-group input:focus,
+  .prenota-form-box .pf-group textarea:focus,
+  .prenota-form-box .pf-group select:focus { border-bottom-color: var(--terracotta); }
+  .prenota-form-box .pf-group textarea { min-height: 80px; }
+  .prenota-form-box .pf-group select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233a3630' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; padding-right: 1.5rem; }
+  .prenota-form-box .pf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .pf-status { display: none; margin-top: 1rem; font-size: 0.85rem; padding: 0.75rem 1rem; }
+  .pf-status.success { display: block; background: #eaf3de; color: #3b6d11; }
+  .pf-status.error { display: block; background: #fcebeb; color: #a32d2d; }
 
   /* CONTATTI */
   .contatti-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
@@ -162,7 +162,7 @@
   .map-bar { background: var(--sand); padding: 1rem 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; border-top: 1px solid var(--divider); }
   .map-bar-address { font-size: 0.82rem; line-height: 1.6; color: var(--ink-soft); }
   .map-bar-label { display: block; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); font-weight: 400; margin-bottom: 0.2rem; }
-  .map-bar-link { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--terracotta); text-decoration: none; white-space: nowrap; }
+  .map-bar-link { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--terracotta); text-decoration: none; }
   .map-bar-link:hover { text-decoration: underline; }
 
   /* FOOTER */
@@ -181,7 +181,7 @@
   .mobile-menu a:hover { color: var(--terracotta); }
   .menu-close { position: absolute; top: 1.5rem; right: 2rem; background: none; border: none; cursor: pointer; font-size: 1.5rem; color: var(--ink); }
 
-  /* POPUP PRENOTAZIONE */
+  /* POPUP */
   #booking-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(26,24,20,0.75); display: flex; align-items: center; justify-content: center; padding: 1.5rem; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
   #booking-overlay.visible { opacity: 1; pointer-events: all; }
   #booking-popup { background: var(--warm-white); max-width: 480px; width: 100%; padding: 3rem; position: relative; transform: translateY(24px); transition: transform 0.4s ease; }
@@ -191,12 +191,12 @@
   #booking-popup h2 em { font-style: italic; color: var(--terracotta); }
   #booking-popup p { font-size: 0.85rem; line-height: 1.75; color: var(--ink-soft); margin-bottom: 2rem; }
   #booking-popup .popup-actions { display: flex; flex-direction: column; gap: 0.75rem; }
-  #booking-popup .popup-close { position: absolute; top: 1.2rem; right: 1.2rem; background: none; border: none; cursor: pointer; font-size: 1.1rem; color: var(--ink-soft); padding: 0.25rem; transition: color 0.2s; }
-  #booking-popup .popup-close:hover { color: var(--terracotta); }
-  #booking-popup .popup-skip { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-soft); background: none; border: none; cursor: pointer; text-align: center; padding: 0.4rem; transition: color 0.2s; }
-  #booking-popup .popup-skip:hover { color: var(--ink); }
+  .popup-close { position: absolute; top: 1.2rem; right: 1.2rem; background: none; border: none; cursor: pointer; font-size: 1.1rem; color: var(--ink-soft); padding: 0.25rem; transition: color 0.2s; }
+  .popup-close:hover { color: var(--terracotta); }
+  .popup-skip { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-soft); background: none; border: none; cursor: pointer; text-align: center; padding: 0.4rem; transition: color 0.2s; }
+  .popup-skip:hover { color: var(--ink); }
 
-  /* COOKIE BANNER */
+  /* COOKIE */
   #cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: var(--ink); padding: 1.2rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; border-top: 2px solid var(--terracotta); transform: translateY(100%); transition: transform 0.4s ease; }
   #cookie-banner.visible { transform: translateY(0); }
   #cookie-banner p { font-size: 0.78rem; line-height: 1.6; color: rgba(245,240,232,0.85); max-width: 700px; }
@@ -206,7 +206,7 @@
   .cookie-accept { background: var(--terracotta); color: var(--warm-white); }
   .cookie-accept:hover { background: #b5633d; }
   .cookie-decline { background: transparent; color: rgba(245,240,232,0.6); border: 1px solid rgba(245,240,232,0.25); }
-  .cookie-decline:hover { color: var(--sand); border-color: rgba(245,240,232,0.5); }
+  .cookie-decline:hover { color: var(--sand); }
 
   /* ANIMATIONS */
   @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
@@ -229,7 +229,7 @@
     .cantina-image::after { display: none; }
     .info-grid { grid-template-columns: 1fr; gap: 2rem; }
     section { padding: 4rem 1.5rem; }
-    .form-row, .prenota-form-box .form-row { grid-template-columns: 1fr; }
+    .form-row, .prenota-form-box .pf-row { grid-template-columns: 1fr; }
     .footer-inner { flex-direction: column; text-align: center; }
     .galleria-grid { grid-template-columns: repeat(2, 1fr); }
     .galleria-item.grande { grid-column: span 2; aspect-ratio: 3/2; }
@@ -373,7 +373,7 @@
       <p class="section-label">Un dono speciale</p>
       <h2 class="section-title">Buoni <em>regalo</em></h2>
       <p class="regalo-body">Regala un pranzo o una cena al Santamonica. I Buoni Regalo sono utilizzabili tutti i giorni (salvo disponibilit&agrave;) escluso Sabato e festivi, con validit&agrave; di 6 mesi dall&rsquo;acquisto. Contattaci per acquistarlo.</p>
-      <a href="/cdn-cgi/l/email-protection#6112000f15000c0e0f08020006040f0e170021060c00080d4f020e0c5e1214030b0402155c23140e0f0e41330406000d0e4132000f15000c0e0f080200" class="btn-primary">Richiedi un buono</a>
+      <a href="mailto:santamonicagenova@gmail.com?subject=Buono Regalo Santamonica" class="btn-primary">Richiedi un buono</a>
     </div>
   </div>
 </section>
@@ -392,24 +392,15 @@
         <div class="prenota-highlights">
           <div class="prenota-highlight">
             <div class="prenota-highlight-icon">&#x1F942;</div>
-            <div class="prenota-highlight-text">
-              <strong>Occasioni speciali</strong>
-              Compleanni, anniversari, proposte di matrimonio &mdash; creiamo l&rsquo;atmosfera giusta.
-            </div>
+            <div class="prenota-highlight-text"><strong>Occasioni speciali</strong>Compleanni, anniversari, proposte di matrimonio &mdash; creiamo l&rsquo;atmosfera giusta.</div>
           </div>
           <div class="prenota-highlight">
             <div class="prenota-highlight-icon">&#x1F33F;</div>
-            <div class="prenota-highlight-text">
-              <strong>Intolleranze e allergie</strong>
-              Segnalacele in anticipo: la cucina si adatta senza compromettere l&rsquo;esperienza.
-            </div>
+            <div class="prenota-highlight-text"><strong>Intolleranze e allergie</strong>Segnalacele in anticipo: la cucina si adatta senza compromettere l&rsquo;esperienza.</div>
           </div>
           <div class="prenota-highlight">
             <div class="prenota-highlight-icon">&#x1F4CD;</div>
-            <div class="prenota-highlight-text">
-              <strong>Tavolo preferito</strong>
-              Se hai una preferenza &mdash; vista mare, interno, angolo riservato &mdash; faccelo sapere.
-            </div>
+            <div class="prenota-highlight-text"><strong>Tavolo preferito</strong>Se hai una preferenza &mdash; vista mare, interno, angolo riservato &mdash; faccelo sapere.</div>
           </div>
         </div>
       </div>
@@ -417,22 +408,22 @@
         <div class="prenota-form-box">
           <form id="prenota-form" action="https://formspree.io/f/mkopjnvq" method="POST">
             <input type="hidden" name="_subject" value="Richiesta prenotazione speciale - Santamonica">
-            <div class="prenota-form-box form-row">
-              <div class="form-group">
+            <div class="pf-row">
+              <div class="pf-group">
                 <label for="p-nome">Nome</label>
                 <input type="text" id="p-nome" name="nome" placeholder="Mario" required>
               </div>
-              <div class="form-group">
+              <div class="pf-group">
                 <label for="p-tel">Telefono</label>
                 <input type="tel" id="p-tel" name="telefono" placeholder="+39 000 0000000" required>
               </div>
             </div>
-            <div class="prenota-form-box form-row">
-              <div class="form-group">
+            <div class="pf-row">
+              <div class="pf-group">
                 <label for="p-data">Data desiderata</label>
                 <input type="date" id="p-data" name="data" required>
               </div>
-              <div class="form-group">
+              <div class="pf-group">
                 <label for="p-persone">Numero di persone</label>
                 <select id="p-persone" name="persone" required>
                   <option value="" disabled selected>Seleziona</option>
@@ -442,12 +433,12 @@
                   <option>4 persone</option>
                   <option>5 persone</option>
                   <option>6 persone</option>
-                  <option>7&ndash;10 persone</option>
+                  <option>7-10 persone</option>
                   <option>Oltre 10 persone</option>
                 </select>
               </div>
             </div>
-            <div class="form-group">
+            <div class="pf-group">
               <label for="p-occasione">Occasione</label>
               <select id="p-occasione" name="occasione">
                 <option value="" disabled selected>Seleziona</option>
@@ -459,18 +450,18 @@
                 <option>Altro</option>
               </select>
             </div>
-            <div class="form-group">
+            <div class="pf-group">
               <label for="p-intolleranze">Intolleranze o allergie</label>
-              <input type="text" id="p-intolleranze" name="intolleranze" placeholder="Es. glutine, crostacei, lattosio&hellip;">
+              <input type="text" id="p-intolleranze" name="intolleranze" placeholder="Es. glutine, crostacei, lattosio">
             </div>
-            <div class="form-group">
+            <div class="pf-group">
               <label for="p-richieste">Richieste particolari</label>
-              <textarea id="p-richieste" name="richieste" placeholder="Tavolo con vista mare, men&ugrave; personalizzato, torta&hellip;"></textarea>
+              <textarea id="p-richieste" name="richieste" placeholder="Tavolo con vista mare, menu personalizzato, torta..."></textarea>
             </div>
             <div style="margin-top:1.5rem;">
               <button type="submit" id="prenota-btn" class="btn-primary" style="cursor:pointer;font-family:'Jost',sans-serif;border:none;width:100%;text-align:center;">Invia la richiesta</button>
             </div>
-            <div class="prenota-form-box form-status" id="prenota-status"></div>
+            <div class="pf-status" id="prenota-status"></div>
           </form>
         </div>
       </div>
@@ -487,12 +478,9 @@
       <div>
         <p class="info-block-label">Orari</p>
         <div class="info-block-content">
-          Marted&igrave;<br>
-          <strong style="color:var(--ink);font-weight:400">19:30 &ndash; 22:30</strong><br><br>
-          Mercoled&igrave; &ndash; Sabato<br>
-          <strong style="color:var(--ink);font-weight:400">12:30 &ndash; 14:30 &nbsp;/&nbsp; 19:30 &ndash; 22:30</strong><br><br>
-          Domenica<br>
-          <strong style="color:var(--ink);font-weight:400">12:30 &ndash; 14:30</strong><br><br>
+          Marted&igrave;<br><strong style="color:var(--ink);font-weight:400">19:30 &ndash; 22:30</strong><br><br>
+          Mercoled&igrave; &ndash; Sabato<br><strong style="color:var(--ink);font-weight:400">12:30 &ndash; 14:30 &nbsp;/&nbsp; 19:30 &ndash; 22:30</strong><br><br>
+          Domenica<br><strong style="color:var(--ink);font-weight:400">12:30 &ndash; 14:30</strong><br><br>
           <em style="font-size:0.78rem">Luned&igrave; chiuso</em>
         </div>
       </div>
@@ -501,7 +489,7 @@
         <div class="info-block-content">
           Lungomare Lombardo 27<br>16145 Genova &mdash; Italy<br><br>
           <a href="tel:+390105533155">+39 010 553 31 55</a><br>
-          <a href="/cdn-cgi/l/email-protection#fd8e9c93899c909293949e9c9a9893928b9cbd9a909c9491d39e9290"><span class="__cf_email__" data-cfemail="3340525d47525e5c5d5a505254565d5c455273545e525a5f1d505c5e">[email&#160;protected]</span></a>
+          <a href="mailto:santamonicagenova@gmail.com">santamonicagenova@gmail.com</a>
         </div>
       </div>
       <div>
@@ -557,10 +545,7 @@
       </div>
       <div class="reveal" style="transition-delay:0.15s">
         <div class="map-wrapper">
-          <iframe
-            src="https://www.openstreetmap.org/export/embed.html?bbox=8.960702%2C44.387346%2C8.968702%2C44.395346&layer=mapnik&marker=44.391346%2C8.964702"
-            height="380" allowfullscreen loading="lazy" title="Mappa Santamonica Genova">
-          </iframe>
+          <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=8.960702%2C44.387346%2C8.968702%2C44.395346&layer=mapnik&marker=44.391346%2C8.964702" height="380" allowfullscreen loading="lazy" title="Mappa Santamonica Genova"></iframe>
           <div class="map-bar">
             <div class="map-bar-address">
               <span class="map-bar-label">Santamonica</span>
@@ -582,7 +567,7 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas</p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <span style="color:var(--terracotta);opacity:1;">v1.0</span></p>
   </div>
 </footer>
 
@@ -594,7 +579,7 @@
   <button id="lightbox-next">&#x203a;</button>
 </div>
 
-<!-- POPUP PRENOTAZIONE -->
+<!-- POPUP -->
 <div id="booking-overlay" role="dialog" aria-modal="true">
   <div id="booking-popup">
     <button class="popup-close" id="popup-close">&#x2715;</button>
@@ -608,7 +593,7 @@
   </div>
 </div>
 
-<!-- COOKIE BANNER -->
+<!-- COOKIE -->
 <div id="cookie-banner" role="dialog" aria-label="Consenso cookie">
   <p>Questo sito utilizza cookie tecnici necessari al funzionamento e, previo consenso, cookie analitici (Google Analytics) per migliorare l&rsquo;esperienza di navigazione. Leggi la nostra <a href="/privacy-policy">Privacy Policy</a> e <a href="/cookies">Cookie Policy</a>.</p>
   <div class="cookie-actions">
@@ -617,84 +602,46 @@
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-  // Nav scroll
+<script>
   var nav = document.getElementById('main-nav');
-  window.addEventListener('scroll', function() {
-    nav.classList.toggle('scrolled', window.scrollY > 60);
-  });
+  window.addEventListener('scroll', function() { nav.classList.toggle('scrolled', window.scrollY > 60); });
 
-  // Mobile menu
-  document.getElementById('hamburger').addEventListener('click', function() {
-    document.getElementById('mobile-menu').classList.add('open');
-  });
-  document.getElementById('menu-close').addEventListener('click', function() {
-    document.getElementById('mobile-menu').classList.remove('open');
-  });
-  document.querySelectorAll('.mobile-link').forEach(function(a) {
-    a.addEventListener('click', function() {
-      document.getElementById('mobile-menu').classList.remove('open');
-    });
-  });
+  document.getElementById('hamburger').addEventListener('click', function() { document.getElementById('mobile-menu').classList.add('open'); });
+  document.getElementById('menu-close').addEventListener('click', function() { document.getElementById('mobile-menu').classList.remove('open'); });
+  document.querySelectorAll('.mobile-link').forEach(function(a) { a.addEventListener('click', function() { document.getElementById('mobile-menu').classList.remove('open'); }); });
 
-  // Scroll reveal
   var reveals = document.querySelectorAll('.reveal');
   var observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
-    });
+    entries.forEach(function(e) { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
   }, { threshold: 0.12 });
   reveals.forEach(function(el) { observer.observe(el); });
 
-  // Form contatti
   var form = document.getElementById('contact-form');
   var btn = document.getElementById('submit-btn');
   var status = document.getElementById('form-status');
   form.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    btn.textContent = 'Invio in corso...';
-    btn.disabled = true;
-    status.className = 'form-status';
+    e.preventDefault(); btn.textContent = 'Invio in corso...'; btn.disabled = true; status.className = 'form-status';
     try {
       var res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } });
-      if (res.ok) {
-        status.textContent = 'Messaggio inviato! Ti risponderemo al pi\u00f9 presto.';
-        status.className = 'form-status success';
-        form.reset();
-      } else { throw new Error(); }
-    } catch(err) {
-      status.textContent = 'Errore nell\u2019invio. Scrivici a santamonicagenova@gmail.com';
-      status.className = 'form-status error';
-    }
-    btn.textContent = 'Invia messaggio';
-    btn.disabled = false;
+      if (res.ok) { status.textContent = 'Messaggio inviato! Ti risponderemo al pi\u00f9 presto.'; status.className = 'form-status success'; form.reset(); }
+      else { throw new Error(); }
+    } catch(err) { status.textContent = 'Errore. Scrivici a santamonicagenova@gmail.com'; status.className = 'form-status error'; }
+    btn.textContent = 'Invia messaggio'; btn.disabled = false;
   });
 
-  // Form prenotazione speciale
   var pForm = document.getElementById('prenota-form');
   var pBtn = document.getElementById('prenota-btn');
   var pStatus = document.getElementById('prenota-status');
   pForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    pBtn.textContent = 'Invio in corso...';
-    pBtn.disabled = true;
-    pStatus.className = 'prenota-form-box form-status';
+    e.preventDefault(); pBtn.textContent = 'Invio in corso...'; pBtn.disabled = true; pStatus.className = 'pf-status';
     try {
       var res = await fetch(pForm.action, { method: 'POST', body: new FormData(pForm), headers: { 'Accept': 'application/json' } });
-      if (res.ok) {
-        pStatus.textContent = 'Richiesta inviata! Vi contatteremo entro 24 ore per confermare.';
-        pStatus.className = 'prenota-form-box form-status success';
-        pForm.reset();
-      } else { throw new Error(); }
-    } catch(err) {
-      pStatus.textContent = 'Errore nell\u2019invio. Chiamaci al +39 010 553 31 55';
-      pStatus.className = 'prenota-form-box form-status error';
-    }
-    pBtn.textContent = 'Invia la richiesta';
-    pBtn.disabled = false;
+      if (res.ok) { pStatus.textContent = 'Richiesta inviata! Vi contatteremo entro 24 ore.'; pStatus.className = 'pf-status success'; pForm.reset(); }
+      else { throw new Error(); }
+    } catch(err) { pStatus.textContent = 'Errore. Chiamaci al +39 010 553 31 55'; pStatus.className = 'pf-status error'; }
+    pBtn.textContent = 'Invia la richiesta'; pBtn.disabled = false;
   });
 
-  // Lightbox
   var galleryImages = [
     { src: 'img/piatto-pesce.jpg', alt: 'Pesce alla griglia' },
     { src: 'img/piatto-tonno.jpg', alt: 'Tonno scottato' },
@@ -703,64 +650,27 @@
     { src: 'img/piatto-dessert.jpg', alt: 'Dessert' }
   ];
   var currentImg = 0;
-  function openLightbox(i) {
-    currentImg = i;
-    document.getElementById('lightbox-img').src = galleryImages[i].src;
-    document.getElementById('lightbox-img').alt = galleryImages[i].alt;
-    document.getElementById('lightbox').classList.add('visible');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeLightbox() {
-    document.getElementById('lightbox').classList.remove('visible');
-    document.body.style.overflow = '';
-  }
-  function changeLightbox(dir) {
-    currentImg = (currentImg + dir + galleryImages.length) % galleryImages.length;
-    document.getElementById('lightbox-img').src = galleryImages[currentImg].src;
-    document.getElementById('lightbox-img').alt = galleryImages[currentImg].alt;
-  }
+  function openLightbox(i) { currentImg = i; document.getElementById('lightbox-img').src = galleryImages[i].src; document.getElementById('lightbox-img').alt = galleryImages[i].alt; document.getElementById('lightbox').classList.add('visible'); document.body.style.overflow = 'hidden'; }
+  function closeLightbox() { document.getElementById('lightbox').classList.remove('visible'); document.body.style.overflow = ''; }
+  function changeLightbox(dir) { currentImg = (currentImg + dir + galleryImages.length) % galleryImages.length; document.getElementById('lightbox-img').src = galleryImages[currentImg].src; document.getElementById('lightbox-img').alt = galleryImages[currentImg].alt; }
   document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
   document.getElementById('lightbox-prev').addEventListener('click', function() { changeLightbox(-1); });
   document.getElementById('lightbox-next').addEventListener('click', function() { changeLightbox(1); });
   document.getElementById('lightbox').addEventListener('click', function(e) { if (e.target === this) closeLightbox(); });
-  document.addEventListener('keydown', function(e) {
-    if (!document.getElementById('lightbox').classList.contains('visible')) return;
-    if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowLeft') changeLightbox(-1);
-    if (e.key === 'ArrowRight') changeLightbox(1);
-  });
+  document.addEventListener('keydown', function(e) { if (!document.getElementById('lightbox').classList.contains('visible')) return; if (e.key === 'Escape') closeLightbox(); if (e.key === 'ArrowLeft') changeLightbox(-1); if (e.key === 'ArrowRight') changeLightbox(1); });
 
-  // Popup prenotazione
   function closePopup() { document.getElementById('booking-overlay').classList.remove('visible'); }
-  if (!sessionStorage.getItem('popup-shown')) {
-    setTimeout(function() {
-      document.getElementById('booking-overlay').classList.add('visible');
-      sessionStorage.setItem('popup-shown', '1');
-    }, 5000);
-  }
+  if (!sessionStorage.getItem('popup-shown')) { setTimeout(function() { document.getElementById('booking-overlay').classList.add('visible'); sessionStorage.setItem('popup-shown', '1'); }, 5000); }
   document.getElementById('popup-close').addEventListener('click', closePopup);
   document.getElementById('popup-skip').addEventListener('click', closePopup);
   document.getElementById('booking-overlay').addEventListener('click', function(e) { if (e.target === this) closePopup(); });
 
-  // Google Analytics (solo con consenso)
-  function loadGA() {
-    var s = document.createElement('script');
-    s.async = true;
-    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-YP71EKXSXX';
-    document.head.appendChild(s);
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    window.gtag = gtag;
-    gtag('js', new Date());
-    gtag('config', 'G-YP71EKXSXX', { anonymize_ip: true });
-  }
-
-  // Cookie banner
+  function loadGA() { var s = document.createElement('script'); s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-YP71EKXSXX'; document.head.appendChild(s); window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } window.gtag = gtag; gtag('js', new Date()); gtag('config', 'G-YP71EKXSXX', { anonymize_ip: true }); }
   var banner = document.getElementById('cookie-banner');
   var choice = localStorage.getItem('cookie-choice');
-  if (!choice) {
-    setTimeout(function() { banner.classList.add('visible'); }, 1200);
-  } else if (choice === 'accepted') {
-    loadGA();
-  }
-  document.getElementById('cookie-accept').addEventListener('clic
+  if (!choice) { setTimeout(function() { banner.classList.add('visible'); }, 1200); } else if (choice === 'accepted') { loadGA(); }
+  document.getElementById('cookie-accept').addEventListener('click', function() { localStorage.setItem('cookie-choice', 'accepted'); banner.classList.remove('visible'); loadGA(); });
+  document.getElementById('cookie-decline').addEventListener('click', function() { localStorage.setItem('cookie-choice', 'declined'); banner.classList.remove('visible'); });
+</script>
+</body>
+</html>

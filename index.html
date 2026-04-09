@@ -125,17 +125,13 @@
   .prenota-highlight-text { font-size: 0.82rem; color: var(--ink-soft); line-height: 1.6; }
   .prenota-highlight-text strong { display: block; color: var(--ink); font-weight: 400; margin-bottom: 0.15rem; }
   .prenota-form-box { background: var(--warm-white); padding: 2.5rem; }
-  .prenota-form-box .pf-group { margin-bottom: 1.5rem; }
-  .prenota-form-box .pf-group label { display: block; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.5rem; }
-  .prenota-form-box .pf-group input,
-  .prenota-form-box .pf-group textarea,
-  .prenota-form-box .pf-group select { width: 100%; padding: 0.85rem 0; border: none; border-bottom: 1px solid var(--divider); background: transparent; font-family: 'Jost', sans-serif; font-size: 0.9rem; color: var(--ink); outline: none; transition: border-color 0.2s; resize: none; appearance: none; -webkit-appearance: none; }
-  .prenota-form-box .pf-group input:focus,
-  .prenota-form-box .pf-group textarea:focus,
-  .prenota-form-box .pf-group select:focus { border-bottom-color: var(--terracotta); }
-  .prenota-form-box .pf-group textarea { min-height: 80px; }
-  .prenota-form-box .pf-group select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233a3630' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; padding-right: 1.5rem; }
-  .prenota-form-box .pf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .pf-group { margin-bottom: 1.5rem; }
+  .pf-group label { display: block; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.5rem; }
+  .pf-group input, .pf-group textarea, .pf-group select { width: 100%; padding: 0.85rem 0; border: none; border-bottom: 1px solid var(--divider); background: transparent; font-family: 'Jost', sans-serif; font-size: 0.9rem; color: var(--ink); outline: none; transition: border-color 0.2s; resize: none; appearance: none; -webkit-appearance: none; }
+  .pf-group input:focus, .pf-group textarea:focus, .pf-group select:focus { border-bottom-color: var(--terracotta); }
+  .pf-group textarea { min-height: 80px; }
+  .pf-group select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233a3630' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; padding-right: 1.5rem; }
+  .pf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
   .pf-status { display: none; margin-top: 1rem; font-size: 0.85rem; padding: 0.75rem 1rem; }
   .pf-status.success { display: block; background: #eaf3de; color: #3b6d11; }
   .pf-status.error { display: block; background: #fcebeb; color: #a32d2d; }
@@ -173,6 +169,8 @@
   .footer-social a { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); text-decoration: none; transition: color 0.2s; }
   .footer-social a:hover { color: var(--sand); }
   .footer-copy { font-size: 0.68rem; color: rgba(245,240,232,0.4); letter-spacing: 0.1em; }
+  .footer-version { color: var(--terracotta); text-decoration: none; opacity: 1; }
+  .footer-version:hover { text-decoration: underline; }
 
   /* MOBILE MENU */
   .mobile-menu { display: none; position: fixed; inset: 0; z-index: 200; background: var(--warm-white); flex-direction: column; justify-content: center; align-items: center; gap: 2.5rem; }
@@ -229,7 +227,7 @@
     .cantina-image::after { display: none; }
     .info-grid { grid-template-columns: 1fr; gap: 2rem; }
     section { padding: 4rem 1.5rem; }
-    .form-row, .prenota-form-box .pf-row { grid-template-columns: 1fr; }
+    .form-row, .pf-row { grid-template-columns: 1fr; }
     .footer-inner { flex-direction: column; text-align: center; }
     .galleria-grid { grid-template-columns: repeat(2, 1fr); }
     .galleria-item.grande { grid-column: span 2; aspect-ratio: 3/2; }
@@ -245,7 +243,6 @@
 </head>
 <body>
 
-<!-- NAV -->
 <nav id="main-nav">
   <a href="#" class="nav-logo">Santamonica <span class="sub">sul mare</span></a>
   <ul class="nav-links">
@@ -260,7 +257,6 @@
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 
-<!-- MOBILE MENU -->
 <div class="mobile-menu" id="mobile-menu">
   <button class="menu-close" id="menu-close">&#x2715;</button>
   <a href="#cucina" class="mobile-link">Cucina</a>
@@ -272,7 +268,6 @@
   <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" style="font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-style:normal;background:var(--ink);color:var(--warm-white);padding:0.9rem 2.5rem;margin-top:1rem;">Prenota</a>
 </div>
 
-<!-- HERO -->
 <section class="hero" style="padding:0;position:relative;">
   <div class="hero-text-panel">
     <p class="hero-eyebrow">Ristorante &middot; Genova</p>
@@ -289,7 +284,6 @@
   </div>
 </section>
 
-<!-- CUCINA -->
 <section id="cucina">
   <div class="section-inner">
     <div class="cucina-grid">
@@ -313,13 +307,11 @@
   </div>
 </section>
 
-<!-- QUOTE -->
 <div class="quote-section">
   <p class="quote-text">&ldquo;Be nice to people. We&rsquo;re all trying our best.&rdquo;</p>
   <p class="quote-attr">&mdash; Monica &amp; Andrea</p>
 </div>
 
-<!-- GALLERIA -->
 <section class="galleria-section" id="galleria">
   <div class="section-inner">
     <p class="section-label reveal">La nostra cucina</p>
@@ -344,7 +336,6 @@
   </div>
 </section>
 
-<!-- CANTINA -->
 <section id="cantina">
   <div class="section-inner">
     <div class="cantina-grid">
@@ -366,19 +357,17 @@
   </div>
 </section>
 
-<!-- REGALO -->
 <section class="regalo-section">
   <div class="section-inner">
     <div class="regalo-inner reveal">
       <p class="section-label">Un dono speciale</p>
       <h2 class="section-title">Buoni <em>regalo</em></h2>
       <p class="regalo-body">Regala un pranzo o una cena al Santamonica. I Buoni Regalo sono utilizzabili tutti i giorni (salvo disponibilit&agrave;) escluso Sabato e festivi, con validit&agrave; di 6 mesi dall&rsquo;acquisto. Contattaci per acquistarlo.</p>
-      <a href="/cdn-cgi/l/email-protection#94e7f5fae0f5f9fbfafdf7f5f3f1fafbe2f5d4f3f9f5fdf8baf7fbf9abe7e1f6fef1f7e0a9d6e1fbfafbb4c6f1f3f5f8fbb4c7f5fae0f5f9fbfafdf7f5" class="btn-primary">Richiedi un buono</a>
+      <a href="mailto:santamonicagenova@gmail.com?subject=Buono Regalo Santamonica" class="btn-primary">Richiedi un buono</a>
     </div>
   </div>
 </section>
 
-<!-- PRENOTAZIONE SPECIALE -->
 <section class="prenota-section" id="prenota">
   <div class="section-inner">
     <p class="section-label reveal">Hai qualcosa da festeggiare?</p>
@@ -469,7 +458,6 @@
   </div>
 </section>
 
-<!-- INFO -->
 <section id="info">
   <div class="section-inner">
     <p class="section-label reveal">Come raggiungerci</p>
@@ -489,7 +477,7 @@
         <div class="info-block-content">
           Lungomare Lombardo 27<br>16145 Genova &mdash; Italy<br><br>
           <a href="tel:+390105533155">+39 010 553 31 55</a><br>
-          <a href="/cdn-cgi/l/email-protection#3b485a554f5a56545552585a5c5e55544d5a7b5c565a525715585456"><span class="__cf_email__" data-cfemail="0172606f75606c6e6f68626066646f6e776041666c60686d2f626e6c">[email&#160;protected]</span></a>
+          <a href="mailto:santamonicagenova@gmail.com">santamonicagenova@gmail.com</a>
         </div>
       </div>
       <div>
@@ -503,7 +491,6 @@
   </div>
 </section>
 
-<!-- CONTATTI -->
 <section id="contatti" style="background:var(--sand);">
   <div class="section-inner">
     <div class="contatti-grid">
@@ -559,7 +546,6 @@
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
   <div class="footer-inner">
     <a href="#" class="footer-logo">Santamonica</a>
@@ -567,11 +553,10 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" style="color:var(--terracotta);text-decoration:none;opacity:1;">v2026.04.09.01</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version">v2026.04.09.02</a></p>
   </div>
 </footer>
 
-<!-- LIGHTBOX -->
 <div id="lightbox">
   <button id="lightbox-close">&#x2715;</button>
   <button id="lightbox-prev">&#x2039;</button>
@@ -579,7 +564,6 @@
   <button id="lightbox-next">&#x203a;</button>
 </div>
 
-<!-- POPUP -->
 <div id="booking-overlay" role="dialog" aria-modal="true">
   <div id="booking-popup">
     <button class="popup-close" id="popup-close">&#x2715;</button>
@@ -593,7 +577,6 @@
   </div>
 </div>
 
-<!-- COOKIE -->
 <div id="cookie-banner" role="dialog" aria-label="Consenso cookie">
   <p>Questo sito utilizza cookie tecnici necessari al funzionamento e, previo consenso, cookie analitici (Google Analytics) per migliorare l&rsquo;esperienza di navigazione. Leggi la nostra <a href="/privacy-policy">Privacy Policy</a> e <a href="/cookies">Cookie Policy</a>.</p>
   <div class="cookie-actions">
@@ -602,7 +585,7 @@
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
   var nav = document.getElementById('main-nav');
   window.addEventListener('scroll', function() { nav.classList.toggle('scrolled', window.scrollY > 60); });
 
@@ -669,4 +652,8 @@
   var banner = document.getElementById('cookie-banner');
   var choice = localStorage.getItem('cookie-choice');
   if (!choice) { setTimeout(function() { banner.classList.add('visible'); }, 1200); } else if (choice === 'accepted') { loadGA(); }
-  document.getElementById('cookie-accept'
+  document.getElementById('cookie-accept').addEventListener('click', function() { localStorage.setItem('cookie-choice', 'accepted'); banner.classList.remove('visible'); loadGA(); });
+  document.getElementById('cookie-decline').addEventListener('click', function() { localStorage.setItem('cookie-choice', 'declined'); banner.classList.remove('visible'); });
+</script>
+</body>
+</html>

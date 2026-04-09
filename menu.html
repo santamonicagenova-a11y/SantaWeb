@@ -1,8 +1,12 @@
 <!DOCTYPE html>
+<!-- versione v 2026.04.09.1 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Menù — Santamonica</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
@@ -28,6 +32,43 @@
     /* ══════════════════════════════════════
        BARRA CONTROLLI
     ══════════════════════════════════════ */
+    .ctrl-bar {
+      text-align: center;
+      padding: .9rem 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--cream);
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      gap: .7rem;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .ctrl-btn {
+      padding: .4rem 1.3rem;
+      background: transparent;
+      border: 1px solid var(--ink);
+      font-family: 'Jost', sans-serif;
+      font-size: .68rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      color: var(--ink);
+      transition: background .2s, color .2s;
+    }
+    .ctrl-btn:hover, .ctrl-btn.active {
+      background: var(--ink);
+      color: var(--cream);
+    }
+    .ctrl-sep {
+      width: 1px;
+      height: 1.4rem;
+      background: var(--rule);
+    }
+
     /* ══════════════════════════════════════
        PAGINA  (shared)
     ══════════════════════════════════════ */
@@ -311,6 +352,7 @@
     @media print {
       @page { size: A4 portrait; margin: 0; }
       body { background: white; }
+      .ctrl-bar { display: none; }
 
       /* carta: 3 pagine */
       #layout-carta .pg {
@@ -338,6 +380,14 @@
 </head>
 <body>
 
+<!-- ── BARRA CONTROLLI ── -->
+<div class="ctrl-bar">
+  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout('carta')">☞ Menù alla carta (3 pag.)</button>
+  <div class="ctrl-sep"></div>
+  <button class="ctrl-btn" id="btn-orario" onclick="showLayout('orario')">☞ Foglio orario (1 pag.)</button>
+  <div class="ctrl-sep"></div>
+  <button class="ctrl-btn" onclick="window.print()">✦ Stampa / Salva PDF</button>
+</div>
 
 <div id="layout-carta"></div>
 <div id="layout-orario"></div>
@@ -347,217 +397,85 @@
    MENÙ  —  modifica solo qui per aggiornare tutto
    ═══════════════════════════════════════════════════════ */
 const MENU = {
+
   "degustazione": {
     "opzioni": [
-      {
-        "portate": 6,
-        "prezzo": 90,
-        "vini": 60
-      },
-      {
-        "portate": 7,
-        "prezzo": 110,
-        "vini": 70
-      }
+      { "portate": 6, "prezzo": 90, "vini": 60 },
+      { "portate": 7, "prezzo": 110, "vini": 70 }
     ],
     "nota": "Prezzo a persona, menù da considerarsi per l'intero tavolo.",
     "percorsi": {
       "6": [
-        {
-          "nome": "Ali di razza, fave nostrane, mela verde, mandorle",
-          "sostenibile": true
-        },
-        {
-          "nome": "Animella di vitello, sedano rapa, nocciole, fondo di pesce",
-          "sostenibile": true
-        },
-        {
-          "nome": "Tortelli di cinghiale, dashi di orata, cipollina, shiso"
-        },
-        {
-          "nome": "Tubetti “<em>Mancini</em>”, baccalà, kosho di agrumi, borlotti",
-          "sostenibile": true
-        },
-        {
-          "nome": "Ombrina nostrana pescata ad amo, salicornia, indivia belga",
-          "sostenibile": true
-        },
-        {
-          "nome": "Gelato al limone nero, levistico, lime, cracker di latte"
-        }
+        { "nome": "Ali di razza, fave nostrane, mela verde, mandorle", "sostenibile": true },
+        { "nome": "Animella di vitello, sedano rapa, nocciole, fondo di pesce", "sostenibile": true },
+        { "nome": "Tortelli di cinghiale, dashi di orata, cipollina, shiso" },
+        { "nome": "Tubetti “<em>Mancini</em>”, baccalà, kosho di agrumi, borlotti", "sostenibile": true },
+        { "nome": "Ombrina nostrana pescata ad amo, salicornia, indivia belga", "sostenibile": true },
+        { "nome": "Gelato al limone nero, levistico, lime, cracker di latte" }
       ],
       "7": "Menù a mano libera dello Chef"
     }
   },
+
   "sezioni": [
     {
       "titolo": "Crudi",
       "piatti": [
-        {
-          "nome": "Ostriche Fine de Claire n. 1",
-          "prezzo": 4,
-          "unita": "cad."
-        },
-        {
-          "nome": "Ostriche Antilope",
-          "prezzo": 7,
-          "unita": "cad."
-        },
-        {
-          "nome": "Ostriche Enrico IV",
-          "prezzo": 8,
-          "unita": "cad."
-        },
-        {
-          "nome": "Scampi nostrani",
-          "prezzo": 17,
-          "unita": "cad.",
-          "sostenibile": true
-        },
-        {
-          "nome": "Gamberi viola nostrani",
-          "prezzo": 11,
-          "unita": "cad.",
-          "sostenibile": true
-        },
-        {
-          "nome": "Selezione solamente di pesci nostrani pescati ad amo",
-          "prezzo": 37,
-          "sostenibile": true,
-          "staccato": true
-        },
-        {
-          "nome": "Degustazione di mare",
-          "prezzo": 80,
-          "sostenibile": true,
-          "staccato": true
-        }
+        { "nome": "Ostriche Fine de Claire", "prezzo": 4, "unita": "cad." },
+        { "nome": "Ostriche Antilope", "prezzo": 7, "unita": "cad." },
+        { "nome": "Ostriche Enrico IV", "prezzo": 8, "unita": "cad." },
+        { "nome": "Scampi nostrani", "prezzo": 17, "unita": "cad.", "sostenibile": true },
+        { "nome": "Gamberi viola nostrani", "prezzo": 11, "unita": "cad.", "sostenibile": true },
+        { "nome": "Selezione solamente di pesci nostrani pescati ad amo", "prezzo": 37, "sostenibile": true, "staccato": true },
+        { "nome": "Degustazione di mare", "prezzo": 80, "sostenibile": true, "staccato": true }
       ]
     },
     {
       "titolo": "Sfiziosi",
       "piatti": [
-        {
-          "nome": "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir",
-          "prezzo": 20,
-          "sostenibile": true
-        },
-        {
-          "nome": "Gamberi viola crudi alla puttanesca",
-          "prezzo": 25,
-          "sostenibile": true
-        },
-        {
-          "nome": "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce",
-          "prezzo": 22,
-          "sostenibile": true
-        },
-        {
-          "nome": "Ali di razza, fave nostrane, mela verde, mandorle",
-          "prezzo": 24,
-          "sostenibile": true
-        },
-        {
-          "nome": "“Non formaggi”",
-          "prezzo": 22,
-          "descrizione": "(Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla)"
-        }
+        { "nome": "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir", "prezzo": 20, "sostenibile": true },
+        { "nome": "Cavolo cappuccio, miso, lamponi, anacardi", "prezzo": 16 },
+        { "nome": "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce", "prezzo": 22, "sostenibile": true },
+        { "nome": "Ali di razza, fave nostrane, mela verde, mandorle", "prezzo": 24, "sostenibile": true },
+        { "nome": "“Non formaggi”", "prezzo": 22, "descrizione": "(Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla)" }
       ]
     },
     {
       "titolo": "Amidi e Carboidrati",
       "piatti": [
-        {
-          "nome": "Spaghettoni quadrati “<em>Mancini</em>”, anemoni di mare, nduja, maggiorana",
-          "prezzo": 32,
-          "sostenibile": true
-        },
-        {
-          "nome": "Tortelli di cinghiale, dashi di orata, cipollina, shiso",
-          "prezzo": 26,
-          "sostenibile": true
-        },
-        {
-          "nome": "Tubetti “<em>Mancini</em>”, baccalà, il nostro kosho di agrumi fermentato, borlotti",
-          "prezzo": 24,
-          "sostenibile": true
-        },
-        {
-          "nome": "Riso “<em>Riserva San Massimo</em>”, ragù di lepre, cime di rapa, Parmigiano Reggiano",
-          "prezzo": 26
-        }
+        { "nome": "Spaghettoni quadrati “<em>Mancini</em>”, anemoni di mare, nduja, maggiorana", "prezzo": 32, "sostenibile": true },
+        { "nome": "Tortelli di cinghiale, dashi di orata, cipollina, shiso", "prezzo": 26, "sostenibile": true },
+        { "nome": "Tubetti “<em>Mancini</em>”, baccalà, il nostro kosho di agrumi fermentato, borlotti", "prezzo": 24, "sostenibile": true },
+        { "nome": "Riso “<em>Riserva San Massimo</em>”, ragù di lepre, cime di rapa, Parmigiano Reggiano", "prezzo": 26 }
       ]
     },
     {
       "titolo": "Non Solo Mare",
       "piatti": [
-        {
-          "nome": "Polpo nostrano, rabarbaro, piselli",
-          "prezzo": 28,
-          "sostenibile": true
-        },
-        {
-          "nome": "Zucchina alla scapece, menta, yogurt, pepe Timut",
-          "prezzo": 18
-        },
-        {
-          "nome": "Ombrina nostrana pescata ad amo, salicornia, indivia belga",
-          "prezzo": 32,
-          "sostenibile": true
-        },
-        {
-          "nome": "Agnello, rabarbaro, ",
-          "prezzo": 28
-        }
+        { "nome": "Polpo nostrano, rabarbaro, piselli", "prezzo": 28, "sostenibile": true },
+        { "nome": "Zucchina alla scapece, menta, yogurt, pepe Timut", "prezzo": 18 },
+        { "nome": "Ombrina nostrana pescata ad amo, salicornia, indivia belga", "prezzo": 32, "sostenibile": true },
+        { "nome": "Picanha, cardoncelli, fondo di manzo", "prezzo": 28 }
       ]
     }
   ],
+
   "pagine": [
-    {
-      "sezioni": [
-        "Crudi",
-        "Sfiziosi"
-      ]
-    },
-    {
-      "sezioni": [
-        "Amidi e Carboidrati",
-        "Non Solo Mare"
-      ]
-    }
+    { "sezioni": ["Crudi", "Sfiziosi"] },
+    { "sezioni": ["Amidi e Carboidrati", "Non Solo Mare"] }
   ],
+
   "orario": {
-    "colSinistra": [
-      "Crudi",
-      "Non Solo Mare"
-    ],
-    "colDestra": [
-      "Amidi e Carboidrati",
-      "Sfiziosi"
-    ],
+    "colSinistra": ["Crudi", "Non Solo Mare"],
+    "colDestra":   ["Amidi e Carboidrati", "Sfiziosi"],
     "separatoreDopo": "Crudi",
     "orarioServizio": [
-      {
-        "giorno": "Martedì",
-        "fasce": [
-          "19:30 – 22:30"
-        ]
-      },
-      {
-        "giorno": "Dal mercoledì al sabato",
-        "fasce": [
-          "12:30 – 14:30",
-          "19:30 – 22:30"
-        ]
-      },
-      {
-        "giorno": "Domenica",
-        "fasce": [
-          "12:30 – 14:30"
-        ]
-      }
+      { "giorno": "Martedì",                "fasce": ["19:30 – 22:30"] },
+      { "giorno": "Dal mercoledì al sabato", "fasce": ["12:30 – 14:30", "19:30 – 22:30"] },
+      { "giorno": "Domenica",               "fasce": ["12:30 – 14:30"] }
     ]
   }
+
 };
 /* ═════════════════════════════════════════════════════════ */
 
@@ -590,9 +508,10 @@ function buildPiatto(p) {
 }
 
 function buildSezione(s) {
+  const label = s.titolo_display || s.titolo;
   return `
     <div class="sezione">
-      <div class="sezione-titolo">${s.titolo}</div>
+      <div class="sezione-titolo">${label}</div>
       ${s.piatti.map(buildPiatto).join('')}
     </div>`;
 }
@@ -679,7 +598,7 @@ function buildOrarioColonna(titoli, sepDopo) {
     return `
       <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
         <div class="orario-sez">
-          <div class="orario-sez-titolo">${s.titolo}</div>
+          <div class="orario-sez-titolo">${s.titolo_display || s.titolo}</div>
           ${piatti}
         </div>
       </div>${sep}`;
@@ -751,5 +670,6 @@ renderCarta();
 renderOrario();
 showLayout('carta');
 </script>
+<div style="text-align:center;padding:4px 0 8px;font-size:.55rem;color:rgba(245,240,232,0.35);letter-spacing:.1em;">v 2026.04.09.1</div>
 </body>
 </html>

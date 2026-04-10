@@ -26,11 +26,19 @@
   nav.scrolled { background: rgba(250,248,244,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--divider); }
   .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
   .nav-logo .sub { font-size: 1rem; letter-spacing: 0.12em; opacity: 0.55; font-weight: 300; text-transform: lowercase; }
-  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links { display: flex; gap: 1.5rem; list-style: none; align-items: center; }
   .nav-links a { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); text-decoration: none; transition: color 0.2s; }
   .nav-links a:hover { color: var(--terracotta); }
+  .nav-right { display: flex; align-items: center; gap: 1rem; }
   .nav-cta { font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-white); background: var(--ink); padding: 0.55rem 1.2rem; text-decoration: none; transition: background 0.2s; }
   .nav-cta:hover { background: var(--terracotta); }
+
+  /* LANG SWITCHER */
+  .lang-switcher { display: flex; gap: 0.3rem; }
+  .lang-btn { font-family: 'Jost', sans-serif; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; background: none; border: none; cursor: pointer; color: var(--ink-soft); padding: 0.2rem 0.35rem; border-radius: 2px; transition: all 0.2s; }
+  .lang-btn:hover { color: var(--ink); }
+  .lang-btn.active { color: var(--terracotta); font-weight: 500; }
+
   .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; }
   .hamburger span { display: block; width: 24px; height: 1.5px; background: var(--ink); }
 
@@ -89,12 +97,10 @@
   #lightbox { position: fixed; inset: 0; z-index: 600; background: rgba(26,24,20,0.95); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 2rem; }
   #lightbox.visible { opacity: 1; pointer-events: all; }
   #lightbox img { max-width: 90vw; max-height: 88vh; object-fit: contain; }
-  #lightbox-close { position: absolute; top: 1.5rem; right: 2rem; background: none; border: none; color: var(--sand); font-size: 1.5rem; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
-  #lightbox-close:hover { opacity: 1; }
-  #lightbox-prev, #lightbox-next { position: absolute; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--sand); font-size: 2.5rem; cursor: pointer; opacity: 0.5; transition: opacity 0.2s; padding: 1rem; }
+  #lightbox-close { position: absolute; top: 1.5rem; right: 2rem; background: none; border: none; color: var(--sand); font-size: 1.5rem; cursor: pointer; opacity: 0.7; }
+  #lightbox-prev, #lightbox-next { position: absolute; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--sand); font-size: 2.5rem; cursor: pointer; opacity: 0.5; padding: 1rem; }
   #lightbox-prev { left: 1rem; }
   #lightbox-next { right: 1rem; }
-  #lightbox-prev:hover, #lightbox-next:hover { opacity: 1; }
 
   /* CANTINA */
   .cantina-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
@@ -178,6 +184,7 @@
   .mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; font-style: italic; color: var(--ink); text-decoration: none; transition: color 0.2s; }
   .mobile-menu a:hover { color: var(--terracotta); }
   .menu-close { position: absolute; top: 1.5rem; right: 2rem; background: none; border: none; cursor: pointer; font-size: 1.5rem; color: var(--ink); }
+  .mobile-lang { display: flex; gap: 0.5rem; margin-top: 1rem; }
 
   /* POPUP */
   #booking-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(26,24,20,0.75); display: flex; align-items: center; justify-content: center; padding: 1.5rem; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
@@ -189,10 +196,8 @@
   #booking-popup h2 em { font-style: italic; color: var(--terracotta); }
   #booking-popup p { font-size: 0.85rem; line-height: 1.75; color: var(--ink-soft); margin-bottom: 2rem; }
   #booking-popup .popup-actions { display: flex; flex-direction: column; gap: 0.75rem; }
-  .popup-close { position: absolute; top: 1.2rem; right: 1.2rem; background: none; border: none; cursor: pointer; font-size: 1.1rem; color: var(--ink-soft); padding: 0.25rem; transition: color 0.2s; }
-  .popup-close:hover { color: var(--terracotta); }
-  .popup-skip { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-soft); background: none; border: none; cursor: pointer; text-align: center; padding: 0.4rem; transition: color 0.2s; }
-  .popup-skip:hover { color: var(--ink); }
+  .popup-close { position: absolute; top: 1.2rem; right: 1.2rem; background: none; border: none; cursor: pointer; font-size: 1.1rem; color: var(--ink-soft); padding: 0.25rem; }
+  .popup-skip { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-soft); background: none; border: none; cursor: pointer; text-align: center; padding: 0.4rem; }
 
   /* COOKIE */
   #cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: var(--ink); padding: 1.2rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; border-top: 2px solid var(--terracotta); transform: translateY(100%); transition: transform 0.4s ease; }
@@ -215,7 +220,7 @@
   /* RESPONSIVE */
   @media (max-width: 900px) {
     nav { padding: 1rem 1.5rem; }
-    .nav-links, .nav-cta { display: none; }
+    .nav-links, .nav-cta, .lang-switcher { display: none; }
     .hamburger { display: flex; }
     .hero { grid-template-columns: 1fr; }
     .hero-text-panel { padding: 7rem 1.5rem 3rem; order: 2; }
@@ -246,38 +251,54 @@
 <nav id="main-nav">
   <a href="#" class="nav-logo">Santamonica <span class="sub">sul mare</span></a>
   <ul class="nav-links">
-    <li><a href="#cucina">Cucina</a></li>
-    <li><a href="#cantina">Cantina</a></li>
-    <li><a href="#galleria">Galleria</a></li>
-    <li><a href="#prenota">Evento</a></li>
-    <li><a href="#info">Info</a></li>
-    <li><a href="#contatti">Contatti</a></li>
+    <li><a href="#cucina" data-i18n="nav_cucina">Cucina</a></li>
+    <li><a href="#cantina" data-i18n="nav_cantina">Cantina</a></li>
+    <li><a href="#galleria" data-i18n="nav_galleria">Galleria</a></li>
+    <li><a href="#prenota" data-i18n="nav_evento">Evento</a></li>
+    <li><a href="#info" data-i18n="nav_info">Info</a></li>
+    <li><a href="#contatti" data-i18n="nav_contatti">Contatti</a></li>
   </ul>
-  <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" class="nav-cta">Prenota</a>
+  <div class="nav-right">
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('it')">IT</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('fr')">FR</button>
+      <button class="lang-btn" onclick="setLang('de')">DE</button>
+      <button class="lang-btn" onclick="setLang('es')">ES</button>
+    </div>
+    <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" class="nav-cta" data-i18n="nav_prenota">Prenota</a>
+  </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
 
 <div class="mobile-menu" id="mobile-menu">
   <button class="menu-close" id="menu-close">&#x2715;</button>
-  <a href="#cucina" class="mobile-link">Cucina</a>
-  <a href="#cantina" class="mobile-link">Cantina</a>
-  <a href="#galleria" class="mobile-link">Galleria</a>
-  <a href="#prenota" class="mobile-link">Evento speciale</a>
-  <a href="#info" class="mobile-link">Info &amp; Orari</a>
-  <a href="#contatti" class="mobile-link">Contatti</a>
-  <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" style="font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-style:normal;background:var(--ink);color:var(--warm-white);padding:0.9rem 2.5rem;margin-top:1rem;">Prenota</a>
+  <a href="#cucina" class="mobile-link" data-i18n="nav_cucina">Cucina</a>
+  <a href="#cantina" class="mobile-link" data-i18n="nav_cantina">Cantina</a>
+  <a href="#galleria" class="mobile-link" data-i18n="nav_galleria">Galleria</a>
+  <a href="#prenota" class="mobile-link" data-i18n="nav_evento_mobile">Evento speciale</a>
+  <a href="#info" class="mobile-link" data-i18n="nav_info_mobile">Info &amp; Orari</a>
+  <a href="#contatti" class="mobile-link" data-i18n="nav_contatti">Contatti</a>
+  <div class="mobile-lang">
+    <button class="lang-btn active" onclick="setLang('it')">IT</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('fr')">FR</button>
+    <button class="lang-btn" onclick="setLang('de')">DE</button>
+    <button class="lang-btn" onclick="setLang('es')">ES</button>
+  </div>
+  <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" style="font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-style:normal;background:var(--ink);color:var(--warm-white);padding:0.9rem 2.5rem;margin-top:1rem;" data-i18n="nav_prenota">Prenota</a>
 </div>
 
 <section class="hero" style="padding:0;position:relative;">
   <div class="hero-text-panel">
-    <p class="hero-eyebrow">Ristorante &middot; Genova</p>
-    <h1 class="hero-title">Cucina <em>viva</em><br>sul mare</h1>
-    <p class="hero-desc">Un progetto in costante divenire, basato sull&rsquo;attenzione al gusto e sulla qualit&agrave; della materia prima. Pesce di Camogli, verdure dell&rsquo;orto genovese, pasta e pane di nostra produzione.</p>
+    <p class="hero-eyebrow" data-i18n="hero_eyebrow">Ristorante &middot; Genova</p>
+    <h1 class="hero-title" data-i18n="hero_title">Cucina <em>viva</em><br>sul mare</h1>
+    <p class="hero-desc" data-i18n="hero_desc">Un progetto in costante divenire...</p>
     <div class="hero-actions">
-      <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" class="btn-primary">Prenota un tavolo</a>
-      <a href="#cucina" class="btn-secondary">Scopri il menu</a>
+      <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" class="btn-primary" data-i18n="hero_btn_prenota">Prenota un tavolo</a>
+      <a href="#cucina" class="btn-secondary" data-i18n="hero_btn_menu">Scopri il menu</a>
     </div>
-    <div class="hero-scroll-indicator">Scorri</div>
+    <div class="hero-scroll-indicator" data-i18n="hero_scorri">Scorri</div>
   </div>
   <div class="hero-image-panel">
     <img src="https://static.wixstatic.com/media/461837_f0bd06030a2e4549aa5125dfe974a199~mv2.jpg" alt="Santamonica ristorante Genova" loading="eager">
@@ -288,15 +309,15 @@
   <div class="section-inner">
     <div class="cucina-grid">
       <div class="reveal">
-        <p class="section-label">La nostra proposta</p>
-        <h2 class="section-title">Cucina <em>del territorio</em></h2>
+        <p class="section-label" data-i18n="cucina_label">La nostra proposta</p>
+        <h2 class="section-title" data-i18n="cucina_title">Cucina <em>del territorio</em></h2>
         <div class="cucina-body">
-          <p>La qualit&agrave; della materia prima &egrave; fondamentale: ci rivolgiamo quanto pi&ugrave; possibile a pescatori e produttori locali. Il pesce arriva da Camogli, le verdure da un piccolo orto sulle alture di Genova.</p>
-          <p>I nostri piatti sono elaborati ma allo stesso tempo semplici, per valorizzare al meglio i prodotti della Liguria. Pasta fresca, pane, focaccia e dolci sono tutti di nostra produzione.</p>
-          <p>Una cucina elegante, in cui anche l&rsquo;estetica e il piatto fisico hanno la loro importanza &mdash; partendo dalla tradizione per diventare contemporanei.</p>
+          <p data-i18n="cucina_p1">La qualit&agrave; della materia prima...</p>
+          <p data-i18n="cucina_p2">I nostri piatti sono elaborati...</p>
+          <p data-i18n="cucina_p3">Una cucina elegante...</p>
         </div>
         <div class="cucina-actions">
-          <a href="https://af88bf37-3bfb-460d-a80e-2a0f7ca776ba.filesusr.com/ugd/461837_d635715c48a04d4c96aa2f5de3ce6530.pdf" target="_blank" class="btn-primary">Guarda il men&ugrave;</a>
+          <a href="https://af88bf37-3bfb-460d-a80e-2a0f7ca776ba.filesusr.com/ugd/461837_d635715c48a04d4c96aa2f5de3ce6530.pdf" target="_blank" class="btn-primary" data-i18n="cucina_btn">Guarda il men&ugrave;</a>
         </div>
       </div>
       <div class="cucina-images reveal" style="transition-delay:0.15s">
@@ -308,30 +329,20 @@
 </section>
 
 <div class="quote-section">
-  <p class="quote-text">&ldquo;Be nice to people. We&rsquo;re all trying our best.&rdquo;</p>
-  <p class="quote-attr">&mdash; Monica &amp; Andrea</p>
+  <p class="quote-text" data-i18n="quote_text">&ldquo;Be nice to people. We&rsquo;re all trying our best.&rdquo;</p>
+  <p class="quote-attr" data-i18n="quote_attr">&mdash; Monica &amp; Andrea</p>
 </div>
 
 <section class="galleria-section" id="galleria">
   <div class="section-inner">
-    <p class="section-label reveal">La nostra cucina</p>
-    <h2 class="section-title reveal">Ogni piatto,<br><em>una storia</em></h2>
+    <p class="section-label reveal" data-i18n="galleria_label">La nostra cucina</p>
+    <h2 class="section-title reveal" data-i18n="galleria_title">Ogni piatto,<br><em>una storia</em></h2>
     <div class="galleria-grid">
-      <div class="galleria-item grande reveal" onclick="openLightbox(0)">
-        <img src="img/piatto-pesce.jpg" alt="Pesce alla griglia con salsa e verdure">
-      </div>
-      <div class="galleria-item reveal" onclick="openLightbox(1)" style="transition-delay:0.1s">
-        <img src="img/piatto-tonno.jpg" alt="Tonno scottato con salse">
-      </div>
-      <div class="galleria-item reveal" onclick="openLightbox(2)" style="transition-delay:0.15s">
-        <img src="img/piatto-pasta.jpg" alt="Pasta fresca fatta in casa">
-      </div>
-      <div class="galleria-item reveal" onclick="openLightbox(3)" style="transition-delay:0.2s">
-        <img src="img/piatto-carne.jpg" alt="Secondo con salsa ricca">
-      </div>
-      <div class="galleria-item grande reveal" onclick="openLightbox(4)" style="transition-delay:0.25s">
-        <img src="img/piatto-dessert.jpg" alt="Dessert con frutti di bosco e salsa">
-      </div>
+      <div class="galleria-item grande reveal" onclick="openLightbox(0)"><img src="img/piatto-pesce.jpg" alt="Pesce"></div>
+      <div class="galleria-item reveal" onclick="openLightbox(1)" style="transition-delay:0.1s"><img src="img/piatto-tonno.jpg" alt="Tonno"></div>
+      <div class="galleria-item reveal" onclick="openLightbox(2)" style="transition-delay:0.15s"><img src="img/piatto-pasta.jpg" alt="Pasta"></div>
+      <div class="galleria-item reveal" onclick="openLightbox(3)" style="transition-delay:0.2s"><img src="img/piatto-carne.jpg" alt="Secondo"></div>
+      <div class="galleria-item grande reveal" onclick="openLightbox(4)" style="transition-delay:0.25s"><img src="img/piatto-dessert.jpg" alt="Dessert"></div>
     </div>
   </div>
 </section>
@@ -343,14 +354,14 @@
         <img src="https://static.wixstatic.com/media/461837_b23457903272448a817a539cb9aadc62~mv2.jpeg" alt="Cantina vini Santamonica">
       </div>
       <div class="reveal" style="transition-delay:0.15s">
-        <p class="section-label">I nostri vini</p>
-        <h2 class="section-title">Una <em>cantina</em> ligure</h2>
+        <p class="section-label" data-i18n="cantina_label">I nostri vini</p>
+        <h2 class="section-title" data-i18n="cantina_title">Una <em>cantina</em> ligure</h2>
         <div class="cucina-body">
-          <p>Monica, sommelier esperta e appassionata, cura personalmente la carta dei vini. In una ricca proposta di etichette italiane spicca la vasta selezione di bottiglie liguri &mdash; abbinamento perfetto al pesce del nostro mare.</p>
-          <p>La crescente richiesta di vini naturali porta il Santamonica a interfacciarsi sempre pi&ugrave; con produttori che lavorano l&rsquo;uva il meno possibile. Un&rsquo;ampia scelta &egrave; disponibile anche a calice.</p>
+          <p data-i18n="cantina_p1">Monica, sommelier...</p>
+          <p data-i18n="cantina_p2">La crescente richiesta...</p>
         </div>
         <div class="cucina-actions">
-          <a href="https://af88bf37-3bfb-460d-a80e-2a0f7ca776ba.filesusr.com/ugd/461837_66faa32523f248c7982f03a1ccef5164.pdf" target="_blank" class="btn-secondary">Carta dei vini</a>
+          <a href="https://af88bf37-3bfb-460d-a80e-2a0f7ca776ba.filesusr.com/ugd/461837_66faa32523f248c7982f03a1ccef5164.pdf" target="_blank" class="btn-secondary" data-i18n="cantina_btn">Carta dei vini</a>
         </div>
       </div>
     </div>
@@ -360,36 +371,36 @@
 <section class="regalo-section">
   <div class="section-inner">
     <div class="regalo-inner reveal">
-      <p class="section-label">Un dono speciale</p>
-      <h2 class="section-title">Buoni <em>regalo</em></h2>
-      <p class="regalo-body">Regala un pranzo o una cena al Santamonica. I Buoni Regalo sono utilizzabili tutti i giorni (salvo disponibilit&agrave;) escluso Sabato e festivi, con validit&agrave; di 6 mesi dall&rsquo;acquisto. Contattaci per acquistarlo.</p>
-      <a href="mailto:santamonicagenova@gmail.com?subject=Buono Regalo Santamonica" class="btn-primary">Richiedi un buono</a>
+      <p class="section-label" data-i18n="regalo_label">Un dono speciale</p>
+      <h2 class="section-title" data-i18n="regalo_title">Buoni <em>regalo</em></h2>
+      <p class="regalo-body" data-i18n="regalo_body">Regala un pranzo...</p>
+      <a href="mailto:santamonicagenova@gmail.com?subject=Buono Regalo Santamonica" class="btn-primary" data-i18n="regalo_btn">Richiedi un buono</a>
     </div>
   </div>
 </section>
 
 <section class="prenota-section" id="prenota">
   <div class="section-inner">
-    <p class="section-label reveal">Hai qualcosa da festeggiare?</p>
-    <h2 class="section-title reveal">Organizza una serata <em>speciale</em></h2>
+    <p class="section-label reveal" data-i18n="prenota_label">Hai qualcosa da festeggiare?</p>
+    <h2 class="section-title reveal" data-i18n="prenota_title">Organizza una serata <em>speciale</em></h2>
     <div class="prenota-grid">
       <div class="reveal">
         <div class="prenota-intro">
-          <p>Che sia un compleanno, un anniversario o una cena aziendale, ci piace sapere in anticipo per prepararci al meglio ad accoglierti.</p>
-          <p>Raccontaci la tua occasione e le tue esigenze: faremo in modo che ogni dettaglio sia curato.</p>
+          <p data-i18n="prenota_p1">Che sia un compleanno...</p>
+          <p data-i18n="prenota_p2">Raccontaci la tua occasione...</p>
         </div>
         <div class="prenota-highlights">
           <div class="prenota-highlight">
             <div class="prenota-highlight-icon">&#x1F942;</div>
-            <div class="prenota-highlight-text"><strong>Occasioni speciali</strong>Compleanni, anniversari, proposte di matrimonio &mdash; creiamo l&rsquo;atmosfera giusta.</div>
+            <div class="prenota-highlight-text"><strong data-i18n="prenota_h1_title">Occasioni speciali</strong><span data-i18n="prenota_h1_text">Compleanni...</span></div>
           </div>
           <div class="prenota-highlight">
             <div class="prenota-highlight-icon">&#x1F33F;</div>
-            <div class="prenota-highlight-text"><strong>Intolleranze e allergie</strong>Segnalacele in anticipo: la cucina si adatta senza compromettere l&rsquo;esperienza.</div>
+            <div class="prenota-highlight-text"><strong data-i18n="prenota_h2_title">Intolleranze e allergie</strong><span data-i18n="prenota_h2_text">Segnalacele...</span></div>
           </div>
           <div class="prenota-highlight">
             <div class="prenota-highlight-icon">&#x1F4CD;</div>
-            <div class="prenota-highlight-text"><strong>Tavolo preferito</strong>Se hai una preferenza &mdash; vista mare, interno, angolo riservato &mdash; faccelo sapere.</div>
+            <div class="prenota-highlight-text"><strong data-i18n="prenota_h3_title">Tavolo preferito</strong><span data-i18n="prenota_h3_text">Se hai una preferenza...</span></div>
           </div>
         </div>
       </div>
@@ -398,57 +409,36 @@
           <form id="prenota-form" action="https://formspree.io/f/mkopjnvq" method="POST">
             <input type="hidden" name="_subject" value="Richiesta prenotazione speciale - Santamonica">
             <div class="pf-row">
-              <div class="pf-group">
-                <label for="p-nome">Nome</label>
-                <input type="text" id="p-nome" name="nome" placeholder="Mario" required>
-              </div>
-              <div class="pf-group">
-                <label for="p-tel">Telefono</label>
-                <input type="tel" id="p-tel" name="telefono" placeholder="+39 000 0000000" required>
-              </div>
+              <div class="pf-group"><label for="p-nome" data-i18n="prenota_f_nome">Nome</label><input type="text" id="p-nome" name="nome" required></div>
+              <div class="pf-group"><label for="p-tel" data-i18n="prenota_f_tel">Telefono</label><input type="tel" id="p-tel" name="telefono" required></div>
             </div>
             <div class="pf-row">
+              <div class="pf-group"><label for="p-data" data-i18n="prenota_f_data">Data desiderata</label><input type="date" id="p-data" name="data" required></div>
               <div class="pf-group">
-                <label for="p-data">Data desiderata</label>
-                <input type="date" id="p-data" name="data" required>
-              </div>
-              <div class="pf-group">
-                <label for="p-persone">Numero di persone</label>
+                <label for="p-persone" data-i18n="prenota_f_persone">Numero di persone</label>
                 <select id="p-persone" name="persone" required>
-                  <option value="" disabled selected>Seleziona</option>
-                  <option>1 persona</option>
-                  <option>2 persone</option>
-                  <option>3 persone</option>
-                  <option>4 persone</option>
-                  <option>5 persone</option>
-                  <option>6 persone</option>
-                  <option>7-10 persone</option>
-                  <option>Oltre 10 persone</option>
+                  <option value="" disabled selected data-i18n="prenota_f_persone_sel">Seleziona</option>
+                  <option>1</option><option>2</option><option>3</option><option>4</option>
+                  <option>5</option><option>6</option><option>7-10</option><option>+10</option>
                 </select>
               </div>
             </div>
             <div class="pf-group">
-              <label for="p-occasione">Occasione</label>
+              <label for="p-occasione" data-i18n="prenota_f_occasione">Occasione</label>
               <select id="p-occasione" name="occasione">
-                <option value="" disabled selected>Seleziona</option>
-                <option>Compleanno</option>
-                <option>Anniversario</option>
-                <option>Proposta di matrimonio</option>
-                <option>Cena di lavoro</option>
-                <option>Cena romantica</option>
-                <option>Altro</option>
+                <option value="" disabled selected data-i18n="prenota_f_occasione_sel">Seleziona</option>
+                <option data-i18n="prenota_f_occ1">Compleanno</option>
+                <option data-i18n="prenota_f_occ2">Anniversario</option>
+                <option data-i18n="prenota_f_occ3">Proposta di matrimonio</option>
+                <option data-i18n="prenota_f_occ4">Cena di lavoro</option>
+                <option data-i18n="prenota_f_occ5">Cena romantica</option>
+                <option data-i18n="prenota_f_occ6">Altro</option>
               </select>
             </div>
-            <div class="pf-group">
-              <label for="p-intolleranze">Intolleranze o allergie</label>
-              <input type="text" id="p-intolleranze" name="intolleranze" placeholder="Es. glutine, crostacei, lattosio">
-            </div>
-            <div class="pf-group">
-              <label for="p-richieste">Richieste particolari</label>
-              <textarea id="p-richieste" name="richieste" placeholder="Tavolo con vista mare, menu personalizzato, torta..."></textarea>
-            </div>
+            <div class="pf-group"><label for="p-intolleranze" data-i18n="prenota_f_intolleranze">Intolleranze</label><input type="text" id="p-intolleranze" name="intolleranze"></div>
+            <div class="pf-group"><label for="p-richieste" data-i18n="prenota_f_richieste">Richieste particolari</label><textarea id="p-richieste" name="richieste"></textarea></div>
             <div style="margin-top:1.5rem;">
-              <button type="submit" id="prenota-btn" class="btn-primary" style="cursor:pointer;font-family:'Jost',sans-serif;border:none;width:100%;text-align:center;">Invia la richiesta</button>
+              <button type="submit" id="prenota-btn" class="btn-primary" style="cursor:pointer;font-family:'Jost',sans-serif;border:none;width:100%;text-align:center;" data-i18n="prenota_f_btn">Invia la richiesta</button>
             </div>
             <div class="pf-status" id="prenota-status"></div>
           </form>
@@ -460,20 +450,23 @@
 
 <section id="info">
   <div class="section-inner">
-    <p class="section-label reveal">Come raggiungerci</p>
-    <h2 class="section-title reveal">Orari &amp; <em>Contatti</em></h2>
+    <p class="section-label reveal" data-i18n="info_label">Come raggiungerci</p>
+    <h2 class="section-title reveal" data-i18n="info_title">Orari &amp; <em>Contatti</em></h2>
     <div class="info-grid reveal" style="transition-delay:0.1s">
       <div>
-        <p class="info-block-label">Orari</p>
+        <p class="info-block-label" data-i18n="info_orari_label">Orari</p>
         <div class="info-block-content">
-          Marted&igrave;<br><strong style="color:var(--ink);font-weight:400">19:30 &ndash; 22:30</strong><br><br>
-          Mercoled&igrave; &ndash; Sabato<br><strong style="color:var(--ink);font-weight:400">12:30 &ndash; 14:30 &nbsp;/&nbsp; 19:30 &ndash; 22:30</strong><br><br>
-          Domenica<br><strong style="color:var(--ink);font-weight:400">12:30 &ndash; 14:30</strong><br><br>
-          <em style="font-size:0.78rem">Luned&igrave; chiuso</em>
+          <span data-i18n="info_orari_mar">Marted&igrave;</span><br>
+          <strong style="color:var(--ink);font-weight:400">19:30 &ndash; 22:30</strong><br><br>
+          <span data-i18n="info_orari_mersab">Mercoled&igrave; &ndash; Sabato</span><br>
+          <strong style="color:var(--ink);font-weight:400">12:30 &ndash; 14:30 &nbsp;/&nbsp; 19:30 &ndash; 22:30</strong><br><br>
+          <span data-i18n="info_orari_dom">Domenica</span><br>
+          <strong style="color:var(--ink);font-weight:400">12:30 &ndash; 14:30</strong><br><br>
+          <em style="font-size:0.78rem" data-i18n="info_orari_lun">Luned&igrave; chiuso</em>
         </div>
       </div>
       <div>
-        <p class="info-block-label">Dove siamo</p>
+        <p class="info-block-label" data-i18n="info_dove_label">Dove siamo</p>
         <div class="info-block-content">
           Lungomare Lombardo 27<br>16145 Genova &mdash; Italy<br><br>
           <a href="tel:+390105533155">+39 010 553 31 55</a><br>
@@ -481,10 +474,10 @@
         </div>
       </div>
       <div>
-        <p class="info-block-label">Note</p>
+        <p class="info-block-label" data-i18n="info_note_label">Note</p>
         <div class="info-block-content">
-          Si prega di segnalare eventuali allergie o intolleranze al momento della prenotazione.<br><br>
-          &#x1F43E; Accettiamo animali di tutte le taglie.
+          <span data-i18n="info_note_text">Si prega di segnalare eventuali allergie...</span><br><br>
+          <span data-i18n="info_animali">&#x1F43E; Accettiamo animali di tutte le taglie.</span>
         </div>
       </div>
     </div>
@@ -495,38 +488,23 @@
   <div class="section-inner">
     <div class="contatti-grid">
       <div class="reveal">
-        <p class="section-label">Scrivici</p>
-        <h2 class="section-title">Manda un <em>messaggio</em></h2>
+        <p class="section-label" data-i18n="contatti_label">Scrivici</p>
+        <h2 class="section-title" data-i18n="contatti_title">Manda un <em>messaggio</em></h2>
         <form id="contact-form" action="https://formspree.io/f/mkopjnvq" method="POST">
           <div class="form-row">
-            <div class="form-group">
-              <label for="nome">Nome</label>
-              <input type="text" id="nome" name="nome" placeholder="Mario" required>
-            </div>
-            <div class="form-group">
-              <label for="cognome">Cognome</label>
-              <input type="text" id="cognome" name="cognome" placeholder="Rossi" required>
-            </div>
+            <div class="form-group"><label for="nome" data-i18n="contatti_f_nome">Nome</label><input type="text" id="nome" name="nome" required></div>
+            <div class="form-group"><label for="cognome" data-i18n="contatti_f_cognome">Cognome</label><input type="text" id="cognome" name="cognome" required></div>
           </div>
           <div class="form-row">
-            <div class="form-group">
-              <label for="email">Email</label>
-              <input type="email" id="email" name="email" placeholder="mario@email.com" required>
-            </div>
-            <div class="form-group">
-              <label for="tel">Telefono</label>
-              <input type="tel" id="tel" name="telefono" placeholder="+39 000 0000000">
-            </div>
+            <div class="form-group"><label for="email" data-i18n="contatti_f_email">Email</label><input type="email" id="email" name="email" required></div>
+            <div class="form-group"><label for="tel" data-i18n="contatti_f_tel">Telefono</label><input type="tel" id="tel" name="telefono"></div>
           </div>
-          <div class="form-group">
-            <label for="msg">Messaggio</label>
-            <textarea id="msg" name="messaggio" placeholder="Come possiamo aiutarti?" required></textarea>
-          </div>
+          <div class="form-group"><label for="msg" data-i18n="contatti_f_msg">Messaggio</label><textarea id="msg" name="messaggio" required></textarea></div>
           <div class="form-check">
             <input type="checkbox" id="privacy" required>
-            <label for="privacy">Accetto la <a href="/privacy-policy">Privacy Policy</a> e i <a href="/cookies">Cookie</a></label>
+            <label for="privacy" data-i18n="contatti_f_privacy">Accetto la <a href="/privacy-policy">Privacy Policy</a> e i <a href="/cookies">Cookie</a></label>
           </div>
-          <button type="submit" id="submit-btn" class="btn-primary" style="cursor:pointer;font-family:'Jost',sans-serif;border:none;">Invia messaggio</button>
+          <button type="submit" id="submit-btn" class="btn-primary" style="cursor:pointer;font-family:'Jost',sans-serif;border:none;" data-i18n="contatti_f_btn">Invia messaggio</button>
           <div class="form-status" id="form-status"></div>
         </form>
       </div>
@@ -534,11 +512,8 @@
         <div class="map-wrapper">
           <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=8.960702%2C44.387346%2C8.968702%2C44.395346&layer=mapnik&marker=44.391346%2C8.964702" height="380" allowfullscreen loading="lazy" title="Mappa Santamonica Genova"></iframe>
           <div class="map-bar">
-            <div class="map-bar-address">
-              <span class="map-bar-label">Santamonica</span>
-              Lungomare Lombardo 27 &mdash; Genova
-            </div>
-            <a href="https://www.openstreetmap.org/?mlat=44.391346&mlon=8.964702#map=17/44.391346/8.964702" target="_blank" class="map-bar-link">Apri in Maps &rarr;</a>
+            <div class="map-bar-address"><span class="map-bar-label">Santamonica</span>Lungomare Lombardo 27 &mdash; Genova</div>
+            <a href="https://www.openstreetmap.org/?mlat=44.391346&mlon=8.964702#map=17/44.391346/8.964702" target="_blank" class="map-bar-link" data-i18n="map_apri">Apri in Maps &rarr;</a>
           </div>
         </div>
       </div>
@@ -553,7 +528,7 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.09.03</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.11.01</a></p>
   </div>
 </footer>
 
@@ -567,25 +542,58 @@
 <div id="booking-overlay" role="dialog" aria-modal="true">
   <div id="booking-popup">
     <button class="popup-close" id="popup-close">&#x2715;</button>
-    <span class="popup-label">Prenota ora</span>
-    <h2>Un tavolo <em>sul mare</em></h2>
-    <p>Siamo aperti dal marted&igrave; alla domenica. Prenota il tuo tavolo e vivi un&rsquo;esperienza di cucina ligure autentica.</p>
+    <span class="popup-label" data-i18n="popup_label">Prenota ora</span>
+    <h2 data-i18n="popup_title">Un tavolo <em>sul mare</em></h2>
+    <p data-i18n="popup_text">Siamo aperti dal marted&igrave; alla domenica...</p>
     <div class="popup-actions">
-      <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" class="btn-primary" style="text-align:center;" onclick="closePopup()">Prenota su TheFork</a>
-      <button class="popup-skip" id="popup-skip">Magari un&rsquo;altra volta</button>
+      <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" class="btn-primary" style="text-align:center;" onclick="closePopup()" data-i18n="popup_btn">Prenota su TheFork</a>
+      <button class="popup-skip" id="popup-skip" data-i18n="popup_skip">Magari un&rsquo;altra volta</button>
     </div>
   </div>
 </div>
 
 <div id="cookie-banner" role="dialog" aria-label="Consenso cookie">
-  <p>Questo sito utilizza cookie tecnici necessari al funzionamento e, previo consenso, cookie analitici (Google Analytics) per migliorare l&rsquo;esperienza di navigazione. Leggi la nostra <a href="/privacy-policy">Privacy Policy</a> e <a href="/cookies">Cookie Policy</a>.</p>
+  <p data-i18n="cookie_text">Questo sito utilizza cookie tecnici...</p>
   <div class="cookie-actions">
-    <button class="cookie-btn cookie-decline" id="cookie-decline">Solo necessari</button>
-    <button class="cookie-btn cookie-accept" id="cookie-accept">Accetta tutti</button>
+    <button class="cookie-btn cookie-decline" id="cookie-decline" data-i18n="cookie_decline">Solo necessari</button>
+    <button class="cookie-btn cookie-accept" id="cookie-accept" data-i18n="cookie_accept">Accetta tutti</button>
   </div>
 </div>
 
 <script>
+  var T = {};
+  var currentLang = localStorage.getItem('sm-lang') || 'it';
+
+  fetch('translations.json')
+    .then(function(r) { return r.json(); })
+    .then(function(data) { T = data; applyLang(currentLang); })
+    .catch(function() { console.warn('translations.json non trovato'); });
+
+  function applyLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('sm-lang', lang);
+    document.documentElement.lang = lang;
+
+    if (!T[lang]) return;
+    var t = T[lang];
+
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n');
+      if (t[key] !== undefined) {
+        el.innerHTML = t[key];
+      }
+    });
+
+    document.querySelectorAll('.lang-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.textContent.toLowerCase() === lang);
+    });
+  }
+
+  function setLang(lang) {
+    applyLang(lang);
+    document.getElementById('mobile-menu').classList.remove('open');
+  }
+
   var nav = document.getElementById('main-nav');
   window.addEventListener('scroll', function() { nav.classList.toggle('scrolled', window.scrollY > 60); });
 
@@ -603,39 +611,39 @@
   var btn = document.getElementById('submit-btn');
   var status = document.getElementById('form-status');
   form.addEventListener('submit', async function(e) {
-    e.preventDefault(); btn.textContent = 'Invio in corso...'; btn.disabled = true; status.className = 'form-status';
+    e.preventDefault(); btn.disabled = true;
     try {
       var res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } });
-      if (res.ok) { status.textContent = 'Messaggio inviato! Ti risponderemo al pi\u00f9 presto.'; status.className = 'form-status success'; form.reset(); }
+      if (res.ok) { status.textContent = T[currentLang] ? T[currentLang].contatti_ok : 'Inviato!'; status.className = 'form-status success'; form.reset(); }
       else { throw new Error(); }
-    } catch(err) { status.textContent = 'Errore. Scrivici a santamonicagenova@gmail.com'; status.className = 'form-status error'; }
-    btn.textContent = 'Invia messaggio'; btn.disabled = false;
+    } catch(err) { status.textContent = T[currentLang] ? T[currentLang].contatti_err : 'Errore.'; status.className = 'form-status error'; }
+    btn.disabled = false;
   });
 
   var pForm = document.getElementById('prenota-form');
   var pBtn = document.getElementById('prenota-btn');
   var pStatus = document.getElementById('prenota-status');
   pForm.addEventListener('submit', async function(e) {
-    e.preventDefault(); pBtn.textContent = 'Invio in corso...'; pBtn.disabled = true; pStatus.className = 'pf-status';
+    e.preventDefault(); pBtn.disabled = true;
     try {
       var res = await fetch(pForm.action, { method: 'POST', body: new FormData(pForm), headers: { 'Accept': 'application/json' } });
-      if (res.ok) { pStatus.textContent = 'Richiesta inviata! Vi contatteremo entro 24 ore.'; pStatus.className = 'pf-status success'; pForm.reset(); }
+      if (res.ok) { pStatus.textContent = T[currentLang] ? T[currentLang].prenota_ok : 'Inviato!'; pStatus.className = 'pf-status success'; pForm.reset(); }
       else { throw new Error(); }
-    } catch(err) { pStatus.textContent = 'Errore. Chiamaci al +39 010 553 31 55'; pStatus.className = 'pf-status error'; }
-    pBtn.textContent = 'Invia la richiesta'; pBtn.disabled = false;
+    } catch(err) { pStatus.textContent = T[currentLang] ? T[currentLang].prenota_err : 'Errore.'; pStatus.className = 'pf-status error'; }
+    pBtn.disabled = false;
   });
 
   var galleryImages = [
-    { src: 'img/piatto-pesce.jpg', alt: 'Pesce alla griglia' },
-    { src: 'img/piatto-tonno.jpg', alt: 'Tonno scottato' },
-    { src: 'img/piatto-pasta.jpg', alt: 'Pasta fresca' },
-    { src: 'img/piatto-carne.jpg', alt: 'Secondo piatto' },
+    { src: 'img/piatto-pesce.jpg', alt: 'Pesce' },
+    { src: 'img/piatto-tonno.jpg', alt: 'Tonno' },
+    { src: 'img/piatto-pasta.jpg', alt: 'Pasta' },
+    { src: 'img/piatto-carne.jpg', alt: 'Secondo' },
     { src: 'img/piatto-dessert.jpg', alt: 'Dessert' }
   ];
   var currentImg = 0;
-  function openLightbox(i) { currentImg = i; document.getElementById('lightbox-img').src = galleryImages[i].src; document.getElementById('lightbox-img').alt = galleryImages[i].alt; document.getElementById('lightbox').classList.add('visible'); document.body.style.overflow = 'hidden'; }
+  function openLightbox(i) { currentImg = i; document.getElementById('lightbox-img').src = galleryImages[i].src; document.getElementById('lightbox').classList.add('visible'); document.body.style.overflow = 'hidden'; }
   function closeLightbox() { document.getElementById('lightbox').classList.remove('visible'); document.body.style.overflow = ''; }
-  function changeLightbox(dir) { currentImg = (currentImg + dir + galleryImages.length) % galleryImages.length; document.getElementById('lightbox-img').src = galleryImages[currentImg].src; document.getElementById('lightbox-img').alt = galleryImages[currentImg].alt; }
+  function changeLightbox(dir) { currentImg = (currentImg + dir + galleryImages.length) % galleryImages.length; document.getElementById('lightbox-img').src = galleryImages[currentImg].src; }
   document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
   document.getElementById('lightbox-prev').addEventListener('click', function() { changeLightbox(-1); });
   document.getElementById('lightbox-next').addEventListener('click', function() { changeLightbox(1); });

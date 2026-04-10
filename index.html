@@ -33,11 +33,28 @@
   .nav-cta { font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-white); background: var(--ink); padding: 0.55rem 1.2rem; text-decoration: none; transition: background 0.2s; }
   .nav-cta:hover { background: var(--terracotta); }
 
-  /* LANG SWITCHER */
-  .lang-switcher { display: flex; gap: 0.3rem; }
-  .lang-btn { font-family: 'Jost', sans-serif; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; background: none; border: none; cursor: pointer; color: var(--ink-soft); padding: 0.2rem 0.35rem; border-radius: 2px; transition: all 0.2s; }
-  .lang-btn:hover { color: var(--ink); }
-  .lang-btn.active { color: var(--terracotta); font-weight: 500; }
+  /* LANG DROPDOWN */
+  .lang-select {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    background: transparent;
+    border: 1px solid var(--divider);
+    padding: 0.35rem 0.6rem;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%233a3630' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    padding-right: 1.4rem;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .lang-select:hover { border-color: var(--terracotta); color: var(--ink); }
+  nav.scrolled .lang-select { background-color: transparent; }
 
   .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; }
   .hamburger span { display: block; width: 24px; height: 1.5px; background: var(--ink); }
@@ -175,7 +192,7 @@
   .footer-social a { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); text-decoration: none; transition: color 0.2s; }
   .footer-social a:hover { color: var(--sand); }
   .footer-copy { font-size: 0.68rem; color: rgba(245,240,232,0.4); letter-spacing: 0.1em; }
-  .footer-version { color: var(--terracotta); text-decoration: none; opacity: 1; }
+  .footer-version { color: var(--terracotta); text-decoration: none; }
   .footer-version:hover { text-decoration: underline; }
 
   /* MOBILE MENU */
@@ -184,7 +201,7 @@
   .mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; font-style: italic; color: var(--ink); text-decoration: none; transition: color 0.2s; }
   .mobile-menu a:hover { color: var(--terracotta); }
   .menu-close { position: absolute; top: 1.5rem; right: 2rem; background: none; border: none; cursor: pointer; font-size: 1.5rem; color: var(--ink); }
-  .mobile-lang { display: flex; gap: 0.5rem; margin-top: 1rem; }
+  .mobile-lang-select { font-family: 'Jost', sans-serif; font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; border: 1px solid var(--divider); padding: 0.5rem 1rem; background: transparent; color: var(--ink); cursor: pointer; outline: none; margin-top: 0.5rem; }
 
   /* POPUP */
   #booking-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(26,24,20,0.75); display: flex; align-items: center; justify-content: center; padding: 1.5rem; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
@@ -220,7 +237,7 @@
   /* RESPONSIVE */
   @media (max-width: 900px) {
     nav { padding: 1rem 1.5rem; }
-    .nav-links, .nav-cta, .lang-switcher { display: none; }
+    .nav-links, .nav-cta, .nav-right { display: none; }
     .hamburger { display: flex; }
     .hero { grid-template-columns: 1fr; }
     .hero-text-panel { padding: 7rem 1.5rem 3rem; order: 2; }
@@ -259,13 +276,13 @@
     <li><a href="#contatti" data-i18n="nav_contatti">Contatti</a></li>
   </ul>
   <div class="nav-right">
-    <div class="lang-switcher">
-      <button class="lang-btn active" onclick="setLang('it')">IT</button>
-      <button class="lang-btn" onclick="setLang('en')">EN</button>
-      <button class="lang-btn" onclick="setLang('fr')">FR</button>
-      <button class="lang-btn" onclick="setLang('de')">DE</button>
-      <button class="lang-btn" onclick="setLang('es')">ES</button>
-    </div>
+    <select class="lang-select" id="lang-select-nav" onchange="setLang(this.value)">
+      <option value="it">IT</option>
+      <option value="en">EN</option>
+      <option value="fr">FR</option>
+      <option value="de">DE</option>
+      <option value="es">ES</option>
+    </select>
     <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" class="nav-cta" data-i18n="nav_prenota">Prenota</a>
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
@@ -279,14 +296,14 @@
   <a href="#prenota" class="mobile-link" data-i18n="nav_evento_mobile">Evento speciale</a>
   <a href="#info" class="mobile-link" data-i18n="nav_info_mobile">Info &amp; Orari</a>
   <a href="#contatti" class="mobile-link" data-i18n="nav_contatti">Contatti</a>
-  <div class="mobile-lang">
-    <button class="lang-btn active" onclick="setLang('it')">IT</button>
-    <button class="lang-btn" onclick="setLang('en')">EN</button>
-    <button class="lang-btn" onclick="setLang('fr')">FR</button>
-    <button class="lang-btn" onclick="setLang('de')">DE</button>
-    <button class="lang-btn" onclick="setLang('es')">ES</button>
-  </div>
-  <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" style="font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-style:normal;background:var(--ink);color:var(--warm-white);padding:0.9rem 2.5rem;margin-top:1rem;" data-i18n="nav_prenota">Prenota</a>
+  <select class="mobile-lang-select" id="lang-select-mobile" onchange="setLang(this.value)">
+    <option value="it">IT — Italiano</option>
+    <option value="en">EN — English</option>
+    <option value="fr">FR — Français</option>
+    <option value="de">DE — Deutsch</option>
+    <option value="es">ES — Español</option>
+  </select>
+  <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" style="font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-style:normal;background:var(--ink);color:var(--warm-white);padding:0.9rem 2.5rem;" data-i18n="nav_prenota">Prenota</a>
 </div>
 
 <section class="hero" style="padding:0;position:relative;">
@@ -317,7 +334,7 @@
           <p data-i18n="cucina_p3">Una cucina elegante...</p>
         </div>
         <div class="cucina-actions">
-          <a href="https://af88bf37-3bfb-460d-a80e-2a0f7ca776ba.filesusr.com/ugd/461837_d635715c48a04d4c96aa2f5de3ce6530.pdf" target="_blank" class="btn-primary" data-i18n="cucina_btn">Guarda il men&ugrave;</a>
+          <a href="menu.html" class="btn-primary" data-i18n="cucina_btn">Guarda il men&ugrave;</a>
         </div>
       </div>
       <div class="cucina-images reveal" style="transition-delay:0.15s">
@@ -528,7 +545,7 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.11.01</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.11.02</a></p>
   </div>
 </footer>
 
@@ -567,26 +584,20 @@
   fetch('translations.json')
     .then(function(r) { return r.json(); })
     .then(function(data) { T = data; applyLang(currentLang); })
-    .catch(function() { console.warn('translations.json non trovato'); });
+    .catch(function() { console.warn('translations.json non trovato — carica su GitHub per testare il multilingua'); });
 
   function applyLang(lang) {
     currentLang = lang;
     localStorage.setItem('sm-lang', lang);
     document.documentElement.lang = lang;
-
     if (!T[lang]) return;
     var t = T[lang];
-
     document.querySelectorAll('[data-i18n]').forEach(function(el) {
       var key = el.getAttribute('data-i18n');
-      if (t[key] !== undefined) {
-        el.innerHTML = t[key];
-      }
+      if (t[key] !== undefined) el.innerHTML = t[key];
     });
-
-    document.querySelectorAll('.lang-btn').forEach(function(btn) {
-      btn.classList.toggle('active', btn.textContent.toLowerCase() === lang);
-    });
+    document.getElementById('lang-select-nav').value = lang;
+    document.getElementById('lang-select-mobile').value = lang;
   }
 
   function setLang(lang) {

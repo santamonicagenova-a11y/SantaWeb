@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.10.2 -->
+<!-- versione v 2026.04.10.3 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -432,7 +432,7 @@ function traduci() {
   if (testi.length === 0) { toast('Nessun testo da tradurre'); return; }
 
   var langs = ['en', 'fr', 'de', 'es'];
-  var langPair = { en: 'it|en', fr: 'it|fr', de: 'it|de', es: 'it|es' };
+  var langPair = { en: 'it-IT|en-GB', fr: 'it-IT|fr-FR', de: 'it-IT|de-DE', es: 'it-IT|es-ES' };
 
   // Crea la coda: tutte le combinazioni testo × lingua in sequenza
   var coda = [];
@@ -637,7 +637,7 @@ function traduci() {
   btn.disabled = true;
 
   var langs = ['en', 'fr', 'de', 'es'];
-  var langPair = { en: 'it|en', fr: 'it|fr', de: 'it|de', es: 'it|es' };
+  var langPair = { en: 'it-IT|en-GB', fr: 'it-IT|fr-FR', de: 'it-IT|de-DE', es: 'it-IT|es-ES' };
   var completati = 0;
   var totale = testi.length * langs.length;
 
@@ -939,6 +939,6 @@ function toast(msg) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.10.2</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.10.3</div>
 </body>
 </html>

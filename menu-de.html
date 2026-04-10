@@ -382,6 +382,10 @@
 
 <!-- ── BARRA CONTROLLI ── -->
 <div class="ctrl-bar">
+  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout('carta')">☞ Menù alla carta (3 pag.)</button>
+  <div class="ctrl-sep"></div>
+  <button class="ctrl-btn" id="btn-orario" onclick="showLayout('orario')">☞ Foglio orario (1 pag.)</button>
+  <div class="ctrl-sep"></div>
   <button class="ctrl-btn" onclick="window.print()">✦ Stampa / Salva PDF</button>
 </div>
 
@@ -490,8 +494,9 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Weißkohl, Miso, Himbeeren, Cashewnüsse",
-          "prezzo": 16
+          "nome": "Gamberi viola crudi alla puttanesca",
+          "prezzo": 25,
+          "sostenibile": true
         },
         {
           "nome": "Kalbsbries, Knollensellerie, Haselnüsse, Fischfondreduktion",
@@ -554,7 +559,7 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Picanha, Königskräuterseitlinge, Rinderjus",
+          "nome": "Agnello, piselli, rabarbaro",
           "prezzo": 28
         }
       ],
@@ -617,9 +622,7 @@ const NOTE_CARTA = `
   Die Liste der Allergene finden Sie auf der letzten Seite dieser Speisekarte.
 `;
 
-const NOTE_ORARIO = `Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche
-delle materie prime i prodotti acquistati freschi vengono abbattuti e congelati.
-Um die Qualität konstant zu halten, werden frische Fischprodukte schockgefrostet und mit dem Symbol * gekennzeichnet.`;
+const NOTE_ORARIO = `Um die Qualität konstant zu halten, werden frische Fischprodukte schockgefrostet und mit dem Symbol * gekennzeichnet.`;
 
 function getSez(titolo) {
   return MENU.sezioni.find(s => s.titolo === titolo);
@@ -674,7 +677,7 @@ function buildDegu(degu) {
     <div class="degu">
       <div class="degu-titolo">Degustationsmenü</div>
       <div class="degu-prezzi">${optsHtml}</div>
-      <div class="degu-nota">${degu.nota.replace("den gesamten Tisch", "<strong>den gesamten Tisch</strong>")}</div>
+      <div class="degu-nota">${degu.nota.replace("l'intero tavolo", "<strong>l\u2019intero tavolo</strong>")}</div>
       ${percorsiHtml}
     </div>`;
 }

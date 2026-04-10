@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.09.7 -->
+<!-- versione v 2026.04.09.8 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -512,7 +512,11 @@ function eseguiPubblicazione(token) {
   var i = 0;
   function next() {
     if (i >= files.length) {
-      toast('\u2713 Pubblicato in 5 lingue!');
+      toast('✓ Pubblicato! Ricarica tra 90 secondi…');
+      setTimeout(function() {
+        toast('⏳ Ricarico dal sito…');
+        setTimeout(caricaDalSito, 1500);
+      }, 90000);
       return;
     }
     var f = files[i++];
@@ -550,6 +554,6 @@ function toast(msg) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.09.7</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.09.8</div>
 </body>
 </html>

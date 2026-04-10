@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.09.5 -->
+<!-- versione v 2026.04.09.6 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -290,11 +290,8 @@ function apriPreview(lang) {
   var html;
   if (!lang || lang === 'it') {
     html = outputCorrente;
-  } else if (menuTradotti[lang]) {
-    html = menuTradotti[lang];
   } else {
     var t = TRANSLATIONS[lang];
-    outputCorrente = costruisciOutput();
     html = costruisciHtmlTradotto(lang, t);
   }
   var win = window.open('', '_blank');
@@ -490,6 +487,6 @@ function toast(msg) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.09.5</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.09.6</div>
 </body>
 </html>

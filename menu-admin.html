@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.10.8 -->
+<!-- versione v 2026.04.10.9 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -139,7 +139,7 @@ function analizza(src) {
   document.getElementById('intro').style.display = 'none';
   document.getElementById('wrap').classList.add('on');
   costruisci();
-  document.getElementById('btn-traduci').disabled = false;
+  
 }
 
 function el(tag, cls, txt) {
@@ -409,6 +409,16 @@ function resetToken() {
   document.getElementById('modal-token').classList.add('on');
 }
 
+function confermaPubblica() {
+  var token = document.getElementById('token-input').value.trim();
+  if (!token) { alert('Inserisci il token'); return; }
+  localStorage.setItem('gh_token', token);
+  chiudiModal();
+  eseguiPubblicazione(token);
+  var btn = document.getElementById('btn-pubblica');
+  if (btn) { btn.textContent = '✦ Traduci e Pubblica'; btn.disabled = false; }
+}
+
 function chiudiModal() {
   document.getElementById('modal-token').classList.remove('on');
 }
@@ -603,6 +613,16 @@ function resetToken() {
   localStorage.removeItem('gh_token');
   document.getElementById('token-input').value = '';
   document.getElementById('modal-token').classList.add('on');
+}
+
+function confermaPubblica() {
+  var token = document.getElementById('token-input').value.trim();
+  if (!token) { alert('Inserisci il token'); return; }
+  localStorage.setItem('gh_token', token);
+  chiudiModal();
+  eseguiPubblicazione(token);
+  var btn = document.getElementById('btn-pubblica');
+  if (btn) { btn.textContent = '✦ Traduci e Pubblica'; btn.disabled = false; }
 }
 
 function chiudiModal() {
@@ -802,6 +822,16 @@ function resetToken() {
   document.getElementById('modal-token').classList.add('on');
 }
 
+function confermaPubblica() {
+  var token = document.getElementById('token-input').value.trim();
+  if (!token) { alert('Inserisci il token'); return; }
+  localStorage.setItem('gh_token', token);
+  chiudiModal();
+  eseguiPubblicazione(token);
+  var btn = document.getElementById('btn-pubblica');
+  if (btn) { btn.textContent = '✦ Traduci e Pubblica'; btn.disabled = false; }
+}
+
 function chiudiModal() {
   document.getElementById('modal-token').classList.remove('on');
 }
@@ -988,6 +1018,16 @@ function resetToken() {
   localStorage.removeItem('gh_token');
   document.getElementById('token-input').value = '';
   document.getElementById('modal-token').classList.add('on');
+}
+
+function confermaPubblica() {
+  var token = document.getElementById('token-input').value.trim();
+  if (!token) { alert('Inserisci il token'); return; }
+  localStorage.setItem('gh_token', token);
+  chiudiModal();
+  eseguiPubblicazione(token);
+  var btn = document.getElementById('btn-pubblica');
+  if (btn) { btn.textContent = '✦ Traduci e Pubblica'; btn.disabled = false; }
 }
 
 function chiudiModal() {
@@ -1217,6 +1257,6 @@ function toast(msg) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.10.8</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.10.9</div>
 </body>
 </html>

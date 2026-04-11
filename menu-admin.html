@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.10.4 -->
+<!-- versione v 2026.04.10.6 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -20,9 +20,6 @@
     .btn-save:hover { opacity:.85; }
     .btn-load { background:transparent; border:1px solid var(--cream); color:var(--cream); }
     .btn-load:hover { background:rgba(255,255,255,.1); }
-    .btn-translate { background:var(--stone); color:#fff; }
-    .btn-translate:hover { opacity:.85; }
-    .btn-translate.translating { background:var(--stone); opacity:.6; cursor:wait; }
     .btn-publish { background:#2d6a4f; color:#fff; }
     .preview-wrap { position:relative; display:inline-block; }
     .preview-menu { display:none; position:absolute; top:100%; left:0; background:var(--ink); min-width:140px; z-index:200; margin-top:2px; }
@@ -92,8 +89,7 @@
         <a onclick="apriPreview('es')">🇪🇸 Español</a>
       </div>
     </div>
-    <button class="btn btn-translate" id="btn-traduci" onclick="traduci()">🌐 Traduci</button>
-    <button class="btn btn-publish" onclick="pubblicaSuGithub()">✦ Pubblica su GitHub</button>
+    <button class="btn btn-publish" id="btn-pubblica" onclick="traduciEPubblica()">✦ Traduci e Pubblica</button>
     <button class="btn btn-load" onclick="resetToken()" title="Cambia token GitHub" style="font-size:.6rem;padding:.45rem .7rem;opacity:.7">🔑</button>
   </div>
 </div>
@@ -111,7 +107,7 @@
 <div class="toast" id="toast">✓ Scaricato!</div>
 
 <script>
-var tplBefore = '', tplAfter = '', dati = null, datiOriginali = null, menuTradotti = {};
+var tplBefore = '', tplAfter = '', dati = null, datiOriginali = null;
 
 function carica(input) {
   var f = input.files[0];
@@ -136,7 +132,6 @@ function analizza(src) {
   var js = src.slice(i1, i2).trim(); // "const MENU = { ... };"
   dati = Function('"use strict";' + js + ';return MENU;')();
   datiOriginali = JSON.parse(JSON.stringify(dati)); // copia immutabile
-  menuTradotti = {}; // reset cache
 
   tplBefore = src.slice(0, i1);
   tplAfter  = src.slice(i2end);
@@ -1071,6 +1066,66 @@ function traduci() {
 }
 
 
+function traduciEPubblica() {
+  if (!dati) { alert('Prima carica il menù'); return; }
+  var btn = document.getElementById('btn-pubblica');
+
+  // Raccogli tutti i testi dal form
+  var m = leggi();
+  var testi = [];
+  m.degustazione.percorsi['6'].forEach(function(p) { if (p.nome) testi.push(p.nome); });
+  m.sezioni.forEach(function(sez) {
+    sez.piatti.forEach(function(p) {
+      if (p.nome) testi.push(p.nome);
+      if (p.descrizione) testi.push(p.descrizione);
+    });
+  });
+  testi = testi.filter(function(v, i, a) { return v && a.indexOf(v) === i; });
+
+  var langs = ['en', 'fr', 'de', 'es'];
+  var coda = [];
+  testi.forEach(function(testo) {
+    langs.forEach(function(lang) { coda.push({ testo: testo, lang: lang }); });
+  });
+
+  var totale = coda.length;
+  btn.textContent = '⏳ Traduzione 0/' + totale + '…';
+  btn.disabled = true;
+
+  function traduciVoce(i) {
+    if (i >= coda.length) {
+      // Traduzione completata — ora pubblica
+      btn.textContent = '⏳ Pubblicazione…';
+      var token = localStorage.getItem('gh_token') || '';
+      if (token) {
+        eseguiPubblicazione(token);
+      } else {
+        document.getElementById('token-input').value = '';
+        document.getElementById('modal-token').classList.add('on');
+      }
+      btn.textContent = '✦ Traduci e Pubblica';
+      btn.disabled = false;
+      return;
+    }
+    var item = coda[i];
+    btn.textContent = '⏳ Traduzione ' + (i+1) + '/' + totale + '…';
+
+    var url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=it&tl=' +
+      item.lang + '&dt=t&q=' + encodeURIComponent(item.testo);
+
+    fetch(url)
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var trad = data && data[0] && data[0][0] && data[0][0][0];
+        if (trad) TRANSLATIONS[item.lang]['piatti'][item.testo] = trad;
+      })
+      .catch(function() {})
+      .finally(function() { setTimeout(function() { traduciVoce(i + 1); }, 80); });
+  }
+
+  traduciVoce(0);
+}
+
 function eseguiPubblicazione(token) {
 
   var headers = {
@@ -1079,15 +1134,18 @@ function eseguiPubblicazione(token) {
     'Content-Type': 'application/json'
   };
 
+  // Ricostruisci SEMPRE l'output dal form aggiornato (non da outputCorrente)
+  outputCorrente = costruisciOutput();
+
   // File da pubblicare: IT + 4 traduzioni
   var files = [{ path: 'menu.html', content: outputCorrente, label: 'Italiano' }];
   ['en','fr','de','es'].forEach(function(lang) {
     var t = TRANSLATIONS[lang];
-    var html = menuTradotti[lang] || costruisciHtmlTradotto(lang, t, costruisciMenuTradotto(leggi(), t));
+    var html = costruisciHtmlTradotto(lang, t);
     files.push({ path: 'menu-' + lang + '.html', content: html, label: lang.toUpperCase() });
   });
 
-  toast('\u23f3 Pubblicazione in corso\u2026');
+  toast('⏳ Pubblicazione in corso…');
 
   var i = 0;
   function next() {
@@ -1103,13 +1161,14 @@ function eseguiPubblicazione(token) {
     pubblicaFile(token, headers, f.path, f.content)
       .then(function(r) {
         if (!r.ok) return r.json().then(function(e){ throw new Error(f.path + ': ' + e.message); });
-        toast('\u2713 ' + f.label + ' (' + i + '/' + files.length + ')');
+        toast('✓ ' + f.label + ' (' + i + '/' + files.length + ')');
         setTimeout(next, 400);
       })
       .catch(function(ex) { alert('Errore: ' + ex.message); });
   }
   next();
 }
+
 
 function toast(msg) {
   var t = document.getElementById('toast');
@@ -1134,6 +1193,6 @@ function toast(msg) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.10.4</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.10.6</div>
 </body>
 </html>

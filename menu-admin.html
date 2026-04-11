@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.11.14 -->
+<!-- versione v 2026.04.11.15 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -327,10 +327,11 @@ function costruisciHtmlTradotto(lang, t) {
   var newBlock = 'const MENU = ' + JSON.stringify(m, null, 2) + ';\n' + SEP;
   var html = src.slice(0, i1) + newBlock + src.slice(i2);
 
-  // Rimuovi ctrl-bar: dal commento fino a <div id="layout-carta">
+  // Rimuovi ctrl-bar: conta 3 </div> dal commento
   var cbStart = html.indexOf('<!-- \u2500\u2500 BARRA CONTROLLI \u2500\u2500 -->');
-  var cbEnd   = html.indexOf('<div id="layout-carta">', cbStart);
-  if (cbStart >= 0 && cbEnd >= 0) {
+  if (cbStart >= 0) {
+    var cbEnd = cbStart;
+    for (var ci = 0; ci < 3; ci++) { cbEnd = html.indexOf('<' + '/div>', cbEnd) + 6; }
     html = html.slice(0, cbStart) + html.slice(cbEnd);
   }
 
@@ -1294,6 +1295,6 @@ function toast(msg) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.11.14</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.11.15</div>
 </body>
 </html>

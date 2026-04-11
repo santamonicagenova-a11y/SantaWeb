@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.10.6 -->
+<!-- versione v 2026.04.10.7 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -1126,6 +1126,20 @@ function traduciEPubblica() {
   traduciVoce(0);
 }
 
+function pubblicaFile(token, headers, path, content) {
+  var apiBase = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + path;
+  return fetch(apiBase, { headers: headers })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var body = {
+        message: 'Aggiornamento menu',
+        content: btoa(unescape(encodeURIComponent(content)))
+      };
+      if (data.sha) body.sha = data.sha;
+      return fetch(apiBase, { method: 'PUT', headers: headers, body: JSON.stringify(body) });
+    });
+}
+
 function eseguiPubblicazione(token) {
 
   var headers = {
@@ -1193,6 +1207,6 @@ function toast(msg) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.10.6</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.10.7</div>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.10.7 -->
+<!-- versione v 2026.04.10.8 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -202,7 +202,12 @@ function costruisci() {
   /* --- SEZIONI --- */
   m.sezioni.forEach(function(sez, si) {
     var fs = el('div','fs');
-    fs.appendChild(el('div','fs-head', sez.titolo));
+    // Header con titolo editabile
+    var head = el('div','fs-head');
+    var titInp = inp('text', 's'+si+'-titolo', sez.titolo);
+    titInp.style.cssText = 'background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.3);color:var(--stone);font-family:'Jost',sans-serif;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;width:100%;padding:0;';
+    head.appendChild(titInp);
+    fs.appendChild(head);
     var body = el('div','fs-body');
 
     var hdr = el('div','grid-hdr');
@@ -239,6 +244,8 @@ function leggi() {
   m.degustazione.percorsi['7'] = document.getElementById('degu7').value;
 
   m.sezioni.forEach(function(sez, si) {
+    var titoloEl = document.getElementById('s'+si+'-titolo');
+    if (titoloEl) sez.titolo = titoloEl.value;
     sez.piatti.forEach(function(p, pi) {
       p.nome = document.getElementById('s'+si+'p'+pi+'-nome').value;
       var pr = document.getElementById('s'+si+'p'+pi+'-prezzo').value;
@@ -296,7 +303,7 @@ function costruisciMenuTradotto(menuForm, t) {
   m.sezioni.forEach(function(sez, si) {
     var origSez = dati.sezioni[si];
     if (!origSez) return;
-    sez.titolo_display = t.sezioni[origSez.titolo] || origSez.titolo;
+    sez.titolo_display = t.sezioni[sez.titolo] || t.sezioni[origSez.titolo] || t.piatti[sez.titolo] || sez.titolo;
     sez.piatti.forEach(function(p) {
       if (!p) return;
       p.nome = tr(p.nome);
@@ -417,6 +424,7 @@ function traduci() {
   var testi = [];
   m.degustazione.percorsi['6'].forEach(function(p) { if (p.nome) testi.push(p.nome); });
   m.sezioni.forEach(function(sez) {
+    if (sez.titolo) testi.push(sez.titolo); // traduci anche il titolo sezione
     sez.piatti.forEach(function(p) {
       if (p.nome) testi.push(p.nome);
       if (p.descrizione) testi.push(p.descrizione);
@@ -491,7 +499,7 @@ function costruisciMenuTradotto(menuForm, t) {
   m.sezioni.forEach(function(sez, si) {
     var origSez = dati.sezioni[si];
     if (!origSez) return;
-    sez.titolo_display = t.sezioni[origSez.titolo] || origSez.titolo;
+    sez.titolo_display = t.sezioni[sez.titolo] || t.sezioni[origSez.titolo] || t.piatti[sez.titolo] || sez.titolo;
     sez.piatti.forEach(function(p) {
       if (!p) return;
       p.nome = tr(p.nome);
@@ -612,6 +620,7 @@ function traduci() {
   var testi = [];
   m.degustazione.percorsi['6'].forEach(function(p) { if (p.nome) testi.push(p.nome); });
   m.sezioni.forEach(function(sez) {
+    if (sez.titolo) testi.push(sez.titolo); // traduci anche il titolo sezione
     sez.piatti.forEach(function(p) {
       if (p.nome) testi.push(p.nome);
       if (p.descrizione) testi.push(p.descrizione);
@@ -687,7 +696,7 @@ function costruisciMenuTradotto(menuForm, t) {
   m.sezioni.forEach(function(sez, si) {
     var origSez = dati.sezioni[si];
     if (!origSez) return;
-    sez.titolo_display = t.sezioni[origSez.titolo] || origSez.titolo;
+    sez.titolo_display = t.sezioni[sez.titolo] || t.sezioni[origSez.titolo] || t.piatti[sez.titolo] || sez.titolo;
     sez.piatti.forEach(function(p) {
       if (!p) return;
       p.nome = tr(p.nome);
@@ -875,7 +884,7 @@ function costruisciMenuTradotto(menuForm, t) {
   m.sezioni.forEach(function(sez, si) {
     var origSez = dati.sezioni[si];
     if (!origSez) return;
-    sez.titolo_display = t.sezioni[origSez.titolo] || origSez.titolo;
+    sez.titolo_display = t.sezioni[sez.titolo] || t.sezioni[origSez.titolo] || t.piatti[sez.titolo] || sez.titolo;
     sez.piatti.forEach(function(p) {
       if (!p) return;
       p.nome = tr(p.nome);
@@ -1075,6 +1084,7 @@ function traduciEPubblica() {
   var testi = [];
   m.degustazione.percorsi['6'].forEach(function(p) { if (p.nome) testi.push(p.nome); });
   m.sezioni.forEach(function(sez) {
+    if (sez.titolo) testi.push(sez.titolo); // traduci anche il titolo sezione
     sez.piatti.forEach(function(p) {
       if (p.nome) testi.push(p.nome);
       if (p.descrizione) testi.push(p.descrizione);
@@ -1207,6 +1217,6 @@ function toast(msg) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.10.7</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.10.8</div>
 </body>
 </html>

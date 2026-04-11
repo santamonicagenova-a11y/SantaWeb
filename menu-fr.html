@@ -382,6 +382,10 @@
 
 <!-- ── BARRA CONTROLLI ── -->
 <div class="ctrl-bar">
+  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout('carta')">☞ Menù alla carta (3 pag.)</button>
+  <div class="ctrl-sep"></div>
+  <button class="ctrl-btn" id="btn-orario" onclick="showLayout('orario')">☞ Foglio orario (1 pag.)</button>
+  <div class="ctrl-sep"></div>
   <button class="ctrl-btn" onclick="window.print()">✦ Stampa / Salva PDF</button>
 </div>
 
@@ -410,26 +414,26 @@ const MENU = {
     "percorsi": {
       "6": [
         {
-          "nome": "Aile de raie, fèves locales, pomme verte, amandes",
+          "nome": "Ailes de raie, fèves locales, pomme verte, amandes",
           "sostenibile": true
         },
         {
-          "nome": "Ris de veau, céleri-rave, noisettes, fond de poisson",
+          "nome": "Ris de veau, céleri-rave, noisettes, bouillon de poisson",
           "sostenibile": true
         },
         {
-          "nome": "Tortelli de sanglier, dashi de dorade, ciboule, shiso"
+          "nome": "Tortelli de sanglier, dashi de daurade, ciboule, shiso"
         },
         {
-          "nome": "Tubetti “<em>Mancini</em>”, morue, kosho d’agrumes, haricots borlotti",
+          "nome": "Tubes « <em>Mancini</em> », morue, kosho aux agrumes, haricots borlotti",
           "sostenibile": true
         },
         {
-          "nome": "Ombrine locale à la ligne, salicorne, endive belge",
+          "nome": "Courbine locale capturée à l'hameçon, salicorne, endive belge",
           "sostenibile": true
         },
         {
-          "nome": "Glace au citron noir, livèche, citron vert, cracker au lait"
+          "nome": "Glace au citron noir, livèche, citron vert, crackers au lait"
         }
       ],
       "7": "Menu carte blanche du Chef"
@@ -440,17 +444,17 @@ const MENU = {
       "titolo": "Crudi",
       "piatti": [
         {
-          "nome": "Huîtres Fine de Claire",
+          "nome": "Huîtres fines de Claire",
           "prezzo": 4,
           "unita": "p."
         },
         {
-          "nome": "Huîtres Antilope",
+          "nome": "Huîtres antilopes",
           "prezzo": 7,
           "unita": "p."
         },
         {
-          "nome": "Huîtres Enrico IV",
+          "nome": "Huîtres Henri IV",
           "prezzo": 8,
           "unita": "p."
         },
@@ -461,19 +465,19 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Crevettes violettes locales",
+          "nome": "Crevettes violettes cultivées sur place",
           "prezzo": 11,
           "unita": "p.",
           "sostenibile": true
         },
         {
-          "nome": "Sélection exclusivement de poissons locaux pêchés à la ligne",
+          "nome": "Sélection uniquement de poissons locaux pêchés à l'hameçon",
           "prezzo": 37,
           "sostenibile": true,
           "staccato": true
         },
         {
-          "nome": "Dégustation de la mer",
+          "nome": "Dégustation de fruits de mer",
           "prezzo": 80,
           "sostenibile": true,
           "staccato": true
@@ -482,55 +486,56 @@ const MENU = {
       "titolo_display": "Crus"
     },
     {
-      "titolo": "Sfiziosi",
+      "titolo": "antipasti",
       "piatti": [
         {
-          "nome": "Calamar local, petits pois frais, bagna cauda légère, kéfir",
+          "nome": "Calamars locaux, petits pois frais, bagna cauda légère, kéfir",
           "prezzo": 20,
           "sostenibile": true
         },
         {
-          "nome": "Chou pommé, miso, framboises, noix de cajou",
-          "prezzo": 16
+          "nome": "Crevettes violettes crues façon puttanesca",
+          "prezzo": 25,
+          "sostenibile": true
         },
         {
-          "nome": "Ris de veau, céleri-rave, noisettes, réduction de fond de poisson",
+          "nome": "Ris de veau, céleri-rave, noisettes, réduction de bouillon de poisson",
           "prezzo": 22,
           "sostenibile": true
         },
         {
-          "nome": "Aile de raie, fèves locales, pomme verte, amandes",
+          "nome": "Ailes de raie, fèves locales, pomme verte, amandes",
           "prezzo": 24,
           "sostenibile": true
         },
         {
-          "nome": "“Non-fromages”",
+          "nome": "\"Pas de fromage\"",
           "prezzo": 22,
-          "descrizione": "(Dégustation de faux fromages artisanaux à base de noix de cajou et lait d’amande)"
+          "descrizione": "(Dégustation de faux fromages artisanaux à base de noix de cajou et de lait d'amande)"
         }
       ],
       "titolo_display": "Entrées"
     },
     {
-      "titolo": "Amidi e Carboidrati",
+      "titolo": "Amidi e carboidrati",
       "piatti": [
         {
-          "nome": "Spaghettoni carrés “<em>Mancini</em>”, anémones de mer, nduja, marjolaine",
+          "nome": "Spaghettis carrés « <em>Mancini</em> », anémones de mer, nduja, marjolaine",
           "prezzo": 32,
           "sostenibile": true
         },
         {
-          "nome": "Tortelli de sanglier, dashi de dorade, ciboule, shiso",
+          "nome": "Tortelli de sanglier, dashi de daurade, ciboule, shiso",
           "prezzo": 26,
           "sostenibile": true
         },
         {
-          "nome": "Tubetti “<em>Mancini</em>”, morue, notre kosho d’agrumes fermenté, borlotti",
+          "nome": "Tubes « <em>Mancini</em> », morue, notre kosho aux agrumes fermentés, borlotti",
           "prezzo": 24,
           "sostenibile": true
         },
         {
-          "nome": "Riz “<em>Riserva San Massimo</em>”, ragû de lièvre, fanes de navet, Parmigiano Reggiano",
+          "nome": "Riz « <em>Riserva San Massimo</em> », ragoût de lièvre, fanes de navet, Parmigiano Reggiano",
           "prezzo": 26
         }
       ],
@@ -540,21 +545,21 @@ const MENU = {
       "titolo": "Non Solo Mare",
       "piatti": [
         {
-          "nome": "Poulpe local, rhubarbe, petits pois",
-          "prezzo": 28,
-          "sostenibile": true
-        },
-        {
-          "nome": "Courgette en escabèche, menthe, yaourt, poivre Timut",
-          "prezzo": 18
-        },
-        {
-          "nome": "Ombrine locale à la ligne, salicorne, endive belge",
+          "nome": "Sériole locale, rhubarbe, petits pois",
           "prezzo": 32,
           "sostenibile": true
         },
         {
-          "nome": "Picanha, pleurotes du panicaut, jus de bœuf",
+          "nome": "Courgette Scapece, menthe, yaourt, poivre Timut",
+          "prezzo": 18
+        },
+        {
+          "nome": "Courbine locale capturée à l'hameçon, salicorne, endive belge",
+          "prezzo": 32,
+          "sostenibile": true
+        },
+        {
+          "nome": "Agneau, petits pois, rhubarbe",
           "prezzo": 28
         }
       ],
@@ -617,9 +622,7 @@ const NOTE_CARTA = `
   La liste des allergènes est consultable à la dernière page de ce menu.
 `;
 
-const NOTE_ORARIO = `Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche
-delle materie prime i prodotti acquistati freschi vengono abbattuti e congelati.
-Pour maintenir constants le niveau qualitatif et les caractéristiques organoleptiques, les produits frais sont surgelés à basse température. Ces produits sont signalés par le symbole : *`;
+const NOTE_ORARIO = `Pour maintenir constants le niveau qualitatif et les caractéristiques organoleptiques, les produits frais sont surgelés à basse température. Ces produits sont signalés par le symbole : *`;
 
 function getSez(titolo) {
   return MENU.sezioni.find(s => s.titolo === titolo);
@@ -674,7 +677,7 @@ function buildDegu(degu) {
     <div class="degu">
       <div class="degu-titolo">Menu Dégustation</div>
       <div class="degu-prezzi">${optsHtml}</div>
-      <div class="degu-nota">${degu.nota.replace("toute la table", "<strong>toute la table</strong>")}</div>
+      <div class="degu-nota">${degu.nota.replace("l'intero tavolo", "<strong>l\u2019intero tavolo</strong>")}</div>
       ${percorsiHtml}
     </div>`;
 }

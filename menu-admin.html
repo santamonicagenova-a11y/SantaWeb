@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.11.7 -->
+<!-- versione v 2026.04.11.9 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -320,26 +320,31 @@ function costruisciHtmlTradotto(lang, t) {
   var menuForm = leggi();
   var m = costruisciMenuTradotto(menuForm, t);
 
-  // Parti da outputCorrente (menu.html italiano) e sostituisci il blocco MENU
   var SEP = '/* ' + '\u2550'.repeat(57) + ' */\n';
-  var START = 'const MENU = {';
   var src = outputCorrente;
-  var i1 = src.indexOf(START);
+  var i1 = src.indexOf('const MENU = {');
   var i2 = src.indexOf(SEP, i1) + SEP.length;
   var newBlock = 'const MENU = ' + JSON.stringify(m, null, 2) + ';\n' + SEP;
   var html = src.slice(0, i1) + newBlock + src.slice(i2);
 
-  // Rimuovi pulsanti carta/orario
-  var BTNS = "  <button class=\"ctrl-btn active\" id=\"btn-carta\" onclick=\"showLayout('carta')\">\u261e Men\u00f9 alla carta (3 pag.)</button>\n  <div class=\"ctrl-sep\"></div>\n  <button class=\"ctrl-btn\" id=\"btn-orario\" onclick=\"showLayout('orario')\">\u261e Foglio orario (1 pag.)</button>\n  <div class=\"ctrl-sep\"></div>\n";
-  html = html.replace(BTNS, '');
+  // Rimuovi tutta la ctrl-bar (dal commento fino a </div>)
+  var cbStart = html.indexOf('<!-- ── BARRA CONTROLLI ── -->');
+  var cbEnd   = html.indexOf('\n\n<div id="layout-carta">', cbStart);
+  if (cbStart >= 0 && cbEnd >= 0) {
+    html = html.slice(0, cbStart) + html.slice(cbEnd + 1);
+  }
+
+  // Fix showLayout per non cercare btn-carta/btn-orario
+  html = html.replace(
+    "document.getElementById('btn-carta').classList.toggle('active',  which === 'carta');\n  document.getElementById('btn-orario').classList.toggle('active', which === 'orario');",
+    "var bc=document.getElementById('btn-carta'); if(bc) bc.classList.toggle('active',which==='carta');\n  var bo=document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active',which==='orario');"
+  );
 
   // Fix getSez per robustezza
   html = html.replace(
     'return MENU.sezioni.find(s => s.titolo === titolo);',
     'var f=MENU.sezioni.find(s=>s.titolo===titolo); if(!f){var ix=["Crudi","Sfiziosi","Amidi e Carboidrati","Non Solo Mare"].indexOf(titolo); if(ix>=0&&MENU.sezioni[ix]) f=MENU.sezioni[ix];} return f;'
   );
-  // Fix showLayout
-  html = html.replace("  document.getElementById('btn-carta').classList.toggle('active',  which === 'carta');\n  document.getElementById('btn-orario').classList.toggle('active', which === 'orario');", "  var bc=document.getElementById('btn-carta'); if(bc) bc.classList.toggle('active',which==='carta');\n  var bo=document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active',which==='orario');");
 
   html = html.replace('<html lang="it">', '<html lang="' + lang + '">');
   html = html.replace(/<title>[^<]*<\/title>/, '<title>' + t.title + '</title>');
@@ -1279,6 +1284,6 @@ function toast(msg) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.11.7</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.11.9</div>
 </body>
 </html>

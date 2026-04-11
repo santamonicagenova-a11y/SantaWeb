@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.11.18 -->
+<!-- versione v 2026.04.11.19 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -327,14 +327,6 @@ function costruisciHtmlTradotto(lang, t) {
   var newBlock = 'const MENU = ' + JSON.stringify(m, null, 2) + ';\n' + SEP;
   var html = src.slice(0, i1) + newBlock + src.slice(i2);
 
-  // Rimuovi ctrl-bar: conta 3 </div> dal commento HTML
-  var cbStart = html.indexOf('<!-- ── BARRA CONTROLLI ── -->');
-  if (cbStart >= 0) {
-    var cbEnd = cbStart;
-    for (var ci = 0; ci < 3; ci++) { cbEnd = html.indexOf('<' + '/div>', cbEnd) + 6; }
-    html = html.slice(0, cbStart) + html.slice(cbEnd);
-  }
-
   // Fix showLayout
   html = html.replace(
     "document.getElementById('btn-carta').classList.toggle('active',  which === 'carta');\n  document.getElementById('btn-orario').classList.toggle('active', which === 'orario');",
@@ -362,6 +354,10 @@ function costruisciHtmlTradotto(lang, t) {
     /<u><em>English Menu<\/em><\/u><br>\s*<u><em>Carte en Fran[^<]*<\/em><\/u>/,
     t.links.join('<br>\n            ')
   );
+
+  // Inietta script che rimuove ctrl-bar dopo il caricamento della pagina
+  html = html.replace('</body>', '<script>document.addEventListener("DOMContentLoaded",function(){var cb=document.querySelector(".ctrl-bar");if(cb)cb.parentNode.removeChild(cb);});<\/script></body>');
+
   return html;
 }
 
@@ -1289,6 +1285,6 @@ function toast(msg) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.11.18</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.11.19</div>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.11.13 -->
+<!-- versione v 2026.04.11.14 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -327,29 +327,29 @@ function costruisciHtmlTradotto(lang, t) {
   var newBlock = 'const MENU = ' + JSON.stringify(m, null, 2) + ';\n' + SEP;
   var html = src.slice(0, i1) + newBlock + src.slice(i2);
 
-  // Rimuovi tutta la ctrl-bar (dal commento fino a </div>)
-  // Rimuovi ctrl-bar: prova con commento HTML
-  var cbStart = html.indexOf('<!-- ── BARRA CONTROLLI ── -->');
+  // Rimuovi ctrl-bar: dal commento fino a <div id="layout-carta">
+  var cbStart = html.indexOf('<!-- \u2500\u2500 BARRA CONTROLLI \u2500\u2500 -->');
   var cbEnd   = html.indexOf('<div id="layout-carta">', cbStart);
   if (cbStart >= 0 && cbEnd >= 0) {
     html = html.slice(0, cbStart) + html.slice(cbEnd);
-  } else {
-    // Fallback: rimuovi solo il div ctrl-bar
-    html = html.replace(/<div class="ctrl-bar">[\s\S]*?<\/div>/, '');
   }
-  // Fallback assoluto: CSS per nascondere la ctrl-bar
-  html = html.replace('</head>', '<style>body .ctrl-bar, .ctrl-bar, div.ctrl-bar { display:none !important; visibility:hidden !important; height:0 !important; overflow:hidden !important; padding:0 !important; margin:0 !important; }</style></head>');
 
-  // Fix showLayout per non cercare btn-carta/btn-orario
+  // Fix showLayout
   html = html.replace(
     "document.getElementById('btn-carta').classList.toggle('active',  which === 'carta');\n  document.getElementById('btn-orario').classList.toggle('active', which === 'orario');",
     "var bc=document.getElementById('btn-carta'); if(bc) bc.classList.toggle('active',which==='carta');\n  var bo=document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active',which==='orario');"
   );
 
-  // Fix getSez per robustezza
+  // Fix getSez
   html = html.replace(
     'return MENU.sezioni.find(s => s.titolo === titolo);',
     'var f=MENU.sezioni.find(s=>s.titolo===titolo); if(!f){var ix=["Crudi","Sfiziosi","Amidi e Carboidrati","Non Solo Mare"].indexOf(titolo); if(ix>=0&&MENU.sezioni[ix]) f=MENU.sezioni[ix];} return f;'
+  );
+
+  // Nascondi ctrl-bar via CSS nel <style> esistente (prima di </style>)
+  html = html.replace(
+    '.ctrl-sep {\n      width: 1px;\n      height: 1.4rem;\n      background: var(--rule);\n    }',
+    '.ctrl-sep {\n      width: 1px;\n      height: 1.4rem;\n      background: var(--rule);\n    }\n    .ctrl-bar { display: none !important; }'
   );
 
   html = html.replace('<html lang="it">', '<html lang="' + lang + '">');
@@ -1294,6 +1294,6 @@ function toast(msg) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.11.13</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.11.14</div>
 </body>
 </html>

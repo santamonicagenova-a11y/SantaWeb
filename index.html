@@ -34,27 +34,8 @@
   .nav-cta:hover { background: var(--terracotta); }
 
   /* LANG DROPDOWN */
-  .lang-select {
-    font-family: 'Jost', sans-serif;
-    font-size: 0.68rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    background: transparent;
-    border: 1px solid var(--divider);
-    padding: 0.35rem 0.6rem;
-    cursor: pointer;
-    outline: none;
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%233a3630' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 0.5rem center;
-    padding-right: 1.4rem;
-    transition: border-color 0.2s, color 0.2s;
-  }
+  .lang-select { font-family: 'Jost', sans-serif; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-soft); background: transparent; border: 1px solid var(--divider); padding: 0.35rem 0.6rem; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%233a3630' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; padding-right: 1.4rem; transition: border-color 0.2s; }
   .lang-select:hover { border-color: var(--terracotta); color: var(--ink); }
-  nav.scrolled .lang-select { background-color: transparent; }
 
   .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; }
   .hamburger span { display: block; width: 24px; height: 1.5px; background: var(--ink); }
@@ -299,9 +280,9 @@
   <select class="mobile-lang-select" id="lang-select-mobile" onchange="setLang(this.value)">
     <option value="it">IT — Italiano</option>
     <option value="en">EN — English</option>
-    <option value="fr">FR — Français</option>
+    <option value="fr">FR — Fran&ccedil;ais</option>
     <option value="de">DE — Deutsch</option>
-    <option value="es">ES — Español</option>
+    <option value="es">ES — Espa&ntilde;ol</option>
   </select>
   <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" style="font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-style:normal;background:var(--ink);color:var(--warm-white);padding:0.9rem 2.5rem;" data-i18n="nav_prenota">Prenota</a>
 </div>
@@ -334,7 +315,7 @@
           <p data-i18n="cucina_p3">Una cucina elegante...</p>
         </div>
         <div class="cucina-actions">
-          <a href="menu.html" class="btn-primary" data-i18n="cucina_btn">Guarda il men&ugrave;</a>
+          <a id="menu-btn" href="menu.html" target="_blank" class="btn-primary" data-i18n="cucina_btn">Guarda il men&ugrave;</a>
         </div>
       </div>
       <div class="cucina-images reveal" style="transition-delay:0.15s">
@@ -545,7 +526,7 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.11.02</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.11.03</a></p>
   </div>
 </footer>
 
@@ -592,10 +573,20 @@
     document.documentElement.lang = lang;
     if (!T[lang]) return;
     var t = T[lang];
+
+    // Aggiorna tutti i testi
     document.querySelectorAll('[data-i18n]').forEach(function(el) {
       var key = el.getAttribute('data-i18n');
       if (t[key] !== undefined) el.innerHTML = t[key];
     });
+
+    // Aggiorna il link del pulsante menu nella lingua corretta
+    var menuBtn = document.getElementById('menu-btn');
+    if (menuBtn && t.cucina_btn_link) {
+      menuBtn.href = t.cucina_btn_link;
+    }
+
+    // Sincronizza i selettori lingua
     document.getElementById('lang-select-nav').value = lang;
     document.getElementById('lang-select-mobile').value = lang;
   }

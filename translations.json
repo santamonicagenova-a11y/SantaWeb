@@ -1,5 +1,6 @@
 {
   "it": {
+    "cucina_btn_link": "menu.html",
     "nav_cucina": "Cucina",
     "nav_cantina": "Cantina",
     "nav_galleria": "Galleria",
@@ -9,38 +10,31 @@
     "nav_prenota": "Prenota",
     "nav_evento_mobile": "Evento speciale",
     "nav_info_mobile": "Info & Orari",
-
     "hero_eyebrow": "Ristorante · Genova",
     "hero_title": "Cucina <em>viva</em><br>sul mare",
     "hero_desc": "Un progetto in costante divenire, basato sull\u2019attenzione al gusto e sulla qualit\u00e0 della materia prima. Pesce di Camogli, verdure dell\u2019orto genovese, pasta e pane di nostra produzione.",
     "hero_btn_prenota": "Prenota un tavolo",
     "hero_btn_menu": "Scopri il menu",
     "hero_scorri": "Scorri",
-
     "cucina_label": "La nostra proposta",
     "cucina_title": "Cucina <em>del territorio</em>",
     "cucina_p1": "La qualit\u00e0 della materia prima \u00e8 fondamentale: ci rivolgiamo quanto pi\u00f9 possibile a pescatori e produttori locali. Il pesce arriva da Camogli, le verdure da un piccolo orto sulle alture di Genova.",
     "cucina_p2": "I nostri piatti sono elaborati ma allo stesso tempo semplici, per valorizzare al meglio i prodotti della Liguria. Pasta fresca, pane, focaccia e dolci sono tutti di nostra produzione.",
     "cucina_p3": "Una cucina elegante, in cui anche l\u2019estetica e il piatto fisico hanno la loro importanza \u2014 partendo dalla tradizione per diventare contemporanei.",
     "cucina_btn": "Guarda il men\u00f9",
-
     "quote_text": "\u201cBe nice to people. We\u2019re all trying our best.\u201d",
     "quote_attr": "\u2014 Monica & Andrea",
-
     "galleria_label": "La nostra cucina",
     "galleria_title": "Ogni piatto,<br><em>una storia</em>",
-
     "cantina_label": "I nostri vini",
     "cantina_title": "Una <em>cantina</em> ligure",
     "cantina_p1": "Monica, sommelier esperta e appassionata, cura personalmente la carta dei vini. In una ricca proposta di etichette italiane spicca la vasta selezione di bottiglie liguri \u2014 abbinamento perfetto al pesce del nostro mare.",
     "cantina_p2": "La crescente richiesta di vini naturali porta il Santamonica a interfacciarsi sempre pi\u00f9 con produttori che lavorano l\u2019uva il meno possibile. Un\u2019ampia scelta \u00e8 disponibile anche a calice.",
     "cantina_btn": "Carta dei vini",
-
     "regalo_label": "Un dono speciale",
     "regalo_title": "Buoni <em>regalo</em>",
     "regalo_body": "Regala un pranzo o una cena al Santamonica. I Buoni Regalo sono utilizzabili tutti i giorni (salvo disponibilit\u00e0) escluso Sabato e festivi, con validit\u00e0 di 6 mesi dall\u2019acquisto. Contattaci per acquistarlo.",
     "regalo_btn": "Richiedi un buono",
-
     "prenota_label": "Hai qualcosa da festeggiare?",
     "prenota_title": "Organizza una serata <em>speciale</em>",
     "prenota_p1": "Che sia un compleanno, un anniversario o una cena aziendale, ci piace sapere in anticipo per prepararci al meglio ad accoglierti.",
@@ -71,7 +65,6 @@
     "prenota_f_btn": "Invia la richiesta",
     "prenota_ok": "Richiesta inviata! Vi contatteremo entro 24 ore.",
     "prenota_err": "Errore. Chiamaci al +39 010 553 31 55",
-
     "info_label": "Come raggiungerci",
     "info_title": "Orari & <em>Contatti</em>",
     "info_orari_label": "Orari",
@@ -83,7 +76,6 @@
     "info_note_label": "Note",
     "info_note_text": "Si prega di segnalare eventuali allergie o intolleranze al momento della prenotazione.",
     "info_animali": "\uD83D\uDC3E Accettiamo animali di tutte le taglie.",
-
     "contatti_label": "Scrivici",
     "contatti_title": "Manda un <em>messaggio</em>",
     "contatti_f_nome": "Nome",
@@ -97,19 +89,17 @@
     "contatti_ok": "Messaggio inviato! Ti risponderemo al pi\u00f9 presto.",
     "contatti_err": "Errore. Scrivici a santamonicagenova@gmail.com",
     "map_apri": "Apri in Maps \u2192",
-
     "popup_label": "Prenota ora",
     "popup_title": "Un tavolo <em>sul mare</em>",
     "popup_text": "Siamo aperti dal marted\u00ec alla domenica. Prenota il tuo tavolo e vivi un\u2019esperienza di cucina ligure autentica.",
     "popup_btn": "Prenota su TheFork",
     "popup_skip": "Magari un\u2019altra volta",
-
     "cookie_text": "Questo sito utilizza cookie tecnici necessari al funzionamento e, previo consenso, cookie analitici (Google Analytics) per migliorare l\u2019esperienza di navigazione. Leggi la nostra <a href='/privacy-policy'>Privacy Policy</a> e <a href='/cookies'>Cookie Policy</a>.",
     "cookie_accept": "Accetta tutti",
     "cookie_decline": "Solo necessari"
   },
-
   "en": {
+    "cucina_btn_link": "menu-en.html",
     "nav_cucina": "Kitchen",
     "nav_cantina": "Wine",
     "nav_galleria": "Gallery",
@@ -119,38 +109,31 @@
     "nav_prenota": "Book",
     "nav_evento_mobile": "Special event",
     "nav_info_mobile": "Info & Hours",
-
     "hero_eyebrow": "Restaurant · Genova",
     "hero_title": "<em>Living</em> cuisine<br>by the sea",
     "hero_desc": "A project in constant evolution, based on attention to flavour and the quality of raw ingredients. Fish from Camogli, vegetables from a small garden in the hills of Genova, pasta and bread made in-house.",
     "hero_btn_prenota": "Book a table",
     "hero_btn_menu": "Explore the menu",
     "hero_scorri": "Scroll",
-
     "cucina_label": "Our offering",
     "cucina_title": "Cuisine of the <em>territory</em>",
     "cucina_p1": "Quality ingredients are fundamental: we source as much as possible from local fishermen and producers. Fish comes from Camogli, vegetables from a small garden in the hills above Genova.",
     "cucina_p2": "Our dishes are refined yet simple, to best showcase Ligurian produce. Fresh pasta, bread, focaccia and desserts are all made in-house.",
     "cucina_p3": "An elegant cuisine, where aesthetics and the physical dish matter \u2014 rooted in tradition but thoroughly contemporary.",
     "cucina_btn": "View the menu",
-
     "quote_text": "\u201cBe nice to people. We\u2019re all trying our best.\u201d",
     "quote_attr": "\u2014 Monica & Andrea",
-
     "galleria_label": "Our cuisine",
     "galleria_title": "Every dish,<br><em>a story</em>",
-
     "cantina_label": "Our wines",
     "cantina_title": "A Ligurian <em>cellar</em>",
     "cantina_p1": "Monica, our expert and passionate sommelier, personally curates the wine list. Alongside a rich selection of Italian labels, the extensive range of Ligurian bottles stands out \u2014 a perfect match for the local seafood.",
     "cantina_p2": "The growing demand for natural wines has led Santamonica to work increasingly with producers who intervene as little as possible. A wide selection is also available by the glass.",
     "cantina_btn": "Wine list",
-
     "regalo_label": "A special gift",
     "regalo_title": "Gift <em>vouchers</em>",
     "regalo_body": "Give the gift of lunch or dinner at Santamonica. Gift vouchers are valid every day (subject to availability) except Saturday and public holidays, with a 6-month expiry from purchase. Contact us to buy one.",
     "regalo_btn": "Request a voucher",
-
     "prenota_label": "Something to celebrate?",
     "prenota_title": "Plan a <em>special</em> evening",
     "prenota_p1": "Whether it\u2019s a birthday, anniversary or business dinner, we love knowing in advance so we can prepare the perfect welcome.",
@@ -181,7 +164,6 @@
     "prenota_f_btn": "Send request",
     "prenota_ok": "Request sent! We will contact you within 24 hours.",
     "prenota_err": "Error. Please call us at +39 010 553 31 55",
-
     "info_label": "Find us",
     "info_title": "Hours & <em>Contact</em>",
     "info_orari_label": "Opening hours",
@@ -193,7 +175,6 @@
     "info_note_label": "Notes",
     "info_note_text": "Please inform us of any allergies or intolerances when booking.",
     "info_animali": "\uD83D\uDC3E We welcome pets of all sizes.",
-
     "contatti_label": "Write to us",
     "contatti_title": "Send a <em>message</em>",
     "contatti_f_nome": "First name",
@@ -207,19 +188,17 @@
     "contatti_ok": "Message sent! We\u2019ll get back to you shortly.",
     "contatti_err": "Error. Write to us at santamonicagenova@gmail.com",
     "map_apri": "Open in Maps \u2192",
-
     "popup_label": "Book now",
     "popup_title": "A table <em>by the sea</em>",
     "popup_text": "We are open Tuesday to Sunday. Book your table and enjoy an authentic Ligurian dining experience.",
     "popup_btn": "Book on TheFork",
     "popup_skip": "Maybe another time",
-
     "cookie_text": "This site uses essential cookies and, with your consent, analytics cookies (Google Analytics) to improve your browsing experience. Read our <a href='/privacy-policy'>Privacy Policy</a> and <a href='/cookies'>Cookie Policy</a>.",
     "cookie_accept": "Accept all",
     "cookie_decline": "Essential only"
   },
-
   "fr": {
+    "cucina_btn_link": "menu-fr.html",
     "nav_cucina": "Cuisine",
     "nav_cantina": "Vins",
     "nav_galleria": "Galerie",
@@ -229,38 +208,31 @@
     "nav_prenota": "R\u00e9server",
     "nav_evento_mobile": "\u00C9v\u00e9nement sp\u00e9cial",
     "nav_info_mobile": "Infos & Horaires",
-
     "hero_eyebrow": "Restaurant · G\u00eanes",
     "hero_title": "Cuisine <em>vivante</em><br>au bord de la mer",
     "hero_desc": "Un projet en constante \u00e9volution, fond\u00e9 sur l\u2019attention au go\u00fbt et \u00e0 la qualit\u00e9 des produits. Poisson de Camogli, l\u00e9gumes d\u2019un petit potager g\u00e9nois, p\u00e2tes et pain faits maison.",
     "hero_btn_prenota": "R\u00e9server une table",
     "hero_btn_menu": "D\u00e9couvrir le menu",
     "hero_scorri": "D\u00e9filer",
-
     "cucina_label": "Notre proposition",
     "cucina_title": "Cuisine du <em>territoire</em>",
     "cucina_p1": "La qualit\u00e9 des produits est primordiale\u00a0: nous nous approvisionnons autant que possible aupr\u00e8s de p\u00eacheurs et producteurs locaux. Le poisson vient de Camogli, les l\u00e9gumes d\u2019un petit jardin sur les hauteurs de G\u00eanes.",
     "cucina_p2": "Nos plats sont \u00e9labor\u00e9s mais simples \u00e0 la fois, pour mettre en valeur les produits de Ligurie. P\u00e2tes fra\u00eeches, pain, focaccia et desserts sont tous faits maison.",
-    "cucina_p3": "Une cuisine \u00e9l\u00e9gante, o\u00f9 l\u2019esth\u00e9tique et le contenant ont leur importance \u2014 ancrée dans la tradition pour devenir contemporaine.",
+    "cucina_p3": "Une cuisine \u00e9l\u00e9gante, o\u00f9 l\u2019esth\u00e9tique et le contenant ont leur importance \u2014 ancr\u00e9e dans la tradition pour devenir contemporaine.",
     "cucina_btn": "Voir le menu",
-
     "quote_text": "\u201cBe nice to people. We\u2019re all trying our best.\u201d",
     "quote_attr": "\u2014 Monica & Andrea",
-
     "galleria_label": "Notre cuisine",
     "galleria_title": "Chaque plat,<br><em>une histoire</em>",
-
     "cantina_label": "Nos vins",
     "cantina_title": "Une <em>cave</em> ligure",
-    "cantina_p1": "Monica, sommelière experte et passionnée, s\u2019occupe personnellement de la carte des vins. Dans une riche s\u00e9lection d\u2019\u00e9tiquettes italiennes, la vaste gamme de vins ligures se distingue \u2014 accord parfait avec les poissons de notre mer.",
+    "cantina_p1": "Monica, sommelière experte et passionn\u00e9e, s\u2019occupe personnellement de la carte des vins. Dans une riche s\u00e9lection d\u2019\u00e9tiquettes italiennes, la vaste gamme de vins ligures se distingue \u2014 accord parfait avec les poissons de notre mer.",
     "cantina_p2": "La demande croissante de vins naturels am\u00e8ne Santamonica \u00e0 travailler de plus en plus avec des producteurs qui interviennent le moins possible. Un large choix est \u00e9galement disponible au verre.",
     "cantina_btn": "Carte des vins",
-
     "regalo_label": "Un cadeau sp\u00e9cial",
     "regalo_title": "Bons <em>cadeaux</em>",
     "regalo_body": "Offrez un d\u00e9jeuner ou un d\u00eener au Santamonica. Les bons cadeaux sont utilisables tous les jours (sous r\u00e9serve de disponibilit\u00e9) sauf le samedi et les jours f\u00e9ri\u00e9s, avec une validit\u00e9 de 6 mois. Contactez-nous pour en acheter un.",
     "regalo_btn": "Demander un bon",
-
     "prenota_label": "Quelque chose \u00e0 f\u00eater\u00a0?",
     "prenota_title": "Organisez une soir\u00e9e <em>sp\u00e9ciale</em>",
     "prenota_p1": "Qu\u2019il s\u2019agisse d\u2019un anniversaire ou d\u2019un d\u00eener d\u2019affaires, nous aimons le savoir \u00e0 l\u2019avance pour pr\u00e9parer le meilleur accueil.",
@@ -291,7 +263,6 @@
     "prenota_f_btn": "Envoyer la demande",
     "prenota_ok": "Demande envoy\u00e9e\u00a0! Nous vous contacterons sous 24 heures.",
     "prenota_err": "Erreur. Appelez-nous au +39 010 553 31 55",
-
     "info_label": "Nous trouver",
     "info_title": "Horaires & <em>Contact</em>",
     "info_orari_label": "Horaires",
@@ -303,7 +274,6 @@
     "info_note_label": "Notes",
     "info_note_text": "Merci de signaler toute allergie ou intol\u00e9rance lors de la r\u00e9servation.",
     "info_animali": "\uD83D\uDC3E Animaux de toutes tailles bienvenus.",
-
     "contatti_label": "\u00C9crivez-nous",
     "contatti_title": "Envoyez un <em>message</em>",
     "contatti_f_nome": "Pr\u00e9nom",
@@ -317,19 +287,17 @@
     "contatti_ok": "Message envoy\u00e9\u00a0! Nous vous r\u00e9pondrons tr\u00e8s bient\u00f4t.",
     "contatti_err": "Erreur. \u00C9crivez-nous \u00e0 santamonicagenova@gmail.com",
     "map_apri": "Ouvrir dans Maps \u2192",
-
     "popup_label": "R\u00e9server maintenant",
     "popup_title": "Une table <em>au bord de la mer</em>",
     "popup_text": "Nous sommes ouverts du mardi au dimanche. R\u00e9servez votre table et vivez une exp\u00e9rience culinaire ligure authentique.",
     "popup_btn": "R\u00e9server sur TheFork",
     "popup_skip": "Peut-\u00eatre une autre fois",
-
     "cookie_text": "Ce site utilise des cookies techniques n\u00e9cessaires et, avec votre consentement, des cookies analytiques (Google Analytics). Lisez notre <a href='/privacy-policy'>Politique de confidentialit\u00e9</a> et notre <a href='/cookies'>Politique cookies</a>.",
     "cookie_accept": "Tout accepter",
     "cookie_decline": "Essentiels uniquement"
   },
-
   "de": {
+    "cucina_btn_link": "menu-de.html",
     "nav_cucina": "K\u00fcche",
     "nav_cantina": "Weine",
     "nav_galleria": "Galerie",
@@ -339,38 +307,31 @@
     "nav_prenota": "Reservieren",
     "nav_evento_mobile": "Besonderes Event",
     "nav_info_mobile": "\u00D6ffnungszeiten",
-
     "hero_eyebrow": "Restaurant · Genua",
     "hero_title": "Lebendige <em>K\u00fcche</em><br>am Meer",
     "hero_desc": "Ein Projekt in st\u00e4ndiger Entwicklung, basierend auf Aufmerksamkeit f\u00fcr Geschmack und Qualit\u00e4t der Zutaten. Fisch aus Camogli, Gem\u00fcse aus einem kleinen Garten \u00fcber Genua, selbst gemachte Pasta und Brot.",
     "hero_btn_prenota": "Tisch reservieren",
     "hero_btn_menu": "Men\u00fc entdecken",
     "hero_scorri": "Scrollen",
-
     "cucina_label": "Unser Angebot",
     "cucina_title": "K\u00fcche des <em>Territoriums</em>",
     "cucina_p1": "Qualit\u00e4t der Zutaten ist grundlegend: Wir beziehen so viel wie m\u00f6glich von lokalen Fischern und Erzeugern. Der Fisch kommt aus Camogli, das Gem\u00fcse aus einem kleinen Garten \u00fcber Genua.",
     "cucina_p2": "Unsere Gerichte sind raffiniert und gleichzeitig einfach, um die ligurischen Produkte optimal zur Geltung zu bringen. Frische Pasta, Brot, Focaccia und Desserts sind alle hausgemacht.",
     "cucina_p3": "Eine elegante K\u00fcche, in der auch \u00c4sthetik und das physische Gericht ihre Bedeutung haben \u2014 in der Tradition verwurzelt und zeitgem\u00e4\u00df.",
     "cucina_btn": "Men\u00fc ansehen",
-
     "quote_text": "\u201cBe nice to people. We\u2019re all trying our best.\u201d",
     "quote_attr": "\u2014 Monica & Andrea",
-
     "galleria_label": "Unsere K\u00fcche",
     "galleria_title": "Jedes Gericht,<br><em>eine Geschichte</em>",
-
     "cantina_label": "Unsere Weine",
     "cantina_title": "Ein ligurischer <em>Keller</em>",
     "cantina_p1": "Monica, unsere erfahrene und leidenschaftliche Sommelière, betreut pers\u00f6nlich die Weinkarte. In einem reichen Angebot italienischer Etiketten sticht die gro\u00dfe Auswahl ligurischer Flaschen hervor \u2014 die perfekte Begleitung zum Fisch unseres Meeres.",
     "cantina_p2": "Die wachsende Nachfrage nach Naturweinen f\u00fchrt Santamonica dazu, immer mehr mit Erzeugern zusammenzuarbeiten, die so wenig wie m\u00f6glich eingreifen. Eine gro\u00dfe Auswahl ist auch glasweise erh\u00e4ltlich.",
     "cantina_btn": "Weinkarte",
-
     "regalo_label": "Ein besonderes Geschenk",
     "regalo_title": "<em>Geschenk</em>gutscheine",
     "regalo_body": "Schenken Sie ein Mittag- oder Abendessen im Santamonica. Gutscheine sind an allen Tagen g\u00fcltig (je nach Verf\u00fcgbarkeit), au\u00dfer samstags und an Feiertagen, mit einer G\u00fcltigkeit von 6 Monaten. Kontaktieren Sie uns f\u00fcr den Kauf.",
     "regalo_btn": "Gutschein anfragen",
-
     "prenota_label": "Etwas zu feiern?",
     "prenota_title": "Planen Sie einen <em>besonderen</em> Abend",
     "prenota_p1": "Ob Geburtstag, Jubil\u00e4um oder Gesch\u00e4ftsessen \u2014 wir m\u00f6chten es im Voraus wissen, um den besten Empfang vorzubereiten.",
@@ -401,7 +362,6 @@
     "prenota_f_btn": "Anfrage senden",
     "prenota_ok": "Anfrage gesendet! Wir melden uns innerhalb von 24 Stunden.",
     "prenota_err": "Fehler. Rufen Sie uns an: +39 010 553 31 55",
-
     "info_label": "So finden Sie uns",
     "info_title": "\u00D6ffnungszeiten & <em>Kontakt</em>",
     "info_orari_label": "\u00D6ffnungszeiten",
@@ -413,7 +373,6 @@
     "info_note_label": "Hinweise",
     "info_note_text": "Bitte teilen Sie uns eventuelle Allergien oder Unvertr\u00e4glichkeiten bei der Reservierung mit.",
     "info_animali": "\uD83D\uDC3E Haustiere aller Gr\u00f6\u00dfen willkommen.",
-
     "contatti_label": "Schreiben Sie uns",
     "contatti_title": "Nachricht <em>senden</em>",
     "contatti_f_nome": "Vorname",
@@ -427,19 +386,17 @@
     "contatti_ok": "Nachricht gesendet! Wir antworten Ihnen so bald wie m\u00f6glich.",
     "contatti_err": "Fehler. Schreiben Sie uns an santamonicagenova@gmail.com",
     "map_apri": "In Maps \u00f6ffnen \u2192",
-
     "popup_label": "Jetzt reservieren",
     "popup_title": "Ein Tisch <em>am Meer</em>",
     "popup_text": "Wir sind Dienstag bis Sonntag ge\u00f6ffnet. Reservieren Sie Ihren Tisch und erleben Sie authentische ligurische K\u00fcche.",
     "popup_btn": "Bei TheFork reservieren",
     "popup_skip": "Vielleicht ein anderes Mal",
-
     "cookie_text": "Diese Website verwendet technisch notwendige Cookies und, mit Ihrer Zustimmung, Analyse-Cookies (Google Analytics). Lesen Sie unsere <a href='/privacy-policy'>Datenschutzrichtlinie</a> und <a href='/cookies'>Cookie-Richtlinie</a>.",
     "cookie_accept": "Alle akzeptieren",
     "cookie_decline": "Nur notwendige"
   },
-
   "es": {
+    "cucina_btn_link": "menu-es.html",
     "nav_cucina": "Cocina",
     "nav_cantina": "Vinos",
     "nav_galleria": "Galer\u00eda",
@@ -449,38 +406,31 @@
     "nav_prenota": "Reservar",
     "nav_evento_mobile": "Evento especial",
     "nav_info_mobile": "Info & Horario",
-
     "hero_eyebrow": "Restaurante · G\u00e9nova",
     "hero_title": "Cocina <em>viva</em><br>junto al mar",
     "hero_desc": "Un proyecto en constante evoluci\u00f3n, basado en la atenci\u00f3n al sabor y la calidad de las materias primas. Pescado de Camogli, verduras de un huerto genovés, pasta y pan de elaboraci\u00f3n propia.",
     "hero_btn_prenota": "Reservar una mesa",
     "hero_btn_menu": "Descubrir el men\u00fa",
     "hero_scorri": "Desplazar",
-
     "cucina_label": "Nuestra propuesta",
     "cucina_title": "Cocina del <em>territorio</em>",
-    "cucina_p1": "La calidad de la materia prima es fundamental: recurrimos en la medida de lo posible a pescadores y productores locales. El pescado llega de Camogli, las verduras de un pequeño huerto en las alturas de G\u00e9nova.",
+    "cucina_p1": "La calidad de la materia prima es fundamental: recurrimos en la medida de lo posible a pescadores y productores locales. El pescado llega de Camogli, las verduras de un peque\u00f1o huerto en las alturas de G\u00e9nova.",
     "cucina_p2": "Nuestros platos son elaborados pero a la vez sencillos, para destacar lo mejor de los productos de Liguria. La pasta fresca, el pan, la focaccia y los postres son todos de elaboraci\u00f3n propia.",
-    "cucina_p3": "Una cocina elegante, en la que también la est\u00e9tica y el plato f\u00edsico tienen su importancia \u2014 partiendo de la tradici\u00f3n para ser contempor\u00e1neos.",
+    "cucina_p3": "Una cocina elegante, en la que tambi\u00e9n la est\u00e9tica y el plato f\u00edsico tienen su importancia \u2014 partiendo de la tradici\u00f3n para ser contempor\u00e1neos.",
     "cucina_btn": "Ver el men\u00fa",
-
     "quote_text": "\u201cBe nice to people. We\u2019re all trying our best.\u201d",
     "quote_attr": "\u2014 Monica & Andrea",
-
     "galleria_label": "Nuestra cocina",
     "galleria_title": "Cada plato,<br><em>una historia</em>",
-
     "cantina_label": "Nuestros vinos",
     "cantina_title": "Una <em>bodega</em> ligur",
     "cantina_p1": "Monica, sommelier experta y apasionada, se ocupa personalmente de la carta de vinos. En una rica oferta de etiquetas italianas destaca la amplia selecci\u00f3n de botellas ligures \u2014 el maridaje perfecto con el pescado de nuestro mar.",
     "cantina_p2": "La creciente demanda de vinos naturales lleva a Santamonica a trabajar cada vez m\u00e1s con productores que intervienen lo menos posible. Una amplia selecci\u00f3n est\u00e1 disponible tambi\u00e9n por copas.",
     "cantina_btn": "Carta de vinos",
-
     "regalo_label": "Un regalo especial",
     "regalo_title": "Bonos <em>regalo</em>",
     "regalo_body": "Regala un almuerzo o una cena en Santamonica. Los bonos regalo son v\u00e1lidos todos los d\u00edas (sujeto a disponibilidad) excepto s\u00e1bados y festivos, con una validez de 6 meses desde la compra. Cont\u00e1ctenos para adquirirlo.",
     "regalo_btn": "Solicitar un bono",
-
     "prenota_label": "\u00BFAlgo que celebrar?",
     "prenota_title": "Organiza una velada <em>especial</em>",
     "prenota_p1": "Ya sea un cumplea\u00f1os, un aniversario o una cena de negocios, nos gusta saberlo con antelaci\u00f3n para preparar la mejor bienvenida.",
@@ -511,7 +461,6 @@
     "prenota_f_btn": "Enviar solicitud",
     "prenota_ok": "\u00A1Solicitud enviada! Nos pondremos en contacto en 24 horas.",
     "prenota_err": "Error. Ll\u00e1menos al +39 010 553 31 55",
-
     "info_label": "C\u00f3mo encontrarnos",
     "info_title": "Horario & <em>Contacto</em>",
     "info_orari_label": "Horario",
@@ -523,7 +472,6 @@
     "info_note_label": "Notas",
     "info_note_text": "Por favor, ind\u00edquenos cualquier alergia o intolerancia al reservar.",
     "info_animali": "\uD83D\uDC3E Aceptamos animales de todos los tama\u00f1os.",
-
     "contatti_label": "Esc\u00edbenos",
     "contatti_title": "Env\u00eda un <em>mensaje</em>",
     "contatti_f_nome": "Nombre",
@@ -537,13 +485,11 @@
     "contatti_ok": "\u00A1Mensaje enviado! Te responderemos pronto.",
     "contatti_err": "Error. Esc\u00edbenos a santamonicagenova@gmail.com",
     "map_apri": "Abrir en Maps \u2192",
-
     "popup_label": "Reservar ahora",
     "popup_title": "Una mesa <em>junto al mar</em>",
     "popup_text": "Abrimos de martes a domingo. Reserva tu mesa y vive una aut\u00e9ntica experiencia de cocina ligur.",
     "popup_btn": "Reservar en TheFork",
     "popup_skip": "Quiz\u00e1s en otra ocasi\u00f3n",
-
     "cookie_text": "Este sitio utiliza cookies t\u00e9cnicas necesarias y, con su consentimiento, cookies anal\u00edticas (Google Analytics). Lea nuestra <a href='/privacy-policy'>Pol\u00edtica de privacidad</a> y <a href='/cookies'>Pol\u00edtica de cookies</a>.",
     "cookie_accept": "Aceptar todo",
     "cookie_decline": "Solo necesarias"

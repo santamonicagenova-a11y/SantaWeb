@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.11.1 -->
+<!-- versione v 2026.04.11.2 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -333,13 +333,26 @@ function costruisciHtmlTradotto(lang, t) {
   html = html.replace('<html lang="it">', '<html lang="' + lang + '">');
   html = html.replace(/<title>[^<]*<\/title>/, '<title>' + t.title + '</title>');
 
+  // Rimuovi pulsanti carta/orario — lascia solo stampa
+  html = html.replace(/(<button[^>]*id="btn-carta"[^>]*>[\s\S]*?<\/button>\s*<div class="ctrl-sep"><\/div>\s*<button[^>]*id="btn-orario"[^>]*>[\s\S]*?<\/button>\s*<div class="ctrl-sep"><\/div>)/g, '');
+
+  // Fix showLayout per non cercare btn-carta/btn-orario inesistenti
+  html = html.replace(
+    "document.getElementById('btn-carta').classList.toggle('active',  which === 'carta');",
+    "var bc = document.getElementById('btn-carta');  if(bc) bc.classList.toggle('active', which==='carta');"
+  );
+  html = html.replace(
+    "document.getElementById('btn-orario').classList.toggle('active', which === 'orario');",
+    "var bo = document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active', which==='orario');"
+  );
+
   html = html.replace(/Note per l'ospite<\/span>[^`]*`/,
     t.note_ospite_titolo + '</span>\n  ' + t.note_carta_1 + '<br>\n  ' + t.note_carta_2 + '\n`');
   html = html.replace(/Per mantenere costanti[\s\S]*?simbolo: \*`/,
     t.note_orario + '`');
   html = html.replace('Men\u00f9\u2019 Degustazione', t.titolo_degustazione);
   html = html.replace('Men&ugrave;&rsquo; Degustazione', t.titolo_degustazione);
-  html = html.replace(/\$\{o\.portate\} portate/g, '${o.portate} ' + t.degu_portate_label);
+  html = html.replace(/\${o\.portate} portate/g, '${o.portate} ' + t.degu_portate_label);
   html = html.replace(/eventuale abbinamento vini/g, t.degu_vini_label);
   html = html.replace('ORARIO DI SERVIZIO:', t.orario_titolo);
   html = html.replace(
@@ -1257,6 +1270,6 @@ function toast(msg) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.11.1</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.11.2</div>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.11.15 -->
+<!-- versione v 2026.04.11.17 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -327,7 +327,7 @@ function costruisciHtmlTradotto(lang, t) {
   var newBlock = 'const MENU = ' + JSON.stringify(m, null, 2) + ';\n' + SEP;
   var html = src.slice(0, i1) + newBlock + src.slice(i2);
 
-  // Rimuovi ctrl-bar: conta 3 </div> dal commento
+  // Rimuovi ctrl-bar: conta 3 </div> dal commento HTML
   var cbStart = html.indexOf('<!-- \u2500\u2500 BARRA CONTROLLI \u2500\u2500 -->');
   if (cbStart >= 0) {
     var cbEnd = cbStart;
@@ -345,12 +345,6 @@ function costruisciHtmlTradotto(lang, t) {
   html = html.replace(
     'return MENU.sezioni.find(s => s.titolo === titolo);',
     'var f=MENU.sezioni.find(s=>s.titolo===titolo); if(!f){var ix=["Crudi","Sfiziosi","Amidi e Carboidrati","Non Solo Mare"].indexOf(titolo); if(ix>=0&&MENU.sezioni[ix]) f=MENU.sezioni[ix];} return f;'
-  );
-
-  // Nascondi ctrl-bar via CSS nel <style> esistente (prima di </style>)
-  html = html.replace(
-    '.ctrl-sep {\n      width: 1px;\n      height: 1.4rem;\n      background: var(--rule);\n    }',
-    '.ctrl-sep {\n      width: 1px;\n      height: 1.4rem;\n      background: var(--rule);\n    }\n    .ctrl-bar { display: none !important; }'
   );
 
   html = html.replace('<html lang="it">', '<html lang="' + lang + '">');
@@ -1295,6 +1289,6 @@ function toast(msg) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.11.15</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.11.17</div>
 </body>
 </html>

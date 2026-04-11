@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- versione v 2026.04.09.1 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -381,6 +382,10 @@
 
 <!-- ── BARRA CONTROLLI ── -->
 <div class="ctrl-bar">
+  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout('carta')">☞ Menù alla carta (3 pag.)</button>
+  <div class="ctrl-sep"></div>
+  <button class="ctrl-btn" id="btn-orario" onclick="showLayout('orario')">☞ Foglio orario (1 pag.)</button>
+  <div class="ctrl-sep"></div>
   <button class="ctrl-btn" onclick="window.print()">✦ Stampa / Salva PDF</button>
 </div>
 
@@ -409,7 +414,7 @@ const MENU = {
     "percorsi": {
       "6": [
         {
-          "nome": "Skate wing, local broad beans, green apple, almonds",
+          "nome": "Ray wings, local broad beans, green apple, almonds",
           "sostenibile": true
         },
         {
@@ -420,15 +425,15 @@ const MENU = {
           "nome": "Wild boar tortelli, sea bream dashi, spring onion, shiso"
         },
         {
-          "nome": "Tubetti “<em>Mancini</em>”, salt cod, citrus kosho, borlotti beans",
+          "nome": "“<em>Mancini</em>” tubes, cod, citrus kosho, borlotti beans",
           "sostenibile": true
         },
         {
-          "nome": "Line-caught local meagre, sea purslane, Belgian endive",
+          "nome": "Local croaker caught with a hook, glasswort, Belgian endive",
           "sostenibile": true
         },
         {
-          "nome": "Black lemon ice cream, lovage, lime, milk cracker"
+          "nome": "Black lemon ice cream, lovage, lime, milk crackers"
         }
       ],
       "7": "Chef's free interpretation menu"
@@ -439,40 +444,40 @@ const MENU = {
       "titolo": "Crudi",
       "piatti": [
         {
-          "nome": "Fine de Claire Oysters",
+          "nome": "Fine de Claire oysters",
           "prezzo": 4,
           "unita": "ea."
         },
         {
-          "nome": "Antilope Oysters",
+          "nome": "Antelope oysters",
           "prezzo": 7,
           "unita": "ea."
         },
         {
-          "nome": "Enrico IV Oysters",
+          "nome": "Oysters Henry IV",
           "prezzo": 8,
           "unita": "ea."
         },
         {
-          "nome": "Local langoustines",
+          "nome": "Local scampi",
           "prezzo": 17,
           "unita": "ea.",
           "sostenibile": true
         },
         {
-          "nome": "Local purple prawns",
+          "nome": "Homegrown purple prawns",
           "prezzo": 11,
           "unita": "ea.",
           "sostenibile": true
         },
         {
-          "nome": "Selection of local line-caught fish only",
+          "nome": "Selection only of local fish caught by hook",
           "prezzo": 37,
           "sostenibile": true,
           "staccato": true
         },
         {
-          "nome": "Sea tasting",
+          "nome": "Seafood tasting",
           "prezzo": 80,
           "sostenibile": true,
           "staccato": true
@@ -481,16 +486,17 @@ const MENU = {
       "titolo_display": "Raw"
     },
     {
-      "titolo": "Sfiziosi",
+      "titolo": "antipasti",
       "piatti": [
         {
-          "nome": "Local squid, fresh peas, light bagna cauda, kefir",
+          "nome": "Local squid, fresh peas, light bagna cauda, ​​kefir",
           "prezzo": 20,
           "sostenibile": true
         },
         {
-          "nome": "Cabbage, miso, raspberries, cashews",
-          "prezzo": 16
+          "nome": "Raw purple prawns puttanesca style",
+          "prezzo": 25,
+          "sostenibile": true
         },
         {
           "nome": "Veal sweetbread, celeriac, hazelnuts, fish stock reduction",
@@ -498,23 +504,23 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Skate wing, local broad beans, green apple, almonds",
+          "nome": "Ray wings, local broad beans, green apple, almonds",
           "prezzo": 24,
           "sostenibile": true
         },
         {
           "nome": "“Not cheese”",
           "prezzo": 22,
-          "descrizione": "(Tasting of artisan fake cheeses made with cashews and almond milk)"
+          "descrizione": "(Tasting of fake artisanal cheeses made from cashews and almond milk)"
         }
       ],
-      "titolo_display": "Starters"
+      "titolo_display": "appetizers"
     },
     {
-      "titolo": "Amidi e Carboidrati",
+      "titolo": "Amidi e carboidrati",
       "piatti": [
         {
-          "nome": "Square spaghettoni “<em>Mancini</em>”, sea anemones, nduja, marjoram",
+          "nome": "“<em>Mancini</em>” square spaghetti, sea anemones, nduja, marjoram",
           "prezzo": 32,
           "sostenibile": true
         },
@@ -524,36 +530,36 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Tubetti “<em>Mancini</em>”, salt cod, our fermented citrus kosho, borlotti beans",
+          "nome": "“<em>Mancini</em>” tubes, cod, our fermented citrus kosho, borlotti",
           "prezzo": 24,
           "sostenibile": true
         },
         {
-          "nome": "Rice “<em>Riserva San Massimo</em>”, hare ragù, turnip tops, Parmigiano Reggiano",
+          "nome": "“<em>Riserva San Massimo</em>” rice, hare ragout, turnip tops, Parmigiano Reggiano",
           "prezzo": 26
         }
       ],
-      "titolo_display": "Pasta & Grains"
+      "titolo_display": "Starches and carbohydrates"
     },
     {
       "titolo": "Non Solo Mare",
       "piatti": [
         {
-          "nome": "Local octopus, rhubarb, peas",
-          "prezzo": 28,
-          "sostenibile": true
-        },
-        {
-          "nome": "Marinated courgette, mint, yogurt, Timut pepper",
-          "prezzo": 18
-        },
-        {
-          "nome": "Line-caught local meagre, sea purslane, Belgian endive",
+          "nome": "Local amberjack, rhubarb, peas",
           "prezzo": 32,
           "sostenibile": true
         },
         {
-          "nome": "Picanha, king oyster mushrooms, beef jus",
+          "nome": "Scapece courgette, mint, yogurt, Timut pepper",
+          "prezzo": 18
+        },
+        {
+          "nome": "Local croaker caught with a hook, glasswort, Belgian endive",
+          "prezzo": 32,
+          "sostenibile": true
+        },
+        {
+          "nome": "Lamb, peas, rhubarb",
           "prezzo": 28
         }
       ],
@@ -616,9 +622,7 @@ const NOTE_CARTA = `
   The list of allergens is available on the last page of this menu.
 `;
 
-const NOTE_ORARIO = `Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche
-delle materie prime i prodotti acquistati freschi vengono abbattuti e congelati.
-To maintain consistent quality standards and organoleptic characteristics, fresh fish products are blast-frozen. These products are marked with the symbol: *`;
+const NOTE_ORARIO = `To maintain consistent quality standards and organoleptic characteristics, fresh fish products are blast-frozen. These products are marked with the symbol: *`;
 
 function getSez(titolo) {
   return MENU.sezioni.find(s => s.titolo === titolo);
@@ -673,7 +677,7 @@ function buildDegu(degu) {
     <div class="degu">
       <div class="degu-titolo">Tasting Menu</div>
       <div class="degu-prezzi">${optsHtml}</div>
-      <div class="degu-nota">${degu.nota.replace("the whole table", "<strong>the whole table</strong>")}</div>
+      <div class="degu-nota">${degu.nota.replace("l'intero tavolo", "<strong>l\u2019intero tavolo</strong>")}</div>
       ${percorsiHtml}
     </div>`;
 }
@@ -789,8 +793,8 @@ function renderOrario() {
 function showLayout(which) {
   document.getElementById('layout-carta').style.display  = which === 'carta'  ? 'block' : 'none';
   document.getElementById('layout-orario').style.display = which === 'orario' ? 'block' : 'none';
-  var bc = document.getElementById('btn-carta');  if(bc) bc.classList.toggle('active', which==='carta');
-  var bo = document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active', which==='orario');
+  document.getElementById('btn-carta').classList.toggle('active',  which === 'carta');
+  document.getElementById('btn-orario').classList.toggle('active', which === 'orario');
 }
 
 /* ── init ── */
@@ -798,5 +802,6 @@ renderCarta();
 renderOrario();
 showLayout('carta');
 </script>
+<div style="text-align:center;padding:4px 0 8px;font-size:.55rem;color:rgba(245,240,232,0.35);letter-spacing:.1em;">v 2026.04.09.1</div>
 </body>
 </html>

@@ -21,7 +21,6 @@
   html { scroll-behavior: smooth; font-size: 16px; }
   body { background: var(--warm-white); color: var(--ink); font-family: 'Jost', sans-serif; font-weight: 300; overflow-x: hidden; }
 
-  /* NAV */
   nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 2rem; background: transparent; transition: background 0.4s, backdrop-filter 0.4s; }
   nav.scrolled { background: rgba(250,248,244,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--divider); }
   .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
@@ -32,15 +31,11 @@
   .nav-right { display: flex; align-items: center; gap: 1rem; }
   .nav-cta { font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-white); background: var(--ink); padding: 0.55rem 1.2rem; text-decoration: none; transition: background 0.2s; }
   .nav-cta:hover { background: var(--terracotta); }
-
-  /* LANG DROPDOWN */
-  .lang-select { font-family: 'Jost', sans-serif; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-soft); background: transparent; border: 1px solid var(--divider); padding: 0.35rem 0.6rem; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%233a3630' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; padding-right: 1.4rem; transition: border-color 0.2s; }
+  .lang-select { font-family: 'Jost', sans-serif; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-soft); background: transparent; border: 1px solid var(--divider); padding: 0.35rem 1.4rem 0.35rem 0.6rem; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%233a3630' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; transition: border-color 0.2s; }
   .lang-select:hover { border-color: var(--terracotta); color: var(--ink); }
-
   .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; }
   .hamburger span { display: block; width: 24px; height: 1.5px; background: var(--ink); }
 
-  /* HERO */
   .hero { min-height: 100svh; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; }
   .hero-text-panel { display: flex; flex-direction: column; justify-content: flex-end; padding: 8rem 4rem 5rem 4rem; background: var(--sand); }
   .hero-eyebrow { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 1.5rem; opacity: 0; animation: fadeUp 0.8s 0.2s forwards; }
@@ -53,20 +48,17 @@
   .hero-image-panel { position: relative; overflow: hidden; }
   .hero-image-panel img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.05); animation: zoomOut 1.4s 0.1s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
 
-  /* BUTTONS */
   .btn-primary { display: inline-block; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-white); background: var(--ink); padding: 0.9rem 2rem; text-decoration: none; transition: background 0.2s; }
   .btn-primary:hover { background: var(--terracotta); }
   .btn-secondary { display: inline-block; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); border: 1px solid var(--ink); padding: 0.9rem 2rem; text-decoration: none; transition: all 0.2s; }
   .btn-secondary:hover { background: var(--ink); color: var(--warm-white); }
 
-  /* SECTIONS */
   section { padding: 6rem 2rem; }
   .section-inner { max-width: 1200px; margin: 0 auto; }
   .section-label { font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 1rem; }
   .section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 300; line-height: 1.1; margin-bottom: 1.5rem; }
   .section-title em { font-style: italic; color: var(--terracotta); }
 
-  /* CUCINA */
   .cucina-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
   .cucina-body { font-size: 0.9rem; line-height: 1.9; color: var(--ink-soft); }
   .cucina-body p + p { margin-top: 1rem; }
@@ -76,12 +68,10 @@
   .cucina-images img:first-child { margin-top: 3rem; }
   .cucina-images img:hover { transform: scale(1.02); }
 
-  /* QUOTE */
   .quote-section { background: var(--ink); padding: 2.5rem 2rem; text-align: center; }
   .quote-text { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.4rem, 3vw, 2.2rem); font-weight: 300; font-style: italic; color: var(--sand); line-height: 1.4; max-width: 800px; margin: 0 auto 0.75rem; }
   .quote-attr { font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); }
 
-  /* GALLERIA */
   .galleria-section { background: var(--ink); padding: 6rem 2rem; }
   .galleria-section .section-label { color: var(--gold); }
   .galleria-section .section-title { color: var(--sand); }
@@ -91,7 +81,6 @@
   .galleria-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s ease; }
   .galleria-item:hover img { transform: scale(1.04); }
 
-  /* LIGHTBOX */
   #lightbox { position: fixed; inset: 0; z-index: 600; background: rgba(26,24,20,0.95); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 2rem; }
   #lightbox.visible { opacity: 1; pointer-events: all; }
   #lightbox img { max-width: 90vw; max-height: 88vh; object-fit: contain; }
@@ -100,25 +89,21 @@
   #lightbox-prev { left: 1rem; }
   #lightbox-next { right: 1rem; }
 
-  /* CANTINA */
   .cantina-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
   .cantina-image { position: relative; }
   .cantina-image img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
   .cantina-image::after { content: ''; position: absolute; top: -1.5rem; left: -1.5rem; right: 1.5rem; bottom: 1.5rem; border: 1px solid var(--gold); z-index: -1; pointer-events: none; }
 
-  /* INFO */
   .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; padding-top: 3rem; border-top: 1px solid var(--divider); }
   .info-block-label { font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
   .info-block-content { font-size: 0.88rem; line-height: 2; color: var(--ink-soft); }
   .info-block-content a { color: var(--ink); text-decoration: none; }
   .info-block-content a:hover { color: var(--terracotta); }
 
-  /* REGALO */
   .regalo-section { background: var(--sand); }
   .regalo-inner { max-width: 700px; margin: 0 auto; text-align: center; }
   .regalo-body { font-size: 0.9rem; line-height: 1.85; color: var(--ink-soft); margin-bottom: 2.5rem; }
 
-  /* PRENOTAZIONE SPECIALE */
   .prenota-section { background: var(--sand); padding: 6rem 2rem; }
   .prenota-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; margin-top: 3rem; }
   .prenota-intro { font-size: 0.9rem; line-height: 1.9; color: var(--ink-soft); }
@@ -140,7 +125,6 @@
   .pf-status.success { display: block; background: #eaf3de; color: #3b6d11; }
   .pf-status.error { display: block; background: #fcebeb; color: #a32d2d; }
 
-  /* CONTATTI */
   .contatti-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
   .form-group { margin-bottom: 1.5rem; }
   .form-group label { display: block; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.5rem; }
@@ -156,7 +140,6 @@
   .form-status.success { display: block; background: #eaf3de; color: #3b6d11; }
   .form-status.error { display: block; background: #fcebeb; color: #a32d2d; }
 
-  /* MAPPA */
   .map-wrapper { width: 100%; }
   .map-wrapper iframe { width: 100%; height: 380px; border: none; display: block; }
   .map-bar { background: var(--sand); padding: 1rem 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; border-top: 1px solid var(--divider); }
@@ -165,7 +148,6 @@
   .map-bar-link { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--terracotta); text-decoration: none; }
   .map-bar-link:hover { text-decoration: underline; }
 
-  /* FOOTER */
   footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
   .footer-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
   .footer-brand { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sand); }
@@ -176,15 +158,13 @@
   .footer-version { color: var(--terracotta); text-decoration: none; }
   .footer-version:hover { text-decoration: underline; }
 
-  /* MOBILE MENU */
   .mobile-menu { display: none; position: fixed; inset: 0; z-index: 200; background: var(--warm-white); flex-direction: column; justify-content: center; align-items: center; gap: 2.5rem; }
   .mobile-menu.open { display: flex; }
   .mobile-menu a { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; font-style: italic; color: var(--ink); text-decoration: none; transition: color 0.2s; }
   .mobile-menu a:hover { color: var(--terracotta); }
   .menu-close { position: absolute; top: 1.5rem; right: 2rem; background: none; border: none; cursor: pointer; font-size: 1.5rem; color: var(--ink); }
-  .mobile-lang-select { font-family: 'Jost', sans-serif; font-size: 0.78rem; letter-spacing: 0.15em; text-transform: uppercase; border: 1px solid var(--divider); padding: 0.5rem 1rem; background: transparent; color: var(--ink); cursor: pointer; outline: none; margin-top: 0.5rem; }
+  .mobile-lang-select { font-family: 'Jost', sans-serif; font-size: 0.78rem; letter-spacing: 0.15em; border: 1px solid var(--divider); padding: 0.5rem 1rem; background: transparent; color: var(--ink); cursor: pointer; outline: none; margin-top: 0.5rem; }
 
-  /* POPUP */
   #booking-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(26,24,20,0.75); display: flex; align-items: center; justify-content: center; padding: 1.5rem; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
   #booking-overlay.visible { opacity: 1; pointer-events: all; }
   #booking-popup { background: var(--warm-white); max-width: 480px; width: 100%; padding: 3rem; position: relative; transform: translateY(24px); transition: transform 0.4s ease; }
@@ -197,7 +177,6 @@
   .popup-close { position: absolute; top: 1.2rem; right: 1.2rem; background: none; border: none; cursor: pointer; font-size: 1.1rem; color: var(--ink-soft); padding: 0.25rem; }
   .popup-skip { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-soft); background: none; border: none; cursor: pointer; text-align: center; padding: 0.4rem; }
 
-  /* COOKIE */
   #cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: var(--ink); padding: 1.2rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; border-top: 2px solid var(--terracotta); transform: translateY(100%); transition: transform 0.4s ease; }
   #cookie-banner.visible { transform: translateY(0); }
   #cookie-banner p { font-size: 0.78rem; line-height: 1.6; color: rgba(245,240,232,0.85); max-width: 700px; }
@@ -209,13 +188,11 @@
   .cookie-decline { background: transparent; color: rgba(245,240,232,0.6); border: 1px solid rgba(245,240,232,0.25); }
   .cookie-decline:hover { color: var(--sand); }
 
-  /* ANIMATIONS */
   @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
   @keyframes zoomOut { from { transform: scale(1.05); } to { transform: scale(1); } }
   .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
   .reveal.visible { opacity: 1; transform: none; }
 
-  /* RESPONSIVE */
   @media (max-width: 900px) {
     nav { padding: 1rem 1.5rem; }
     .nav-links, .nav-cta, .nav-right { display: none; }
@@ -258,7 +235,7 @@
   </ul>
   <div class="nav-right">
     <select class="lang-select" id="lang-select-nav" onchange="setLang(this.value)">
-      <option value="it">IT</option>
+      <option value="it" selected>IT</option>
       <option value="en">EN</option>
       <option value="fr">FR</option>
       <option value="de">DE</option>
@@ -278,7 +255,7 @@
   <a href="#info" class="mobile-link" data-i18n="nav_info_mobile">Info &amp; Orari</a>
   <a href="#contatti" class="mobile-link" data-i18n="nav_contatti">Contatti</a>
   <select class="mobile-lang-select" id="lang-select-mobile" onchange="setLang(this.value)">
-    <option value="it">IT — Italiano</option>
+    <option value="it" selected>IT — Italiano</option>
     <option value="en">EN — English</option>
     <option value="fr">FR — Fran&ccedil;ais</option>
     <option value="de">DE — Deutsch</option>
@@ -291,7 +268,7 @@
   <div class="hero-text-panel">
     <p class="hero-eyebrow" data-i18n="hero_eyebrow">Ristorante &middot; Genova</p>
     <h1 class="hero-title" data-i18n="hero_title">Cucina <em>viva</em><br>sul mare</h1>
-    <p class="hero-desc" data-i18n="hero_desc">Un progetto in costante divenire...</p>
+    <p class="hero-desc" data-i18n="hero_desc">Un progetto in costante divenire, basato sull&rsquo;attenzione al gusto e sulla qualit&agrave; della materia prima. Pesce di Camogli, verdure dell&rsquo;orto genovese, pasta e pane di nostra produzione.</p>
     <div class="hero-actions">
       <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" class="btn-primary" data-i18n="hero_btn_prenota">Prenota un tavolo</a>
       <a href="#cucina" class="btn-secondary" data-i18n="hero_btn_menu">Scopri il menu</a>
@@ -310,9 +287,9 @@
         <p class="section-label" data-i18n="cucina_label">La nostra proposta</p>
         <h2 class="section-title" data-i18n="cucina_title">Cucina <em>del territorio</em></h2>
         <div class="cucina-body">
-          <p data-i18n="cucina_p1">La qualit&agrave; della materia prima...</p>
-          <p data-i18n="cucina_p2">I nostri piatti sono elaborati...</p>
-          <p data-i18n="cucina_p3">Una cucina elegante...</p>
+          <p data-i18n="cucina_p1">La qualit&agrave; della materia prima &egrave; fondamentale: ci rivolgiamo quanto pi&ugrave; possibile a pescatori e produttori locali. Il pesce arriva da Camogli, le verdure da un piccolo orto sulle alture di Genova.</p>
+          <p data-i18n="cucina_p2">I nostri piatti sono elaborati ma allo stesso tempo semplici, per valorizzare al meglio i prodotti della Liguria. Pasta fresca, pane, focaccia e dolci sono tutti di nostra produzione.</p>
+          <p data-i18n="cucina_p3">Una cucina elegante, in cui anche l&rsquo;estetica e il piatto fisico hanno la loro importanza &mdash; partendo dalla tradizione per diventare contemporanei.</p>
         </div>
         <div class="cucina-actions">
           <a id="menu-btn" href="menu.html" target="_blank" class="btn-primary" data-i18n="cucina_btn">Guarda il men&ugrave;</a>
@@ -336,10 +313,10 @@
     <p class="section-label reveal" data-i18n="galleria_label">La nostra cucina</p>
     <h2 class="section-title reveal" data-i18n="galleria_title">Ogni piatto,<br><em>una storia</em></h2>
     <div class="galleria-grid">
-      <div class="galleria-item grande reveal" onclick="openLightbox(0)"><img src="img/piatto-pesce.jpg" alt="Pesce"></div>
-      <div class="galleria-item reveal" onclick="openLightbox(1)" style="transition-delay:0.1s"><img src="img/piatto-tonno.jpg" alt="Tonno"></div>
-      <div class="galleria-item reveal" onclick="openLightbox(2)" style="transition-delay:0.15s"><img src="img/piatto-pasta.jpg" alt="Pasta"></div>
-      <div class="galleria-item reveal" onclick="openLightbox(3)" style="transition-delay:0.2s"><img src="img/piatto-carne.jpg" alt="Secondo"></div>
+      <div class="galleria-item grande reveal" onclick="openLightbox(0)"><img src="img/piatto-pesce.jpg" alt="Pesce alla griglia"></div>
+      <div class="galleria-item reveal" onclick="openLightbox(1)" style="transition-delay:0.1s"><img src="img/piatto-tonno.jpg" alt="Tonno scottato"></div>
+      <div class="galleria-item reveal" onclick="openLightbox(2)" style="transition-delay:0.15s"><img src="img/piatto-pasta.jpg" alt="Pasta fresca"></div>
+      <div class="galleria-item reveal" onclick="openLightbox(3)" style="transition-delay:0.2s"><img src="img/piatto-carne.jpg" alt="Secondo piatto"></div>
       <div class="galleria-item grande reveal" onclick="openLightbox(4)" style="transition-delay:0.25s"><img src="img/piatto-dessert.jpg" alt="Dessert"></div>
     </div>
   </div>
@@ -355,8 +332,8 @@
         <p class="section-label" data-i18n="cantina_label">I nostri vini</p>
         <h2 class="section-title" data-i18n="cantina_title">Una <em>cantina</em> ligure</h2>
         <div class="cucina-body">
-          <p data-i18n="cantina_p1">Monica, sommelier...</p>
-          <p data-i18n="cantina_p2">La crescente richiesta...</p>
+          <p data-i18n="cantina_p1">Monica, sommelier esperta e appassionata, cura personalmente la carta dei vini. In una ricca proposta di etichette italiane spicca la vasta selezione di bottiglie liguri &mdash; abbinamento perfetto al pesce del nostro mare.</p>
+          <p data-i18n="cantina_p2">La crescente richiesta di vini naturali porta il Santamonica a interfacciarsi sempre pi&ugrave; con produttori che lavorano l&rsquo;uva il meno possibile. Un&rsquo;ampia scelta &egrave; disponibile anche a calice.</p>
         </div>
         <div class="cucina-actions">
           <a href="https://af88bf37-3bfb-460d-a80e-2a0f7ca776ba.filesusr.com/ugd/461837_66faa32523f248c7982f03a1ccef5164.pdf" target="_blank" class="btn-secondary" data-i18n="cantina_btn">Carta dei vini</a>
@@ -371,8 +348,8 @@
     <div class="regalo-inner reveal">
       <p class="section-label" data-i18n="regalo_label">Un dono speciale</p>
       <h2 class="section-title" data-i18n="regalo_title">Buoni <em>regalo</em></h2>
-      <p class="regalo-body" data-i18n="regalo_body">Regala un pranzo...</p>
-      <a href="/cdn-cgi/l/email-protection#3a495b544e5b57555453595b5d5f54554c5b7a5d575b53561459555705494f58505f594e07784f5554551a685f5d5b56551a695b544e5b57555453595b" class="btn-primary" data-i18n="regalo_btn">Richiedi un buono</a>
+      <p class="regalo-body" data-i18n="regalo_body">Regala un pranzo o una cena al Santamonica. I Buoni Regalo sono utilizzabili tutti i giorni (salvo disponibilit&agrave;) escluso Sabato e festivi, con validit&agrave; di 6 mesi dall&rsquo;acquisto. Contattaci per acquistarlo.</p>
+      <a href="mailto:santamonicagenova@gmail.com?subject=Buono Regalo Santamonica" class="btn-primary" data-i18n="regalo_btn">Richiedi un buono</a>
     </div>
   </div>
 </section>
@@ -384,21 +361,21 @@
     <div class="prenota-grid">
       <div class="reveal">
         <div class="prenota-intro">
-          <p data-i18n="prenota_p1">Che sia un compleanno...</p>
-          <p data-i18n="prenota_p2">Raccontaci la tua occasione...</p>
+          <p data-i18n="prenota_p1">Che sia un compleanno, un anniversario o una cena aziendale, ci piace sapere in anticipo per prepararci al meglio ad accoglierti.</p>
+          <p data-i18n="prenota_p2">Raccontaci la tua occasione e le tue esigenze: faremo in modo che ogni dettaglio sia curato.</p>
         </div>
         <div class="prenota-highlights">
           <div class="prenota-highlight">
             <div class="prenota-highlight-icon">&#x1F942;</div>
-            <div class="prenota-highlight-text"><strong data-i18n="prenota_h1_title">Occasioni speciali</strong><span data-i18n="prenota_h1_text">Compleanni...</span></div>
+            <div class="prenota-highlight-text"><strong data-i18n="prenota_h1_title">Occasioni speciali</strong><span data-i18n="prenota_h1_text">Compleanni, anniversari, proposte di matrimonio &mdash; creiamo l&rsquo;atmosfera giusta.</span></div>
           </div>
           <div class="prenota-highlight">
             <div class="prenota-highlight-icon">&#x1F33F;</div>
-            <div class="prenota-highlight-text"><strong data-i18n="prenota_h2_title">Intolleranze e allergie</strong><span data-i18n="prenota_h2_text">Segnalacele...</span></div>
+            <div class="prenota-highlight-text"><strong data-i18n="prenota_h2_title">Intolleranze e allergie</strong><span data-i18n="prenota_h2_text">Segnalacele in anticipo: la cucina si adatta senza compromettere l&rsquo;esperienza.</span></div>
           </div>
           <div class="prenota-highlight">
             <div class="prenota-highlight-icon">&#x1F4CD;</div>
-            <div class="prenota-highlight-text"><strong data-i18n="prenota_h3_title">Tavolo preferito</strong><span data-i18n="prenota_h3_text">Se hai una preferenza...</span></div>
+            <div class="prenota-highlight-text"><strong data-i18n="prenota_h3_title">Tavolo preferito</strong><span data-i18n="prenota_h3_text">Se hai una preferenza &mdash; vista mare, interno, angolo riservato &mdash; faccelo sapere.</span></div>
           </div>
         </div>
       </div>
@@ -433,7 +410,7 @@
                 <option data-i18n="prenota_f_occ6">Altro</option>
               </select>
             </div>
-            <div class="pf-group"><label for="p-intolleranze" data-i18n="prenota_f_intolleranze">Intolleranze</label><input type="text" id="p-intolleranze" name="intolleranze"></div>
+            <div class="pf-group"><label for="p-intolleranze" data-i18n="prenota_f_intolleranze">Intolleranze o allergie</label><input type="text" id="p-intolleranze" name="intolleranze"></div>
             <div class="pf-group"><label for="p-richieste" data-i18n="prenota_f_richieste">Richieste particolari</label><textarea id="p-richieste" name="richieste"></textarea></div>
             <div style="margin-top:1.5rem;">
               <button type="submit" id="prenota-btn" class="btn-primary" style="cursor:pointer;font-family:'Jost',sans-serif;border:none;width:100%;text-align:center;" data-i18n="prenota_f_btn">Invia la richiesta</button>
@@ -468,13 +445,13 @@
         <div class="info-block-content">
           Lungomare Lombardo 27<br>16145 Genova &mdash; Italy<br><br>
           <a href="tel:+390105533155">+39 010 553 31 55</a><br>
-          <a href="/cdn-cgi/l/email-protection#f685979882979b99989f9597919398998097b6919b979f9ad895999b"><span class="__cf_email__" data-cfemail="5e2d3f302a3f333130373d3f393b3031283f1e39333f3732703d3133">[email&#160;protected]</span></a>
+          <a href="mailto:santamonicagenova@gmail.com">santamonicagenova@gmail.com</a>
         </div>
       </div>
       <div>
         <p class="info-block-label" data-i18n="info_note_label">Note</p>
         <div class="info-block-content">
-          <span data-i18n="info_note_text">Si prega di segnalare eventuali allergie...</span><br><br>
+          <span data-i18n="info_note_text">Si prega di segnalare eventuali allergie o intolleranze al momento della prenotazione.</span><br><br>
           <span data-i18n="info_animali">&#x1F43E; Accettiamo animali di tutte le taglie.</span>
         </div>
       </div>
@@ -526,7 +503,7 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.11.03</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.11.04</a></p>
   </div>
 </footer>
 
@@ -542,7 +519,7 @@
     <button class="popup-close" id="popup-close">&#x2715;</button>
     <span class="popup-label" data-i18n="popup_label">Prenota ora</span>
     <h2 data-i18n="popup_title">Un tavolo <em>sul mare</em></h2>
-    <p data-i18n="popup_text">Siamo aperti dal marted&igrave; alla domenica...</p>
+    <p data-i18n="popup_text">Siamo aperti dal marted&igrave; alla domenica. Prenota il tuo tavolo e vivi un&rsquo;esperienza di cucina ligure autentica.</p>
     <div class="popup-actions">
       <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" class="btn-primary" style="text-align:center;" onclick="closePopup()" data-i18n="popup_btn">Prenota su TheFork</a>
       <button class="popup-skip" id="popup-skip" data-i18n="popup_skip">Magari un&rsquo;altra volta</button>
@@ -551,42 +528,33 @@
 </div>
 
 <div id="cookie-banner" role="dialog" aria-label="Consenso cookie">
-  <p data-i18n="cookie_text">Questo sito utilizza cookie tecnici...</p>
+  <p data-i18n="cookie_text">Questo sito utilizza cookie tecnici necessari al funzionamento e, previo consenso, cookie analitici (Google Analytics) per migliorare l&rsquo;esperienza di navigazione. Leggi la nostra <a href="/privacy-policy">Privacy Policy</a> e <a href="/cookies">Cookie Policy</a>.</p>
   <div class="cookie-actions">
     <button class="cookie-btn cookie-decline" id="cookie-decline" data-i18n="cookie_decline">Solo necessari</button>
     <button class="cookie-btn cookie-accept" id="cookie-accept" data-i18n="cookie_accept">Accetta tutti</button>
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
   var T = {};
   var currentLang = 'it';
 
   fetch('translations.json')
     .then(function(r) { return r.json(); })
-    .then(function(data) { T = data; applyLang(currentLang); })
-    .catch(function() { console.warn('translations.json non trovato — carica su GitHub per testare il multilingua'); });
+    .then(function(data) { T = data; applyLang('it'); })
+    .catch(function() { console.warn('translations.json non trovato — funziona su GitHub Pages'); });
 
   function applyLang(lang) {
     currentLang = lang;
-    localStorage.setItem('sm-lang', lang);
     document.documentElement.lang = lang;
     if (!T[lang]) return;
     var t = T[lang];
-
-    // Aggiorna tutti i testi
     document.querySelectorAll('[data-i18n]').forEach(function(el) {
       var key = el.getAttribute('data-i18n');
       if (t[key] !== undefined) el.innerHTML = t[key];
     });
-
-    // Aggiorna il link del pulsante menu nella lingua corretta
     var menuBtn = document.getElementById('menu-btn');
-    if (menuBtn && t.cucina_btn_link) {
-      menuBtn.href = t.cucina_btn_link;
-    }
-
-    // Sincronizza i selettori lingua
+    if (menuBtn && t.cucina_btn_link) menuBtn.href = t.cucina_btn_link;
     document.getElementById('lang-select-nav').value = lang;
     document.getElementById('lang-select-mobile').value = lang;
   }
@@ -636,10 +604,10 @@
   });
 
   var galleryImages = [
-    { src: 'img/piatto-pesce.jpg', alt: 'Pesce' },
-    { src: 'img/piatto-tonno.jpg', alt: 'Tonno' },
-    { src: 'img/piatto-pasta.jpg', alt: 'Pasta' },
-    { src: 'img/piatto-carne.jpg', alt: 'Secondo' },
+    { src: 'img/piatto-pesce.jpg', alt: 'Pesce alla griglia' },
+    { src: 'img/piatto-tonno.jpg', alt: 'Tonno scottato' },
+    { src: 'img/piatto-pasta.jpg', alt: 'Pasta fresca' },
+    { src: 'img/piatto-carne.jpg', alt: 'Secondo piatto' },
     { src: 'img/piatto-dessert.jpg', alt: 'Dessert' }
   ];
   var currentImg = 0;
@@ -662,4 +630,8 @@
   var banner = document.getElementById('cookie-banner');
   var choice = localStorage.getItem('cookie-choice');
   if (!choice) { setTimeout(function() { banner.classList.add('visible'); }, 1200); } else if (choice === 'accepted') { loadGA(); }
-  document.getElementById('cookie-accept'
+  document.getElementById('cookie-accept').addEventListener('click', function() { localStorage.setItem('cookie-choice', 'accepted'); banner.classList.remove('visible'); loadGA(); });
+  document.getElementById('cookie-decline').addEventListener('click', function() { localStorage.setItem('cookie-choice', 'declined'); banner.classList.remove('visible'); });
+</script>
+</body>
+</html>

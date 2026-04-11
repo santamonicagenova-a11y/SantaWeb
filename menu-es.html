@@ -382,10 +382,6 @@
 
 <!-- ── BARRA CONTROLLI ── -->
 <div class="ctrl-bar">
-  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout('carta')">☞ Menù alla carta (3 pag.)</button>
-  <div class="ctrl-sep"></div>
-  <button class="ctrl-btn" id="btn-orario" onclick="showLayout('orario')">☞ Foglio orario (1 pag.)</button>
-  <div class="ctrl-sep"></div>
   <button class="ctrl-btn" onclick="window.print()">✦ Stampa / Salva PDF</button>
 </div>
 
@@ -414,26 +410,26 @@ const MENU = {
     "percorsi": {
       "6": [
         {
-          "nome": "Alitas de raya, habas locales, manzana verde, almendras",
+          "nome": "Aleta de raya, habas locales, manzana verde, almendras",
           "sostenibile": true
         },
         {
-          "nome": "Mollejas de ternera, apionabo, avellanas, caldo de pescado",
+          "nome": "Mollejas de ternera, apio nabo, avellanas, fondo de pescado",
           "sostenibile": true
         },
         {
           "nome": "Tortelli de jabalí, dashi de dorada, cebolleta, shiso"
         },
         {
-          "nome": "Tubos de “<em>Mancini</em>”, bacalao, kosho cítrico, judías borlotti",
+          "nome": "Tubetti “<em>Mancini</em>”, bacalao, kosho de cítricos, alubias borlotti",
           "sostenibile": true
         },
         {
-          "nome": "Corvina local capturada con anzuelo, cristalina y escarola belga",
+          "nome": "Corvina local de anzuelo, salicornia, endibia belga",
           "sostenibile": true
         },
         {
-          "nome": "Helado de limón negro, apio, lima, galletas de leche"
+          "nome": "Helado de limón negro, levístico, lima, cracker de leche"
         }
       ],
       "7": "Menú a libre elección del Chef"
@@ -444,40 +440,40 @@ const MENU = {
       "titolo": "Crudi",
       "piatti": [
         {
-          "nome": "Ostras finas de Claire",
+          "nome": "Ostras Fine de Claire",
           "prezzo": 4,
           "unita": "ud."
         },
         {
-          "nome": "Ostras antílope",
+          "nome": "Ostras Antilope",
           "prezzo": 7,
           "unita": "ud."
         },
         {
-          "nome": "Ostras Enrique IV",
+          "nome": "Ostras Enrico IV",
           "prezzo": 8,
           "unita": "ud."
         },
         {
-          "nome": "Gambas locales",
+          "nome": "Cigalas locales",
           "prezzo": 17,
           "unita": "ud.",
           "sostenibile": true
         },
         {
-          "nome": "Gambas moradas de cosecha propia",
+          "nome": "Gambas violetas locales",
           "prezzo": 11,
           "unita": "ud.",
           "sostenibile": true
         },
         {
-          "nome": "Selección únicamente de pescado local capturado con anzuelo.",
+          "nome": "Selección exclusivamente de pescados locales de anzuelo",
           "prezzo": 37,
           "sostenibile": true,
           "staccato": true
         },
         {
-          "nome": "Degustación de mariscos",
+          "nome": "Degustación del mar",
           "prezzo": 80,
           "sostenibile": true,
           "staccato": true
@@ -486,41 +482,40 @@ const MENU = {
       "titolo_display": "Crudos"
     },
     {
-      "titolo": "antipasti",
+      "titolo": "Sfiziosi",
       "piatti": [
         {
-          "nome": "Calamares locales, guisantes frescos, bagna cauda ligera, kéfir",
+          "nome": "Calamar local, guisantes frescos, bagna cauda ligera, kéfir",
           "prezzo": 20,
           "sostenibile": true
         },
         {
-          "nome": "Gamba morada cruda a la puttanesca",
-          "prezzo": 25,
-          "sostenibile": true
+          "nome": "Col repollo, miso, frambuesas, anacardos",
+          "prezzo": 16
         },
         {
-          "nome": "Mollejas de ternera, apionabo, avellanas, reducción de caldo de pescado",
+          "nome": "Mollejas de ternera, apio nabo, avellanas, reducción de fondo de pescado",
           "prezzo": 22,
           "sostenibile": true
         },
         {
-          "nome": "Alitas de raya, habas locales, manzana verde, almendras",
+          "nome": "Aleta de raya, habas locales, manzana verde, almendras",
           "prezzo": 24,
           "sostenibile": true
         },
         {
-          "nome": "“No queso”",
+          "nome": "“No quesos”",
           "prezzo": 22,
-          "descrizione": "(Degustación de falsos quesos artesanales elaborados con anacardos y leche de almendras)"
+          "descrizione": "(Degustación de falsos quesos artesanales a base de anacardos y leche de almendra)"
         }
       ],
       "titolo_display": "Entrantes"
     },
     {
-      "titolo": "Amidi e carboidrati",
+      "titolo": "Amidi e Carboidrati",
       "piatti": [
         {
-          "nome": "Espaguetis cuadrados “<em>Mancini</em>”, anémonas de mar, nduja, mejorana",
+          "nome": "Spaghettoni cuadrados “<em>Mancini</em>”, anémonas de mar, nduja, mejorana",
           "prezzo": 32,
           "sostenibile": true
         },
@@ -530,7 +525,7 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Tubos de “<em>Mancini</em>”, bacalao, nuestro kosho cítrico fermentado, borlotti",
+          "nome": "Tubetti “<em>Mancini</em>”, bacalao, nuestro kosho de cítricos fermentado, borlotti",
           "prezzo": 24,
           "sostenibile": true
         },
@@ -545,21 +540,21 @@ const MENU = {
       "titolo": "Non Solo Mare",
       "piatti": [
         {
-          "nome": "Medregal, ruibarbo y guisantes locales",
-          "prezzo": 32,
+          "nome": "Pulpo local, ruibarbo, guisantes",
+          "prezzo": 28,
           "sostenibile": true
         },
         {
-          "nome": "Calabacín Scapece, menta, yogur, pimienta Timut",
+          "nome": "Calabacín en escabeche, menta, yogur, pimienta Timut",
           "prezzo": 18
         },
         {
-          "nome": "Corvina local capturada con anzuelo, cristalina y escarola belga",
+          "nome": "Corvina local de anzuelo, salicornia, endibia belga",
           "prezzo": 32,
           "sostenibile": true
         },
         {
-          "nome": "Cordero, guisantes, ruibarbo",
+          "nome": "Picanha, setas cardoncelli, jugo de ternera",
           "prezzo": 28
         }
       ],
@@ -622,7 +617,9 @@ const NOTE_CARTA = `
   La lista de alérgenos se puede consultar en la última página de esta carta.
 `;
 
-const NOTE_ORARIO = `Para mantener constantes el nivel cualitativo y las características organolépticas, los productos frescos se ultracongelan y se señalan con el símbolo: *`;
+const NOTE_ORARIO = `Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche
+delle materie prime i prodotti acquistati freschi vengono abbattuti e congelati.
+Para mantener constantes el nivel cualitativo y las características organolépticas, los productos frescos se ultracongelan y se señalan con el símbolo: *`;
 
 function getSez(titolo) {
   return MENU.sezioni.find(s => s.titolo === titolo);
@@ -677,7 +674,7 @@ function buildDegu(degu) {
     <div class="degu">
       <div class="degu-titolo">Menú Degustación</div>
       <div class="degu-prezzi">${optsHtml}</div>
-      <div class="degu-nota">${degu.nota.replace("l'intero tavolo", "<strong>l\u2019intero tavolo</strong>")}</div>
+      <div class="degu-nota">${degu.nota.replace("toda la mesa", "<strong>toda la mesa</strong>")}</div>
       ${percorsiHtml}
     </div>`;
 }

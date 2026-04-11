@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.11.2 -->
+<!-- versione v 2026.04.11.3 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -107,7 +107,7 @@
 <div class="toast" id="toast">✓ Scaricato!</div>
 
 <script>
-var tplBefore = '', tplAfter = '', dati = null, datiOriginali = null;
+var tplBefore = '', tplAfter = '', tplBeforeLang = '', dati = null, datiOriginali = null;
 
 function carica(input) {
   var f = input.files[0];
@@ -135,6 +135,17 @@ function analizza(src) {
 
   tplBefore = src.slice(0, i1);
   tplAfter  = src.slice(i2end);
+  // Versione senza pulsanti carta/orario per i file in lingua
+  tplBeforeLang = tplBefore
+    .replace(/<button[^>]*id="btn-carta"[^>]*>[\s\S]*?<\/button>\s*<div class="ctrl-sep"><\/div>\s*<button[^>]*id="btn-orario"[^>]*>[\s\S]*?<\/button>\s*<div class="ctrl-sep"><\/div>/g, '')
+    .replace(
+      "document.getElementById('btn-carta').classList.toggle('active',  which === 'carta');",
+      "var bc = document.getElementById('btn-carta');  if(bc) bc.classList.toggle('active', which==='carta');"
+    )
+    .replace(
+      "document.getElementById('btn-orario').classList.toggle('active', which === 'orario');",
+      "var bo = document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active', which==='orario');"
+    );
 
   document.getElementById('intro').style.display = 'none';
   document.getElementById('wrap').classList.add('on');
@@ -324,27 +335,12 @@ function costruisciHtmlTradotto(lang, t) {
   var m = costruisciMenuTradotto(menuForm, t);
 
   var SEP = '/* ' + '\u2550'.repeat(57) + ' */\n';
-  var START = 'const MENU = {';
-  var i1 = src.indexOf(START);
-  var i2 = src.indexOf(SEP, i1) + SEP.length;
   var newBlock = 'const MENU = ' + JSON.stringify(m, null, 2) + ';\n' + SEP;
-  var html = src.slice(0, i1) + newBlock + src.slice(i2);
+  // Usa tplBeforeLang (senza pulsanti carta/orario) + dati tradotti + tplAfter originale
+  var html = tplBeforeLang + newBlock + tplAfter;
 
   html = html.replace('<html lang="it">', '<html lang="' + lang + '">');
   html = html.replace(/<title>[^<]*<\/title>/, '<title>' + t.title + '</title>');
-
-  // Rimuovi pulsanti carta/orario — lascia solo stampa
-  html = html.replace(/(<button[^>]*id="btn-carta"[^>]*>[\s\S]*?<\/button>\s*<div class="ctrl-sep"><\/div>\s*<button[^>]*id="btn-orario"[^>]*>[\s\S]*?<\/button>\s*<div class="ctrl-sep"><\/div>)/g, '');
-
-  // Fix showLayout per non cercare btn-carta/btn-orario inesistenti
-  html = html.replace(
-    "document.getElementById('btn-carta').classList.toggle('active',  which === 'carta');",
-    "var bc = document.getElementById('btn-carta');  if(bc) bc.classList.toggle('active', which==='carta');"
-  );
-  html = html.replace(
-    "document.getElementById('btn-orario').classList.toggle('active', which === 'orario');",
-    "var bo = document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active', which==='orario');"
-  );
 
   html = html.replace(/Note per l'ospite<\/span>[^`]*`/,
     t.note_ospite_titolo + '</span>\n  ' + t.note_carta_1 + '<br>\n  ' + t.note_carta_2 + '\n`');
@@ -1270,6 +1266,6 @@ function toast(msg) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.11.2</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.11.3</div>
 </body>
 </html>

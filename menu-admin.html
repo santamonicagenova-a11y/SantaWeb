@@ -333,6 +333,11 @@ function costruisciHtmlTradotto(lang, t) {
   var BTNS = "  <button class=\"ctrl-btn active\" id=\"btn-carta\" onclick=\"showLayout('carta')\">\u261e Men\u00f9 alla carta (3 pag.)</button>\n  <div class=\"ctrl-sep\"></div>\n  <button class=\"ctrl-btn\" id=\"btn-orario\" onclick=\"showLayout('orario')\">\u261e Foglio orario (1 pag.)</button>\n  <div class=\"ctrl-sep\"></div>\n";
   html = html.replace(BTNS, '');
 
+  // Fix getSez per robustezza
+  html = html.replace(
+    'return MENU.sezioni.find(s => s.titolo === titolo);',
+    'var f=MENU.sezioni.find(s=>s.titolo===titolo); if(!f){var ix=["Crudi","Sfiziosi","Amidi e Carboidrati","Non Solo Mare"].indexOf(titolo); if(ix>=0&&MENU.sezioni[ix]) f=MENU.sezioni[ix];} return f;'
+  );
   // Fix showLayout
   html = html.replace("  document.getElementById('btn-carta').classList.toggle('active',  which === 'carta');\n  document.getElementById('btn-orario').classList.toggle('active', which === 'orario');", "  var bc=document.getElementById('btn-carta'); if(bc) bc.classList.toggle('active',which==='carta');\n  var bo=document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active',which==='orario');");
 

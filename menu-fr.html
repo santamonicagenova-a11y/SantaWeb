@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.09.1 -->
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -382,10 +381,6 @@
 
 <!-- ── BARRA CONTROLLI ── -->
 <div class="ctrl-bar">
-  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout('carta')">☞ Menù alla carta (3 pag.)</button>
-  <div class="ctrl-sep"></div>
-  <button class="ctrl-btn" id="btn-orario" onclick="showLayout('orario')">☞ Foglio orario (1 pag.)</button>
-  <div class="ctrl-sep"></div>
   <button class="ctrl-btn" onclick="window.print()">✦ Stampa / Salva PDF</button>
 </div>
 
@@ -414,26 +409,26 @@ const MENU = {
     "percorsi": {
       "6": [
         {
-          "nome": "Ailes de raie, fèves locales, pomme verte, amandes",
+          "nome": "Aile de raie, fèves locales, pomme verte, amandes",
           "sostenibile": true
         },
         {
-          "nome": "Ris de veau, céleri-rave, noisettes, bouillon de poisson",
+          "nome": "Ris de veau, céleri-rave, noisettes, fond de poisson",
           "sostenibile": true
         },
         {
-          "nome": "Tortelli de sanglier, dashi de daurade, ciboule, shiso"
+          "nome": "Tortelli de sanglier, dashi de dorade, ciboule, shiso"
         },
         {
-          "nome": "Tubes « <em>Mancini</em> », morue, kosho aux agrumes, haricots borlotti",
+          "nome": "Tubetti “<em>Mancini</em>”, morue, kosho d’agrumes, haricots borlotti",
           "sostenibile": true
         },
         {
-          "nome": "Courbine locale capturée à l'hameçon, salicorne, endive belge",
+          "nome": "Ombrine locale à la ligne, salicorne, endive belge",
           "sostenibile": true
         },
         {
-          "nome": "Glace au citron noir, livèche, citron vert, crackers au lait"
+          "nome": "Glace au citron noir, livèche, citron vert, cracker au lait"
         }
       ],
       "7": "Menu carte blanche du Chef"
@@ -444,17 +439,17 @@ const MENU = {
       "titolo": "Crudi",
       "piatti": [
         {
-          "nome": "Huîtres fines de Claire",
+          "nome": "Huîtres Fine de Claire",
           "prezzo": 4,
           "unita": "p."
         },
         {
-          "nome": "Huîtres antilopes",
+          "nome": "Huîtres Antilope",
           "prezzo": 7,
           "unita": "p."
         },
         {
-          "nome": "Huîtres Henri IV",
+          "nome": "Huîtres Enrico IV",
           "prezzo": 8,
           "unita": "p."
         },
@@ -465,19 +460,19 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Crevettes violettes cultivées sur place",
+          "nome": "Crevettes violettes locales",
           "prezzo": 11,
           "unita": "p.",
           "sostenibile": true
         },
         {
-          "nome": "Sélection uniquement de poissons locaux pêchés à l'hameçon",
+          "nome": "Sélection exclusivement de poissons locaux pêchés à la ligne",
           "prezzo": 37,
           "sostenibile": true,
           "staccato": true
         },
         {
-          "nome": "Dégustation de fruits de mer",
+          "nome": "Dégustation de la mer",
           "prezzo": 80,
           "sostenibile": true,
           "staccato": true
@@ -486,80 +481,79 @@ const MENU = {
       "titolo_display": "Crus"
     },
     {
-      "titolo": "antipasti",
+      "titolo": "Sfiziosi",
       "piatti": [
         {
-          "nome": "Calamars locaux, petits pois frais, bagna cauda légère, kéfir",
+          "nome": "Calamar local, petits pois frais, bagna cauda légère, kéfir",
           "prezzo": 20,
           "sostenibile": true
         },
         {
-          "nome": "Crevettes violettes crues façon puttanesca",
-          "prezzo": 25,
-          "sostenibile": true
+          "nome": "Chou pommé, miso, framboises, noix de cajou",
+          "prezzo": 16
         },
         {
-          "nome": "Ris de veau, céleri-rave, noisettes, réduction de bouillon de poisson",
+          "nome": "Ris de veau, céleri-rave, noisettes, réduction de fond de poisson",
           "prezzo": 22,
           "sostenibile": true
         },
         {
-          "nome": "Ailes de raie, fèves locales, pomme verte, amandes",
+          "nome": "Aile de raie, fèves locales, pomme verte, amandes",
           "prezzo": 24,
           "sostenibile": true
         },
         {
-          "nome": "\"Pas de fromage\"",
+          "nome": "“Non-fromages”",
           "prezzo": 22,
-          "descrizione": "(Dégustation de faux fromages artisanaux à base de noix de cajou et de lait d'amande)"
+          "descrizione": "(Dégustation de faux fromages artisanaux à base de noix de cajou et lait d’amande)"
         }
       ],
-      "titolo_display": "apéritifs"
+      "titolo_display": "Entrées"
     },
     {
-      "titolo": "Amidi e carboidrati",
+      "titolo": "Amidi e Carboidrati",
       "piatti": [
         {
-          "nome": "Spaghettis carrés « <em>Mancini</em> », anémones de mer, nduja, marjolaine",
+          "nome": "Spaghettoni carrés “<em>Mancini</em>”, anémones de mer, nduja, marjolaine",
           "prezzo": 32,
           "sostenibile": true
         },
         {
-          "nome": "Tortelli de sanglier, dashi de daurade, ciboule, shiso",
+          "nome": "Tortelli de sanglier, dashi de dorade, ciboule, shiso",
           "prezzo": 26,
           "sostenibile": true
         },
         {
-          "nome": "Tubes « <em>Mancini</em> », morue, notre kosho aux agrumes fermentés, borlotti",
+          "nome": "Tubetti “<em>Mancini</em>”, morue, notre kosho d’agrumes fermenté, borlotti",
           "prezzo": 24,
           "sostenibile": true
         },
         {
-          "nome": "Riz « <em>Riserva San Massimo</em> », ragoût de lièvre, fanes de navet, Parmigiano Reggiano",
+          "nome": "Riz “<em>Riserva San Massimo</em>”, ragû de lièvre, fanes de navet, Parmigiano Reggiano",
           "prezzo": 26
         }
       ],
-      "titolo_display": "Amidons et glucides"
+      "titolo_display": "Pâtes & Céréales"
     },
     {
       "titolo": "Non Solo Mare",
       "piatti": [
         {
-          "nome": "Sériole locale, rhubarbe, petits pois",
-          "prezzo": 32,
+          "nome": "Poulpe local, rhubarbe, petits pois",
+          "prezzo": 28,
           "sostenibile": true
         },
         {
-          "nome": "Courgette Scapece, menthe, yaourt, poivre Timut",
+          "nome": "Courgette en escabèche, menthe, yaourt, poivre Timut",
           "prezzo": 18
         },
         {
-          "nome": "Courbine locale capturée à l'hameçon, salicorne, endive belge",
+          "nome": "Ombrine locale à la ligne, salicorne, endive belge",
           "prezzo": 32,
           "sostenibile": true
         },
         {
-          "nome": "Agneau, petits pois, rhubarbe",
+          "nome": "Picanha, pleurotes du panicaut, jus de bœuf",
           "prezzo": 28
         }
       ],
@@ -622,10 +616,18 @@ const NOTE_CARTA = `
   La liste des allergènes est consultable à la dernière page de ce menu.
 `;
 
-const NOTE_ORARIO = `Pour maintenir constants le niveau qualitatif et les caractéristiques organoleptiques, les produits frais sont surgelés à basse température. Ces produits sont signalés par le symbole : *`;
+const NOTE_ORARIO = `Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche
+delle materie prime i prodotti acquistati freschi vengono abbattuti e congelati.
+Pour maintenir constants le niveau qualitatif et les caractéristiques organoleptiques, les produits frais sont surgelés à basse température. Ces produits sont signalés par le symbole : *`;
 
 function getSez(titolo) {
-  return MENU.sezioni.find(s => s.titolo === titolo);
+  var found = MENU.sezioni.find(s => s.titolo === titolo);
+  if (!found) {
+    // Fallback: cerca per titolo_display o per indice
+    var idx = ['Crudi','Sfiziosi','Amidi e Carboidrati','Non Solo Mare'].indexOf(titolo);
+    if (idx >= 0 && MENU.sezioni[idx]) found = MENU.sezioni[idx];
+  }
+  return found;
 }
 
 function buildPiatto(p) {
@@ -677,7 +679,7 @@ function buildDegu(degu) {
     <div class="degu">
       <div class="degu-titolo">Menu Dégustation</div>
       <div class="degu-prezzi">${optsHtml}</div>
-      <div class="degu-nota">${degu.nota.replace("l'intero tavolo", "<strong>l\u2019intero tavolo</strong>")}</div>
+      <div class="degu-nota">${degu.nota.replace("toute la table", "<strong>toute la table</strong>")}</div>
       ${percorsiHtml}
     </div>`;
 }
@@ -793,8 +795,8 @@ function renderOrario() {
 function showLayout(which) {
   document.getElementById('layout-carta').style.display  = which === 'carta'  ? 'block' : 'none';
   document.getElementById('layout-orario').style.display = which === 'orario' ? 'block' : 'none';
-  document.getElementById('btn-carta').classList.toggle('active',  which === 'carta');
-  document.getElementById('btn-orario').classList.toggle('active', which === 'orario');
+  var bc=document.getElementById('btn-carta'); if(bc) bc.classList.toggle('active',which==='carta');
+  var bo=document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active',which==='orario');
 }
 
 /* ── init ── */
@@ -802,6 +804,5 @@ renderCarta();
 renderOrario();
 showLayout('carta');
 </script>
-<div style="text-align:center;padding:4px 0 8px;font-size:.55rem;color:rgba(245,240,232,0.35);letter-spacing:.1em;">v 2026.04.09.1</div>
 </body>
 </html>

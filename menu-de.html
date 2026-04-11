@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.09.1 -->
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
@@ -382,10 +381,6 @@
 
 <!-- ── BARRA CONTROLLI ── -->
 <div class="ctrl-bar">
-  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout('carta')">☞ Menù alla carta (3 pag.)</button>
-  <div class="ctrl-sep"></div>
-  <button class="ctrl-btn" id="btn-orario" onclick="showLayout('orario')">☞ Foglio orario (1 pag.)</button>
-  <div class="ctrl-sep"></div>
   <button class="ctrl-btn" onclick="window.print()">✦ Stampa / Salva PDF</button>
 </div>
 
@@ -418,22 +413,22 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Kalbsbries, Sellerie, Haselnüsse, Fischfond",
+          "nome": "Kalbsbries, Knollensellerie, Haselnüsse, Fischfond",
           "sostenibile": true
         },
         {
-          "nome": "Wildschwein-Tortelli, Doraden-Dashi, Frühlingszwiebeln, Shiso"
+          "nome": "Wildschweintortelli, Goldbrassen-Dashi, Frühlingszwiebel, Shiso"
         },
         {
-          "nome": "„<em>Mancini</em>“-Röhren, Kabeljau, Zitrus-Kosho, Borlotti-Bohnen",
+          "nome": "Tubetti “<em>Mancini</em>”, Stockfisch, Zitruskosho, Borlottibohnen",
           "sostenibile": true
         },
         {
-          "nome": "Mit dem Haken gefangener einheimischer Krähenfisch, Queller, belgische Endivie",
+          "nome": "Lokal geangelter Umberfisch, Queller, Chicorée",
           "sostenibile": true
         },
         {
-          "nome": "Schwarzes Zitroneneis, Liebstöckel, Limette, Milchcracker"
+          "nome": "Schwarzzitronen-Eis, Liebstöckel, Limette, Milchcracker"
         }
       ],
       "7": "Menü nach freier Wahl des Küchenchefs"
@@ -444,40 +439,40 @@ const MENU = {
       "titolo": "Crudi",
       "piatti": [
         {
-          "nome": "Feine Austern von de Claire",
+          "nome": "Fine de Claire Austern",
           "prezzo": 4,
           "unita": "Stk."
         },
         {
-          "nome": "Antilopen-Austern",
+          "nome": "Antilope Austern",
           "prezzo": 7,
           "unita": "Stk."
         },
         {
-          "nome": "Austern Heinrich IV",
+          "nome": "Enrico IV Austern",
           "prezzo": 8,
           "unita": "Stk."
         },
         {
-          "nome": "Lokale Scampi",
+          "nome": "Heimische Scampi",
           "prezzo": 17,
           "unita": "Stk.",
           "sostenibile": true
         },
         {
-          "nome": "Selbstgezüchtete lila Garnelen",
+          "nome": "Heimische Violettgarnelen",
           "prezzo": 11,
           "unita": "Stk.",
           "sostenibile": true
         },
         {
-          "nome": "Auswahl ausschließlich lokaler Fische, die mit dem Haken gefangen werden",
+          "nome": "Auswahl ausschließlich heimischer Angelfische",
           "prezzo": 37,
           "sostenibile": true,
           "staccato": true
         },
         {
-          "nome": "Verkostung von Meeresfrüchten",
+          "nome": "Meeresverkostung",
           "prezzo": 80,
           "sostenibile": true,
           "staccato": true
@@ -486,20 +481,19 @@ const MENU = {
       "titolo_display": "Rohkost"
     },
     {
-      "titolo": "antipasti",
+      "titolo": "Sfiziosi",
       "piatti": [
         {
-          "nome": "Lokaler Tintenfisch, frische Erbsen, leichte Bagna Cauda, ​​​​Kefir",
+          "nome": "Heimischer Tintenfisch, frische Erbsen, leichte Bagna Cauda, Kefir",
           "prezzo": 20,
           "sostenibile": true
         },
         {
-          "nome": "Rohe lila Garnelen nach Puttanesca-Art",
-          "prezzo": 25,
-          "sostenibile": true
+          "nome": "Weißkohl, Miso, Himbeeren, Cashewnüsse",
+          "prezzo": 16
         },
         {
-          "nome": "Kalbsbries, Sellerie, Haselnüsse, Reduzierung des Fischfonds",
+          "nome": "Kalbsbries, Knollensellerie, Haselnüsse, Fischfondreduktion",
           "prezzo": 22,
           "sostenibile": true
         },
@@ -509,57 +503,57 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "„Kein Käse“",
+          "nome": "“Kein Käse”",
           "prezzo": 22,
-          "descrizione": "(Verkostung von Kunstkäse aus Cashewnüssen und Mandelmilch)"
+          "descrizione": "(Verkostung handwerklicher Pseudokäse auf Cashew- und Mandelmilchbasis)"
         }
       ],
       "titolo_display": "Vorspeisen"
     },
     {
-      "titolo": "Amidi e carboidrati",
+      "titolo": "Amidi e Carboidrati",
       "piatti": [
         {
-          "nome": "„<em>Mancini</em>“ quadratische Spaghetti, Seeanemonen, Nduja, Majoran",
+          "nome": "Quadratische Spaghettoni “<em>Mancini</em>”, Seeanemonen, Nduja, Majoran",
           "prezzo": 32,
           "sostenibile": true
         },
         {
-          "nome": "Wildschwein-Tortelli, Doraden-Dashi, Frühlingszwiebeln, Shiso",
+          "nome": "Wildschweintortelli, Goldbrassen-Dashi, Frühlingszwiebel, Shiso",
           "prezzo": 26,
           "sostenibile": true
         },
         {
-          "nome": "„<em>Mancini</em>“-Röhren, Kabeljau, unser fermentiertes Zitrus-Kosho, Borlotti",
+          "nome": "Tubetti “<em>Mancini</em>”, Stockfisch, unser fermentiertes Zitruskosho, Borlottibohnen",
           "prezzo": 24,
           "sostenibile": true
         },
         {
-          "nome": "„<em>Riserva San Massimo</em>“-Reis, Hasenragout, Rübenblätter, Parmigiano Reggiano",
+          "nome": "Reis “<em>Riserva San Massimo</em>”, Hasenragù, Steckrübenblätter, Parmigiano Reggiano",
           "prezzo": 26
         }
       ],
-      "titolo_display": "Stärken und Kohlenhydrate"
+      "titolo_display": "Pasta & Getreide"
     },
     {
       "titolo": "Non Solo Mare",
       "piatti": [
         {
-          "nome": "Lokaler Amberjack, Rhabarber, Erbsen",
-          "prezzo": 32,
+          "nome": "Heimischer Oktopus, Rhabarber, Erbsen",
+          "prezzo": 28,
           "sostenibile": true
         },
         {
-          "nome": "Scapece-Zucchini, Minze, Joghurt, Timut-Pfeffer",
+          "nome": "Marinierte Zucchini, Minze, Joghurt, Timutpfeffer",
           "prezzo": 18
         },
         {
-          "nome": "Mit dem Haken gefangener einheimischer Krähenfisch, Queller, belgische Endivie",
+          "nome": "Lokal geangelter Umberfisch, Queller, Chicorée",
           "prezzo": 32,
           "sostenibile": true
         },
         {
-          "nome": "Lamm, Erbsen, Rhabarber",
+          "nome": "Picanha, Königskräuterseitlinge, Rinderjus",
           "prezzo": 28
         }
       ],
@@ -622,10 +616,18 @@ const NOTE_CARTA = `
   Die Liste der Allergene finden Sie auf der letzten Seite dieser Speisekarte.
 `;
 
-const NOTE_ORARIO = `Um die Qualität konstant zu halten, werden frische Fischprodukte schockgefrostet und mit dem Symbol * gekennzeichnet.`;
+const NOTE_ORARIO = `Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche
+delle materie prime i prodotti acquistati freschi vengono abbattuti e congelati.
+Um die Qualität konstant zu halten, werden frische Fischprodukte schockgefrostet und mit dem Symbol * gekennzeichnet.`;
 
 function getSez(titolo) {
-  return MENU.sezioni.find(s => s.titolo === titolo);
+  var found = MENU.sezioni.find(s => s.titolo === titolo);
+  if (!found) {
+    // Fallback: cerca per titolo_display o per indice
+    var idx = ['Crudi','Sfiziosi','Amidi e Carboidrati','Non Solo Mare'].indexOf(titolo);
+    if (idx >= 0 && MENU.sezioni[idx]) found = MENU.sezioni[idx];
+  }
+  return found;
 }
 
 function buildPiatto(p) {
@@ -677,7 +679,7 @@ function buildDegu(degu) {
     <div class="degu">
       <div class="degu-titolo">Degustationsmenü</div>
       <div class="degu-prezzi">${optsHtml}</div>
-      <div class="degu-nota">${degu.nota.replace("l'intero tavolo", "<strong>l\u2019intero tavolo</strong>")}</div>
+      <div class="degu-nota">${degu.nota.replace("den gesamten Tisch", "<strong>den gesamten Tisch</strong>")}</div>
       ${percorsiHtml}
     </div>`;
 }
@@ -793,8 +795,8 @@ function renderOrario() {
 function showLayout(which) {
   document.getElementById('layout-carta').style.display  = which === 'carta'  ? 'block' : 'none';
   document.getElementById('layout-orario').style.display = which === 'orario' ? 'block' : 'none';
-  document.getElementById('btn-carta').classList.toggle('active',  which === 'carta');
-  document.getElementById('btn-orario').classList.toggle('active', which === 'orario');
+  var bc=document.getElementById('btn-carta'); if(bc) bc.classList.toggle('active',which==='carta');
+  var bo=document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active',which==='orario');
 }
 
 /* ── init ── */
@@ -802,6 +804,5 @@ renderCarta();
 renderOrario();
 showLayout('carta');
 </script>
-<div style="text-align:center;padding:4px 0 8px;font-size:.55rem;color:rgba(245,240,232,0.35);letter-spacing:.1em;">v 2026.04.09.1</div>
 </body>
 </html>

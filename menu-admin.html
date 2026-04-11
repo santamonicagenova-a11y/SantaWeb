@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.11.17 -->
+<!-- versione v 2026.04.11.18 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -328,7 +328,7 @@ function costruisciHtmlTradotto(lang, t) {
   var html = src.slice(0, i1) + newBlock + src.slice(i2);
 
   // Rimuovi ctrl-bar: conta 3 </div> dal commento HTML
-  var cbStart = html.indexOf('<!-- \u2500\u2500 BARRA CONTROLLI \u2500\u2500 -->');
+  var cbStart = html.indexOf('<!-- ── BARRA CONTROLLI ── -->');
   if (cbStart >= 0) {
     var cbEnd = cbStart;
     for (var ci = 0; ci < 3; ci++) { cbEnd = html.indexOf('<' + '/div>', cbEnd) + 6; }
@@ -1289,6 +1289,6 @@ function toast(msg) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.11.17</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.11.18</div>
 </body>
 </html>

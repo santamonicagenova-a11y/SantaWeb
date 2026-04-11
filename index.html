@@ -372,7 +372,7 @@
       <p class="section-label" data-i18n="regalo_label">Un dono speciale</p>
       <h2 class="section-title" data-i18n="regalo_title">Buoni <em>regalo</em></h2>
       <p class="regalo-body" data-i18n="regalo_body">Regala un pranzo...</p>
-      <a href="mailto:santamonicagenova@gmail.com?subject=Buono Regalo Santamonica" class="btn-primary" data-i18n="regalo_btn">Richiedi un buono</a>
+      <a href="/cdn-cgi/l/email-protection#3a495b544e5b57555453595b5d5f54554c5b7a5d575b53561459555705494f58505f594e07784f5554551a685f5d5b56551a695b544e5b57555453595b" class="btn-primary" data-i18n="regalo_btn">Richiedi un buono</a>
     </div>
   </div>
 </section>
@@ -468,7 +468,7 @@
         <div class="info-block-content">
           Lungomare Lombardo 27<br>16145 Genova &mdash; Italy<br><br>
           <a href="tel:+390105533155">+39 010 553 31 55</a><br>
-          <a href="mailto:santamonicagenova@gmail.com">santamonicagenova@gmail.com</a>
+          <a href="/cdn-cgi/l/email-protection#f685979882979b99989f9597919398998097b6919b979f9ad895999b"><span class="__cf_email__" data-cfemail="5e2d3f302a3f333130373d3f393b3031283f1e39333f3732703d3133">[email&#160;protected]</span></a>
         </div>
       </div>
       <div>
@@ -558,9 +558,9 @@
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   var T = {};
-  var currentLang = localStorage.getItem('sm-lang') || 'it';
+  var currentLang = 'it';
 
   fetch('translations.json')
     .then(function(r) { return r.json(); })
@@ -662,8 +662,4 @@
   var banner = document.getElementById('cookie-banner');
   var choice = localStorage.getItem('cookie-choice');
   if (!choice) { setTimeout(function() { banner.classList.add('visible'); }, 1200); } else if (choice === 'accepted') { loadGA(); }
-  document.getElementById('cookie-accept').addEventListener('click', function() { localStorage.setItem('cookie-choice', 'accepted'); banner.classList.remove('visible'); loadGA(); });
-  document.getElementById('cookie-decline').addEventListener('click', function() { localStorage.setItem('cookie-choice', 'declined'); banner.classList.remove('visible'); });
-</script>
-</body>
-</html>
+  document.getElementById('cookie-accept'

@@ -381,10 +381,6 @@
 
 <!-- ── BARRA CONTROLLI ── -->
 <div class="ctrl-bar">
-  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout('carta')">☞ Menù alla carta (3 pag.)</button>
-  <div class="ctrl-sep"></div>
-  <button class="ctrl-btn" id="btn-orario" onclick="showLayout('orario')">☞ Foglio orario (1 pag.)</button>
-  <div class="ctrl-sep"></div>
   <button class="ctrl-btn" onclick="window.print()">✦ Stampa / Salva PDF</button>
 </div>
 
@@ -797,8 +793,8 @@ function renderOrario() {
 function showLayout(which) {
   document.getElementById('layout-carta').style.display  = which === 'carta'  ? 'block' : 'none';
   document.getElementById('layout-orario').style.display = which === 'orario' ? 'block' : 'none';
-  document.getElementById('btn-carta').classList.toggle('active',  which === 'carta');
-  document.getElementById('btn-orario').classList.toggle('active', which === 'orario');
+  var bc=document.getElementById('btn-carta'); if(bc) bc.classList.toggle('active',which==='carta');
+  var bo=document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active',which==='orario');
 }
 
 /* ── init ── */

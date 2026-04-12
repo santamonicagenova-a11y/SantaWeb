@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.12.2 -->
+<!-- versione v 2026.04.12.3 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -1210,7 +1210,23 @@ function eseguiPubblicazione(token) {
   ];
   ['en','fr','de','es'].forEach(function(lang) {
     var t = TRANSLATIONS[lang];
-    var html = costruisciHtmlTradotto(lang, t);
+    // Parti da menu-it.html (già senza pulsanti) e traduci
+    var html = costruisciMenuItPub();
+    var m = costruisciMenuTradotto(leggi(), t);
+    var SEP = '/* ' + '\u2550'.repeat(57) + ' */\n';
+    var i1 = html.indexOf('const MENU = {');
+    var i2 = html.indexOf(SEP, i1) + SEP.length;
+    html = html.slice(0, i1) + 'const MENU = ' + JSON.stringify(m, null, 2) + ';\n' + SEP + html.slice(i2);
+    html = html.replace('<html lang="it">', '<html lang="' + lang + '">');
+    html = html.replace(/<title>[^<]*<\/title>/, '<title>' + t.title + '<\/title>');
+    html = html.replace(/Note per l'ospite<\/span>[^`]*`/, t.note_ospite_titolo + '<\/span>\n  ' + t.note_carta_1 + '<br>\n  ' + t.note_carta_2 + '\n`');
+    html = html.replace(/Per mantenere costanti[\s\S]*?simbolo: \*`/, t.note_orario + '`');
+    html = html.replace('Menù’ Degustazione', t.titolo_degustazione);
+    html = html.replace('Men&ugrave;&rsquo; Degustazione', t.titolo_degustazione);
+    html = html.replace(/\${o\.portate} portate/g, '${o.portate} ' + t.degu_portate_label);
+    html = html.replace(/eventuale abbinamento vini/g, t.degu_vini_label);
+    html = html.replace('ORARIO DI SERVIZIO:', t.orario_titolo);
+    html = html.replace(/<u><em>English Menu<\/em><\/u><br>\s*<u><em>Carte en Fran[^<]*<\/em><\/u>/, t.links.join('<br>\n            '));
     files.push({ path: 'menu-' + lang + '.html', content: html, label: lang.toUpperCase() });
   });
 
@@ -1262,6 +1278,6 @@ function toast(msg) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.12.2</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.12.3</div>
 </body>
 </html>

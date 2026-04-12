@@ -379,6 +379,15 @@
 </head>
 <body>
 
+<!-- ── BARRA CONTROLLI ── -->
+<div class="ctrl-bar">
+  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout('carta')">☞ Menù alla carta (3 pag.)</button>
+  <div class="ctrl-sep"></div>
+  <button class="ctrl-btn" id="btn-orario" onclick="showLayout('orario')">☞ Foglio orario (1 pag.)</button>
+  <div class="ctrl-sep"></div>
+  <button class="ctrl-btn" onclick="window.print()">✦ Stampa / Salva PDF</button>
+</div>
+
 <div id="layout-carta"></div>
 <div id="layout-orario"></div>
 
@@ -408,22 +417,22 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Kalbsbries, Knollensellerie, Haselnüsse, Fischfond",
+          "nome": "Kalbsbries, Sellerie, Haselnüsse, Fischfond",
           "sostenibile": true
         },
         {
-          "nome": "Wildschweintortelli, Goldbrassen-Dashi, Frühlingszwiebel, Shiso"
+          "nome": "Wildschwein-Tortelli, Doraden-Dashi, Frühlingszwiebeln, Shiso"
         },
         {
-          "nome": "Tubetti “<em>Mancini</em>”, Stockfisch, Zitruskosho, Borlottibohnen",
+          "nome": "„<em>Mancini</em>“-Röhren, Kabeljau, Zitrus-Kosho, Borlotti-Bohnen",
           "sostenibile": true
         },
         {
-          "nome": "Lokal geangelter Umberfisch, Queller, Chicorée",
+          "nome": "Mit dem Haken gefangener einheimischer Krähenfisch, Queller, belgische Endivie",
           "sostenibile": true
         },
         {
-          "nome": "Schwarzzitronen-Eis, Liebstöckel, Limette, Milchcracker"
+          "nome": "Schwarzes Zitroneneis, Liebstöckel, Limette, Milchcracker"
         }
       ],
       "7": "Menü nach freier Wahl des Küchenchefs"
@@ -434,40 +443,40 @@ const MENU = {
       "titolo": "Crudi",
       "piatti": [
         {
-          "nome": "Fine de Claire Austern",
+          "nome": "Feine Austern von de Claire",
           "prezzo": 4,
           "unita": "Stk."
         },
         {
-          "nome": "Antilope Austern",
+          "nome": "Antilopen-Austern",
           "prezzo": 7,
           "unita": "Stk."
         },
         {
-          "nome": "Enrico IV Austern",
+          "nome": "Austern Heinrich IV",
           "prezzo": 8,
           "unita": "Stk."
         },
         {
-          "nome": "Heimische Scampi",
+          "nome": "Lokale Scampi",
           "prezzo": 17,
           "unita": "Stk.",
           "sostenibile": true
         },
         {
-          "nome": "Heimische Violettgarnelen",
+          "nome": "Selbstgezüchtete lila Garnelen",
           "prezzo": 11,
           "unita": "Stk.",
           "sostenibile": true
         },
         {
-          "nome": "Auswahl ausschließlich heimischer Angelfische",
+          "nome": "Auswahl ausschließlich lokaler Fische, die mit dem Haken gefangen werden",
           "prezzo": 37,
           "sostenibile": true,
           "staccato": true
         },
         {
-          "nome": "Meeresverkostung",
+          "nome": "Verkostung von Meeresfrüchten",
           "prezzo": 80,
           "sostenibile": true,
           "staccato": true
@@ -479,16 +488,16 @@ const MENU = {
       "titolo": "Sfiziosi",
       "piatti": [
         {
-          "nome": "Heimischer Tintenfisch, frische Erbsen, leichte Bagna Cauda, Kefir",
+          "nome": "Lokaler Tintenfisch, frische Erbsen, leichte Bagna Cauda, ​​​​Kefir",
           "prezzo": 20,
           "sostenibile": true
         },
         {
-          "nome": "Weißkohl, Miso, Himbeeren, Cashewnüsse",
+          "nome": "Kohl, Miso, Himbeeren, Cashewnüsse",
           "prezzo": 16
         },
         {
-          "nome": "Kalbsbries, Knollensellerie, Haselnüsse, Fischfondreduktion",
+          "nome": "Kalbsbries, Sellerie, Haselnüsse, Reduzierung des Fischfonds",
           "prezzo": 22,
           "sostenibile": true
         },
@@ -498,9 +507,9 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "“Kein Käse”",
+          "nome": "„Kein Käse“",
           "prezzo": 22,
-          "descrizione": "(Verkostung handwerklicher Pseudokäse auf Cashew- und Mandelmilchbasis)"
+          "descrizione": "(Verkostung von Kunstkäse aus Cashewnüssen und Mandelmilch)"
         }
       ],
       "titolo_display": "Vorspeisen"
@@ -509,22 +518,22 @@ const MENU = {
       "titolo": "Amidi e Carboidrati",
       "piatti": [
         {
-          "nome": "Quadratische Spaghettoni “<em>Mancini</em>”, Seeanemonen, Nduja, Majoran",
+          "nome": "„<em>Mancini</em>“ quadratische Spaghetti, Seeanemonen, Nduja, Majoran",
           "prezzo": 32,
           "sostenibile": true
         },
         {
-          "nome": "Wildschweintortelli, Goldbrassen-Dashi, Frühlingszwiebel, Shiso",
+          "nome": "Wildschwein-Tortelli, Doraden-Dashi, Frühlingszwiebeln, Shiso",
           "prezzo": 26,
           "sostenibile": true
         },
         {
-          "nome": "Tubetti “<em>Mancini</em>”, Stockfisch, unser fermentiertes Zitruskosho, Borlottibohnen",
+          "nome": "„<em>Mancini</em>“-Röhren, Kabeljau, unser fermentiertes Zitrus-Kosho, Borlotti",
           "prezzo": 24,
           "sostenibile": true
         },
         {
-          "nome": "Reis “<em>Riserva San Massimo</em>”, Hasenragù, Steckrübenblätter, Parmigiano Reggiano",
+          "nome": "„<em>Riserva San Massimo</em>“-Reis, Hasenragout, Rübenblätter, Parmigiano Reggiano",
           "prezzo": 26
         }
       ],
@@ -534,21 +543,21 @@ const MENU = {
       "titolo": "Non Solo Mare",
       "piatti": [
         {
-          "nome": "Heimischer Oktopus, Rhabarber, Erbsen",
+          "nome": "Lokaler Oktopus, Rhabarber, Erbsen",
           "prezzo": 28,
           "sostenibile": true
         },
         {
-          "nome": "Marinierte Zucchini, Minze, Joghurt, Timutpfeffer",
+          "nome": "Scapece-Zucchini, Minze, Joghurt, Timut-Pfeffer",
           "prezzo": 18
         },
         {
-          "nome": "Lokal geangelter Umberfisch, Queller, Chicorée",
+          "nome": "Mit dem Haken gefangener einheimischer Krähenfisch, Queller, belgische Endivie",
           "prezzo": 32,
           "sostenibile": true
         },
         {
-          "nome": "Picanha, Königskräuterseitlinge, Rinderjus",
+          "nome": "Picanha, Cardoncelli, Rinderbrühe",
           "prezzo": 28
         }
       ],
@@ -611,9 +620,7 @@ const NOTE_CARTA = `
   Die Liste der Allergene finden Sie auf der letzten Seite dieser Speisekarte.
 `;
 
-const NOTE_ORARIO = `Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche
-delle materie prime i prodotti acquistati freschi vengono abbattuti e congelati.
-Um die Qualität konstant zu halten, werden frische Fischprodukte schockgefrostet und mit dem Symbol * gekennzeichnet.`;
+const NOTE_ORARIO = `Um die Qualität konstant zu halten, werden frische Fischprodukte schockgefrostet und mit dem Symbol * gekennzeichnet.`;
 
 function getSez(titolo) {
   var found = MENU.sezioni.find(s => s.titolo === titolo);
@@ -674,7 +681,7 @@ function buildDegu(degu) {
     <div class="degu">
       <div class="degu-titolo">Degustationsmenü</div>
       <div class="degu-prezzi">${optsHtml}</div>
-      <div class="degu-nota">${degu.nota.replace("den gesamten Tisch", "<strong>den gesamten Tisch</strong>")}</div>
+      <div class="degu-nota">${degu.nota.replace("l'intero tavolo", "<strong>l\u2019intero tavolo</strong>")}</div>
       ${percorsiHtml}
     </div>`;
 }
@@ -790,8 +797,8 @@ function renderOrario() {
 function showLayout(which) {
   document.getElementById('layout-carta').style.display  = which === 'carta'  ? 'block' : 'none';
   document.getElementById('layout-orario').style.display = which === 'orario' ? 'block' : 'none';
-  var bc=document.getElementById('btn-carta'); if(bc) bc.classList.toggle('active',which==='carta');
-  var bo=document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active',which==='orario');
+  document.getElementById('btn-carta').classList.toggle('active',  which === 'carta');
+  document.getElementById('btn-orario').classList.toggle('active', which === 'orario');
 }
 
 /* ── init ── */

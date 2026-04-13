@@ -1,5 +1,4 @@
 // Template HTML per generazione menu in lingua
-// Aggiornato automaticamente da menu-admin
 
 function costruisciHtmlTradotto(lang, t) {
   var menuForm = leggi();
@@ -34,4 +33,423 @@ function costruisciHtmlTradotto(lang, t) {
   );
   return html;
 }
+
+
+var tplBefore = '', tplAfter = '', dati = null, datiOriginali = null;
+
+function carica(input) {
+  var f = input.files[0];
+  if (!f) return;
+  var r = new FileReader();
+  r.onload = function(e) {
+    try { analizza(e.target.result); }
+    catch(ex) { document.getElementById('err').textContent = 'Errore: ' + ex.message; }
+  };
+  r.readAsText(f, 'utf-8');
+}
+
+function analizza(src) {
+  var START = 'const MENU = {';
+  var END   = '/* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */';
+  var i1 = src.indexOf(START);
+  if (i1 < 0) throw new Error('Blocco MENU non trovato — hai caricato il file giusto?');
+  var i2 = src.indexOf(END, i1);
+  if (i2 < 0) throw new Error('Fine blocco MENU non trovata.');
+  var i2end = src.indexOf('\n', i2) + 1;
+
+  var js = src.slice(i1, i2).trim(); // "const MENU = { ... };"
+  dati = Function('"use strict";' + js + ';return MENU;')();
+  datiOriginali = JSON.parse(JSON.stringify(dati)); // copia immutabile
+
+  tplBefore = src.slice(0, i1);
+  tplAfter  = src.slice(i2end);
+
+
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('wrap').classList.add('on');
+  costruisci();
+  
+}
+
+function el(tag, cls, txt) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (txt !== undefined) e.textContent = txt;
+  return e;
+}
+function inp(type, id, val, ph) {
+  var e = document.createElement('input');
+  e.type = type; e.id = id;
+  if (val !== undefined && val !== null) e.value = val;
+  if (ph) e.placeholder = ph;
+  return e;
+}
+function chk(id, v) {
+  var e = document.createElement('input');
+  e.type = 'checkbox'; e.id = id; e.checked = !!v;
+  e.style.cssText = 'display:block;margin:auto';
+  return e;
+}
+
+function costruisci() {
+  var wrap = document.getElementById('wrap');
+  wrap.innerHTML = '';
+  var m = dati;
+
+  /* --- DEGUSTAZIONE --- */
+  var fsd = el('div','fs');
+  fsd.appendChild(el('div','fs-head','Menù Degustazione'));
+  var bd = el('div','fs-body');
+
+  bd.appendChild(el('div','sub','Opzioni prezzo'));
+  m.degustazione.opzioni.forEach(function(o, i) {
+    var row = el('div','opt-row');
+    var c1 = el('div'); c1.appendChild(el('span','opt-lbl','Portate')); c1.appendChild(inp('number','op-portate-'+i, o.portate)); row.appendChild(c1);
+    var c2 = el('div'); c2.appendChild(el('span','opt-lbl','Prezzo €')); c2.appendChild(inp('number','op-prezzo-'+i, o.prezzo)); row.appendChild(c2);
+    var c3 = el('div'); c3.appendChild(el('span','opt-lbl','Vini €')); c3.appendChild(inp('number','op-vini-'+i, o.vini)); row.appendChild(c3);
+    bd.appendChild(row);
+  });
+
+  var s6 = el('div','sub'); s6.innerHTML = 'Percorso \u201c6\u201d \u00a0<span style="color:var(--rust);font-size:.6rem">\u2611 = sostenibile *</span>';
+  bd.appendChild(s6);
+  var h6 = el('div'); h6.style.cssText = 'display:grid;grid-template-columns:1fr 30px;gap:.4rem;padding:.3rem 0;border-bottom:1px solid var(--rule);margin-bottom:.3rem';
+  h6.appendChild(el('div','col-lbl','Nome piatto')); h6.appendChild(el('div','col-lbl','*'));
+  bd.appendChild(h6);
+  m.degustazione.percorsi['6'].forEach(function(p, i) {
+    var row = el('div','degu-row');
+    row.appendChild(inp('text','d6p-'+i, p.nome));
+    row.appendChild(chk('d6s-'+i, p.sostenibile));
+    bd.appendChild(row);
+  });
+
+  bd.appendChild(el('div','sub','Percorso \u201c7\u201d'));
+  var i7 = inp('text','degu7', m.degustazione.percorsi['7']);
+  i7.style.width = '100%'; bd.appendChild(i7);
+
+  fsd.appendChild(bd); wrap.appendChild(fsd);
+
+  /* --- SEZIONI --- */
+  m.sezioni.forEach(function(sez, si) {
+    var fs = el('div','fs');
+    // Header con titolo editabile
+    var head = el('div','fs-head', sez.titolo);
+    fs.appendChild(head);
+    var body = el('div','fs-body');
+
+    var hdr = el('div','grid-hdr');
+    ['Nome piatto','Prezzo €','Unità','Descrizione','*'].forEach(function(t){ hdr.appendChild(el('div','col-lbl',t)); });
+    body.appendChild(hdr);
+
+    sez.piatti.forEach(function(p, pi) {
+      var row = el('div','grid-row');
+      row.appendChild(inp('text',   's'+si+'p'+pi+'-nome',   p.nome));
+      row.appendChild(inp('number', 's'+si+'p'+pi+'-prezzo', p.prezzo));
+      row.appendChild(inp('text',   's'+si+'p'+pi+'-unita',  p.unita||'', 'cad.'));
+      row.appendChild(inp('text',   's'+si+'p'+pi+'-desc',   p.descrizione||''));
+      row.appendChild(chk('s'+si+'p'+pi+'-eco', p.sostenibile));
+      body.appendChild(row);
+    });
+
+    fs.appendChild(body); wrap.appendChild(fs);
+  });
+}
+
+function leggi() {
+  var m = JSON.parse(JSON.stringify(dati));
+
+  m.degustazione.opzioni.forEach(function(o, i) {
+    o.portate = +document.getElementById('op-portate-'+i).value;
+    o.prezzo  = +document.getElementById('op-prezzo-'+i).value;
+    o.vini    = +document.getElementById('op-vini-'+i).value;
+  });
+  m.degustazione.percorsi['6'].forEach(function(p, i) {
+    p.nome = document.getElementById('d6p-'+i).value;
+    var eco = document.getElementById('d6s-'+i).checked;
+    if (eco) p.sostenibile = true; else delete p.sostenibile;
+  });
+  m.degustazione.percorsi['7'] = document.getElementById('degu7').value;
+
+  m.sezioni.forEach(function(sez, si) {
+    // NON sovrascrivere sez.titolo — è la chiave usata da getSez e pagine
+    // Il titolo editabile nel form è solo display
+    sez.piatti.forEach(function(p, pi) {
+      p.nome = document.getElementById('s'+si+'p'+pi+'-nome').value;
+      var pr = document.getElementById('s'+si+'p'+pi+'-prezzo').value;
+      p.prezzo = pr !== '' ? +pr : null;
+      var u = document.getElementById('s'+si+'p'+pi+'-unita').value.trim();
+      if (u) p.unita = u; else delete p.unita;
+      var d = document.getElementById('s'+si+'p'+pi+'-desc').value.trim();
+      if (d) p.descrizione = d; else delete p.descrizione;
+      var eco = document.getElementById('s'+si+'p'+pi+'-eco').checked;
+      if (eco) p.sostenibile = true; else delete p.sostenibile;
+    });
+  });
+  return m;
+}
+
+var MENU_URL = 'https://santamonicagenova-a11y.github.io/SantaWeb/menu.html';
+var REPO_OWNER = 'santamonicagenova-a11y';
+var REPO_NAME  = 'SantaWeb';
+var MENU_PATH  = 'menu.html';
+var outputCorrente = '';
+
+function costruisciOutput() {
+  var m = leggi();
+  var sep = '/* ' + '\u2550'.repeat(57) + ' */\n';
+  var blocco = 'const MENU = ' + JSON.stringify(m, null, 2) + ';\n' + sep;
+  return tplBefore + blocco + tplAfter;
+}
+
+function salva() { apriPreview(); }
+
+function togglePreviewMenu(e) {
+  e.stopPropagation();
+  document.getElementById('preview-menu').classList.toggle('open');
+}
+document.addEventListener('click', function() {
+  var m = document.getElementById('preview-menu');
+  if (m) m.classList.remove('open');
+});
+
+
+function costruisciMenuTradotto(menuForm, t) {
+  var orig = dati;
+  var m = JSON.parse(JSON.stringify(menuForm));
+  var piatti = t.piatti;
+
+  // Usa sempre il nome nel form come chiave — Traduci ha già aggiornato il dizionario
+  function tr(n) { return piatti[n] || n; }
+
+  m.degustazione.nota = t.degu_nota;
+  m.degustazione.percorsi['7'] = t.percorso_7;
+  m.degustazione.percorsi['6'].forEach(function(p) {
+    if (p) p.nome = tr(p.nome);
+  });
+
+  m.sezioni.forEach(function(sez, si) {
+    var origSez = dati.sezioni[si];
+    if (!origSez) return;
+    sez.titolo_display = t.sezioni[sez.titolo] || t.sezioni[origSez.titolo] || t.piatti[sez.titolo] || sez.titolo;
+    sez.piatti.forEach(function(p) {
+      if (!p) return;
+      p.nome = tr(p.nome);
+      if (p.unita) p.unita = t.unita[p.unita] || p.unita;
+      if (p.descrizione) p.descrizione = tr(p.descrizione);
+    });
+  });
+
+  m.orario.orarioServizio.forEach(function(o) {
+    o.giorno = t.orario[o.giorno] || o.giorno;
+  });
+  return m;
+}
+var tplBefore = '', tplAfter = '', dati = null, datiOriginali = null;
+
+function carica(input) {
+  var f = input.files[0];
+  if (!f) return;
+  var r = new FileReader();
+  r.onload = function(e) {
+    try { analizza(e.target.result); }
+    catch(ex) { document.getElementById('err').textContent = 'Errore: ' + ex.message; }
+  };
+  r.readAsText(f, 'utf-8');
+}
+
+function analizza(src) {
+  var START = 'const MENU = {';
+  var END   = '/* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */';
+  var i1 = src.indexOf(START);
+  if (i1 < 0) throw new Error('Blocco MENU non trovato — hai caricato il file giusto?');
+  var i2 = src.indexOf(END, i1);
+  if (i2 < 0) throw new Error('Fine blocco MENU non trovata.');
+  var i2end = src.indexOf('\n', i2) + 1;
+
+  var js = src.slice(i1, i2).trim(); // "const MENU = { ... };"
+  dati = Function('"use strict";' + js + ';return MENU;')();
+  datiOriginali = JSON.parse(JSON.stringify(dati)); // copia immutabile
+
+  tplBefore = src.slice(0, i1);
+  tplAfter  = src.slice(i2end);
+
+
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('wrap').classList.add('on');
+  costruisci();
+  
+}
+
+function el(tag, cls, txt) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (txt !== undefined) e.textContent = txt;
+  return e;
+}
+function inp(type, id, val, ph) {
+  var e = document.createElement('input');
+  e.type = type; e.id = id;
+  if (val !== undefined && val !== null) e.value = val;
+  if (ph) e.placeholder = ph;
+  return e;
+}
+function chk(id, v) {
+  var e = document.createElement('input');
+  e.type = 'checkbox'; e.id = id; e.checked = !!v;
+  e.style.cssText = 'display:block;margin:auto';
+  return e;
+}
+
+function costruisci() {
+  var wrap = document.getElementById('wrap');
+  wrap.innerHTML = '';
+  var m = dati;
+
+  /* --- DEGUSTAZIONE --- */
+  var fsd = el('div','fs');
+  fsd.appendChild(el('div','fs-head','Menù Degustazione'));
+  var bd = el('div','fs-body');
+
+  bd.appendChild(el('div','sub','Opzioni prezzo'));
+  m.degustazione.opzioni.forEach(function(o, i) {
+    var row = el('div','opt-row');
+    var c1 = el('div'); c1.appendChild(el('span','opt-lbl','Portate')); c1.appendChild(inp('number','op-portate-'+i, o.portate)); row.appendChild(c1);
+    var c2 = el('div'); c2.appendChild(el('span','opt-lbl','Prezzo €')); c2.appendChild(inp('number','op-prezzo-'+i, o.prezzo)); row.appendChild(c2);
+    var c3 = el('div'); c3.appendChild(el('span','opt-lbl','Vini €')); c3.appendChild(inp('number','op-vini-'+i, o.vini)); row.appendChild(c3);
+    bd.appendChild(row);
+  });
+
+  var s6 = el('div','sub'); s6.innerHTML = 'Percorso \u201c6\u201d \u00a0<span style="color:var(--rust);font-size:.6rem">\u2611 = sostenibile *</span>';
+  bd.appendChild(s6);
+  var h6 = el('div'); h6.style.cssText = 'display:grid;grid-template-columns:1fr 30px;gap:.4rem;padding:.3rem 0;border-bottom:1px solid var(--rule);margin-bottom:.3rem';
+  h6.appendChild(el('div','col-lbl','Nome piatto')); h6.appendChild(el('div','col-lbl','*'));
+  bd.appendChild(h6);
+  m.degustazione.percorsi['6'].forEach(function(p, i) {
+    var row = el('div','degu-row');
+    row.appendChild(inp('text','d6p-'+i, p.nome));
+    row.appendChild(chk('d6s-'+i, p.sostenibile));
+    bd.appendChild(row);
+  });
+
+  bd.appendChild(el('div','sub','Percorso \u201c7\u201d'));
+  var i7 = inp('text','degu7', m.degustazione.percorsi['7']);
+  i7.style.width = '100%'; bd.appendChild(i7);
+
+  fsd.appendChild(bd); wrap.appendChild(fsd);
+
+  /* --- SEZIONI --- */
+  m.sezioni.forEach(function(sez, si) {
+    var fs = el('div','fs');
+    // Header con titolo editabile
+    var head = el('div','fs-head', sez.titolo);
+    fs.appendChild(head);
+    var body = el('div','fs-body');
+
+    var hdr = el('div','grid-hdr');
+    ['Nome piatto','Prezzo €','Unità','Descrizione','*'].forEach(function(t){ hdr.appendChild(el('div','col-lbl',t)); });
+    body.appendChild(hdr);
+
+    sez.piatti.forEach(function(p, pi) {
+      var row = el('div','grid-row');
+      row.appendChild(inp('text',   's'+si+'p'+pi+'-nome',   p.nome));
+      row.appendChild(inp('number', 's'+si+'p'+pi+'-prezzo', p.prezzo));
+      row.appendChild(inp('text',   's'+si+'p'+pi+'-unita',  p.unita||'', 'cad.'));
+      row.appendChild(inp('text',   's'+si+'p'+pi+'-desc',   p.descrizione||''));
+      row.appendChild(chk('s'+si+'p'+pi+'-eco', p.sostenibile));
+      body.appendChild(row);
+    });
+
+    fs.appendChild(body); wrap.appendChild(fs);
+  });
+}
+
+function leggi() {
+  var m = JSON.parse(JSON.stringify(dati));
+
+  m.degustazione.opzioni.forEach(function(o, i) {
+    o.portate = +document.getElementById('op-portate-'+i).value;
+    o.prezzo  = +document.getElementById('op-prezzo-'+i).value;
+    o.vini    = +document.getElementById('op-vini-'+i).value;
+  });
+  m.degustazione.percorsi['6'].forEach(function(p, i) {
+    p.nome = document.getElementById('d6p-'+i).value;
+    var eco = document.getElementById('d6s-'+i).checked;
+    if (eco) p.sostenibile = true; else delete p.sostenibile;
+  });
+  m.degustazione.percorsi['7'] = document.getElementById('degu7').value;
+
+  m.sezioni.forEach(function(sez, si) {
+    // NON sovrascrivere sez.titolo — è la chiave usata da getSez e pagine
+    // Il titolo editabile nel form è solo display
+    sez.piatti.forEach(function(p, pi) {
+      p.nome = document.getElementById('s'+si+'p'+pi+'-nome').value;
+      var pr = document.getElementById('s'+si+'p'+pi+'-prezzo').value;
+      p.prezzo = pr !== '' ? +pr : null;
+      var u = document.getElementById('s'+si+'p'+pi+'-unita').value.trim();
+      if (u) p.unita = u; else delete p.unita;
+      var d = document.getElementById('s'+si+'p'+pi+'-desc').value.trim();
+      if (d) p.descrizione = d; else delete p.descrizione;
+      var eco = document.getElementById('s'+si+'p'+pi+'-eco').checked;
+      if (eco) p.sostenibile = true; else delete p.sostenibile;
+    });
+  });
+  return m;
+}
+
+var MENU_URL = 'https://santamonicagenova-a11y.github.io/SantaWeb/menu.html';
+var REPO_OWNER = 'santamonicagenova-a11y';
+var REPO_NAME  = 'SantaWeb';
+var MENU_PATH  = 'menu.html';
+var outputCorrente = '';
+
+function costruisciOutput() {
+  var m = leggi();
+  var sep = '/* ' + '\u2550'.repeat(57) + ' */\n';
+  var blocco = 'const MENU = ' + JSON.stringify(m, null, 2) + ';\n' + sep;
+  return tplBefore + blocco + tplAfter;
+}
+
+function salva() { apriPreview(); }
+
+function togglePreviewMenu(e) {
+  e.stopPropagation();
+  document.getElementById('preview-menu').classList.toggle('open');
+}
+document.addEventListener('click', function() {
+  var m = document.getElementById('preview-menu');
+  if (m) m.classList.remove('open');
+});
+
+
+function costruisciMenuTradotto(menuForm, t) {
+  var orig = dati;
+  var m = JSON.parse(JSON.stringify(menuForm));
+  var piatti = t.piatti;
+
+  // Usa sempre il nome nel form come chiave — Traduci ha già aggiornato il dizionario
+  function tr(n) { return piatti[n] || n; }
+
+  m.degustazione.nota = t.degu_nota;
+  m.degustazione.percorsi['7'] = t.percorso_7;
+  m.degustazione.percorsi['6'].forEach(function(p) {
+    if (p) p.nome = tr(p.nome);
+  });
+
+  m.sezioni.forEach(function(sez, si) {
+    var origSez = dati.sezioni[si];
+    if (!origSez) return;
+    sez.titolo_display = t.sezioni[sez.titolo] || t.sezioni[origSez.titolo] || t.piatti[sez.titolo] || sez.titolo;
+    sez.piatti.forEach(function(p) {
+      if (!p) return;
+      p.nome = tr(p.nome);
+      if (p.unita) p.unita = t.unita[p.unita] || p.unita;
+      if (p.descrizione) p.descrizione = tr(p.descrizione);
+    });
+  });
+
+  m.orario.orarioServizio.forEach(function(o) {
+    o.giorno = t.orario[o.giorno] || o.giorno;
+  });
+  return m;
+}
+
 

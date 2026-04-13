@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.12.4 -->
+<!-- versione v 2026.04.13.1 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -77,7 +77,13 @@
     <h1>Admin Menù</h1>
   </div>
   <div class="top-btns">
-    <button class="btn btn-load" onclick="caricaDalSito()">↓ Carica dal sito</button>
+    <div class="preview-wrap" id="carica-wrap">
+      <button class="btn btn-load" onclick="toggleCaricaMenu(event)">↓ Carica dal sito ▾</button>
+      <div class="preview-menu" id="carica-menu">
+        <a onclick="caricaDalSito('carta')">☞ Menù alla carta</a>
+        <a onclick="caricaDalSito('dolci')">☞ Menù dolci</a>
+      </div>
+    </div>
     <button class="btn btn-load" onclick="document.getElementById('file-input').click()">↑ Carica da file</button>
     <div class="preview-wrap">
       <button class="btn btn-save" onclick="togglePreviewMenu(event)">⧉ Preview ▾</button>
@@ -124,6 +130,6 @@
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.12.4</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.13.1</div>
 </body>
 </html>

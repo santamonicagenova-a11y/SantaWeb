@@ -216,6 +216,8 @@ function togglePreviewMenu(e) {
 document.addEventListener('click', function() {
   var m = document.getElementById('preview-menu');
   if (m) m.classList.remove('open');
+  var cm = document.getElementById('carica-menu');
+  if (cm) cm.classList.remove('open');
 });
 
 
@@ -424,6 +426,8 @@ function togglePreviewMenu(e) {
 document.addEventListener('click', function() {
   var m = document.getElementById('preview-menu');
   if (m) m.classList.remove('open');
+  var cm = document.getElementById('carica-menu');
+  if (cm) cm.classList.remove('open');
 });
 
 
@@ -480,14 +484,58 @@ function toggleCaricaMenu(e) {
   document.getElementById('carica-menu').classList.toggle('open');
 }
 
+function caricaDolciDaMemoria() {
+  // Costruisce un HTML dolci fittizio da usare come base nell'admin
+  // Legge menu-dolci.html da GitHub Pages oppure usa MENU_DOLCI_IT in memoria
+  tipoMenuCorrente = 'dolci';
+  document.getElementById('carica-menu').classList.remove('open');
+  document.getElementById('err').textContent = '';
+  // Carica menu-dolci.html da GitHub (se esiste) altrimenti usa quello in memoria
+  fetch(DOLCI_URL + '?nocache=' + Date.now(), { cache: 'no-store' })
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
+    .catch(function() {
+      // File non ancora su GitHub — usa quello generato localmente
+      return null;
+    })
+    .then(function(src) {
+      if (src) {
+        analizzaDolci(src);
+      } else {
+        // Genera HTML dolci base da MENU_DOLCI_IT
+        var END = '/* ' + '\u2550'.repeat(57) + ' */\n';
+        var block = 'const MENU = ' + JSON.stringify(MENU_DOLCI_IT, null, 2) + ';\n' + END;
+        // Prendi i template da menu.html già caricato (tplBefore/tplAfter)
+        if (!tplBefore) { alert('Carica prima il menu carta per inizializzare i template'); tipoMenuCorrente = 'carta'; return; }
+        src = tplBefore + block + tplAfter;
+        analizzaDolci(src);
+      }
+    });
+}
+
+function analizzaDolci(src) {
+  try {
+    analizza(src);
+    document.getElementById('intro').style.display = 'none';
+    document.getElementById('wrap').classList.add('on');
+    costruisci();
+    toast('✓ Menù dolci caricato');
+  } catch(ex) {
+    document.getElementById('err').textContent = 'Errore: ' + ex.message;
+  }
+}
+
 function caricaDalSito(tipo) {
   tipo = tipo || 'carta';
   tipoMenuCorrente = tipo;
   document.getElementById('carica-menu').classList.remove('open');
-  var url = tipo === 'dolci' ? DOLCI_URL : MENU_URL;
+  if (tipo === 'dolci') { caricaDolciDaMemoria(); return; }
+  var url = MENU_URL;
   var btn = document.querySelector('.btn-load');
   document.getElementById('err').textContent = '';
-  fetch(url + '?nocache=' + Date.now())
+  fetch(url + '?nocache=' + Date.now(), { cache: 'no-store' })
     .then(function(r) {
       if (!r.ok) throw new Error('Errore HTTP ' + r.status);
       return r.text();

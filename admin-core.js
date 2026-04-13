@@ -98,7 +98,8 @@ function costruisci() {
   wrap.innerHTML = '';
   var m = dati;
 
-  /* --- DEGUSTAZIONE --- */
+  /* --- DEGUSTAZIONE (solo menu carta) --- */
+  if (m.degustazione) {
   var fsd = el('div','fs');
   fsd.appendChild(el('div','fs-head','Menù Degustazione'));
   var bd = el('div','fs-body');
@@ -130,6 +131,8 @@ function costruisci() {
 
   fsd.appendChild(bd); wrap.appendChild(fsd);
 
+  } // fine degustazione
+
   /* --- SEZIONI --- */
   m.sezioni.forEach(function(sez, si) {
     var fs = el('div','fs');
@@ -159,17 +162,19 @@ function costruisci() {
 function leggi() {
   var m = JSON.parse(JSON.stringify(dati));
 
-  m.degustazione.opzioni.forEach(function(o, i) {
-    o.portate = +document.getElementById('op-portate-'+i).value;
-    o.prezzo  = +document.getElementById('op-prezzo-'+i).value;
-    o.vini    = +document.getElementById('op-vini-'+i).value;
-  });
-  m.degustazione.percorsi['6'].forEach(function(p, i) {
-    p.nome = document.getElementById('d6p-'+i).value;
-    var eco = document.getElementById('d6s-'+i).checked;
-    if (eco) p.sostenibile = true; else delete p.sostenibile;
-  });
-  m.degustazione.percorsi['7'] = document.getElementById('degu7').value;
+  if (m.degustazione) {
+    m.degustazione.opzioni.forEach(function(o, i) {
+      o.portate = +document.getElementById('op-portate-'+i).value;
+      o.prezzo  = +document.getElementById('op-prezzo-'+i).value;
+      o.vini    = +document.getElementById('op-vini-'+i).value;
+    });
+    m.degustazione.percorsi['6'].forEach(function(p, i) {
+      p.nome = document.getElementById('d6p-'+i).value;
+      var eco = document.getElementById('d6s-'+i).checked;
+      if (eco) p.sostenibile = true; else delete p.sostenibile;
+    });
+    m.degustazione.percorsi['7'] = document.getElementById('degu7').value;
+  }
 
   m.sezioni.forEach(function(sez, si) {
     // NON sovrascrivere sez.titolo — è la chiave usata da getSez e pagine
@@ -196,7 +201,7 @@ var MENU_PATH  = 'menu.html';
 var outputCorrente = '';
 var DOLCI_URL = 'https://santamonicagenova-a11y.github.io/SantaWeb/menu-dolci.html';
 var DOLCI_PATH = 'menu-dolci.html';
-var MENU_DOLCI_IT = {"sezioni": [{"titolo": "Golosità", "piatti": [{"nome": "Gelato al limone nero, levistico, lime, cracker di latte", "prezzo": 14}, {"nome": "Ananas, parfait al carbone, caramello al caffè", "prezzo": 14}, {"nome": "Gelato al porcino, fragole, terra al cioccolato", "prezzo": 14}, {"nome": "Sacripantina", "prezzo": 11}, {"nome": "Erborinato ligure e Picolit Zorzettig", "prezzo": 12}]}], "allergeni": [{"nome": "Gelato al limone nero", "allergeni": "glutine, latticini"}, {"nome": "Gelato porcino", "allergeni": "latticini, uova"}, {"nome": "Ananas", "allergeni": "uovo, glutine, latticini"}, {"nome": "Sacripantina", "allergeni": "frutta a guscio, uovo, glutine, latticini, solforosa"}, {"nome": "Erborinato e Picolit", "allergeni": "latticini, solforosa"}]};
+var MENU_DOLCI_IT = {"sezioni": [{"titolo": "Golosità", "piatti": [{"nome": "Gelato al limone nero, levistico, lime, cracker di latte", "prezzo": 14}, {"nome": "Ananas, parfait al carbone, caramello al caffè", "prezzo": 14}, {"nome": "Gelato al porcino, fragole, terra al cioccolato", "prezzo": 14}, {"nome": "Sacripantina", "prezzo": 11}, {"nome": "Erborinato ligure e Picolit Zorzettig", "prezzo": 12}]}], "allergeni": [{"nome": "Gelato al limone nero", "allergeni": "glutine, latticini"}, {"nome": "Gelato porcino", "allergeni": "latticini, uova"}, {"nome": "Ananas", "allergeni": "uovo, glutine, latticini"}, {"nome": "Sacripantina", "allergeni": "frutta a guscio, uovo, glutine, latticini, solforosa"}, {"nome": "Erborinato e Picolit", "allergeni": "latticini, solforosa"}], "pagine": [{"sezioni": ["Golosità"]}]};
 var TRADUZIONI_DOLCI = {"en": {"title": "Desserts — Santamonica", "sezione": "Sweets", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Black lemon gelato, lovage, lime, milk cracker", "Ananas, parfait al carbone, caramello al caffè": "Pineapple, charcoal parfait, coffee caramel", "Gelato al porcino, fragole, terra al cioccolato": "Porcini gelato, strawberries, chocolate soil", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Ligurian blue cheese and Picolit Zorzettig"}}, "fr": {"title": "Desserts — Santamonica", "sezione": "Gourmandises", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Glace citron noir, livèche, citron vert, cracker au lait", "Ananas, parfait al carbone, caramello al caffè": "Ananas, parfait au charbon, caramel au café", "Gelato al porcino, fragole, terra al cioccolato": "Glace aux cèpes, fraises, terre au chocolat", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Fromage persillé ligurien et Picolit Zorzettig"}}, "de": {"title": "Desserts — Santamonica", "sezione": "Desserts", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Schwarzzitroneneis, Liebstöckel, Limette, Milchcracker", "Ananas, parfait al carbone, caramello al caffè": "Ananas, Kohle-Parfait, Kaffeekaramell", "Gelato al porcino, fragole, terra al cioccolato": "Steinpilzeis, Erdbeeren, Schokoladenerde", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Ligurischer Blauschimmelkäse und Picolit Zorzettig"}}, "es": {"title": "Postres — Santamonica", "sezione": "Delicias", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Helado de limón negro, levístico, lima, cracker de leche", "Ananas, parfait al carbone, caramello al caffè": "Piña, parfait de carbón, caramelo de café", "Gelato al porcino, fragole, terra al cioccolato": "Helado de boletus, fresas, tierra de chocolate", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Queso azul ligur y Picolit Zorzettig"}}};
 var tipoMenuCorrente = 'carta';
 
@@ -426,8 +431,6 @@ function togglePreviewMenu(e) {
 document.addEventListener('click', function() {
   var m = document.getElementById('preview-menu');
   if (m) m.classList.remove('open');
-  var cm = document.getElementById('carica-menu');
-  if (cm) cm.classList.remove('open');
 });
 
 
@@ -484,55 +487,11 @@ function toggleCaricaMenu(e) {
   document.getElementById('carica-menu').classList.toggle('open');
 }
 
-function caricaDolciDaMemoria() {
-  // Costruisce un HTML dolci fittizio da usare come base nell'admin
-  // Legge menu-dolci.html da GitHub Pages oppure usa MENU_DOLCI_IT in memoria
-  tipoMenuCorrente = 'dolci';
-  document.getElementById('carica-menu').classList.remove('open');
-  document.getElementById('err').textContent = '';
-  // Carica menu-dolci.html da GitHub (se esiste) altrimenti usa quello in memoria
-  fetch(DOLCI_URL + '?nocache=' + Date.now(), { cache: 'no-store' })
-    .then(function(r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.text();
-    })
-    .catch(function() {
-      // File non ancora su GitHub — usa quello generato localmente
-      return null;
-    })
-    .then(function(src) {
-      if (src) {
-        analizzaDolci(src);
-      } else {
-        // Genera HTML dolci base da MENU_DOLCI_IT
-        var END = '/* ' + '\u2550'.repeat(57) + ' */\n';
-        var block = 'const MENU = ' + JSON.stringify(MENU_DOLCI_IT, null, 2) + ';\n' + END;
-        // Prendi i template da menu.html già caricato (tplBefore/tplAfter)
-        if (!tplBefore) { alert('Carica prima il menu carta per inizializzare i template'); tipoMenuCorrente = 'carta'; return; }
-        src = tplBefore + block + tplAfter;
-        analizzaDolci(src);
-      }
-    });
-}
-
-function analizzaDolci(src) {
-  try {
-    analizza(src);
-    document.getElementById('intro').style.display = 'none';
-    document.getElementById('wrap').classList.add('on');
-    costruisci();
-    toast('✓ Menù dolci caricato');
-  } catch(ex) {
-    document.getElementById('err').textContent = 'Errore: ' + ex.message;
-  }
-}
-
 function caricaDalSito(tipo) {
   tipo = tipo || 'carta';
   tipoMenuCorrente = tipo;
   document.getElementById('carica-menu').classList.remove('open');
-  if (tipo === 'dolci') { caricaDolciDaMemoria(); return; }
-  var url = MENU_URL;
+  var url = tipo === 'dolci' ? DOLCI_URL : MENU_URL;
   var btn = document.querySelector('.btn-load');
   document.getElementById('err').textContent = '';
   fetch(url + '?nocache=' + Date.now(), { cache: 'no-store' })

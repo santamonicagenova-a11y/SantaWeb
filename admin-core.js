@@ -191,6 +191,14 @@ function leggi() {
       if (eco) p.sostenibile = true; else delete p.sostenibile;
     });
   });
+  if (m.allergeni) {
+    m.allergeni.forEach(function(a, ai) {
+      var n = document.getElementById('all-'+ai+'-nome');
+      var al = document.getElementById('all-'+ai+'-all');
+      if (n) a.nome = n.value;
+      if (al) a.allergeni = al.value;
+    });
+  }
   return m;
 }
 
@@ -431,14 +439,22 @@ function traduci() {
 
   // Raccogli tutti i testi dal form
   var testi = [];
-  m.degustazione.percorsi['6'].forEach(function(p) { if (p.nome) testi.push(p.nome); });
+  if (m.degustazione) {
+    m.degustazione.percorsi['6'].forEach(function(p) { if (p.nome) testi.push(p.nome); });
+  }
   m.sezioni.forEach(function(sez) {
-    if (sez.titolo) testi.push(sez.titolo); // traduci anche il titolo sezione
+    if (sez.titolo) testi.push(sez.titolo);
     sez.piatti.forEach(function(p) {
       if (p.nome) testi.push(p.nome);
       if (p.descrizione) testi.push(p.descrizione);
     });
   });
+  if (m.allergeni) {
+    m.allergeni.forEach(function(a) {
+      if (a.nome) testi.push(a.nome);
+      if (a.allergeni) testi.push(a.allergeni);
+    });
+  }
   testi = testi.filter(function(v, i, a) { return v && a.indexOf(v) === i; });
 
   if (testi.length === 0) { toast('Nessun testo da tradurre'); return; }
@@ -646,7 +662,7 @@ function eseguiPubblicazione(token) {
 
 
 function costruisciMenuDolciTradotto(lang) {
-  var m = JSON.parse(JSON.stringify(MENU_DOLCI_IT));
+  var m = JSON.parse(JSON.stringify(leggi())); // usa i dati aggiornati dal form
   var t = TRADUZIONI_DOLCI[lang];
   if (!t) return null;
   for (var si = 0; si < m.sezioni.length; si++) {
@@ -655,6 +671,13 @@ function costruisciMenuDolciTradotto(lang) {
       var nome = m.sezioni[si].piatti[pi].nome;
       m.sezioni[si].piatti[pi].nome = t.piatti[nome] || nome;
     }
+  }
+  // Traduci allergeni usando il dizionario piatti (aggiornato da Traduci e Pubblica)
+  if (m.allergeni) {
+    m.allergeni.forEach(function(a) {
+      a.nome = t.piatti[a.nome] || a.nome;
+      a.allergeni = t.piatti[a.allergeni] || a.allergeni;
+    });
   }
   return m;
 }

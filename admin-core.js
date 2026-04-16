@@ -210,7 +210,7 @@ var outputCorrente = '';
 var DOLCI_URL = 'https://santamonicagenova-a11y.github.io/SantaWeb/menu-dolci.html';
 var DOLCI_PATH = 'menu-dolci.html';
 var MENU_DOLCI_IT = {"sezioni": [{"titolo": "Golosità", "piatti": [{"nome": "Gelato al limone nero, levistico, lime, cracker di latte", "prezzo": 14}, {"nome": "Ananas, parfait al carbone, caramello al caffè", "prezzo": 14}, {"nome": "Gelato al porcino, fragole, terra al cioccolato", "prezzo": 14}, {"nome": "Sacripantina", "prezzo": 11}, {"nome": "Erborinato ligure e Picolit Zorzettig", "prezzo": 12}]}], "allergeni": [{"nome": "Gelato al limone nero", "allergeni": "glutine, latticini"}, {"nome": "Gelato porcino", "allergeni": "latticini, uova"}, {"nome": "Ananas", "allergeni": "uovo, glutine, latticini"}, {"nome": "Sacripantina", "allergeni": "frutta a guscio, uovo, glutine, latticini, solforosa"}, {"nome": "Erborinato e Picolit", "allergeni": "latticini, solforosa"}], "pagine": [{"sezioni": ["Golosità"]}]};
-var TRADUZIONI_DOLCI = {"en": {"title": "Desserts — Santamonica", "sezione": "Sweets", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Black lemon gelato, lovage, lime, milk cracker", "Ananas, parfait al carbone, caramello al caffè": "Pineapple, charcoal parfait, coffee caramel", "Gelato al porcino, fragole, terra al cioccolato": "Porcini gelato, strawberries, chocolate soil", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Ligurian blue cheese and Picolit Zorzettig"}}, "fr": {"title": "Desserts — Santamonica", "sezione": "Gourmandises", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Glace citron noir, livèche, citron vert, cracker au lait", "Ananas, parfait al carbone, caramello al caffè": "Ananas, parfait au charbon, caramel au café", "Gelato al porcino, fragole, terra al cioccolato": "Glace aux cèpes, fraises, terre au chocolat", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Fromage persillé ligurien et Picolit Zorzettig"}}, "de": {"title": "Desserts — Santamonica", "sezione": "Desserts", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Schwarzzitroneneis, Liebstöckel, Limette, Milchcracker", "Ananas, parfait al carbone, caramello al caffè": "Ananas, Kohle-Parfait, Kaffeekaramell", "Gelato al porcino, fragole, terra al cioccolato": "Steinpilzeis, Erdbeeren, Schokoladenerde", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Ligurischer Blauschimmelkäse und Picolit Zorzettig"}}, "es": {"title": "Postres — Santamonica", "sezione": "Delicias", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Helado de limón negro, levístico, lima, cracker de leche", "Ananas, parfait al carbone, caramello al caffè": "Piña, parfait de carbón, caramelo de café", "Gelato al porcino, fragole, terra al cioccolato": "Helado de boletus, fresas, tierra de chocolate", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Queso azul ligur y Picolit Zorzettig"}}};
+var TRADUZIONI_DOLCI = {"en": {"title": "Desserts — Santamonica", "sezione": "Sweets", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Black lemon gelato, lovage, lime, milk cracker", "Ananas, parfait al carbone, caramello al caffè": "Pineapple, charcoal parfait, coffee caramel", "Gelato al porcino, fragole, terra al cioccolato": "Porcini gelato, strawberries, chocolate soil", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Ligurian blue cheese and Picolit Zorzettig", "glutine, latticini": "gluten, dairy", "latticini, uova": "dairy, eggs", "uovo, glutine, latticini": "egg, gluten, dairy", "frutta a guscio, uovo, glutine, latticini, solforosa": "tree nuts, egg, gluten, dairy, sulphites", "latticini, solforosa": "dairy, sulphites", "Gelato al limone nero": "Black lemon gelato", "Gelato porcino": "Porcini gelato", "Ananas": "Pineapple", "Erborinato e Picolit": "Blue cheese and Picolit"}}, "fr": {"title": "Desserts — Santamonica", "sezione": "Gourmandises", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Glace citron noir, livèche, citron vert, cracker au lait", "Ananas, parfait al carbone, caramello al caffè": "Ananas, parfait au charbon, caramel au café", "Gelato al porcino, fragole, terra al cioccolato": "Glace aux cèpes, fraises, terre au chocolat", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Fromage persillé ligurien et Picolit Zorzettig", "glutine, latticini": "gluten, produits laitiers", "latticini, uova": "produits laitiers, œufs", "uovo, glutine, latticini": "œuf, gluten, produits laitiers", "frutta a guscio, uovo, glutine, latticini, solforosa": "fruits à coque, œuf, gluten, produits laitiers, sulfites", "latticini, solforosa": "produits laitiers, sulfites", "Gelato al limone nero": "Glace citron noir", "Gelato porcino": "Glace aux cèpes", "Ananas": "Ananas", "Erborinato e Picolit": "Fromage persillé et Picolit"}}, "de": {"title": "Desserts — Santamonica", "sezione": "Desserts", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Schwarzzitroneneis, Liebstöckel, Limette, Milchcracker", "Ananas, parfait al carbone, caramello al caffè": "Ananas, Kohle-Parfait, Kaffeekaramell", "Gelato al porcino, fragole, terra al cioccolato": "Steinpilzeis, Erdbeeren, Schokoladenerde", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Ligurischer Blauschimmelkäse und Picolit Zorzettig", "glutine, latticini": "Gluten, Milchprodukte", "latticini, uova": "Milchprodukte, Eier", "uovo, glutine, latticini": "Ei, Gluten, Milchprodukte", "frutta a guscio, uovo, glutine, latticini, solforosa": "Schalenfrüchte, Ei, Gluten, Milchprodukte, Sulfite", "latticini, solforosa": "Milchprodukte, Sulfite", "Gelato al limone nero": "Schwarzzitroneneis", "Gelato porcino": "Steinpilzeis", "Ananas": "Ananas", "Erborinato e Picolit": "Blauschimmelkäse und Picolit"}}, "es": {"title": "Postres — Santamonica", "sezione": "Delicias", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Helado de limón negro, levístico, lima, cracker de leche", "Ananas, parfait al carbone, caramello al caffè": "Piña, parfait de carbón, caramelo de café", "Gelato al porcino, fragole, terra al cioccolato": "Helado de boletus, fresas, tierra de chocolate", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Queso azul ligur y Picolit Zorzettig", "glutine, latticini": "gluten, lácteos", "latticini, uova": "lácteos, huevos", "uovo, glutine, latticini": "huevo, gluten, lácteos", "frutta a guscio, uovo, glutine, latticini, solforosa": "frutos secos, huevo, gluten, lácteos, sulfitos", "latticini, solforosa": "lácteos, sulfitos", "Gelato al limone nero": "Helado de limón negro", "Gelato porcino": "Helado de boletus", "Ananas": "Piña", "Erborinato e Picolit": "Queso azul y Picolit"}}};
 var tipoMenuCorrente = 'carta';
 
 function costruisciOutput() {
@@ -518,20 +518,24 @@ function eseguiPubblicazione(token) {
 
 function costruisciMenuDolciTradotto(lang) {
   var m = JSON.parse(JSON.stringify(leggi())); // usa i dati aggiornati dal form
-  var t = TRADUZIONI_DOLCI[lang];
-  if (!t) return null;
-  for (var si = 0; si < m.sezioni.length; si++) {
-    m.sezioni[si].titolo_display = t.sezione;
-    for (var pi = 0; pi < m.sezioni[si].piatti.length; pi++) {
-      var nome = m.sezioni[si].piatti[pi].nome;
-      m.sezioni[si].piatti[pi].nome = t.piatti[nome] || nome;
-    }
-  }
-  // Traduci allergeni usando il dizionario piatti (aggiornato da Traduci e Pubblica)
+  var tStatic = TRADUZIONI_DOLCI[lang] || {};
+  // Usa il dizionario dinamico (aggiornato da traduciEPubblica) come fonte primaria
+  var piatti = (TRANSLATIONS[lang] && TRANSLATIONS[lang]['piatti']) || {};
+
+  // Titolo sezione
+  m.sezioni.forEach(function(sez) {
+    sez.titolo_display = piatti[sez.titolo] || tStatic.sezione || sez.titolo;
+    sez.piatti.forEach(function(p) {
+      p.nome = piatti[p.nome] || p.nome;
+      if (p.descrizione) p.descrizione = piatti[p.descrizione] || p.descrizione;
+    });
+  });
+
+  // Allergeni — nome piatto e lista allergeni tradotti
   if (m.allergeni) {
     m.allergeni.forEach(function(a) {
-      a.nome = t.piatti[a.nome] || a.nome;
-      a.allergeni = t.piatti[a.allergeni] || a.allergeni;
+      a.nome      = piatti[a.nome]      || a.nome;
+      a.allergeni = piatti[a.allergeni] || a.allergeni;
     });
   }
   return m;

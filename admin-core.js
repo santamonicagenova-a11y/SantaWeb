@@ -277,7 +277,8 @@ function apriPreview(lang) {
     window.open(URL.createObjectURL(blob), '_blank').focus();
   } else {
     // Lingue: apri direttamente da GitHub Pages
-    var base = 'https://santamonicagenova-a11y.github.io/SantaWeb/menu-' + lang + '.html';
+    var prefix = tipoMenuCorrente === 'dolci' ? 'menu-dolci-' : 'menu-';
+    var base = 'https://santamonicagenova-a11y.github.io/SantaWeb/' + prefix + lang + '.html';
     window.open(base + '?v=' + Date.now(), '_blank').focus();
   }
 }

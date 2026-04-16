@@ -267,88 +267,6 @@ function costruisciMenuTradotto(menuForm, t) {
 }
 var tplBefore = '', tplAfter = '', dati = null, datiOriginali = null;
 
-function carica(input) {
-  var f = input.files[0];
-  if (!f) return;
-  var r = new FileReader();
-  r.onload = function(e) {
-    try { analizza(e.target.result); }
-    catch(ex) { document.getElementById('err').textContent = 'Errore: ' + ex.message; }
-  };
-  r.readAsText(f, 'utf-8');
-}
-
-function el(tag, cls, txt) {
-  var e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (txt !== undefined) e.textContent = txt;
-  return e;
-}
-function inp(type, id, val, ph) {
-  var e = document.createElement('input');
-  e.type = type; e.id = id;
-  if (val !== undefined && val !== null) e.value = val;
-  if (ph) e.placeholder = ph;
-  return e;
-}
-function chk(id, v) {
-  var e = document.createElement('input');
-  e.type = 'checkbox'; e.id = id; e.checked = !!v;
-  e.style.cssText = 'display:block;margin:auto';
-  return e;
-}
-
-function costruisciOutput() {
-  var m = leggi();
-  var sep = '/* ' + '\u2550'.repeat(57) + ' */\n';
-  var blocco = 'const MENU = ' + JSON.stringify(m, null, 2) + ';\n' + sep;
-  return tplBefore + blocco + tplAfter;
-}
-
-function salva() { apriPreview(); }
-
-function togglePreviewMenu(e) {
-  e.stopPropagation();
-  document.getElementById('preview-menu').classList.toggle('open');
-}
-document.addEventListener('click', function() {
-  var m = document.getElementById('preview-menu');
-  if (m) m.classList.remove('open');
-});
-
-
-function costruisciMenuTradotto(menuForm, t) {
-  var orig = dati;
-  var m = JSON.parse(JSON.stringify(menuForm));
-  var piatti = t.piatti;
-
-  // Usa sempre il nome nel form come chiave — Traduci ha già aggiornato il dizionario
-  function tr(n) { return piatti[n] || n; }
-
-  m.degustazione.nota = t.degu_nota;
-  m.degustazione.percorsi['7'] = t.percorso_7;
-  m.degustazione.percorsi['6'].forEach(function(p) {
-    if (p) p.nome = tr(p.nome);
-  });
-
-  m.sezioni.forEach(function(sez, si) {
-    var origSez = dati.sezioni[si];
-    if (!origSez) return;
-    sez.titolo_display = t.sezioni[sez.titolo] || t.sezioni[origSez.titolo] || t.piatti[sez.titolo] || sez.titolo;
-    sez.piatti.forEach(function(p) {
-      if (!p) return;
-      p.nome = tr(p.nome);
-      if (p.unita) p.unita = t.unita[p.unita] || p.unita;
-      if (p.descrizione) p.descrizione = tr(p.descrizione);
-    });
-  });
-
-  m.orario.orarioServizio.forEach(function(o) {
-    o.giorno = t.orario[o.giorno] || o.giorno;
-  });
-  return m;
-}
-
 function apriPreview(lang) {
   if (!dati) { alert('Prima carica il menù'); return; }
   document.getElementById('preview-menu').classList.remove('open');
@@ -507,69 +425,6 @@ function traduci() {
 }
 
 
-function costruisciMenuTradotto(menuForm, t) {
-  var orig = dati;
-  var m = JSON.parse(JSON.stringify(menuForm));
-  var piatti = t.piatti;
-
-  // Usa sempre il nome nel form come chiave — Traduci ha già aggiornato il dizionario
-  function tr(n) { return piatti[n] || n; }
-
-  m.degustazione.nota = t.degu_nota;
-  m.degustazione.percorsi['7'] = t.percorso_7;
-  m.degustazione.percorsi['6'].forEach(function(p) {
-    if (p) p.nome = tr(p.nome);
-  });
-
-  m.sezioni.forEach(function(sez, si) {
-    var origSez = dati.sezioni[si];
-    if (!origSez) return;
-    sez.titolo_display = t.sezioni[sez.titolo] || t.sezioni[origSez.titolo] || t.piatti[sez.titolo] || sez.titolo;
-    sez.piatti.forEach(function(p) {
-      if (!p) return;
-      p.nome = tr(p.nome);
-      if (p.unita) p.unita = t.unita[p.unita] || p.unita;
-      if (p.descrizione) p.descrizione = tr(p.descrizione);
-    });
-  });
-
-  m.orario.orarioServizio.forEach(function(o) {
-    o.giorno = t.orario[o.giorno] || o.giorno;
-  });
-  return m;
-}
-
-function costruisciHtmlTradotto(lang, t) {
-  var src = outputCorrente;
-  var menuForm = leggi();
-  var m = costruisciMenuTradotto(menuForm, t);
-
-  var SEP = '/* ' + '\u2550'.repeat(57) + ' */\n';
-  var START = 'const MENU = {';
-  var i1 = src.indexOf(START);
-  var i2 = src.indexOf(SEP, i1) + SEP.length;
-  var newBlock = 'const MENU = ' + JSON.stringify(m, null, 2) + ';\n' + SEP;
-  var html = src.slice(0, i1) + newBlock + src.slice(i2);
-
-  html = html.replace('<html lang="it">', '<html lang="' + lang + '">');
-  html = html.replace(/<title>[^<]*<\/title>/, '<title>' + t.title + '</title>');
-
-  html = html.replace(/Note per l'ospite<\/span>[^`]*`/,
-    t.note_ospite_titolo + '</span>\n  ' + t.note_carta_1 + '<br>\n  ' + t.note_carta_2 + '\n`');
-  html = html.replace(/Per mantenere costanti[\s\S]*?simbolo: \*`/,
-    t.note_orario + '`');
-  html = html.replace('Men\u00f9\u2019 Degustazione', t.titolo_degustazione);
-  html = html.replace('Men&ugrave;&rsquo; Degustazione', t.titolo_degustazione);
-  html = html.replace(/\$\{o\.portate\} portate/g, '${o.portate} ' + t.degu_portate_label);
-  html = html.replace(/eventuale abbinamento vini/g, t.degu_vini_label);
-  html = html.replace('ORARIO DI SERVIZIO:', t.orario_titolo);
-  html = html.replace(
-    /<u><em>English Menu<\/em><\/u><br>\s*<u><em>Carte en Fran[^<]*<\/em><\/u>/,
-    t.links.join('<br>\n            ')
-  );
-  return html;
-}
-
 function pubblicaFile(token, headers, path, content) {
   var apiBase = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + path;
   return fetch(apiBase, { headers: headers })
@@ -699,6 +554,70 @@ function filesDolci() {
   });
   return files;
 }
+
+function traduciEPubblica() {
+  if (!dati) { alert('Prima carica il menù'); return; }
+  var btn = document.getElementById('btn-pubblica');
+  var m = leggi();
+  var testi = [];
+  if (m.degustazione) {
+    m.degustazione.percorsi['6'].forEach(function(p) { if (p.nome) testi.push(p.nome); });
+  }
+  m.sezioni.forEach(function(sez) {
+    if (sez.titolo) testi.push(sez.titolo);
+    sez.piatti.forEach(function(p) {
+      if (p.nome) testi.push(p.nome);
+      if (p.descrizione) testi.push(p.descrizione);
+    });
+  });
+  if (m.allergeni) {
+    m.allergeni.forEach(function(a) {
+      if (a.nome) testi.push(a.nome);
+      if (a.allergeni) testi.push(a.allergeni);
+    });
+  }
+  testi = testi.filter(function(v, i, a) { return v && a.indexOf(v) === i; });
+
+  var langs = ['en', 'fr', 'de', 'es'];
+  var langPair = { en: 'it-IT|en-GB', fr: 'it-IT|fr-FR', de: 'it-IT|de-DE', es: 'it-IT|es-ES' };
+  var coda = [];
+  testi.forEach(function(testo) {
+    langs.forEach(function(lang) { coda.push({ testo: testo, lang: lang }); });
+  });
+  var totale = coda.length;
+  btn.textContent = '⏳ Traduzione 0/' + totale + '…';
+  btn.disabled = true;
+
+  function traduciVoce(i) {
+    if (i >= coda.length) {
+      btn.textContent = '⏳ Pubblicazione…';
+      var token = localStorage.getItem('gh_token') || '';
+      if (token) {
+        eseguiPubblicazione(token);
+      } else {
+        document.getElementById('token-input').value = '';
+        document.getElementById('modal-token').classList.add('on');
+      }
+      btn.textContent = '✶ Traduci e Pubblica';
+      btn.disabled = false;
+      return;
+    }
+    var item = coda[i];
+    btn.textContent = '⏳ Traduzione ' + (i+1) + '/' + totale + '…';
+    var url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=it&tl=' +
+      item.lang + '&dt=t&q=' + encodeURIComponent(item.testo);
+    fetch(url)
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var trad = data && data[0] && data[0][0] && data[0][0][0];
+        if (trad) TRANSLATIONS[item.lang]['piatti'][item.testo] = trad;
+      })
+      .catch(function() {})
+      .finally(function() { setTimeout(function() { traduciVoce(i + 1); }, 80); });
+  }
+  traduciVoce(0);
+}
+
 
 function toast(msg) {
   var t = document.getElementById('toast');

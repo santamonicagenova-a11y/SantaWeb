@@ -62,7 +62,7 @@
   .cucina-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
   .cucina-body { font-size: 0.9rem; line-height: 1.9; color: var(--ink-soft); }
   .cucina-body p + p { margin-top: 1rem; }
-  .cucina-actions { margin-top: 2.5rem; }
+  .cucina-actions { margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap; }
   .cucina-images { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
   .cucina-images img { width: 100%; aspect-ratio: 3/4; object-fit: cover; transition: transform 0.5s ease; }
   .cucina-images img:first-child { margin-top: 3rem; }
@@ -293,6 +293,7 @@
         </div>
         <div class="cucina-actions">
           <a id="menu-btn" href="menu-it.html" target="_blank" class="btn-primary" data-i18n="cucina_btn">Guarda il men&ugrave;</a>
+          <a id="dolci-btn" href="menu-dolci-it.html" target="_blank" class="btn-secondary" data-i18n="dolci_btn">Men&ugrave; dolci</a>
         </div>
       </div>
       <div class="cucina-images reveal" style="transition-delay:0.15s">
@@ -503,7 +504,7 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.11.05</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.17.01</a></p>
   </div>
 </footer>
 
@@ -555,6 +556,8 @@
     });
     var menuBtn = document.getElementById('menu-btn');
     if (menuBtn && t.cucina_btn_link) menuBtn.href = t.cucina_btn_link;
+    var dolciBtn = document.getElementById('dolci-btn');
+    if (dolciBtn && t.dolci_btn_link) dolciBtn.href = t.dolci_btn_link;
     document.getElementById('lang-select-nav').value = lang;
     document.getElementById('lang-select-mobile').value = lang;
   }

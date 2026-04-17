@@ -1,5 +1,4 @@
 // Template HTML per generazione menu in lingua
-// v 2026.04.17.01
 
 function costruisciHtmlTradotto(lang, t) {
   var menuForm = leggi();

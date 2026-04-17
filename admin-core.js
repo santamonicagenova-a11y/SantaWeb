@@ -1,5 +1,5 @@
 // Core functions per menu-admin Santamonica
-// v 2026.04.17.03
+// v 2026.04.17.04
 
 
 function costruisciHtmlTradotto(lang, t) {
@@ -326,6 +326,7 @@ function costruisciMenuTradotto(menuForm, t) {
 var tplBefore = '', tplAfter = '', dati = null, datiOriginali = null;
 
 function apriPreview(lang) {
+  if (tipoMenuCorrente === 'allergeni') { apriPreviewAllergeni(); return; }
   if (!dati) { alert('Prima carica il menù'); return; }
   document.getElementById('preview-menu').classList.remove('open');
   outputCorrente = costruisciOutput();
@@ -350,6 +351,7 @@ function caricaDalSito(tipo) {
   tipo = tipo || 'carta';
   tipoMenuCorrente = tipo;
   document.getElementById('carica-menu').classList.remove('open');
+  if (tipo === 'allergeni') { caricaAllergeniDalSito(); return; }
   var url = tipo === 'dolci' ? DOLCI_URL : MENU_URL;
   var btn = document.querySelector('.btn-load');
   document.getElementById('err').textContent = '';
@@ -398,6 +400,7 @@ function confermaPubblica() {
   if (!token) { alert('Inserisci il token'); return; }
   localStorage.setItem('gh_token', token);
   chiudiModal();
+  if (window._pendingAllergeniPublish) { window._pendingAllergeniPublish = false; pubblicaAllergeni(token); return; }
   eseguiPubblicazione(token);
   var btn = document.getElementById('btn-pubblica');
   if (btn) { btn.textContent = '✦ Traduci e Pubblica'; btn.disabled = false; }
@@ -618,6 +621,7 @@ function filesDolci() {
 }
 
 function traduciEPubblica() {
+  if (tipoMenuCorrente === 'allergeni') { traduciEPubblicaAllergeni(); return; }
   if (!dati) { alert('Prima carica il menù'); return; }
   var btn = document.getElementById('btn-pubblica');
   var m = leggi();
@@ -686,4 +690,270 @@ function toast(msg) {
   t.textContent = msg;
   t.classList.add('on');
   setTimeout(function(){ t.classList.remove('on'); }, 3000);
+}
+
+// ═══════════════════════════════════════════════════════
+// MENU ALLERGENI — funzioni admin
+// ═══════════════════════════════════════════════════════
+
+var ALLERGENI_URL  = 'https://santamonicagenova-a11y.github.io/SantaWeb/menu-allergeni.html';
+var ALLERGENI_PATH = 'menu-allergeni.html';
+var datiAllergeni    = null;   // { sezioni: [...] } estratto da ALLERGENI_DATA
+var tplAllBefore     = '';
+var tplAllAfter      = '';
+var datiMenuPerAllergeni = null; // copia di dati (MENU) per ricavare i piatti
+
+var TUTTI_ALLERGENI = [
+  'glutine','crostacei','uova','pesce','arachidi',
+  'soia','latte','frutta a guscio','sedano',
+  'senape','sesamo','solfiti','lupini','molluschi'
+];
+
+// ── Carica menu-allergeni.html dal sito ────────────────
+function caricaAllergeniDalSito() {
+  toast('\u23f3 Caricamento allergeni...');
+  fetch(ALLERGENI_URL + '?nocache=' + Date.now(), { cache: 'no-store' })
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
+    .then(function(src) {
+      analizzaAllergeni(src);
+      // Serve anche il menu carta per ricavare lista piatti aggiornata
+      // Se dati (menu carta) già caricato usiamo quello, altrimenti lo fetch
+      if (dati && dati.sezioni) {
+        datiMenuPerAllergeni = dati;
+        costruisciFormAllergeni();
+        toast('\u2713 Allergeni caricati');
+      } else {
+        fetch(MENU_URL + '?nocache=' + Date.now(), { cache: 'no-store' })
+          .then(function(r2) { return r2.text(); })
+          .then(function(src2) {
+            try {
+              analizza(src2);
+              datiMenuPerAllergeni = dati;
+            } catch(e) {}
+            costruisciFormAllergeni();
+            toast('\u2713 Allergeni caricati');
+          })
+          .catch(function() {
+            // fallback: usa solo datiAllergeni senza aggiornare i piatti
+            costruisciFormAllergeni();
+            toast('\u2713 Allergeni caricati (menu non aggiornato)');
+          });
+      }
+    })
+    .catch(function(e) { toast('\u2717 Errore: ' + e); });
+}
+
+// ── Estrae ALLERGENI_DATA dal sorgente ────────────────
+function analizzaAllergeni(src) {
+  var START = 'const ALLERGENI_DATA = ';
+  var SEP   = '/* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */';
+  var i1 = src.indexOf(START);
+  if (i1 < 0) throw new Error('ALLERGENI_DATA non trovato');
+  var i2 = src.indexOf(SEP, i1);
+  if (i2 < 0) throw new Error('Fine blocco allergeni non trovata');
+  var i2end = src.indexOf('\n', i2) + 1;
+
+  var js = src.slice(i1, i2).trim();
+  datiAllergeni = Function('"use strict";' + js + ';return ALLERGENI_DATA;')();
+
+  tplAllBefore = src.slice(0, i1);
+  tplAllAfter  = src.slice(i2end);
+}
+
+// ── Costruisce il form di editing allergeni ────────────
+function costruisciFormAllergeni() {
+  tipoMenuCorrente = 'allergeni';
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('wrap').classList.add('on');
+
+  // Sincronizza i piatti del menu carta → struttura allergeni
+  // Mantiene gli allergeni già salvati per piatti che esistono ancora
+  if (datiMenuPerAllergeni && datiMenuPerAllergeni.sezioni) {
+    var sezioniMenu = datiMenuPerAllergeni.sezioni;
+    var mapExisting = {}; // nome piatto → allergeni[]
+    if (datiAllergeni && datiAllergeni.sezioni) {
+      datiAllergeni.sezioni.forEach(function(s) {
+        s.piatti.forEach(function(p) {
+          mapExisting[p.nome] = p.allergeni || [];
+        });
+      });
+    }
+    // Ricostruisce datiAllergeni dai piatti del menu carta (esclude Crudi)
+    var sezioniAllergeni = [];
+    sezioniMenu.forEach(function(sez) {
+      if (sez.titolo === 'Crudi') return; // Crudi senza allergeni
+      var piatti = sez.piatti.map(function(p) {
+        // Ripulisce il nome dal tag <em>
+        var nomeClean = p.nome.replace(/<[^>]+>/g, '');
+        return {
+          nome: nomeClean,
+          allergeni: mapExisting[nomeClean] || []
+        };
+      });
+      sezioniAllergeni.push({
+        titolo: sez.titolo_display || sez.titolo,
+        piatti: piatti
+      });
+    });
+    datiAllergeni = { sezioni: sezioniAllergeni };
+  }
+
+  var wrap = document.getElementById('wrap');
+  wrap.innerHTML = '';
+
+  var intro = document.createElement('div');
+  intro.className = 'fs';
+  var head = document.createElement('div');
+  head.className = 'fs-head';
+  head.textContent = 'Allergeni — Menù alla Carta';
+  intro.appendChild(head);
+  var body = document.createElement('div');
+  body.className = 'fs-body';
+
+  // Nota
+  var nota = document.createElement('div');
+  nota.className = 'sub';
+  nota.innerHTML = 'Spunta gli allergeni presenti in ciascun piatto. I piatti della sezione Crudi non vengono inclusi.';
+  nota.style.cssText = 'margin-bottom:.8rem;font-style:italic;color:var(--stone)';
+  body.appendChild(nota);
+
+  datiAllergeni.sezioni.forEach(function(sez, si) {
+    var sezBlock = document.createElement('div');
+    sezBlock.style.cssText = 'margin-bottom:1.2rem';
+
+    var sezTit = document.createElement('div');
+    sezTit.className = 'sub';
+    sezTit.textContent = sez.titolo;
+    sezTit.style.cssText = 'font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.5rem;padding-bottom:.3rem;border-bottom:1px solid var(--rule)';
+    sezBlock.appendChild(sezTit);
+
+    sez.piatti.forEach(function(piatto, pi) {
+      var pBlock = document.createElement('div');
+      pBlock.style.cssText = 'padding:.6rem 0;border-bottom:1px dotted var(--rule)';
+
+      var pNome = document.createElement('div');
+      pNome.style.cssText = 'font-size:.85rem;font-weight:600;margin-bottom:.4rem';
+      pNome.textContent = piatto.nome;
+      pBlock.appendChild(pNome);
+
+      var checkGrid = document.createElement('div');
+      checkGrid.style.cssText = 'display:flex;flex-wrap:wrap;gap:.3rem .6rem';
+
+      TUTTI_ALLERGENI.forEach(function(all) {
+        var id = 'all_' + si + '_' + pi + '_' + all.replace(/\s+/g, '_');
+        var label = document.createElement('label');
+        label.style.cssText = 'display:flex;align-items:center;gap:.25rem;font-family:Jost,sans-serif;font-size:.68rem;letter-spacing:.04em;cursor:pointer;padding:.2rem .4rem;border:1px solid var(--rule);border-radius:2px;transition:background .15s';
+        var chkEl = document.createElement('input');
+        chkEl.type = 'checkbox';
+        chkEl.id = id;
+        chkEl.checked = (piatto.allergeni || []).indexOf(all) >= 0;
+        chkEl.style.cssText = 'cursor:pointer;accent-color:var(--ink)';
+        chkEl.onchange = function() {
+          label.style.background = this.checked ? 'var(--ink)' : '';
+          label.style.color = this.checked ? 'var(--cream)' : '';
+          label.style.borderColor = this.checked ? 'var(--ink)' : 'var(--rule)';
+        };
+        // Applica stile iniziale se già checked
+        if (chkEl.checked) {
+          label.style.background = 'var(--ink)';
+          label.style.color = 'var(--cream)';
+          label.style.borderColor = 'var(--ink)';
+        }
+        var span = document.createElement('span');
+        span.textContent = all;
+        label.appendChild(chkEl);
+        label.appendChild(span);
+        checkGrid.appendChild(label);
+      });
+
+      pBlock.appendChild(checkGrid);
+      sezBlock.appendChild(pBlock);
+    });
+
+    body.appendChild(sezBlock);
+  });
+
+  intro.appendChild(body);
+  wrap.appendChild(intro);
+}
+
+// ── Legge il form e restituisce ALLERGENI_DATA aggiornato ─
+function leggiFormAllergeni() {
+  if (!datiAllergeni) return null;
+  var m = JSON.parse(JSON.stringify(datiAllergeni));
+  m.sezioni.forEach(function(sez, si) {
+    sez.piatti.forEach(function(piatto, pi) {
+      piatto.allergeni = [];
+      TUTTI_ALLERGENI.forEach(function(all) {
+        var id = 'all_' + si + '_' + pi + '_' + all.replace(/\s+/g, '_');
+        var el = document.getElementById(id);
+        if (el && el.checked) piatto.allergeni.push(all);
+      });
+    });
+  });
+  return m;
+}
+
+// ── Costruisce l'HTML del file allergeni ──────────────
+function costruisciOutputAllergeni() {
+  var m = leggiFormAllergeni();
+  if (!m) return '';
+  var SEP = '/* \u2550'.repeat(1) + '\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */\n';
+  var blocco = 'const ALLERGENI_DATA = ' + JSON.stringify(m, null, 2) + ';\n' + SEP;
+  return tplAllBefore + blocco + tplAllAfter;
+}
+
+// ── Preview allergeni ──────────────────────────────────
+function apriPreviewAllergeni() {
+  var html = costruisciOutputAllergeni();
+  if (!html) { toast('\u2717 Nessun dato allergeni'); return; }
+  var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  window.open(URL.createObjectURL(blob), '_blank').focus();
+}
+
+// ── Pubblica allergeni su GitHub ───────────────────────
+function pubblicaAllergeni(token) {
+  var html = costruisciOutputAllergeni();
+  if (!html) { toast('\u2717 Nessun dato'); return; }
+  var headers = {
+    'Authorization': 'token ' + token,
+    'Accept': 'application/vnd.github.v3+json',
+    'Content-Type': 'application/json'
+  };
+  var apiBase = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + ALLERGENI_PATH;
+  toast('\u23f3 Pubblicazione allergeni...');
+  fetch(apiBase, { headers: headers })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      var body = {
+        message: 'Aggiornamento allergeni v2026.04.17',
+        content: btoa(unescape(encodeURIComponent(html)))
+      };
+      if (d.sha) body.sha = d.sha;
+      return fetch(apiBase, { method: 'PUT', headers: headers, body: JSON.stringify(body) });
+    })
+    .then(function(r) {
+      if (!r.ok) return r.json().then(function(e) { throw new Error(e.message); });
+      toast('\u2713 Allergeni pubblicati!');
+      var btn = document.getElementById('btn-pubblica');
+      if (btn) { btn.textContent = '\u2756 Traduci e Pubblica'; btn.disabled = false; }
+    })
+    .catch(function(e) { toast('\u2717 Errore: ' + e.message); });
+}
+
+// ── Entry point pubblicazione allergeni ───────────────
+function traduciEPubblicaAllergeni() {
+  if (!datiAllergeni) { alert('Prima carica gli allergeni'); return; }
+  var token = localStorage.getItem('gh_token') || '';
+  if (token) {
+    pubblicaAllergeni(token);
+  } else {
+    document.getElementById('token-input').value = '';
+    document.getElementById('modal-token').classList.add('on');
+    // Salva callback per dopo conferma token
+    window._pendingAllergeniPublish = true;
+  }
 }

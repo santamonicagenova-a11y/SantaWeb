@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<!-- v 2026.04.17.03 -->
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Allergeni — Santamonica</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cream: #faf7f2;
+      --ink:   #1a1714;
+      --stone: #8c7e6e;
+      --rust:  #9e4a2a;
+      --rule:  #d4c9b8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 400;
+    }
+
+    /* ── ctrl bar ── */
+    .ctrl-bar {
+      text-align: center;
+      padding: .9rem 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--cream);
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      gap: .7rem;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .ctrl-btn {
+      padding: .4rem 1.3rem;
+      background: transparent;
+      border: 1px solid var(--ink);
+      font-family: 'Jost', sans-serif;
+      font-size: .68rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      color: var(--ink);
+      transition: background .2s, color .2s;
+    }
+    .ctrl-btn:hover {
+      background: var(--ink);
+      color: var(--cream);
+    }
+
+    /* ── pagina A4 ── */
+    .pg {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 2rem auto;
+      padding: 16mm 22mm 14mm;
+      background: #fff;
+      box-shadow: 0 2px 24px rgba(0,0,0,.10);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── intestazione ── */
+    .pg-header {
+      text-align: center;
+      margin-bottom: 8mm;
+      padding-bottom: 4mm;
+      border-bottom: 1.5px solid var(--ink);
+    }
+    .pg-header-title {
+      font-size: 1.9rem;
+      font-weight: 600;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    .pg-header-sub {
+      margin-top: .4rem;
+      font-family: 'Jost', sans-serif;
+      font-size: .65rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--stone);
+    }
+
+    /* ── nota legale ── */
+    .nota-legale {
+      font-style: italic;
+      font-size: .72rem;
+      color: var(--stone);
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 7mm;
+      padding-bottom: 5mm;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    /* ── sezioni ── */
+    .sezione {
+      margin-bottom: 7mm;
+    }
+    .sezione-titolo {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: 3mm;
+      padding-bottom: 1.5mm;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    /* ── piatto ── */
+    .piatto-row {
+      display: flex;
+      align-items: baseline;
+      padding: 2mm 0;
+      border-bottom: 1px dotted var(--rule);
+      gap: 4mm;
+    }
+    .piatto-row:last-child {
+      border-bottom: none;
+    }
+    .piatto-nome {
+      font-size: .9rem;
+      font-weight: 400;
+      flex: 0 0 38%;
+      line-height: 1.3;
+    }
+    .piatto-allergeni {
+      font-style: italic;
+      font-size: .82rem;
+      color: var(--ink);
+      flex: 1;
+      line-height: 1.4;
+    }
+    .piatto-allergeni-vuoti {
+      font-style: italic;
+      font-size: .78rem;
+      color: var(--stone);
+    }
+
+    /* ── legenda in fondo ── */
+    .legenda {
+      margin-top: auto;
+      padding-top: 5mm;
+      border-top: 1px solid var(--rule);
+      font-size: .67rem;
+      color: var(--stone);
+      font-style: italic;
+      line-height: 1.65;
+      text-align: center;
+    }
+    .legenda strong {
+      font-style: normal;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    /* ── stampa ── */
+    @media print {
+      @page { size: A4 portrait; margin: 0; }
+      body { background: white; }
+      .ctrl-bar { display: none; }
+      .pg {
+        width: 210mm;
+        height: 297mm;
+        min-height: unset;
+        margin: 0;
+        padding: 14mm 20mm 12mm;
+        box-shadow: none;
+        page-break-after: always;
+      }
+      .pg:last-child { page-break-after: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="ctrl-bar">
+  <button class="ctrl-btn" onclick="window.print()">✦ Stampa / Salva PDF</button>
+</div>
+
+<div id="layout-allergeni"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   ALLERGENI  —  modifica solo qui per aggiornare tutto
+   ═══════════════════════════════════════════════════════ */
+const ALLERGENI_DATA = {
+  "sezioni": [
+    {
+      "titolo": "Sfiziosi",
+      "piatti": [
+        {
+          "nome": "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir",
+          "allergeni": ["latte", "pesce", "solfiti", "molluschi"]
+        },
+        {
+          "nome": "Cavolo cappuccio, miso, lamponi, anacardi",
+          "allergeni": ["soia", "frutta a guscio"]
+        },
+        {
+          "nome": "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce",
+          "allergeni": ["latte", "frutta a guscio", "solfiti", "pesce"]
+        },
+        {
+          "nome": "Ali di razza, fave nostrane, mela verde, mandorle",
+          "allergeni": ["latte", "pesce", "frutta a guscio", "lupini"]
+        },
+        {
+          "nome": "\u201cNon formaggi\u201d",
+          "allergeni": ["frutta a guscio"]
+        }
+      ]
+    },
+    {
+      "titolo": "Amidi e Carboidrati",
+      "piatti": [
+        {
+          "nome": "Riso \u201cRiserva San Massimo\u201d, rag\u00f9 di lepre, cime di rapa, Parmigiano Reggiano",
+          "allergeni": ["sedano", "latte", "solfiti"]
+        },
+        {
+          "nome": "Tortelli di cinghiale, dashi di orata, cipollina, shiso",
+          "allergeni": ["latte", "glutine", "pesce", "sedano", "solfiti"]
+        },
+        {
+          "nome": "Tubetti \u201cMancini\u201d, baccal\u00e0, il nostro kosho di agrumi fermentato, borlotti",
+          "allergeni": ["glutine", "pesce", "soia", "latte"]
+        },
+        {
+          "nome": "Spaghettoni quadrati \u201cMancini\u201d, anemoni di mare, nduja, maggiorana",
+          "allergeni": ["glutine", "latte"]
+        }
+      ]
+    },
+    {
+      "titolo": "Non Solo Mare",
+      "piatti": [
+        {
+          "nome": "Ombrina nostrana pescata ad amo, salicornia, indivia belga",
+          "allergeni": ["pesce", "sedano", "latte"]
+        },
+        {
+          "nome": "Polpo nostrano, rabarbaro, piselli",
+          "allergeni": ["molluschi"]
+        },
+        {
+          "nome": "Picanha, cardoncelli, fondo di manzo",
+          "allergeni": ["soia", "latte", "sedano"]
+        },
+        {
+          "nome": "Zucchina alla scapece, menta, yogurt, pepe Timut",
+          "allergeni": ["latte"]
+        }
+      ]
+    }
+  ]
+};
+/* ═════════════════════════════════════════════════════════ */
+
+const TUTTI_ALLERGENI = [
+  "glutine","crostacei","uova","pesce","arachidi",
+  "soia","latte","frutta a guscio","sedano",
+  "senape","sesamo","solfiti","lupini","molluschi"
+];
+
+function render() {
+  var root = document.getElementById('layout-allergeni');
+  root.innerHTML = '';
+
+  var pg = document.createElement('div');
+  pg.className = 'pg';
+
+  // Intestazione
+  pg.innerHTML = '<div class="pg-header">' +
+    '<div class="pg-header-title">Allergeni</div>' +
+    '<div class="pg-header-sub">Santamonica &mdash; Lungomare Lombardo 27, Genova</div>' +
+    '</div>' +
+    '<div class="nota-legale">' +
+    'Informativa ai sensi del Reg. UE 1169/2011. Per ulteriori informazioni sugli allergeni ' +
+    'presenti nei nostri piatti si prega di rivolgersi al personale di sala.' +
+    '</div>';
+
+  // Sezioni
+  ALLERGENI_DATA.sezioni.forEach(function(sez) {
+    var sezDiv = document.createElement('div');
+    sezDiv.className = 'sezione';
+
+    var titolo = document.createElement('div');
+    titolo.className = 'sezione-titolo';
+    titolo.textContent = sez.titolo;
+    sezDiv.appendChild(titolo);
+
+    sez.piatti.forEach(function(piatto) {
+      var row = document.createElement('div');
+      row.className = 'piatto-row';
+
+      var nome = document.createElement('div');
+      nome.className = 'piatto-nome';
+      nome.innerHTML = piatto.nome;
+
+      var all = document.createElement('div');
+      if (piatto.allergeni && piatto.allergeni.length > 0) {
+        all.className = 'piatto-allergeni';
+        all.textContent = piatto.allergeni.join(', ');
+      } else {
+        all.className = 'piatto-allergeni-vuoti';
+        all.textContent = 'nessun allergene dichiarato';
+      }
+
+      row.appendChild(nome);
+      row.appendChild(all);
+      sezDiv.appendChild(row);
+    });
+
+    pg.appendChild(sezDiv);
+  });
+
+  // Legenda allergeni
+  var legenda = document.createElement('div');
+  legenda.className = 'legenda';
+  legenda.innerHTML = '<strong>Allergeni regolamentati (Reg. UE 1169/2011):</strong><br>' +
+    TUTTI_ALLERGENI.join(' &bull; ');
+  pg.appendChild(legenda);
+
+  root.appendChild(pg);
+}
+
+render();
+
+/* versione v 2026.04.17.03 */
+</script>
+</body>
+</html>

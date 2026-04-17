@@ -277,14 +277,15 @@ function apriPreview(lang) {
   if (!dati) { alert('Prima carica il menù'); return; }
   document.getElementById('preview-menu').classList.remove('open');
   outputCorrente = costruisciOutput();
-  if (!lang || lang === 'it') {
-    // Italiano: genera al volo
+  if ((!lang || lang === 'it') && tipoMenuCorrente !== 'dolci') {
+    // Carta italiano: genera al volo
     var blob = new Blob([outputCorrente], { type: 'text/html;charset=utf-8' });
     window.open(URL.createObjectURL(blob), '_blank').focus();
   } else {
-    // Lingue: apri direttamente da GitHub Pages
+    // Dolci italiano + tutte le altre lingue: apri da GitHub Pages
     var prefix = tipoMenuCorrente === 'dolci' ? 'menu-dolci-' : 'menu-';
-    var base = 'https://santamonicagenova-a11y.github.io/SantaWeb/' + prefix + lang + '.html';
+    var langCode = (!lang || lang === 'it') ? 'it' : lang;
+    var base = 'https://santamonicagenova-a11y.github.io/SantaWeb/' + prefix + langCode + '.html';
     window.open(base + '?v=' + Date.now(), '_blank').focus();
   }
 }

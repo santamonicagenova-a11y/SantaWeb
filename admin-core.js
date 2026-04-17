@@ -1,8 +1,7 @@
 // Core functions per menu-admin Santamonica
-// v 2026.04.17.02
+// v 2026.04.17.03
 
 
-var TRANSLATIONS = {"en": {"lang": "en", "lang_label": "English", "title": "Menu — Santamonica", "degu_titolo": "Tasting Menu", "degu_portate_label": "courses", "degu_vini_label": "wine pairing", "degu_nota": "Price per person, menu to be shared by the whole table.", "degu_intero_tavolo": "the whole table", "percorso_7": "Chef's free interpretation menu", "note_carta_1": "To maintain consistent quality and organoleptic characteristics of raw ingredients, fresh fish products are blast-frozen after purchase. These products are marked with the symbol * for clear and transparent customer information.", "note_carta_2": "The list of allergens is available on the last page of this menu.", "note_ospite_titolo": "Guest notes", "note_orario": "To maintain consistent quality standards and organoleptic characteristics, fresh fish products are blast-frozen. These products are marked with the symbol: *", "orario_titolo": "OPENING HOURS:", "titolo_degustazione": "Tasting Menu", "sezioni": {"Crudi": "Raw", "Sfiziosi": "Starters", "Amidi e Carboidrati": "Pasta & Grains", "Non Solo Mare": "Not Only Sea"}, "unita": {"cad.": "ea."}, "piatti": {"Ali di razza, fave nostrane, mela verde, mandorle": "Skate wing, local broad beans, green apple, almonds", "Animella di vitello, sedano rapa, nocciole, fondo di pesce": "Veal sweetbread, celeriac, hazelnuts, fish stock", "Tortelli di cinghiale, dashi di orata, cipollina, shiso": "Wild boar tortelli, sea bream dashi, spring onion, shiso", "Tubetti “<em>Mancini</em>”, baccalà, kosho di agrumi, borlotti": "Tubetti “<em>Mancini</em>”, salt cod, citrus kosho, borlotti beans", "Ombrina nostrana pescata ad amo, salicornia, indivia belga": "Line-caught local meagre, sea purslane, Belgian endive", "Gelato al limone nero, levistico, lime, cracker di latte": "Black lemon ice cream, lovage, lime, milk cracker", "Ostriche Fine de Claire": "Fine de Claire Oysters", "Ostriche Antilope": "Antilope Oysters", "Ostriche Enrico IV": "Enrico IV Oysters", "Scampi nostrani": "Local langoustines", "Gamberi viola nostrani": "Local purple prawns", "Selezione solamente di pesci nostrani pescati ad amo": "Selection of local line-caught fish only", "Degustazione di mare": "Sea tasting", "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir": "Local squid, fresh peas, light bagna cauda, kefir", "Cavolo cappuccio, miso, lamponi, anacardi": "Cabbage, miso, raspberries, cashews", "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce": "Veal sweetbread, celeriac, hazelnuts, fish stock reduction", "“Non formaggi”": "“Not cheese”", "(Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla)": "(Tasting of artisan fake cheeses made with cashews and almond milk)", "Spaghettoni quadrati “<em>Mancini</em>”, anemoni di mare, nduja, maggiorana": "Square spaghettoni “<em>Mancini</em>”, sea anemones, nduja, marjoram", "Tubetti “<em>Mancini</em>”, baccalà, il nostro kosho di agrumi fermentato, borlotti": "Tubetti “<em>Mancini</em>”, salt cod, our fermented citrus kosho, borlotti beans", "Riso “<em>Riserva San Massimo</em>”, ragù di lepre, cime di rapa, Parmigiano Reggiano": "Rice “<em>Riserva San Massimo</em>”, hare ragù, turnip tops, Parmigiano Reggiano", "Polpo nostrano, rabarbaro, piselli": "Local octopus, rhubarb, peas", "Zucchina alla scapece, menta, yogurt, pepe Timut": "Marinated courgette, mint, yogurt, Timut pepper", "Picanha, cardoncelli, fondo di manzo": "Picanha, king oyster mushrooms, beef jus", "Gambero viola crudo": "Raw purple prawn", "Agnello": "Lamb"}, "orario": {"Martedì": "Tuesday", "Dal mercoledì al sabato": "Wednesday to Saturday", "Domenica": "Sunday"}, "links": ["<u>Italian Menu</u>", "<u>Carte en Française</u>", "<u>Speisekarte auf Deutsch</u>", "<u>Carta en Español</u>"]}, "fr": {"lang": "fr", "lang_label": "Français", "title": "Menu — Santamonica", "degu_titolo": "Menu Dégustation", "degu_portate_label": "plats", "degu_vini_label": "accord mets-vins", "degu_nota": "Prix par personne, menu à partager par toute la table.", "degu_intero_tavolo": "toute la table", "percorso_7": "Menu carte blanche du Chef", "note_carta_1": "Pour maintenir constants le niveau qualitatif et les caractéristiques organoleptiques des matières premières, les produits de la mer achetés frais sont surgelés à basse température. Ces produits sont signalés par le symbole * pour une information claire et transparente à la clientèle.", "note_carta_2": "La liste des allergènes est consultable à la dernière page de ce menu.", "note_ospite_titolo": "Note pour nos hôtes", "note_orario": "Pour maintenir constants le niveau qualitatif et les caractéristiques organoleptiques, les produits frais sont surgelés à basse température. Ces produits sont signalés par le symbole : *", "orario_titolo": "HORAIRES D'OUVERTURE :", "titolo_degustazione": "Menu Dégustation", "sezioni": {"Crudi": "Crus", "Sfiziosi": "Entrées", "Amidi e Carboidrati": "Pâtes & Céréales", "Non Solo Mare": "Pas Seulement la Mer"}, "unita": {"cad.": "p."}, "piatti": {"Ali di razza, fave nostrane, mela verde, mandorle": "Aile de raie, fèves locales, pomme verte, amandes", "Animella di vitello, sedano rapa, nocciole, fondo di pesce": "Ris de veau, céleri-rave, noisettes, fond de poisson", "Tortelli di cinghiale, dashi di orata, cipollina, shiso": "Tortelli de sanglier, dashi de dorade, ciboule, shiso", "Tubetti “<em>Mancini</em>”, baccalà, kosho di agrumi, borlotti": "Tubetti “<em>Mancini</em>”, morue, kosho d’agrumes, haricots borlotti", "Ombrina nostrana pescata ad amo, salicornia, indivia belga": "Ombrine locale à la ligne, salicorne, endive belge", "Gelato al limone nero, levistico, lime, cracker di latte": "Glace au citron noir, livèche, citron vert, cracker au lait", "Ostriche Fine de Claire": "Huîtres Fine de Claire", "Ostriche Antilope": "Huîtres Antilope", "Ostriche Enrico IV": "Huîtres Enrico IV", "Scampi nostrani": "Langoustines locales", "Gamberi viola nostrani": "Crevettes violettes locales", "Selezione solamente di pesci nostrani pescati ad amo": "Sélection exclusivement de poissons locaux pêchés à la ligne", "Degustazione di mare": "Dégustation de la mer", "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir": "Calamar local, petits pois frais, bagna cauda légère, kéfir", "Cavolo cappuccio, miso, lamponi, anacardi": "Chou pommé, miso, framboises, noix de cajou", "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce": "Ris de veau, céleri-rave, noisettes, réduction de fond de poisson", "“Non formaggi”": "“Non-fromages”", "(Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla)": "(Dégustation de faux fromages artisanaux à base de noix de cajou et lait d’amande)", "Spaghettoni quadrati “<em>Mancini</em>”, anemoni di mare, nduja, maggiorana": "Spaghettoni carrés “<em>Mancini</em>”, anémones de mer, nduja, marjolaine", "Tubetti “<em>Mancini</em>”, baccalà, il nostro kosho di agrumi fermentato, borlotti": "Tubetti “<em>Mancini</em>”, morue, notre kosho d’agrumes fermenté, borlotti", "Riso “<em>Riserva San Massimo</em>”, ragù di lepre, cime di rapa, Parmigiano Reggiano": "Riz “<em>Riserva San Massimo</em>”, ragû de lièvre, fanes de navet, Parmigiano Reggiano", "Polpo nostrano, rabarbaro, piselli": "Poulpe local, rhubarbe, petits pois", "Zucchina alla scapece, menta, yogurt, pepe Timut": "Courgette en escabèche, menthe, yaourt, poivre Timut", "Picanha, cardoncelli, fondo di manzo": "Picanha, pleurotes du panicaut, jus de bœuf", "Gambero viola crudo": "Crevette violette crue", "Agnello": "Agneau"}, "orario": {"Martedì": "Mardi", "Dal mercoledì al sabato": "Du mercredi au samedi", "Domenica": "Dimanche"}, "links": ["<u>Menu Italiano</u>", "<u>English Menu</u>", "<u>Speisekarte auf Deutsch</u>", "<u>Carta en Español</u>"]}, "de": {"lang": "de", "lang_label": "Deutsch", "title": "Speisekarte — Santamonica", "degu_titolo": "Degustationsmenü", "degu_portate_label": "Gänge", "degu_vini_label": "Weinbegleitung", "degu_nota": "Preis pro Person, Menü für den gesamten Tisch.", "degu_intero_tavolo": "den gesamten Tisch", "percorso_7": "Menü nach freier Wahl des Küchenchefs", "note_carta_1": "Um die Qualität und die organoleptischen Eigenschaften der Rohstoffe konstant zu halten, werden frisch eingekaufte Fischprodukte schockgefrostet. Diese Produkte sind mit dem Symbol * gekennzeichnet.", "note_carta_2": "Die Liste der Allergene finden Sie auf der letzten Seite dieser Speisekarte.", "note_ospite_titolo": "Hinweis für unsere Gäste", "note_orario": "Um die Qualität konstant zu halten, werden frische Fischprodukte schockgefrostet und mit dem Symbol * gekennzeichnet.", "orario_titolo": "ÖFFNUNGSZEITEN:", "titolo_degustazione": "Degustationsmenü", "sezioni": {"Crudi": "Rohkost", "Sfiziosi": "Vorspeisen", "Amidi e Carboidrati": "Pasta & Getreide", "Non Solo Mare": "Nicht Nur Meer"}, "unita": {"cad.": "Stk."}, "piatti": {"Ali di razza, fave nostrane, mela verde, mandorle": "Rochenflügel, heimische Saubohnen, grüner Apfel, Mandeln", "Animella di vitello, sedano rapa, nocciole, fondo di pesce": "Kalbsbries, Knollensellerie, Haselnüsse, Fischfond", "Tortelli di cinghiale, dashi di orata, cipollina, shiso": "Wildschweintortelli, Goldbrassen-Dashi, Frühlingszwiebel, Shiso", "Tubetti “<em>Mancini</em>”, baccalà, kosho di agrumi, borlotti": "Tubetti “<em>Mancini</em>”, Stockfisch, Zitruskosho, Borlottibohnen", "Ombrina nostrana pescata ad amo, salicornia, indivia belga": "Lokal geangelter Umberfisch, Queller, Chicorée", "Gelato al limone nero, levistico, lime, cracker di latte": "Schwarzzitronen-Eis, Liebstöckel, Limette, Milchcracker", "Ostriche Fine de Claire": "Fine de Claire Austern", "Ostriche Antilope": "Antilope Austern", "Ostriche Enrico IV": "Enrico IV Austern", "Scampi nostrani": "Heimische Scampi", "Gamberi viola nostrani": "Heimische Violettgarnelen", "Selezione solamente di pesci nostrani pescati ad amo": "Auswahl ausschließlich heimischer Angelfische", "Degustazione di mare": "Meeresverkostung", "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir": "Heimischer Tintenfisch, frische Erbsen, leichte Bagna Cauda, Kefir", "Cavolo cappuccio, miso, lamponi, anacardi": "Weißkohl, Miso, Himbeeren, Cashewnüsse", "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce": "Kalbsbries, Knollensellerie, Haselnüsse, Fischfondreduktion", "“Non formaggi”": "“Kein Käse”", "(Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla)": "(Verkostung handwerklicher Pseudokäse auf Cashew- und Mandelmilchbasis)", "Spaghettoni quadrati “<em>Mancini</em>”, anemoni di mare, nduja, maggiorana": "Quadratische Spaghettoni “<em>Mancini</em>”, Seeanemonen, Nduja, Majoran", "Tubetti “<em>Mancini</em>”, baccalà, il nostro kosho di agrumi fermentato, borlotti": "Tubetti “<em>Mancini</em>”, Stockfisch, unser fermentiertes Zitruskosho, Borlottibohnen", "Riso “<em>Riserva San Massimo</em>”, ragù di lepre, cime di rapa, Parmigiano Reggiano": "Reis “<em>Riserva San Massimo</em>”, Hasenragù, Steckrübenblätter, Parmigiano Reggiano", "Polpo nostrano, rabarbaro, piselli": "Heimischer Oktopus, Rhabarber, Erbsen", "Zucchina alla scapece, menta, yogurt, pepe Timut": "Marinierte Zucchini, Minze, Joghurt, Timutpfeffer", "Picanha, cardoncelli, fondo di manzo": "Picanha, Königskräuterseitlinge, Rinderjus", "Gambero viola crudo": "Rohe Violettgarnele", "Agnello": "Lamm"}, "orario": {"Martedì": "Dienstag", "Dal mercoledì al sabato": "Mittwoch bis Samstag", "Domenica": "Sonntag"}, "links": ["<u>Menu Italiano</u>", "<u>English Menu</u>", "<u>Carte en Française</u>", "<u>Carta en Español</u>"]}, "es": {"lang": "es", "lang_label": "Español", "title": "Carta — Santamonica", "degu_titolo": "Menú Degustación", "degu_portate_label": "platos", "degu_vini_label": "maridaje de vinos", "degu_nota": "Precio por persona, menú para toda la mesa.", "degu_intero_tavolo": "toda la mesa", "percorso_7": "Menú a libre elección del Chef", "note_carta_1": "Para mantener constantes el nivel cualitativo y las características organolépticas de las materias primas, los productos de pescado comprados frescos se someten a ultracongelación. Estos productos se señalan con el símbolo * para una información clara y transparente.", "note_carta_2": "La lista de alérgenos se puede consultar en la última página de esta carta.", "note_ospite_titolo": "Nota para nuestros huéspedes", "note_orario": "Para mantener constantes el nivel cualitativo y las características organolépticas, los productos frescos se ultracongelan y se señalan con el símbolo: *", "orario_titolo": "HORARIO DE SERVICIO:", "titolo_degustazione": "Menú Degustación", "sezioni": {"Crudi": "Crudos", "Sfiziosi": "Entrantes", "Amidi e Carboidrati": "Pastas & Cereales", "Non Solo Mare": "No Solo Mar"}, "unita": {"cad.": "ud."}, "piatti": {"Ali di razza, fave nostrane, mela verde, mandorle": "Aleta de raya, habas locales, manzana verde, almendras", "Animella di vitello, sedano rapa, nocciole, fondo di pesce": "Mollejas de ternera, apio nabo, avellanas, fondo de pescado", "Tortelli di cinghiale, dashi di orata, cipollina, shiso": "Tortelli de jabalí, dashi de dorada, cebolleta, shiso", "Tubetti “<em>Mancini</em>”, baccalà, kosho di agrumi, borlotti": "Tubetti “<em>Mancini</em>”, bacalao, kosho de cítricos, alubias borlotti", "Ombrina nostrana pescata ad amo, salicornia, indivia belga": "Corvina local de anzuelo, salicornia, endibia belga", "Gelato al limone nero, levistico, lime, cracker di latte": "Helado de limón negro, levístico, lima, cracker de leche", "Ostriche Fine de Claire": "Ostras Fine de Claire", "Ostriche Antilope": "Ostras Antilope", "Ostriche Enrico IV": "Ostras Enrico IV", "Scampi nostrani": "Cigalas locales", "Gamberi viola nostrani": "Gambas violetas locales", "Selezione solamente di pesci nostrani pescati ad amo": "Selección exclusivamente de pescados locales de anzuelo", "Degustazione di mare": "Degustación del mar", "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir": "Calamar local, guisantes frescos, bagna cauda ligera, kéfir", "Cavolo cappuccio, miso, lamponi, anacardi": "Col repollo, miso, frambuesas, anacardos", "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce": "Mollejas de ternera, apio nabo, avellanas, reducción de fondo de pescado", "“Non formaggi”": "“No quesos”", "(Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla)": "(Degustación de falsos quesos artesanales a base de anacardos y leche de almendra)", "Spaghettoni quadrati “<em>Mancini</em>”, anemoni di mare, nduja, maggiorana": "Spaghettoni cuadrados “<em>Mancini</em>”, anémonas de mar, nduja, mejorana", "Tubetti “<em>Mancini</em>”, baccalà, il nostro kosho di agrumi fermentato, borlotti": "Tubetti “<em>Mancini</em>”, bacalao, nuestro kosho de cítricos fermentado, borlotti", "Riso “<em>Riserva San Massimo</em>”, ragù di lepre, cime di rapa, Parmigiano Reggiano": "Arroz “<em>Riserva San Massimo</em>”, ragú de liebre, grelos, Parmigiano Reggiano", "Polpo nostrano, rabarbaro, piselli": "Pulpo local, ruibarbo, guisantes", "Zucchina alla scapece, menta, yogurt, pepe Timut": "Calabacín en escabeche, menta, yogur, pimienta Timut", "Picanha, cardoncelli, fondo di manzo": "Picanha, setas cardoncelli, jugo de ternera", "Gambero viola crudo": "Gamba violeta cruda", "Agnello": "Cordero"}, "orario": {"Martedì": "Martes", "Dal mercoledì al sabato": "De miércoles a sábado", "Domenica": "Domingo"}, "links": ["<u>Menu Italiano</u>", "<u>English Menu</u>", "<u>Carte en Française</u>", "<u>Speisekarte auf Deutsch</u>"]}};
 function costruisciHtmlTradotto(lang, t) {
   var menuForm = leggi();
   var m = costruisciMenuTradotto(menuForm, t);
@@ -38,7 +37,6 @@ function costruisciHtmlTradotto(lang, t) {
 }
 
 
-var tplBefore = '', tplAfter = '', dati = null, datiOriginali = null;
 
 function carica(input) {
   var f = input.files[0];
@@ -272,11 +270,6 @@ var DOLCI_PATH = 'menu-dolci.html';
 var MENU_DOLCI_IT = {"sezioni": [{"titolo": "Golosità", "piatti": [{"nome": "Gelato al limone nero, levistico, lime, cracker di latte", "prezzo": 14}, {"nome": "Ananas, parfait al carbone, caramello al caffè", "prezzo": 14}, {"nome": "Gelato al porcino, fragole, terra al cioccolato", "prezzo": 14}, {"nome": "Sacripantina", "prezzo": 11}, {"nome": "Erborinato ligure e Picolit Zorzettig", "prezzo": 12}]}], "allergeni": [{"nome": "Gelato al limone nero", "allergeni": "glutine, latticini"}, {"nome": "Gelato porcino", "allergeni": "latticini, uova"}, {"nome": "Ananas", "allergeni": "uovo, glutine, latticini"}, {"nome": "Sacripantina", "allergeni": "frutta a guscio, uovo, glutine, latticini, solforosa"}, {"nome": "Erborinato e Picolit", "allergeni": "latticini, solforosa"}], "pagine": [{"sezioni": ["Golosità"]}]};
 var TRADUZIONI_DOLCI = {"en": {"title": "Desserts — Santamonica", "sezione": "Sweets", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Black lemon gelato, lovage, lime, milk cracker", "Ananas, parfait al carbone, caramello al caffè": "Pineapple, charcoal parfait, coffee caramel", "Gelato al porcino, fragole, terra al cioccolato": "Porcini gelato, strawberries, chocolate soil", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Ligurian blue cheese and Picolit Zorzettig", "glutine, latticini": "gluten, dairy", "latticini, uova": "dairy, eggs", "uovo, glutine, latticini": "egg, gluten, dairy", "frutta a guscio, uovo, glutine, latticini, solforosa": "tree nuts, egg, gluten, dairy, sulphites", "latticini, solforosa": "dairy, sulphites", "Gelato al limone nero": "Black lemon gelato", "Gelato porcino": "Porcini gelato", "Ananas": "Pineapple", "Erborinato e Picolit": "Blue cheese and Picolit"}}, "fr": {"title": "Desserts — Santamonica", "sezione": "Gourmandises", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Glace citron noir, livèche, citron vert, cracker au lait", "Ananas, parfait al carbone, caramello al caffè": "Ananas, parfait au charbon, caramel au café", "Gelato al porcino, fragole, terra al cioccolato": "Glace aux cèpes, fraises, terre au chocolat", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Fromage persillé ligurien et Picolit Zorzettig", "glutine, latticini": "gluten, produits laitiers", "latticini, uova": "produits laitiers, œufs", "uovo, glutine, latticini": "œuf, gluten, produits laitiers", "frutta a guscio, uovo, glutine, latticini, solforosa": "fruits à coque, œuf, gluten, produits laitiers, sulfites", "latticini, solforosa": "produits laitiers, sulfites", "Gelato al limone nero": "Glace citron noir", "Gelato porcino": "Glace aux cèpes", "Ananas": "Ananas", "Erborinato e Picolit": "Fromage persillé et Picolit"}}, "de": {"title": "Desserts — Santamonica", "sezione": "Desserts", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Schwarzzitroneneis, Liebstöckel, Limette, Milchcracker", "Ananas, parfait al carbone, caramello al caffè": "Ananas, Kohle-Parfait, Kaffeekaramell", "Gelato al porcino, fragole, terra al cioccolato": "Steinpilzeis, Erdbeeren, Schokoladenerde", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Ligurischer Blauschimmelkäse und Picolit Zorzettig", "glutine, latticini": "Gluten, Milchprodukte", "latticini, uova": "Milchprodukte, Eier", "uovo, glutine, latticini": "Ei, Gluten, Milchprodukte", "frutta a guscio, uovo, glutine, latticini, solforosa": "Schalenfrüchte, Ei, Gluten, Milchprodukte, Sulfite", "latticini, solforosa": "Milchprodukte, Sulfite", "Gelato al limone nero": "Schwarzzitroneneis", "Gelato porcino": "Steinpilzeis", "Ananas": "Ananas", "Erborinato e Picolit": "Blauschimmelkäse und Picolit"}}, "es": {"title": "Postres — Santamonica", "sezione": "Delicias", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Helado de limón negro, levístico, lima, cracker de leche", "Ananas, parfait al carbone, caramello al caffè": "Piña, parfait de carbón, caramelo de café", "Gelato al porcino, fragole, terra al cioccolato": "Helado de boletus, fresas, tierra de chocolate", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Queso azul ligur y Picolit Zorzettig", "glutine, latticini": "gluten, lácteos", "latticini, uova": "lácteos, huevos", "uovo, glutine, latticini": "huevo, gluten, lácteos", "frutta a guscio, uovo, glutine, latticini, solforosa": "frutos secos, huevo, gluten, lácteos, sulfitos", "latticini, solforosa": "lácteos, sulfitos", "Gelato al limone nero": "Helado de limón negro", "Gelato porcino": "Helado de boletus", "Ananas": "Piña", "Erborinato e Picolit": "Queso azul y Picolit"}}};
 var tipoMenuCorrente = 'carta';
-var VINI_URL = 'https://santamonicagenova-a11y.github.io/SantaWeb/menu-vini.html';
-var VINI_PATH = 'menu-vini.html';
-var datiVini = null;
-var tplViniBefore = '', tplViniAfter = '';
-var TRADUZIONI_VINI = {};
 
 function costruisciOutput() {
   var m = leggi();
@@ -357,7 +350,6 @@ function caricaDalSito(tipo) {
   tipo = tipo || 'carta';
   tipoMenuCorrente = tipo;
   document.getElementById('carica-menu').classList.remove('open');
-  if (tipo === 'vini') { caricaViniDalSito(); return; }
   var url = tipo === 'dolci' ? DOLCI_URL : MENU_URL;
   var btn = document.querySelector('.btn-load');
   document.getElementById('err').textContent = '';
@@ -415,7 +407,6 @@ function chiudiModal() {
   document.getElementById('modal-token').classList.remove('on');
 }
 
-var TRANSLATIONS = {"en": {"lang": "en", "lang_label": "English", "title": "Menu — Santamonica", "degu_titolo": "Tasting Menu", "degu_portate_label": "courses", "degu_vini_label": "wine pairing", "degu_nota": "Price per person, menu to be shared by the whole table.", "degu_intero_tavolo": "the whole table", "percorso_7": "Chef's free interpretation menu", "note_carta_1": "To maintain consistent quality and organoleptic characteristics of raw ingredients, fresh fish products are blast-frozen after purchase. These products are marked with the symbol * for clear and transparent customer information.", "note_carta_2": "The list of allergens is available on the last page of this menu.", "note_ospite_titolo": "Guest notes", "note_orario": "To maintain consistent quality standards and organoleptic characteristics, fresh fish products are blast-frozen. These products are marked with the symbol: *", "orario_titolo": "OPENING HOURS:", "titolo_degustazione": "Tasting Menu", "sezioni": {"Crudi": "Raw", "Sfiziosi": "Starters", "Amidi e Carboidrati": "Pasta & Grains", "Non Solo Mare": "Not Only Sea"}, "unita": {"cad.": "ea."}, "piatti": {"Ali di razza, fave nostrane, mela verde, mandorle": "Skate wing, local broad beans, green apple, almonds", "Animella di vitello, sedano rapa, nocciole, fondo di pesce": "Veal sweetbread, celeriac, hazelnuts, fish stock", "Tortelli di cinghiale, dashi di orata, cipollina, shiso": "Wild boar tortelli, sea bream dashi, spring onion, shiso", "Tubetti “<em>Mancini</em>”, baccalà, kosho di agrumi, borlotti": "Tubetti “<em>Mancini</em>”, salt cod, citrus kosho, borlotti beans", "Ombrina nostrana pescata ad amo, salicornia, indivia belga": "Line-caught local meagre, sea purslane, Belgian endive", "Gelato al limone nero, levistico, lime, cracker di latte": "Black lemon ice cream, lovage, lime, milk cracker", "Ostriche Fine de Claire": "Fine de Claire Oysters", "Ostriche Antilope": "Antilope Oysters", "Ostriche Enrico IV": "Enrico IV Oysters", "Scampi nostrani": "Local langoustines", "Gamberi viola nostrani": "Local purple prawns", "Selezione solamente di pesci nostrani pescati ad amo": "Selection of local line-caught fish only", "Degustazione di mare": "Sea tasting", "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir": "Local squid, fresh peas, light bagna cauda, kefir", "Cavolo cappuccio, miso, lamponi, anacardi": "Cabbage, miso, raspberries, cashews", "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce": "Veal sweetbread, celeriac, hazelnuts, fish stock reduction", "“Non formaggi”": "“Not cheese”", "(Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla)": "(Tasting of artisan fake cheeses made with cashews and almond milk)", "Spaghettoni quadrati “<em>Mancini</em>”, anemoni di mare, nduja, maggiorana": "Square spaghettoni “<em>Mancini</em>”, sea anemones, nduja, marjoram", "Tubetti “<em>Mancini</em>”, baccalà, il nostro kosho di agrumi fermentato, borlotti": "Tubetti “<em>Mancini</em>”, salt cod, our fermented citrus kosho, borlotti beans", "Riso “<em>Riserva San Massimo</em>”, ragù di lepre, cime di rapa, Parmigiano Reggiano": "Rice “<em>Riserva San Massimo</em>”, hare ragù, turnip tops, Parmigiano Reggiano", "Polpo nostrano, rabarbaro, piselli": "Local octopus, rhubarb, peas", "Zucchina alla scapece, menta, yogurt, pepe Timut": "Marinated courgette, mint, yogurt, Timut pepper", "Picanha, cardoncelli, fondo di manzo": "Picanha, king oyster mushrooms, beef jus", "Gambero viola crudo": "Raw purple prawn", "Agnello": "Lamb"}, "orario": {"Martedì": "Tuesday", "Dal mercoledì al sabato": "Wednesday to Saturday", "Domenica": "Sunday"}, "links": ["<u>Italian Menu</u>", "<u>Carte en Française</u>", "<u>Speisekarte auf Deutsch</u>", "<u>Carta en Español</u>"]}, "fr": {"lang": "fr", "lang_label": "Français", "title": "Menu — Santamonica", "degu_titolo": "Menu Dégustation", "degu_portate_label": "plats", "degu_vini_label": "accord mets-vins", "degu_nota": "Prix par personne, menu à partager par toute la table.", "degu_intero_tavolo": "toute la table", "percorso_7": "Menu carte blanche du Chef", "note_carta_1": "Pour maintenir constants le niveau qualitatif et les caractéristiques organoleptiques des matières premières, les produits de la mer achetés frais sont surgelés à basse température. Ces produits sont signalés par le symbole * pour une information claire et transparente à la clientèle.", "note_carta_2": "La liste des allergènes est consultable à la dernière page de ce menu.", "note_ospite_titolo": "Note pour nos hôtes", "note_orario": "Pour maintenir constants le niveau qualitatif et les caractéristiques organoleptiques, les produits frais sont surgelés à basse température. Ces produits sont signalés par le symbole : *", "orario_titolo": "HORAIRES D'OUVERTURE :", "titolo_degustazione": "Menu Dégustation", "sezioni": {"Crudi": "Crus", "Sfiziosi": "Entrées", "Amidi e Carboidrati": "Pâtes & Céréales", "Non Solo Mare": "Pas Seulement la Mer"}, "unita": {"cad.": "p."}, "piatti": {"Ali di razza, fave nostrane, mela verde, mandorle": "Aile de raie, fèves locales, pomme verte, amandes", "Animella di vitello, sedano rapa, nocciole, fondo di pesce": "Ris de veau, céleri-rave, noisettes, fond de poisson", "Tortelli di cinghiale, dashi di orata, cipollina, shiso": "Tortelli de sanglier, dashi de dorade, ciboule, shiso", "Tubetti “<em>Mancini</em>”, baccalà, kosho di agrumi, borlotti": "Tubetti “<em>Mancini</em>”, morue, kosho d’agrumes, haricots borlotti", "Ombrina nostrana pescata ad amo, salicornia, indivia belga": "Ombrine locale à la ligne, salicorne, endive belge", "Gelato al limone nero, levistico, lime, cracker di latte": "Glace au citron noir, livèche, citron vert, cracker au lait", "Ostriche Fine de Claire": "Huîtres Fine de Claire", "Ostriche Antilope": "Huîtres Antilope", "Ostriche Enrico IV": "Huîtres Enrico IV", "Scampi nostrani": "Langoustines locales", "Gamberi viola nostrani": "Crevettes violettes locales", "Selezione solamente di pesci nostrani pescati ad amo": "Sélection exclusivement de poissons locaux pêchés à la ligne", "Degustazione di mare": "Dégustation de la mer", "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir": "Calamar local, petits pois frais, bagna cauda légère, kéfir", "Cavolo cappuccio, miso, lamponi, anacardi": "Chou pommé, miso, framboises, noix de cajou", "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce": "Ris de veau, céleri-rave, noisettes, réduction de fond de poisson", "“Non formaggi”": "“Non-fromages”", "(Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla)": "(Dégustation de faux fromages artisanaux à base de noix de cajou et lait d’amande)", "Spaghettoni quadrati “<em>Mancini</em>”, anemoni di mare, nduja, maggiorana": "Spaghettoni carrés “<em>Mancini</em>”, anémones de mer, nduja, marjolaine", "Tubetti “<em>Mancini</em>”, baccalà, il nostro kosho di agrumi fermentato, borlotti": "Tubetti “<em>Mancini</em>”, morue, notre kosho d’agrumes fermenté, borlotti", "Riso “<em>Riserva San Massimo</em>”, ragù di lepre, cime di rapa, Parmigiano Reggiano": "Riz “<em>Riserva San Massimo</em>”, ragû de lièvre, fanes de navet, Parmigiano Reggiano", "Polpo nostrano, rabarbaro, piselli": "Poulpe local, rhubarbe, petits pois", "Zucchina alla scapece, menta, yogurt, pepe Timut": "Courgette en escabèche, menthe, yaourt, poivre Timut", "Picanha, cardoncelli, fondo di manzo": "Picanha, pleurotes du panicaut, jus de bœuf", "Gambero viola crudo": "Crevette violette crue", "Agnello": "Agneau"}, "orario": {"Martedì": "Mardi", "Dal mercoledì al sabato": "Du mercredi au samedi", "Domenica": "Dimanche"}, "links": ["<u>Menu Italiano</u>", "<u>English Menu</u>", "<u>Speisekarte auf Deutsch</u>", "<u>Carta en Español</u>"]}, "de": {"lang": "de", "lang_label": "Deutsch", "title": "Speisekarte — Santamonica", "degu_titolo": "Degustationsmenü", "degu_portate_label": "Gänge", "degu_vini_label": "Weinbegleitung", "degu_nota": "Preis pro Person, Menü für den gesamten Tisch.", "degu_intero_tavolo": "den gesamten Tisch", "percorso_7": "Menü nach freier Wahl des Küchenchefs", "note_carta_1": "Um die Qualität und die organoleptischen Eigenschaften der Rohstoffe konstant zu halten, werden frisch eingekaufte Fischprodukte schockgefrostet. Diese Produkte sind mit dem Symbol * gekennzeichnet.", "note_carta_2": "Die Liste der Allergene finden Sie auf der letzten Seite dieser Speisekarte.", "note_ospite_titolo": "Hinweis für unsere Gäste", "note_orario": "Um die Qualität konstant zu halten, werden frische Fischprodukte schockgefrostet und mit dem Symbol * gekennzeichnet.", "orario_titolo": "ÖFFNUNGSZEITEN:", "titolo_degustazione": "Degustationsmenü", "sezioni": {"Crudi": "Rohkost", "Sfiziosi": "Vorspeisen", "Amidi e Carboidrati": "Pasta & Getreide", "Non Solo Mare": "Nicht Nur Meer"}, "unita": {"cad.": "Stk."}, "piatti": {"Ali di razza, fave nostrane, mela verde, mandorle": "Rochenflügel, heimische Saubohnen, grüner Apfel, Mandeln", "Animella di vitello, sedano rapa, nocciole, fondo di pesce": "Kalbsbries, Knollensellerie, Haselnüsse, Fischfond", "Tortelli di cinghiale, dashi di orata, cipollina, shiso": "Wildschweintortelli, Goldbrassen-Dashi, Frühlingszwiebel, Shiso", "Tubetti “<em>Mancini</em>”, baccalà, kosho di agrumi, borlotti": "Tubetti “<em>Mancini</em>”, Stockfisch, Zitruskosho, Borlottibohnen", "Ombrina nostrana pescata ad amo, salicornia, indivia belga": "Lokal geangelter Umberfisch, Queller, Chicorée", "Gelato al limone nero, levistico, lime, cracker di latte": "Schwarzzitronen-Eis, Liebstöckel, Limette, Milchcracker", "Ostriche Fine de Claire": "Fine de Claire Austern", "Ostriche Antilope": "Antilope Austern", "Ostriche Enrico IV": "Enrico IV Austern", "Scampi nostrani": "Heimische Scampi", "Gamberi viola nostrani": "Heimische Violettgarnelen", "Selezione solamente di pesci nostrani pescati ad amo": "Auswahl ausschließlich heimischer Angelfische", "Degustazione di mare": "Meeresverkostung", "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir": "Heimischer Tintenfisch, frische Erbsen, leichte Bagna Cauda, Kefir", "Cavolo cappuccio, miso, lamponi, anacardi": "Weißkohl, Miso, Himbeeren, Cashewnüsse", "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce": "Kalbsbries, Knollensellerie, Haselnüsse, Fischfondreduktion", "“Non formaggi”": "“Kein Käse”", "(Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla)": "(Verkostung handwerklicher Pseudokäse auf Cashew- und Mandelmilchbasis)", "Spaghettoni quadrati “<em>Mancini</em>”, anemoni di mare, nduja, maggiorana": "Quadratische Spaghettoni “<em>Mancini</em>”, Seeanemonen, Nduja, Majoran", "Tubetti “<em>Mancini</em>”, baccalà, il nostro kosho di agrumi fermentato, borlotti": "Tubetti “<em>Mancini</em>”, Stockfisch, unser fermentiertes Zitruskosho, Borlottibohnen", "Riso “<em>Riserva San Massimo</em>”, ragù di lepre, cime di rapa, Parmigiano Reggiano": "Reis “<em>Riserva San Massimo</em>”, Hasenragù, Steckrübenblätter, Parmigiano Reggiano", "Polpo nostrano, rabarbaro, piselli": "Heimischer Oktopus, Rhabarber, Erbsen", "Zucchina alla scapece, menta, yogurt, pepe Timut": "Marinierte Zucchini, Minze, Joghurt, Timutpfeffer", "Picanha, cardoncelli, fondo di manzo": "Picanha, Königskräuterseitlinge, Rinderjus", "Gambero viola crudo": "Rohe Violettgarnele", "Agnello": "Lamm"}, "orario": {"Martedì": "Dienstag", "Dal mercoledì al sabato": "Mittwoch bis Samstag", "Domenica": "Sonntag"}, "links": ["<u>Menu Italiano</u>", "<u>English Menu</u>", "<u>Carte en Française</u>", "<u>Carta en Español</u>"]}, "es": {"lang": "es", "lang_label": "Español", "title": "Carta — Santamonica", "degu_titolo": "Menú Degustación", "degu_portate_label": "platos", "degu_vini_label": "maridaje de vinos", "degu_nota": "Precio por persona, menú para toda la mesa.", "degu_intero_tavolo": "toda la mesa", "percorso_7": "Menú a libre elección del Chef", "note_carta_1": "Para mantener constantes el nivel cualitativo y las características organolépticas de las materias primas, los productos de pescado comprados frescos se someten a ultracongelación. Estos productos se señalan con el símbolo * para una información clara y transparente.", "note_carta_2": "La lista de alérgenos se puede consultar en la última página de esta carta.", "note_ospite_titolo": "Nota para nuestros huéspedes", "note_orario": "Para mantener constantes el nivel cualitativo y las características organolépticas, los productos frescos se ultracongelan y se señalan con el símbolo: *", "orario_titolo": "HORARIO DE SERVICIO:", "titolo_degustazione": "Menú Degustación", "sezioni": {"Crudi": "Crudos", "Sfiziosi": "Entrantes", "Amidi e Carboidrati": "Pastas & Cereales", "Non Solo Mare": "No Solo Mar"}, "unita": {"cad.": "ud."}, "piatti": {"Ali di razza, fave nostrane, mela verde, mandorle": "Aleta de raya, habas locales, manzana verde, almendras", "Animella di vitello, sedano rapa, nocciole, fondo di pesce": "Mollejas de ternera, apio nabo, avellanas, fondo de pescado", "Tortelli di cinghiale, dashi di orata, cipollina, shiso": "Tortelli de jabalí, dashi de dorada, cebolleta, shiso", "Tubetti “<em>Mancini</em>”, baccalà, kosho di agrumi, borlotti": "Tubetti “<em>Mancini</em>”, bacalao, kosho de cítricos, alubias borlotti", "Ombrina nostrana pescata ad amo, salicornia, indivia belga": "Corvina local de anzuelo, salicornia, endibia belga", "Gelato al limone nero, levistico, lime, cracker di latte": "Helado de limón negro, levístico, lima, cracker de leche", "Ostriche Fine de Claire": "Ostras Fine de Claire", "Ostriche Antilope": "Ostras Antilope", "Ostriche Enrico IV": "Ostras Enrico IV", "Scampi nostrani": "Cigalas locales", "Gamberi viola nostrani": "Gambas violetas locales", "Selezione solamente di pesci nostrani pescati ad amo": "Selección exclusivamente de pescados locales de anzuelo", "Degustazione di mare": "Degustación del mar", "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir": "Calamar local, guisantes frescos, bagna cauda ligera, kéfir", "Cavolo cappuccio, miso, lamponi, anacardi": "Col repollo, miso, frambuesas, anacardos", "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce": "Mollejas de ternera, apio nabo, avellanas, reducción de fondo de pescado", "“Non formaggi”": "“No quesos”", "(Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla)": "(Degustación de falsos quesos artesanales a base de anacardos y leche de almendra)", "Spaghettoni quadrati “<em>Mancini</em>”, anemoni di mare, nduja, maggiorana": "Spaghettoni cuadrados “<em>Mancini</em>”, anémonas de mar, nduja, mejorana", "Tubetti “<em>Mancini</em>”, baccalà, il nostro kosho di agrumi fermentato, borlotti": "Tubetti “<em>Mancini</em>”, bacalao, nuestro kosho de cítricos fermentado, borlotti", "Riso “<em>Riserva San Massimo</em>”, ragù di lepre, cime di rapa, Parmigiano Reggiano": "Arroz “<em>Riserva San Massimo</em>”, ragú de liebre, grelos, Parmigiano Reggiano", "Polpo nostrano, rabarbaro, piselli": "Pulpo local, ruibarbo, guisantes", "Zucchina alla scapece, menta, yogurt, pepe Timut": "Calabacín en escabeche, menta, yogur, pimienta Timut", "Picanha, cardoncelli, fondo di manzo": "Picanha, setas cardoncelli, jugo de ternera", "Gambero viola crudo": "Gamba violeta cruda", "Agnello": "Cordero"}, "orario": {"Martedì": "Martes", "Dal mercoledì al sabato": "De miércoles a sábado", "Domenica": "Domingo"}, "links": ["<u>Menu Italiano</u>", "<u>English Menu</u>", "<u>Carte en Française</u>", "<u>Speisekarte auf Deutsch</u>"]}};
 
 function traduci() {
   if (!dati) { alert('Prima carica il menù'); return; }
@@ -627,7 +618,6 @@ function filesDolci() {
 }
 
 function traduciEPubblica() {
-  if (tipoMenuCorrente === 'vini') { traduciEPubblicaVini(); return; }
   if (!dati) { alert('Prima carica il menù'); return; }
   var btn = document.getElementById('btn-pubblica');
   var m = leggi();
@@ -696,324 +686,4 @@ function toast(msg) {
   t.textContent = msg;
   t.classList.add('on');
   setTimeout(function(){ t.classList.remove('on'); }, 3000);
-}
-
-// ═══════════════════════════════════════════════════════
-// MENU VINI — funzioni admin (da aggiungere ad admin-core.js)
-// ═══════════════════════════════════════════════════════
-
-var VINI_URL = 'https://santamonicagenova-a11y.github.io/SantaWeb/menu-vini.html';
-var VINI_PATH = 'menu-vini.html';
-var datiVini = null;
-var tplViniBefore = '', tplViniAfter = '';
-
-// ─── Carica menu-vini.html da GitHub ───────────────────
-function caricaViniDalSito() {
-  toast('⏳ Caricamento lista vini...');
-  fetch(VINI_URL + '?v=' + Date.now(), { cache: 'no-store' })
-    .then(function(r) { return r.text(); })
-    .then(function(src) {
-      analizzaVini(src);
-      costruisciFormVini();
-      toast('✓ Lista vini caricata');
-    })
-    .catch(function(e) { toast('✗ Errore caricamento vini: ' + e); });
-}
-
-// ─── Estrae const MENU_VINI dal sorgente ───────────────
-function analizzaVini(src) {
-  var start = src.indexOf('const MENU_VINI = ');
-  if (start === -1) { toast('✗ MENU_VINI non trovato'); return; }
-  start += 'const MENU_VINI = '.length;
-  var depth = 0, i = start, inStr = false, strChar = '';
-  for (; i < src.length; i++) {
-    var c = src[i];
-    if (inStr) {
-      if (c === '\\') { i++; continue; }
-      if (c === strChar) inStr = false;
-    } else {
-      if (c === '"' || c === "'") { inStr = true; strChar = c; }
-      else if (c === '{' || c === '[') depth++;
-      else if (c === '}' || c === ']') { depth--; if (depth === 0) { i++; break; } }
-    }
-  }
-  var jsonStr = src.substring(start, i);
-  datiVini = (new Function('return ' + jsonStr))();
-  tplViniBefore = src.substring(0, src.indexOf('const MENU_VINI = '));
-  tplViniAfter = src.substring(i);
-  // rimuove il ';' finale che rimane
-  if (tplViniAfter.charAt(0) === ';') tplViniAfter = tplViniAfter.substring(1);
-}
-
-// ─── Leggi form e restituisce MENU_VINI aggiornato ─────
-function leggiFormVini() {
-  if (!datiVini) return null;
-  var m = JSON.parse(JSON.stringify(datiVini)); // deep copy
-  m.sezioni.forEach(function(sez, si) {
-    var viniList = raccogliViniDaForm(sez, si);
-    if (sez.sottosezioni) {
-      sez.sottosezioni.forEach(function(ss, ssi) {
-        ss.vini = raccogliViniDaForm(ss, si + '_' + ssi);
-      });
-    } else {
-      sez.vini = raccogliViniDaForm(sez, si);
-    }
-  });
-  return m;
-}
-
-function raccogliViniDaForm(contenitore, prefisso) {
-  var vini = [];
-  (contenitore.vini || []).forEach(function(v, vi) {
-    var p = 'vino_' + prefisso + '_' + vi + '_';
-    var nv = {};
-    nv.nome = getVal(p + 'nome') || v.nome;
-    var abv = getVal(p + 'abv');
-    if (abv) nv.abv = abv;
-    var extra = getVal(p + 'extra');
-    if (extra) nv.extra = extra;
-    else if (v.annata) { var an = getVal(p + 'annata'); if (an) nv.annata = an; }
-    var uve = getVal(p + 'uve');
-    if (uve) nv.uve = uve;
-    var regione = getVal(p + 'regione');
-    if (regione) nv.regione = regione;
-    var pb = getVal(p + 'prezzo_bottiglia');
-    if (pb) nv.prezzo_bottiglia = parseFloat(pb);
-    var pc = getVal(p + 'prezzo_calice');
-    if (pc) nv.prezzo_calice = parseFloat(pc);
-    var desc = getVal(p + 'descrizione');
-    if (desc) nv.descrizione = desc;
-    // Annate
-    if (v.annate) {
-      nv.annate = v.annate.map(function(a, ai) {
-        var ap = 'annata_' + prefisso + '_' + vi + '_' + ai + '_';
-        var na = {};
-        na.anno = getVal(ap + 'anno') || a.anno;
-        var aAbv = getVal(ap + 'abv');
-        if (aAbv) na.abv = aAbv;
-        var apb = getVal(ap + 'prezzo_bottiglia');
-        if (apb) na.prezzo_bottiglia = parseFloat(apb);
-        var apc = getVal(ap + 'prezzo_calice');
-        if (apc) na.prezzo_calice = parseFloat(apc);
-        return na;
-      });
-    }
-    if (v.a_calice) nv.a_calice = true;
-    vini.push(nv);
-  });
-  return vini;
-}
-
-function getVal(id) {
-  var el = document.getElementById(id);
-  return el ? el.value.trim() : '';
-}
-
-// ─── Costruisce il form di editing ─────────────────────
-function costruisciFormVini() {
-  if (!datiVini) return;
-  var html = '';
-  datiVini.sezioni.forEach(function(sez, si) {
-    html += '<div class="sez-block">';
-    html += '<div class="sez-hdr">' + sez.titolo + '</div>';
-    if (sez.sottosezioni) {
-      sez.sottosezioni.forEach(function(ss, ssi) {
-        if (ss.titolo) html += '<div class="subsez-hdr">' + ss.titolo + '</div>';
-        html += renderViniForm(ss, si + '_' + ssi);
-      });
-    } else {
-      html += renderViniForm(sez, si);
-    }
-    html += '</div>';
-  });
-  document.getElementById('form-area').innerHTML = html;
-}
-
-function renderViniForm(contenitore, prefisso) {
-  var html = '';
-  (contenitore.vini || []).forEach(function(v, vi) {
-    var p = 'vino_' + prefisso + '_' + vi + '_';
-    html += '<div class="vino-form">';
-    html += inpRow('Nome', p + 'nome', v.nome, 'full');
-    html += inpRow('ABV', p + 'abv', v.abv || '', 'short');
-    if (v.extra !== undefined) html += inpRow('Extra (sboccatura/annata/extra)', p + 'extra', v.extra || '', 'mid');
-    else if (v.annata !== undefined) html += inpRow('Annata', p + 'annata', v.annata || '', 'short');
-    html += inpRow('Uve', p + 'uve', v.uve || '', 'full');
-    if (v.regione !== undefined) html += inpRow('Regione', p + 'regione', v.regione || '', 'mid');
-    if (!v.annate) {
-      html += inpRow('Prezzo bottiglia (€)', p + 'prezzo_bottiglia', v.prezzo_bottiglia || '', 'short');
-      html += inpRow('Prezzo calice (€)', p + 'prezzo_calice', v.prezzo_calice || '', 'short');
-    }
-    html += taRow('Descrizione', p + 'descrizione', v.descrizione || '');
-    // Annate
-    if (v.annate && v.annate.length) {
-      html += '<div class="annate-form-hdr">Annate:</div>';
-      v.annate.forEach(function(a, ai) {
-        var ap = 'annata_' + prefisso + '_' + vi + '_' + ai + '_';
-        html += '<div class="annata-form-row">';
-        html += inpRow('Anno', ap + 'anno', a.anno || '', 'short');
-        html += inpRow('ABV', ap + 'abv', a.abv || '', 'short');
-        html += inpRow('€ bottiglia', ap + 'prezzo_bottiglia', a.prezzo_bottiglia || '', 'short');
-        html += inpRow('€ calice', ap + 'prezzo_calice', a.prezzo_calice || '', 'short');
-        html += '</div>';
-      });
-    }
-    html += '</div>';
-  });
-  return html;
-}
-
-function inpRow(label, id, val, size) {
-  var w = size === 'full' ? '100%' : size === 'mid' ? '60%' : '120px';
-  return '<div class="inp-row"><label>' + label + '</label><input id="' + id + '" value="' + escHtml(String(val)) + '" style="width:' + w + '"></div>';
-}
-function taRow(label, id, val) {
-  return '<div class="inp-row"><label>' + label + '</label><textarea id="' + id + '" rows="2" style="width:100%">' + escHtml(val) + '</textarea></div>';
-}
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-// ─── Costruisce output HTML vini (IT, sorgente) ────────
-function costruisciOutputVini() {
-  var mv = leggiFormVini();
-  if (!mv) return '';
-  var js = 'const MENU_VINI = ' + JSON.stringify(mv) + ';';
-  return tplViniBefore + js + tplViniAfter;
-}
-
-// ─── Preview vini ──────────────────────────────────────
-function apriPreviewVini(lang) {
-  if (!lang || lang === 'it') {
-    var html = costruisciOutputVini();
-    if (!html) { toast('✗ Nessun dato vini'); return; }
-    var blob = new Blob([html], {type: 'text/html'});
-    window.open(URL.createObjectURL(blob), '_blank');
-  } else {
-    window.open(VINI_URL.replace('menu-vini.html', 'menu-vini-' + lang + '.html') + '?v=' + Date.now(), '_blank');
-  }
-}
-
-// ─── Traduzione e pubblicazione vini ───────────────────
-var TRADUZIONI_VINI = {};
-
-function traduciEPubblicaVini() {
-  var mv = leggiFormVini();
-  if (!mv) { toast('✗ Nessun dato'); return; }
-  var nomi = [];
-  mv.sezioni.forEach(function(sez) {
-    function raccogliNomi(contenitore) {
-      (contenitore.vini || []).forEach(function(v) {
-        if (v.nome) nomi.push(v.nome);
-        if (v.descrizione) nomi.push(v.descrizione);
-        if (v.uve) nomi.push(v.uve);
-        if (v.annate) v.annate.forEach(function(a) { if (a.anno) nomi.push(a.anno); });
-      });
-    }
-    if (sez.sottosezioni) sez.sottosezioni.forEach(raccogliNomi);
-    else raccogliNomi(sez);
-    if (sez.titolo) nomi.push(sez.titolo);
-    if (sez.nota) nomi.push(sez.nota);
-    if (sez.sottosezioni) sez.sottosezioni.forEach(function(ss) { if (ss.titolo) nomi.push(ss.titolo); });
-  });
-  // Deduplica
-  nomi = nomi.filter(function(v, i, a) { return v && a.indexOf(v) === i; });
-  var langs = ['en', 'fr', 'de', 'es'];
-  var btn = document.getElementById('btn-pubblica');
-  if (btn) btn.disabled = true;
-
-  function traduciLang(li) {
-    if (li >= langs.length) {
-      pubblica_vini(mv);
-      return;
-    }
-    var lang = langs[li];
-    TRADUZIONI_VINI[lang] = {};
-    var idx = 0;
-    function next() {
-      if (idx >= nomi.length) {
-        toast('✦ Tradotto ' + lang.toUpperCase() + ' (' + (li+1) + '/4)');
-        setTimeout(function() { traduciLang(li + 1); }, 200);
-        return;
-      }
-      var testo = nomi[idx];
-      idx++;
-      if (btn) btn.textContent = '⏳ ' + lang + ' ' + idx + '/' + nomi.length;
-      var url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=it&tl=' + lang + '&dt=t&q=' + encodeURIComponent(testo);
-      fetch(url).then(function(r){return r.json();}).then(function(d){
-        TRADUZIONI_VINI[lang][testo] = d[0][0][0];
-        setTimeout(next, 80);
-      }).catch(function(){ TRADUZIONI_VINI[lang][testo] = testo; setTimeout(next, 80); });
-    }
-    next();
-  }
-  traduciLang(0);
-}
-
-function pubblica_vini(mv) {
-  var token = localStorage.getItem('gh_token');
-  if (!token) { token = prompt('GitHub token:'); if (!token) return; localStorage.setItem('gh_token', token); }
-  toast('⏳ Pubblicazione vini in corso...');
-  var itHtml = costruisciOutputVini();
-  var headers = { 'Authorization': 'token ' + token, 'Content-Type': 'application/json' };
-  var files = [{ path: VINI_PATH, content: itHtml }];
-  ['en','fr','de','es'].forEach(function(lang) {
-    files.push({ path: 'menu-vini-' + lang + '.html', content: costruisciViniTradotto(lang, mv) });
-  });
-  var idx = 0;
-  function next() {
-    if (idx >= files.length) {
-      if (document.getElementById('btn-pubblica')) document.getElementById('btn-pubblica').disabled = false;
-      toast('✓ Lista vini pubblicata in tutte le lingue');
-      return;
-    }
-    pubblicaFileVini(token, headers, files[idx].path, files[idx].content, function() { idx++; next(); });
-  }
-  next();
-}
-
-function pubblicaFileVini(token, headers, path, content, cb) {
-  var apiUrl = 'https://api.github.com/repos/santamonicagenova-a11y/SantaWeb/contents/' + path;
-  fetch(apiUrl, { headers: headers })
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-      var body = { message: 'Update ' + path + ' v2026.04.16', content: btoa(unescape(encodeURIComponent(content))), sha: d.sha || undefined };
-      return fetch(apiUrl, { method: 'PUT', headers: headers, body: JSON.stringify(body) });
-    })
-    .then(function() { cb(); })
-    .catch(function(e) { toast('✗ Errore ' + path); cb(); });
-}
-
-// ─── Genera HTML vini in lingua ────────────────────────
-function costruisciViniTradotto(lang, mv) {
-  var t = TRADUZIONI_VINI[lang] || {};
-  function tr(s) { return t[s] || s; }
-  // Traduce la struttura dati
-  var mvt = JSON.parse(JSON.stringify(mv));
-  mvt.sezioni.forEach(function(sez) {
-    sez.titolo = tr(sez.titolo);
-    if (sez.nota) sez.nota = tr(sez.nota);
-    function tradVini(contenitore) {
-      (contenitore.vini || []).forEach(function(v) {
-        if (v.descrizione) v.descrizione = tr(v.descrizione);
-        if (v.uve) v.uve = tr(v.uve);
-      });
-    }
-    if (sez.sottosezioni) {
-      sez.sottosezioni.forEach(function(ss) {
-        ss.titolo = tr(ss.titolo);
-        tradVini(ss);
-      });
-    } else {
-      tradVini(sez);
-    }
-  });
-  // Usa tplViniBefore/After con lang sostituito
-  var js = 'const MENU_VINI = ' + JSON.stringify(mvt) + ';';
-  var html = tplViniBefore + js + tplViniAfter;
-  html = html.replace('<html lang="it">', '<html lang="' + lang + '">');
-  var titles = { en: 'Wine List — Santamonica', fr: 'Carte des Vins — Santamonica', de: 'Weinkarte — Santamonica', es: 'Lista de Vinos — Santamonica' };
-  html = html.replace('<title>Lista Vini — Santamonica</title>', '<title>' + (titles[lang] || 'Lista Vini — Santamonica') + '</title>');
-  var coverTitles = { en: ['Wine List', 'Wine List'], fr: ['Carte des Vins', 'Carte des Vins'], de: ['Weinkarte', 'Weinkarte'], es: ['Lista de Vinos', 'Lista de Vinos'] };
-  return html;
 }

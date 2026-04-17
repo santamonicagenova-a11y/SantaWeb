@@ -173,10 +173,31 @@ function costruisci() {
     var fso = el('div','fs'); fso.appendChild(el('div','fs-head','Foglio Orario'));
     var bdo = el('div','fs-body'); bdo.appendChild(el('div','sub','Immagine QR code'));
     var qrRow = el('div'); qrRow.style.cssText = 'margin-bottom:.8rem';
-    var qrLbl = el('span','opt-lbl','URL immagine QR (vuoto = QR predefinito)'); qrLbl.style.display='block'; qrLbl.style.marginBottom='.3rem';
-    var qrInp = inp('text','orario-qr-url', m.orario.qr_url || ''); qrInp.style.width='100%'; qrInp.placeholder='https://esempio.com/qr.png';
-    qrRow.appendChild(qrLbl); qrRow.appendChild(qrInp);
-    if (m.orario.qr_url) { var qrPrev=document.createElement('img'); qrPrev.src=m.orario.qr_url; qrPrev.style.cssText='width:60px;height:60px;display:block;margin-top:.4rem;border:1px solid var(--rule)'; qrRow.appendChild(qrPrev); }
+    var qrLbl = el('span','opt-lbl','Seleziona immagine QR (PNG/JPG)'); qrLbl.style.display='block'; qrLbl.style.marginBottom='.3rem';
+    qrRow.appendChild(qrLbl);
+    // Anteprima immagine corrente
+    var qrPrev = document.createElement('img'); qrPrev.id='qr-preview';
+    qrPrev.style.cssText='width:60px;height:60px;display:'+(m.orario.qr_url?'block':'none')+';margin-bottom:.4rem;border:1px solid var(--rule)';
+    if (m.orario.qr_url) qrPrev.src = m.orario.qr_url;
+    qrRow.appendChild(qrPrev);
+    // Input file
+    var qrFile = document.createElement('input'); qrFile.type='file'; qrFile.id='orario-qr-file'; qrFile.accept='image/*';
+    qrFile.style.cssText='font-family:Jost,sans-serif;font-size:.78rem;cursor:pointer';
+    qrFile.onchange = function() {
+      var file = this.files[0]; if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var prev = document.getElementById('qr-preview');
+        if (prev) { prev.src = e.target.result; prev.style.display='block'; }
+      };
+      reader.readAsDataURL(file);
+    };
+    qrRow.appendChild(qrFile);
+    // Pulsante reset
+    var qrReset = document.createElement('button'); qrReset.textContent='✕ Ripristina QR predefinito';
+    qrReset.style.cssText='margin-top:.4rem;display:block;font-family:Jost,sans-serif;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:1px solid var(--rule);padding:.3rem .7rem;cursor:pointer;color:var(--stone)';
+    qrReset.onclick = function(e) { e.preventDefault(); var f=document.getElementById('orario-qr-file'); if(f) f.value=''; var p=document.getElementById('qr-preview'); if(p){p.src='';p.style.display='none';} };
+    qrRow.appendChild(qrReset);
     bdo.appendChild(qrRow); fso.appendChild(bdo); wrap.appendChild(fso);
   }
 }
@@ -217,8 +238,18 @@ function leggi() {
     });
   });
   if (m.orario) {
-    var qrEl=document.getElementById('orario-qr-url');
-    if(qrEl){ var qrVal=qrEl.value.trim(); if(qrVal) m.orario.qr_url=qrVal; else delete m.orario.qr_url; }
+    var qrFile = document.getElementById('orario-qr-file');
+    if (qrFile && qrFile.files && qrFile.files[0]) {
+      // Nuovo file selezionato — legge sincrono tramite preview già caricata
+      var qrPrevEl = document.getElementById('qr-preview');
+      if (qrPrevEl && qrPrevEl.src && qrPrevEl.src.indexOf('data:') === 0) {
+        m.orario.qr_url = qrPrevEl.src;
+      }
+    } else if (qrFile && !qrFile.files.length) {
+      // Reset: rimuovi qr_url solo se il preview è stato resettato
+      var qrPrevEl2 = document.getElementById('qr-preview');
+      if (qrPrevEl2 && qrPrevEl2.style.display === 'none') delete m.orario.qr_url;
+    }
   }
   if (m.allergeni) {
     m.allergeni.forEach(function(a, ai) {

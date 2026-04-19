@@ -48,9 +48,9 @@
   .hero-image-panel { position: relative; overflow: hidden; }
   .hero-image-panel img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.05); animation: zoomOut 1.4s 0.1s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
 
-  .btn-primary { display: inline-block; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-white); background: var(--ink); padding: 0.9rem 2rem; text-decoration: none; transition: background 0.2s; }
+  .btn-primary { display: inline-block; box-sizing: border-box; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-white); background: var(--ink); padding: 0.9rem 2rem; text-decoration: none; transition: background 0.2s; }
   .btn-primary:hover { background: var(--terracotta); }
-  .btn-secondary { display: inline-block; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); border: 1px solid var(--ink); padding: 0.9rem 2rem; text-decoration: none; transition: all 0.2s; }
+  .btn-secondary { display: inline-block; box-sizing: border-box; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); border: 1px solid var(--ink); padding: 0.9rem 2rem; text-decoration: none; transition: all 0.2s; }
   .btn-secondary:hover { background: var(--ink); color: var(--warm-white); }
 
   section { padding: 6rem 2rem; }
@@ -231,7 +231,7 @@
     <li><a href="#galleria" data-i18n="nav_galleria">Galleria</a></li>
     <li><a href="#prenota" data-i18n="nav_evento">Evento</a></li>
     <li><a href="#info" data-i18n="nav_info">Info</a></li>
-    <li><a href="#contatti" data-i18n="nav_contatti">Contatti</a></li>
+    <li><a href="#info" data-i18n="nav_contatti">Contatti</a></li>
   </ul>
   <div class="nav-right">
     <select class="lang-select" id="lang-select-nav" onchange="setLang(this.value)">
@@ -253,7 +253,7 @@
   <a href="#galleria" class="mobile-link" data-i18n="nav_galleria">Galleria</a>
   <a href="#prenota" class="mobile-link" data-i18n="nav_evento_mobile">Evento speciale</a>
   <a href="#info" class="mobile-link" data-i18n="nav_info_mobile">Info &amp; Orari</a>
-  <a href="#contatti" class="mobile-link" data-i18n="nav_contatti">Contatti</a>
+  <a href="#info" class="mobile-link" data-i18n="nav_contatti">Contatti</a>
   <select class="mobile-lang-select" id="lang-select-mobile" onchange="setLang(this.value)">
     <option value="it" selected>IT — Italiano</option>
     <option value="en">EN — English</option>
@@ -446,45 +446,12 @@
         <div class="info-block-content">
           Lungomare Lombardo 27<br>16145 Genova &mdash; Italy<br><br>
           <a href="tel:+390105533155">+39 010 553 31 55</a><br>
-          <a href="mailto:santamonicagenova@gmail.com">santamonicagenova@gmail.com</a>
-        </div>
-      </div>
-      <div>
-        <p class="info-block-label" data-i18n="info_note_label">Note</p>
-        <div class="info-block-content">
+          <a href="mailto:santamonicagenova@gmail.com">santamonicagenova@gmail.com</a><br><br>
           <span data-i18n="info_note_text">Si prega di segnalare eventuali allergie o intolleranze al momento della prenotazione.</span><br><br>
           <span data-i18n="info_animali">&#x1F43E; Accettiamo animali di tutte le taglie.</span>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<section id="contatti" style="background:var(--sand);">
-  <div class="section-inner">
-    <div class="contatti-grid">
-      <div class="reveal">
-        <p class="section-label" data-i18n="contatti_label">Scrivici</p>
-        <h2 class="section-title" data-i18n="contatti_title">Manda un <em>messaggio</em></h2>
-        <form id="contact-form" action="https://formspree.io/f/mkopjnvq" method="POST">
-          <div class="form-row">
-            <div class="form-group"><label for="nome" data-i18n="contatti_f_nome">Nome</label><input type="text" id="nome" name="nome" required></div>
-            <div class="form-group"><label for="cognome" data-i18n="contatti_f_cognome">Cognome</label><input type="text" id="cognome" name="cognome" required></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label for="email" data-i18n="contatti_f_email">Email</label><input type="email" id="email" name="email" required></div>
-            <div class="form-group"><label for="tel" data-i18n="contatti_f_tel">Telefono</label><input type="tel" id="tel" name="telefono"></div>
-          </div>
-          <div class="form-group"><label for="msg" data-i18n="contatti_f_msg">Messaggio</label><textarea id="msg" name="messaggio" required></textarea></div>
-          <div class="form-check">
-            <input type="checkbox" id="privacy" required>
-            <label for="privacy" data-i18n="contatti_f_privacy">Accetto la <a href="/privacy-policy">Privacy Policy</a> e i <a href="/cookies">Cookie</a></label>
-          </div>
-          <button type="submit" id="submit-btn" class="btn-primary" style="cursor:pointer;font-family:'Jost',sans-serif;border:none;" data-i18n="contatti_f_btn">Invia messaggio</button>
-          <div class="form-status" id="form-status"></div>
-        </form>
-      </div>
-      <div class="reveal" style="transition-delay:0.15s">
+      <div>
         <div class="map-wrapper">
           <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=8.960702%2C44.387346%2C8.968702%2C44.395346&layer=mapnik&marker=44.391346%2C8.964702" height="380" allowfullscreen loading="lazy" title="Mappa Santamonica Genova"></iframe>
           <div class="map-bar">
@@ -504,7 +471,7 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.17.01</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.17.02</a></p>
   </div>
 </footer>
 
@@ -579,19 +546,6 @@
     entries.forEach(function(e) { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
   }, { threshold: 0.12 });
   reveals.forEach(function(el) { observer.observe(el); });
-
-  var form = document.getElementById('contact-form');
-  var btn = document.getElementById('submit-btn');
-  var status = document.getElementById('form-status');
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault(); btn.disabled = true;
-    try {
-      var res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'Accept': 'application/json' } });
-      if (res.ok) { status.textContent = T[currentLang] ? T[currentLang].contatti_ok : 'Inviato!'; status.className = 'form-status success'; form.reset(); }
-      else { throw new Error(); }
-    } catch(err) { status.textContent = T[currentLang] ? T[currentLang].contatti_err : 'Errore.'; status.className = 'form-status error'; }
-    btn.disabled = false;
-  });
 
   var pForm = document.getElementById('prenota-form');
   var pBtn = document.getElementById('prenota-btn');

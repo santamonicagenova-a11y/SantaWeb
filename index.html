@@ -468,10 +468,26 @@
       <p class="section-label">Resta in contatto</p>
       <h2 class="section-title">La nostra <em>newsletter</em></h2>
       <p style="font-size:0.88rem;line-height:1.75;color:var(--ink-soft);margin-bottom:2rem;">Novità, menu stagionali e offerte speciali direttamente nella tua casella.</p>
-      <div style="border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(26,24,20,0.08);width:100%;max-width:540px;margin:0 auto;">
-        <iframe src="https://02558e4e.sibforms.com/serve/MUIFAP19U4mM3rIDX53JK3s315yNrbOdpn3j1-YETv1PVNkmqBoijV8pS5p9qV5NT2TztdDdAv6tuCnTRMTr3zNeVcsX7T40lLd10aDJHQEthGprUBgunsdVREeveVwg-_99TGHVoCiY5AFBlCJWawGgAMwzu8xDFope7UcYEFNQqvHwdEcATBYMGn36okvCRDd8nnSv2JLEzuFc1w==" frameborder="0" scrolling="auto" allowfullscreen style="display:block;width:100%;height:320px;border:none;"></iframe>
+      <div style="max-width:420px;margin:0 auto;">
+        <form id="sib-form" method="POST" action="https://02558e4e.sibforms.com/serve/MUIFAP19U4mM3rIDX53JK3s315yNrbOdpn3j1-YETv1PVNkmqBoijV8pS5p9qV5NT2TztdDdAv6tuCnTRMTr3zNeVcsX7T40lLd10aDJHQEthGprUBgunsdVREeveVwg-_99TGHVoCiY5AFBlCJWawGgAMwzu8xDFope7UcYEFNQqvHwdEcATBYMGn36okvCRDd8nnSv2JLEzuFc1w==" data-type="subscription" style="display:flex;flex-direction:column;gap:0.75rem;">
+          <input type="text" id="EMAIL" name="EMAIL" placeholder="La tua email" required autocomplete="off"
+            style="width:100%;padding:0.9rem 1rem;border:1px solid var(--divider);background:var(--warm-white);color:var(--ink);font-family:'Jost',sans-serif;font-size:0.85rem;outline:none;letter-spacing:0.05em;">
+          <label style="display:flex;align-items:flex-start;gap:0.6rem;cursor:pointer;text-align:left;">
+            <input type="checkbox" id="CONFERMA" name="CONFERMA" value="1" required
+              style="margin-top:3px;accent-color:var(--terracotta);flex-shrink:0;">
+            <span style="font-size:0.72rem;color:var(--ink-soft);line-height:1.5;">Accetto di ricevere la newsletter e le comunicazioni di Santamonica. Puoi annullare l'iscrizione in qualsiasi momento.</span>
+          </label>
+          <button type="submit"
+            style="width:100%;padding:0.9rem 2rem;background:var(--ink);border:none;color:var(--warm-white);font-family:'Jost',sans-serif;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;"
+            onmouseover="this.style.background='var(--terracotta)'" onmouseout="this.style.background='var(--ink)'">
+            Iscriviti
+          </button>
+          <input type="text" name="email_address_check" value="" style="display:none;">
+          <input type="hidden" name="locale" value="it">
+        </form>
+        <div id="error-message" style="display:none;margin-top:0.75rem;padding:0.75rem 1rem;background:#ffeded;color:#661d1d;font-size:0.78rem;font-family:'Jost',sans-serif;">La tua iscrizione non può essere convalidata.</div>
+        <div id="success-message" style="display:none;margin-top:0.75rem;padding:0.75rem 1rem;background:#e7faf0;color:#085229;font-size:0.78rem;font-family:'Jost',sans-serif;">La tua iscrizione è avvenuta correttamente.</div>
       </div>
-      <p style="font-size:0.68rem;color:var(--ink-soft);opacity:0.6;margin-top:1rem;letter-spacing:0.05em;">Puoi disiscriverti in qualsiasi momento. Leggi la nostra <a href="/privacy-policy" style="color:var(--terracotta);text-decoration:underline;">Privacy Policy</a>.</p>
     </div>
   </div>
 </section>
@@ -483,7 +499,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.17.10</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.17.11</a></p>
   </div>
 </footer>
 
@@ -602,5 +618,14 @@
   document.getElementById('cookie-accept').addEventListener('click', function() { localStorage.setItem('cookie-choice', 'accepted'); banner.classList.remove('visible'); loadGA(); });
   document.getElementById('cookie-decline').addEventListener('click', function() { localStorage.setItem('cookie-choice', 'declined'); banner.classList.remove('visible'); });
 </script>
+<script>
+  window.REQUIRED_CODE_ERROR_MESSAGE = 'Scegli un prefisso paese';
+  window.LOCALE = 'it';
+  window.EMAIL_INVALID_MESSAGE = "Le informazioni fornite non sono valide.";
+  window.REQUIRED_ERROR_MESSAGE = "Questo campo non può essere lasciato vuoto.";
+  window.GENERIC_INVALID_MESSAGE = "Le informazioni fornite non sono valide.";
+  var AUTOHIDE = Boolean(0);
+</script>
+<script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
 </body>
 </html>

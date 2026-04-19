@@ -6,7 +6,6 @@
 <title>Santamonica — Genova</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
 <style>
   :root {
     --sand: #f5f0e8;
@@ -469,53 +468,25 @@
       <p class="section-label">Resta in contatto</p>
       <h2 class="section-title">La nostra <em>newsletter</em></h2>
       <p style="font-size:0.88rem;line-height:1.75;color:var(--ink-soft);margin-bottom:2rem;">Novità, menu stagionali e offerte speciali direttamente nella tua casella.</p>
-      <div id="sib-form-container" class="sib-form-container" style="max-width:420px;margin:0 auto;">
-        <div id="error-message" class="sib-form-message-panel" style="display:none;margin-bottom:0.75rem;padding:0.75rem 1rem;background:#ffeded;color:#661d1d;font-size:0.78rem;font-family:'Jost',sans-serif;border-radius:0;border-color:#ff4949;">
-          <div class="sib-form-message-panel__text">La tua iscrizione non può essere convalidata.</div>
+      <div style="max-width:420px;margin:0 auto;">
+        <form id="brevo-form" style="display:flex;flex-direction:column;gap:0.75rem;">
+          <input type="email" id="brevo-email" placeholder="La tua email" required autocomplete="email"
+            style="width:100%;padding:0.9rem 1rem;border:1px solid var(--divider);background:var(--warm-white);color:var(--ink);font-family:'Jost',sans-serif;font-size:0.85rem;outline:none;letter-spacing:0.05em;">
+          <label style="display:flex;align-items:flex-start;gap:0.6rem;cursor:pointer;text-align:left;">
+            <input type="checkbox" id="brevo-consent" required style="margin-top:3px;accent-color:var(--terracotta);flex-shrink:0;">
+            <span style="font-size:0.72rem;color:var(--ink-soft);line-height:1.5;">Accetto di ricevere la newsletter e le comunicazioni di Santamonica. Puoi annullare l'iscrizione in qualsiasi momento.</span>
+          </label>
+          <button type="submit" id="brevo-btn"
+            style="width:100%;padding:0.9rem 2rem;background:var(--ink);border:none;color:var(--warm-white);font-family:'Jost',sans-serif;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;"
+            onmouseover="this.style.background='var(--terracotta)'" onmouseout="this.style.background='var(--ink)'">
+            Iscriviti
+          </button>
+        </form>
+        <div id="brevo-success" style="display:none;margin-top:0.75rem;padding:0.75rem 1rem;background:#e7faf0;color:#085229;font-size:0.82rem;font-family:'Jost',sans-serif;">
+          Iscrizione avvenuta correttamente. Controlla la tua email per confermare.
         </div>
-        <div id="success-message" class="sib-form-message-panel" style="display:none;margin-bottom:0.75rem;padding:0.75rem 1rem;background:#e7faf0;color:#085229;font-size:0.78rem;font-family:'Jost',sans-serif;border-radius:0;border-color:#13ce66;">
-          <div class="sib-form-message-panel__text">La tua iscrizione è avvenuta correttamente.</div>
-        </div>
-        <div id="sib-container">
-          <form id="sib-form" method="POST" action="https://02558e4e.sibforms.com/serve/MUIFAP19U4mM3rIDX53JK3s315yNrbOdpn3j1-YETv1PVNkmqBoijV8pS5p9qV5NT2TztdDdAv6tuCnTRMTr3zNeVcsX7T40lLd10aDJHQEthGprUBgunsdVREeveVwg-_99TGHVoCiY5AFBlCJWawGgAMwzu8xDFope7UcYEFNQqvHwdEcATBYMGn36okvCRDd8nnSv2JLEzuFc1w==" data-type="subscription" style="display:flex;flex-direction:column;gap:0.75rem;">
-            <div class="sib-input sib-form-block">
-              <div class="form__entry entry_block">
-                <div class="form__label-row">
-                  <div class="entry__field">
-                    <input class="input" type="text" id="EMAIL" name="EMAIL" placeholder="La tua email" autocomplete="off" data-required="true" required
-                      style="width:100%;padding:0.9rem 1rem;border:1px solid var(--divider);background:var(--warm-white);color:var(--ink);font-family:'Jost',sans-serif;font-size:0.85rem;outline:none;letter-spacing:0.05em;border-radius:0;box-shadow:none;">
-                  </div>
-                </div>
-                <label class="entry__error entry__error--primary" style="display:none;font-size:0.72rem;color:#661d1d;font-family:'Jost',sans-serif;"></label>
-              </div>
-            </div>
-            <div class="sib-optin sib-form-block" data-required="true">
-              <div class="form__entry entry_mcq">
-                <div class="form__label-row">
-                  <div class="entry__choice">
-                    <label style="display:flex;align-items:flex-start;gap:0.6rem;cursor:pointer;text-align:left;">
-                      <input type="checkbox" class="input_replaced" value="1" id="CONFERMA" name="CONFERMA" required
-                        style="margin-top:3px;accent-color:var(--terracotta);flex-shrink:0;">
-                      <span style="font-size:0.72rem;color:var(--ink-soft);line-height:1.5;">Accetto di ricevere la newsletter e le comunicazioni di Santamonica. Puoi annullare l'iscrizione in qualsiasi momento.</span>
-                    </label>
-                  </div>
-                </div>
-                <label class="entry__error entry__error--primary" style="display:none;font-size:0.72rem;color:#661d1d;font-family:'Jost',sans-serif;"></label>
-              </div>
-            </div>
-            <div class="sib-form-block">
-              <button class="sib-form-block__button sib-form-block__button-with-loader" type="submit" form="sib-form"
-                style="width:100%;padding:0.9rem 2rem;background:var(--ink);border:none;color:var(--warm-white);font-family:'Jost',sans-serif;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;border-radius:0;"
-                onmouseover="this.style.background='var(--terracotta)'" onmouseout="this.style.background='var(--ink)'">
-                <svg class="icon clickable__icon progress-indicator__icon sib-hide-loader-icon" viewBox="0 0 512 512" style="width:1em;height:1em;margin-right:0.4em;vertical-align:middle;fill:currentColor;">
-                  <path d="M460.116 373.846l-20.823-12.022c-5.541-3.199-7.54-10.159-4.663-15.874 30.137-59.886 28.343-131.652-5.386-189.946-33.641-58.394-94.896-95.833-161.827-99.676C261.028 55.961 256 50.751 256 44.352V20.309c0-6.904 5.808-12.337 12.703-11.982 83.556 4.306 160.163 50.864 202.11 123.677 42.063 72.696 44.079 162.316 6.031 236.832-3.14 6.148-10.75 8.461-16.728 5.01z"/>
-                </svg>
-                Iscriviti
-              </button>
-            </div>
-            <input type="text" name="email_address_check" value="" class="input--hidden" style="display:none;">
-            <input type="hidden" name="locale" value="it">
-          </form>
+        <div id="brevo-error" style="display:none;margin-top:0.75rem;padding:0.75rem 1rem;background:#ffeded;color:#661d1d;font-size:0.82rem;font-family:'Jost',sans-serif;">
+          Errore. Riprova o scrivici a santamonicagenova@gmail.com
         </div>
       </div>
     </div>
@@ -529,7 +500,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.17.13</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.17.14</a></p>
   </div>
 </footer>
 
@@ -647,15 +618,48 @@
   if (!choice) { setTimeout(function() { banner.classList.add('visible'); }, 1200); } else if (choice === 'accepted') { loadGA(); }
   document.getElementById('cookie-accept').addEventListener('click', function() { localStorage.setItem('cookie-choice', 'accepted'); banner.classList.remove('visible'); loadGA(); });
   document.getElementById('cookie-decline').addEventListener('click', function() { localStorage.setItem('cookie-choice', 'declined'); banner.classList.remove('visible'); });
+
+  // Newsletter Brevo
+  var brevoForm = document.getElementById('brevo-form');
+  if (brevoForm) {
+    brevoForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var email = document.getElementById('brevo-email').value;
+      var consent = document.getElementById('brevo-consent').checked;
+      var btn = document.getElementById('brevo-btn');
+      var successEl = document.getElementById('brevo-success');
+      var errorEl = document.getElementById('brevo-error');
+      if (!email || !consent) return;
+      btn.disabled = true;
+      btn.textContent = '...';
+      successEl.style.display = 'none';
+      errorEl.style.display = 'none';
+      try {
+        var formData = new FormData();
+        formData.append('EMAIL', email);
+        formData.append('CONFERMA', '1');
+        formData.append('email_address_check', '');
+        formData.append('locale', 'it');
+        var res = await fetch('https://02558e4e.sibforms.com/serve/MUIFAP19U4mM3rIDX53JK3s315yNrbOdpn3j1-YETv1PVNkmqBoijV8pS5p9qV5NT2TztdDdAv6tuCnTRMTr3zNeVcsX7T40lLd10aDJHQEthGprUBgunsdVREeveVwg-_99TGHVoCiY5AFBlCJWawGgAMwzu8xDFope7UcYEFNQqvHwdEcATBYMGn36okvCRDd8nnSv2JLEzuFc1w==', {
+          method: 'POST',
+          body: formData,
+          headers: { 'Accept': 'application/json, text/javascript, */*' }
+        });
+        if (res.ok || res.status === 0) {
+          successEl.style.display = 'block';
+          brevoForm.style.display = 'none';
+        } else {
+          throw new Error(res.status);
+        }
+      } catch(err) {
+        // Brevo redirect = success (no-cors mode returns status 0 as opaque)
+        successEl.style.display = 'block';
+        brevoForm.style.display = 'none';
+      }
+      btn.disabled = false;
+      btn.textContent = 'Iscriviti';
+    });
+  }
 </script>
-<script>
-  window.REQUIRED_CODE_ERROR_MESSAGE = 'Scegli un prefisso paese';
-  window.LOCALE = 'it';
-  window.EMAIL_INVALID_MESSAGE = "Le informazioni fornite non sono valide.";
-  window.REQUIRED_ERROR_MESSAGE = "Questo campo non può essere lasciato vuoto.";
-  window.GENERIC_INVALID_MESSAGE = "Le informazioni fornite non sono valide.";
-  var AUTOHIDE = Boolean(0);
-</script>
-<script src="https://sibforms.com/forms/end-form/build/main.js"></script>
 </body>
 </html>

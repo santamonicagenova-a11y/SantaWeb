@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.20.01 -->
+<!-- versione v 2026.04.20.02 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -117,7 +117,7 @@
   <div class="fs">
     <div class="fs-head">Foto — Sezione &ldquo;La nostra cucina&rdquo;</div>
     <div class="fs-body">
-      <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">Seleziona fino a 6 foto. Quelle compilate sostituiranno le foto attuali nella sezione cucina del sito. La griglia si adatta automaticamente al numero di immagini caricate.</p>
+      <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">Seleziona fino a 6 foto. Quelle compilate sostituiranno le foto nella galleria <strong>La nostra cucina</strong>. La griglia si adatta automaticamente: la prima e l'ultima foto saranno in formato largo.</p>
       <div id="foto-slots"></div>
       <div style="margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;">
         <button class="btn btn-publish" onclick="pubblicaFotoCucina()">✦ Pubblica foto</button>
@@ -146,7 +146,7 @@ function apriGestoreFoto() {
   fotoDati = [null,null,null,null,null,null];
   document.getElementById('foto-status').style.color = 'var(--stone)';
   document.getElementById('foto-status').textContent = 'Caricamento foto attuali…';
-  fetch(FOTO_BASE + 'cucina-photos.json?t=' + Date.now(), { cache:'no-store' })
+  fetch(FOTO_BASE + 'gallery-photos.json?t=' + Date.now(), { cache:'no-store' })
     .then(function(r){ return r.ok ? r.json() : []; })
     .catch(function(){ return []; })
     .then(function(data){
@@ -252,13 +252,13 @@ async function _eseguiPubblicaFoto(token) {
   for (var i=0; i<6; i++) {
     var d = fotoDati[i]; if (!d) continue;
     var altText = (document.getElementById('alt-'+i) ? document.getElementById('alt-'+i).value : '') || d.alt || '';
-    var filePath = 'img/cucina/foto'+(i+1)+'.jpg';
+    var filePath = 'img/galleria/foto'+(i+1)+'.jpg';
     if (d.file && d.dataUrl) {
       statusEl.textContent = '⏳ Carico foto '+(i+1)+'…';
       var base64 = d.dataUrl.split(',')[1];
       var sha=null;
       try { var chk=await fetch(apiBase+filePath,{headers:headers}); if(chk.ok){var ex=await chk.json();sha=ex.sha||null;} } catch(e){}
-      var body={message:'Foto cucina '+(i+1),content:base64}; if(sha) body.sha=sha;
+      var body={message:'Foto galleria '+(i+1),content:base64}; if(sha) body.sha=sha;
       var r=await fetch(apiBase+filePath,{method:'PUT',headers:headers,body:JSON.stringify(body)});
       if(!r.ok){statusEl.style.color='var(--rust)';statusEl.textContent='✗ Errore foto '+(i+1);return;}
     }
@@ -266,12 +266,12 @@ async function _eseguiPubblicaFoto(token) {
   }
 
   if (!photoList.length) { statusEl.style.color='var(--rust)'; statusEl.textContent='✗ Nessuna foto selezionata'; return; }
-  statusEl.textContent = '⏳ Aggiorno cucina-photos.json…';
+  statusEl.textContent = '⏳ Aggiorno gallery-photos.json…';
   var jsonB64 = btoa(unescape(encodeURIComponent(JSON.stringify(photoList,null,2))));
   var jSha=null;
-  try { var jc=await fetch(apiBase+'cucina-photos.json',{headers:headers}); if(jc.ok){var je=await jc.json();jSha=je.sha||null;} } catch(e){}
-  var jBody={message:'Aggiorno cucina-photos.json',content:jsonB64}; if(jSha) jBody.sha=jSha;
-  var jRes=await fetch(apiBase+'cucina-photos.json',{method:'PUT',headers:headers,body:JSON.stringify(jBody)});
+  try { var jc=await fetch(apiBase+'gallery-photos.json',{headers:headers}); if(jc.ok){var je=await jc.json();jSha=je.sha||null;} } catch(e){}
+  var jBody={message:'Aggiorno gallery-photos.json',content:jsonB64}; if(jSha) jBody.sha=jSha;
+  var jRes=await fetch(apiBase+'gallery-photos.json',{method:'PUT',headers:headers,body:JSON.stringify(jBody)});
   if (jRes.ok) { statusEl.style.color='#2d6a4f'; statusEl.textContent='✓ Foto pubblicate! Il sito si aggiornerà entro 90 secondi.'; }
   else { statusEl.style.color='var(--rust)'; statusEl.textContent='✗ Errore aggiornamento JSON.'; }
 }
@@ -306,6 +306,6 @@ async function _eseguiPubblicaFoto(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.20.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.20.02</div>
 </body>
 </html>

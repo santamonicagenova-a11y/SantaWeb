@@ -294,7 +294,10 @@
           <a id="dolci-btn" href="menu-dolci-it.html" target="_blank" class="btn-secondary" data-i18n="dolci_btn">Men&ugrave; dolci</a>
         </div>
       </div>
-      <div class="cucina-images reveal" id="cucina-imgs" style="transition-delay:0.15s"></div>
+      <div class="cucina-images reveal" style="transition-delay:0.15s">
+        <img src="https://static.wixstatic.com/media/461837_166ee198f58246e68b5dba24fc9b68ef~mv2.jpg" alt="Cucina Santamonica">
+        <img src="https://static.wixstatic.com/media/461837_d7446c2748b64bd4acdb089d7c65bf7d~mv2.jpg" alt="Ingredienti freschi">
+      </div>
     </div>
   </div>
 </section>
@@ -308,13 +311,7 @@
   <div class="section-inner">
     <p class="section-label reveal" data-i18n="galleria_label">La nostra cucina</p>
     <h2 class="section-title reveal" data-i18n="galleria_title">Ogni piatto,<br><em>una storia</em></h2>
-    <div class="galleria-grid">
-      <div class="galleria-item grande reveal" onclick="openLightbox(0)"><img src="img/piatto-pesce.jpg" alt="Pesce alla griglia"></div>
-      <div class="galleria-item reveal" onclick="openLightbox(1)" style="transition-delay:0.1s"><img src="img/piatto-tonno.jpg" alt="Tonno scottato"></div>
-      <div class="galleria-item reveal" onclick="openLightbox(2)" style="transition-delay:0.15s"><img src="img/piatto-pasta.jpg" alt="Pasta fresca"></div>
-      <div class="galleria-item reveal" onclick="openLightbox(3)" style="transition-delay:0.2s"><img src="img/piatto-carne.jpg" alt="Secondo piatto"></div>
-      <div class="galleria-item grande reveal" onclick="openLightbox(4)" style="transition-delay:0.25s"><img src="img/piatto-dessert.jpg" alt="Dessert"></div>
-    </div>
+    <div class="galleria-grid" id="galleria-grid"></div>
   </div>
 </section>
 
@@ -497,7 +494,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.20.01</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.20.02</a></p>
   </div>
 </footer>
 
@@ -586,14 +583,42 @@
     pBtn.disabled = false;
   });
 
-  var galleryImages = [
-    { src: 'img/piatto-pesce.jpg', alt: 'Pesce alla griglia' },
-    { src: 'img/piatto-tonno.jpg', alt: 'Tonno scottato' },
-    { src: 'img/piatto-pasta.jpg', alt: 'Pasta fresca' },
-    { src: 'img/piatto-carne.jpg', alt: 'Secondo piatto' },
+  var galleryImages = [];
+  var currentImg = 0;
+
+  function buildGallery(photos) {
+    galleryImages = photos;
+    var grid = document.getElementById('galleria-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    photos.forEach(function(p, i) {
+      var isGrande = (i === 0) || (photos.length >= 5 && i === photos.length - 1);
+      var div = document.createElement('div');
+      div.className = 'galleria-item reveal' + (isGrande ? ' grande' : '');
+      if (i > 0) div.style.transitionDelay = (i * 0.05) + 's';
+      div.onclick = (function(idx){ return function(){ openLightbox(idx); }; })(i);
+      var img = document.createElement('img');
+      img.src = p.src; img.alt = p.alt || '';
+      div.appendChild(img);
+      grid.appendChild(div);
+    });
+    // Rilancia observer per reveal
+    var newReveals = grid.querySelectorAll('.reveal');
+    newReveals.forEach(function(el) { observer.observe(el); });
+  }
+
+  var galleryDefaults = [
+    { src: 'img/piatto-pesce.jpg',   alt: 'Pesce alla griglia' },
+    { src: 'img/piatto-tonno.jpg',   alt: 'Tonno scottato' },
+    { src: 'img/piatto-pasta.jpg',   alt: 'Pasta fresca' },
+    { src: 'img/piatto-carne.jpg',   alt: 'Secondo piatto' },
     { src: 'img/piatto-dessert.jpg', alt: 'Dessert' }
   ];
-  var currentImg = 0;
+
+  fetch('gallery-photos.json?t=' + Date.now(), { cache: 'no-store' })
+    .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
+    .then(function(d) { buildGallery(d && d.length ? d : galleryDefaults); })
+    .catch(function() { buildGallery(galleryDefaults); });
   function openLightbox(i) { currentImg = i; document.getElementById('lightbox-img').src = galleryImages[i].src; document.getElementById('lightbox').classList.add('visible'); document.body.style.overflow = 'hidden'; }
   function closeLightbox() { document.getElementById('lightbox').classList.remove('visible'); document.body.style.overflow = ''; }
   function changeLightbox(dir) { currentImg = (currentImg + dir + galleryImages.length) % galleryImages.length; document.getElementById('lightbox-img').src = galleryImages[currentImg].src; }
@@ -657,35 +682,6 @@
       btn.textContent = 'Iscriviti';
     });
   }
-
-  // ---- Foto sezione cucina: carica da cucina-photos.json, fallback Wix ----
-  (function() {
-    var c = document.getElementById('cucina-imgs');
-    if (!c) return;
-    var defaults = [
-      { src: 'https://static.wixstatic.com/media/461837_166ee198f58246e68b5dba24fc9b68ef~mv2.jpg', alt: 'Cucina Santamonica' },
-      { src: 'https://static.wixstatic.com/media/461837_d7446c2748b64bd4acdb089d7c65bf7d~mv2.jpg', alt: 'Ingredienti freschi' }
-    ];
-    function renderFoto(photos) {
-      c.innerHTML = '';
-      var n = photos.length;
-      if (n === 0) { renderFoto(defaults); return; }
-      if      (n === 1) c.style.gridTemplateColumns = '1fr';
-      else if (n <= 4)  c.style.gridTemplateColumns = '1fr 1fr';
-      else              c.style.gridTemplateColumns = 'repeat(3, 1fr)';
-      photos.forEach(function(p, i) {
-        var img = document.createElement('img');
-        img.src = p.src;
-        img.alt = p.alt || '';
-        if (i === 0 && n === 2) img.style.marginTop = '3rem';
-        c.appendChild(img);
-      });
-    }
-    fetch('cucina-photos.json?t=' + Date.now(), { cache: 'no-store' })
-      .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
-      .then(function(d) { renderFoto(d && d.length ? d : defaults); })
-      .catch(function() { renderFoto(defaults); });
-  })();
 </script>
 </body>
 </html>

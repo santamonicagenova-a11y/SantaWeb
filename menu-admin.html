@@ -83,6 +83,7 @@
         <a onclick="caricaDalSito('carta')">☞ Menù alla carta</a>
         <a onclick="caricaDalSito('dolci')">☞ Menù dolci</a>
         <a onclick="caricaDalSito('allergeni')">☞ Allergeni carta</a>
+        <a onclick="apriGestoreFoto()">📷 Foto cucina</a>
       </div>
     </div>
     <button class="btn btn-load" onclick="document.getElementById('file-input').click()">↑ Carica da file</button>
@@ -111,11 +112,185 @@
 </div>
 
 <div class="wrap" id="wrap"></div>
+
+<div id="foto-section" style="max-width:700px;margin:1.5rem auto;padding:0 1rem;display:none;">
+  <div class="fs">
+    <div class="fs-head">Foto — Sezione &ldquo;La nostra cucina&rdquo;</div>
+    <div class="fs-body">
+      <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">Seleziona fino a 6 foto. Quelle compilate sostituiranno le foto attuali nella sezione cucina del sito. La griglia si adatta automaticamente al numero di immagini caricate.</p>
+      <div id="foto-slots"></div>
+      <div style="margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;">
+        <button class="btn btn-publish" onclick="pubblicaFotoCucina()">✦ Pubblica foto</button>
+        <button class="btn btn-load" onclick="chiudiFoto()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
+        <span id="foto-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast">✓ Scaricato!</div>
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates.js"></script>
 <script src="admin-core.js"></script>
+<script>
+// ══ FOTO CUCINA ══════════════════════════════════════════
+var fotoDati = [null,null,null,null,null,null];
+var FOTO_BASE = 'https://santamonicagenova-a11y.github.io/SantaWeb/';
+
+function apriGestoreFoto() {
+  document.getElementById('carica-menu').classList.remove('open');
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('wrap').classList.remove('on');
+  document.getElementById('foto-section').style.display = 'block';
+  fotoDati = [null,null,null,null,null,null];
+  document.getElementById('foto-status').style.color = 'var(--stone)';
+  document.getElementById('foto-status').textContent = 'Caricamento foto attuali…';
+  fetch(FOTO_BASE + 'cucina-photos.json?t=' + Date.now(), { cache:'no-store' })
+    .then(function(r){ return r.ok ? r.json() : []; })
+    .catch(function(){ return []; })
+    .then(function(data){
+      for (var i=0; i<Math.min(6,data.length); i++) {
+        if (data[i] && data[i].src) {
+          var s = data[i].src.startsWith('http') ? data[i].src : FOTO_BASE + data[i].src;
+          fotoDati[i] = { file:null, dataUrl:null, src:s, alt:data[i].alt||'' };
+        }
+      }
+      document.getElementById('foto-status').textContent = '';
+      _renderSlots();
+    });
+}
+
+function chiudiFoto() {
+  document.getElementById('foto-section').style.display = 'none';
+  if (!document.getElementById('wrap').classList.contains('on'))
+    document.getElementById('intro').style.display = '';
+}
+
+function _renderSlots() {
+  var container = document.getElementById('foto-slots');
+  container.innerHTML = '';
+  for (var i=0; i<6; i++) {
+    (function(idx) {
+      var d = fotoDati[idx];
+      var thumbSrc = d && (d.dataUrl || d.src) || '';
+      var slot = document.createElement('div');
+      slot.style.cssText = 'background:#fff;border:1px solid var(--rule);margin-bottom:.5rem;padding:.7rem 1rem;display:grid;grid-template-columns:90px 1fr auto;gap:1rem;align-items:center;';
+
+      // Thumb
+      var thumb = document.createElement('div');
+      thumb.id = 'thumb-' + idx;
+      thumb.style.cssText = 'width:90px;height:65px;background:var(--sand);border:1px solid var(--rule);overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;';
+      if (thumbSrc) {
+        var ti = document.createElement('img');
+        ti.src = thumbSrc; ti.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+        thumb.appendChild(ti);
+      } else {
+        thumb.innerHTML = '<span style="font-size:.58rem;color:var(--stone)">Foto '+(idx+1)+'</span>';
+      }
+
+      // Info
+      var info = document.createElement('div');
+      info.style.cssText = 'display:flex;flex-direction:column;gap:.35rem;min-width:0;';
+      var lbl = document.createElement('div');
+      lbl.style.cssText = 'font-size:.6rem;color:var(--stone);letter-spacing:.08em;text-transform:uppercase;';
+      lbl.textContent = 'Foto '+(idx+1);
+      var ai = document.createElement('input');
+      ai.type='text'; ai.id='alt-'+idx; ai.value=d?d.alt:''; ai.placeholder='Descrizione (alt text)';
+      info.appendChild(lbl); info.appendChild(ai);
+
+      // Btns
+      var btns = document.createElement('div');
+      btns.style.cssText = 'display:flex;flex-direction:column;gap:.3rem;flex-shrink:0;';
+      var fl = document.createElement('label');
+      fl.style.cssText = 'display:block;padding:.35rem .75rem;background:var(--ink);color:#fff;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;text-align:center;white-space:nowrap;';
+      fl.textContent = 'Sfoglia';
+      var fi = document.createElement('input');
+      fi.type='file'; fi.accept='image/*'; fi.style.display='none';
+      fi.onchange = (function(ii){ return function(){ selezionaFoto(this,ii); }; })(idx);
+      fl.appendChild(fi); btns.appendChild(fl);
+      if (thumbSrc) {
+        var db = document.createElement('button');
+        db.className='btn btn-load';
+        db.style.cssText='font-size:.6rem;border:1px solid var(--rule);color:var(--stone);padding:.3rem .5rem;';
+        db.textContent='✕ Rimuovi';
+        db.onclick=(function(ii){ return function(){ fotoDati[ii]=null; _renderSlots(); }; })(idx);
+        btns.appendChild(db);
+      }
+
+      slot.appendChild(thumb); slot.appendChild(info); slot.appendChild(btns);
+      container.appendChild(slot);
+    })(i);
+  }
+}
+
+function selezionaFoto(input, idx) {
+  var file = input.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var altEl = document.getElementById('alt-'+idx);
+    fotoDati[idx] = { file:file, dataUrl:e.target.result, src:null, alt:(altEl&&altEl.value)||file.name.replace(/\.[^.]+$/,'') };
+    var thumb = document.getElementById('thumb-'+idx);
+    if (thumb) { thumb.innerHTML=''; var img=document.createElement('img'); img.src=e.target.result; img.style.cssText='width:100%;height:100%;object-fit:cover;'; thumb.appendChild(img); }
+  };
+  reader.readAsDataURL(file);
+}
+
+function pubblicaFotoCucina() {
+  var token = localStorage.getItem('gh_token')||'';
+  if (!token) { window._pendingFotoPublish=true; document.getElementById('token-input').value=''; document.getElementById('modal-token').classList.add('on'); return; }
+  _eseguiPubblicaFoto(token);
+}
+
+async function _eseguiPubblicaFoto(token) {
+  var statusEl = document.getElementById('foto-status');
+  statusEl.style.color = 'var(--stone)';
+  var headers = { 'Authorization':'token '+token, 'Accept':'application/vnd.github.v3+json', 'Content-Type':'application/json' };
+  var apiBase = 'https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/';
+  var photoList = [];
+
+  for (var i=0; i<6; i++) {
+    var d = fotoDati[i]; if (!d) continue;
+    var altText = (document.getElementById('alt-'+i) ? document.getElementById('alt-'+i).value : '') || d.alt || '';
+    var filePath = 'img/cucina/foto'+(i+1)+'.jpg';
+    if (d.file && d.dataUrl) {
+      statusEl.textContent = '⏳ Carico foto '+(i+1)+'…';
+      var base64 = d.dataUrl.split(',')[1];
+      var sha=null;
+      try { var chk=await fetch(apiBase+filePath,{headers:headers}); if(chk.ok){var ex=await chk.json();sha=ex.sha||null;} } catch(e){}
+      var body={message:'Foto cucina '+(i+1),content:base64}; if(sha) body.sha=sha;
+      var r=await fetch(apiBase+filePath,{method:'PUT',headers:headers,body:JSON.stringify(body)});
+      if(!r.ok){statusEl.style.color='var(--rust)';statusEl.textContent='✗ Errore foto '+(i+1);return;}
+    }
+    photoList.push({ src:filePath, alt:altText });
+  }
+
+  if (!photoList.length) { statusEl.style.color='var(--rust)'; statusEl.textContent='✗ Nessuna foto selezionata'; return; }
+  statusEl.textContent = '⏳ Aggiorno cucina-photos.json…';
+  var jsonB64 = btoa(unescape(encodeURIComponent(JSON.stringify(photoList,null,2))));
+  var jSha=null;
+  try { var jc=await fetch(apiBase+'cucina-photos.json',{headers:headers}); if(jc.ok){var je=await jc.json();jSha=je.sha||null;} } catch(e){}
+  var jBody={message:'Aggiorno cucina-photos.json',content:jsonB64}; if(jSha) jBody.sha=jSha;
+  var jRes=await fetch(apiBase+'cucina-photos.json',{method:'PUT',headers:headers,body:JSON.stringify(jBody)});
+  if (jRes.ok) { statusEl.style.color='#2d6a4f'; statusEl.textContent='✓ Foto pubblicate! Il sito si aggiornerà entro 90 secondi.'; }
+  else { statusEl.style.color='var(--rust)'; statusEl.textContent='✗ Errore aggiornamento JSON.'; }
+}
+
+// Override confermaPubblica per intercettare _pendingFotoPublish
+(function(){
+  window.confermaPubblica = function() {
+    var token = document.getElementById('token-input').value.trim();
+    if (!token) { alert('Inserisci il token'); return; }
+    localStorage.setItem('gh_token', token);
+    chiudiModal();
+    if (window._pendingFotoPublish) { window._pendingFotoPublish=false; _eseguiPubblicaFoto(token); return; }
+    if (window._pendingAllergeniPublish) { window._pendingAllergeniPublish=false; pubblicaAllergeni(token); return; }
+    eseguiPubblicazione(token);
+    var btn=document.getElementById('btn-pubblica');
+    if(btn){btn.textContent='✦ Traduci e Pubblica';btn.disabled=false;}
+  };
+})();
+</script>
 <!-- MODALE TOKEN GITHUB -->
 <div class="modal-overlay" id="modal-token">
   <div class="modal">

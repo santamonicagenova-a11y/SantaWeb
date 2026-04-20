@@ -294,10 +294,7 @@
           <a id="dolci-btn" href="menu-dolci-it.html" target="_blank" class="btn-secondary" data-i18n="dolci_btn">Men&ugrave; dolci</a>
         </div>
       </div>
-      <div class="cucina-images reveal" style="transition-delay:0.15s">
-        <img src="https://static.wixstatic.com/media/461837_166ee198f58246e68b5dba24fc9b68ef~mv2.jpg" alt="Cucina Santamonica">
-        <img src="https://static.wixstatic.com/media/461837_d7446c2748b64bd4acdb089d7c65bf7d~mv2.jpg" alt="Ingredienti freschi">
-      </div>
+      <div class="cucina-images reveal" id="cucina-imgs" style="transition-delay:0.15s"></div>
     </div>
   </div>
 </section>
@@ -660,6 +657,35 @@
       btn.textContent = 'Iscriviti';
     });
   }
+
+  // ---- Foto sezione cucina: carica da cucina-photos.json, fallback Wix ----
+  (function() {
+    var c = document.getElementById('cucina-imgs');
+    if (!c) return;
+    var defaults = [
+      { src: 'https://static.wixstatic.com/media/461837_166ee198f58246e68b5dba24fc9b68ef~mv2.jpg', alt: 'Cucina Santamonica' },
+      { src: 'https://static.wixstatic.com/media/461837_d7446c2748b64bd4acdb089d7c65bf7d~mv2.jpg', alt: 'Ingredienti freschi' }
+    ];
+    function renderFoto(photos) {
+      c.innerHTML = '';
+      var n = photos.length;
+      if (n === 0) { renderFoto(defaults); return; }
+      if      (n === 1) c.style.gridTemplateColumns = '1fr';
+      else if (n <= 4)  c.style.gridTemplateColumns = '1fr 1fr';
+      else              c.style.gridTemplateColumns = 'repeat(3, 1fr)';
+      photos.forEach(function(p, i) {
+        var img = document.createElement('img');
+        img.src = p.src;
+        img.alt = p.alt || '';
+        if (i === 0 && n === 2) img.style.marginTop = '3rem';
+        c.appendChild(img);
+      });
+    }
+    fetch('cucina-photos.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
+      .then(function(d) { renderFoto(d && d.length ? d : defaults); })
+      .catch(function() { renderFoto(defaults); });
+  })();
 </script>
 </body>
 </html>

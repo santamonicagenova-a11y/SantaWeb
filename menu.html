@@ -673,11 +673,12 @@ function showLayout(which) {
    (bypass con ?admin nell'URL)
 ══════════════════════════════════════ */
 (function() {
-  var params = new URLSearchParams(window.location.search);
-  if (!params.has('admin')) {
-    var base = window.location.href.split('?')[0].replace('menu.html', 'menu-it.html');
-    window.location.replace(base + '?v=' + Date.now());
-  }
+  var loc = window.location;
+  if (loc.protocol === 'blob:') return;
+  if (!loc.pathname.endsWith('menu.html')) return;
+  if (new URLSearchParams(loc.search).has('admin')) return;
+  var base = loc.href.split('?')[0].replace('menu.html', 'menu-it.html');
+  loc.replace(base + '?v=' + Date.now());
 })();
 
 /* ── init ── */

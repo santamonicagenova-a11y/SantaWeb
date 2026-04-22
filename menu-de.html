@@ -431,8 +431,8 @@ const MENU = {
       ],
       "7": "Menü nach freier Wahl des Küchenchefs"
     },
-    "percorso_label_6": "6",
-    "percorso_label_7": "7"
+    "percorso_label_6": "Sei",
+    "percorso_label_7": "Sette"
   },
   "sezioni": [
     {
@@ -489,8 +489,8 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Kohl, Miso, Himbeeren, Cashewnüsse",
-          "prezzo": 16
+          "nome": "Rohe lila Garnelen nach Puttanesca-Art",
+          "prezzo": 25
         },
         {
           "nome": "Kalbsbries, Sellerie, Haselnüsse, Reduzierung des Fischfonds",
@@ -796,6 +796,19 @@ function showLayout(which) {
   var bc=document.getElementById('btn-carta'); if(bc) bc.classList.toggle('active',which==='carta');
   var bo=document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active',which==='orario');
 }
+
+/* ══════════════════════════════════════
+   REDIRECT VISITATORI → menu-it.html
+   (bypass con ?admin nell'URL)
+══════════════════════════════════════ */
+(function() {
+  var loc = window.location;
+  if (loc.protocol === 'blob:') return;
+  if (!loc.pathname.endsWith('menu.html')) return;
+  if (new URLSearchParams(loc.search).has('admin')) return;
+  var base = loc.href.split('?')[0].replace('menu.html', 'menu-it.html');
+  loc.replace(base + '?v=' + Date.now());
+})();
 
 /* ── init ── */
 renderCarta();

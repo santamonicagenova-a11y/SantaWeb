@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.04.20.02 -->
+<!-- versione v 2026.04.23.01 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -84,6 +84,7 @@
         <a onclick="caricaDalSito('dolci')">☞ Menù dolci</a>
         <a onclick="caricaDalSito('allergeni')">☞ Allergeni carta</a>
         <a onclick="apriGestoreFoto()">📷 Foto cucina</a>
+        <a onclick="apriSezioneVini()">🍷 Menù Vini</a>
       </div>
     </div>
     <button class="btn btn-load" onclick="document.getElementById('file-input').click()">↑ Carica da file</button>
@@ -123,6 +124,28 @@
         <button class="btn btn-publish" onclick="pubblicaFotoCucina()">✦ Pubblica foto</button>
         <button class="btn btn-load" onclick="chiudiFoto()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
         <span id="foto-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="vini-section" style="max-width:700px;margin:1.5rem auto;padding:0 1rem;display:none;">
+  <div class="fs">
+    <div class="fs-head">Menù Vini — Converti da PDF</div>
+    <div class="fs-body">
+      <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">
+        Seleziona il file PDF della lista vini per convertirlo in HTML e pubblicarlo sul sito.
+        Una preview si aprirà automaticamente prima della pubblicazione.
+      </p>
+      <div style="margin-bottom:1rem;">
+        <span class="opt-lbl" style="display:block;margin-bottom:.4rem;">File PDF</span>
+        <input type="file" id="vini-pdf-input" accept=".pdf"
+          style="font-family:Jost,sans-serif;font-size:.78rem;cursor:pointer" />
+      </div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1rem;">
+        <button class="btn btn-publish" onclick="convertiEPubblicaVini()">✦ Converti e Pubblica</button>
+        <button class="btn btn-load" onclick="chiudiSezioneVini()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
+        <span id="vini-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
       </div>
     </div>
   </div>
@@ -284,6 +307,7 @@ async function _eseguiPubblicaFoto(token) {
     localStorage.setItem('gh_token', token);
     chiudiModal();
     if (window._pendingFotoPublish) { window._pendingFotoPublish=false; _eseguiPubblicaFoto(token); return; }
+    if (window._pendingViniPublish && window._pendingViniHtml) { window._pendingViniPublish=false; var vh=window._pendingViniHtml; window._pendingViniHtml=null; _pubblicaMenuVini(token, vh, document.getElementById('vini-status')); return; }
     if (window._pendingAllergeniPublish) { window._pendingAllergeniPublish=false; pubblicaAllergeni(token); return; }
     eseguiPubblicazione(token);
     var btn=document.getElementById('btn-pubblica');
@@ -306,6 +330,6 @@ async function _eseguiPubblicaFoto(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.20.02</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.04.23.01</div>
 </body>
 </html>

@@ -1,270 +1,519 @@
 <!DOCTYPE html>
-<!-- v 2026.04.16.01 -->
+<!-- v 2026.04.23.01 -->
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>Lista Vini — Santamonica</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<title>Lista Vini &mdash; Santamonica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #faf7f2;
+    --ink:   #1a1714;
+    --stone: #8c7e6e;
+    --rust:  #9e4a2a;
+    --rule:  #d4c9b8;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: 'Jost', sans-serif;
-    font-weight: 300;
-    background: #fff;
-    color: #1a1a1a;
-    font-size: 13px;
-    line-height: 1.5;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
   }
-  .page {
+  .pg {
     width: 210mm;
-    min-height: 297mm;
-    margin: 0 auto;
-    padding: 18mm 16mm 14mm;
+    margin: 2rem auto;
+    padding: 14mm 22mm 14mm;
     background: #fff;
+    box-shadow: 0 2px 24px rgba(0,0,0,.10);
   }
-  /* Cover page */
-  .cover {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 297mm;
+  .pg-header {
     text-align: center;
+    margin-bottom: 8mm;
+    padding-bottom: 5mm;
+    border-bottom: 1px solid var(--rule);
   }
-  .cover-title {
-    font-family: 'Jost', sans-serif;
-    font-weight: 400;
-    font-size: 22px;
-    letter-spacing: 0.35em;
+  .logo {
+    font-size: 3.3rem;
+    font-weight: 300;
+    letter-spacing: .22em;
     text-transform: uppercase;
-    margin-bottom: 6px;
+    line-height: 1;
   }
-  .cover-divider {
-    width: 200px;
-    border: none;
-    border-top: 1px solid #1a1a1a;
-    margin: 0 auto 4px;
-  }
-  .cover-subtitle {
+  .logo em { font-style: italic; color: var(--stone); }
+  .logo-sub {
+    margin-top: .45rem;
     font-family: 'Jost', sans-serif;
-    font-weight: 400;
-    font-size: 18px;
-    letter-spacing: 0.35em;
+    font-size: .67rem;
+    letter-spacing: .22em;
     text-transform: uppercase;
+    color: var(--stone);
   }
-  .cover-sommelier {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 14px;
-    margin-top: 48px;
-    font-style: italic;
-    color: #444;
-  }
-  /* Sezione titolo */
-  .sezione-titolo {
-    font-family: 'Jost', sans-serif;
-    font-weight: 400;
-    font-size: 20px;
-    letter-spacing: 0.2em;
+  .lista-titolo {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: .22em;
     text-transform: uppercase;
     text-align: center;
-    margin-bottom: 20px;
-    margin-top: 8px;
+    margin: 5mm 0 1mm;
   }
-  .sottosezione-titolo {
+  .sommelier {
     font-family: 'Jost', sans-serif;
-    font-weight: 400;
-    font-size: 13px;
-    letter-spacing: 0.15em;
+    font-size: .7rem;
+    letter-spacing: .14em;
     text-transform: uppercase;
-    margin-bottom: 12px;
-    margin-top: 18px;
-  }
-  /* Nota sezione (es. "A calice") */
-  .sezione-nota {
+    color: var(--stone);
     text-align: center;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 15px;
-    text-decoration: underline;
-    margin-bottom: 18px;
-    letter-spacing: 0.05em;
+    margin-bottom: 7mm;
   }
-  /* Vino */
+  .sez-titolo {
+    font-size: 1.98rem;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    text-align: center;
+    margin: 8mm 0 4mm;
+    padding-bottom: 2mm;
+    border-bottom: 1px solid var(--rule);
+  }
+  .sottosez-titolo {
+    font-family: 'Jost', sans-serif;
+    font-size: .7rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin: 6mm 0 3mm;
+  }
   .vino {
-    margin-bottom: 12px;
+    margin-bottom: 3.5mm;
+    text-align: justify;
+    font-size: 1.0rem;
+    line-height: 1.52;
   }
-  .vino-nome {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    font-weight: 600;
-    font-size: 14px;
-    display: inline;
-  }
-  .vino-meta {
-    font-family: 'Jost', sans-serif;
-    font-weight: 300;
-    font-size: 12px;
-    display: inline;
-    color: #333;
-  }
-  .vino-prezzo {
-    font-family: 'Jost', sans-serif;
-    font-weight: 400;
-    font-size: 12px;
-    display: inline;
-  }
-  .vino-descrizione {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 13px;
-    color: #333;
-    margin-top: 1px;
-    line-height: 1.45;
-  }
-  /* Annate indentate */
-  .annate-lista {
-    margin-top: 3px;
-    padding-left: 20px;
-  }
-  .annata-riga {
-    font-family: 'Jost', sans-serif;
-    font-weight: 300;
-    font-size: 12px;
-    line-height: 1.7;
-  }
-  /* Separatore tra sezioni */
-  .sep {
-    border: none;
-    border-top: 1px solid #ccc;
-    margin: 22px 0;
-  }
-  .sep-light {
-    border: none;
-    border-top: 1px solid #e8e8e8;
-    margin: 14px 0;
-  }
-  /* Versione footer */
-  .footer-ver {
+  .version {
     text-align: center;
-    font-size: 9px;
-    color: #bbb;
-    margin-top: 20px;
+    padding: 6px 0;
     font-family: 'Jost', sans-serif;
-    font-weight: 300;
+    font-size: .55rem;
+    color: #888;
+    letter-spacing: .1em;
   }
-  /* Links lingua */
-  .lingua-links {
-    text-align: center;
-    margin-top: 18px;
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 600;
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  .lingua-links a { color: #1a1a1a; margin: 0 8px; text-decoration: underline; }
   @media print {
-    .page { margin: 0; padding: 12mm 14mm; }
-    .cover { min-height: 100vh; }
+    @page { size: A4 portrait; margin: 0; }
+    body { background: white; }
+    .pg {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0;
+      box-shadow: none;
+      page-break-after: always;
+    }
   }
 </style>
 </head>
 <body>
-<div id="root"></div>
-<script>
-const MENU_VINI = {"sezioni": [{"titolo": "BOLLICINE", "sottosezioni": [{"titolo": "LIGURIA", "vini": [{"nome": "\"Andalora\" Spumante Brut - Cascina Praiè", "abv": "11%", "uve": "Rossese 100%", "extra": "Metodo Martinotti", "prezzo_bottiglia": 36, "prezzo_calice": 10, "descrizione": "Profumo di mare e sapidità."}, {"nome": "\"Axillo\" - A. Bruzzone", "abv": "12%", "annata": "IGT 2022", "uve": "Vermentino e Bianchetta", "prezzo_bottiglia": 37, "prezzo_calice": 11, "descrizione": "Profumo fine e con sentori di fiori bianchi. Frizzante in modo delicato."}]}, {"titolo": "ALTRE REGIONI", "vini": [{"nome": "\"100\" Ancestrale - Castello di Stefanago", "abv": "12,5%", "uve": "Pinot Nero 100%", "regione": "Lombardia", "prezzo_bottiglia": 65, "descrizione": "Rifermentato in bottiglia sui lieviti per 100 mesi. Rosa e viola essiccati, frutto rosso in confettura, ricordi di forno e sentori minerali intensi."}, {"nome": "\"Animante\" Franciacorta Dosaggio Zero - Barone Pizzini", "abv": "12%", "extra": "sboccatura 9-2025", "uve": "Chardonnay 70%, Pinot Nero 13%, Pinot Bianco 10%, Erbamat 7%", "regione": "Lombardia", "prezzo_bottiglia": 54, "prezzo_calice": 13, "descrizione": "Affinato in bottiglia per 20-30 mesi. Profumi floreali, agrumi e miele d'acacia, albicocca e frutta fresca. Avvolgente, fresco e ben strutturato, sapido in chiusura."}, {"nome": "\"Animante\" Lungo Affinamento Franciacorta Dosaggio Zero - Barone Pizzini", "abv": "12%", "extra": "sboccatura 6-2024", "uve": "Chardonnay 94%, Pinot Nero 3%, Pinot Bianco 3%", "regione": "Lombardia", "prezzo_bottiglia": 65, "descrizione": "Affinato in bottiglia per 78 mesi. Fruttato, floreale, agrumi, albicocca, frutta secca e miele. Corposo e sapido."}, {"nome": "\"Filari Ginevra\" - Alberto Lot", "abv": "10,5%", "uve": "Glera 100%", "regione": "Veneto", "prezzo_bottiglia": 32, "prezzo_calice": 9, "descrizione": "Fiori bianchi ed agrumi, albicocca e rosa. Avvolgente ed equilibrato."}, {"nome": "\"Ossigeno\" - Robb de Matt", "abv": "11%", "annata": "2023", "uve": "Falanghina 80%, Coda di Pecora 20%", "regione": "Campania", "prezzo_bottiglia": 39, "descrizione": "Rifermentato in bottiglia, macerazione di 7 giorni. Non filtrato né chiarificato e senza solfiti aggiunti. Acidità audace, frutti, agrumi e salinità. Denso e complesso."}, {"nome": "Pinot Nero Dosaggio Zero - Lusenti", "abv": "12,5%", "extra": "2021, sboccatura 07-2025", "uve": "Pinot Nero 100%", "regione": "Emilia-Romagna", "prezzo_bottiglia": 53, "descrizione": "Rifermentato in bottiglia e successivamente affinato sui lieviti per almeno 48 mesi. Fiori bianchi con spiccata acidità. Bolla sottile, gusto fresco e sapido."}, {"nome": "Prosecco \"Radicale\" Extra Brut - Bellenda", "abv": "11%", "annata": "2018", "uve": "Glera 100%", "regione": "Veneto", "prezzo_bottiglia": 44, "descrizione": "Metodo ancestrale senza solfiti aggiunti e senza sboccatura, rifermentato in bottiglia. Fuori dagli schemi e senza compromessi. Mela e pera, ha sentori di lavanda, mora di gelso, kumquat e nocciola. In bocca è sapido, asciutto, lungo e pastoso."}, {"nome": "Prosecco Superiore Brut Pas Dosé \"S.C. 1931\" - Bellenda", "abv": "11,5%", "extra": "DOCG 2021, sboccatura 10-2024", "uve": "Glera 100%", "regione": "Veneto", "prezzo_bottiglia": 39, "prezzo_calice": 12, "descrizione": "Metodo classico. Frutta a polpa bianca e nocciole con sentori di miele d'acacia."}, {"nome": "\"Zero Infinito\" - Pojer e Sandri", "abv": "12%", "annata": "2023", "uve": "Solaris 100%", "regione": "Trentino", "prezzo_bottiglia": 39, "descrizione": "Non filtrato, metodo ancestrale, rifermentato in bottiglia. Profumo floreale e leggermente aromatico. Fiori di sambuco, mela, pera, albicocca. Gusto succoso e fresco."}]}]}, {"titolo": "BOLLICINE ROSÉ", "sottosezioni": [{"titolo": "LIGURIA", "vini": [{"nome": "\"Axillo\" Rosé - A. Bruzzone", "abv": "12,5%", "uve": "Ciliegiolo 100%", "prezzo_bottiglia": 39, "prezzo_calice": 12, "descrizione": "Profumi ampi e fruttati. Frizzante in modo delicato."}]}, {"titolo": "ALTRE REGIONI", "vini": [{"nome": "\"60\" Ancestrale - Castello di Stefanago", "abv": "12,5%", "uve": "Pinot Nero 100%", "regione": "Lombardia", "prezzo_bottiglia": 57, "descrizione": "Rifermentato in bottiglia sui lieviti per 100 mesi. Rosa e viola essiccati, frutto rosso in confettura, ricordi di forno e sentori minerali intensi."}, {"nome": "\"Big Bang\" - Robb de Matt", "abv": "11%", "annata": "2023", "uve": "Falanghina 70%, Coda di Pecora 30%", "regione": "Campania", "prezzo_bottiglia": 34, "descrizione": "Rifermentato in bottiglia, macerazione di 7 giorni. Non filtrato né chiarificato. Senza solfiti aggiunti. Pesca, ginestra, lieviti ed erbe aromatiche."}, {"nome": "Brut Rosé - Pojer e Sandri", "abv": "12,5%", "uve": "Pinot Nero 50% e Chardonnay 50%", "regione": "Trentino", "prezzo_bottiglia": 52, "descrizione": "Ciliegia marasca e lamponi del Pinot Nero si accostano alla mandorla e nocciola dello Chardonnay."}, {"nome": "\"Il Sole di Leo\" Spumante Brut Rosé - UCCI Cantina Urbana", "abv": "11%", "extra": "s.a.", "uve": "Freisa 100%", "regione": "Piemonte", "prezzo_bottiglia": 33, "descrizione": "Lievissima macerazione, nessuna chiarifica né filtrazione. Fresco e fruttato, sapido e dissetante."}, {"nome": "\"Mu\" - Robb de Matt", "abv": "12%", "annata": "2023", "uve": "Aglianico 100%", "regione": "Campania", "prezzo_bottiglia": 39, "descrizione": "Rifermentato in bottiglia. Follemente beverino con un'acidità elettrica e che in bocca sa di lampone ed arancia rossa."}, {"nome": "\"Rosa di Fognano\" - Az. Agr. Paolo Foppiani", "abv": "12%", "uve": "Barbera 100%", "regione": "Emilia-Romagna", "prezzo_bottiglia": 37, "descrizione": "Metodo ancestrale con breve macerazione sulle bucce e rifermentazione in bottiglia dopo un affinamento di 6 mesi in acciaio. Salame liquido."}, {"nome": "\"Rosé\" Franciacorta Extra Brut - Barone Pizzini", "abv": "12%", "extra": "sboccatura 1-2024", "uve": "Pinot Nero 70%, Chardonnay 30%", "regione": "Lombardia", "prezzo_bottiglia": 65, "prezzo_calice": 18, "descrizione": "Affinamento di 30-40 mesi sui lieviti. Rosa, ribes e mirtillo. Strutturato, sapido e persistente."}, {"nome": "\"Zero Infinito Cremisi\" - Pojer e Sandri", "abv": "12%", "annata": "2023", "uve": "Vitigni PIWI", "regione": "Trentino", "prezzo_bottiglia": 42, "descrizione": "Non filtrato, metodo ancestrale, rifermentato in bottiglia. Rosa e fragola, lampone e melograno. Succoso, fragrante, acido, sapido."}]}]}, {"titolo": "CHAMPAGNE", "nota": "A calice", "sottosezioni": [{"titolo": "", "vini": [{"nome": "Etienne Oudart Brut Origine", "abv": "12%", "extra": "2019, deg. 7/2024", "uve": "Pinot Meunier 60%, Chardonnay 25%, Pinot Noir 15%", "prezzo_bottiglia": 79, "prezzo_calice": 17, "descrizione": "Matura sui lieviti per 60 mesi. Frutta bianca e mela verde, struttura leggera e fresca.", "a_calice": true}, {"nome": "Billecart-Salmon Brut Réserve", "abv": "12%", "extra": "s.a.", "uve": "Pinot Noir 30%, Pinot Meunier 40%, Chardonnay 30%", "prezzo_bottiglia": 95, "descrizione": "Matura sui lieviti per almeno 24 mesi. Perlage fine e persistente. Floreale, frutta fresca, pera matura e tanti fiori bianchi."}, {"nome": "Bollinger Special Cuvée", "abv": "12%", "extra": "s.a.", "uve": "Pinot Nero 60%, Chardonnay 25%, Pinot Meunier 15%", "prezzo_bottiglia": 105, "descrizione": "Frutta matura e spezie. Note di pesca e sfumature di mela cotta e composta. Buona struttura, persistenza e vivacità."}, {"nome": "Bruno Paillard Blanc de Blancs Grand Cru", "abv": "12%", "extra": "2019, deg. 7/2024", "uve": "Chardonnay 100%", "prezzo_bottiglia": 150, "descrizione": "Extra-brut. 25 annate di vini di riserva. Maturazione di 4 anni sui lieviti ed almeno 10 mesi in bottiglia dopo la sboccatura. Lime e pompelmo, mandorla e crosta di pane. Finale fresco e lungo."}, {"nome": "Bruno Paillard Blanc de Noirs Grand Cru", "abv": "12%", "extra": "2019, deg. 6/2024", "uve": "Pinot Nero 100%", "prezzo_bottiglia": 160, "descrizione": "Extra-brut. Breve passaggio in legno, maturazione sui lieviti di 3 anni e 6 mesi in bottiglia. Sentori di petali di rosa, pompelmo e pepe. Sale, ciliegia, kumquat e mela cotogna. Bella lunghezza."}, {"nome": "écume Blanc de Pinot Noir Premier Cru", "abv": "12,5%", "extra": "AOC 2023, deg. 2026", "uve": "Pinot Nero 100%", "prezzo_bottiglia": 105, "descrizione": "Non filtrato. Aromi di agrumi e fiori bianchi. Fresco e persistente."}, {"nome": "Jaquesson Cuvée 748", "abv": "12,5%", "extra": "2020, deg. 12/2024", "uve": "Pinot Noir e Meunier 75%, Chardonnay 25%", "prezzo_bottiglia": 145, "descrizione": "Dosaggio 2 gr/l. Base agrumata e leggermente candita, sentori di frutta secca e sfumature minerali e pietrose. In bocca un'effervescenza setosa e finissima si intreccia a un preciso ritorno olfattivo, per chiudere con pulizia, sapidità e accenni dolci."}, {"nome": "Philipponnat Réserve Perpétuelle Non Dosé", "abv": "12,5%", "extra": "2021, deg. 9/2025", "uve": "Pinot Noir 65%, Pinot Meunier 2%, Chardonnay 32%", "prezzo_bottiglia": 110, "descrizione": "Maturazione di 3 anni sui lieviti. Erbe aromatiche, pan brioche, nocciola e frutti di bosco. Corpo generoso e buona freschezza, note di ribes rosso e di lampone. Finale lungo e minerale."}, {"nome": "Ruinart Brut", "abv": "12,5%", "extra": "s.a.", "uve": "Pinot Nero 57%, Chardonnay 40%, Pinot Meunier 3%", "prezzo_bottiglia": 110, "descrizione": "Frutti a polpa bianca, albicocca, nocciole e mandorle. Fresco ed elegante, finale di rara persistenza."}, {"nome": "Tarlant Zero Brut Nature Pas Dosé", "abv": "12%", "extra": "2018, deg. 7/2023", "uve": "Chardonnay 32%, Meunier 32%, Pinot Nero 32%, Petit Mesnil + Arbanne + Pinot Blanc 4%", "prezzo_bottiglia": 95, "descrizione": "Affinato sui lieviti in bottiglia per quasi 7 anni. Aromi tostati di agrumi e frutta secca, buona freschezza."}]}]}, {"titolo": "CHAMPAGNE ROSÉ", "nota": "A calice", "sottosezioni": [{"titolo": "", "vini": [{"nome": "Etienne Oudart Brut Rosé Référence", "abv": "12%", "extra": "2021, deg. 4/2024", "uve": "Pinot Meunier 50%, Chardonnay 20%, Pinot Noir 30%", "prezzo_bottiglia": 95, "prezzo_calice": 20, "descrizione": "Matura sui lieviti per 36 mesi. Ribes, cassis e fragoline di bosco. Grande freschezza.", "a_calice": true}, {"nome": "Bollinger Rosé", "abv": "12,5%", "extra": "s.a.", "uve": "Pinot Nero 67%, Chardonnay 33%", "prezzo_bottiglia": 170, "descrizione": "Agrumi e frutti rossi. Freschezza prolungata e cremosa."}, {"nome": "Bollinger \"La Grande Année Rosé 2014\"", "abv": "12,5%", "extra": "deg. 8/2021", "uve": "Pinot Nero 61%, Chardonnay 39%", "prezzo_bottiglia": 340, "descrizione": "Ciliegia, limone, mela cotogna e bergamotto con una sottile nota iodata. Sottile acidità e struttura delicata. Finale lungo e salino."}, {"nome": "Billecart-Salmon Rosé", "abv": "12%", "extra": "s.a.", "uve": "Pinot Nero 30%, Chardonnay 40%, Pinot Meunier 30%", "prezzo_bottiglia": 140, "descrizione": "Note di ribes, di lamponi e di bacche. Profumato, fresco ed elegante."}, {"nome": "Bruno Paillard Rosé", "abv": "12%", "extra": "2020, deg. 9/2024", "uve": "Pinot Nero in maggioranza e Chardonnay", "prezzo_bottiglia": 130, "descrizione": "Extra-brut. 25 annate di vini di riserva. Maturazione di 3 anni sui lieviti ed almeno 5 mesi in bottiglia dopo la sboccatura. Marasca, fragola selvatica e violetta, un tocco di limone. Finale lungo, fresco e raffinato."}, {"nome": "Larmandier-Bernier Rosé de Saignée", "abv": "12,5%", "annata": "2013", "uve": "Pinot Noir 100%", "prezzo_bottiglia": 180, "descrizione": "Affinamento di 72 mesi sulle fecce fini. Note di torba delicatamente affumicate. Trama speziata, complessa e saporita."}, {"nome": "Pinot-Chevauchet \"Elegante\" Rosé Pas Dosé", "abv": "12%", "extra": "s.a.", "uve": "Chardonnay 50%, Meunier 30%, Pinot Nero 20%", "prezzo_bottiglia": 95, "descrizione": "Affinato per almeno 6 anni sui lieviti, non filtrato. Frutti rossi e frutta fresca, ben strutturato e persistente."}, {"nome": "Ruinart Brut Rosé", "abv": "12,5%", "extra": "s.a.", "uve": "Pinot Nero 55%, Chardonnay 45%", "prezzo_bottiglia": 165, "descrizione": "Fresco e delicato al naso, con sentori di piccoli frutti rossi e note di melograno. Nitido e ricco in degustazione, con il frutto che si esprime pienamente e una finitura che richiama l'aggrumato del pompelmo rosa."}, {"nome": "Tarlant Zero Brut Nature Rosé", "abv": "12%", "extra": "2018, deg. 2/2024", "uve": "Chardonnay 50%, Pinot Nero 44%, Pinot Meunier 6%", "prezzo_bottiglia": 110, "descrizione": "Affinato 6 mesi in barrique e poi almeno 5 anni sui lieviti, non filtrato. Ricco, avvolgente e fruttato, asciutto e verticale nella chiusa finale."}]}]}, {"titolo": "VINI BIANCHI", "sottosezioni": [{"titolo": "LIGURIA DI LEVANTE", "vini": [{"nome": "Albarola - Cantine Lunae Bosoni", "abv": "13%", "extra": "DOC 2024", "uve": "Albarola 100%", "prezzo_bottiglia": 37, "prezzo_calice": 10, "descrizione": "Note di agrumi ed erbe secche. Gusto equilibrato, intenso, minerale."}, {"nome": "\"Bamboo Road\" - Stefano Legnani", "uve": "Trebbiano, Malvasia di Candia, Albana, Vermentino", "descrizione": "Macerazione di 5 giorni sulle bucce, uve provenienti da vigne di 50/80 anni. Nessuna filtrazione. Frutta matura, fiori, note aggrumate e minerali. Al palato è secco, avvolgente, polposo con buona acidità e un persistente finale. Ogni annata evolve in maniera personale.", "annate": [{"anno": "2020", "abv": "11%", "prezzo_bottiglia": 69}, {"anno": "2022", "abv": "12%", "prezzo_bottiglia": 59}, {"anno": "2023", "abv": "13,5%", "prezzo_bottiglia": 49}]}, {"nome": "\"Beppin\" - Mulino di Barry", "abv": "12%", "extra": "DOC 2024", "uve": "Bianchetta, Vermentino, Bosco", "prezzo_bottiglia": 44, "descrizione": "Macerazione di 2 mesi sulle bucce. Mela verde e fiori bianchi. Grande finezza ed eleganza, gusto fresco e asciutto con un finale sapido."}, {"nome": "Bianchetta \"Ninte de Ninte\" - La Ricolla", "abv": "12,5%", "extra": "IGT 2021", "uve": "Bianchetta 100%", "prezzo_bottiglia": 49, "descrizione": "Senza solfiti aggiunti. Fermentazione sulle bucce per 5 giorni, 6 mesi di affinamento in anfora. Fresco, agile e accattivante. In apparenza esile, si muove su profumi che spaziano dai fiori, alla frutta, fino a sfumature salmastre e terrose."}, {"nome": "\"Bonazolae\" - Cà du Ferrà", "abv": "13%", "extra": "DOP 2024", "uve": "Vermentino 65%, Albarola 30%, Bosco 5%", "prezzo_bottiglia": 39, "prezzo_calice": 11, "descrizione": "Richiami fruttati e di erbe spontanee, sorso avvolgente, profondo e soddisfacente. Il sole, il vento, la pietra mai doma caratterizzano un vino dagli accenti profondamente ligustici."}, {"nome": "Cimixà \"Giamin\" - Az. Agricola U Cantin", "abv": "13%", "annata": "2020", "uve": "Cimixà 100%", "prezzo_bottiglia": 46, "descrizione": "Macerato non filtrato, 27 mesi di acciaio e 6 di bottiglia. Sapido, fruttato e molto minerale."}, {"nome": "Cimixà \"Sentè\" - Az. Agricola U Cantin", "abv": "13,5%", "annata": "2022", "uve": "Cimixà 100%", "prezzo_bottiglia": 42, "descrizione": "Non filtrato, 48 ore di macerazione, 6 mesi di acciaio e 2/3 anni di bottiglia. Minerale con buona acidità, sapido e fruttato."}, {"nome": "Cinque Terre - Possa", "abv": "13%", "extra": "DOP 2024", "uve": "Bosco 80% e vitigni autoctoni 20%", "prezzo_bottiglia": 49, "descrizione": "Profumi netti, intensi; bocca sapida e materica, in equilibrio tra calore e freschezza. Finale erbaceo e balsamico."}, {"nome": "\"Con-tatto\" - Cian Cianin", "uve": "Vermentino, Bosco, Albarola", "descrizione": "Lunga macerazione sulle bucce, in parte poi maturato in barrique ed infine affinato in bottiglia per 9 mesi. Sapidità, macchia mediterranea e frutti maturi. Lunga persistenza.", "annate": [{"anno": "2023", "abv": "12,5%", "prezzo_bottiglia": 54}, {"anno": "2024", "abv": "12%", "prezzo_bottiglia": 49}]}, {"nome": "\"Erbaspada\" - Mönte d'Arvï", "abv": "14,5%", "annata": "2024", "uve": "Vermentino, Bosco, Albarola", "prezzo_bottiglia": 46, "descrizione": "Fiori selvatici e miele salmastro."}, {"nome": "\"Fortezza\" - Luna Mater", "abv": "13%", "uve": "Albarola, Trebbiano e Malvasia", "descrizione": "Macerazione di 5 giorni in acciaio. Vino volutamente non acido, austero.", "annate": [{"anno": "2021", "prezzo_bottiglia": 49}, {"anno": "2022", "prezzo_bottiglia": 45}]}, {"nome": "\"Loup Garou\" - Stefano Legnani", "abv": "13%", "annata": "2020", "uve": "vitigni autoctoni", "prezzo_bottiglia": 74, "descrizione": "Macerato, non filtrato. Fermentazione spontanea con lieviti indigeni e macerazione di 5 giorni sulle bucce. Affinamento in acciaio."}, {"nome": "\"Particella 906\" - Luna Mater", "abv": "13,5%", "extra": "IGT 2021", "uve": "Vermentino 60%, Albarola Trebbiano Malvasia 40%", "prezzo_bottiglia": 42, "descrizione": "Vermentino macerato per 18 ore, gli altri per 5 giorni. Acido, fresco e terrosamente corposo."}, {"nome": "\"Pentesilea\" - Cerrolungo", "abv": "13%", "annata": "2020", "uve": "Vermentino, Albarola, Bosco", "prezzo_bottiglia": 42, "descrizione": "Non filtrato e macerato per 6/10 giorni. Note floreali e minerali, miele e rosmarino. Cremoso e materico."}, {"nome": "\"Ponte di Toi\" - Stefano Legnani", "abv": "12,5", "uve": "vitigni autoctoni", "descrizione": "Macerato, non filtrato. Fermentazione spontanea con macerazione di 7 giorni, sosta in acciaio per l'inverno prima dell'imbottigliamento. Sapido, lungo e croccante con note balsamiche.", "annate": [{"anno": "2021", "abv": "11%", "prezzo_bottiglia": 69}, {"anno": "2023", "abv": "13%", "prezzo_bottiglia": 49}]}, {"nome": "\"Raixe\" - Giorgia Grande", "abv": "12,5%", "annata": "2022", "uve": "Vermentino, Bosco, Albarola", "prezzo_bottiglia": 44, "descrizione": "Macerazione di 3 giorni sulle bucce ed affinamento in acciaio per 6 mesi. Fiori bianchi, frutti maturi e note sapide e minerali."}, {"nome": "Ruzzese \"Zero Tolleranza per il Silenzio\" - Cà du Ferrà", "abv": "13%", "extra": "DOP 2023", "uve": "Ruzzese 100%", "prezzo_bottiglia": 95, "descrizione": "8 mesi in botti di rovere e 9 di affinamento in bottiglia, solo 500 bottiglie prodotte. Cedro, arancia candita e note di macchia mediterranea. Fresco, minerale, di buona struttura. Finale dolce e persistente."}, {"nome": "Vermentino \"A Posa\" - Az. Agricola U Cantin", "abv": "13%", "annata": "2022", "uve": "Vermentino 100%", "prezzo_bottiglia": 39, "descrizione": "Non filtrato, 6 mesi di acciaio e 6 di bottiglia. Sapido, fresco e beverino."}, {"nome": "Vermentino \"Atys\" - La Ghiaia", "abv": "13,5%", "extra": "DOC 2023", "uve": "Vermentino 100%", "prezzo_bottiglia": 37, "prezzo_calice": 11, "descrizione": "Erbette aromatiche e leggere note di fiori bianchi. Acidità e sapidità sono equilibrate da una delicata morbidezza. Il finale è lungo e pieno su sentori leggermente balsamici e minerali."}, {"nome": "Vermentino \"Aut Aut\" - Cian Cianin", "uve": "Vermentino 100%", "descrizione": "Macerazione sulle bucce per 5 giorni, 9 mesi in barrique e quindi 9 mesi di affinamento in bottiglia. Persistente ed asciutto, caldo ed avvolgente. Pura macchia mediterranea.", "annate": [{"anno": "2023", "abv": "13%", "prezzo_bottiglia": 54}, {"anno": "2024", "abv": "13%", "prezzo_bottiglia": 49}]}, {"nome": "Vermentino \"Berette 2.0\" - La Ricolla", "abv": "13%", "extra": "IGT 2023", "uve": "Vermentino 100%", "prezzo_bottiglia": 46, "descrizione": "Macerazione sulle bucce per 14 giorni, 6 mesi di affinamento in anfora. Sapido e materico, terroso e floreale."}, {"nome": "Vermentino \"Ithaa\" - La Ghiaia", "abv": "12,5%", "extra": "IGT 2024", "uve": "Vermentino 100%", "prezzo_bottiglia": 42, "descrizione": "Vecchie vigne di 60 anni, macerazione di 2 mesi, non filtrato né chiarificato. Intense note agrumate e floreali quali bergamotto, pompelmo e fiori d'arancio. Strutturato, fresco, sapido con un buon corpo. Tannini lievemente morbidi e raffinati."}, {"nome": "Vermentino \"Luccicante\" - Cà du Ferrà", "abv": "13%", "extra": "DOP 2024", "uve": "Vermentino 100%", "prezzo_bottiglia": 49, "prezzo_calice": 14, "descrizione": "Fiori di campo, camomilla, erbe aromatiche e sentori fruttati di pesca a polpa bianca, mandorla non tostata, mela golden. Vivace, sapido, armonico e di lunga persistenza."}, {"nome": "Vermentino \"Oua2\" - La Ricolla", "abv": "13%", "extra": "IGT 2023", "uve": "Vermentino 100%", "prezzo_bottiglia": 46, "descrizione": "Macerazione sulle bucce per 150 giorni, 6 mesi di affinamento in anfora. Complesso e lungo. Agrumi, pesca, erbe mediterranee. Piacevolmente amarognolo."}]}, {"titolo": "GENOVA", "vini": [{"nome": "Bianchetta - Villa Cambiaso", "abv": "12,5%", "extra": "DOC 2024", "uve": "Bianchetta 100%", "prezzo_bottiglia": 34, "prezzo_calice": 10, "descrizione": "Mela verde e fiori d'arancio. Sapido, caldo, fresco con un lieve fondo amarognolo."}, {"nome": "Cimixà - Andrea Bruzzone", "abv": "13,5%", "extra": "DOP 2024", "uve": "Cimixà 100%", "prezzo_bottiglia": 29, "descrizione": "Frutti tropicali e note vegetali. Vino fresco, sapido e minerale. Lunga persistenza."}, {"nome": "Coronata \"o Cônâ\" - Villa Cambiaso", "abv": "13%", "extra": "DOC 2021", "uve": "Bianchetta Genovese, Albarola e Vermentino", "prezzo_bottiglia": 33, "prezzo_calice": 9, "descrizione": "Profumo delicato, fruttato, persistente. Sentori di erbe e fiori di campo. Sapore secco, sapido e armonico."}, {"nome": "\"Patiscimile\" - Andrea Bruzzone", "abv": "12,5%", "annata": "2023", "uve": "Bianchetta 100%", "prezzo_bottiglia": 37, "prezzo_calice": 10, "descrizione": "La vigna migliore invecchiata 6 mesi in botti di cemento. Profumo fruttato con sentori di fiori di campo. Delicato e morbido."}, {"nome": "Vermentino \"e Galêe\" - Villa Cambiaso", "abv": "13%", "extra": "DOC 2022", "uve": "Vermentino 100%", "prezzo_bottiglia": 33, "prezzo_calice": 9, "descrizione": "Mela verde e fiori d'arancio. Sapido, caldo, fresco con un lieve fondo amarognolo."}]}, {"titolo": "LIGURIA DI PONENTE", "vini": [{"nome": "Pigato - Müragni", "abv": "12%", "extra": "DOC 2024", "uve": "Pigato 100%", "prezzo_bottiglia": 44, "prezzo_calice": 13, "descrizione": "Molto profumato di pesca e salvia. Al palato acidità e sapidità finale."}, {"nome": "Pigato \"Incanto\" - La Casetta", "abv": "13,5%", "extra": "IGT 2024", "uve": "Pigato 100%", "prezzo_bottiglia": 32, "prezzo_calice": 9, "descrizione": "Breve macerazione senza aggiunta di solfiti. Fruttato e floreale, sapido con lieve retrogusto amarognolo."}, {"nome": "Pigato \"Marené\" - BioVio", "abv": "13,5%", "extra": "DOC 2024", "uve": "Pigato 100%", "prezzo_bottiglia": 39, "prezzo_calice": 11, "descrizione": "Muschio e sottobosco, ginestra e cedro. Gusto secco, abbastanza intenso e persistente con finale leggermente ammandorlato."}, {"nome": "Pigato Superiore \"Cremen\" - Deperi", "abv": "13,5%", "extra": "DOC 2023", "uve": "Pigato 100%", "prezzo_bottiglia": 49, "descrizione": "Affinato sulle fecce per 10 mesi in botti di rovere. Note tostate e di miele. Intenso, balsamico e minerale."}, {"nome": "Pigato \"P'Igi\" macerato - Deperi", "abv": "13,5%", "annata": "2022", "uve": "Pigato 100%", "prezzo_bottiglia": 39, "descrizione": "Macerazione di 7 giorni con successiva svinatura in anfora e dopo altri 8 mesi sulle fecce. Non filtrato né chiarificato. Sentori di frutta e pietra focaia. In bocca è ricco ma allo stesso tempo di buona beva con un finale leggermente astringente."}, {"nome": "Vermentino \"Giada\" - La Casetta", "abv": "13%", "extra": "IGT 2024", "uve": "Vermentino 100%", "prezzo_bottiglia": 32, "prezzo_calice": 9, "descrizione": "Breve macerazione senza aggiunta di solfiti. Fruttato e floreale dal sapore sapido e fresco."}]}, {"titolo": "CAMPANIA", "vini": [{"nome": "\"Privo L'eretico 2023\" - Ale.P.A.", "abv": "12,5%", "extra": "IGT 2021", "uve": "Pallagrello 100%", "prezzo_bottiglia": 49, "descrizione": "Nessuna filtrazione o chiarifica. Macerazione di 8 giorni cui segue un affinamento di 12 mesi in acciaio e castagno. Albicocche essiccate, miele, arance, polpa di mela e spezie orientali. Fresco, ben sapido, dal persistente finale speziato."}, {"nome": "\"Riccio Bianco\" - Ale.P.A.", "abv": "13,5%", "extra": "IGT 2024", "uve": "Pallagrello 100%", "prezzo_bottiglia": 42, "descrizione": "Uno dei pochi vitigni al mondo ad avere entrambe le varietà, bacca bianca e rossa. Affinato solo in acciaio. Frutta bianca, sale, noce moscata. Fresco e leggermente sapido con aromi di frutta gialla e agrumi."}]}, {"titolo": "EMILIA-ROMAGNA (Val Trebbia)", "vini": [{"nome": "\"Ageno\" - La Stoppa", "abv": "12,5%", "annata": "2020", "uve": "Malvasia di Candia 100%", "prezzo_bottiglia": 59, "descrizione": "4 mesi di macerazione sulle bucce e seguente affinamento in botte. Miele e spezie, tannico e persistente."}, {"nome": "Bianco di Fognano - Paolo Foppiani", "abv": "11,5%", "annata": "2021", "uve": "Malvasia di Candia e Ortrugo", "prezzo_bottiglia": 34, "descrizione": "8 mesi di macerazione sulle bucce. Agrumi e pesca sorretti da una buona spalla acida."}, {"nome": "\"CasèBianco\" - Casè", "abv": "11%", "annata": "2022", "uve": "Malvasia di Candia Aromatica, Marsanne, Trebbiano, Moscato Bianco, Ortrugo", "prezzo_bottiglia": 36, "descrizione": "Macerazione di 40 giorni. Fresco e minerale con aromi fruttati. Buona struttura."}, {"nome": "\"Catavela\" - Denavolo", "abv": "10,5%", "annata": "2022", "uve": "Malvasia di Candia 25%, Ortrugo 25%, Marsanne 25%, altre uve locali 25%", "prezzo_bottiglia": 29, "descrizione": "Macerazione di 7 giorni di uve da vigne giovani. Agile e fragrante, frutta matura, salvia e fiori freschi. Spiccata acidità."}, {"nome": "\"Dinavolino\" - Denavolo", "abv": "12%", "annata": "2021", "uve": "Malvasia di Candia 25%, Ortrugo 25%, Marsanne 25%, altre uve locali 25%", "prezzo_bottiglia": 34, "descrizione": "6 mesi di macerazione sulle bucce. Fruttato e floreale, con sentori balsamici e di erbe aromatiche e sfumature minerali. Molto fresco e dotato di una spiccata mineralità."}, {"nome": "\"Dinavolo\" - Denavolo", "abv": "12,5%", "annata": "2021", "uve": "Malvasia di Candia 25%, Ortrugo 25%, Marsanne 25%, altre uve locali 25%", "prezzo_bottiglia": 49, "descrizione": "8 mesi di macerazione sulle bucce. Tè bianco, pesca disidratata e rosmarino, genziana. Asciutto ed acido, tannino graffiante."}, {"nome": "\"Jai Guru Deva\" - Shun Minowa", "uve": "Ortrugo 60%, Malvasia di Candia, Marsanne, Sauvignon Blanc, Moscato", "descrizione": "Macerazione di 2 mesi di uve da vigne vecchie, affinamento in cemento e botti di acacia. Agrumi, fiori bianchi, miele, cannella e spezie. Tannino, sapidità ed acidità.", "annate": [{"anno": "2020", "abv": "12,8%", "prezzo_bottiglia": 49}, {"anno": "2021", "abv": "13,5%", "prezzo_bottiglia": 44}]}, {"nome": "\"Solata\" - Montepascolo", "abv": "12%", "annata": "2022", "uve": "Malvasia di Candia, Sauvignon, Moscato", "prezzo_bottiglia": 36, "descrizione": "Macerazione di 60 giorni, affinamento di 12 mesi in cemento ed altri 12 in bottiglia. Leggermente petillant."}]}, {"titolo": "EMILIA-ROMAGNA", "vini": [{"nome": "Malvasia \"Vej 240\" - Podere Pradarolo", "abv": "12,5%", "extra": "IGT 2022", "uve": "Malvasia di Candia Aromatica 100%", "prezzo_bottiglia": 42, "descrizione": "Macerazione sulle bucce in vasche di cemento. Nessuna filtrazione, chiarifica, aggiunta di lieviti. Rosa antica, corpo importante e tannini spiccati, floreale e fresco in bocca."}, {"nome": "\"Ripa di Sopravento\" - Vittorio Graziano", "abv": "12%", "annata": "2024", "uve": "Trebbiano ed altri vitigni locali", "prezzo_bottiglia": 42, "descrizione": "Metodo ancestrale rifermentato in vetroresina. Fresco, sapido e minerale di buona struttura."}, {"nome": "\"Rorippa\" - Lusenti", "abv": "12%", "annata": "2021", "uve": "Chardonnay 90%, Malvasia 10%", "prezzo_bottiglia": 42, "descrizione": "Non filtrato, macerato in anfora per 6 mesi. Mineralità e sapidità. Frutta, crema e cocco."}]}, {"titolo": "FRIULI", "vini": [{"nome": "\"I Fiori di Leonie\" - Zorzettig", "abv": "13,5%", "extra": "DOC 2020", "uve": "Pinot Bianco, Friulano, Sauvignon", "prezzo_bottiglia": 69, "descrizione": "Leggera nota floreale e richiami fruttati di mela Golden e crema pasticcera. Equilibrato e avvolgente, di buona persistenza e struttura, con un finale balsamico."}, {"nome": "Malvasia \"Orange\" - Le Vigne di Zamò", "abv": "13%", "extra": "IGT 2022", "uve": "Malvasia 100%", "prezzo_bottiglia": 49, "prezzo_calice": 13, "descrizione": "Macerazione di 6 mesi in anfora, non filtrato. Pompelmo, albicocca, pesca e muschio con tannini ben integrati."}, {"nome": "Ribolla Gialla - Zorzettig", "abv": "13%", "extra": "DOC 2022", "uve": "Ribolla Gialla 100%", "prezzo_bottiglia": 44, "prezzo_calice": 12, "descrizione": "Naso floreale con note di camomilla e fiori di acacia, mela e albicocca. Grazie al buono stato di maturazione delle uve raccolte evidenzia al palato la caratteristica nota acida smorzata e ben bilanciata da una ampia complessità di corpo. Buona sapidità che rende il finale lungo di grande piacevolezza."}]}, {"titolo": "LOMBARDIA", "vini": [{"nome": "Riesling \"San Rocco\" - Stefanago", "abv": "13%", "extra": "IGP 2016", "uve": "Riesling 100%", "prezzo_bottiglia": 48, "descrizione": "12 mesi in botti di acacia e 12 mesi in bottiglia. Sapido, fresco, equilibrato e persistente."}, {"nome": "Traminer \"Arò\" - Stefanago", "abv": "13%", "extra": "IGP 2023", "uve": "Traminer 100%", "prezzo_bottiglia": 36, "descrizione": "Arancia, fiori di rosa, litchi, zenzero e coriandolo. Succoso e aromatico."}]}, {"titolo": "PIEMONTE", "vini": [{"nome": "Arneis - Renato Fenocchio", "abv": "12,5%", "extra": "DOC 2023", "uve": "Arneis 100%", "prezzo_bottiglia": 32, "prezzo_calice": 9, "descrizione": "Ginestra, camomilla e frutta fresca. Acidulo, pieno e persistente."}, {"nome": "Chardonnay \"Ada\" - Simone Borsari", "abv": "13%", "uve": "Chardonnay 100%", "prezzo_bottiglia": 48, "prezzo_calice": 13, "descrizione": "10 mesi di tonneau. Minerale, fruttato, floreale e sapido."}, {"nome": "Chardonnay \"An Piota\" - Forti del Vento", "abv": "13,5%", "annata": "2022", "uve": "Chardonnay 100%", "prezzo_bottiglia": 34, "prezzo_calice": 9, "descrizione": "2 mesi di macerazione e quindi 6 mesi di affinamento in anfora. Non il solito Chardonnay. Fresco e minerale, naso complesso con richiami di scorza di arancia."}, {"nome": "Cortese \"Maia\" - Forti del Vento", "abv": "12,5%", "annata": "2022", "uve": "Cortese 100%", "prezzo_bottiglia": 32, "prezzo_calice": 9, "descrizione": "3 mesi di macerazione e quindi 8 mesi di affinamento in acciaio. Vino secco, affilato e minerale. Con una beva di gran carattere."}, {"nome": "Riesling \"Marin\" - Fontanafredda", "abv": "13%", "extra": "DOC 2021", "uve": "Riesling 100%", "prezzo_bottiglia": 37, "prezzo_calice": 10, "descrizione": "Agrumi, pesca bianca, alloro e rosmarino uniti all'idrocarburo e all'acidità del Riesling. Retrogusto lungo e sapido."}, {"nome": "Timorasso \"C.C.C\" - Az. Agr. Ricci", "abv": "14%", "uve": "Timorasso 100%", "prezzo_bottiglia": 79, "descrizione": "Vino superorange. Macerazione di 3 giorni e lungo invecchiamento ossidativo in botte per 12 mesi. No filtrazioni né chiarifiche. Frutta gialla matura, miele, fiori di campo, camomilla, cenni salmastri e sfumature ossidative. Il sorso è ampio e lungo, con una prevalenza di sensazioni terziarie di particolare intensità espressiva. Il finale è leggermente tannico, fresco e salino."}, {"nome": "Timorasso \"Io Cammino da Solo\" - Az. Agr. Ricci", "abv": "13,5%", "annata": "2019", "uve": "Timorasso 100%", "prezzo_bottiglia": 69, "descrizione": "Macerazione di 100 giorni sulle bucce in anfore interrate e affinato di 12 mesi in legni di castagno. Da bere rigorosamente a temperatura ambiente."}]}, {"titolo": "SICILIA", "vini": [{"nome": "Catarratto \"Macerato\" - Ferracane", "abv": "12%", "extra": "IGP 2023", "uve": "Catarratto 100%", "prezzo_bottiglia": 42, "descrizione": "19 giorni di macerazione sulle bucce e 2 mesi di affinamento sui lieviti. Sentori di lievito, erba appena tagliata, chiusura con mandorla. Di medio corpo ma fresco, leggermente salato, tannino morbido."}, {"nome": "\"Fossa delle Triglie\" - Badalucco", "abv": "12,5%", "annata": "2024", "uve": "varietà locali", "prezzo_bottiglia": 45, "descrizione": "Non filtrato, macerato 6 mesi sulle fecce. Frutta gialla matura. Avvolgente, fresco, delicato e marino."}, {"nome": "Grillo \"Magico Ariddu\" - Ferracane", "abv": "12%", "extra": "IGP 2023", "uve": "Grillo 100%", "prezzo_bottiglia": 32, "descrizione": "2 giorni di macerazione sulle bucce. Fruttato con sentori di pesca e fiori d'arancio. Equilibrata morbidezza e buon corpo."}, {"nome": "Grillo \"Note di Bianco\" - Alessandro Viola", "abv": "12,5%", "extra": "IGP 2024", "uve": "Grillo 100%", "prezzo_bottiglia": 35, "descrizione": "Non filtrato, macerato 6 mesi sulle fecce. Frutta gialla matura. Avvolgente, fresco, delicato e marino."}, {"nome": "Grillo \"Pinzeri\" - Funaro", "abv": "13%", "extra": "DOC 2024", "uve": "Grillo 100%", "prezzo_bottiglia": 32, "descrizione": "Al naso sentori floreali e fruttati (melone giallo e pesca). Morbido e pieno con lunga persistenza."}]}, {"titolo": "TOSCANA", "vini": [{"nome": "Ansonaco (Isola del Giglio) - Vigneto Altura", "abv": "13,5%", "extra": "IGT 2024", "uve": "Ansonaco (Inzolia) 100%", "prezzo_bottiglia": 59, "descrizione": "Macerazione di 4 giorni ed affinamento in acciaio."}, {"nome": "\"Aura Vanempo\" - Poggio di Cicignano", "abv": "13%", "extra": "IGT 2020", "uve": "Trebbiano 45%, San Colombano 35%, Malvasia del Chianti 20%", "prezzo_bottiglia": 49, "descrizione": "Vigne di oltre 50 anni. Macerazione di 5 giorni ed affinamento di 12 mesi in barrique. Agrumi canditi, nocciole, fiori di campo ed erbe spontanee. Struttura possente e ricca. Salinità e freschezza."}]}, {"titolo": "TRENTINO - ALTO ADIGE", "vini": [{"nome": "Gewürztraminer - In der Eben", "abv": "13%", "extra": "IGT 2021", "uve": "Gewürztraminer 100%", "prezzo_bottiglia": 59, "descrizione": "Fermentazione spontanea in botte grande di legno. Invecchiamento in botte grande di rovere per 12 mesi. Imbottigliamento senza chiarifica e filtrazione. Litchi, mango e chiodi di garofano. Fresco, morbido e di grande carattere. Ottima la persistenza."}, {"nome": "Gewürztraminer \"Turmhof\" - Tiefenbrunner", "abv": "15%", "extra": "DOC 2023", "uve": "Gewürztraminer 100%", "prezzo_bottiglia": 48, "prezzo_calice": 13, "descrizione": "Petali di rosa, spezie, miele e litchi. Corpo robusto e finale aromatico persistente."}]}, {"titolo": "VALLE D'AOSTA", "vini": [{"nome": "\"Pantagruel\" - Cantina di Cuneaz", "abv": "13,5%", "extra": "DOC 2023", "uve": "Gewurztraminer 100%", "prezzo_bottiglia": 39, "prezzo_calice": 11, "descrizione": "Macerazione di 24 ore e seguente affinamento in botte per circa 1 anno. Pieno ed opulento con un finale dritto e secco."}]}, {"titolo": "VENETO", "vini": [{"nome": "\"Brespa\" - Il Moralizzatore", "abv": "13%", "extra": "IGT 2024", "uve": "Vespaiola 100%", "prezzo_bottiglia": 48, "descrizione": "Note minerali e lievemente balsamiche. Sapido, appagante e fresco."}, {"nome": "Chardonnay \"Sar-do-nè\" - Santa Colomba", "abv": "13%", "extra": "IGT 2022", "uve": "Chardonnay 100%", "prezzo_bottiglia": 26, "prezzo_calice": 9, "descrizione": "Intensi sentori floreali, vena minerale e spezie dolci."}, {"nome": "Garganega \"Pico\" - Angiolino Maule", "abv": "12%", "extra": "IGT 2023", "uve": "Garganega 100%", "prezzo_bottiglia": 49, "descrizione": "Miele di acacia e fiori di campo. Gusto diretto, minerale e persistente. Buona freschezza."}, {"nome": "Sauvignon \"Sudigiri\" - Villa Job", "abv": "13%", "extra": "IGT 2022", "uve": "Sauvignon 100%", "prezzo_bottiglia": 39, "prezzo_calice": 11, "descrizione": "Macerazione sulle bucce per 3 giorni e seguente affinamento di 6 mesi in cemento e 3 mesi in botte. Ortica e sambuco, pompelmo e frutto della passione. Bella struttura con spalla erbacea."}, {"nome": "\"Togo\" - Il Ceo", "abv": "11,5%", "annata": "2023", "uve": "Vespaiola, Glera Lunga e Pedevenda", "prezzo_bottiglia": 38, "prezzo_calice": 11, "descrizione": "Nespola e tiglio. Sapido e croccante con una spiccata freschezza finale."}]}]}, {"titolo": "VINI ROSATI", "sottosezioni": [{"titolo": "LIGURIA", "vini": [{"nome": "\"La Foce\" - La Cornice", "abv": "13%", "extra": "IGT 2022", "uve": "Sangiovese, Canaiolo e Syrah", "prezzo_bottiglia": 32, "descrizione": "Frutti di bosco e rosa canina, calendula e melissa. Buona acidità e tannino sfumato."}, {"nome": "\"La Poggia\" - Luna Mater", "abv": "14%", "extra": "IGT 2024", "uve": "Syrah 100%", "prezzo_bottiglia": 44, "descrizione": "Elegante ed equilibrato."}, {"nome": "\"Lappazucche\" - Berry&Berry", "abv": "11,5%", "annata": "2023", "uve": "Barbarossa 80%, altri vitigni autoctoni 20%", "prezzo_bottiglia": 34, "prezzo_calice": 10, "descrizione": "Aromi fruttati e floreali con una piacevole nota speziata."}, {"nome": "\"Rosé d'Amour\" - Possa", "abv": "12%", "annata": "2024", "uve": "Bonamico 80% e Moscato rosso 20%", "prezzo_bottiglia": 44, "descrizione": "Profumi nitidi e schietti, molto eleganti di frutti di bosco, lampone, mirtillo e ribes. In bocca è molto morbido."}]}, {"titolo": "ALTRE REGIONI", "vini": [{"nome": "Cerasuolo d'Abruzzo \"Suffonte\" - Az. Agr. Ludovico", "abv": "14%", "extra": "DOC 2020", "uve": "Montepulciano d'Abruzzo 100%", "regione": "Abruzzo", "prezzo_bottiglia": 39, "descrizione": "Macerazione di 7 giorni ed affinamento in acciaio. Nessuna chiarifica o filtrazione. Frutto croccante, sapidità, freschezza e struttura."}, {"nome": "\"Il Sole di Leo\" - UCCI Cantina Urbana", "abv": "12,5%", "annata": "2023", "uve": "Freisa 100%", "regione": "Piemonte", "prezzo_bottiglia": 33, "descrizione": "Lampone e rosa. Fresco, croccante, di buona sapidità."}, {"nome": "\"Il Sole di Leo\" Botte Scolma - UCCI Cantina Urbana", "abv": "14%", "annata": "2017", "uve": "Freisa 100%", "regione": "Piemonte", "prezzo_bottiglia": 46, "descrizione": "Vinificato in legno ed affinato in botte scolma. Tabacco e cioccolato, leggermente ossidato e di buon corpo."}, {"nome": "Pinot Grigio \"Macerato\" - Stefanago", "abv": "13,5%", "extra": "IGP 2023", "uve": "Pinot Grigio 100%", "regione": "Lombardia", "prezzo_bottiglia": 36, "descrizione": "Pera e frutta fresca. Vino giovane e non impegnativo, sapido ed asciutto."}]}]}, {"titolo": "VINI ROSSI", "sottosezioni": [{"titolo": "LIGURIA", "vini": [{"nome": "\"Cuxii\" - Il Baggio Pellegrino", "abv": "12,5%", "annata": "2022", "uve": "Ormeasco 80% Cabernet", "prezzo_bottiglia": 39, "descrizione": "Frutti di bosco, ribes, rosa canina. Persistente con tannino piacevole."}, {"nome": "Granaccia \"Bricco dei Bambini\" - Viarzo", "abv": "14,5%", "extra": "DOC 2020", "uve": "Granaccia 100%", "prezzo_bottiglia": 57, "descrizione": "Macerazione in cemento e seguente affinamento di 18 mesi in tonneau di rovere. Frutti rossi, note speziate, sentori di sottobosco e leggero tocco balsamico."}, {"nome": "Granaccia \"Trexenda\" - Viarzo", "abv": "14%", "extra": "IGT 2020", "uve": "Granaccia 100%", "prezzo_bottiglia": 47, "descrizione": "Macerazione in cemento e seguente affinamento di 10 mesi in tonneau di rovere."}, {"nome": "\"Ngilù\" - Cà du Ferrà", "abv": "13,5%", "extra": "DOP 2020", "uve": "Sangiovese, Merlot, Ciliegiolo", "prezzo_bottiglia": 48, "prezzo_calice": 14, "descrizione": "Melograno, lampone e ciliegia rossa. Vivace ed armonico, di buona struttura e lunga persistenza."}, {"nome": "\"Niccolò V\" - Cantine Lunae Bosoni", "abv": "14%", "extra": "DOC 2015", "uve": "Sangiovese, Merlot, Pollera Nera", "prezzo_bottiglia": 55, "descrizione": "12 giorni di permanenza sulle bucce e successivo affinamento di 18 mesi in botte. Fragola matura e ciliegia, vaniglia e liquerizia. Trama tannica setosa e piacevolmente acida. Finale lungo e persistente."}, {"nome": "\"Poderino\" - Luna Mater", "abv": "14%", "extra": "IGT 2020", "uve": "Merlot, Cabernet Sauvignon, Syrah e Sangiovese", "prezzo_bottiglia": 39, "descrizione": "Macerazione di almeno 10 giorni. Ogni uva vendemmiata e vinificata separatamente (parte in acciaio e parte in botte di terzo passaggio). Dopo l'inverno si passa all'assemblaggio."}, {"nome": "Rossese di Dolceacqua - Cantina Muragni", "abv": "13,5%", "extra": "DOC 2023", "uve": "Rossese 100%", "prezzo_bottiglia": 39, "prezzo_calice": 12, "descrizione": "Rosmarino, pepe nero ed un tannino morbido e maturo. Buona persistenza."}]}, {"titolo": "EMILIA-ROMAGNA", "vini": [{"nome": "Barbera \"Velius\" - Podere Pradarolo", "abv": "14,5%", "extra": "IGT 2016", "uve": "Barbera 100%", "prezzo_bottiglia": 42, "descrizione": "90 giorni di macerazione sulle bucce, nessuna filtrazione, chiarifica o aggiunta di solfiti. Persistenti note fruttate, tannini ed acidità evidenti."}, {"nome": "\"Dinavolo Rosso\" - Denavolo", "abv": "12,5%", "annata": "2022", "uve": "Bonarda, Barbera, Pinot Nero, Pinot Grigio", "prezzo_bottiglia": 49, "descrizione": "8 mesi di macerazione sulle bucce. Morbido, note vegetali e frutti rossi."}, {"nome": "\"Giulio\" - Montepascolo", "abv": "14,5%", "annata": "2020", "uve": "Barbera, Bonarda, Syrah", "prezzo_bottiglia": 39, "prezzo_calice": 11, "descrizione": "Affinato in botti di rovere per almeno 1 anno. Mirtilli sotto spirito, spezie e terra. Struttura poderosa con tannini gentili."}, {"nome": "\"Macchiona\" - La Stoppa", "uve": "Barbera, Croatina", "descrizione": "Affinato in botti di rovere per almeno 1 anno. Mirtilli sotto spirito, spezie e terra. Struttura poderosa con tannini.", "annate": [{"anno": "2009", "abv": "11%", "prezzo_bottiglia": 69}, {"anno": "2016", "abv": "13%", "prezzo_bottiglia": 59}]}, {"nome": "Pinot Nero \"Riva del Ciliegio\" - Casè", "abv": "13,5%", "extra": "IGT 2016", "uve": "Pinot Nero 100%", "prezzo_bottiglia": 44, "descrizione": "Macerazione di 30 giorni in botte grande e successivo affinamento di 10 mesi in acciaio. Vino asciutto, tagliente e minerale. Speziato e balsamico."}, {"nome": "\"Trebbiolo\" - La Stoppa", "abv": "13,5%", "annata": "2023", "uve": "Barbera, Croatina", "prezzo_bottiglia": 32, "prezzo_calice": 9, "descrizione": "Macerazione di 20 giorni ed affinamento di 10 mesi in cemento. Bacche rosse, fiori, humus e sentori vegetali. Buona persistenza."}]}, {"titolo": "PIEMONTE", "vini": [{"nome": "Barbera \"Dritto al Cuore\" - Az. Agr. Ricci", "abv": "15%", "extra": "DOC 2020", "uve": "Barbera 100%", "prezzo_bottiglia": 36, "descrizione": "Vinificate con fermentazione spontanea, affinano in acciaio per 12 mesi. Fresco e fruttato. Fiori di campo e sottobosco."}, {"nome": "\"Crematto\" - Crealto", "abv": "13,5%", "annata": "2022", "uve": "Uve autoctone, prevalenza di Nebbiolo", "prezzo_bottiglia": 34, "prezzo_calice": 11, "descrizione": "Fresco e beverino grazie alla breve macerazione ed all'affinamento in acciaio."}, {"nome": "Dolcetto \"Nibiô\" - Cascina degli Ulivi", "abv": "14%", "annata": "2016", "uve": "Dolcetto 100%", "prezzo_bottiglia": 42, "descrizione": "4 settimane di macerazione e 24 mesi di affinamento in botte. Frutti rossi e prugne mature, tannini vigorosi e buona struttura."}, {"nome": "Dolcetto \"Ottotori\" - Forti del Vento", "abv": "13%", "annata": "2020", "uve": "Dolcetto 100%", "prezzo_bottiglia": 32, "prezzo_calice": 9, "descrizione": "Cru maturato un anno in legno ed affinato in bottiglia. Struttura, tannino e finezza. Buona acidità."}, {"nome": "Freisa \"Poco Dopo un Ferragosto\" - Cà del Prete", "abv": "14%", "extra": "DOC 2019", "uve": "Freisa 100%", "prezzo_bottiglia": 36, "descrizione": "Affinato per 6 mesi sulle bucce. Intenso ed elegante, tannino avvolgente."}, {"nome": "Nebbiolo - Andrea Ballarin", "abv": "13,5%", "extra": "DOC 2024", "uve": "Nebbiolo 100%", "prezzo_bottiglia": 32, "descrizione": "Rosa e viola, in bocca sapido, dolce e persistente."}]}, {"titolo": "SARDEGNA", "vini": [{"nome": "\"Case Sparse\" - Az. Agr. Pusole", "abv": "15%", "extra": "IGT 2021", "uve": "Cannonau 90% e Monica 10%", "prezzo_bottiglia": 49, "descrizione": "Raccolta tardiva e macerazione di 15 gg. Nessuna chimica né filtrazione. Piccoli frutti rossi, viola, pepe nero, ciliegia e macchia mediterranea. Vino scorrevole, estivo, persistente e dal tannino equilibrato."}]}, {"titolo": "SICILIA", "vini": [{"nome": "\"Costa Jatta\" - Biscaris", "abv": "13%", "extra": "IGP 2024", "uve": "Frappato 100%", "prezzo_bottiglia": 37, "prezzo_calice": 11, "descrizione": "Fresco, complesso e variegato al naso, frutta scura matura e spezie."}, {"nome": "\"SP68\" - Arianna Occhipinti", "abv": "12,5%", "extra": "IGT 2023", "uve": "Frappato di Vittoria, Nero d'Avola", "prezzo_bottiglia": 37, "descrizione": "Macerazione di 15 giorni sulle bucce e fermentazione spontanea in tini di cemento per 7 mesi. Vino giovane, polposo e diretto, piacevolmente fresco. Pepe nero, pietra focaia, tabacco e note mentolate."}]}, {"titolo": "TRENTINO ALTO-ADIGE", "vini": [{"nome": "Pinot Nero - In der Eben", "abv": "12%", "extra": "IGT 2020", "uve": "Pinot Nero 100%", "prezzo_bottiglia": 65, "descrizione": "Fermentazione spontanea ed affinamento in botti grandi di rovere per 22 mesi. Fresco e speziato. Frutti rossi, terra, sottobosco e corteccia. In bocca entra dritto, teso ed asciutto."}, {"nome": "Pinot Nero \"Turmhof\" - Tiefenbrunner", "abv": "14%", "extra": "DOC 2023", "uve": "Pinot Nero 100%", "prezzo_bottiglia": 46, "prezzo_calice": 12, "descrizione": "10 mesi in botte, 2 mesi in cemento e poi 5 mesi in bottiglia. More, lamponi e ciliegie. Morbido e pieno, elegante ed equilibrato."}]}, {"titolo": "VENETO", "vini": [{"nome": "Amarone della Valpolicella Classico - Allegrini", "uve": "Corvina 70%, Rondinella 15%, Oseleta 5%", "descrizione": "Fiori passiti e di frutta rossa. China, vaniglia, pepe nero e cacao. Strutturato e vigoroso, morbido e vellutato. Chiude su note balsamiche di grande persistenza.", "annate": [{"anno": "2017", "abv": "16%", "prezzo_bottiglia": 130}, {"anno": "2018", "abv": "16%", "prezzo_bottiglia": 120}]}, {"nome": "\"Pino Nero\" - Santa Colomba", "abv": "12,5%", "extra": "IGT 2024", "uve": "Pinot Nero 100%", "prezzo_bottiglia": 34, "prezzo_calice": 11, "descrizione": "More, ribes rosso e sottobosco. Poco tannico, fresco e vellutato. Vaniglia e spezie date dall'affinamento in botte."}, {"nome": "\"Trojan Horse\" - Cantina Martinelli", "abv": "12,5%", "extra": "IGT 2022", "uve": "Corvina, Corvinone, Merlot, Cabernet Franc, Garganega", "prezzo_bottiglia": 36, "descrizione": "Fragola e ciliegia, corteccia e terra. Sanguigno, caratteriale ma godibile."}]}]}, {"titolo": "BIRRE", "vini": [{"nome": "Maltus Faber Bianca", "abv": "4,7%", "extra": "33 cl", "prezzo_bottiglia": 10, "descrizione": "Birra di malto pils, frumento ed avena. Colore chiaro con schiuma candida e persistente. Aroma fine ed un po' agrumato. Una birra molto dissetante e piacevole."}, {"nome": "Maltus Faber Blonde", "abv": "5,5%", "extra": "33 cl", "prezzo_bottiglia": 10, "descrizione": "Bianca schiuma persistente. L'aroma è quasi esuberante, erbaceo e fruttato con una sfumatura delicata di pompelmo."}, {"nome": "Maltus Faber Ambrata", "abv": "7%", "extra": "33 cl", "prezzo_bottiglia": 10, "descrizione": "Nell'aroma pulito prevale il caramello. In bocca è morbida, piena, con sentori fruttati gentili e sfuma in un retrogusto più amarognolo e secco."}]}]};
+<div class="pg">
+  <div class="pg-header">
+    <div class="logo">Santa<em>monica</em></div>
+    <div class="logo-sub">Lungomare Lombardo 27 &mdash; Genova</div>
+  </div>
+  <div class="lista-titolo">Lista Vini &mdash; Wine List</div>
+  <div class="sommelier">Sommelier Professionista Monica Capurro</div>
 
-function fmt(v) {
-  if (!v) return '';
-  var parts = [];
-  if (v.abv) parts.push(v.abv);
-  if (v.extra) parts.push(v.extra);
-  else if (v.annata) parts.push(v.annata);
-  if (v.uve) parts.push('Uve: ' + v.uve);
-  if (v.regione) parts.push(v.regione);
-  return parts.length ? ' - ' + parts.join(' - ') : '';
-}
+<h2 class="sez-titolo">NO-LO</h2>
 
-function fmtPrezzo(v) {
-  var p = '';
-  if (v.prezzo_bottiglia) p += '€ ' + v.prezzo_bottiglia;
-  if (v.prezzo_calice) p += ', € ' + v.prezzo_calice;
-  if (p) p += '.';
-  return p;
-}
+<p class="vino">WineZero Bianco &mdash; bottiglia &euro; 27, calice &euro; 9</p>
+<p class="vino">WineZero Rosso &mdash; bottiglia &euro; 27, calice &euro; 9</p>
+<p class="vino">Bollicina <em>&ldquo;Steinbock&rdquo;</em> (Hofs&auml;tter) &mdash; bottiglia &euro; 32, calice &euro; 12</p>
+<p class="vino">Sidro Baladin (4,7&deg;) &euro; 10</p>
+<p class="vino">Birra Poretti analcolica 33cl &euro; 5</p>
 
-function renderVino(v) {
-  var html = '<div class="vino">';
-  html += '<span class="vino-nome">' + v.nome + '</span>';
-  var meta = fmt(v);
-  if (meta) html += '<span class="vino-meta">' + meta + '</span>';
-  // Vino senza annate: prezzo inline
-  if (!v.annate && (v.prezzo_bottiglia || v.prezzo_calice)) {
-    html += ' <span class="vino-prezzo">' + fmtPrezzo(v) + '</span>';
-  }
-  if (v.descrizione) html += '<div class="vino-descrizione">' + v.descrizione + '</div>';
-  // Annate indentate
-  if (v.annate && v.annate.length) {
-    html += '<div class="annate-lista">';
-    v.annate.forEach(function(a) {
-      var ap = a.prezzo_bottiglia ? '€ ' + a.prezzo_bottiglia : '';
-      var aAbv = a.abv ? a.abv + ' - ' : '';
-      html += '<div class="annata-riga">Annata ' + a.anno + ' ' + aAbv + ap + '</div>';
-    });
-    html += '</div>';
-  }
-  html += '</div>';
-  return html;
-}
+<h2 class="sez-titolo">Bollicine</h2>
 
-function renderSottosezione(ss) {
-  var html = '';
-  if (ss.titolo) html += '<div class="sottosezione-titolo">' + ss.titolo + '</div>';
-  ss.vini.forEach(function(v) { html += renderVino(v); });
-  return html;
-}
+<h3 class="sottosez-titolo">Liguria</h3>
 
-function renderSezione(sez) {
-  var html = '<hr class="sep">';
-  html += '<div class="sezione-titolo">' + sez.titolo + '</div>';
-  if (sez.nota) html += '<div class="sezione-nota">' + sez.nota + '</div>';
-  if (sez.sottosezioni) {
-    sez.sottosezioni.forEach(function(ss) { html += renderSottosezione(ss); });
-  } else if (sez.vini) {
-    sez.vini.forEach(function(v) { html += renderVino(v); });
-  }
-  return html;
-}
+<p class="vino"><strong>&ldquo;Andalora&rdquo; Spumante Brut</strong> &ndash; Cascina Prai&egrave; 11% &ndash; Uve: Rossese 100% &ndash; bottiglia &euro; 36, calice &euro; 10. Metodo Martinotti. Profumo di mare e sapidità.</p>
 
-function render() {
-  var html = '<div class="page">';
-  // Cover
-  html += '<div class="cover">';
-  html += '<div class="cover-title">Lista Vini</div>';
-  html += '<hr class="cover-divider">';
-  html += '<div class="cover-subtitle">Wine List</div>';
-  html += '<div class="cover-sommelier">Sommelier Professionista Monica Capurro</div>';
-  html += '</div>';
-  // Sezioni
-  MENU_VINI.sezioni.forEach(function(sez) {
-    html += renderSezione(sez);
-  });
-  html += '<div class="lingua-links">';
-  html += '<a href="menu-vini-en.html"><u>English Wine List</u></a>';
-  html += '<a href="menu-vini-fr.html"><u>Carte des Vins</u></a>';
-  html += '<a href="menu-vini-de.html"><u>Weinkarte</u></a>';
-  html += '<a href="menu-vini-es.html"><u>Lista de Vinos</u></a>';
-  html += '</div>';
-  html += '<div class="footer-ver">v 2026.04.16.01</div>';
-  html += '</div>';
-  document.getElementById('root').innerHTML = html;
-}
+<p class="vino"><strong>&ldquo;Axillo&rdquo;</strong> &ndash; A. Bruzzone (IGT 2022) 12% &ndash; Uve: Vermentino e Bianchetta &ndash; bottiglia &euro; 37, calice &euro; 11. Profumo fine e con sentori di fiori bianchi. Frizzante in modo delicato.</p>
 
-render();
-</script>
+<p class="vino"><strong>&ldquo;Janua&rdquo; Spumante Brut Millesimato</strong> &ndash; A. Bruzzone (DOP 2021) 12% &ndash; Uve: Vermentino e Bianchetta &ndash; bottiglia &euro; 45, calice &euro; 12. Oltre 30 mesi di affinamento sui lieviti. Bolle piccole e persistenti, vino fresco e sapido.</p>
+
+<h3 class="sottosez-titolo">Altre Regioni</h3>
+
+<p class="vino"><strong>&ldquo;100&rdquo; Ancestrale</strong> &ndash; Castello di Stefanago 12,5% &ndash; Uve: Pinot Nero 100% &ndash; Lombardia &ndash; &euro; 65. Rifermentato in bottiglia sui lieviti per 100 mesi. Rosa e viola essiccati, frutto rosso in confettura, ricordi di forno e sentori minerali intensi.</p>
+
+<p class="vino"><strong>&ldquo;Animante&rdquo; Franciacorta Dosaggio Zero</strong> &ndash; Barone Pizzini (sboccatura 9-2025) 12% &ndash; Uve: Chardonnay 70%, Pinot Nero 13%, Pinot Bianco 10%, Erbamat 7% &ndash; Lombardia &ndash; bottiglia &euro; 54, calice &euro; 13. Affinato in bottiglia per 20-30 mesi. Profumi floreali, agrumi e miele d'acacia, albicocca e frutta fresca. Avvolgente, fresco e ben strutturato, sapido in chiusura.</p>
+
+<p class="vino"><strong>&ldquo;Animante&rdquo; Lungo Affinamento Franciacorta Dosaggio Zero</strong> &ndash; Barone Pizzini (sboccatura 6-2024) 12% &ndash; Uve: Chardonnay 94%, Pinot Nero 3%, Pinot Bianco 3% &ndash; Lombardia &ndash; &euro; 65. Affinato in bottiglia per 78 mesi. Fruttato, floreale, agrumi, albicocca, frutta secca e miele. Corposo e sapido.</p>
+
+<p class="vino"><strong>&ldquo;Filari Ginevra&rdquo;</strong> &ndash; Alberto Lot 10,5% &ndash; Uve: Glera 100% &ndash; Veneto &ndash; bottiglia &euro; 32, calice &euro; 9. Fiori bianchi ed agrumi, albicocca e rosa. Avvolgente ed equilibrato.</p>
+
+<p class="vino"><strong>&ldquo;Ossigeno&rdquo;</strong> &ndash; Robb de Matt (2023) 11% &ndash; Uve: Falanghina 80%, Coda di Pecora 20% &ndash; Campania &ndash; &euro; 39. Rifermentato in bottiglia, macerazione di 7 giorni. Non filtrato n&eacute; chiarificato e senza solfiti aggiunti. Acidit&agrave; audace, frutti, agrumi e salinitá. Denso e complesso.</p>
+
+<p class="vino"><strong>Pinot Nero Dosaggio Zero</strong> &ndash; Lusenti (2021, sboccatura 07-2025) 12,5% &ndash; Uve: Pinot Nero 100% &ndash; Emilia-Romagna &ndash; &euro; 53. Rifermentato in bottiglia e successivamente affinato sui lieviti per almeno 48 mesi. Fiori bianchi con spiccata acidit&agrave;. Bolla sottile, gusto fresco e sapido.</p>
+
+<p class="vino"><strong>Prosecco &ldquo;Radicale&rdquo; Extra Brut</strong> &ndash; Bellenda (2018) 11% &ndash; Uve: Glera 100% &ndash; Veneto &ndash; &euro; 44. Metodo ancestrale senza solfiti aggiunti e senza sboccatura, rifermentato in bottiglia. Fuori dagli schemi e senza compromessi. Mela e pera, sentori di lavanda, mora di gelso, kumquat e nocciola. In bocca &egrave; sapido, asciutto, lungo e pastoso.</p>
+
+<p class="vino"><strong>Prosecco Superiore Brut Pas Dos&eacute; &ldquo;S.C. 1931&rdquo;</strong> &ndash; Bellenda (DOCG 2021, sboccatura 10-2024) 11,5% &ndash; Uve: Glera 100% &ndash; Veneto &ndash; bottiglia &euro; 39, calice &euro; 12. Metodo classico. Frutta a polpa bianca e nocciole con sentori di miele d'acacia.</p>
+
+<p class="vino"><strong>&ldquo;Zero Infinito&rdquo;</strong> &ndash; Pojer e Sandri (2023) 12% &ndash; Uve: Solaris 100% &ndash; Trentino &ndash; &euro; 39. Non filtrato, metodo ancestrale, rifermentato in bottiglia. Profumo floreale e leggermente aromatico. Fiori di sambuco, mela, pera, albicocca. Gusto succoso e fresco.</p>
+
+<h2 class="sez-titolo">Bollicine Ros&eacute;</h2>
+
+<h3 class="sottosez-titolo">Liguria</h3>
+
+<p class="vino"><strong>&ldquo;Axillo&rdquo; Ros&eacute;</strong> &ndash; A. Bruzzone 12,5% &ndash; Uve: Ciliegiolo 100% &ndash; bottiglia &euro; 39, calice &euro; 12. Profumi ampi e fruttati. Frizzante in modo delicato.</p>
+
+<h3 class="sottosez-titolo">Altre Regioni</h3>
+
+<p class="vino"><strong>&ldquo;60&rdquo; Ancestrale</strong> &ndash; Castello di Stefanago 12,5% &ndash; Uve: Pinot Nero 100% &ndash; Lombardia &ndash; &euro; 57. Rifermentato in bottiglia sui lieviti per 100 mesi. Rosa e viola essiccati, frutto rosso in confettura, ricordi di forno e sentori minerali intensi.</p>
+
+<p class="vino"><strong>&ldquo;Big Bang&rdquo;</strong> &ndash; Robb de Matt (2023) 11% &ndash; Uve: Falanghina 70%, Coda di Pecora 30% &ndash; Campania &ndash; &euro; 34. Rifermentato in bottiglia, macerazione di 7 giorni. Non filtrato n&eacute; chiarificato. Senza solfiti aggiunti. Pesca, ginestra, lieviti ed erbe aromatiche.</p>
+
+<p class="vino"><strong>&ldquo;Misluli&rdquo;</strong> &ndash; Cantina Ninni (2025) 11,5% &ndash; Uve: Sangiovese 100% &ndash; Umbria &ndash; &euro; 45. Metodo ancestrale, senza chiarifica n&eacute; filtrazioni. Fragolina di bosco, ciliegia e amarena. Bolla fine e persistente.</p>
+
+<p class="vino"><strong>&ldquo;Rosa di Fognano&rdquo;</strong> &ndash; Az. Agr. Paolo Foppiani 12% &ndash; Uve: Barbera 100% &ndash; Emilia-Romagna &ndash; &euro; 37. Metodo ancestrale con breve macerazione sulle bucce e rifermentazione in bottiglia dopo un affinamento di 6 mesi in acciaio. Salame liquido.</p>
+
+<p class="vino"><strong>&ldquo;Ros&eacute;&rdquo; Franciacorta Extra Brut</strong> &ndash; Barone Pizzini (sboccatura 1-2024) 12% &ndash; Uve: Pinot Nero 70%, Chardonnay 30% &ndash; Lombardia &ndash; bottiglia &euro; 65, calice &euro; 18. Affinamento di 30-40 mesi sui lieviti. Rosa, ribes e mirtillo. Strutturato, sapido e persistente.</p>
+
+<p class="vino"><strong>&ldquo;Zero Infinito Cremisi&rdquo;</strong> &ndash; Pojer e Sandri (2023) 12% &ndash; Uve: Vitigni PIWI &ndash; Trentino &ndash; &euro; 42. Non filtrato, metodo ancestrale, rifermentato in bottiglia. Rosa e fragola, lampone e melograno. Succoso, fragrante, acido, sapido.</p>
+
+<h2 class="sez-titolo">Champagne</h2>
+<p class="sottosez-titolo" style="font-style:italic;text-align:center;margin-bottom:4mm;">A calice</p>
+
+<p class="vino"><strong>Etienne Oudart Brut Origine</strong> &ndash; 12% (2019, deg. 7/2024) &ndash; Uve: Pinot Meunier 60%, Chardonnay 25%, Pinot Noir 15% &ndash; bottiglia &euro; 79, calice &euro; 17. Matura sui lieviti per 60 mesi. Frutta bianca e mela verde, struttura leggera e fresca.</p>
+
+<p class="vino"><strong>Billecart-Salmon Brut R&eacute;serve</strong> &ndash; 12% (s.a.) &ndash; Uve: Pinot Noir 30%, Pinot Meunier 40%, Chardonnay 30% &ndash; &euro; 95. Matura sui lieviti per almeno 24 mesi. Perlage fine e persistente. Floreale, frutta fresca, pera matura e tanti fiori bianchi.</p>
+
+<p class="vino"><strong>Bollinger Special Cuv&eacute;e</strong> &ndash; 12% (s.a.) &ndash; Uve: Pinot Nero 60%, Chardonnay 25%, Pinot Meunier 15% &ndash; &euro; 105. Frutta matura e spezie. Note di pesca e sfumature di mela cotta e composta. Buona struttura, persistenza e vivacit&agrave;.</p>
+
+<p class="vino"><strong>Bruno Paillard Blanc de Blancs Grand Cru</strong> &ndash; 12% (2019, deg. 7/2024) &ndash; Uve: Chardonnay 100% &ndash; &euro; 150. Extra-brut. 25 annate di vini di riserva. Maturazione di 4 anni sui lieviti ed almeno 10 mesi in bottiglia dopo la sboccatura. Lime e pompelmo, mandorla e crosta di pane. Finale fresco e lungo.</p>
+
+<p class="vino"><strong>Bruno Paillard Blanc de Noirs Grand Cru</strong> &ndash; 12% (2019, deg. 6/2024) &ndash; Uve: Pinot Nero 100% &ndash; &euro; 160. Extra-brut. Breve passaggio in legno, maturazione sui lieviti di 3 anni e 6 mesi in bottiglia. Sentori di petali di rosa, pompelmo e pepe. Sale, ciliegia, kumquat e mela cotogna. Bella lunghezza.</p>
+
+<p class="vino"><strong>&eacute;cume Blanc de Pinot Noir Premier Cru</strong> &ndash; 12,5% (AOC 2023, deg. 2026) &ndash; Uve: Pinot Nero 100% &ndash; &euro; 105. Non filtrato. Aromi di agrumi e fiori bianchi. Fresco e persistente.</p>
+
+<p class="vino"><strong>Jaquesson Cuv&eacute;e 748</strong> &ndash; 12,5% (2020, deg. 12/2024) &ndash; Uve: Pinot Noir e Meunier 75%, Chardonnay 25% &ndash; &euro; 145. Dosaggio 2 gr/l. Base agrumata e leggermente candita, sentori di frutta secca e sfumature minerali e pietrose. In bocca un&rsquo;effervescenza setosa e finissima si intreccia a un preciso ritorno olfattivo, per chiudere con pulizia, sapidità e accenni dolci.</p>
+
+<p class="vino"><strong>Philipponnat R&eacute;serve Perp&eacute;tuelle Non Dos&eacute;</strong> &ndash; 12,5% (2021 deg. 9/2025) &ndash; Uve: Pinot Noir 65%, Pinot Meunier 2%, Chardonnay 32% &ndash; &euro; 110. Maturazione di 3 anni sui lieviti. Erbe aromatiche, pan brioche, nocciola e frutti di bosco. Corpo generoso e buona freschezza, note di ribes rosso e di lampone. Finale lungo e minerale.</p>
+
+<p class="vino"><strong>Ruinart Brut</strong> &ndash; 12,5% (s.a.) &ndash; Uve: Pinot Nero 57%, Chardonnay 40%, Pinot Meunier 3% &ndash; &euro; 110. Frutti a polpa bianca, albicocca, nocciole e mandorle. Fresco ed elegante, finale di rara persistenza.</p>
+
+<p class="vino"><strong>Tarlant Zero Brut Nature Pas Dos&eacute;</strong> &ndash; 12% (2018, deg. 7/2023) &ndash; Uve: Chardonnay 32%, Meunier 32%, Pinot Nero 32%, Petit Mesnil + Arbanne + Pinot Blanc 4% &ndash; &euro; 95. Affinato sui lieviti in bottiglia per quasi 7 anni. Aromi tostati di agrumi e frutta secca, buona freschezza.</p>
+
+<h2 class="sez-titolo">Champagne Ros&eacute;</h2>
+<p class="sottosez-titolo" style="font-style:italic;text-align:center;margin-bottom:4mm;">A calice</p>
+
+<p class="vino"><strong>Etienne Oudart Brut Ros&eacute; R&eacute;f&eacute;rence</strong> &ndash; 12% (2021, deg. 4/2024) &ndash; Uve: Pinot Meunier 50%, Chardonnay 20%, Pinot Noir 30% &ndash; bottiglia &euro; 95, calice &euro; 20. Matura sui lieviti per 36 mesi. Ribes, cassis e fragoline di bosco. Grande freschezza.</p>
+
+<p class="vino"><strong>Bollinger Ros&eacute;</strong> &ndash; 12,5% (s.a.) &ndash; Uve: Pinot Nero 67%, Chardonnay 33% &ndash; &euro; 170. Agrumi e frutti rossi. Freschezza prolungata e cremosa.</p>
+
+<p class="vino"><strong>Bollinger &ldquo;La Grande Ann&eacute;e Ros&eacute; 2014&rdquo;</strong> &ndash; 12,5% (deg. 8/2021) &ndash; Uve: Pinot Nero 61%, Chardonnay 39% &ndash; &euro; 340. Ciliegia, limone, mela cotogna e bergamotto con una sottile nota iodata. Sottile acidit&agrave; e struttura delicata. Finale lungo e salino.</p>
+
+<p class="vino"><strong>Billecart-Salmon Ros&eacute;</strong> &ndash; 12% (s.a.) &ndash; Uve: Pinot Nero 30%, Chardonnay 40%, Pinot Meunier 30% &ndash; &euro; 140. Note di ribes, di lamponi e di bacche. Profumato, fresco ed elegante.</p>
+
+<p class="vino"><strong>Bruno Paillard Ros&eacute;</strong> &ndash; 12% (2020, deg. 9/2024) &ndash; Uve: Pinot Nero in maggioranza e Chardonnay &ndash; &euro; 130. Extra-brut. 25 annate di vini di riserva. Maturazione di 3 anni sui lieviti ed almeno 5 mesi in bottiglia dopo la sboccatura. Marasca, fragola selvatica e violetta, un tocco di limone. Finale lungo, fresco e raffinato.</p>
+
+<p class="vino"><strong>Larmandier-Bernier Ros&eacute; de Saign&eacute;e</strong> &ndash; 12,5% (2013) &ndash; Uve: Pinot Noir 100% &ndash; &euro; 180. Affinamento di 72 mesi sulle fecce fini. Note di torba delicatamente affumicate. Trama speziata, complessa e saporita.</p>
+
+<p class="vino"><strong>Pinot-Chevauchet &ldquo;Elegante&rdquo; Ros&eacute; Pas Dos&eacute;</strong> &ndash; 12% (s.a.) &ndash; Uve: Chardonnay 50%, Meunier 30%, Pinot Nero 20% &ndash; &euro; 95. Affinato per almeno 6 anni sui lieviti, non filtrato. Frutti rossi e frutta fresca, ben strutturato e persistente.</p>
+
+<p class="vino"><strong>Ruinart Brut Ros&eacute;</strong> &ndash; 12,5% (s.a.) &ndash; Uve: Pinot Nero 55%, Chardonnay 45% &ndash; &euro; 165. Fresco e delicato al naso, con sentori di piccoli frutti rossi e note di melograno. Nitido e ricco in degustazione, con il frutto che si esprime pienamente e una finitura che richiama l&rsquo;aggrumato del pompelmo rosa.</p>
+
+<p class="vino"><strong>Tarlant Zero Brut Nature Ros&eacute;</strong> &ndash; 12% (2018, deg. 2/2024) &ndash; Uve: Chardonnay 50%, Pinot Nero 44%, Pinot Meunier 6% &ndash; &euro; 110. Affinato 6 mesi in barrique e poi almeno 5 anni sui lieviti, non filtrato. Ricco, avvolgente e fruttato, asciutto e verticale nella chiusa finale.</p>
+
+<h2 class="sez-titolo">Vini Bianchi</h2>
+
+<h3 class="sottosez-titolo">Liguria di Levante</h3>
+
+<p class="vino"><strong>Albarola</strong> &ndash; Cantine Lunae Bosoni (DOC 2024) 13% &ndash; Uve: Albarola 100% &ndash; bottiglia &euro; 37, calice &euro; 10. Note di agrumi ed erbe secche. Gusto equilibrato, intenso, minerale.</p>
+
+<p class="vino"><strong>&ldquo;Bamboo Road&rdquo;</strong> &ndash; Stefano Legnani &ndash; Uve: Trebbiano, Malvasia di Candia, Albana, Vermentino &ndash; Macerazione di 5 giorni sulle bucce, uve provenienti da vigne di 50/80 anni. Nessuna filtrazione. Frutta matura, fiori, note aggrumate e minerali. Al palato &egrave; secco, avvolgente, polposo con buona acidit&agrave; e un persistente finale. Ogni annata evolve in maniera &ldquo;personale&rdquo;.&nbsp; Annata 2020 11% &euro; 69 &mdash; Annata 2022 12% &euro; 59 &mdash; Annata 2023 13,5% &euro; 49.</p>
+
+<p class="vino"><strong>&ldquo;Beppin&rdquo;</strong> &ndash; Mulino di Barry (DOC 2024) 12% &ndash; Uve: Bianchetta, Vermentino, Bosco &ndash; &euro; 44. Macerazione di 2 mesi sulle bucce. Mela verde e fiori bianchi. Grande finezza ed eleganza, gusto fresco e asciutto con un finale sapido.</p>
+
+<p class="vino"><strong>Bianchetta &ldquo;Ninte de Ninte&rdquo;</strong> &ndash; La Ricolla (IGT 2021) 12,5% &ndash; Uve: Bianchetta 100% &ndash; &euro; 49. Senza solfiti aggiunti. Fermentazione sulle bucce per 5 giorni, 6 mesi di affinamento in anfora. Fresco, agile e accattivante. In apparenza esile, si muove su profumi che spaziano dai fiori, alla frutta, fino a sfumature salmastre e terrose.</p>
+
+<p class="vino"><strong>&ldquo;Bonazolae&rdquo;</strong> &ndash; C&agrave; du Ferr&agrave; (DOP 2024) 13% &ndash; Uve: Vermentino 65%, Albarola 30%, Bosco 5% &ndash; bottiglia &euro; 39, calice &euro; 11. Richiami fruttati e di erbe spontanee, sorso avvolgente, profondo e soddisfacente. Il sole, il vento, la pietra mai doma caratterizzano un vino dagli accenti profondamente ligustici.</p>
+
+<p class="vino"><strong>Cimix&agrave; &ldquo;Giamin&rdquo;</strong> &ndash; Az. Agricola U Cantin (2020) 13% &ndash; Uve: Cimix&agrave; 100% &ndash; &euro; 46. Macerato non filtrato, 27 mesi di acciaio e 6 di bottiglia. Sapido, fruttato e molto minerale.</p>
+
+<p class="vino"><strong>Cimix&agrave; &ldquo;Sent&egrave;&rdquo;</strong> &ndash; Az. Agricola U Cantin (2022) 13,5% &ndash; Uve: Cimix&agrave; 100% &ndash; &euro; 42. Non filtrato, 48 ore di macerazione, 6 mesi di acciaio e 2/3 anni di bottiglia. Minerale con buona acidit&agrave;, sapido e fruttato.</p>
+
+<p class="vino"><strong>Cinque Terre</strong> &ndash; Possa (DOP 2024) 13% &ndash; Uve: Bosco 80% e vitigni autoctoni 20% &ndash; &euro; 49. Profumi netti, intensi; bocca sapida e materica, in equilibrio tra calore e freschezza. Finale erbaceo e balsamico.</p>
+
+<p class="vino"><strong>&ldquo;Con-tatto&rdquo;</strong> &ndash; Cian Cianin (IGT) &ndash; Uve: Vermentino, Bosco, Albarola. Lunga macerazione sulle bucce, in parte poi maturato in barrique ed infine affinato in bottiglia per 9 mesi. Sapidità, macchia mediterranea e frutti maturi. Lunga persistenza.&nbsp; Annata 2023 12,5% &euro; 54 &mdash; Annata 2024 12% &euro; 49.</p>
+
+<p class="vino"><strong>&ldquo;Erbaspada&rdquo;</strong> &ndash; M&ouml;nte d&rsquo;Arv&iuml; (2024) 14,5% &ndash; Uve: Vermentino, Bosco, Albarola &ndash; &euro; 46. Fiori selvatici e miele salmastro.</p>
+
+<p class="vino"><strong>&ldquo;Fortezza&rdquo;</strong> &ndash; Luna Mater (IGT) 13% &ndash; Uve: Albarola, Trebbiano e Malvasia. Macerazione di 5 giorni in acciaio. Vino volutamente non acido, austero.&nbsp; Annata 2021 &euro; 49 &mdash; Annata 2022 &euro; 45.</p>
+
+<p class="vino"><strong>&ldquo;Loup Garou&rdquo;</strong> &ndash; Stefano Legnani (2020) 13% &ndash; Uve: vitigni autoctoni &ndash; &euro; 74. Macerato, non filtrato. Fermentazione spontanea con lieviti indigeni e macerazione di 5 giorni sulle bucce. Legnani preleva 1/3 del contenuto della vasca di Ponte Di Toi e poi lo lascia sulle fecce fini fino ad agosto. Affinamento in acciaio.</p>
+
+<p class="vino"><strong>&ldquo;Particella 906&rdquo;</strong> &ndash; Luna Mater (IGT 2021) 13,5% &ndash; Uve: Vermentino 60%, Albarola Trebbiano Malvasia 40% &ndash; &euro; 42. Vermentino macerato per 18 ore, gli altri per 5 giorni. Acido, fresco e terrosamente corposo.</p>
+
+<p class="vino"><strong>&ldquo;Pentesilea&rdquo;</strong> &ndash; Cerrolungo (2020) 13% &ndash; Uve: Vermentino, Albarola, Bosco &ndash; &euro; 42. Non filtrato e macerato per 6/10 giorni. Note floreali e minerali, miele e rosmarino. Cremoso e materico.</p>
+
+<p class="vino"><strong>&ldquo;Ponte di Toi&rdquo;</strong> &ndash; Stefano Legnani 12,5% &ndash; Uve: vitigni autoctoni. Macerato, non filtrato. Fermentazione spontanea con macerazione di 7 giorni, sosta in acciaio per l&rsquo;inverno prima dell&rsquo;imbottigliamento. Sapido, lungo e croccante con note balsamiche.&nbsp; Annata 2021 11% &euro; 69 &mdash; Annata 2023 13% &euro; 49.</p>
+
+<p class="vino"><strong>&ldquo;Raixe&rdquo;</strong> &ndash; Giorgia Grande (2022) 12,5% &ndash; &euro; 44. Uve: Vermentino, Bosco, Albarola. Macerazione di 3 giorni sulle bucce ed affinamento in acciaio per 6 mesi. Fiori bianchi, frutti maturi e note sapide e minerali.</p>
+
+<p class="vino"><strong>Ruzzese &ldquo;Zero Tolleranza per il Silenzio&rdquo;</strong> &ndash; C&agrave; du Ferr&agrave; (DOP 2023) 13% &ndash; Uve: Ruzzese 100% &ndash; &euro; 95. 8 mesi in botti di rovere e 9 di affinamento in bottiglia, solo 500 bottiglie prodotte. Cedro, arancia candita e note di macchia mediterranea. Fresco, minerale, di buona struttura. Finale dolce e persistente.</p>
+
+<p class="vino"><strong>Vermentino &ldquo;A Posa&rdquo;</strong> &ndash; Az. Agricola U Cantin (2022) 13% &ndash; Uve: Vermentino 100% &ndash; &euro; 39. Non filtrato, 6 mesi di acciaio e 6 di bottiglia. Sapido, fresco e beverino.</p>
+
+<p class="vino"><strong>Vermentino &ldquo;Atys&rdquo;</strong> &ndash; La Ghiaia (DOC 2023) 13,5% &ndash; Uve: Vermentino 100% &ndash; bottiglia &euro; 37, calice &euro; 11. Erbette aromatiche e leggere note di fiori bianchi. Acidità e sapidità sono equilibrate da una delicata morbidezza. Il finale &egrave; lungo e pieno su sentori leggermente balsamici e minerali.</p>
+
+<p class="vino"><strong>Vermentino &ldquo;Aut Aut&rdquo;</strong> &ndash; Cian Cianin (IGT) &ndash; Uve: Vermentino 100%. Macerazione sulle bucce per 5 giorni, 9 mesi in barrique e quindi 9 mesi di affinamento in bottiglia. Persistente ed asciutto, caldo ed avvolgente. Pura macchia mediterranea.&nbsp; Annata 2023 13% &euro; 54 &mdash; Annata 2024 13% &euro; 49.</p>
+
+<p class="vino"><strong>Vermentino &ldquo;Berette 2.0&rdquo;</strong> &ndash; La Ricolla (IGT 2023) 13% &ndash; Uve: Vermentino 100% &ndash; &euro; 46. Macerazione sulle bucce per 14 giorni, 6 mesi di affinamento in anfora. Sapido e materico, terroso e floreale.</p>
+
+<p class="vino"><strong>Vermentino &ldquo;Ithaa&rdquo;</strong> &ndash; La Ghiaia (IGT 2024) 12,5% &ndash; Uve: Vermentino 100% &ndash; &euro; 42. Vecchie vigne di 60 anni, macerazione di 2 mesi, non filtrato n&eacute; chiarificato. Intense note agrumate e floreali quali bergamotto, pompelmo e fiori d&rsquo;arancio. Strutturato, fresco, sapido con un buon corpo. Tannini lievemente morbidi e raffinati.</p>
+
+<p class="vino"><strong>Vermentino &ldquo;Luccicante&rdquo;</strong> &ndash; C&agrave; du Ferr&agrave; (DOP 2024) 13% &ndash; Uve: Vermentino 100% &ndash; bottiglia &euro; 49, calice &euro; 14. Fiori di campo, camomilla, erbe aromatiche e sentori fruttati di pesca a polpa bianca, mandorla non tostata, mela golden. Vivace, sapido, armonico e di lunga persistenza.</p>
+
+<p class="vino"><strong>Vermentino &ldquo;Oua2&rdquo;</strong> &ndash; La Ricolla (IGT 2023) 13% &ndash; Uve: Vermentino 100% &ndash; &euro; 46. Macerazione sulle bucce per 150 giorni, 6 mesi di affinamento in anfora. Complesso e lungo. Agrumi, pesca, erbe mediterranee. Piacevolmente amarognolo.</p>
+
+<h3 class="sottosez-titolo">Genova</h3>
+
+<p class="vino"><strong>Bianchetta</strong> &ndash; Villa Cambiaso (DOC 2024) 12,5% &ndash; Uve: Bianchetta 100% &ndash; bottiglia &euro; 34, calice &euro; 10. Mela verde e fiori d&rsquo;arancio. Sapido, caldo, fresco con un lieve fondo amarognolo.</p>
+
+<p class="vino"><strong>Cimix&agrave;</strong> &ndash; Andrea Bruzzone (DOP 2024) 13,5% &ndash; Uve: Cimix&agrave; 100% &ndash; &euro; 29. Frutti tropicali e note vegetali. Vino fresco, sapido e minerale. Lunga persistenza.</p>
+
+<p class="vino"><strong>Coronata &ldquo;o C&ocirc;n&acirc;&rdquo;</strong> &ndash; Villa Cambiaso (DOC 2021) 13% &ndash; Uve: Bianchetta Genovese, Albarola e Vermentino &ndash; bottiglia &euro; 33, calice &euro; 9. Profumo delicato, fruttato, persistente. Sentori di erbe e fiori di campo. Sapore secco, sapido e armonico.</p>
+
+<p class="vino"><strong>&ldquo;Patiscimile&rdquo;</strong> &ndash; Andrea Bruzzone (2023) 12,5% &ndash; Uve: Bianchetta 100% &ndash; bottiglia &euro; 37, calice &euro; 10. La vigna migliore invecchiata 6 mesi in botti di cemento. Profumo fruttato con sentori di fiori di campo. Delicato e morbido.</p>
+
+<p class="vino"><strong>Vermentino &ldquo;e Gal&ecirc;e&rdquo;</strong> &ndash; Villa Cambiaso (DOC 2022) 13% &ndash; Uve: Vermentino 100% &ndash; bottiglia &euro; 33, calice &euro; 9. Mela verde e fiori d&rsquo;arancio. Sapido, caldo, fresco con un lieve fondo amarognolo.</p>
+
+<h3 class="sottosez-titolo">Liguria di Ponente</h3>
+
+<p class="vino"><strong>&ldquo;Lumassina di bosco&rdquo;</strong> &ndash; Terrazze Singhie (IGT 2024) 12% &ndash; Uve: Lumassina 100% &ndash; &euro; 54. Macerazione di circa 15 giorni ed affinamento di 12 mesi in botte. Note erbacee, floreali e balsamiche.</p>
+
+<p class="vino"><strong>Pigato &ldquo;Maren&eacute;&rdquo;</strong> &ndash; BioVio (DOC 2024) 13,5% &ndash; Uve: Pigato 100% &ndash; bottiglia &euro; 39, calice &euro; 11. Muschio e sottobosco, ginestra e cedro. Gusto secco, abbastanza intenso e persistente con finale leggermente ammandorlato.</p>
+
+<p class="vino"><strong>Pigato Superiore &ldquo;Cremen&rdquo;</strong> &ndash; Deperi (DOC 2023) 13,5% &ndash; Uve: Pigato 100% &ndash; &euro; 49. Affinato sulle fecce per 10 mesi in botti di rovere. Note tostate e di miele. Intenso, balsamico e minerale.</p>
+
+<p class="vino"><strong>Pigato &ldquo;P&rsquo;Igi&rdquo; macerato</strong> &ndash; Deperi (2022) 13,5% &ndash; Uve: Pigato 100% &ndash; &euro; 39. Macerazione di 7 giorni con successiva svinatura in anfora e dopo altri 8 mesi sulle fecce. Non filtrato n&eacute; chiarificato. Sentori di frutta e pietra focaia. In bocca &egrave; ricco ma allo stesso tempo di buona beva con un finale leggermente astringente.</p>
+
+<p class="vino"><strong>Vermentino &ldquo;Giada&rdquo;</strong> &ndash; La Casetta (IGT 2024) 13% &ndash; Uve: Vermentino 100% &ndash; bottiglia &euro; 32, calice &euro; 9. Breve macerazione senza aggiunta di solfiti. Fruttato e floreale dal sapore sapido e fresco.</p>
+
+<p class="vino"><strong>Vermentino &ldquo;TreCr&ugrave;&rdquo;</strong> &ndash; Terrazze Singhie (IGT 2024) 12% &ndash; Uve: Vermentino 100% &ndash; &euro; 54. Macerazione di circa 20 giorni ed affinamento di 12 mesi in botte. Sapido e delicato.</p>
+
+<h3 class="sottosez-titolo">Campania</h3>
+
+<p class="vino"><strong>&ldquo;Privo L&rsquo;eretico 2023&rdquo;</strong> &ndash; Ale.P.A. (IGT 2021) 12,5% &ndash; Uve: Pallagrello 100% &ndash; &euro; 49. Nessuna filtrazione o chiarifica. Macerazione di 8 giorni cui segue un affinamento di 12 mesi in acciaio e castagno. Albicocche essiccate, miele, arance, polpa di mela e spezie orientali. Fresco, ben sapido, dal persistente finale speziato.</p>
+
+<p class="vino"><strong>&ldquo;Riccio Bianco&rdquo;</strong> &ndash; Ale.P.A. (IGT 2024) 13,5% &ndash; Uve: Pallagrello 100% &ndash; &euro; 42. Uno dei pochi vitigni al mondo ad avere entrambe le variet&agrave;, bacca bianca e rossa. Affinato solo in acciaio. Frutta bianca, sale, noce moscata. Fresco e leggermente sapido con aromi di frutta gialla e agrumi.</p>
+
+<h3 class="sottosez-titolo">Emilia-Romagna (Val Trebbia)</h3>
+
+<p class="vino"><strong>&ldquo;Ageno&rdquo;</strong> &ndash; La Stoppa (2020) 12,5% &ndash; Uve: Malvasia di Candia 100% &ndash; &euro; 59. 4 mesi di macerazione sulle bucce e seguente affinamento in botte. Miele e spezie, tannico e persistente.</p>
+
+<p class="vino"><strong>Bianco di Fognano</strong> &ndash; Paolo Foppiani (2021) 11,5% &ndash; Uve: Malvasia di Candia e Ortrugo &ndash; &euro; 34. 8 mesi di macerazione sulle bucce. Agrumi e pesca sorretti da una buona spalla acida.</p>
+
+<p class="vino"><strong>&ldquo;Cas&egrave;Bianco&rdquo;</strong> &ndash; Cas&egrave; (2022) 11% &ndash; Uve: Malvasia di Candia Aromatica, Marsanne, Trebbiano, Moscato Bianco, Ortrugo &ndash; &euro; 36. Macerazione di 40 giorni. Fresco e minerale con aromi fruttati, buona struttura.</p>
+
+<p class="vino"><strong>&ldquo;Catavela&rdquo;</strong> &ndash; Denavolo (2022) 10,5% &ndash; Uve: Malvasia di Candia 25%, Ortrugo 25%, Marsanne 25%, altre uve locali 25% &ndash; &euro; 29. Macerazione di 7 giorni di uve da vigne giovani. Agile e fragrante, frutta matura, salvia e fiori freschi. Spiccata acidit&agrave;.</p>
+
+<p class="vino"><strong>&ldquo;Dinavolino&rdquo;</strong> &ndash; Denavolo (2021) 12% &ndash; Uve: Malvasia di Candia 25%, Ortrugo 25%, Marsanne 25%, altre uve locali 25% &ndash; &euro; 34. 6 mesi di macerazione sulle bucce. Fruttato e floreale, con sentori balsamici e di erbe aromatiche e sfumature minerali. Molto fresco e dotato di una spiccata mineralit&agrave;.</p>
+
+<p class="vino"><strong>&ldquo;Dinavolo&rdquo;</strong> &ndash; Denavolo (2021) 12,5% &ndash; Uve: Malvasia di Candia 25%, Ortrugo 25%, Marsanne 25%, altre uve locali 25% &ndash; &euro; 49. 8 mesi di macerazione sulle bucce. T&egrave; bianco, pesca disidratata e rosmarino, genziana. Asciutto ed acido, tannino graffiante.</p>
+
+<p class="vino"><strong>&ldquo;Jai Guru Deva&rdquo;</strong> &ndash; Shun Minowa &ndash; Uve: Ortrugo 60%, Malvasia di Candia, Marsanne, Sauvignon Blanc, Moscato. Macerazione di 2 mesi di uve da vigne vecchie, affinamento in cemento e botti di acacia. Agrumi, fiori bianchi, miele, cannella e spezie. Tannino, sapidità ed acidità.&nbsp; Annata 2020 12,8% &euro; 49 &mdash; Annata 2021 13,5% &euro; 44.</p>
+
+<p class="vino"><strong>&ldquo;Solata&rdquo;</strong> &ndash; Montepascolo (2022) 12% &ndash; Uve: Malvasia di Candia, Sauvignon, Moscato &ndash; &euro; 36. Macerazione di 60 giorni, affinamento di 12 mesi in cemento ed altri 12 in bottiglia. Leggermente p&eacute;tillant.</p>
+
+<h3 class="sottosez-titolo">Emilia-Romagna</h3>
+
+<p class="vino"><strong>Malvasia &ldquo;Vej 240&rdquo;</strong> &ndash; Podere Pradarolo (IGT 2022) 12,5% &ndash; Uve: Malvasia di Candia Aromatica 100% &ndash; &euro; 42. Macerazione sulle bucce in vasche di cemento. Nessuna filtrazione, chiarifica, aggiunta di lieviti. Rosa antica, corpo importante e tannini spiccati, floreale e fresco in bocca.</p>
+
+<p class="vino"><strong>&ldquo;Ripa di Sopravento&rdquo;</strong> &ndash; Vittorio Graziano (2024) 12% &ndash; Uve: Trebbiano ed altri vitigni locali &ndash; &euro; 42. Metodo ancestrale rifermentato in vetroresina. Fresco, sapido e minerale di buona struttura.</p>
+
+<p class="vino"><strong>&ldquo;Rorippa&rdquo;</strong> &ndash; Lusenti (2021) 12% &ndash; Uve: Chardonnay 90%, Malvasia 10% &ndash; &euro; 42. Non filtrato, macerato in anfora per 6 mesi. Mineralit&agrave; e sapidità. Frutta, crema e cocco.</p>
+
+<h3 class="sottosez-titolo">Friuli</h3>
+
+<p class="vino"><strong>&ldquo;I Fiori di Leonie&rdquo;</strong> &ndash; Zorzettig (DOC 2020) 13,5% &ndash; Uve: Pinot Bianco, Friulano, Sauvignon &ndash; &euro; 69. Leggera nota floreale e richiami fruttati di mela Golden e crema pasticcera. Equilibrato e avvolgente, di buona persistenza e struttura, con un finale balsamico.</p>
+
+<p class="vino"><strong>Malvasia &ldquo;Orange&rdquo;</strong> &ndash; Le Vigne di Zam&ograve; (IGT 2022) 13% &ndash; Uve: Malvasia 100% &ndash; bottiglia &euro; 49, calice &euro; 13. Macerazione di 6 mesi in anfora, non filtrato. Pompelmo, albicocca, pesca e muschio con tannini ben integrati.</p>
+
+<p class="vino"><strong>Ribolla Gialla</strong> &ndash; Zorzettig (DOC 2022) 13% &ndash; Uve: Ribolla Gialla 100% &ndash; bottiglia &euro; 44, calice &euro; 12. Naso floreale con note di camomilla e fiori di acacia, mela e albicocca. Grazie al buono stato di maturazione delle uve raccolte evidenzia al palato la caratteristica nota acida smorzata e ben bilanciata da una ampia complessit&agrave; di corpo. Buona sapidità che rende il finale lungo di grande piacevolezza.</p>
+
+<h3 class="sottosez-titolo">Lombardia</h3>
+
+<p class="vino"><strong>Riesling &ldquo;San Rocco&rdquo;</strong> &ndash; Stefanago (IGP 2016) 13% &ndash; Uve: Riesling 100% &ndash; &euro; 48. 12 mesi in botti di acacia e 12 mesi in bottiglia. Sapido, fresco, equilibrato e persistente.</p>
+
+<p class="vino"><strong>Traminer &ldquo;Ar&ograve;&rdquo;</strong> &ndash; Stefanago (IGP 2023) 13% &ndash; Uve: Traminer 100% &ndash; &euro; 36. Arancia, fiori di rosa, litchi, zenzero e coriandolo. Succoso e aromatico.</p>
+
+<h3 class="sottosez-titolo">Piemonte</h3>
+
+<p class="vino"><strong>Arneis</strong> &ndash; Renato Fenocchio (DOC 2023) 12,5% &ndash; Uve: Arneis 100% &ndash; bottiglia &euro; 32, calice &euro; 9. Ginestra, camomilla e frutta fresca. Acidulo, pieno e persistente.</p>
+
+<p class="vino"><strong>Chardonnay &ldquo;Ada&rdquo;</strong> &ndash; Simone Borsari 13% &ndash; Uve: Chardonnay 100% &ndash; bottiglia &euro; 48, calice &euro; 13. 10 mesi di tonneau. Minerale, fruttato, floreale e sapido.</p>
+
+<p class="vino"><strong>Chardonnay &ldquo;An Piota&rdquo;</strong> &ndash; Forti del Vento (2022) 13,5% &ndash; Uve: Chardonnay 100% &ndash; bottiglia &euro; 34, calice &euro; 9. 2 mesi di macerazione e quindi 6 mesi di affinamento in anfora. Non il solito Chardonnay. Fresco e minerale, naso complesso con richiami di scorza di arancia.</p>
+
+<p class="vino"><strong>Cortese &ldquo;Maia&rdquo;</strong> &ndash; Forti del Vento (2022) 12,5% &ndash; Uve: Cortese 100% &ndash; bottiglia &euro; 32, calice &euro; 9. 3 mesi di macerazione e quindi 8 mesi di affinamento in acciaio. Vino secco, affilato e minerale. Con una beva di gran carattere.</p>
+
+<p class="vino"><strong>Riesling &ldquo;Marin&rdquo;</strong> &ndash; Fontanafredda (DOC 2021) 13% &ndash; Uve: Riesling 100% &ndash; bottiglia &euro; 37, calice &euro; 10. Agrumi, pesca bianca, alloro e rosmarino uniti all&rsquo;idrocarburo e all&rsquo;acidit&agrave; del Riesling. Retrogusto lungo e sapido.</p>
+
+<p class="vino"><strong>Timorasso &ldquo;C.C.C&rdquo;</strong> &ndash; Az. Agr. Ricci 14% &ndash; Uve: Timorasso 100% &ndash; &euro; 79. Vino superorange. Macerazione di 3 giorni e lungo invecchiamento ossidativo in botte per 12 mesi. No filtrazioni n&eacute; chiarifiche. Frutta gialla matura, miele, fiori di campo, camomilla, cenni salmastri e sfumature ossidative. Il sorso &egrave; ampio e lungo, con una prevalenza di sensazioni terziarie di particolare intensità espressiva. Il finale &egrave; leggermente tannico, fresco e salino.</p>
+
+<p class="vino"><strong>Timorasso &ldquo;Io Cammino da Solo&rdquo;</strong> &ndash; Az. Agr. Ricci (2019) 13,5% &ndash; Uve: Timorasso 100% &ndash; &euro; 69. Macerazione di 100 giorni sulle bucce in anfore interrate e affinato di 12 mesi in legni di castagno. Da bere rigorosamente a temperatura ambiente.</p>
+
+<h3 class="sottosez-titolo">Sicilia</h3>
+
+<p class="vino"><strong>Catarratto &ldquo;Macerato&rdquo;</strong> &ndash; Ferracane (IGP 2023) 12% &ndash; Uve: Catarratto 100% &ndash; &euro; 42. 19 giorni di macerazione sulle bucce e 2 mesi di affinamento sui lieviti. Sentori di lievito, erba appena tagliata, chiusura con mandorla. Di medio corpo ma fresco, leggermente salato, tannino morbido.</p>
+
+<p class="vino"><strong>&ldquo;Fossa delle Triglie&rdquo;</strong> &ndash; Badalucco (2024) 12,5% &ndash; Uve: variet&agrave; locali &ndash; &euro; 45. Non filtrato, macerato 6 mesi sulle fecce. Frutta gialla matura. Avvolgente, fresco, delicato e marino.</p>
+
+<p class="vino"><strong>Grillo &ldquo;Magico Ariddu&rdquo;</strong> &ndash; Ferracane (IGP 2023) 12% &ndash; Uve: Grillo 100% &ndash; &euro; 32. 2 giorni di macerazione sulle bucce. Fruttato con sentori di pesca e fiori d&rsquo;arancio. Equilibrata morbidezza e buon corpo.</p>
+
+<p class="vino"><strong>Grillo &ldquo;Note di Bianco&rdquo;</strong> &ndash; Alessandro Viola (IGP 2024) 12,5% &ndash; Uve: Grillo 100% &ndash; &euro; 35. Non filtrato, macerato 6 mesi sulle fecce. Frutta gialla matura. Avvolgente, fresco, delicato e marino.</p>
+
+<p class="vino"><strong>Grillo &ldquo;Pinzeri&rdquo;</strong> &ndash; Funaro (DOC 2024) 13% &ndash; Uve: Grillo 100% &ndash; &euro; 32. Al naso sentori floreali e fruttati (melone giallo e pesca). Morbido e pieno con lunga persistenza.</p>
+
+<h3 class="sottosez-titolo">Toscana</h3>
+
+<p class="vino"><strong>Ansonaco (Isola del Giglio)</strong> &ndash; Vigneto Altura (IGT 2024) 13,5% &ndash; Uve: Ansonaco (Inzolia) 100% &ndash; &euro; 59. Macerazione di 4 giorni ed affinamento in acciaio.</p>
+
+<p class="vino"><strong>&ldquo;Aura Vanempo&rdquo;</strong> &ndash; Poggio di Cicignano (IGT 2020) 13% &ndash; Uve: Trebbiano 45%, San Colombano 35%, Malvasia del Chianti 20% &ndash; &euro; 49. Vigne di oltre 50 anni. Macerazione di 5 giorni ed affinamento di 12 mesi in barrique. Agrumi canditi, nocciole, fiori di campo ed erbe spontanee. Struttura possente e ricca. Salinit&agrave; e freschezza.</p>
+
+<h3 class="sottosez-titolo">Trentino &ndash; Alto Adige</h3>
+
+<p class="vino"><strong>Gew&uuml;rztraminer &ldquo;Turmhof&rdquo;</strong> &ndash; Tiefenbrunner (DOC 2023) 15% &ndash; Uve: Gew&uuml;rztraminer 100% &ndash; bottiglia &euro; 48, calice &euro; 13. Petali di rosa, spezie, miele e litchi. Corpo robusto e finale aromatico persistente.</p>
+
+<h3 class="sottosez-titolo">Umbria</h3>
+
+<p class="vino"><strong>&ldquo;Misluli&rdquo;</strong> &ndash; Cantina Ninni (DOC 2024) 12% &ndash; Uve: Trebbiano Spoletino 100% &ndash; &euro; 42. Orange wine da vitigni di oltre 70 anni, non filtrato n&eacute; chiarificato. Note salmastre e iodate accompagnate da una buona acidit&agrave;.</p>
+
+<h3 class="sottosez-titolo">Valle d&rsquo;Aosta</h3>
+
+<p class="vino"><strong>&ldquo;Pantagruel&rdquo;</strong> &ndash; Cantina di Cuneaz (DOC 2023) 13,5% &ndash; Uve: Gewurztraminer 100% &ndash; bottiglia &euro; 39, calice &euro; 11. Macerazione di 24 ore e seguente affinamento in botte per circa 1 anno. Pieno ed opulento con un finale dritto e secco.</p>
+
+<h3 class="sottosez-titolo">Veneto</h3>
+
+<p class="vino"><strong>&ldquo;Brespa&rdquo;</strong> &ndash; Il Moralizzatore (IGT 2024) 13% &ndash; Uve: Vespaiola 100% &ndash; &euro; 48. Note minerali e lievemente balsamiche. Sapido, appagante e fresco.</p>
+
+<p class="vino"><strong>Chardonnay &ldquo;Sar-do-n&egrave;&rdquo;</strong> &ndash; Santa Colomba (IGT 2022) 13% &ndash; Uve: Chardonnay 100% &ndash; bottiglia &euro; 26, calice &euro; 9. Intensi sentori floreali, vena minerale e spezie dolci.</p>
+
+<p class="vino"><strong>Garganega &ldquo;Pico&rdquo;</strong> &ndash; Angiolino Maule (IGT 2023) 12% &ndash; Uve: Garganega 100% &ndash; &euro; 49. Miele di acacia e fiori di campo. Gusto diretto, minerale e persistente. Buona freschezza.</p>
+
+<p class="vino"><strong>Sauvignon &ldquo;Sudigiri&rdquo;</strong> &ndash; Villa Job (IGT 2022) 13% &ndash; Uve: Sauvignon 100% &ndash; bottiglia &euro; 39, calice &euro; 11. Macerazione sulle bucce per 3 giorni e seguente affinamento di 6 mesi in cemento e 3 mesi in botte. Ortica e sambuco, pompelmo e frutto della passione. Bella struttura con spalla erbacea.</p>
+
+<p class="vino"><strong>&ldquo;Togo&rdquo;</strong> &ndash; Il Ceo (2023) 11,5% &ndash; Uve: Vespaiola, Glera Lunga e Pedevenda &ndash; bottiglia &euro; 38, calice &euro; 11. Nespola e tiglio. Sapido e croccante con una spiccata freschezza finale.</p>
+
+<h2 class="sez-titolo">Vini Rosati</h2>
+
+<h3 class="sottosez-titolo">Liguria</h3>
+
+<p class="vino"><strong>&ldquo;La Foce&rdquo;</strong> &ndash; La Cornice (IGT 2022) 13% &ndash; Uve: Sangiovese, Canaiolo e Syrah &ndash; &euro; 32. Frutti di bosco e rosa canina, calendula e melissa. Buona acidit&agrave; e tannino sfumato.</p>
+
+<p class="vino"><strong>&ldquo;La Poggia&rdquo;</strong> &ndash; Luna Mater (IGT 2024) 14% &ndash; Uve: Syrah 100% &ndash; &euro; 44. Elegante ed equilibrato.</p>
+
+<p class="vino"><strong>&ldquo;Lappazucche&rdquo;</strong> &ndash; Berry&amp;Berry (2023) 11,5% &ndash; Uve: Barbarossa 80%, altri vitigni autoctoni 20% &ndash; bottiglia &euro; 34, calice &euro; 10. Aromi fruttati e floreali con una piacevole nota speziata.</p>
+
+<p class="vino"><strong>&ldquo;Ros&eacute; d&rsquo;Amour&rdquo;</strong> &ndash; Possa (2024) 12% &ndash; Uve: Bonamico 80% e Moscato rosso 20% &ndash; &euro; 44. Profumi nitidi e schietti, molto eleganti di frutti di bosco, lampone, mirtillo e ribes. In bocca &egrave; molto morbido.</p>
+
+<p class="vino"><strong>&ldquo;Velia&rdquo;</strong> &ndash; Cian Cianin (2025) 12% &ndash; Uve: Bonamico, Ciliegiolo, Pollera ed altri &ndash; &euro; 56. Produzione limitatissima. Lunga macerazione sulle bucce, in parte poi maturato in barrique ed infine affinato in bottiglia per 9 mesi.</p>
+
+<h3 class="sottosez-titolo">Altre Regioni</h3>
+
+<p class="vino"><strong>Cerasuolo d&rsquo;Abruzzo &ldquo;Suffonte&rdquo;</strong> &ndash; Az. Agr. Ludovico (DOC 2020) 14% &ndash; Abruzzo &ndash; Uve: Montepulciano d&rsquo;Abruzzo 100% &ndash; &euro; 39. Macerazione di 7 giorni ed affinamento in acciaio. Nessuna chiarifica o filtrazione. Frutto croccante, sapidità, freschezza e struttura.</p>
+
+<p class="vino"><strong>&ldquo;Il Sole di Leo&rdquo;</strong> &ndash; UCCI Cantina Urbana (2023) 12,5% &ndash; Uve: Freisa 100% &ndash; Piemonte &ndash; &euro; 33. Lampone e rosa. Fresco, croccante, di buona sapidità.</p>
+
+<p class="vino"><strong>&ldquo;Il Sole di Leo&rdquo; Botte Scolma</strong> &ndash; UCCI Cantina Urbana (2017) 14% &ndash; Uve: Freisa 100% &ndash; Piemonte &ndash; &euro; 46. Vinificato in legno ed affinato in botte scolma. Tabacco e cioccolato, leggermente ossidato e di buon corpo.</p>
+
+<p class="vino"><strong>Pinot Grigio &ldquo;Macerato&rdquo;</strong> &ndash; Stefanago (IGP 2023) 13,5% &ndash; Uve: Pinot Grigio 100% &ndash; Lombardia &ndash; &euro; 36. Pera e frutta fresca. Vino giovane e non impegnativo, sapido ed asciutto.</p>
+
+<h2 class="sez-titolo">Vini Rossi</h2>
+
+<h3 class="sottosez-titolo">Liguria</h3>
+
+<p class="vino"><strong>&ldquo;Cuxii&rdquo;</strong> &ndash; Il Baggio Pellegrino (2022) 12,5% &ndash; Uve: Ormeasco 80% Cabernet &ndash; &euro; 39. Frutti di bosco, ribes, rosa canina. Persistente con tannino piacevole.</p>
+
+<p class="vino"><strong>Granaccia &ldquo;Bricco dei Bambini&rdquo;</strong> &ndash; Viarzo (DOC 2020) 14,5% &ndash; Uve: Granaccia 100% &ndash; &euro; 57. Macerazione in cemento e seguente affinamento di 18 mesi in tonneau di rovere. Frutti rossi, note speziate, sentori di sottobosco e leggero tocco balsamico.</p>
+
+<p class="vino"><strong>Granaccia &ldquo;Trexenda&rdquo;</strong> &ndash; Viarzo (IGT 2020) 14% &ndash; Uve: Granaccia 100% &ndash; &euro; 47. Macerazione in cemento e seguente affinamento di 10 mesi in tonneau di rovere.</p>
+
+<p class="vino"><strong>&ldquo;Ngil&ugrave;&rdquo;</strong> &ndash; C&agrave; du Ferr&agrave; (DOP 2020) 13,5% &ndash; Uve: Sangiovese, Merlot, Ciliegiolo &ndash; bottiglia &euro; 48, calice &euro; 14. Melograno, lampone e ciliegia rossa. Vivace ed armonico, di buona struttura e lunga persistenza.</p>
+
+<p class="vino"><strong>&ldquo;Niccol&ograve; V&rdquo;</strong> &ndash; Cantine Lunae Bosoni (DOC 2015) 14% &ndash; Uve: Sangiovese, Merlot, Pollera Nera &ndash; &euro; 55. 12 giorni di permanenza sulle bucce e successivo affinamento di 18 mesi in botte. Fragola matura e ciliegia, vaniglia e liquerizia. Trama tannica setosa e piacevolmente acida. Finale lungo e persistente.</p>
+
+<p class="vino"><strong>&ldquo;Poderino&rdquo;</strong> &ndash; Luna Mater (IGT 2020) 14% &ndash; Uve: Merlot, Cabernet Sauvignon, Syrah e Sangiovese &ndash; &euro; 39. Macerazione di almeno 10 giorni. Ogni uva vendemmiata e vinificata separatamente (parte in acciaio e parte in botte di terzo passaggio). Dopo l&rsquo;inverno si passa all&rsquo;assemblaggio.</p>
+
+<p class="vino"><strong>Rossese di Dolceacqua</strong> &ndash; Cantina Muragni (DOC 2023) 13,5% &ndash; Uve: Rossese 100% &ndash; bottiglia &euro; 39, calice &euro; 12. Rosmarino, pepe nero ed un tannino morbido e maturo. Buona persistenza.</p>
+
+<h3 class="sottosez-titolo">Emilia-Romagna</h3>
+
+<p class="vino"><strong>Barbera &ldquo;Velius&rdquo;</strong> &ndash; Podere Pradarolo (IGT 2016) 14,5% &ndash; Uve: Barbera 100% &ndash; &euro; 42. 90 giorni di macerazione sulle bucce, nessuna filtrazione, chiarifica o aggiunta di solfiti. Persistenti note fruttate, tannini ed acidit&agrave; evidenti.</p>
+
+<p class="vino"><strong>&ldquo;Dinavolo Rosso&rdquo;</strong> &ndash; Denavolo (2022) 12,5% &ndash; Uve: Bonarda, Barbera, Pinot Nero, Pinot Grigio &ndash; &euro; 49. 8 mesi di macerazione sulle bucce. Morbido, note vegetali e frutti rossi.</p>
+
+<p class="vino"><strong>&ldquo;Giulio&rdquo;</strong> &ndash; Montepascolo (2020) 14,5% &ndash; Uve: Barbera, Bonarda, Syrah &ndash; bottiglia &euro; 39, calice &euro; 11. Affinato in botti di rovere per almeno 1 anno. Mirtilli sotto spirito, spezie e terra. Struttura poderosa con tannini &ldquo;gentili&rdquo;.</p>
+
+<p class="vino"><strong>&ldquo;Macchiona&rdquo;</strong> &ndash; La Stoppa &ndash; Uve: Barbera, Croatina. Affinato in botti di rovere per almeno 1 anno. Mirtilli sotto spirito, spezie e terra. Struttura poderosa con tannini.&nbsp; Annata IGT 2009 11% &euro; 69 &mdash; Annata IGT 2016 13% &euro; 59.</p>
+
+<p class="vino"><strong>Pinot Nero &ldquo;Riva del Ciliegio&rdquo;</strong> &ndash; Cas&egrave; (IGT 2016) 13,5% &ndash; Uve: Pinot Nero 100% &ndash; &euro; 44. Macerazione di 30 giorni in botte grande e successivo affinamento di 10 mesi in acciaio. Vino asciutto, tagliente e minerale. Speziato e balsamico.</p>
+
+<p class="vino"><strong>&ldquo;Trebbiolo&rdquo;</strong> &ndash; La Stoppa (2023) 13,5% &ndash; Uve: Barbera, Croatina &ndash; bottiglia &euro; 32, calice &euro; 9. Macerazione di 20 giorni ed affinamento di 10 mesi in cemento. Bacche rosse, fiori, humus e sentori vegetali. Buona persistenza.</p>
+
+<h3 class="sottosez-titolo">Piemonte</h3>
+
+<p class="vino"><strong>Barbera &ldquo;Dritto al Cuore&rdquo;</strong> &ndash; Az. Agr. Ricci (DOC 2020) 15% &ndash; Uve: Barbera 100% &ndash; &euro; 36. Vinificate con fermentazione spontanea, affinano in acciaio per 12 mesi. Fresco e fruttato. Fiori di campo e sottobosco.</p>
+
+<p class="vino"><strong>&ldquo;Crematto&rdquo;</strong> &ndash; Crealto (2022) 13,5% &ndash; Uve: Uve autoctone, prevalenza di Nebbiolo &ndash; bottiglia &euro; 34, calice &euro; 11. Fresco e beverino grazie alla breve macerazione ed all&rsquo;affinamento in acciaio.</p>
+
+<p class="vino"><strong>Dolcetto &ldquo;Nibi&ograve;&rdquo;</strong> &ndash; Cascina degli Ulivi (2016) 14% &ndash; Uve: Dolcetto 100% &ndash; &euro; 42. 4 settimane di macerazione e 24 mesi di affinamento in botte. Frutti rossi e prugne mature, tannini vigorosi e buona struttura.</p>
+
+<p class="vino"><strong>Dolcetto &ldquo;Ottotori&rdquo;</strong> &ndash; Forti del Vento (2020) 13% &ndash; Uve: Dolcetto 100% &ndash; bottiglia &euro; 32, calice &euro; 9. Cru maturato un anno in legno ed affinato in bottiglia. Struttura, tannino e finezza. Buona acidità.</p>
+
+<p class="vino"><strong>Freisa &ldquo;Poco Dopo un Ferragosto&rdquo;</strong> &ndash; C&agrave; del Prete (DOC 2019) 14% &ndash; Uve: Freisa 100% &ndash; &euro; 36. Affinato per 6 mesi sulle bucce. Intenso ed elegante, tannino avvolgente.</p>
+
+<p class="vino"><strong>Nebbiolo</strong> &ndash; Andrea Ballarin (DOC 2024) 13,5% &ndash; Uve: Nebbiolo 100% &ndash; &euro; 32. Rosa e viola, in bocca sapido, dolce e persistente.</p>
+
+<h3 class="sottosez-titolo">Sardegna</h3>
+
+<p class="vino"><strong>&ldquo;Case Sparse&rdquo;</strong> &ndash; Az. Agr. Pusole (IGT 2021) 15% &ndash; Uve: Cannonau 90% e Monica 10% &ndash; &euro; 49. Raccolta tardiva e macerazione di 15 gg. Nessuna chimica n&eacute; filtrazione. Piccoli frutti rossi, viola, pepe nero, ciliegia e macchia mediterranea. Vino scorrevole, estivo, persistente e dal tannino equilibrato.</p>
+
+<h3 class="sottosez-titolo">Sicilia</h3>
+
+<p class="vino"><strong>&ldquo;Costa Jatta&rdquo;</strong> &ndash; Biscaris (IGP 2024) 13% &ndash; Uve: Frappato 100% &ndash; bottiglia &euro; 37, calice &euro; 11. Fresco, complesso e variegato al naso, frutta scura matura e spezie.</p>
+
+<p class="vino"><strong>&ldquo;SP68&rdquo;</strong> &ndash; Arianna Occhipinti (IGT 2023) 12,5% &ndash; Uve: Frappato di Vittoria, Nero d&rsquo;Avola &ndash; &euro; 37. Macerazione di 15 giorni sulle bucce e fermentazione spontanea in tini di cemento per 7 mesi. Vino giovane, polposo e diretto, piacevolmente fresco. Pepe nero, pietra focaia, tabacco e note mentolate.</p>
+
+<h3 class="sottosez-titolo">Trentino Alto-Adige</h3>
+
+<p class="vino"><strong>Pinot Nero</strong> &ndash; In der Eben (IGT 2020) 12% &ndash; Uve: Pinot Nero 100% &ndash; &euro; 65. Fermentazione spontanea ed affinamento in botti grandi di rovere per 22 mesi. Fresco e speziato. Frutti rossi, terra, sottobosco e corteccia. In bocca entra dritto, teso ed asciutto.</p>
+
+<p class="vino"><strong>Pinot Nero &ldquo;Turmhof&rdquo;</strong> &ndash; Tiefenbrunner (DOC 2023) 14% &ndash; Uve: Pinot Nero 100% &ndash; bottiglia &euro; 46, calice &euro; 12. 10 mesi in botte, 2 mesi in cemento e poi 5 mesi in bottiglia. More, lamponi e ciliegie. Morbido e pieno, elegante ed equilibrato.</p>
+
+<h3 class="sottosez-titolo">Umbria</h3>
+
+<p class="vino"><strong>&ldquo;Diavolaccio d&rsquo;un Piero&rdquo;</strong> &ndash; Cantina Ninni (IGT 2024) 12% &ndash; Uve: Barbera, Sangiovese, Montepulciano, Aleatico &ndash; &euro; 56. Frutta rossa, lampone e china. Minerale, acido, avvolgente.</p>
+
+<h3 class="sottosez-titolo">Veneto</h3>
+
+<p class="vino"><strong>Amarone della Valpolicella Classico</strong> &ndash; Allegrini &ndash; Uve: Corvina 70%, Rondinella 15%, Oseleta 5%. Fiori passiti e di frutta rossa. China, vaniglia, pepe nero e cacao. Strutturato e vigoroso, morbido e vellutato. Chiude su note balsamiche di grande persistenza.&nbsp; DOCG 2017 16% &euro; 130 &mdash; DOCG 2018 16% &euro; 120.</p>
+
+<p class="vino"><strong>&ldquo;Pino Nero&rdquo;</strong> &ndash; Santa Colomba (IGT 2024) 12,5% &ndash; Uve: Pinot Nero 100% &ndash; bottiglia &euro; 34, calice &euro; 11. More, ribes rosso e sottobosco. Poco tannico, fresco e vellutato. Vaniglia e spezie date dall&rsquo;affinamento in botte.</p>
+
+<p class="vino"><strong>&ldquo;Trojan Horse&rdquo;</strong> &ndash; Cantina Martinelli (IGT 2022) 12,5% &ndash; Uve: Corvina, Corvinone, Merlot, Cabernet Franc, Garganega &ndash; &euro; 36. Fragola e ciliegia, corteccia e terra. Sanguigno, caratteriale ma godibile.</p>
+
+<h2 class="sez-titolo">Birre</h2>
+
+<p class="vino"><strong>Maltus Faber Bianca</strong> &ndash; 4,7%, bottiglia da 33 cl. &euro; 10. Birra di malto pils, frumento ed avena. Colore chiaro con schiuma candida e persistente. Aroma fine ed un po&rsquo; agrumato. Una birra molto dissetante e piacevole.</p>
+
+<p class="vino"><strong>Maltus Faber Blonde</strong> &ndash; 5,5%, bottiglia da 33 cl. &euro; 10. Bianca schiuma persistente. L&rsquo;aroma &egrave; quasi esuberante, erbaceo e fruttato con una sfumatura delicata di pompelmo.</p>
+
+<p class="vino"><strong>Maltus Faber Ambrata</strong> &ndash; 7%, bottiglia da 33 cl. &euro; 10. Nell&rsquo;aroma pulito prevale il caramello. In bocca &egrave; morbida, piena, con sentori fruttati gentili e sfuma in un retrogusto pi&ugrave; amarognolo e secco.</p>
+
+</div>
+<div class="version">v 2026.04.23.01</div>
 </body>
 </html>

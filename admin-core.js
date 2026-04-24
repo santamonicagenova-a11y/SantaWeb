@@ -389,7 +389,7 @@ function caricaDalSito(tipo) {
   var url = tipo === 'dolci' ? DOLCI_URL : MENU_URL;
   var btn = document.querySelector('.btn-load');
   document.getElementById('err').textContent = '';
-  fetch(url + '?nocache=' + Date.now() + '_' + Math.random().toString(36).slice(2), { cache: 'no-store', headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' } })
+  fetch(url + '?nocache=' + Date.now() + '_' + Math.random().toString(36).slice(2), { cache: 'no-store' })
     .then(function(r) {
       if (!r.ok) throw new Error('Errore HTTP ' + r.status);
       return r.text();

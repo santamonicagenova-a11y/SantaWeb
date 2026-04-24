@@ -116,15 +116,24 @@ function costruisci() {
     bd.appendChild(row);
   });
 
+  // Identifico le 2 chiavi dei percorsi: quella con array (6) e quella con stringa (7).
+  // Questo rende il codice agnostic rispetto alle chiavi effettive ('6'/'7' oppure 'Sei'/'Sette').
+  var _percKeys = Object.keys(m.degustazione.percorsi);
+  var _key6 = _percKeys.find(function(k){ return Array.isArray(m.degustazione.percorsi[k]); }) || '6';
+  var _key7 = _percKeys.find(function(k){ return typeof m.degustazione.percorsi[k] === 'string'; }) || '7';
+  // Normalizza percorso_label_* se mancanti
+  if (!m.degustazione.percorso_label_6) m.degustazione.percorso_label_6 = _key6;
+  if (!m.degustazione.percorso_label_7) m.degustazione.percorso_label_7 = _key7;
+
   var s6wrap = el('div','opt-row');
-  var s6lbl = el('div'); s6lbl.appendChild(el('span','opt-lbl','Label percorso 6')); s6lbl.appendChild(inp('text','degu-label-6', m.degustazione.percorso_label_6 || '6')); s6wrap.appendChild(s6lbl);
+  var s6lbl = el('div'); s6lbl.appendChild(el('span','opt-lbl','Label percorso 6')); s6lbl.appendChild(inp('text','degu-label-6', m.degustazione.percorso_label_6)); s6wrap.appendChild(s6lbl);
   bd.appendChild(s6wrap);
   var s6 = el('div','sub'); s6.innerHTML = 'Percorso \u201c6\u201d \u00a0<span style="color:var(--rust);font-size:.6rem">\u2611 = sostenibile *</span>';
   bd.appendChild(s6);
   var h6 = el('div'); h6.style.cssText = 'display:grid;grid-template-columns:1fr 30px;gap:.4rem;padding:.3rem 0;border-bottom:1px solid var(--rule);margin-bottom:.3rem';
   h6.appendChild(el('div','col-lbl','Nome piatto')); h6.appendChild(el('div','col-lbl','*'));
   bd.appendChild(h6);
-  m.degustazione.percorsi['6'].forEach(function(p, i) {
+  m.degustazione.percorsi[_key6].forEach(function(p, i) {
     var row = el('div','degu-row');
     row.appendChild(inp('text','d6p-'+i, p.nome));
     row.appendChild(chk('d6s-'+i, p.sostenibile));
@@ -132,10 +141,10 @@ function costruisci() {
   });
 
   var s7wrap = el('div','opt-row');
-  var s7lbl = el('div'); s7lbl.appendChild(el('span','opt-lbl','Label percorso 7')); s7lbl.appendChild(inp('text','degu-label-7', m.degustazione.percorso_label_7 || '7')); s7wrap.appendChild(s7lbl);
+  var s7lbl = el('div'); s7lbl.appendChild(el('span','opt-lbl','Label percorso 7')); s7lbl.appendChild(inp('text','degu-label-7', m.degustazione.percorso_label_7)); s7wrap.appendChild(s7lbl);
   bd.appendChild(s7wrap);
   bd.appendChild(el('div','sub','Percorso \u201c7\u201d'));
-  var i7 = inp('text','degu7', m.degustazione.percorsi['7']);
+  var i7 = inp('text','degu7', m.degustazione.percorsi[_key7]);
   i7.style.width = '100%'; bd.appendChild(i7);
 
   fsd.appendChild(bd); wrap.appendChild(fsd);
@@ -215,14 +224,34 @@ function leggi() {
       o.prezzo  = +document.getElementById('op-prezzo-'+i).value;
       o.vini    = +document.getElementById('op-vini-'+i).value;
     });
-    m.degustazione.percorsi['6'].forEach(function(p, i) {
-      p.nome = document.getElementById('d6p-'+i).value;
-      var eco = document.getElementById('d6s-'+i).checked;
-      if (eco) p.sostenibile = true; else delete p.sostenibile;
-    });
-    m.degustazione.percorsi['7'] = document.getElementById('degu7').value;
-    var l6=document.getElementById('degu-label-6'); if(l6) m.degustazione.percorso_label_6=l6.value.trim()||'6';
-    var l7=document.getElementById('degu-label-7'); if(l7) m.degustazione.percorso_label_7=l7.value.trim()||'7';
+    // Identifico le chiavi correnti (possono essere '6'/'7' o 'Sei'/'Sette' ecc.)
+    var _kAll = Object.keys(m.degustazione.percorsi);
+    var _kOld6 = _kAll.find(function(k){ return Array.isArray(m.degustazione.percorsi[k]); }) || '6';
+    var _kOld7 = _kAll.find(function(k){ return typeof m.degustazione.percorsi[k] === 'string'; }) || '7';
+    // Leggi gli array di piatti dal form usando la vecchia chiave
+    var perc6 = m.degustazione.percorsi[_kOld6];
+    if (Array.isArray(perc6)) {
+      perc6.forEach(function(p, i) {
+        var ne = document.getElementById('d6p-'+i);
+        if (ne) p.nome = ne.value;
+        var eco = document.getElementById('d6s-'+i);
+        if (eco && eco.checked) p.sostenibile = true; else delete p.sostenibile;
+      });
+    }
+    var d7val = document.getElementById('degu7');
+    var perc7 = d7val ? d7val.value : m.degustazione.percorsi[_kOld7];
+    // Rinomina le chiavi dei percorsi in base alle label scelte nel form
+    // (il template usa la chiave come etichetta: "6" → "Sei", "7" → "Sette", ecc.)
+    var l6El=document.getElementById('degu-label-6');
+    var l7El=document.getElementById('degu-label-7');
+    var newLabel6 = l6El ? (l6El.value.trim() || '6') : '6';
+    var newLabel7 = l7El ? (l7El.value.trim() || '7') : '7';
+    var newPercorsi = {};
+    newPercorsi[newLabel6] = perc6;
+    newPercorsi[newLabel7] = perc7;
+    m.degustazione.percorsi = newPercorsi;
+    m.degustazione.percorso_label_6 = newLabel6;
+    m.degustazione.percorso_label_7 = newLabel7;
   }
 
   m.sezioni.forEach(function(sez, si) {
@@ -254,7 +283,7 @@ function leggi() {
   return m;
 }
 
-var MENU_URL = 'https://santamonicagenova-a11y.github.io/SantaWeb/menu.html';
+var MENU_URL = 'https://santamonicagenova-a11y.github.io/SantaWeb/menu-it.html';
 var REPO_OWNER = 'santamonicagenova-a11y';
 var REPO_NAME  = 'SantaWeb';
 var MENU_PATH  = 'menu.html';
@@ -299,10 +328,16 @@ function costruisciMenuTradotto(menuForm, t) {
   function tr(n) { return piatti[n] || n; }
 
   m.degustazione.nota = t.degu_nota;
-  m.degustazione.percorsi['7'] = t.percorso_7;
-  m.degustazione.percorsi['6'].forEach(function(p) {
-    if (p) p.nome = tr(p.nome);
-  });
+  // I percorsi hanno chiavi dinamiche (es. "Sei"/"Sette" o "6"/"7"):
+  // percorso_label_6/7 conservano quali sono, usiamo quelli per ritrovarli.
+  var lbl6 = m.degustazione.percorso_label_6 || '6';
+  var lbl7 = m.degustazione.percorso_label_7 || '7';
+  if (m.degustazione.percorsi[lbl7] !== undefined) m.degustazione.percorsi[lbl7] = t.percorso_7;
+  if (Array.isArray(m.degustazione.percorsi[lbl6])) {
+    m.degustazione.percorsi[lbl6].forEach(function(p) {
+      if (p) p.nome = tr(p.nome);
+    });
+  }
 
   m.sezioni.forEach(function(sez, si) {
     var origSez = dati.sezioni[si];
@@ -354,7 +389,7 @@ function caricaDalSito(tipo) {
   var url = tipo === 'dolci' ? DOLCI_URL : MENU_URL;
   var btn = document.querySelector('.btn-load');
   document.getElementById('err').textContent = '';
-  fetch(url + '?nocache=' + Date.now(), { cache: 'no-store' })
+  fetch(url + '?nocache=' + Date.now() + '_' + Math.random().toString(36).slice(2), { cache: 'no-store', headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' } })
     .then(function(r) {
       if (!r.ok) throw new Error('Errore HTTP ' + r.status);
       return r.text();

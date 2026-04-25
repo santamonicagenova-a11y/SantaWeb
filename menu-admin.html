@@ -68,6 +68,7 @@
     .toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(5rem); background:#2d6a4f; color:#fff; padding:.65rem 1.6rem; font-size:.8rem; transition:transform .3s; z-index:999; }
     .toast.on { transform:translateX(-50%) translateY(0); }
   </style>
+  <script src="foto-optimizer.js"></script>
 </head>
 <body>
 
@@ -252,10 +253,47 @@ function selezionaFoto(input, idx) {
   var file = input.files[0]; if (!file) return;
   var reader = new FileReader();
   reader.onload = function(e) {
+    var origDataUrl = e.target.result;
+    var origSizeKB = (file.size / 1024).toFixed(1);
     var altEl = document.getElementById('alt-'+idx);
-    fotoDati[idx] = { file:file, dataUrl:e.target.result, src:null, alt:(altEl&&altEl.value)||file.name.replace(/\.[^.]+$/,'') };
-    var thumb = document.getElementById('thumb-'+idx);
-    if (thumb) { thumb.innerHTML=''; var img=document.createElement('img'); img.src=e.target.result; img.style.cssText='width:100%;height:100%;object-fit:cover;'; thumb.appendChild(img); }
+    var altText = (altEl && altEl.value) || file.name.replace(/\.[^.]+$/, '');
+    
+    var statusEl = document.getElementById('foto-status');
+    if (statusEl) statusEl.textContent = '⏳ Ottimizzazione foto ' + (idx+1) + '…';
+    
+    ottimizzaImmagine(origDataUrl, function(webpBase64) {
+      if (!webpBase64) {
+        if (statusEl) statusEl.textContent = '✗ Errore compressione foto ' + (idx+1);
+        return;
+      }
+      
+      var compressSizeKB = (webpBase64.length * 0.75 / 1024).toFixed(1);
+      var risparmio = (100 * (1 - compressSizeKB / origSizeKB)).toFixed(1);
+      
+      fotoDati[idx] = {
+        file: file,
+        dataUrl: origDataUrl,
+        webpBase64: webpBase64,
+        src: null,
+        alt: altText,
+        origSizeKB: origSizeKB,
+        compressSizeKB: compressSizeKB
+      };
+      
+      var thumb = document.getElementById('thumb-'+idx);
+      if (thumb) {
+        thumb.innerHTML = '';
+        var img = document.createElement('img');
+        img.src = origDataUrl;
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+        thumb.appendChild(img);
+      }
+      
+      if (statusEl) {
+        statusEl.innerHTML = '✓ Foto ' + (idx+1) + ': ' + compressSizeKB + ' KB (era ' + origSizeKB + ' KB, -' + risparmio + '%)';
+        statusEl.style.color = '#2d6a4f';
+      }
+    });
   };
   reader.readAsDataURL(file);
 }
@@ -276,13 +314,17 @@ async function _eseguiPubblicaFoto(token) {
   for (var i=0; i<6; i++) {
     var d = fotoDati[i]; if (!d) continue;
     var altText = (document.getElementById('alt-'+i) ? document.getElementById('alt-'+i).value : '') || d.alt || '';
-    var filePath = 'img/galleria/foto'+(i+1)+'.jpg';
-    if (d.file && d.dataUrl) {
-      statusEl.textContent = '⏳ Carico foto '+(i+1)+'…';
-      var base64 = d.dataUrl.split(',')[1];
+    var filePath = 'img/galleria/foto'+(i+1)+'.webp';
+    if (d.file && d.webpBase64) {
+      statusEl.textContent = '⏳ Carico foto '+(i+1)+' (WebP)…';
+      var base64 = d.webpBase64;
       var sha=null;
-      try { var chk=await fetch(apiBase+filePath,{headers:headers}); if(chk.ok){var ex=await chk.json();sha=ex.sha||null;} } catch(e){}
-      var body={message:'Foto galleria '+(i+1),content:base64}; if(sha) body.sha=sha;
+      try { 
+        var chk=await fetch(apiBase+filePath,{headers:headers}); 
+        if(chk.ok){var ex=await chk.json();sha=ex.sha||null;} 
+      } catch(e){}
+      var body={message:'Foto galleria '+(i+1)+' (WebP)',content:base64}; 
+      if(sha) body.sha=sha;
       var r=await fetch(apiBase+filePath,{method:'PUT',headers:headers,body:JSON.stringify(body)});
       if(!r.ok){statusEl.style.color='var(--rust)';statusEl.textContent='✗ Errore foto '+(i+1);return;}
     }
@@ -296,7 +338,7 @@ async function _eseguiPubblicaFoto(token) {
   try { var jc=await fetch(apiBase+'gallery-photos.json',{headers:headers}); if(jc.ok){var je=await jc.json();jSha=je.sha||null;} } catch(e){}
   var jBody={message:'Aggiorno gallery-photos.json',content:jsonB64}; if(jSha) jBody.sha=jSha;
   var jRes=await fetch(apiBase+'gallery-photos.json',{method:'PUT',headers:headers,body:JSON.stringify(jBody)});
-  if (jRes.ok) { statusEl.style.color='#2d6a4f'; statusEl.textContent='✓ Foto pubblicate! Il sito si aggiornerà entro 90 secondi.'; }
+  if (jRes.ok) { statusEl.style.color='#2d6a4f'; statusEl.textContent='✓ Foto pubblicate (WebP ottimizzate)! Il sito si aggiornerà entro 90 secondi.'; }
   else { statusEl.style.color='var(--rust)'; statusEl.textContent='✗ Errore aggiornamento JSON.'; }
 }
 

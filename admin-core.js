@@ -300,7 +300,19 @@ function costruisciOutput() {
   var blocco = 'const MENU = ' + JSON.stringify(m, null, 2) + ';\n' + sep;
   // Per la carta usa SEMPRE i template embedded aggiornati (non il file caricato dal sito)
   if (tipoMenuCorrente === 'carta') {
-    return CARTA_TPL_B + blocco + CARTA_TPL_A;
+    var html = CARTA_TPL_B + blocco + CARTA_TPL_A;
+    // Inietta la ctrl-bar (versione admin: switch carta/orario + stampa + scarica).
+    // costruisciMenuItPub() rimuove solo BTNS dei bottoni switch per il pubblico;
+    // qui aggiungiamo tutta la barra.
+    var CTRL_BAR = '<div class="ctrl-bar">\n'
+      + '  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout(\'carta\')">\u261e Men\u00f9 alla carta (3 pag.)</button>\n'
+      + '  <div class="ctrl-sep"></div>\n'
+      + '  <button class="ctrl-btn" id="btn-orario" onclick="showLayout(\'orario\')">\u261e Foglio orario (1 pag.)</button>\n'
+      + '  <div class="ctrl-sep"></div>\n'
+      + '  <button class="ctrl-btn" onclick="window.print()">\u26a1 Stampa</button>\n'
+      + '</div>\n';
+    html = html.replace('<body>\n', '<body>\n' + CTRL_BAR);
+    return html;
   }
   return tplBefore + blocco + tplAfter;
 }
@@ -535,9 +547,9 @@ function pubblicaFile(token, headers, path, content, rawBase64) {
 }
 
 function costruisciMenuItPub() {
-  // Menu italiano pubblico: outputCorrente senza pulsanti carta/orario
-  var BTNS = "  <button class=\"ctrl-btn active\" id=\"btn-carta\" onclick=\"showLayout('carta')\">\u261e Men\u00f9 alla carta (3 pag.)</button>\n  <div class=\"ctrl-sep\"></div>\n  <button class=\"ctrl-btn\" id=\"btn-orario\" onclick=\"showLayout('orario')\">\u261e Foglio orario (1 pag.)</button>\n  <div class=\"ctrl-sep\"></div>\n";
-  var html = outputCorrente.replace(BTNS, '');
+  // Menu italiano pubblico: outputCorrente senza la ctrl-bar (switch carta/orario + stampa)
+  // La ctrl-bar contiene div interni (ctrl-sep), quindi matchiamo fino al </div> che precede layout-carta
+  var html = outputCorrente.replace(/<div class="ctrl-bar">[\s\S]*?Stampa<\/button>\s*<\/div>\s*/, '');
   html = html.replace("  document.getElementById('btn-carta').classList.toggle('active',  which === 'carta');\n  document.getElementById('btn-orario').classList.toggle('active', which === 'orario');", "  var bc=document.getElementById('btn-carta'); if(bc) bc.classList.toggle('active',which==='carta');\n  var bo=document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active',which==='orario');");
   return html;
 }

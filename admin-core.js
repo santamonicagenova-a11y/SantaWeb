@@ -386,7 +386,12 @@ function traduci() {
   // Raccogli tutti i testi dal form
   var testi = [];
   if (m.degustazione) {
-    m.degustazione.percorsi['6'].forEach(function(p) { if (p.nome) testi.push(p.nome); });
+    var key6 = Object.keys(m.degustazione.percorsi).find(function(k) { 
+      return Array.isArray(m.degustazione.percorsi[k]); 
+    });
+    if (key6) {
+      m.degustazione.percorsi[key6].forEach(function(p) { if (p.nome) testi.push(p.nome); });
+    }
   }
   m.sezioni.forEach(function(sez) {
     if (sez.titolo) testi.push(sez.titolo);
@@ -600,7 +605,12 @@ function traduciEPubblica() {
   var m = leggi();
   var testi = [];
   if (m.degustazione) {
-    m.degustazione.percorsi['6'].forEach(function(p) { if (p.nome) testi.push(p.nome); });
+    var key6 = Object.keys(m.degustazione.percorsi).find(function(k) { 
+      return Array.isArray(m.degustazione.percorsi[k]); 
+    });
+    if (key6) {
+      m.degustazione.percorsi[key6].forEach(function(p) { if (p.nome) testi.push(p.nome); });
+    }
   }
   m.sezioni.forEach(function(sez) {
     if (sez.titolo) testi.push(sez.titolo);

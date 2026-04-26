@@ -51,7 +51,7 @@
       background: transparent;
       border: 1px solid var(--ink);
       font-family: 'Jost', sans-serif;
-      font-size: 0.8976rem;
+      font-size: .68rem;
       letter-spacing: .16em;
       text-transform: uppercase;
       cursor: pointer;
@@ -96,7 +96,7 @@
       border-bottom: 1px solid var(--rule);
     }
     .logo {
-      font-size: 3.3rem;
+      font-size: 2.5rem;
       font-weight: 300;
       letter-spacing: .22em;
       text-transform: uppercase;
@@ -106,7 +106,7 @@
     .logo-sub {
       margin-top: .45rem;
       font-family: 'Jost', sans-serif;
-      font-size: 0.8844rem;
+      font-size: .67rem;
       letter-spacing: .22em;
       text-transform: uppercase;
       color: var(--stone);
@@ -122,7 +122,7 @@
       padding: 4mm 0;
     }
     .degu-titolo {
-      font-size: 1.848rem;
+      font-size: 1.4rem;
       font-weight: 600;
       letter-spacing: .16em;
       text-transform: uppercase;
@@ -130,13 +130,13 @@
     }
     .degu-prezzi {
       font-style: italic;
-      font-size: 1.2936rem;
+      font-size: .98rem;
       line-height: 1.4;
       margin-bottom: 2mm;
     }
     .degu-nota {
       font-style: italic;
-      font-size: 1.2936rem;
+      font-size: .98rem;
       color: var(--ink);
       margin-bottom: 14mm;
     }
@@ -151,12 +151,12 @@
     .percorso-label {
       font-style: italic;
       font-weight: 700;
-      font-size: 1.65rem;
+      font-size: 1.25rem;
       margin-bottom: 3mm;
     }
-    .percorso-piatto { font-size: 1.2672rem; line-height: 1.95; font-style: normal; }
+    .percorso-piatto { font-size: .96rem; line-height: 1.95; font-style: normal; }
     .percorso-piatto em { font-style: normal; }
-    .percorso-libero { font-size: 1.2672rem; line-height: 1.95; font-style: normal; }
+    .percorso-libero { font-size: .96rem; line-height: 1.95; font-style: normal; }
 
     /* ── sezioni carta ── */
     .pg-content {
@@ -169,34 +169,36 @@
     .sezione-titolo {
       font-family: 'Cormorant Garamond', serif;
       font-style: normal;
-      font-size: 1.98rem;
+      font-size: 1.5rem;
       font-weight: 600;
       letter-spacing: .14em;
       text-transform: uppercase;
       text-align: center;
       margin-bottom: 5mm;
+      padding-bottom: 2mm;
+      border-bottom: 1px solid var(--rule);
     }
 
     /* ── piatti carta ── */
     .piatto {
       text-align: center;
       padding: .5mm 0;
-      font-size: 1.2672rem;
+      font-size: .96rem;
       line-height: 1.4;
     }
     .piatto-prezzo {
-      font-size: 1.056rem;
+      font-size: .8rem;
       color: var(--stone);
       margin-left: .3rem;
     }
     .piatto-unita {
-      font-size: 1.0032rem;
+      font-size: .76rem;
       color: var(--stone);
       margin-left: .1rem;
     }
     .piatto-desc {
       font-style: italic;
-      font-size: 1.0824rem;
+      font-size: .82rem;
       color: var(--stone);
       display: block;
     }
@@ -205,14 +207,14 @@
     .eco::after {
       content: ' *';
       color: var(--rust);
-      font-size: 1.0032em;
+      font-size: .76em;
     }
 
     /* ── note ospite carta ── */
     .note-ospite {
       margin-top: auto;
       font-style: italic;
-      font-size: 0.9636rem;
+      font-size: .73rem;
       color: var(--stone);
       text-align: center;
       line-height: 1.65;
@@ -235,7 +237,7 @@
 
     .orario-logo {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 3.23rem;
+      font-size: 3.8rem;
       font-style: italic;
       font-weight: 300;
       letter-spacing: .08em;
@@ -273,7 +275,7 @@
     .orario-sez { text-align: center; }
 
     .orario-sez-titolo {
-      font-size: 1.275rem;
+      font-size: 1.5rem;
       font-weight: 700;
       letter-spacing: .12em;
       text-transform: uppercase;
@@ -281,7 +283,7 @@
     }
 
     .orario-piatto {
-      font-size: 1.02rem;
+      font-size: 1.2rem;
       line-height: 1.35;
       text-align: center;
       margin-bottom: .55rem;
@@ -291,7 +293,7 @@
     .orario-piatto .eco::after {
       content: ' *';
       color: var(--rust);
-      font-size: 1.0032em;
+      font-size: .76em;
     }
 
     /* ── sezione orario in basso ── */
@@ -305,7 +307,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-style: normal;
       font-weight: 700;
-      font-size: 0.935rem;
+      font-size: 1.1rem;
       letter-spacing: .12em;
       text-transform: uppercase;
       line-height: 2.1;
@@ -322,7 +324,7 @@
 
     .orario-servizio {
       font-style: italic;
-      font-size: 0.85rem;
+      font-size: 1rem;
       line-height: 1.85;
       text-align: center;
     }
@@ -334,7 +336,7 @@
     }
 
     .orario-nota {
-      font-size: 0.612rem;
+      font-size: .72rem;
       color: var(--stone);
       line-height: 1.6;
       text-align: center;
@@ -376,12 +378,6 @@
   </style>
 </head>
 <body>
-
-<!-- ── BARRA CONTROLLI ── -->
-<div class="ctrl-bar">
-  <button class="ctrl-btn" onclick="window.print()">✦ Stampa / Salva PDF</button>
-</div>
-
 <div id="layout-carta"></div>
 <div id="layout-orario"></div>
 
@@ -405,7 +401,7 @@ const MENU = {
     ],
     "nota": "Prix par personne, menu à partager par toute la table.",
     "percorsi": {
-      "6": [
+      "Sei": [
         {
           "nome": "Ailes de raie, fèves locales, pomme verte, amandes",
           "sostenibile": true
@@ -429,7 +425,7 @@ const MENU = {
           "nome": "Glace au citron noir, livèche, citron vert, crackers au lait"
         }
       ],
-      "7": "Menu carte blanche du Chef"
+      "Sette": "Menu carte blanche du Chef"
     },
     "percorso_label_6": "Sei",
     "percorso_label_7": "Sette"
@@ -554,7 +550,7 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Agneaux, petits pois frais, rhubarbe",
+          "nome": "Agnello, piselli freschi, rabarbaro",
           "prezzo": 28
         }
       ],
@@ -659,7 +655,7 @@ function buildDegu(degu) {
     if (typeof piatti === 'string') {
       percorsiHtml += `
         <div class="percorso">
-          <div class="percorso-label">&ldquo;${n==="6" && degu.percorso_label_6 ? degu.percorso_label_6 : n==="7" && degu.percorso_label_7 ? degu.percorso_label_7 : n}&rdquo;</div>
+          <div class="percorso-label">&ldquo;${n}&rdquo;</div>
           <div class="percorso-piatto percorso-libero">${piatti}</div>
         </div>`;
     } else {
@@ -668,7 +664,7 @@ function buildDegu(degu) {
       ).join('');
       percorsiHtml += `
         <div class="percorso">
-          <div class="percorso-label">&ldquo;${n==="6" && degu.percorso_label_6 ? degu.percorso_label_6 : n==="7" && degu.percorso_label_7 ? degu.percorso_label_7 : n}&rdquo;</div>
+          <div class="percorso-label">&ldquo;${n}&rdquo;</div>
           ${righe}
         </div>`;
     }
@@ -761,10 +757,31 @@ function renderOrario() {
         <div class="orario-footer-col">
           <hr style="border:none;border-top:1px solid var(--ink);margin:2mm 0">
           <div class="orario-links">
-            English Menu<br>
-            Carte en Française
+            <u>Menu Italiano</u><br>
+            <u>English Menu</u><br>
+            <u>Speisekarte auf Deutsch</u><br>
+            <u>Carta en Español</u>
           </div>
-          <img src="orario-qr.png" alt="QR code" class="orario-qr" />
+          <img src="https://santamonicagenova-a11y.github.io/SantaWeb/orario-qr.png" alt="QR code" style="width:45mm;height:45mm;display:block;margin:0 auto;" />
+        </div>
+      </div>
+
+      <!-- colonna destra -->
+      <div class="orario-col">
+        ${buildOrarioColonna(cfg.colDestra, "Amidi e Carboidrati")}
+
+        <!-- footer destra: orario + nota -->
+        <div class="orario-footer-col">
+          <hr style="border:none;border-top:1px solid var(--ink);margin:2mm 0">
+          <div class="orario-servizio">
+            <span class="orario-servizio-titolo"><em>HORAIRES D'OUVERTURE :</em></span>
+            ${orarioHtml}
+          </div>
+          <div class="orario-nota">${NOTE_ORARIO}</div>
+        </div>
+      </div>
+
+    </div>
   `;
   root.appendChild(pg);
 }
@@ -778,19 +795,6 @@ function showLayout(which) {
   var bc=document.getElementById('btn-carta'); if(bc) bc.classList.toggle('active',which==='carta');
   var bo=document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active',which==='orario');
 }
-
-/* ══════════════════════════════════════
-   REDIRECT VISITATORI → menu-it.html
-   (bypass con ?admin nell'URL)
-══════════════════════════════════════ */
-(function() {
-  var loc = window.location;
-  if (loc.protocol === 'blob:') return;
-  if (!loc.pathname.endsWith('menu.html')) return;
-  if (new URLSearchParams(loc.search).has('admin')) return;
-  var base = loc.href.split('?')[0].replace('menu.html', 'menu-it.html');
-  loc.replace(base + '?v=' + Date.now());
-})();
 
 /* ── init ── */
 renderCarta();

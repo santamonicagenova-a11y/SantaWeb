@@ -1,5 +1,5 @@
 // Core functions per menu-admin Santamonica
-// v 2026.04.23.02
+// v 2026.04.26.01
 
 function carica(input) {
   var f = input.files[0];

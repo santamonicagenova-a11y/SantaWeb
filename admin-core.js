@@ -386,9 +386,12 @@ function traduci() {
   // Raccogli tutti i testi dal form
   var testi = [];
   if (m.degustazione) {
-    var key6 = Object.keys(m.degustazione.percorsi).find(function(k) { 
-      return Array.isArray(m.degustazione.percorsi[k]); 
-    });
+    var key6;
+    if (m.degustazione.percorsi && typeof m.degustazione.percorsi === 'object') {
+      key6 = Object.keys(m.degustazione.percorsi).find(function(k) { 
+        return Array.isArray(m.degustazione.percorsi[k]); 
+      });
+    }
     if (key6) {
       m.degustazione.percorsi[key6].forEach(function(p) { if (p.nome) testi.push(p.nome); });
     }
@@ -519,7 +522,14 @@ function eseguiPubblicazione(token) {
     html = html.replace(/\${o\.portate} portate/g, '${o.portate} ' + t.degu_portate_label);
     html = html.replace(/eventuale abbinamento vini/g, t.degu_vini_label);
     html = html.replace('ORARIO DI SERVIZIO:', t.orario_titolo);
-    html = html.replace(/English Menu<br>\s*Carte en Fran[^<]*<br>\s*Speisekarte auf Deutsch<br>\s*Carta en Espa\u00f1ol/, t.links.join('<br>\n            '));
+    // Genera dinamicamente i 4 link QR per le lingue
+    var qrLinks = [
+      '<a href="menu-en.html"><u>English Menu</u></a>',
+      '<a href="menu-fr.html"><u>Carte en Français</u></a>',
+      '<a href="menu-de.html"><u>Speisekarte auf Deutsch</u></a>',
+      '<a href="menu-es.html"><u>Carta en Español</u></a>'
+    ];
+    html = html.replace(/English Menu<br>\s*Carte en Fran[^<]*<br>\s*Speisekarte auf Deutsch<br>\s*Carta en Espa\u00f1ol/, qrLinks.join('<br>\n            '));
     files.push({ path: 'menu-' + lang + '.html', content: html, label: lang.toUpperCase() });
     });
   }
@@ -605,9 +615,12 @@ function traduciEPubblica() {
   var m = leggi();
   var testi = [];
   if (m.degustazione) {
-    var key6 = Object.keys(m.degustazione.percorsi).find(function(k) { 
-      return Array.isArray(m.degustazione.percorsi[k]); 
-    });
+    var key6;
+    if (m.degustazione.percorsi && typeof m.degustazione.percorsi === 'object') {
+      key6 = Object.keys(m.degustazione.percorsi).find(function(k) { 
+        return Array.isArray(m.degustazione.percorsi[k]); 
+      });
+    }
     if (key6) {
       m.degustazione.percorsi[key6].forEach(function(p) { if (p.nome) testi.push(p.nome); });
     }

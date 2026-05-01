@@ -1,5 +1,5 @@
 // Core functions per menu-admin Santamonica
-// v 2026.04.26.01
+// v 2026.04.23.02
 
 function carica(input) {
   var f = input.files[0];
@@ -70,8 +70,8 @@ function costruisci() {
   m.degustazione.opzioni.forEach(function(o, i) {
     var row = el('div','opt-row');
     var c1 = el('div'); c1.appendChild(el('span','opt-lbl','Portate')); c1.appendChild(inp('number','op-portate-'+i, o.portate)); row.appendChild(c1);
-    var c2 = el('div'); c2.appendChild(el('span','opt-lbl','Prezzo €')); c2.appendChild(inp('number','op-prezzo-'+i, o.prezzo)); row.appendChild(c2);
-    var c3 = el('div'); c3.appendChild(el('span','opt-lbl','Vini €')); c3.appendChild(inp('number','op-vini-'+i, o.vini)); row.appendChild(c3);
+    var c2 = el('div'); c2.appendChild(el('span','opt-lbl','Prezzo')); c2.appendChild(inp('number','op-prezzo-'+i, o.prezzo)); row.appendChild(c2);
+    var c3 = el('div'); c3.appendChild(el('span','opt-lbl','Vini')); c3.appendChild(inp('number','op-vini-'+i, o.vini)); row.appendChild(c3);
     bd.appendChild(row);
   });
 
@@ -124,7 +124,7 @@ function costruisci() {
     var body = el('div','fs-body');
 
     var hdr = el('div','grid-hdr');
-    ['Nome piatto','Prezzo €','Unità','Descrizione','*'].forEach(function(t){ hdr.appendChild(el('div','col-lbl',t)); });
+    ['Nome piatto','Prezzo','Unità','Descrizione','*'].forEach(function(t){ hdr.appendChild(el('div','col-lbl',t)); });
     body.appendChild(hdr);
 
     sez.piatti.forEach(function(p, pi) {

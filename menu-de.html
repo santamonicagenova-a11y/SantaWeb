@@ -414,7 +414,7 @@ const MENU = {
           "nome": "Wildschwein-Tortelli, Doraden-Dashi, Frühlingszwiebeln, Shiso"
         },
         {
-          "nome": "„<em>Mancini</em>“-Röhren, Kabeljau, Zitrus-Kosho, Borlotti-Bohnen",
+          "nome": "<em>Mancini</em>-Röhren, Kabeljau, Zitrus-Kosho, Borlotti-Bohnen",
           "sostenibile": true
         },
         {
@@ -511,7 +511,7 @@ const MENU = {
       "titolo": "Amidi e Carboidrati",
       "piatti": [
         {
-          "nome": "„<em>Mancini</em>“ quadratische Spaghetti, Seeanemonen, Nduja, Majoran",
+          "nome": "<em>Mancini</em> quadratische Spaghetti, Seeanemonen, Nduja, Majoran",
           "prezzo": 32,
           "sostenibile": true
         },
@@ -521,12 +521,12 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "„<em>Mancini</em>“-Röhren, Kabeljau, unser fermentiertes Zitrus-Kosho, Borlotti",
+          "nome": "<em>Mancini</em>-Röhren, Kabeljau, unser fermentiertes Zitrus-Kosho, Borlotti",
           "prezzo": 24,
           "sostenibile": true
         },
         {
-          "nome": "„<em>Riserva San Massimo</em>“-Reis, Austern, weißer Spargel, Vanille",
+          "nome": "<em>Riserva San Massimo</em> Reis, Austern, weißer Spargel, Vanille",
           "prezzo": 35,
           "sostenibile": true
         }
@@ -648,7 +648,7 @@ function buildSezione(s) {
 
 function buildDegu(degu) {
   const optsHtml = degu.opzioni.map(o =>
-    `${o.portate} Gänge &nbsp;€ ${o.prezzo}, Weinbegleitung € ${o.vini}`
+    `${o.portate} Gänge &nbsp;${o.prezzo}, Weinbegleitung ${o.vini}`
   ).join('<br>');
 
   let percorsiHtml = '';
@@ -719,7 +719,7 @@ function buildOrarioColonna(titoli, sepDopo) {
     const piatti = s.piatti.map(p => {
       const eco = p.sostenibile ? ' eco' : '';
       const unitaHtml = p.unita ? ` ${p.unita}` : '';
-      const prezzoHtml = p.prezzo != null ? ` € ${p.prezzo}${unitaHtml}` : '';
+      const prezzoHtml = p.prezzo != null ? ` ${p.prezzo}${unitaHtml}` : '';
       return `<div class="orario-piatto"><span class="${'piatto-riga' + eco}">${p.nome}${prezzoHtml}</span></div>`;
     }).join('');
 

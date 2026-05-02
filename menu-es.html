@@ -414,7 +414,7 @@ const MENU = {
           "nome": "Tortelli de jabalí, dashi de dorada, cebolleta, shiso"
         },
         {
-          "nome": "Tubos de “<em>Mancini</em>”, bacalao, kosho cítrico, judías borlotti",
+          "nome": "Tubos de <em>Mancini</em>, bacalao, kosho cítrico, judías borlotti",
           "sostenibile": true
         },
         {
@@ -511,7 +511,7 @@ const MENU = {
       "titolo": "Amidi e Carboidrati",
       "piatti": [
         {
-          "nome": "Espaguetis cuadrados “<em>Mancini</em>”, anémonas de mar, nduja, mejorana",
+          "nome": "Espaguetis cuadrados <em>Mancini</em>, anémonas de mar, nduja, mejorana",
           "prezzo": 32,
           "sostenibile": true
         },
@@ -521,12 +521,12 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Tubos de “<em>Mancini</em>”, bacalao, nuestro kosho cítrico fermentado, borlotti",
+          "nome": "Tubos de <em>Mancini</em>, bacalao, nuestros cítricos fermentados kosho, borlotti",
           "prezzo": 24,
           "sostenibile": true
         },
         {
-          "nome": "Arroz “<em>Riserva San Massimo</em>”, ostras, espárragos blancos, vainilla",
+          "nome": "<em>Riserva San Massimo</em> arroz, ostras, espárragos blancos, vainilla",
           "prezzo": 35,
           "sostenibile": true
         }
@@ -648,7 +648,7 @@ function buildSezione(s) {
 
 function buildDegu(degu) {
   const optsHtml = degu.opzioni.map(o =>
-    `${o.portate} platos &nbsp;€ ${o.prezzo}, maridaje de vinos € ${o.vini}`
+    `${o.portate} platos &nbsp;${o.prezzo}, maridaje de vinos ${o.vini}`
   ).join('<br>');
 
   let percorsiHtml = '';
@@ -719,7 +719,7 @@ function buildOrarioColonna(titoli, sepDopo) {
     const piatti = s.piatti.map(p => {
       const eco = p.sostenibile ? ' eco' : '';
       const unitaHtml = p.unita ? ` ${p.unita}` : '';
-      const prezzoHtml = p.prezzo != null ? ` € ${p.prezzo}${unitaHtml}` : '';
+      const prezzoHtml = p.prezzo != null ? ` ${p.prezzo}${unitaHtml}` : '';
       return `<div class="orario-piatto"><span class="${'piatto-riga' + eco}">${p.nome}${prezzoHtml}</span></div>`;
     }).join('');
 

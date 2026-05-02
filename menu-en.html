@@ -414,7 +414,7 @@ const MENU = {
           "nome": "Wild boar tortelli, sea bream dashi, spring onion, shiso"
         },
         {
-          "nome": "“<em>Mancini</em>” tubes, cod, citrus kosho, borlotti beans",
+          "nome": "<em>Mancini</em> tubes, cod, citrus kosho, borlotti beans",
           "sostenibile": true
         },
         {
@@ -511,7 +511,7 @@ const MENU = {
       "titolo": "Amidi e Carboidrati",
       "piatti": [
         {
-          "nome": "“<em>Mancini</em>” square spaghetti, sea anemones, nduja, marjoram",
+          "nome": "<em>Mancini</em> square spaghetti, sea anemones, nduja, marjoram",
           "prezzo": 32,
           "sostenibile": true
         },
@@ -521,12 +521,12 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "“<em>Mancini</em>” tubes, cod, our fermented citrus kosho, borlotti",
+          "nome": "<em>Mancini</em> tubes, cod, our fermented citrus kosho, borlotti",
           "prezzo": 24,
           "sostenibile": true
         },
         {
-          "nome": "“<em>Riserva San Massimo</em>” rice, oysters, white asparagus, vanilla",
+          "nome": "<em>Riserva San Massimo</em> rice, oysters, white asparagus, vanilla",
           "prezzo": 35,
           "sostenibile": true
         }
@@ -648,7 +648,7 @@ function buildSezione(s) {
 
 function buildDegu(degu) {
   const optsHtml = degu.opzioni.map(o =>
-    `${o.portate} courses &nbsp;€ ${o.prezzo}, wine pairing € ${o.vini}`
+    `${o.portate} courses &nbsp;${o.prezzo}, wine pairing ${o.vini}`
   ).join('<br>');
 
   let percorsiHtml = '';
@@ -719,7 +719,7 @@ function buildOrarioColonna(titoli, sepDopo) {
     const piatti = s.piatti.map(p => {
       const eco = p.sostenibile ? ' eco' : '';
       const unitaHtml = p.unita ? ` ${p.unita}` : '';
-      const prezzoHtml = p.prezzo != null ? ` € ${p.prezzo}${unitaHtml}` : '';
+      const prezzoHtml = p.prezzo != null ? ` ${p.prezzo}${unitaHtml}` : '';
       return `<div class="orario-piatto"><span class="${'piatto-riga' + eco}">${p.nome}${prezzoHtml}</span></div>`;
     }).join('');
 

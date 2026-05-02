@@ -409,7 +409,7 @@ const MENU = {
         "vini": 70
       }
     ],
-    "nota": "Prezzo a persona, menù da considerarsi per l'intero tavolo.",
+    "nota": "Prezzo a persona, menù da considerarsi per l'intero tavolo.<br>I menù sono disponibili fino alle 13:30 a pranzo ed alle 21:30 a cena",
     "percorsi": {
       "Sei": [
         {
@@ -424,7 +424,7 @@ const MENU = {
           "nome": "Tortelli di cinghiale, dashi di orata, cipollina, shiso"
         },
         {
-          "nome": "Tubetti “<em>Mancini</em>”, baccalà, kosho di agrumi, borlotti",
+          "nome": "Tubetti <em>Mancini</em>, baccalà, kosho di agrumi, borlotti",
           "sostenibile": true
         },
         {
@@ -521,7 +521,7 @@ const MENU = {
       "titolo": "Amidi e Carboidrati",
       "piatti": [
         {
-          "nome": "Spaghettoni quadrati “<em>Mancini</em>”, anemoni di mare, nduja, maggiorana",
+          "nome": "Spaghettoni quadrati <em>Mancini</em>, anemoni di mare, nduja, maggiorana",
           "prezzo": 32,
           "sostenibile": true
         },
@@ -531,12 +531,12 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Tubetti “<em>Mancini</em>”, baccalà, il nostro kosho di agrumi fermentato, borlotti",
+          "nome": "Tubetti <em>Mancini</em>, baccalà, il nostro kosho di agrumi fermentato, borlotti",
           "prezzo": 24,
           "sostenibile": true
         },
         {
-          "nome": "Riso “<em>Riserva San Massimo</em>”, ostriche, asparago bianco, vaniglia",
+          "nome": "Riso <em>Riserva San Massimo</em>, ostriche, asparago bianco, vaniglia",
           "prezzo": 35,
           "sostenibile": true
         }
@@ -662,7 +662,7 @@ function buildSezione(s) {
 
 function buildDegu(degu) {
   const optsHtml = degu.opzioni.map(o =>
-    `${o.portate} portate &nbsp;€ ${o.prezzo}, eventuale abbinamento vini € ${o.vini}`
+    `${o.portate} portate &nbsp;${o.prezzo}, eventuale abbinamento vini ${o.vini}`
   ).join('<br>');
 
   let percorsiHtml = '';
@@ -733,7 +733,7 @@ function buildOrarioColonna(titoli, sepDopo) {
     const piatti = s.piatti.map(p => {
       const eco = p.sostenibile ? ' eco' : '';
       const unitaHtml = p.unita ? ` ${p.unita}` : '';
-      const prezzoHtml = p.prezzo != null ? ` € ${p.prezzo}${unitaHtml}` : '';
+      const prezzoHtml = p.prezzo != null ? ` ${p.prezzo}${unitaHtml}` : '';
       return `<div class="orario-piatto"><span class="${'piatto-riga' + eco}">${p.nome}${prezzoHtml}</span></div>`;
     }).join('');
 

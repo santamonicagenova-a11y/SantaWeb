@@ -1,5 +1,80 @@
 // Core functions per menu-admin Santamonica
-// v 2026.04.23.02
+// v 2026.05.02 — DeepL API integration
+
+// ═══════════════════════════════════════════════════════
+// DEEPL API — configurazione e helper
+// ═══════════════════════════════════════════════════════
+var DEEPL_ENDPOINT  = 'https://api-free.deepl.com/v2/translate';
+var DEEPL_LANG_MAP  = { en: 'EN-GB', fr: 'FR', de: 'DE', es: 'ES' };
+
+function getDeepLKey() {
+  return (localStorage.getItem('deepl_key') || '').trim();
+}
+
+function resetDeepLKey() {
+  localStorage.removeItem('deepl_key');
+  var inp = document.getElementById('deepl-key-input'); if (inp) inp.value = '';
+  var modal = document.getElementById('modal-deepl'); if (modal) modal.classList.add('on');
+}
+
+function confermaDeepLKey() {
+  var inp = document.getElementById('deepl-key-input');
+  var key = inp ? inp.value.trim() : '';
+  if (!key) { alert('Inserisci la chiave API DeepL'); return; }
+  localStorage.setItem('deepl_key', key);
+  var modal = document.getElementById('modal-deepl'); if (modal) modal.classList.remove('on');
+  // Riprendi azione pendente, se presente
+  if (window._pendingTranslate === 'traduci') { window._pendingTranslate = null; traduci(); }
+  else if (window._pendingTranslate === 'traduciEPubblica') { window._pendingTranslate = null; traduciEPubblica(); }
+}
+
+function chiudiModalDeepL() {
+  var modal = document.getElementById('modal-deepl'); if (modal) modal.classList.remove('on');
+}
+
+// Apre modal o fallback a prompt() se modal non presente. Ritorna true se chiave già presente.
+function _assicuraDeepLKey(pendingFn) {
+  if (getDeepLKey()) return true;
+  var modal = document.getElementById('modal-deepl');
+  if (modal) {
+    window._pendingTranslate = pendingFn;
+    var inp = document.getElementById('deepl-key-input'); if (inp) inp.value = '';
+    modal.classList.add('on');
+  } else {
+    var k = prompt('Inserisci la tua DeepL API Key (Free):\n\nOttienila gratis su https://www.deepl.com/pro-api');
+    if (!k) return false;
+    localStorage.setItem('deepl_key', k.trim());
+    return true;
+  }
+  return false;
+}
+
+// Chiama DeepL API. Ritorna Promise che risolve con { trad: string|null, authError: bool }.
+function chiamaDeepL(testo, langCode) {
+  var key = getDeepLKey();
+  if (!key) return Promise.resolve({ trad: null, authError: false });
+  var targetLang = DEEPL_LANG_MAP[langCode] || langCode.toUpperCase();
+  var body = 'text=' + encodeURIComponent(testo) +
+             '&source_lang=IT' +
+             '&target_lang=' + encodeURIComponent(targetLang) +
+             '&tag_handling=html' +
+             '&preserve_formatting=1';
+  return fetch(DEEPL_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'DeepL-Auth-Key ' + key,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: body
+  }).then(function(r) {
+    if (r.status === 403) { localStorage.removeItem('deepl_key'); return { trad: null, authError: true }; }
+    if (!r.ok) return { trad: null, authError: false };
+    return r.json().then(function(data) {
+      var trad = data && data.translations && data.translations[0] && data.translations[0].text;
+      return { trad: trad || null, authError: false };
+    });
+  }).catch(function() { return { trad: null, authError: false }; });
+}
 
 function carica(input) {
   var f = input.files[0];
@@ -379,7 +454,8 @@ function chiudiModal() {
 
 
 function traduci() {
-  if (!dati) { alert('Prima carica il menù'); return; }
+  if (!dati) { alert('Prima carica il men\u00f9'); return; }
+  if (!_assicuraDeepLKey('traduci')) return;
   var m = leggi();
   var btn = document.getElementById('btn-traduci');
 
@@ -440,19 +516,18 @@ function traduci() {
     var item = coda[i];
     btn.textContent = '\u23f3 ' + (i+1) + '/' + totale + '\u2026';
 
-    // Google Translate API non ufficiale — nessun CORS, nessuna chiave
-    var url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=it&tl=' +
-      item.lang + '&dt=t&q=' + encodeURIComponent(item.testo);
-
-    fetch(url)
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        // La risposta è [[["traduzione","originale",null,null,1],...],...]
-        var trad = data && data[0] && data[0][0] && data[0][0][0];
-        if (trad) TRANSLATIONS[item.lang]['piatti'][item.testo] = trad;
-      })
-      .catch(function() {})
-      .finally(function() {
+    chiamaDeepL(item.testo, item.lang)
+      .then(function(res) {
+        if (res.authError) {
+          // Chiave invalida: ferma e richiedi nuova chiave
+          btn.textContent = '\uD83C\uDF10 Traduci';
+          btn.classList.remove('translating');
+          btn.disabled = false;
+          alert('DeepL: chiave API non valida o quota esaurita. Reinseriscila.');
+          _assicuraDeepLKey('traduci');
+          return;
+        }
+        if (res.trad) TRANSLATIONS[item.lang]['piatti'][item.testo] = res.trad;
         setTimeout(function() { traduciVoce(i + 1); }, 80);
       });
   }
@@ -611,6 +686,7 @@ function filesDolci() {
 function traduciEPubblica() {
   if (tipoMenuCorrente === 'allergeni') { traduciEPubblicaAllergeni(); return; }
   if (!dati) { alert('Prima carica il menù'); return; }
+  if (!_assicuraDeepLKey('traduciEPubblica')) return;
   var btn = document.getElementById('btn-pubblica');
   var m = leggi();
   var testi = [];
@@ -666,16 +742,18 @@ function traduciEPubblica() {
     }
     var item = coda[i];
     btn.textContent = '⏳ Traduzione ' + (i+1) + '/' + totale + '…';
-    var url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=it&tl=' +
-      item.lang + '&dt=t&q=' + encodeURIComponent(item.testo);
-    fetch(url)
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        var trad = data && data[0] && data[0][0] && data[0][0][0];
-        if (trad) TRANSLATIONS[item.lang]['piatti'][item.testo] = trad;
-      })
-      .catch(function() {})
-      .finally(function() { setTimeout(function() { traduciVoce(i + 1); }, 80); });
+    chiamaDeepL(item.testo, item.lang)
+      .then(function(res) {
+        if (res.authError) {
+          btn.textContent = '✶ Traduci e Pubblica';
+          btn.disabled = false;
+          alert('DeepL: chiave API non valida o quota esaurita. Reinseriscila.');
+          _assicuraDeepLKey('traduciEPubblica');
+          return;
+        }
+        if (res.trad) TRANSLATIONS[item.lang]['piatti'][item.testo] = res.trad;
+        setTimeout(function() { traduciVoce(i + 1); }, 80);
+      });
   }
   traduciVoce(0);
 }

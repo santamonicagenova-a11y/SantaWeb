@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.05.09.01 -->
+<!-- versione v 2026.05.09.02 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -120,7 +120,7 @@
   <div class="fs">
     <div class="fs-head">Foto — Sezione &ldquo;La nostra cucina&rdquo;</div>
     <div class="fs-body">
-      <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">Seleziona fino a 6 foto. Quelle compilate sostituiranno le foto nella galleria <strong>La nostra cucina</strong>. La griglia si adatta automaticamente: la prima e l'ultima foto saranno in formato largo.</p>
+      <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">Seleziona fino a 6 foto. Per ognuna verranno generate <strong>due versioni</strong>: una thumbnail leggera mostrata nella griglia e una versione full ad alta definizione visibile cliccando sulla foto. La griglia si adatta automaticamente: la prima e l'ultima foto saranno in formato largo.</p>
       <div id="foto-slots"></div>
       <div style="margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;">
         <button class="btn btn-publish" onclick="pubblicaFotoCucina()">✦ Pubblica foto</button>
@@ -273,29 +273,31 @@ function selezionaFoto(input, idx) {
     var origSizeKB = (file.size / 1024).toFixed(1);
     var altEl = document.getElementById('alt-'+idx);
     var altText = (altEl && altEl.value) || file.name.replace(/\.[^.]+$/, '');
-    
+
     var statusEl = document.getElementById('foto-status');
-    if (statusEl) statusEl.textContent = '⏳ Ottimizzazione foto ' + (idx+1) + '…';
-    
-    ottimizzaImmagine(origDataUrl, function(webpBase64) {
-      if (!webpBase64) {
+    if (statusEl) statusEl.textContent = '⏳ Ottimizzazione foto ' + (idx+1) + ' (full + thumb)…';
+
+    ottimizzaImmagineDoppia(origDataUrl, function(result) {
+      if (!result.full || !result.thumb) {
         if (statusEl) statusEl.textContent = '✗ Errore compressione foto ' + (idx+1);
         return;
       }
-      
-      var compressSizeKB = (webpBase64.length * 0.75 / 1024).toFixed(1);
-      var risparmio = (100 * (1 - compressSizeKB / origSizeKB)).toFixed(1);
-      
+
+      var fullKB = (result.full.length * 0.75 / 1024).toFixed(1);
+      var thumbKB = (result.thumb.length * 0.75 / 1024).toFixed(1);
+
       fotoDati[idx] = {
         file: file,
         dataUrl: origDataUrl,
-        webpBase64: webpBase64,
+        webpFull: result.full,
+        webpThumb: result.thumb,
         src: null,
         alt: altText,
         origSizeKB: origSizeKB,
-        compressSizeKB: compressSizeKB
+        fullKB: fullKB,
+        thumbKB: thumbKB
       };
-      
+
       var thumb = document.getElementById('thumb-'+idx);
       if (thumb) {
         thumb.innerHTML = '';
@@ -304,9 +306,9 @@ function selezionaFoto(input, idx) {
         img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
         thumb.appendChild(img);
       }
-      
+
       if (statusEl) {
-        statusEl.innerHTML = '✓ Foto ' + (idx+1) + ': ' + compressSizeKB + ' KB (era ' + origSizeKB + ' KB, -' + risparmio + '%)';
+        statusEl.innerHTML = '✓ Foto ' + (idx+1) + ': full ' + fullKB + ' KB · thumb ' + thumbKB + ' KB (orig ' + origSizeKB + ' KB)';
         statusEl.style.color = '#2d6a4f';
       }
     });
@@ -327,24 +329,38 @@ async function _eseguiPubblicaFoto(token) {
   var apiBase = 'https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/';
   var photoList = [];
 
+  // Helper: upload file (full o thumb) con check sha pre-esistente
+  async function _uploadFile(filePath, base64, message) {
+    var sha = null;
+    try {
+      var chk = await fetch(apiBase+filePath, { headers: headers });
+      if (chk.ok) { var ex = await chk.json(); sha = ex.sha || null; }
+    } catch(e){}
+    var body = { message: message, content: base64 };
+    if (sha) body.sha = sha;
+    var r = await fetch(apiBase+filePath, { method:'PUT', headers: headers, body: JSON.stringify(body) });
+    return r.ok;
+  }
+
   for (var i=0; i<6; i++) {
     var d = fotoDati[i]; if (!d) continue;
     var altText = (document.getElementById('alt-'+i) ? document.getElementById('alt-'+i).value : '') || d.alt || '';
-    var filePath = 'img/galleria/foto'+(i+1)+'.webp';
-    if (d.file && d.webpBase64) {
-      statusEl.textContent = '⏳ Carico foto '+(i+1)+' (WebP)…';
-      var base64 = d.webpBase64;
-      var sha=null;
-      try { 
-        var chk=await fetch(apiBase+filePath,{headers:headers}); 
-        if(chk.ok){var ex=await chk.json();sha=ex.sha||null;} 
-      } catch(e){}
-      var body={message:'Foto galleria '+(i+1)+' (WebP)',content:base64}; 
-      if(sha) body.sha=sha;
-      var r=await fetch(apiBase+filePath,{method:'PUT',headers:headers,body:JSON.stringify(body)});
-      if(!r.ok){statusEl.style.color='var(--rust)';statusEl.textContent='✗ Errore foto '+(i+1);return;}
+    var fullPath  = 'img/galleria/foto'+(i+1)+'.webp';
+    var thumbPath = 'img/galleria/thumb/foto'+(i+1)+'.webp';
+
+    if (d.file && d.webpFull && d.webpThumb) {
+      // Upload full
+      statusEl.textContent = '⏳ Carico foto '+(i+1)+' full…';
+      if (!(await _uploadFile(fullPath, d.webpFull, 'Foto galleria '+(i+1)+' full (WebP HD)'))) {
+        statusEl.style.color='var(--rust)'; statusEl.textContent='✗ Errore upload full foto '+(i+1); return;
+      }
+      // Upload thumb
+      statusEl.textContent = '⏳ Carico foto '+(i+1)+' thumb…';
+      if (!(await _uploadFile(thumbPath, d.webpThumb, 'Foto galleria '+(i+1)+' thumb (WebP)'))) {
+        statusEl.style.color='var(--rust)'; statusEl.textContent='✗ Errore upload thumb foto '+(i+1); return;
+      }
     }
-    photoList.push({ src:filePath, alt:altText });
+    photoList.push({ src: fullPath, srcThumb: thumbPath, alt: altText });
   }
 
   if (!photoList.length) { statusEl.style.color='var(--rust)'; statusEl.textContent='✗ Nessuna foto selezionata'; return; }
@@ -352,9 +368,9 @@ async function _eseguiPubblicaFoto(token) {
   var jsonB64 = btoa(unescape(encodeURIComponent(JSON.stringify(photoList,null,2))));
   var jSha=null;
   try { var jc=await fetch(apiBase+'gallery-photos.json',{headers:headers}); if(jc.ok){var je=await jc.json();jSha=je.sha||null;} } catch(e){}
-  var jBody={message:'Aggiorno gallery-photos.json',content:jsonB64}; if(jSha) jBody.sha=jSha;
+  var jBody={message:'Aggiorno gallery-photos.json (full+thumb)',content:jsonB64}; if(jSha) jBody.sha=jSha;
   var jRes=await fetch(apiBase+'gallery-photos.json',{method:'PUT',headers:headers,body:JSON.stringify(jBody)});
-  if (jRes.ok) { statusEl.style.color='#2d6a4f'; statusEl.textContent='✓ Foto pubblicate (WebP ottimizzate)! Il sito si aggiornerà entro 90 secondi.'; }
+  if (jRes.ok) { statusEl.style.color='#2d6a4f'; statusEl.textContent='✓ Foto pubblicate (HD + thumb)! Il sito si aggiornerà entro 90 secondi.'; }
   else { statusEl.style.color='var(--rust)'; statusEl.textContent='✗ Errore aggiornamento JSON.'; }
 }
 
@@ -593,6 +609,6 @@ async function _eseguiPubblicaFotoSito(token) {
 <script src="admin-templates-shared.js"></script>
 <script src="admin-core.js"></script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.05.09.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.05.09.02</div>
 </body>
 </html>

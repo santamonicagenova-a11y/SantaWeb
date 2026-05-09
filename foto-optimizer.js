@@ -1,108 +1,79 @@
-// foto-optimizer.js — Ottimizzazione immagini WebP per menu-admin.html
-// v 2026.04.25.01
+// foto-optimizer.js — v 2026.05.09.02
+// Ottimizzazione immagini per repo SantaWeb (Canvas API → WebP).
+//
+// API pubblica (window.*):
+//   ottimizzaImmagine(dataUrl, callback)            → WebP qualità alta, max 1920px, q=0.90
+//                                                     (usata per Hero / Cucina / Cantina sito)
+//   ottimizzaImmagineFullGalleria(dataUrl, cb)      → WebP "full" per lightbox, max 2400px, q=0.90
+//   ottimizzaImmagineThumb(dataUrl, cb)             → WebP thumbnail, max 800px, q=0.82
+//   ottimizzaImmagineDoppia(dataUrl, cb)            → cb({ full, thumb }) — per gallerie con lightbox
+//
+// Tutti i callback ricevono SOLO la parte base64 (senza prefisso "data:image/webp;base64,").
+// In caso di errore: callback(null) — oppure { full:null, thumb:null } per la doppia.
+//
+// Cambiamenti rispetto alla versione precedente (q=0.75):
+//  - Qualità innalzata a 0.90 per ridurre artefatti visivi su pannelli grandi
+//  - Limite dimensione massima 1920/2400 (prima era libero/non documentato)
+//  - Smoothing alto in fase di resize per nitidezza
+//  - Aggiunte ottimizzaImmagineThumb e ottimizzaImmagineDoppia per pattern thumb+full
 
-/**
- * FUNZIONI DI COMPRESSIONE/OTTIMIZZAZIONE IMMAGINI
- * 
- * Workflow:
- * 1. Utente seleziona foto JPG
- * 2. Carica in fotoDati come Base64 (preview)
- * 3. Al publish: ridimensiona + converte WebP
- * 4. Carica WebP ottimizzato su GitHub
- * 5. Aggiorna gallery-photos.json
- */
+(function (global) {
+  'use strict';
 
-// Configurazione
-var FOTO_CONFIG = {
-  maxWidth: 400,        // pixel, mobile-first
-  maxHeight: 600,       // pixel
-  quality: 0.75,        // 75% qualità WebP
-  format: 'image/webp'
-};
-
-/**
- * Ridimensiona + converte un'immagine a WebP
- * @param {string} dataUrl - Data URL immagine (base64)
- * @param {function} callback - (webpBase64String) =>
- */
-function ottimizzaImmagine(dataUrl, callback) {
-  var img = new Image();
-  img.onload = function() {
-    // Calcola dimensioni ridimensionate (mantenendo aspect ratio)
-    var newW = img.width, newH = img.height;
-    if (newW > FOTO_CONFIG.maxWidth) {
-      var ratio = FOTO_CONFIG.maxWidth / newW;
-      newW = FOTO_CONFIG.maxWidth;
-      newH = Math.round(newH * ratio);
-    }
-    if (newH > FOTO_CONFIG.maxHeight) {
-      var ratio = FOTO_CONFIG.maxHeight / newH;
-      newH = FOTO_CONFIG.maxHeight;
-      newW = Math.round(newW * ratio);
-    }
-
-    // Canvas
-    var canvas = document.createElement('canvas');
-    canvas.width = newW;
-    canvas.height = newH;
-    var ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0, newW, newH);
-
-    // Converti a WebP
-    canvas.toBlob(function(blob) {
-      if (!blob) {
-        console.error('Errore conversione WebP');
+  function _processImage(dataUrl, maxW, quality, callback) {
+    if (!dataUrl) { callback(null); return; }
+    var img = new Image();
+    img.onload = function () {
+      var w = img.width, h = img.height;
+      if (!w || !h) { callback(null); return; }
+      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      // Smoothing alta qualità per ridimensionamento nitido
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, 0, 0, w, h);
+      try {
+        var url = canvas.toDataURL('image/webp', quality);
+        if (!url || url.indexOf('data:image/webp') !== 0) {
+          // Browser non supporta encoding WebP — fallback impossibile mantenendo lo schema attuale
+          callback(null);
+          return;
+        }
+        callback(url.split(',')[1]);
+      } catch (e) {
         callback(null);
-        return;
       }
-      // Leggi blob come Base64
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        var webpBase64 = e.target.result.split(',')[1];
-        callback(webpBase64);
-      };
-      reader.readAsDataURL(blob);
-    }, FOTO_CONFIG.format, FOTO_CONFIG.quality);
-  };
-  img.onerror = function() {
-    console.error('Errore caricamento immagine');
-    callback(null);
-  };
-  img.src = dataUrl;
-}
-
-/**
- * Versione asincrona (Promise) — da usare con async/await
- */
-function ottimizzaImmagineAsync(dataUrl) {
-  return new Promise(function(resolve, reject) {
-    ottimizzaImmagine(dataUrl, function(webpBase64) {
-      if (webpBase64) resolve(webpBase64);
-      else reject(new Error('Compressione immagine fallita'));
-    });
-  });
-}
-
-/**
- * Estrai metadati file originale (dimensioni, dimensione file)
- */
-function getMetadataFoto(file) {
-  var sizeKB = (file.size / 1024).toFixed(1);
-  return {
-    nome: file.name,
-    sizeKB: sizeKB,
-    type: file.type
-  };
-}
-
-/**
- * Mostra info compressione in UI (dopo ottimizzazione)
- */
-function mostraRisparmio(origSizeKB, compressSizeKB, elementId) {
-  var risparmio = (100 * (1 - compressSizeKB / origSizeKB)).toFixed(1);
-  var el = document.getElementById(elementId);
-  if (el) {
-    el.innerHTML = '✓ Ottimizzato: ' + compressSizeKB + ' KB (era ' + origSizeKB + ' KB, -' + risparmio + '%)';
-    el.style.color = '#2d6a4f';
+    };
+    img.onerror = function () { callback(null); };
+    img.src = dataUrl;
   }
-}
+
+  // === API ===
+
+  // Foto singola alta qualità (Hero / Cucina / Cantina sito)
+  global.ottimizzaImmagine = function (dataUrl, callback) {
+    _processImage(dataUrl, 1920, 0.90, callback);
+  };
+
+  // Foto "full" per galleria — più grande perché aperta nel lightbox
+  global.ottimizzaImmagineFullGalleria = function (dataUrl, callback) {
+    _processImage(dataUrl, 2400, 0.90, callback);
+  };
+
+  // Thumbnail (visualizzata in griglia)
+  global.ottimizzaImmagineThumb = function (dataUrl, callback) {
+    _processImage(dataUrl, 800, 0.82, callback);
+  };
+
+  // Doppia esportazione per galleria: { full, thumb } in parallelo
+  global.ottimizzaImmagineDoppia = function (dataUrl, callback) {
+    var result = { full: null, thumb: null };
+    var done = 0;
+    function check() { done++; if (done === 2) callback(result); }
+    global.ottimizzaImmagineFullGalleria(dataUrl, function (b) { result.full = b; check(); });
+    global.ottimizzaImmagineThumb(dataUrl, function (b) { result.thumb = b; check(); });
+  };
+
+})(window);

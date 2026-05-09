@@ -121,6 +121,7 @@
   .pf-group textarea { min-height: 80px; }
   .pf-group select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233a3630' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; padding-right: 1.5rem; }
   .pf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .pf-hint { font-size: 0.7rem; color: var(--ink-soft); margin: -0.8rem 0 1.5rem; font-style: italic; }
   .pf-status { display: none; margin-top: 1rem; font-size: 0.85rem; padding: 0.75rem 1rem; }
   .pf-status.success { display: block; background: #eaf3de; color: #3b6d11; }
   .pf-status.error { display: block; background: #fcebeb; color: #a32d2d; }
@@ -365,10 +366,12 @@
           <form id="prenota-form" action="https://formspree.io/f/mkopjnvq" method="POST">
             <input type="hidden" name="tipo" id="p-tipo" value="standard">
             <input type="hidden" name="_subject" id="p-subject" value="Prenotazione tavolo - Santamonica">
+            <div class="pf-group"><label for="p-nome" data-i18n="prenota_f_nome">Nome</label><input type="text" id="p-nome" name="nome" required></div>
             <div class="pf-row">
-              <div class="pf-group"><label for="p-nome" data-i18n="prenota_f_nome">Nome</label><input type="text" id="p-nome" name="nome" required></div>
-              <div class="pf-group"><label for="p-tel" data-i18n="prenota_f_tel">Telefono</label><input type="tel" id="p-tel" name="telefono" required></div>
+              <div class="pf-group"><label for="p-tel" data-i18n="prenota_f_tel">Telefono</label><input type="tel" id="p-tel" name="telefono"></div>
+              <div class="pf-group"><label for="p-email" data-i18n="prenota_f_email">Email</label><input type="email" id="p-email" name="email"></div>
             </div>
+            <p class="pf-hint" data-i18n="prenota_contatto_hint">Almeno uno tra telefono ed email &egrave; obbligatorio.</p>
             <div class="pf-row">
               <div class="pf-group"><label for="p-data" data-i18n="prenota_f_data">Data desiderata</label><input type="date" id="p-data" name="data" required></div>
               <div class="pf-group">
@@ -393,7 +396,7 @@
                 <option value="Altro" data-i18n="prenota_f_occ6">Altro</option>
               </select>
             </div>
-            <div class="pf-group"><label for="p-intolleranze" data-i18n="prenota_f_intolleranze">Intolleranze o allergie</label><input type="text" id="p-intolleranze" name="intolleranze"></div>
+            <div class="pf-group"><label for="p-intolleranze" data-i18n="prenota_f_intolleranze">Intolleranze o allergie *</label><input type="text" id="p-intolleranze" name="intolleranze" required data-i18n-placeholder="prenota_f_intolleranze_ph" placeholder="Scrivi 'nessuna' se non hai allergie"></div>
             <div class="pf-group"><label for="p-richieste" data-i18n="prenota_f_richieste">Richieste particolari</label><textarea id="p-richieste" name="richieste"></textarea></div>
             <div style="margin-top:1.5rem;">
               <button type="submit" id="prenota-btn" class="btn-primary" style="cursor:pointer;font-family:'Jost',sans-serif;border:none;width:100%;text-align:center;" data-i18n="prenota_f_btn">Invia la richiesta</button>
@@ -484,7 +487,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.05.09.03</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.05.09.04</a></p>
   </div>
 </footer>
 
@@ -521,6 +524,10 @@
       var key = el.getAttribute('data-i18n');
       if (t[key] !== undefined) el.innerHTML = t[key];
     });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n-placeholder');
+      if (t[key] !== undefined) el.setAttribute('placeholder', t[key]);
+    });
     var menuBtn = document.getElementById('menu-btn');
     if (menuBtn && t.cucina_btn_link) menuBtn.href = t.cucina_btn_link;
     var dolciBtn = document.getElementById('dolci-btn');
@@ -552,6 +559,14 @@
   var pStatus = document.getElementById('prenota-status');
   pForm.addEventListener('submit', async function(e) {
     e.preventDefault(); pBtn.disabled = true;
+    var telVal = document.getElementById('p-tel').value.trim();
+    var emailVal = document.getElementById('p-email').value.trim();
+    if (!telVal && !emailVal) {
+      pStatus.textContent = (T[currentLang] && T[currentLang].prenota_err_contatto) || 'Inserisci almeno un contatto tra telefono ed email.';
+      pStatus.className = 'pf-status error';
+      pBtn.disabled = false;
+      return;
+    }
     var occVal = document.getElementById('p-occasione').value;
     var isSpeciale = occVal && occVal !== 'Cena standard';
     document.getElementById('p-tipo').value = isSpeciale ? 'speciale' : 'standard';

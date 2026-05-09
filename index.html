@@ -165,18 +165,6 @@
   .menu-close { position: absolute; top: 1.5rem; right: 2rem; background: none; border: none; cursor: pointer; font-size: 1.5rem; color: var(--ink); }
   .mobile-lang-select { font-family: 'Jost', sans-serif; font-size: 0.78rem; letter-spacing: 0.15em; border: 1px solid var(--divider); padding: 0.5rem 1rem; background: transparent; color: var(--ink); cursor: pointer; outline: none; margin-top: 0.5rem; }
 
-  #booking-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(26,24,20,0.75); display: flex; align-items: center; justify-content: center; padding: 1.5rem; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
-  #booking-overlay.visible { opacity: 1; pointer-events: all; }
-  #booking-popup { background: var(--warm-white); max-width: 480px; width: 100%; padding: 3rem; position: relative; transform: translateY(24px); transition: transform 0.4s ease; }
-  #booking-overlay.visible #booking-popup { transform: translateY(0); }
-  #booking-popup .popup-label { font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 1rem; display: block; }
-  #booking-popup h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; line-height: 1.1; margin-bottom: 1rem; }
-  #booking-popup h2 em { font-style: italic; color: var(--terracotta); }
-  #booking-popup p { font-size: 0.85rem; line-height: 1.75; color: var(--ink-soft); margin-bottom: 2rem; }
-  #booking-popup .popup-actions { display: flex; flex-direction: column; gap: 0.75rem; }
-  .popup-close { position: absolute; top: 1.2rem; right: 1.2rem; background: none; border: none; cursor: pointer; font-size: 1.1rem; color: var(--ink-soft); padding: 0.25rem; }
-  .popup-skip { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-soft); background: none; border: none; cursor: pointer; text-align: center; padding: 0.4rem; }
-
   #cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; background: var(--ink); padding: 1.2rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; border-top: 2px solid var(--terracotta); transform: translateY(100%); transition: transform 0.4s ease; }
   #cookie-banner.visible { transform: translateY(0); }
   #cookie-banner p { font-size: 0.78rem; line-height: 1.6; color: rgba(245,240,232,0.85); max-width: 700px; }
@@ -303,8 +291,8 @@
 </section>
 
 <div class="quote-section">
-  <p class="quote-text" data-i18n="quote_text">&ldquo;Be nice to people. We&rsquo;re all trying our best.&rdquo;</p>
-  <p class="quote-attr" data-i18n="quote_attr">&mdash; Monica &amp; Andrea</p>
+  <p class="quote-text">Un ristorante dovrebbe farti stare meglio di quando sei entrato. Tutto il resto viene dopo.</p>
+  <p class="quote-attr">&mdash; Monica &amp; Andrea</p>
 </div>
 
 <section class="galleria-section" id="galleria">
@@ -505,19 +493,6 @@
   <button id="lightbox-next">&#x203a;</button>
 </div>
 
-<div id="booking-overlay" role="dialog" aria-modal="true">
-  <div id="booking-popup">
-    <button class="popup-close" id="popup-close">&#x2715;</button>
-    <span class="popup-label" data-i18n="popup_label">Prenota ora</span>
-    <h2 data-i18n="popup_title">Un tavolo <em>sul mare</em></h2>
-    <p data-i18n="popup_text">Siamo aperti dal marted&igrave; alla domenica. Prenota il tuo tavolo e vivi un&rsquo;esperienza di cucina ligure autentica.</p>
-    <div class="popup-actions">
-      <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" class="btn-primary" style="text-align:center;" onclick="closePopup()" data-i18n="popup_btn">Prenota su TheFork</a>
-      <button class="popup-skip" id="popup-skip" data-i18n="popup_skip">Magari un&rsquo;altra volta</button>
-    </div>
-  </div>
-</div>
-
 <div id="cookie-banner" role="dialog" aria-label="Consenso cookie">
   <p data-i18n="cookie_text">Questo sito utilizza cookie tecnici necessari al funzionamento e, previo consenso, cookie analitici (Google Analytics) per migliorare l&rsquo;esperienza di navigazione. Leggi la nostra <a href="/privacy-policy">Privacy Policy</a> e <a href="/cookies">Cookie Policy</a>.</p>
   <div class="cookie-actions">
@@ -627,12 +602,6 @@
   document.getElementById('lightbox-next').addEventListener('click', function() { changeLightbox(1); });
   document.getElementById('lightbox').addEventListener('click', function(e) { if (e.target === this) closeLightbox(); });
   document.addEventListener('keydown', function(e) { if (!document.getElementById('lightbox').classList.contains('visible')) return; if (e.key === 'Escape') closeLightbox(); if (e.key === 'ArrowLeft') changeLightbox(-1); if (e.key === 'ArrowRight') changeLightbox(1); });
-
-  function closePopup() { document.getElementById('booking-overlay').classList.remove('visible'); }
-  if (!sessionStorage.getItem('popup-shown')) { setTimeout(function() { document.getElementById('booking-overlay').classList.add('visible'); sessionStorage.setItem('popup-shown', '1'); }, 5000); }
-  document.getElementById('popup-close').addEventListener('click', closePopup);
-  document.getElementById('popup-skip').addEventListener('click', closePopup);
-  document.getElementById('booking-overlay').addEventListener('click', function(e) { if (e.target === this) closePopup(); });
 
   function loadGA() { var s = document.createElement('script'); s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-YP71EKXSXX'; document.head.appendChild(s); window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } window.gtag = gtag; gtag('js', new Date()); gtag('config', 'G-YP71EKXSXX', { anonymize_ip: true }); }
   var banner = document.getElementById('cookie-banner');

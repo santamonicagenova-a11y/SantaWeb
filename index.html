@@ -228,7 +228,7 @@
       <option value="de">DE</option>
       <option value="es">ES</option>
     </select>
-    <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" class="nav-cta" data-i18n="nav_prenota">Prenota</a>
+    <a href="#prenota" class="nav-cta" data-i18n="nav_prenota">Prenota</a>
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
@@ -247,7 +247,7 @@
     <option value="de">DE — Deutsch</option>
     <option value="es">ES — Espa&ntilde;ol</option>
   </select>
-  <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" style="font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-style:normal;background:var(--ink);color:var(--warm-white);padding:0.9rem 2.5rem;" data-i18n="nav_prenota">Prenota</a>
+  <a href="#prenota" style="font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-style:normal;background:var(--ink);color:var(--warm-white);padding:0.9rem 2.5rem;" data-i18n="nav_prenota">Prenota</a>
 </div>
 
 <section class="hero" style="padding:0;position:relative;">
@@ -256,13 +256,13 @@
     <h1 class="hero-title" data-i18n="hero_title">Cucina <em>viva</em><br>sul mare</h1>
     <p class="hero-desc" data-i18n="hero_desc">Un progetto in costante divenire, basato sull&rsquo;attenzione al gusto e sulla qualit&agrave; della materia prima. Pesce di Camogli, verdure dell&rsquo;orto genovese, pasta e pane di nostra produzione.</p>
     <div class="hero-actions">
-      <a href="https://widget.thefork.com/2a3a7eb3-cf6b-4252-8451-c68ffd53d4df" target="_blank" class="btn-primary" data-i18n="hero_btn_prenota">Prenota un tavolo</a>
+      <a href="#prenota" class="btn-primary" data-i18n="hero_btn_prenota">Prenota un tavolo</a>
       <a href="#cucina" class="btn-secondary" data-i18n="hero_btn_menu">Scopri il menu</a>
     </div>
     <div class="hero-scroll-indicator" data-i18n="hero_scorri">Scorri</div>
   </div>
   <div class="hero-image-panel">
-    <img src="https://static.wixstatic.com/media/461837_f0bd06030a2e4549aa5125dfe974a199~mv2.jpg" alt="Santamonica ristorante Genova" loading="eager">
+    <img src="img/hero.jpg" data-img-key="hero" alt="Santamonica ristorante Genova" loading="eager">
   </div>
 </section>
 
@@ -283,8 +283,8 @@
         </div>
       </div>
       <div class="cucina-images reveal" style="transition-delay:0.15s">
-        <img src="https://static.wixstatic.com/media/461837_166ee198f58246e68b5dba24fc9b68ef~mv2.jpg" alt="Cucina Santamonica">
-        <img src="https://static.wixstatic.com/media/461837_d7446c2748b64bd4acdb089d7c65bf7d~mv2.jpg" alt="Ingredienti freschi">
+        <img src="img/cucina-piatto.jpg" data-img-key="cucina_piatto" alt="Cucina Santamonica">
+        <img src="img/cucina-ingredienti.jpg" data-img-key="cucina_ingredienti" alt="Ingredienti freschi">
       </div>
     </div>
   </div>
@@ -307,7 +307,7 @@
   <div class="section-inner">
     <div class="cantina-grid">
       <div class="cantina-image reveal">
-        <img src="https://static.wixstatic.com/media/461837_b23457903272448a817a539cb9aadc62~mv2.jpeg" alt="Cantina vini Santamonica">
+        <img src="img/cantina.jpg" data-img-key="cantina" alt="Cantina vini Santamonica">
       </div>
       <div class="reveal" style="transition-delay:0.15s">
         <p class="section-label" data-i18n="cantina_label">I nostri vini</p>
@@ -482,7 +482,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.04.20.02</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.05.09.01</a></p>
   </div>
 </footer>
 
@@ -594,6 +594,18 @@
     .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
     .then(function(d) { buildGallery(d && d.length ? d : galleryDefaults); })
     .catch(function() { buildGallery(galleryDefaults); });
+
+  // Immagini sezioni statiche (hero, cucina, cantina) — caricate da form admin
+  fetch('site-images.json?t=' + Date.now(), { cache: 'no-store' })
+    .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
+    .then(function(d) {
+      document.querySelectorAll('[data-img-key]').forEach(function(el) {
+        var k = el.getAttribute('data-img-key');
+        if (d[k] && d[k].src) el.src = d[k].src;
+        if (d[k] && d[k].alt) el.alt = d[k].alt;
+      });
+    })
+    .catch(function() { /* fallback: src locali gi\u00e0 presenti negli <img> */ });
   function openLightbox(i) { currentImg = i; document.getElementById('lightbox-img').src = galleryImages[i].src; document.getElementById('lightbox').classList.add('visible'); document.body.style.overflow = 'hidden'; }
   function closeLightbox() { document.getElementById('lightbox').classList.remove('visible'); document.body.style.overflow = ''; }
   function changeLightbox(dir) { currentImg = (currentImg + dir + galleryImages.length) % galleryImages.length; document.getElementById('lightbox-img').src = galleryImages[currentImg].src; }

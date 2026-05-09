@@ -337,18 +337,18 @@
 
 <section class="prenota-section" id="prenota">
   <div class="section-inner">
-    <p class="section-label reveal" data-i18n="prenota_label">Hai qualcosa da festeggiare?</p>
-    <h2 class="section-title reveal" data-i18n="prenota_title">Organizza una serata <em>speciale</em></h2>
+    <p class="section-label reveal" data-i18n="prenota_label">Prenota un tavolo</p>
+    <h2 class="section-title reveal" data-i18n="prenota_title">Riserva la tua <em>serata</em></h2>
     <div class="prenota-grid">
       <div class="reveal">
         <div class="prenota-intro">
-          <p data-i18n="prenota_p1">Che sia un compleanno, un anniversario o una cena aziendale, ci piace sapere in anticipo per prepararci al meglio ad accoglierti.</p>
-          <p data-i18n="prenota_p2">Raccontaci la tua occasione e le tue esigenze: faremo in modo che ogni dettaglio sia curato.</p>
+          <p data-i18n="prenota_p1">Compila il modulo per riservare un tavolo. Ti ricontattiamo a conferma.</p>
+          <p data-i18n="prenota_p2">Se &egrave; un&rsquo;occasione speciale &mdash; compleanno, anniversario, cena di lavoro &mdash; segnalacelo: cureremo ogni dettaglio.</p>
         </div>
         <div class="prenota-highlights">
           <div class="prenota-highlight">
             <div class="prenota-highlight-icon">&#x1F942;</div>
-            <div class="prenota-highlight-text"><strong data-i18n="prenota_h1_title">Occasioni speciali</strong><span data-i18n="prenota_h1_text">Compleanni, anniversari, proposte di matrimonio &mdash; creiamo l&rsquo;atmosfera giusta.</span></div>
+            <div class="prenota-highlight-text"><strong data-i18n="prenota_h1_title">Occasione speciale?</strong><span data-i18n="prenota_h1_text">Compleanni, anniversari, proposte &mdash; selezionala nel form e creiamo l&rsquo;atmosfera giusta.</span></div>
           </div>
           <div class="prenota-highlight">
             <div class="prenota-highlight-icon">&#x1F33F;</div>
@@ -363,7 +363,8 @@
       <div class="reveal" style="transition-delay:0.15s">
         <div class="prenota-form-box">
           <form id="prenota-form" action="https://formspree.io/f/mkopjnvq" method="POST">
-            <input type="hidden" name="_subject" value="Richiesta prenotazione speciale - Santamonica">
+            <input type="hidden" name="tipo" id="p-tipo" value="standard">
+            <input type="hidden" name="_subject" id="p-subject" value="Prenotazione tavolo - Santamonica">
             <div class="pf-row">
               <div class="pf-group"><label for="p-nome" data-i18n="prenota_f_nome">Nome</label><input type="text" id="p-nome" name="nome" required></div>
               <div class="pf-group"><label for="p-tel" data-i18n="prenota_f_tel">Telefono</label><input type="tel" id="p-tel" name="telefono" required></div>
@@ -380,15 +381,16 @@
               </div>
             </div>
             <div class="pf-group">
-              <label for="p-occasione" data-i18n="prenota_f_occasione">Occasione</label>
+              <label for="p-occasione" data-i18n="prenota_f_occasione">Occasione (opzionale)</label>
               <select id="p-occasione" name="occasione">
                 <option value="" disabled selected data-i18n="prenota_f_occasione_sel">Seleziona</option>
-                <option data-i18n="prenota_f_occ1">Compleanno</option>
-                <option data-i18n="prenota_f_occ2">Anniversario</option>
-                <option data-i18n="prenota_f_occ3">Proposta di matrimonio</option>
-                <option data-i18n="prenota_f_occ4">Cena di lavoro</option>
-                <option data-i18n="prenota_f_occ5">Cena romantica</option>
-                <option data-i18n="prenota_f_occ6">Altro</option>
+                <option value="Cena standard" data-i18n="prenota_f_occ_standard">Cena standard</option>
+                <option value="Compleanno" data-i18n="prenota_f_occ1">Compleanno</option>
+                <option value="Anniversario" data-i18n="prenota_f_occ2">Anniversario</option>
+                <option value="Proposta di matrimonio" data-i18n="prenota_f_occ3">Proposta di matrimonio</option>
+                <option value="Cena di lavoro" data-i18n="prenota_f_occ4">Cena di lavoro</option>
+                <option value="Cena romantica" data-i18n="prenota_f_occ5">Cena romantica</option>
+                <option value="Altro" data-i18n="prenota_f_occ6">Altro</option>
               </select>
             </div>
             <div class="pf-group"><label for="p-intolleranze" data-i18n="prenota_f_intolleranze">Intolleranze o allergie</label><input type="text" id="p-intolleranze" name="intolleranze"></div>
@@ -482,7 +484,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.05.09.02</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.05.09.03</a></p>
   </div>
 </footer>
 
@@ -550,6 +552,10 @@
   var pStatus = document.getElementById('prenota-status');
   pForm.addEventListener('submit', async function(e) {
     e.preventDefault(); pBtn.disabled = true;
+    var occVal = document.getElementById('p-occasione').value;
+    var isSpeciale = occVal && occVal !== 'Cena standard';
+    document.getElementById('p-tipo').value = isSpeciale ? 'speciale' : 'standard';
+    document.getElementById('p-subject').value = isSpeciale ? 'Prenotazione speciale - Santamonica' : 'Prenotazione tavolo - Santamonica';
     try {
       var res = await fetch(pForm.action, { method: 'POST', body: new FormData(pForm), headers: { 'Accept': 'application/json' } });
       if (res.ok) { pStatus.textContent = T[currentLang] ? T[currentLang].prenota_ok : 'Inviato!'; pStatus.className = 'pf-status success'; pForm.reset(); }

@@ -262,7 +262,7 @@
     <div class="hero-scroll-indicator" data-i18n="hero_scorri">Scorri</div>
   </div>
   <div class="hero-image-panel">
-    <img src="img/hero.jpg" data-img-key="hero" alt="Santamonica ristorante Genova" loading="eager">
+    <img src="img/hero.jpg" data-img-key="hero" alt="Santamonica ristorante Genova" loading="eager" decoding="async">
   </div>
 </section>
 
@@ -283,8 +283,8 @@
         </div>
       </div>
       <div class="cucina-images reveal" style="transition-delay:0.15s">
-        <img src="img/cucina-piatto.jpg" data-img-key="cucina_piatto" alt="Cucina Santamonica">
-        <img src="img/cucina-ingredienti.jpg" data-img-key="cucina_ingredienti" alt="Ingredienti freschi">
+        <img src="img/cucina-piatto.jpg" data-img-key="cucina_piatto" alt="Cucina Santamonica" loading="lazy" decoding="async">
+        <img src="img/cucina-ingredienti.jpg" data-img-key="cucina_ingredienti" alt="Ingredienti freschi" loading="lazy" decoding="async">
       </div>
     </div>
   </div>
@@ -307,7 +307,7 @@
   <div class="section-inner">
     <div class="cantina-grid">
       <div class="cantina-image reveal">
-        <img src="img/cantina.jpg" data-img-key="cantina" alt="Cantina vini Santamonica">
+        <img src="img/cantina.jpg" data-img-key="cantina" alt="Cantina vini Santamonica" loading="lazy" decoding="async">
       </div>
       <div class="reveal" style="transition-delay:0.15s">
         <p class="section-label" data-i18n="cantina_label">I nostri vini</p>
@@ -482,7 +482,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.05.09.01</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v2026.05.09.02</a></p>
   </div>
 </footer>
 
@@ -573,7 +573,11 @@
       if (i > 0) div.style.transitionDelay = (i * 0.05) + 's';
       div.onclick = (function(idx){ return function(){ openLightbox(idx); }; })(i);
       var img = document.createElement('img');
-      img.src = p.src; img.alt = p.alt || '';
+      // In griglia uso la thumbnail (caricamento veloce); fallback a src se manca srcThumb
+      img.src = p.srcThumb || p.src;
+      img.alt = p.alt || '';
+      img.loading = 'lazy';
+      img.decoding = 'async';
       div.appendChild(img);
       grid.appendChild(div);
     });

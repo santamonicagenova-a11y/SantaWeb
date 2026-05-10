@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Pagine private (stampa menu) — non indicizzare
+Disallow: /menu-it.html
+Disallow: /menu-dolci-it.html
+
+# Admin e login — non indicizzare
+Disallow: /login.html
+
+# Sitemap
+Sitemap: https://santamonicagenova.it/sitemap.xml

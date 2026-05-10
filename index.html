@@ -3,7 +3,92 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Santamonica — Genova</title>
+<title>Ristorante Santamonica Genova | Pesce Fresco Gourmet sul Lungomare</title>
+<meta name="description" content="Ristorante gourmet di pesce fresco sul Lungomare Lombardo di Genova. Cucina del territorio ligure, cantina curata, vista mare. Prenota il tuo tavolo online.">
+<meta name="robots" content="index, follow">
+
+<!-- Canonical -->
+<link rel="canonical" href="https://santamonicagenova.it/">
+
+<!-- Hreflang – stessa URL, lingue gestite via JS -->
+<link rel="alternate" hreflang="it" href="https://santamonicagenova.it/">
+<link rel="alternate" hreflang="en" href="https://santamonicagenova.it/">
+<link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/">
+<link rel="alternate" hreflang="de" href="https://santamonicagenova.it/">
+<link rel="alternate" hreflang="es" href="https://santamonicagenova.it/">
+<link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="restaurant">
+<meta property="og:title" content="Ristorante Santamonica Genova | Pesce Fresco Gourmet sul Lungomare">
+<meta property="og:description" content="Ristorante gourmet di pesce fresco sul Lungomare Lombardo di Genova. Cucina del territorio ligure, cantina curata, vista mare.">
+<meta property="og:url" content="https://santamonicagenova.it/">
+<meta property="og:image" content="https://santamonicagenova.it/img/hero.jpg">
+<meta property="og:locale" content="it_IT">
+<meta property="og:site_name" content="Santamonica Ristorante Genova">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ristorante Santamonica Genova | Pesce Fresco Gourmet">
+<meta name="twitter:description" content="Ristorante gourmet di pesce fresco sul Lungomare Lombardo di Genova. Prenota online.">
+<meta name="twitter:image" content="https://santamonicagenova.it/img/hero.jpg">
+
+<!-- Schema.org JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  "name": "Santamonica",
+  "description": "Ristorante gourmet di pesce fresco sul Lungomare Lombardo di Genova. Cucina del territorio ligure, cantina curata, vista mare.",
+  "url": "https://santamonicagenova.it",
+  "image": "https://santamonicagenova.it/img/hero.jpg",
+  "telephone": "+390105533155",
+  "email": "santamonicagenova@gmail.com",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Lungomare Lombardo 27",
+    "addressLocality": "Genova",
+    "addressRegion": "GE",
+    "postalCode": "16145",
+    "addressCountry": "IT"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": 44.391346,
+    "longitude": 8.964702
+  },
+  "servesCuisine": ["Cucina di Mare", "Cucina Ligure", "Pesce Fresco", "Gourmet"],
+  "priceRange": "€€€",
+  "currenciesAccepted": "EUR",
+  "paymentAccepted": "Cash, Credit Card",
+  "menu": "https://santamonicagenova.it/menu-it.html",
+  "hasMap": "https://www.openstreetmap.org/?mlat=44.391346&mlon=8.964702",
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": "Tuesday",
+      "opens": "19:30",
+      "closes": "22:30"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Wednesday","Thursday","Friday","Saturday"],
+      "opens": "12:30",
+      "closes": "22:30"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": "Sunday",
+      "opens": "12:30",
+      "closes": "14:30"
+    }
+  ],
+  "sameAs": [
+    "https://www.instagram.com/ristorantesantamonica/",
+    "https://www.facebook.com/santamonicage"
+  ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -265,7 +350,7 @@
     <div class="hero-scroll-indicator" data-i18n="hero_scorri">Scorri</div>
   </div>
   <div class="hero-image-panel">
-    <img src="img/hero.jpg" data-img-key="hero" alt="Santamonica ristorante Genova" loading="eager" decoding="async">
+    <img src="img/hero.jpg" data-img-key="hero" alt="Vista del ristorante Santamonica sul Lungomare Lombardo di Genova con vista mare" loading="eager" decoding="async">
   </div>
 </section>
 
@@ -281,13 +366,13 @@
           <p data-i18n="cucina_p3">Una cucina elegante, in cui anche l&rsquo;estetica e il piatto fisico hanno la loro importanza &mdash; partendo dalla tradizione per diventare contemporanei.</p>
         </div>
         <div class="cucina-actions">
-          <a id="menu-btn" href="menu-it.html" target="_blank" class="btn-primary" data-i18n="cucina_btn">Guarda il men&ugrave;</a>
-          <a id="dolci-btn" href="menu-dolci-it.html" target="_blank" class="btn-secondary" data-i18n="dolci_btn">Men&ugrave; dolci</a>
+          <a id="menu-btn" href="menu.html" target="_blank" class="btn-primary" data-i18n="cucina_btn">Guarda il men&ugrave;</a>
+          <a id="dolci-btn" href="menu-dolci.html" target="_blank" class="btn-secondary" data-i18n="dolci_btn">Men&ugrave; dolci</a>
         </div>
       </div>
       <div class="cucina-images reveal" style="transition-delay:0.15s">
-        <img src="img/cucina-piatto.jpg" data-img-key="cucina_piatto" alt="Cucina Santamonica" loading="lazy" decoding="async">
-        <img src="img/cucina-ingredienti.jpg" data-img-key="cucina_ingredienti" alt="Ingredienti freschi" loading="lazy" decoding="async">
+        <img src="img/cucina-piatto.jpg" data-img-key="cucina_piatto" alt="Piatto gourmet di pesce fresco del ristorante Santamonica Genova" loading="lazy" decoding="async">
+        <img src="img/cucina-ingredienti.jpg" data-img-key="cucina_ingredienti" alt="Ingredienti freschi liguri: pesce di Camogli e verdure dell'orto genovese" loading="lazy" decoding="async">
       </div>
     </div>
   </div>
@@ -310,7 +395,7 @@
   <div class="section-inner">
     <div class="cantina-grid">
       <div class="cantina-image reveal">
-        <img src="img/cantina.jpg" data-img-key="cantina" alt="Cantina vini Santamonica" loading="lazy" decoding="async">
+        <img src="img/cantina.jpg" data-img-key="cantina" alt="Cantina con selezione di vini liguri del ristorante Santamonica Genova" loading="lazy" decoding="async">
       </div>
       <div class="reveal" style="transition-delay:0.15s">
         <p class="section-label" data-i18n="cantina_label">I nostri vini</p>
@@ -530,6 +615,22 @@
       var key = el.getAttribute('data-i18n-placeholder');
       if (t[key] !== undefined) el.setAttribute('placeholder', t[key]);
     });
+    // Aggiorna title e meta description per SEO e social sharing
+    if (t.page_title) {
+      document.title = t.page_title;
+      var ogTitle = document.querySelector('meta[property="og:title"]');
+      var twTitle = document.querySelector('meta[name="twitter:title"]');
+      if (ogTitle) ogTitle.setAttribute('content', t.page_title);
+      if (twTitle) twTitle.setAttribute('content', t.page_title);
+    }
+    if (t.page_description) {
+      var metaDesc = document.querySelector('meta[name="description"]');
+      var ogDesc = document.querySelector('meta[property="og:description"]');
+      var twDesc = document.querySelector('meta[name="twitter:description"]');
+      if (metaDesc) metaDesc.setAttribute('content', t.page_description);
+      if (ogDesc) ogDesc.setAttribute('content', t.page_description);
+      if (twDesc) twDesc.setAttribute('content', t.page_description);
+    }
     var menuBtn = document.getElementById('menu-btn');
     if (menuBtn && t.cucina_btn_link) menuBtn.href = t.cucina_btn_link;
     var dolciBtn = document.getElementById('dolci-btn');

@@ -6,6 +6,8 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://santamonicagenova.it/menu-en.html">
   <title>Menu — Santamonica</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
@@ -197,9 +199,19 @@
     }
     .piatto-desc {
       font-style: italic;
-      font-size: .82rem;
+      font-size: 0.7em;
+      line-height: 1.25;
       color: var(--stone);
       display: block;
+      margin-top: 0.3mm;
+    }
+    .percorso-desc {
+      font-style: italic;
+      font-size: 0.7em;
+      line-height: 1.25;
+      color: var(--stone);
+      display: block;
+      margin-top: 0.3mm;
     }
     .piatto-staccato { margin-top: 3.5mm; }
 
@@ -349,7 +361,7 @@
     ══════════════════════════════════════ */
     @media print {
       @page { size: A4 portrait; margin: 0; }
-      html { font-size: 20px; } /* +50% leggibilita\u0301 stampa (v 2026.05.13.01) */
+      html { font-size: 24px; } /* +50% leggibilita\u0301 stampa (v 2026.05.13.01) */
       body { background: white; }
       .ctrl-bar { display: none; }
 
@@ -419,7 +431,7 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "&quot;Tournedos à la Rossini&quot;",
+          "nome": "&quot;Tournedos à la Rossini&quot;?",
           "sostenibile": true
         },
         {
@@ -663,9 +675,10 @@ function buildDegu(degu) {
           <div class="percorso-piatto percorso-libero">${piatti}</div>
         </div>`;
     } else {
-      const righe = piatti.map(p =>
-        `<div class="percorso-piatto${p.sostenibile ? ' eco' : ''}">${p.nome}</div>`
-      ).join('');
+      const righe = piatti.map(p => {
+        const descHtml = p.descrizione ? `<span class="percorso-desc">${p.descrizione}</span>` : '';
+        return `<div class="percorso-piatto${p.sostenibile ? ' eco' : ''}">${p.nome}${descHtml}</div>`;
+      }).join('');
       percorsiHtml += `
         <div class="percorso">
           <div class="percorso-label">&ldquo;${n}&rdquo;</div>

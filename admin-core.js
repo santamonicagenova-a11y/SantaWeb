@@ -1,4 +1,6 @@
 // Core functions per menu-admin Santamonica
+// v 2026.05.14.02 — Inversione menu.html (pubblico, SEO) ↔ menu-it.html (admin/preview)
+//                + iniezione meta SEO sui file pubblici
 // v 2026.05.14.01 — Proxy DeepL via Vercel function (bypass CORS) + report errori traduzione
 
 // ═══════════════════════════════════════════════════════
@@ -552,19 +554,64 @@ function eseguiPubblicazione(token) {
   // Ricostruisci SEMPRE l'output dal form aggiornato (non da outputCorrente)
   outputCorrente = costruisciOutput();
 
-  // File da pubblicare: IT + 4 traduzioni
-  outputCorrente = costruisciOutput();
+  // ── Helper: inietta meta SEO completi sul file menu.html (versione IT pubblica)
+  function iniettaSeoITPubblico(html) {
+    var SEO_HEAD = '<meta name="description" content="Scopri il menu del ristorante Santamonica a Genova: pesce fresco di Camogli, pasta fatta in casa, cucina ligure contemporanea. Ingredienti locali selezionati ogni giorno.">\n  ' +
+      '<meta name="robots" content="index, follow">\n  ' +
+      '<link rel="canonical" href="https://santamonicagenova.it/menu.html">\n  ' +
+      '<meta property="og:type" content="website">\n  ' +
+      '<meta property="og:title" content="Menu | Ristorante Santamonica Genova">\n  ' +
+      '<meta property="og:description" content="Pesce fresco di Camogli, pasta fatta in casa, cucina ligure contemporanea. Il menu del ristorante Santamonica sul Lungomare di Genova.">\n  ' +
+      '<meta property="og:url" content="https://santamonicagenova.it/menu.html">\n  ' +
+      '<meta property="og:image" content="https://santamonicagenova.it/img/hero.jpg">\n  ' +
+      '<script type="application/ld+json">\n' +
+      '  {\n' +
+      '    "@context": "https://schema.org",\n' +
+      '    "@type": "Menu",\n' +
+      '    "name": "Menu Santamonica",\n' +
+      '    "url": "https://santamonicagenova.it/menu.html",\n' +
+      '    "inLanguage": "it",\n' +
+      '    "hasMenuSection": [\n' +
+      '      { "@type": "MenuSection", "name": "Antipasti" },\n' +
+      '      { "@type": "MenuSection", "name": "Primi" },\n' +
+      '      { "@type": "MenuSection", "name": "Secondi di Mare" },\n' +
+      '      { "@type": "MenuSection", "name": "Contorni" }\n' +
+      '    ]\n' +
+      '  }\n' +
+      '  </script>\n  ';
+    // Sostituisce title con SEO + title (in modo da posizionare i meta prima del title come da convenzione)
+    return html.replace(/<title>([^<]*)<\/title>/, '<title>Menu Pesce Fresco e Cucina Ligure | Ristorante Santamonica Genova</title>\n  ' + SEO_HEAD);
+  }
+
+  // ── Helper: inietta noindex + canonical sul file menu-it.html (admin/preview, non SEO)
+  function iniettaNoIndexIT(html) {
+    var TAGS = '<meta name="robots" content="noindex, nofollow">\n  ' +
+               '<link rel="canonical" href="https://santamonicagenova.it/menu-it.html">\n  ';
+    return html.replace('<title>', TAGS + '<title>');
+  }
+
+  // ── Helper: inietta canonical + index sui file lingua (menu-LL.html)
+  function iniettaSeoLingua(html, lang) {
+    var TAGS = '<meta name="robots" content="index, follow">\n  ' +
+               '<link rel="canonical" href="https://santamonicagenova.it/menu-' + lang + '.html">\n  ';
+    return html.replace('<title>', TAGS + '<title>');
+  }
+
+  // File da pubblicare: IT pubblico (menu.html) + IT admin (menu-it.html) + 4 traduzioni
+  // NB v 2026.05.14.02: invertiti rispetto a versioni precedenti.
+  //    menu.html    = versione pubblica SENZA ctrl-bar, con SEO completo (index)
+  //    menu-it.html = versione admin/preview CON ctrl-bar, noindex
   var files;
   if (tipoMenuCorrente === 'dolci') {
     files = filesDolci();
   } else {
     files = [
-      { path: 'menu.html', content: outputCorrente, label: 'Italiano (admin)' },
-      { path: 'menu-it.html', content: costruisciMenuItPub(), label: 'Italiano (pub)' }
+      { path: 'menu.html',    content: iniettaSeoITPubblico(costruisciMenuItPub()), label: 'Italiano (pubblico, SEO)' },
+      { path: 'menu-it.html', content: iniettaNoIndexIT(outputCorrente),            label: 'Italiano (admin/preview)' }
     ];
     ['en','fr','de','es'].forEach(function(lang) {
     var t = TRANSLATIONS[lang];
-    // Parti da menu-it.html (già senza pulsanti) e traduci
+    // Parti dalla versione pubblica IT (senza pulsanti) e traduci
     var html = costruisciMenuItPub();
     var m = costruisciMenuTradotto(leggi(), t);
     var SEP = '/* ' + '\u2550'.repeat(57) + ' */\n';
@@ -588,6 +635,8 @@ function eseguiPubblicazione(token) {
       '<a href="menu-es.html"><u>Carta en Español</u></a>'
     ];
     html = html.replace(/English Menu<br>\s*Carte en Fran[^<]*<br>\s*Speisekarte auf Deutsch<br>\s*Carta en Espa\u00f1ol/, qrLinks.join('<br>\n            '));
+    // Inietta canonical + index per la lingua specifica
+    html = iniettaSeoLingua(html, lang);
     files.push({ path: 'menu-' + lang + '.html', content: html, label: lang.toUpperCase() });
     });
   }

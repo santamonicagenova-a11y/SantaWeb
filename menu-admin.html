@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- versione v 2026.05.09.03 -->
+<!-- versione v 2026.05.14.01 — rimosso modal/bottone chiave DeepL (ora server-side via Vercel proxy api/translate.js) -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -102,7 +102,6 @@
     </div>
     <button class="btn btn-publish" id="btn-pubblica" onclick="traduciEPubblica()">✦ Traduci e Pubblica</button>
     <button class="btn btn-load" onclick="resetToken()" title="Cambia token GitHub" style="font-size:.6rem;padding:.45rem .7rem;opacity:.7">🔑</button>
-    <button class="btn btn-load" onclick="resetDeepLKey()" title="Cambia chiave DeepL" style="font-size:.6rem;padding:.45rem .7rem;opacity:.7">🔐</button>
   </div>
 </div>
 
@@ -606,26 +605,10 @@ async function _eseguiPubblicaFotoSito(token) {
   </div>
 </div>
 
-<!-- MODALE CHIAVE DEEPL -->
-<div class="modal-overlay" id="modal-deepl">
-  <div class="modal">
-    <h3>Chiave API DeepL</h3>
-    <p>Inserisci la tua DeepL API Key (piano <strong>Free</strong> = 500.000 caratteri/mese gratis).<br>
-    Viene salvata solo nel tuo browser e non condivisa con nessuno.<br>
-    <a href="https://www.deepl.com/pro-api" target="_blank" style="color:var(--rust)">Registrati gratis su DeepL API →</a> &middot;
-    <a href="https://www.deepl.com/account/summary" target="_blank" style="color:var(--rust)">La tua chiave →</a></p>
-    <input type="password" id="deepl-key-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx" />
-    <div class="modal-btns">
-      <button class="btn btn-load" onclick="chiudiModalDeepL()" style="border:1px solid var(--ink);color:var(--ink)">Annulla</button>
-      <button class="btn btn-publish" onclick="confermaDeepLKey()">Conferma</button>
-    </div>
-  </div>
-</div>
-
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js"></script>
 <script src="admin-core.js"></script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.05.09.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.05.14.01</div>
 </body>
 </html>

@@ -1,79 +1,57 @@
 // Core functions per menu-admin Santamonica
-// v 2026.05.02 — DeepL API integration
+// v 2026.05.14.01 — Proxy DeepL via Vercel function (bypass CORS) + report errori traduzione
 
 // ═══════════════════════════════════════════════════════
-// DEEPL API — configurazione e helper
+// TRADUZIONE — proxy Vercel verso DeepL
 // ═══════════════════════════════════════════════════════
-var DEEPL_ENDPOINT  = 'https://api-free.deepl.com/v2/translate';
-var DEEPL_LANG_MAP  = { en: 'EN-GB', fr: 'FR', de: 'DE', es: 'ES' };
+// Il browser non può chiamare DeepL direttamente (blocco CORS sul lato DeepL).
+// Soluzione: chiamiamo una Vercel Serverless Function nostra (api/translate.js) che
+// fa da proxy. La chiave DeepL vive in Vercel env (DEEPL_KEY), non più in localStorage.
+var PROXY_ENDPOINT = 'https://santa-web-peach.vercel.app/api/translate';
+var DEEPL_LANG_MAP = { en: 'EN-GB', fr: 'FR', de: 'DE', es: 'ES' };
 
-function getDeepLKey() {
-  return (localStorage.getItem('deepl_key') || '').trim();
-}
-
-function resetDeepLKey() {
-  localStorage.removeItem('deepl_key');
-  var inp = document.getElementById('deepl-key-input'); if (inp) inp.value = '';
-  var modal = document.getElementById('modal-deepl'); if (modal) modal.classList.add('on');
-}
-
+// Stub legacy lasciati no-op per compatibilità con onclick HTML esistenti in menu-admin.
+// Le funzioni che usavano la chiave in localStorage sono ora ininfluenti.
+function getDeepLKey() { return ''; }
+function resetDeepLKey() {}
 function confermaDeepLKey() {
-  var inp = document.getElementById('deepl-key-input');
-  var key = inp ? inp.value.trim() : '';
-  if (!key) { alert('Inserisci la chiave API DeepL'); return; }
-  localStorage.setItem('deepl_key', key);
   var modal = document.getElementById('modal-deepl'); if (modal) modal.classList.remove('on');
-  // Riprendi azione pendente, se presente
-  if (window._pendingTranslate === 'traduci') { window._pendingTranslate = null; traduci(); }
-  else if (window._pendingTranslate === 'traduciEPubblica') { window._pendingTranslate = null; traduciEPubblica(); }
 }
-
 function chiudiModalDeepL() {
   var modal = document.getElementById('modal-deepl'); if (modal) modal.classList.remove('on');
 }
+function _assicuraDeepLKey(pendingFn) { return true; } // sempre OK: la chiave è server-side
 
-// Apre modal o fallback a prompt() se modal non presente. Ritorna true se chiave già presente.
-function _assicuraDeepLKey(pendingFn) {
-  if (getDeepLKey()) return true;
-  var modal = document.getElementById('modal-deepl');
-  if (modal) {
-    window._pendingTranslate = pendingFn;
-    var inp = document.getElementById('deepl-key-input'); if (inp) inp.value = '';
-    modal.classList.add('on');
-  } else {
-    var k = prompt('Inserisci la tua DeepL API Key (Free):\n\nOttienila gratis su https://www.deepl.com/pro-api');
-    if (!k) return false;
-    localStorage.setItem('deepl_key', k.trim());
-    return true;
-  }
-  return false;
-}
-
-// Chiama DeepL API. Ritorna Promise che risolve con { trad: string|null, authError: bool }.
+// Chiama il proxy Vercel. Ritorna Promise che risolve con
+// { trad: string|null, authError: bool, errorMsg: string|null }.
 function chiamaDeepL(testo, langCode) {
-  var key = getDeepLKey();
-  if (!key) return Promise.resolve({ trad: null, authError: false });
   var targetLang = DEEPL_LANG_MAP[langCode] || langCode.toUpperCase();
-  var body = 'text=' + encodeURIComponent(testo) +
-             '&source_lang=IT' +
-             '&target_lang=' + encodeURIComponent(targetLang) +
-             '&tag_handling=html' +
-             '&preserve_formatting=1';
-  return fetch(DEEPL_ENDPOINT, {
+  return fetch(PROXY_ENDPOINT, {
     method: 'POST',
-    headers: {
-      'Authorization': 'DeepL-Auth-Key ' + key,
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: body
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: testo, target_lang: targetLang })
   }).then(function(r) {
-    if (r.status === 403) { localStorage.removeItem('deepl_key'); return { trad: null, authError: true }; }
-    if (!r.ok) return { trad: null, authError: false };
+    // 401/403 = problema chiave server-side (env non settata o invalidata)
+    if (r.status === 401 || r.status === 403) {
+      console.error('[Translate] Chiave DeepL server-side non valida o mancante (status ' + r.status + ')');
+      return { trad: null, authError: true, errorMsg: 'Chiave DeepL invalida lato server' };
+    }
+    if (!r.ok) {
+      return r.json().then(function(err) {
+        console.error('[Translate] HTTP ' + r.status, err);
+        return { trad: null, authError: false, errorMsg: 'HTTP ' + r.status + ' (' + (err && err.error || 'errore') + ')' };
+      }).catch(function() {
+        return { trad: null, authError: false, errorMsg: 'HTTP ' + r.status };
+      });
+    }
     return r.json().then(function(data) {
       var trad = data && data.translations && data.translations[0] && data.translations[0].text;
-      return { trad: trad || null, authError: false };
+      return { trad: trad || null, authError: false, errorMsg: trad ? null : 'risposta vuota' };
     });
-  }).catch(function() { return { trad: null, authError: false }; });
+  }).catch(function(err) {
+    console.error('[Translate] Network error:', err);
+    return { trad: null, authError: false, errorMsg: 'errore di rete' };
+  });
 }
 
 function carica(input) {
@@ -504,13 +482,18 @@ function traduci() {
       coda.push({ testo: testo, lang: lang });
     });
   });
+  var falliti = [];
 
   function traduciVoce(i) {
     if (i >= coda.length) {
       btn.textContent = '\uD83C\uDF10 Traduci';
       btn.classList.remove('translating');
       btn.disabled = false;
-      toast('\u2713 ' + testi.length + ' voci tradotte in 4 lingue!');
+      if (falliti.length > 0) {
+        toast('\u26a0 ' + (testi.length - falliti.length) + '/' + testi.length + ' voci tradotte, ' + falliti.length + ' fallite (vedi console)');
+      } else {
+        toast('\u2713 ' + testi.length + ' voci tradotte in 4 lingue!');
+      }
       return;
     }
     var item = coda[i];
@@ -519,15 +502,15 @@ function traduci() {
     chiamaDeepL(item.testo, item.lang)
       .then(function(res) {
         if (res.authError) {
-          // Chiave invalida: ferma e richiedi nuova chiave
           btn.textContent = '\uD83C\uDF10 Traduci';
           btn.classList.remove('translating');
           btn.disabled = false;
-          alert('DeepL: chiave API non valida o quota esaurita. Reinseriscila.');
-          _assicuraDeepLKey('traduci');
+          alert('Errore proxy DeepL: ' + (res.errorMsg || 'chiave non valida lato server') +
+                '\n\nVerifica che la env variable DEEPL_KEY sia configurata su Vercel.');
           return;
         }
         if (res.trad) TRANSLATIONS[item.lang]['piatti'][item.testo] = res.trad;
+        else falliti.push({ testo: item.testo, lang: item.lang, errorMsg: res.errorMsg });
         setTimeout(function() { traduciVoce(i + 1); }, 80);
       });
   }
@@ -723,11 +706,29 @@ function traduciEPubblica() {
     langs.forEach(function(lang) { coda.push({ testo: testo, lang: lang }); });
   });
   var totale = coda.length;
+  var falliti = []; // {testo, lang, errorMsg}
   btn.textContent = '⏳ Traduzione 0/' + totale + '…';
   btn.disabled = true;
 
   function traduciVoce(i) {
     if (i >= coda.length) {
+      // Report finale traduzioni fallite (utile per diagnosticare quota/network/proxy down)
+      if (falliti.length > 0) {
+        var primi = falliti.slice(0, 5).map(function(f) {
+          return '• [' + f.lang.toUpperCase() + '] "' + f.testo.slice(0, 40) + (f.testo.length > 40 ? '…' : '') + '" — ' + (f.errorMsg || 'errore');
+        }).join('\n');
+        var resto = falliti.length > 5 ? '\n…e altre ' + (falliti.length - 5) : '';
+        var ok = confirm(
+          'Traduzioni fallite: ' + falliti.length + '/' + totale + '\n\n' +
+          primi + resto + '\n\n' +
+          'Pubblicare comunque? (le voci non tradotte resteranno in italiano nei file lingua)'
+        );
+        if (!ok) {
+          btn.textContent = '✶ Traduci e Pubblica';
+          btn.disabled = false;
+          return;
+        }
+      }
       btn.textContent = '⏳ Pubblicazione…';
       var token = localStorage.getItem('gh_token') || '';
       if (token) {
@@ -747,11 +748,12 @@ function traduciEPubblica() {
         if (res.authError) {
           btn.textContent = '✶ Traduci e Pubblica';
           btn.disabled = false;
-          alert('DeepL: chiave API non valida o quota esaurita. Reinseriscila.');
-          _assicuraDeepLKey('traduciEPubblica');
+          alert('Errore proxy DeepL: ' + (res.errorMsg || 'chiave non valida lato server') +
+                '\n\nVerifica che la env variable DEEPL_KEY sia configurata su Vercel.');
           return;
         }
         if (res.trad) TRANSLATIONS[item.lang]['piatti'][item.testo] = res.trad;
+        else falliti.push({ testo: item.testo, lang: item.lang, errorMsg: res.errorMsg });
         setTimeout(function() { traduciVoce(i + 1); }, 80);
       });
   }

@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.05.15.03 — Documento generico: rimosso header Santamonica + titolo (solo contenuto file)
 // v 2026.05.15.02 — Documento generico: bottoni allineamento testo (giustificato/sinistra/centro) nella preview
 // v 2026.05.15.01 — Aggiunto "Documento generico" (PDF/DOCX/TXT → HTML stile carta, no upload)
 // v 2026.05.14.02 — Inversione menu.html (pubblico, SEO) ↔ menu-it.html (admin/preview)
@@ -1410,11 +1411,6 @@ function _docGen_costruisciHTML(titolo, corpoHtml) {
     '.doc-toolbar .align-grp button{background:transparent;border:none;padding:.45rem .9rem;font-size:.65rem;letter-spacing:.1em;}',
     '.doc-toolbar .align-grp button.active{background:var(--stone,#8c7e6e);}',
     '.pg{width:210mm;margin:2rem auto;padding:18mm 22mm;background:#fff;box-shadow:0 2px 24px rgba(0,0,0,.10);min-height:260mm;}',
-    '.pg-header{text-align:center;margin-bottom:8mm;padding-bottom:5mm;border-bottom:1px solid var(--rule,#d4c9b8);}',
-    '.pg-header .logo{font-family:"Cormorant Garamond",Georgia,serif;font-size:3.3rem;font-weight:300;letter-spacing:.22em;text-transform:uppercase;line-height:1;}',
-    '.pg-header .logo em{font-style:italic;color:var(--stone,#8c7e6e);}',
-    '.pg-header .logo-sub{margin-top:.45rem;font-family:"Jost",sans-serif;font-size:.67rem;letter-spacing:.22em;text-transform:uppercase;color:var(--stone,#8c7e6e);}',
-    '.doc-titolo{font-family:"Cormorant Garamond",Georgia,serif;font-size:1.8rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;text-align:center;margin:4mm 0 8mm;padding-bottom:3mm;border-bottom:1px solid var(--rule,#d4c9b8);}',
     '.doc-corpo{font-family:"Cormorant Garamond",Georgia,serif;font-size:1.05rem;line-height:1.6;color:var(--ink,#1a1714);}',
     '.doc-corpo p{margin:0 0 .7rem;}',
     '.doc-corpo.align-justify p{text-align:justify;}',
@@ -1452,11 +1448,6 @@ function _docGen_costruisciHTML(titolo, corpoHtml) {
     '  </div>',
     '</div>',
     '<div class="pg">',
-    '  <div class="pg-header">',
-    '    <div class="logo">Santa<em>monica</em></div>',
-    '    <div class="logo-sub">Lungomare Lombardo 27 — Genova</div>',
-    '  </div>',
-    '  <div class="doc-titolo">' + titoloEsc + '</div>',
     '  <div class="doc-corpo align-justify" id="doc-corpo">' + corpoHtml + '</div>',
     '</div>',
     '<script>',

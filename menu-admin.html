@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- versione v 2026.05.14.01 — rimosso modal/bottone chiave DeepL (ora server-side via Vercel proxy api/translate.js) -->
+<!-- versione v 2026.05.15.01 — aggiunto pulsante "Documento generico" (PDF/DOCX/TXT → HTML stile carta) -->
+<!-- v 2026.05.14.01 — rimosso modal/bottone chiave DeepL (ora server-side via Vercel proxy api/translate.js) -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -87,6 +88,7 @@
         <a onclick="apriGestoreFoto()">📷 Foto cucina</a>
         <a onclick="apriGestoreFotoSito()">🏛️ Foto sito</a>
         <a onclick="apriSezioneVini()">🍷 Menù Vini</a>
+        <a onclick="apriSezioneDocGenerico()">📄 Documento generico</a>
       </div>
     </div>
     <button class="btn btn-load" onclick="document.getElementById('file-input').click()">↑ Carica da file</button>
@@ -163,6 +165,33 @@
         <button class="btn btn-publish" onclick="convertiEPubblicaVini()">✦ Converti e Pubblica</button>
         <button class="btn btn-load" onclick="chiudiSezioneVini()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
         <span id="vini-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="doc-section" style="max-width:700px;margin:1.5rem auto;padding:0 1rem;display:none;">
+  <div class="fs">
+    <div class="fs-head">Documento generico — Converti in HTML stile carta</div>
+    <div class="fs-body">
+      <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">
+        Carica un file (<strong>PDF, DOCX o TXT</strong>) per convertirlo in HTML con caratteri e layout coerenti con la carta del menù.
+        Si aprirà una preview con i pulsanti per <strong>stampare</strong> o <strong>scaricare</strong> il file HTML in locale.
+        Nessuna pubblicazione automatica sul sito.
+      </p>
+      <div style="margin-bottom:1rem;">
+        <span class="opt-lbl" style="display:block;margin-bottom:.4rem;">File (PDF · DOCX · TXT)</span>
+        <input type="file" id="doc-generico-input" accept=".pdf,.docx,.txt"
+          style="font-family:Jost,sans-serif;font-size:.78rem;cursor:pointer" />
+      </div>
+      <div style="margin-bottom:1rem;">
+        <span class="opt-lbl" style="display:block;margin-bottom:.4rem;">Titolo (opzionale — default: nome file)</span>
+        <input type="text" id="doc-generico-titolo" placeholder="es. Comunicazione al personale" />
+      </div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1rem;">
+        <button class="btn btn-publish" onclick="convertiDocGenerico()">✦ Converti e Apri Preview</button>
+        <button class="btn btn-load" onclick="chiudiSezioneDocGenerico()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
+        <span id="doc-generico-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
       </div>
     </div>
   </div>
@@ -609,6 +638,6 @@ async function _eseguiPubblicaFotoSito(token) {
 <script src="admin-templates-shared.js"></script>
 <script src="admin-core.js"></script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.05.14.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.05.15.01</div>
 </body>
 </html>

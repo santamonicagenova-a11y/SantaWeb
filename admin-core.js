@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.05.15.01 — Aggiunto "Documento generico" (PDF/DOCX/TXT → HTML stile carta, no upload)
 // v 2026.05.14.02 — Inversione menu.html (pubblico, SEO) ↔ menu-it.html (admin/preview)
 //                + iniezione meta SEO sui file pubblici
 // v 2026.05.14.01 — Proxy DeepL via Vercel function (bypass CORS) + report errori traduzione
@@ -1248,4 +1249,230 @@ function _pubblicaMenuVini(token, html, statusEl) {
       statusEl.style.color = 'var(--rust)';
       statusEl.textContent = '\u2717 Errore: ' + e.message;
     });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DOCUMENTO GENERICO (PDF/DOCX/TXT → HTML stile carta) — v 2026.05.15.01
+// Preview + Stampa + Download HTML locale. NO upload GitHub.
+// ═══════════════════════════════════════════════════════════════════════════
+
+function apriSezioneDocGenerico() {
+  document.getElementById('carica-menu').classList.remove('open');
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('wrap').classList.remove('on');
+  var fs = document.getElementById('foto-section');       if (fs) fs.style.display = 'none';
+  var fss = document.getElementById('foto-sito-section'); if (fss) fss.style.display = 'none';
+  var vs = document.getElementById('vini-section');       if (vs) vs.style.display = 'none';
+  var ds = document.getElementById('doc-section');        if (ds) ds.style.display = 'block';
+  var st = document.getElementById('doc-generico-status');
+  if (st) { st.textContent = ''; st.style.color = 'var(--stone)'; }
+}
+
+function chiudiSezioneDocGenerico() {
+  var ds = document.getElementById('doc-section');
+  if (ds) ds.style.display = 'none';
+  if (!document.getElementById('wrap').classList.contains('on')) {
+    document.getElementById('intro').style.display = '';
+  }
+}
+
+function convertiDocGenerico() {
+  var fileInput = document.getElementById('doc-generico-input');
+  var file = fileInput && fileInput.files[0];
+  var statusEl = document.getElementById('doc-generico-status');
+  if (!file) { alert('Seleziona un file (PDF, DOCX o TXT)'); return; }
+  statusEl.style.color = 'var(--stone)';
+  var ext = (file.name.split('.').pop() || '').toLowerCase();
+
+  var titoloInput = document.getElementById('doc-generico-titolo');
+  var titolo = (titoloInput && titoloInput.value.trim()) || file.name.replace(/\.[^.]+$/, '');
+
+  if (ext === 'pdf')   { _docGen_caricaLib('pdf',  function(){ _docGen_estraiPDF(file, statusEl, titolo);  }, statusEl); return; }
+  if (ext === 'docx')  { _docGen_caricaLib('docx', function(){ _docGen_estraiDOCX(file, statusEl, titolo); }, statusEl); return; }
+  if (ext === 'txt')   { _docGen_estraiTXT(file, statusEl, titolo); return; }
+  statusEl.style.color = 'var(--rust)';
+  statusEl.textContent = '✗ Formato non supportato: .' + ext;
+}
+
+function _docGen_caricaLib(tipo, onReady, statusEl) {
+  if (tipo === 'pdf') {
+    if (typeof pdfjsLib !== 'undefined') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      onReady(); return;
+    }
+    statusEl.textContent = '⏳ Caricamento PDF.js…';
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload = function() {
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      onReady();
+    };
+    s.onerror = function() { statusEl.style.color = 'var(--rust)'; statusEl.textContent = '✗ Impossibile caricare PDF.js'; };
+    document.head.appendChild(s);
+  } else if (tipo === 'docx') {
+    if (typeof mammoth !== 'undefined') { onReady(); return; }
+    statusEl.textContent = '⏳ Caricamento Mammoth (DOCX)…';
+    var m = document.createElement('script');
+    m.src = 'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.7.0/mammoth.browser.min.js';
+    m.onload = onReady;
+    m.onerror = function() { statusEl.style.color = 'var(--rust)'; statusEl.textContent = '✗ Impossibile caricare Mammoth'; };
+    document.head.appendChild(m);
+  }
+}
+
+async function _docGen_estraiPDF(file, statusEl, titolo) {
+  try {
+    var ab = await file.arrayBuffer();
+    var pdf = await pdfjsLib.getDocument({ data: ab }).promise;
+    statusEl.textContent = '⏳ Estrazione testo (' + pdf.numPages + ' pagine)…';
+    var paragrafi = [];
+    for (var i = 1; i <= pdf.numPages; i++) {
+      var page = await pdf.getPage(i);
+      var tc = await page.getTextContent();
+      var righe = {};
+      tc.items.forEach(function(it) {
+        var y = Math.round(it.transform[5]);
+        righe[y] = (righe[y] || '') + it.str;
+      });
+      Object.keys(righe).sort(function(a,b){ return Number(b) - Number(a); }).forEach(function(y){
+        var t = righe[y].replace(/\s+/g, ' ').trim();
+        if (t) paragrafi.push('<p>' + _docGen_escape(t) + '</p>');
+      });
+      if (i < pdf.numPages) paragrafi.push('<div style="page-break-after:always"></div>');
+    }
+    _docGen_apriPreview(titolo, paragrafi.join('\n'), statusEl);
+  } catch (e) {
+    statusEl.style.color = 'var(--rust)';
+    statusEl.textContent = '✗ Errore PDF: ' + e.message;
+  }
+}
+
+async function _docGen_estraiDOCX(file, statusEl, titolo) {
+  try {
+    statusEl.textContent = '⏳ Conversione DOCX…';
+    var ab = await file.arrayBuffer();
+    var r = await mammoth.convertToHtml({ arrayBuffer: ab });
+    _docGen_apriPreview(titolo, r.value, statusEl);
+  } catch (e) {
+    statusEl.style.color = 'var(--rust)';
+    statusEl.textContent = '✗ Errore DOCX: ' + e.message;
+  }
+}
+
+async function _docGen_estraiTXT(file, statusEl, titolo) {
+  try {
+    statusEl.textContent = '⏳ Lettura TXT…';
+    var txt = await file.text();
+    var corpo = txt.split(/\n\s*\n/).map(function(p) {
+      return '<p>' + _docGen_escape(p).replace(/\n/g, '<br>') + '</p>';
+    }).join('\n');
+    _docGen_apriPreview(titolo, corpo, statusEl);
+  } catch (e) {
+    statusEl.style.color = 'var(--rust)';
+    statusEl.textContent = '✗ Errore TXT: ' + e.message;
+  }
+}
+
+function _docGen_escape(s) {
+  return String(s).replace(/[&<>"']/g, function(c){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+  });
+}
+
+function _docGen_costruisciHTML(titolo, corpoHtml) {
+  // Estrae il blocco <style> di CARTA_TPL_B per riusare font/colori/print del template carta
+  var styleCarta = '';
+  if (typeof CARTA_TPL_B === 'string') {
+    var m = CARTA_TPL_B.match(/<style[^>]*>[\s\S]*?<\/style>/);
+    if (m) styleCarta = m[0];
+  }
+  var titoloEsc = _docGen_escape(titolo);
+  var nomeDownload = JSON.stringify(titolo.replace(/[^\w\s\-]/g, '_') + '.html');
+  return [
+    '<!DOCTYPE html>',
+    '<html lang="it"><head>',
+    '<meta charset="UTF-8">',
+    '<meta name="viewport" content="width=device-width,initial-scale=1.0">',
+    '<title>' + titoloEsc + '</title>',
+    '<link rel="preconnect" href="https://fonts.googleapis.com">',
+    '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">',
+    styleCarta,
+    '<style>',
+    'body{background:var(--cream,#faf7f2);color:var(--ink,#1a1714);}',
+    '.doc-toolbar{position:sticky;top:0;background:var(--ink,#1a1714);color:#fff;padding:.7rem 1.2rem;display:flex;gap:.6rem;z-index:1000;font-family:"Jost",sans-serif;}',
+    '.doc-toolbar button{padding:.45rem 1.3rem;border:none;background:var(--rust,#9e4a2a);color:#fff;font-family:"Jost",sans-serif;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;}',
+    '.doc-toolbar button:hover{opacity:.85;}',
+    '.doc-toolbar .btn-sec{background:transparent;border:1px solid #fff;}',
+    '.pg{width:210mm;margin:2rem auto;padding:18mm 22mm;background:#fff;box-shadow:0 2px 24px rgba(0,0,0,.10);min-height:260mm;}',
+    '.pg-header{text-align:center;margin-bottom:8mm;padding-bottom:5mm;border-bottom:1px solid var(--rule,#d4c9b8);}',
+    '.pg-header .logo{font-family:"Cormorant Garamond",Georgia,serif;font-size:3.3rem;font-weight:300;letter-spacing:.22em;text-transform:uppercase;line-height:1;}',
+    '.pg-header .logo em{font-style:italic;color:var(--stone,#8c7e6e);}',
+    '.pg-header .logo-sub{margin-top:.45rem;font-family:"Jost",sans-serif;font-size:.67rem;letter-spacing:.22em;text-transform:uppercase;color:var(--stone,#8c7e6e);}',
+    '.doc-titolo{font-family:"Cormorant Garamond",Georgia,serif;font-size:1.8rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;text-align:center;margin:4mm 0 8mm;padding-bottom:3mm;border-bottom:1px solid var(--rule,#d4c9b8);}',
+    '.doc-corpo{font-family:"Cormorant Garamond",Georgia,serif;font-size:1.05rem;line-height:1.6;color:var(--ink,#1a1714);}',
+    '.doc-corpo p{margin:0 0 .7rem;text-align:justify;}',
+    '.doc-corpo h1,.doc-corpo h2,.doc-corpo h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink,#1a1714);margin:1.4rem 0 .5rem;}',
+    '.doc-corpo h1{font-size:1.5rem;}',
+    '.doc-corpo h2{font-size:1.2rem;color:var(--stone,#8c7e6e);}',
+    '.doc-corpo h3{font-size:1rem;color:var(--stone,#8c7e6e);}',
+    '.doc-corpo ul,.doc-corpo ol{margin:.5rem 0 1rem 1.5rem;}',
+    '.doc-corpo li{margin-bottom:.3rem;}',
+    '.doc-corpo strong{font-weight:600;}',
+    '.doc-corpo em{font-style:italic;color:var(--stone,#8c7e6e);}',
+    '.doc-corpo img{max-width:100%;height:auto;display:block;margin:1rem auto;}',
+    '.doc-corpo table{border-collapse:collapse;margin:1rem 0;width:100%;}',
+    '.doc-corpo th,.doc-corpo td{border:1px solid var(--rule,#d4c9b8);padding:.4rem .6rem;text-align:left;font-size:.95rem;}',
+    '.doc-corpo th{background:var(--sand,#f0ebe0);font-weight:600;}',
+    '@media print{',
+    '  @page{size:A4 portrait;margin:0;}',
+    '  html{font-size:24px;}',
+    '  body{background:#fff;}',
+    '  .doc-toolbar{display:none;}',
+    '  .pg{width:210mm;margin:0;padding:18mm 22mm;box-shadow:none;page-break-after:always;}',
+    '}',
+    '</style>',
+    '</head><body>',
+    '<div class="doc-toolbar">',
+    '  <button onclick="window.print()">🖨️ Stampa</button>',
+    '  <button class="btn-sec" onclick="_docScaricaHTML()">💾 Scarica HTML</button>',
+    '  <button class="btn-sec" onclick="window.close()">✕ Chiudi</button>',
+    '</div>',
+    '<div class="pg">',
+    '  <div class="pg-header">',
+    '    <div class="logo">Santa<em>monica</em></div>',
+    '    <div class="logo-sub">Lungomare Lombardo 27 — Genova</div>',
+    '  </div>',
+    '  <div class="doc-titolo">' + titoloEsc + '</div>',
+    '  <div class="doc-corpo">' + corpoHtml + '</div>',
+    '</div>',
+    '<script>',
+    'function _docScaricaHTML(){',
+    '  var html = document.documentElement.outerHTML;',
+    '  var blob = new Blob([html], {type:"text/html;charset=utf-8"});',
+    '  var a = document.createElement("a");',
+    '  a.href = URL.createObjectURL(blob);',
+    '  a.download = ' + nomeDownload + ';',
+    '  document.body.appendChild(a); a.click(); document.body.removeChild(a);',
+    '  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);',
+    '}',
+    '<\/script>',
+    '</body></html>'
+  ].join('\n');
+}
+
+function _docGen_apriPreview(titolo, corpoHtml, statusEl) {
+  var html = _docGen_costruisciHTML(titolo, corpoHtml);
+  var w = window.open('', '_blank');
+  if (!w) {
+    statusEl.style.color = 'var(--rust)';
+    statusEl.textContent = '✗ Popup bloccato. Consenti i popup per questo sito.';
+    return;
+  }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  statusEl.style.color = '#2d6a4f';
+  statusEl.textContent = '✓ Preview aperta in nuova finestra.';
 }

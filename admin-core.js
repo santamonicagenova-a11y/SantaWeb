@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.05.15.04 — Documento generico: toggle centratura verticale del testo nella pagina
 // v 2026.05.15.03 — Documento generico: rimosso header Santamonica + titolo (solo contenuto file)
 // v 2026.05.15.02 — Documento generico: bottoni allineamento testo (giustificato/sinistra/centro) nella preview
 // v 2026.05.15.01 — Aggiunto "Documento generico" (PDF/DOCX/TXT → HTML stile carta, no upload)
@@ -1410,7 +1411,8 @@ function _docGen_costruisciHTML(titolo, corpoHtml) {
     '.doc-toolbar .align-grp{display:flex;gap:0;margin-left:auto;border:1px solid #fff;}',
     '.doc-toolbar .align-grp button{background:transparent;border:none;padding:.45rem .9rem;font-size:.65rem;letter-spacing:.1em;}',
     '.doc-toolbar .align-grp button.active{background:var(--stone,#8c7e6e);}',
-    '.pg{width:210mm;margin:2rem auto;padding:18mm 22mm;background:#fff;box-shadow:0 2px 24px rgba(0,0,0,.10);min-height:260mm;}',
+    '.pg{width:210mm;margin:2rem auto;padding:18mm 22mm;background:#fff;box-shadow:0 2px 24px rgba(0,0,0,.10);min-height:260mm;box-sizing:border-box;}',
+    '.pg.center-v{display:flex;flex-direction:column;justify-content:center;}',
     '.doc-corpo{font-family:"Cormorant Garamond",Georgia,serif;font-size:1.05rem;line-height:1.6;color:var(--ink,#1a1714);}',
     '.doc-corpo p{margin:0 0 .7rem;}',
     '.doc-corpo.align-justify p{text-align:justify;}',
@@ -1445,9 +1447,10 @@ function _docGen_costruisciHTML(titolo, corpoHtml) {
     '    <button id="align-justify" class="active" onclick="_docAlign(\'justify\')" title="Giustificato">≡ Giust.</button>',
     '    <button id="align-left" onclick="_docAlign(\'left\')" title="Allinea a sinistra">⇤ Sx</button>',
     '    <button id="align-center" onclick="_docAlign(\'center\')" title="Allinea al centro">↔ Centro</button>',
+    '    <button id="center-v" onclick="_docCenterV()" title="Centra verticalmente nella pagina">⇕ Centro V</button>',
     '  </div>',
     '</div>',
-    '<div class="pg">',
+    '<div class="pg" id="doc-pg">',
     '  <div class="doc-corpo align-justify" id="doc-corpo">' + corpoHtml + '</div>',
     '</div>',
     '<script>',
@@ -1459,6 +1462,12 @@ function _docGen_costruisciHTML(titolo, corpoHtml) {
     '    var b = document.getElementById("align-" + m);',
     '    if (b) b.classList.toggle("active", m === mode);',
     '  });',
+    '}',
+    'function _docCenterV(){',
+    '  var pg = document.getElementById("doc-pg");',
+    '  var btn = document.getElementById("center-v");',
+    '  pg.classList.toggle("center-v");',
+    '  btn.classList.toggle("active", pg.classList.contains("center-v"));',
     '}',
     'function _docScaricaHTML(){',
     '  var html = document.documentElement.outerHTML;',

@@ -1,0 +1,9 @@
+# Santamonica Web — Cloudflare Pages redirects
+# v 2026.05.17.01
+# F0.4 — DE/ES ritirati: redirect 301 verso versione IT pubblica
+# TODO F0.16: estendere con redirect 301 da URL Wix vecchi
+
+/menu-de.html         /menu.html         301
+/menu-es.html         /menu.html         301
+/menu-dolci-de.html   /menu-dolci.html   301
+/menu-dolci-es.html   /menu-dolci.html   301

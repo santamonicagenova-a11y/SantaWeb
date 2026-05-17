@@ -1,0 +1,525 @@
+<!--
+  ─────────────────────────────────────────────────────────────────────────
+  privacy.html — Informativa Privacy
+  Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
+  Versione: v 2026.05.17.01
+  Ultimo aggiornamento: 2026-05-17
+  Lingua: IT (versione ufficiale)
+  Stato: BOZZA DIY pubblicata · F0.8 revisione legale sospesa (decisione utente 17-05-2026)
+  Schema di riferimento: v3 (ROADMAP_Santamonica_Web v.08 §F0.8)
+  ─────────────────────────────────────────────────────────────────────────
+-->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index, follow">
+  <title>Informativa Privacy — Santamonica</title>
+  <meta name="description" content="Informativa sul trattamento dei dati personali del ristorante Santamonica (Il Giuliano di Andrea Giachino e C. S.a.s.), ai sensi del Reg. UE 2016/679 (GDPR) e del D.Lgs. 196/2003.">
+  <link rel="canonical" href="https://santamonicagenova.it/privacy.html">
+  <style>
+    :root {
+      --bg: #faf8f4;
+      --surface: #ffffff;
+      --text: #2a2520;
+      --text-soft: #5a544c;
+      --accent: #8b3a2e;
+      --rule: #e6dfd4;
+      --summary-bg: #f3ede2;
+      --code-bg: #efe9dd;
+      --serif: "Cormorant Garamond", "Georgia", "Times New Roman", serif;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.65;
+      color: var(--text);
+      background: var(--bg);
+    }
+    .legal-page { max-width: 780px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+    header.legal-head { border-bottom: 1px solid var(--rule); padding-bottom: 1.5rem; margin-bottom: 2.5rem; }
+    header.legal-head .breadcrumb { font-size: 0.85rem; color: var(--text-soft); margin-bottom: 1rem; }
+    header.legal-head .breadcrumb a { color: var(--text-soft); text-decoration: none; border-bottom: 1px dotted var(--text-soft); }
+    h1 { font-family: var(--serif); font-weight: 500; font-size: 2.25rem; line-height: 1.2; margin: 0 0 0.5rem; color: var(--text); }
+    .legal-meta { font-size: 0.875rem; color: var(--text-soft); }
+    h2 { font-family: var(--serif); font-weight: 500; font-size: 1.5rem; margin: 3rem 0 0.75rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); color: var(--text); }
+    h2:first-of-type { border-top: none; padding-top: 0; }
+    h3 { font-family: var(--sans); font-weight: 600; font-size: 1.05rem; margin: 1.75rem 0 0.5rem; color: var(--text); }
+    p { margin: 0.75rem 0; }
+    ul, ol { padding-left: 1.4rem; margin: 0.75rem 0; }
+    li { margin: 0.35rem 0; }
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(139, 58, 46, 0.3); }
+    a:hover { border-bottom-color: var(--accent); }
+    .summary { background: var(--summary-bg); border-left: 3px solid var(--accent); padding: 1rem 1.2rem; margin: 1rem 0 1.5rem; font-size: 0.95rem; }
+    .summary strong { color: var(--accent); }
+    table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.92rem; }
+    th, td { text-align: left; vertical-align: top; padding: 0.7rem 0.8rem; border-bottom: 1px solid var(--rule); }
+    th { background: var(--surface); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-soft); }
+    td code, p code { background: var(--code-bg); padding: 0.1rem 0.35rem; border-radius: 2px; font-size: 0.88em; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+    .toc { background: var(--surface); border: 1px solid var(--rule); padding: 1.2rem 1.4rem; margin: 2rem 0 3rem; font-size: 0.92rem; }
+    .toc strong { display: block; font-family: var(--serif); font-weight: 500; font-size: 1.05rem; margin-bottom: 0.6rem; color: var(--text-soft); }
+    .toc ol { padding-left: 1.2rem; margin: 0; }
+    .toc li { margin: 0.2rem 0; }
+    .toc a { border-bottom: none; }
+    .toc a:hover { text-decoration: underline; }
+    footer.legal-foot { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); font-size: 0.82rem; color: var(--text-soft); }
+    .changelog { font-size: 0.88rem; }
+    .changelog dt { font-weight: 600; margin-top: 0.5rem; }
+    .changelog dd { margin-left: 1.2rem; color: var(--text-soft); }
+    @media (max-width: 600px) {
+      .legal-page { padding: 2rem 1.1rem 3.5rem; }
+      h1 { font-size: 1.8rem; }
+      h2 { font-size: 1.3rem; }
+      table { font-size: 0.85rem; }
+      th, td { padding: 0.55rem 0.5rem; }
+    }
+  </style>
+  <!-- Cookie consent · vanilla-cookieconsent v3.1.0 (bundle locale) · F0.9 -->
+  <link rel="stylesheet" href="/assets/cookieconsent/v3/cookieconsent.css">
+  <script defer src="/assets/cookieconsent/v3/cookieconsent.umd.js"></script>
+  <script defer src="/assets/js/cookieconsent-config.js"></script>
+</head>
+<body>
+
+<main class="legal-page" id="content">
+
+  <header class="legal-head">
+    <div class="breadcrumb"><a href="/">Santamonica</a> &nbsp;›&nbsp; Privacy</div>
+    <h1>Informativa sulla Privacy</h1>
+    <p class="legal-meta">
+      Ultimo aggiornamento: <strong>17 maggio 2026</strong> · Versione&nbsp;<strong>v&nbsp;2026.05.17.01</strong> · Lingua&nbsp;ufficiale: italiano
+    </p>
+  </header>
+
+  <nav class="toc" aria-label="Indice">
+    <strong>In questa pagina</strong>
+    <ol>
+      <li><a href="#s1">Chi tratta i tuoi dati</a></li>
+      <li><a href="#s2">In sintesi</a></li>
+      <li><a href="#s3">Quali dati raccogliamo</a></li>
+      <li><a href="#s4">Perché li trattiamo e con quale base giuridica</a></li>
+      <li><a href="#s5">Come li proteggiamo</a></li>
+      <li><a href="#s6">Per quanto tempo li conserviamo</a></li>
+      <li><a href="#s7">A chi possiamo comunicarli</a></li>
+      <li><a href="#s8">Trasferimenti fuori dall'Unione Europea</a></li>
+      <li><a href="#s9">I tuoi diritti</a></li>
+      <li><a href="#s10">Come esercitarli</a></li>
+      <li><a href="#s11">Minori</a></li>
+      <li><a href="#s12">Cookie e tecnologie simili</a></li>
+      <li><a href="#s13">Modifiche all'informativa</a></li>
+    </ol>
+  </nav>
+
+  <p>La presente informativa è resa ai sensi degli articoli&nbsp;13 e&nbsp;14 del Regolamento (UE) 2016/679 (di seguito, «<strong>GDPR</strong>») e del D.Lgs. 30 giugno 2003, n.&nbsp;196 («<strong>Codice Privacy</strong>») come modificato dal D.Lgs.&nbsp;101/2018, e descrive come il Titolare tratta i dati personali raccolti tramite il sito <code>santamonicagenova.it</code> e in occasione delle attività del ristorante&nbsp;Santamonica.</p>
+
+  <p>La versione in italiano è quella ufficiale e prevale in caso di discordanza con eventuali traduzioni di cortesia in altre lingue.</p>
+
+  <h2 id="s1">1. Chi tratta i tuoi dati (Titolare del trattamento)</h2>
+
+  <div class="summary">
+    <strong>In breve:</strong> il titolare è la società che gestisce il ristorante Santamonica. Tutte le richieste in materia di privacy si inviano a <a href="mailto:privacy@santamonicagenova.it">privacy@santamonicagenova.it</a>.
+  </div>
+
+  <p>Il Titolare del trattamento è:</p>
+  <ul>
+    <li><strong>Il Giuliano di Andrea Giachino e C. S.a.s.</strong> (di seguito anche «il&nbsp;Titolare»)</li>
+    <li>Sede legale: Lungomare Lombardo&nbsp;27, 16145 Genova&nbsp;(GE), Italia</li>
+    <li>P.IVA e Codice Fiscale: <code>02395420991</code></li>
+    <li>PEC: <a href="mailto:ilgiulianosas@legalmail.it">ilgiulianosas@legalmail.it</a></li>
+    <li>Email dedicata alla privacy: <a href="mailto:privacy@santamonicagenova.it">privacy@santamonicagenova.it</a></li>
+  </ul>
+
+  <p>Il Titolare non ha nominato un Responsabile della protezione dei dati (DPO) in quanto, in considerazione dell'oggetto e della portata delle attività svolte, non ricorrono i presupposti previsti dall'art.&nbsp;37 GDPR. L'indirizzo email indicato sopra resta in ogni momento il punto di contatto in materia di privacy.</p>
+
+  <h2 id="s2">2. In sintesi</h2>
+
+  <div class="summary">
+    <strong>In breve:</strong> raccogliamo solo i dati che ci servono per <em>prenotare il tuo tavolo</em>, gestire le tue eventuali <em>allergie</em> (con consenso separato), inviarti la <em>newsletter</em> se la chiedi, e vendere i <em>voucher regalo</em>. Non profiliamo, non vendiamo i tuoi dati a terzi, non li usiamo per pubblicità mirata. Puoi cancellarti, accedere ai tuoi dati o opporti al trattamento in qualunque momento.
+  </div>
+
+  <p>Questa informativa è scritta in linguaggio chiaro come richiesto dall'art.&nbsp;12 GDPR. Ogni sezione inizia con una sintesi e prosegue con i dettagli tecnici per chi desidera approfondire. Se qualcosa non ti è chiaro, scrivici: cercheremo di spiegartelo nel modo più semplice possibile.</p>
+
+  <h2 id="s3">3. Quali dati raccogliamo</h2>
+
+  <div class="summary">
+    <strong>In breve:</strong> raccogliamo solo dati che fornisci tu stesso (prenotazione, newsletter, voucher) oppure dati tecnici minimi che il tuo browser invia automaticamente. Le allergie, se le dichiari, sono trattate come <em>categoria particolare</em> con consenso esplicito.
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Categoria di dati</th><th>Esempi</th><th>Origine</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Identificativi e contatti</td>
+        <td>Nome, telefono, email</td>
+        <td>Fornito dall'interessato (form prenotazione, voucher, newsletter)</td>
+      </tr>
+      <tr>
+        <td>Dati di prenotazione</td>
+        <td>Data, ora, numero di persone, occasione, richieste particolari</td>
+        <td>Fornito dall'interessato</td>
+      </tr>
+      <tr>
+        <td><strong>Allergie e intolleranze alimentari</strong></td>
+        <td>Indicazioni testuali fornite nel campo dedicato del form</td>
+        <td>Fornito dall'interessato — <strong>categoria particolare ex art.&nbsp;9 GDPR</strong>, trattata solo con consenso esplicito separato</td>
+      </tr>
+      <tr>
+        <td>Dati relativi ai voucher regalo</td>
+        <td>Nome dell'acquirente, nome ed email del destinatario, importo, eventuale dedica, codice voucher, stato (attivo/riscattato)</td>
+        <td>Fornito dall'acquirente in fase di acquisto</td>
+      </tr>
+      <tr>
+        <td>Dati di pagamento</td>
+        <td>Importo della transazione, identificativi tecnici del pagamento</td>
+        <td>Generati da Stripe; il Titolare <strong>non riceve né memorizza</strong> i dati della carta</td>
+      </tr>
+      <tr>
+        <td>Dati tecnici e di navigazione</td>
+        <td>Indirizzo IP, user agent, pagine visitate, timestamp, statistiche aggregate</td>
+        <td>Raccolti automaticamente da Cloudflare per sicurezza della rete e analytics privacy-first (senza cookie)</td>
+      </tr>
+      <tr>
+        <td>Audit log dei consensi</td>
+        <td>Timestamp, lingua, fonte e tipologia di consenso in chiaro; email e indirizzo IP <em>esclusivamente</em> sotto forma di hash crittografico HMAC-SHA-256</td>
+        <td>Generato lato server al momento del rilascio del consenso (newsletter, allergie) per consentire al Titolare di dimostrare il consenso ai sensi dell'art.&nbsp;7 GDPR</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Non raccogliamo dati di geolocalizzazione precisa, non utilizziamo Google Analytics né Facebook Pixel né strumenti analoghi di profilazione comportamentale.</p>
+
+  <p><strong>Una nota sui voucher regalo.</strong> Quando acquisti un voucher per un'altra persona, ci fornisci alcuni dati che la riguardano (nome, email, eventuale dedica). La persona destinataria riceverà questa informativa, in forma sintetica e tramite link, contestualmente all'email di consegna del voucher, ai sensi dell'art.&nbsp;14 GDPR. Ti chiediamo di assicurarti, prima dell'acquisto, che la persona sia informata e d'accordo con il fatto che ci comunichi i suoi dati.</p>
+
+  <h2 id="s4">4. Perché li trattiamo e con quale base giuridica</h2>
+
+  <div class="summary">
+    <strong>In breve:</strong> ogni dato che raccogliamo ha una finalità precisa e una base giuridica esplicita (esecuzione di un contratto, consenso, obbligo di legge, legittimo interesse).
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Finalità</th><th>Base giuridica</th><th>Dati interessati</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Gestire la tua prenotazione (conferma, modifica, contatto in caso di necessità)</td>
+        <td>Art.&nbsp;6(1)(b) GDPR — esecuzione di misure precontrattuali e del contratto di ristorazione</td>
+        <td>Identificativi, contatti, dati di prenotazione</td>
+      </tr>
+      <tr>
+        <td>Tenere conto di allergie e intolleranze in cucina</td>
+        <td><strong>Art.&nbsp;9(2)(a) GDPR — consenso esplicito</strong>, raccolto con checkbox dedicata e separata da quella della prenotazione</td>
+        <td>Allergie/intolleranze dichiarate</td>
+      </tr>
+      <tr>
+        <td>Inviarti la newsletter con eventi, menu stagionali, iniziative</td>
+        <td>Art.&nbsp;6(1)(a) GDPR — consenso, con doppia conferma (double opt-in) e disiscrizione in un click</td>
+        <td>Email, nome, lingua, fonte di iscrizione</td>
+      </tr>
+      <tr>
+        <td>Dimostrare la validità dei consensi ricevuti</td>
+        <td>Art.&nbsp;7 GDPR — onere della prova del consenso; art.&nbsp;2947 c.c.</td>
+        <td>Audit log <code>consents.json</code> in forma HMAC</td>
+      </tr>
+      <tr>
+        <td>Vendere e gestire i voucher regalo (incasso, emissione, riscatto)</td>
+        <td>Art.&nbsp;6(1)(b) GDPR — contratto</td>
+        <td>Dati acquirente e destinatario, importo, codice</td>
+      </tr>
+      <tr>
+        <td>Adempimenti fiscali e contabili sulle vendite</td>
+        <td>Art.&nbsp;6(1)(c) GDPR — obbligo di legge; DPR&nbsp;600/1973; art.&nbsp;2220 c.c.</td>
+        <td>Dati transazione e fatturazione</td>
+      </tr>
+      <tr>
+        <td>Garantire la sicurezza del sito e prevenire abusi</td>
+        <td>Art.&nbsp;6(1)(f) GDPR — legittimo interesse del Titolare alla sicurezza dei sistemi informatici</td>
+        <td>IP, log di accesso, statistiche aggregate Cloudflare</td>
+      </tr>
+      <tr>
+        <td>Rispondere alle richieste di esercizio dei diritti (DSAR) e adempiere all'obbligo di riscontro</td>
+        <td>Art.&nbsp;6(1)(c) GDPR — obbligo legale derivante dagli artt.&nbsp;12 e&nbsp;15-22 GDPR; art.&nbsp;6(1)(f) per la conservazione difensiva del registro DSAR</td>
+        <td>Email, oggetto della richiesta, esito</td>
+      </tr>
+      <tr>
+        <td>Difendere o far valere un diritto in sede giudiziaria</td>
+        <td>Art.&nbsp;6(1)(f) — legittimo interesse; art.&nbsp;9(2)(f) per categorie particolari</td>
+        <td>Per il tempo strettamente necessario</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Nessuna delle finalità sopra elencate comporta processi decisionali automatizzati o profilazione di cui all'art.&nbsp;22 GDPR.</p>
+
+  <h2 id="s5">5. Come li proteggiamo (misure di sicurezza)</h2>
+
+  <div class="summary">
+    <strong>In breve:</strong> traffico cifrato HTTPS, hash crittografici per gli audit, autenticazione a due fattori sugli strumenti di gestione, accesso limitato alle sole persone autorizzate.
+  </div>
+
+  <p>Le misure tecniche e organizzative adottate ai sensi dell'art.&nbsp;32 GDPR includono, in sintesi:</p>
+  <ul>
+    <li>cifratura del traffico tra browser e server (HTTPS/TLS) imposta in modo permanente (HSTS) sul dominio <code>santamonicagenova.it</code>;</li>
+    <li>hashing HMAC-SHA-256 con <em>salt</em> custodito lato server per i log dei consensi (newsletter e allergie): l'email e l'IP non sono mai memorizzati in chiaro nell'audit log;</li>
+    <li>autenticazione a due fattori (2FA) obbligatoria su tutti gli strumenti di gestione (Google, Stripe, Cloudflare, GitHub);</li>
+    <li>token di accesso al repository in modalità <em>fine-grained</em>, con permessi minimi e scadenza periodica;</li>
+    <li>policy di sicurezza HTTP (CSP, X-Frame-Options, Referrer-Policy, Permissions-Policy) configurate a livello di server;</li>
+    <li>aggiornamento regolare delle dipendenze software e monitoraggio delle vulnerabilità;</li>
+    <li>backup periodico dei dati operativi e procedura documentata di risposta alle violazioni di sicurezza (data breach) con notifica al Garante entro 72 ore nei casi previsti dall'art.&nbsp;33 GDPR.</li>
+  </ul>
+
+  <h2 id="s6">6. Per quanto tempo li conserviamo</h2>
+
+  <div class="summary">
+    <strong>In breve:</strong> conserviamo ogni dato solo per il tempo strettamente necessario alla finalità, oppure per il tempo imposto dalla legge (10 anni per i dati fiscali). Le allergie sono cancellate <strong>entro 48 ore</strong> dopo la prenotazione.
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Categoria</th><th>Periodo di conservazione</th><th>Riferimento</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Email iscritta alla newsletter (Brevo)</td>
+        <td>Fino alla revoca del consenso (link «disiscrizione»)</td>
+        <td>Art.&nbsp;6(1)(a) GDPR</td>
+      </tr>
+      <tr>
+        <td>Audit log consenso newsletter</td>
+        <td>24 mesi dopo la revoca</td>
+        <td>Art.&nbsp;7 GDPR · art.&nbsp;2947 c.c.</td>
+      </tr>
+      <tr>
+        <td><strong>Allergie e intolleranze</strong></td>
+        <td><strong>Massimo 48 ore dopo la data della prenotazione</strong>, dopodiché cancellate</td>
+        <td>Art.&nbsp;9(2)(a) GDPR · principio di minimizzazione</td>
+      </tr>
+      <tr>
+        <td>Audit log consenso allergie</td>
+        <td>24 mesi dopo la prenotazione (solo in forma hash)</td>
+        <td>Art.&nbsp;9(2)(a) · art.&nbsp;7 GDPR</td>
+      </tr>
+      <tr>
+        <td>Dati delle prenotazioni (form)</td>
+        <td>Fino a 12 mesi dalla data della prenotazione</td>
+        <td>Art.&nbsp;5(1)(e) GDPR — limitazione della conservazione</td>
+      </tr>
+      <tr>
+        <td>Voucher attivi non ancora riscattati</td>
+        <td>Fino alla data di scadenza (12 mesi dall'acquisto) + 5 anni</td>
+        <td>Art.&nbsp;6(1)(c) · DPR&nbsp;600/1973</td>
+      </tr>
+      <tr>
+        <td>Voucher riscattati o rimborsati</td>
+        <td>10 anni dal riscatto</td>
+        <td>Art.&nbsp;2220 c.c. — scritture contabili</td>
+      </tr>
+      <tr>
+        <td>Transazioni Stripe</td>
+        <td>10 anni (gestiti direttamente da Stripe)</td>
+        <td>Obblighi fiscali — non cancellabili anche su richiesta</td>
+      </tr>
+      <tr>
+        <td>Email transazionali (conferme automatiche)</td>
+        <td>Fino a 24 mesi</td>
+        <td>Art.&nbsp;6(1)(b) GDPR</td>
+      </tr>
+      <tr>
+        <td>Log tecnici di traffico Cloudflare</td>
+        <td>7 giorni</td>
+        <td>Art.&nbsp;6(1)(f) — sicurezza dei sistemi</td>
+      </tr>
+      <tr>
+        <td>Registro richieste di esercizio diritti (DSAR)</td>
+        <td>5 anni dalla risposta</td>
+        <td>Art.&nbsp;12 GDPR · esigenze di difesa</td>
+      </tr>
+      <tr>
+        <td>Registro violazioni di sicurezza (data breach)</td>
+        <td>10 anni dall'evento</td>
+        <td>Art.&nbsp;33(5) GDPR — obbligo di documentazione</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Al termine dei periodi indicati i dati sono cancellati o resi anonimi in modo irreversibile, salvo quando una norma imperativa imponga la prosecuzione della conservazione.</p>
+
+  <h2 id="s7">7. A chi possiamo comunicarli (destinatari)</h2>
+
+  <div class="summary">
+    <strong>In breve:</strong> i tuoi dati sono accessibili solo a fornitori tecnici scelti per la loro affidabilità e nominati responsabili del trattamento ai sensi dell'art.&nbsp;28 GDPR. Non li vendiamo a nessuno.
+  </div>
+
+  <p>Per fornire i servizi descritti il Titolare si avvale dei seguenti fornitori, nominati responsabili del trattamento ex art.&nbsp;28 GDPR oppure operanti come titolari autonomi nei limiti delle rispettive informative:</p>
+
+  <table>
+    <thead>
+      <tr><th>Fornitore</th><th>Servizio</th><th>Sede</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Cloudflare, Inc.</td>
+        <td>Hosting del sito (Pages), proxy applicativo (Functions, Workers), instradamento email (Email Routing), web analytics privacy-first senza cookie</td>
+        <td>Stati Uniti (con filiali UE)</td>
+      </tr>
+      <tr>
+        <td>Stripe Payments Europe Limited (con sub-responsabile Stripe, Inc.)</td>
+        <td>Processo dei pagamenti per i voucher regalo</td>
+        <td>Dublino (Irlanda) + Stati Uniti</td>
+      </tr>
+      <tr>
+        <td>Sendinblue SAS («Brevo»)</td>
+        <td>Invio della newsletter e delle email transazionali; gestione iscrizioni con doppio opt-in</td>
+        <td>Francia (UE)</td>
+      </tr>
+      <tr>
+        <td>DeepL SE</td>
+        <td>Traduzione automatica del menu (testi non personali)</td>
+        <td>Germania (UE)</td>
+      </tr>
+      <tr>
+        <td>Formspree, Inc.</td>
+        <td>Instradamento dei messaggi inviati tramite i form del sito</td>
+        <td>Stati Uniti</td>
+      </tr>
+      <tr>
+        <td>Google Ireland Limited / Google LLC</td>
+        <td>Mappa di Google Maps incorporata; aggregazione recensioni pubbliche tramite Places API (nessun dato personale degli utenti del sito viene inviato)</td>
+        <td>Irlanda / Stati Uniti</td>
+      </tr>
+      <tr>
+        <td>GitHub, Inc. (Microsoft Corporation)</td>
+        <td>Versionamento del codice sorgente e archiviazione dei file di audit log (in forma hash)</td>
+        <td>Stati Uniti</td>
+      </tr>
+      <tr>
+        <td>Consulente fiscale del Titolare</td>
+        <td>Adempimenti contabili e fiscali</td>
+        <td>Italia</td>
+      </tr>
+      <tr>
+        <td>Autorità pubbliche</td>
+        <td>Comunicazione su richiesta motivata di autorità giudiziarie, fiscali, di pubblica sicurezza</td>
+        <td>Italia</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>La libreria <em>vanilla-cookieconsent</em> utilizzata per il banner cookie è eseguita esclusivamente nel tuo browser e non invia dati a terzi.</p>
+
+  <p>I tuoi dati non sono mai venduti, ceduti per finalità di marketing di terzi, né utilizzati per profilazione pubblicitaria su altre piattaforme.</p>
+
+  <h2 id="s8">8. Trasferimenti fuori dall'Unione Europea</h2>
+
+  <div class="summary">
+    <strong>In breve:</strong> alcuni fornitori hanno server negli Stati Uniti. In quei casi il trasferimento avviene sulla base del <em>Data Privacy Framework</em> UE-USA, integrato — ove necessario — da Clausole Contrattuali Standard. Monitoriamo l'evoluzione giurisprudenziale e normativa europea in materia.
+  </div>
+
+  <p>Alcuni dei fornitori sopra elencati (Cloudflare, Stripe, Google, GitHub) hanno sede o operano server negli Stati Uniti e risultano certificati al <em>EU-U.S. Data Privacy Framework</em>. Per altri fornitori statunitensi (in particolare Formspree), la verifica della certificazione DPF è in corso e, nelle more, il trasferimento avviene sulla base di Clausole Contrattuali Standard. Il trasferimento dei dati al di fuori dello Spazio Economico Europeo avviene quindi nel rispetto degli artt.&nbsp;44 e seguenti del GDPR, attraverso una combinazione di:</p>
+  <ul>
+    <li>adesione del fornitore al <strong>EU-U.S. Data Privacy Framework</strong> (decisione di adeguatezza della Commissione europea del 10&nbsp;luglio&nbsp;2023);</li>
+    <li>Clausole Contrattuali Standard approvate dalla Commissione (decisione di esecuzione (UE) 2021/914) integrate nei contratti con i fornitori;</li>
+    <li>misure tecniche supplementari (cifratura, pseudonimizzazione, minimizzazione) ove applicabili.</li>
+  </ul>
+  <p>Il Titolare verifica annualmente l'effettiva persistenza della certificazione DPF dei propri fornitori statunitensi tramite il registro pubblico <code>dataprivacyframework.gov</code> e si riserva di adottare misure ulteriori in caso di pronuncia giurisprudenziale o intervento normativo che modifichi il quadro attuale.</p>
+  <p>Puoi ottenere copia delle garanzie contrattuali in essere scrivendo a <a href="mailto:privacy@santamonicagenova.it">privacy@santamonicagenova.it</a>.</p>
+
+  <h2 id="s9">9. I tuoi diritti</h2>
+
+  <div class="summary">
+    <strong>In breve:</strong> puoi accedere ai tuoi dati, correggerli, cancellarli, limitarne l'uso, riceverli in formato portabile, opporti al trattamento, revocare il consenso e presentare reclamo al Garante. Nessun costo, salvo richieste manifestamente abusive.
+  </div>
+
+  <p>In qualità di interessato puoi esercitare in qualunque momento i seguenti diritti previsti dagli artt.&nbsp;15-21 GDPR:</p>
+  <ul>
+    <li><strong>diritto di accesso</strong> (art.&nbsp;15): ottenere conferma del trattamento e una copia dei tuoi dati;</li>
+    <li><strong>diritto di rettifica</strong> (art.&nbsp;16): correggere dati inesatti o integrarli se incompleti;</li>
+    <li><strong>diritto alla cancellazione</strong> o «all'oblio» (art.&nbsp;17): chiedere la cancellazione, salvo quando ostino obblighi di legge (es. obblighi fiscali decennali);</li>
+    <li><strong>diritto di limitazione</strong> (art.&nbsp;18): chiedere la sospensione del trattamento mentre verifichiamo o contestiamo qualcosa;</li>
+    <li><strong>diritto alla portabilità</strong> (art.&nbsp;20): ricevere i dati che ci hai fornito in formato strutturato e leggibile, o trasmetterli a un altro titolare;</li>
+    <li><strong>diritto di opposizione</strong> (art.&nbsp;21): opporsi al trattamento fondato sul legittimo interesse o, in qualunque momento e senza necessità di motivazione, al marketing diretto;</li>
+    <li><strong>diritto di revocare il consenso</strong> in qualunque momento (art.&nbsp;7&nbsp;§&nbsp;3), senza pregiudizio per la liceità del trattamento precedente alla revoca;</li>
+    <li><strong>diritto di presentare reclamo all'autorità di controllo</strong> (art.&nbsp;77 GDPR — vedi § successivo).</li>
+  </ul>
+
+  <p><strong>Decisioni automatizzate (art.&nbsp;22 GDPR).</strong> A fini di trasparenza, segnaliamo che il Titolare <strong>non effettua</strong> processi decisionali interamente automatizzati né profilazione produttivi di effetti giuridici o significativamente incidenti sulla persona. Il diritto di cui all'art.&nbsp;22 GDPR non trova pertanto applicazione in concreto.</p>
+
+  <h2 id="s10">10. Come esercitarli</h2>
+
+  <div class="summary">
+    <strong>In breve:</strong> scrivici a <a href="mailto:privacy@santamonicagenova.it">privacy@santamonicagenova.it</a>. Rispondiamo entro un mese (estendibile fino a tre nei casi complessi). Se non sei soddisfatto puoi rivolgerti al Garante italiano o all'autorità del tuo Paese.
+  </div>
+
+  <p>Per esercitare i tuoi diritti puoi:</p>
+  <ul>
+    <li>scrivere a <a href="mailto:privacy@santamonicagenova.it">privacy@santamonicagenova.it</a> (canale ordinario);</li>
+    <li>oppure inviare una PEC a <a href="mailto:ilgiulianosas@legalmail.it">ilgiulianosas@legalmail.it</a>;</li>
+    <li>oppure scriverci all'indirizzo postale della sede legale indicato al §&nbsp;1.</li>
+  </ul>
+
+  <p>Per consentirci di gestire la richiesta in modo accurato e sicuro, indica nel messaggio: il diritto che intendi esercitare, una descrizione sintetica della richiesta, e — solo se necessario per identificarti senza ambiguità — informazioni utili a collegarti al trattamento (es. la data di una prenotazione, il codice di un voucher). In caso di dubbio sull'identità potremo chiederti elementi ulteriori, ai sensi dell'art.&nbsp;12(6) GDPR.</p>
+
+  <p>Risponderemo senza ingiustificato ritardo e comunque entro <strong>un mese</strong> dal ricevimento della richiesta, ai sensi dell'art.&nbsp;12(3) GDPR. Tale termine può essere prorogato di ulteriori <strong>due mesi</strong>, ove necessario, tenuto conto della complessità o del numero delle richieste; in tal caso ti informeremo della proroga e dei motivi entro il primo mese. L'esercizio dei diritti è gratuito; in caso di richieste manifestamente infondate o eccessive, in particolare per il loro carattere ripetitivo, ci riserviamo, ai sensi dell'art.&nbsp;12(5) GDPR, di addebitare un contributo ragionevole o di rifiutare l'evasione, motivando la decisione.</p>
+
+  <p>Se ritieni che il trattamento dei tuoi dati violi il GDPR, hai diritto di proporre reclamo all'autorità di controllo competente:</p>
+  <ul>
+    <li>per i residenti in Italia, al <strong>Garante per la protezione dei dati personali</strong> — Piazza Venezia 11, 00187 Roma — <a href="https://www.garanteprivacy.it" target="_blank" rel="noopener">www.garanteprivacy.it</a>;</li>
+    <li>per i residenti in Francia, alla <strong>CNIL</strong> — <a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>;</li>
+    <li>per i residenti nel Regno Unito, all'<strong>ICO</strong> — <a href="https://ico.org.uk" target="_blank" rel="noopener">ico.org.uk</a>;</li>
+    <li>per residenti in altri Stati membri, all'autorità di controllo del proprio Paese o del luogo di lavoro abituale (art.&nbsp;77 GDPR).</li>
+  </ul>
+
+  <h2 id="s11">11. Minori</h2>
+
+  <div class="summary">
+    <strong>In breve:</strong> i servizi del sito non sono pensati per minori di 14 anni. Al di sotto di questa soglia il consenso al trattamento dei dati deve essere prestato da chi esercita la responsabilità genitoriale.
+  </div>
+
+  <p>Ai sensi dell'art.&nbsp;8 GDPR e dell'art.&nbsp;2-quinquies del D.Lgs.&nbsp;196/2003, in Italia il minore può prestare validamente il consenso al trattamento dei propri dati in relazione ai servizi della società dell'informazione al compimento del <strong>quattordicesimo anno di età</strong>. Al di sotto di tale soglia il consenso deve essere prestato da chi esercita la responsabilità genitoriale.</p>
+  <p>Le versioni dell'informativa in altre lingue, una volta pubblicate, faranno riferimento alle soglie nazionali corrispondenti (15&nbsp;anni in Francia, 13&nbsp;anni nel Regno Unito).</p>
+  <p>Se vieni a conoscenza del fatto che un minore al di sotto della soglia applicabile ci ha fornito dati senza il consenso parentale, ti invitiamo a segnalarcelo: provvederemo prontamente alla cancellazione.</p>
+
+  <h2 id="s12">12. Cookie e tecnologie simili</h2>
+
+  <div class="summary">
+    <strong>In breve:</strong> usiamo pochissimi cookie, tutti descritti nella <a href="/cookies.html">Cookie Policy</a> dedicata. Puoi rivedere o ritirare il consenso in qualunque momento dal pannello «Gestisci preferenze».
+  </div>
+
+  <p>Il sito utilizza esclusivamente cookie tecnici necessari al funzionamento e — previo consenso espresso tramite il banner — eventuali cookie non strettamente tecnici (es. quelli impostati da Stripe nella pagina di checkout o da Google Maps nella mappa incorporata). Non utilizziamo cookie analitici di profilazione: la web analytics adottata (Cloudflare Web Analytics) funziona <em>senza</em> impostare cookie nel browser.</p>
+  <p>Per il dettaglio aggiornato dei cookie utilizzati, della loro durata e delle modalità di gestione delle preferenze, consulta la <a href="/cookies.html"><strong>Cookie Policy</strong></a>.</p>
+
+  <h2 id="s13">13. Modifiche all'informativa</h2>
+
+  <div class="summary">
+    <strong>In breve:</strong> aggiorniamo questa pagina quando cambiano le pratiche o la normativa. Le modifiche sostanziali sono comunicate via banner sul sito e — se sei iscritto alla newsletter — via email.
+  </div>
+
+  <p>Il Titolare si riserva di aggiornare la presente informativa per riflettere modifiche normative, dei servizi offerti o dell'organizzazione interna. Le modifiche meramente formali (correzioni redazionali, riformulazioni che non incidono sul significato) sono pubblicate senza preavviso. Le modifiche sostanziali (nuove finalità, nuovi destinatari, nuove basi giuridiche, modifiche significative dei tempi di conservazione) sono segnalate per almeno 30 giorni tramite avviso ben visibile sulla home del sito e, se sei iscritto alla newsletter, tramite comunicazione via email.</p>
+  <p>La data riportata in apertura («Ultimo aggiornamento») e la sigla di versione consentono di identificare in modo univoco l'edizione vigente. Lo storico delle versioni è disponibile su richiesta scrivendo a <a href="mailto:privacy@santamonicagenova.it">privacy@santamonicagenova.it</a>.</p>
+
+  <h3>Storico delle versioni</h3>
+  <dl class="changelog">
+    <dt>v 2026.05.17.01 — 17 maggio 2026</dt>
+    <dd>Integrazione del banner di consenso cookie (vanilla-cookieconsent v3.1.0, bundle locale) eseguita nel rilascio operativo F0.9 del ROADMAP v.08. Nessuna modifica sostanziale al testo dell'informativa.</dd>
+    <dt>v 2026.05.16.02 — 16 maggio 2026</dt>
+    <dd>Revisione interna iterativa pre-revisione legale: correzione termini di riscontro DSAR (1 mese + 2 di proroga); rimozione di art.&nbsp;12 come «base giuridica»; integrazione informativa al destinatario di voucher ex art.&nbsp;14 GDPR; precisazioni su audit log HMAC; allineamento sezione minori; aggiornamento riferimenti trasferimenti USA al quadro DPF; lessico «sub-responsabile» (art.&nbsp;28 GDPR).</dd>
+    <dt>v 2026.05.16.01 — 16 maggio 2026</dt>
+    <dd>Prima stesura DIY conforme a GDPR e Codice Privacy.</dd>
+  </dl>
+
+  <footer class="legal-foot">
+    Informativa Privacy · v&nbsp;2026.05.17.01 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
+  </footer>
+
+</main>
+
+</body>
+</html>
+<!-- Fine privacy.html · v 2026.05.17.01 -->

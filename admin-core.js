@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.05.17.04 — F0.6bis: migrate fetch admin GH Pages → CF Pages (BASE_FETCH_URL centralizzato, 7 occorrenze)
 // v 2026.05.17.03 — F0.4: rimosse lingue DE + ES (langs array, TRADUZIONI_DOLCI, qrLinks, langPair)
 // v 2026.05.15.04 — Documento generico: toggle centratura verticale del testo nella pagina
 // v 2026.05.15.03 — Documento generico: rimosso header Santamonica + titolo (solo contenuto file)
@@ -7,6 +8,11 @@
 // v 2026.05.14.02 — Inversione menu.html (pubblico, SEO) ↔ menu-it.html (admin/preview)
 //                + iniezione meta SEO sui file pubblici
 // v 2026.05.14.01 — Proxy DeepL via Vercel function (bypass CORS) + report errori traduzione
+
+// ═══════════════════════════════════════════════════════
+// CONFIG — F0.6bis: URL base fetch admin (CF Pages, era GH Pages)
+// ═══════════════════════════════════════════════════════
+var BASE_FETCH_URL = 'https://santamonica-web.pages.dev';
 
 // ═══════════════════════════════════════════════════════
 // TRADUZIONE — proxy Vercel verso DeepL
@@ -208,7 +214,7 @@ function costruisci() {
     // Anteprima immagine corrente
     var qrPrev = document.createElement('img'); qrPrev.id='qr-preview';
     qrPrev.style.cssText='width:60px;height:60px;display:block;margin-bottom:.4rem;border:1px solid var(--rule);object-fit:contain';
-    qrPrev.src='https://santamonicagenova-a11y.github.io/SantaWeb/orario-qr.png?t='+Date.now();
+    qrPrev.src=BASE_FETCH_URL+'/orario-qr.png?t='+Date.now();
     qrPrev.onerror=function(){this.style.display='none';};
     qrRow.appendChild(qrPrev);
     // Input file
@@ -228,7 +234,7 @@ function costruisci() {
     // Pulsante reset
     var qrReset = document.createElement('button'); qrReset.textContent='✕ Ripristina QR predefinito';
     qrReset.style.cssText='margin-top:.4rem;display:block;font-family:Jost,sans-serif;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:1px solid var(--rule);padding:.3rem .7rem;cursor:pointer;color:var(--stone)';
-    qrReset.onclick = function(e) { e.preventDefault(); var f=document.getElementById('orario-qr-file'); if(f) f.value=''; _qrBase64=null; var p=document.getElementById('qr-preview'); if(p){p.src='https://santamonicagenova-a11y.github.io/SantaWeb/orario-qr.png?t='+Date.now();p.style.display='block';} };
+    qrReset.onclick = function(e) { e.preventDefault(); var f=document.getElementById('orario-qr-file'); if(f) f.value=''; _qrBase64=null; var p=document.getElementById('qr-preview'); if(p){p.src=BASE_FETCH_URL+'/orario-qr.png?t='+Date.now();p.style.display='block';} };
     qrRow.appendChild(qrReset);
     bdo.appendChild(qrRow); fso.appendChild(bdo); wrap.appendChild(fso);
   }
@@ -302,12 +308,12 @@ function leggi() {
   return m;
 }
 
-var MENU_URL = 'https://santamonicagenova-a11y.github.io/SantaWeb/menu-it.html';
+var MENU_URL = BASE_FETCH_URL + '/menu-it.html';
 var REPO_OWNER = 'santamonicagenova-a11y';
 var REPO_NAME  = 'SantaWeb';
 var MENU_PATH  = 'menu.html';
 var outputCorrente = '';
-var DOLCI_URL = 'https://santamonicagenova-a11y.github.io/SantaWeb/menu-dolci.html';
+var DOLCI_URL = BASE_FETCH_URL + '/menu-dolci.html';
 var DOLCI_PATH = 'menu-dolci.html';
 var MENU_DOLCI_IT = {"sezioni": [{"titolo": "Golosità", "piatti": [{"nome": "Gelato al limone nero, levistico, lime, cracker di latte", "prezzo": 14}, {"nome": "Ananas, parfait al carbone, caramello al caffè", "prezzo": 14}, {"nome": "Gelato al porcino, fragole, terra al cioccolato", "prezzo": 14}, {"nome": "Sacripantina", "prezzo": 11}, {"nome": "Erborinato ligure e Picolit Zorzettig", "prezzo": 12}]}], "allergeni": [{"nome": "Gelato al limone nero", "allergeni": "glutine, latticini"}, {"nome": "Gelato porcino", "allergeni": "latticini, uova"}, {"nome": "Ananas", "allergeni": "uovo, glutine, latticini"}, {"nome": "Sacripantina", "allergeni": "frutta a guscio, uovo, glutine, latticini, solforosa"}, {"nome": "Erborinato e Picolit", "allergeni": "latticini, solforosa"}], "pagine": [{"sezioni": ["Golosità"]}]};
 var TRADUZIONI_DOLCI = {"en": {"title": "Desserts — Santamonica", "sezione": "Sweets", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Black lemon gelato, lovage, lime, milk cracker", "Ananas, parfait al carbone, caramello al caffè": "Pineapple, charcoal parfait, coffee caramel", "Gelato al porcino, fragole, terra al cioccolato": "Porcini gelato, strawberries, chocolate soil", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Ligurian blue cheese and Picolit Zorzettig", "glutine, latticini": "gluten, dairy", "latticini, uova": "dairy, eggs", "uovo, glutine, latticini": "egg, gluten, dairy", "frutta a guscio, uovo, glutine, latticini, solforosa": "tree nuts, egg, gluten, dairy, sulphites", "latticini, solforosa": "dairy, sulphites", "Gelato al limone nero": "Black lemon gelato", "Gelato porcino": "Porcini gelato", "Ananas": "Pineapple", "Erborinato e Picolit": "Blue cheese and Picolit"}}, "fr": {"title": "Desserts — Santamonica", "sezione": "Gourmandises", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Glace citron noir, livèche, citron vert, cracker au lait", "Ananas, parfait al carbone, caramello al caffè": "Ananas, parfait au charbon, caramel au café", "Gelato al porcino, fragole, terra al cioccolato": "Glace aux cèpes, fraises, terre au chocolat", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Fromage persillé ligurien et Picolit Zorzettig", "glutine, latticini": "gluten, produits laitiers", "latticini, uova": "produits laitiers, œufs", "uovo, glutine, latticini": "œuf, gluten, produits laitiers", "frutta a guscio, uovo, glutine, latticini, solforosa": "fruits à coque, œuf, gluten, produits laitiers, sulfites", "latticini, solforosa": "produits laitiers, sulfites", "Gelato al limone nero": "Glace citron noir", "Gelato porcino": "Glace aux cèpes", "Ananas": "Ananas", "Erborinato e Picolit": "Fromage persillé et Picolit"}}};
@@ -364,7 +370,7 @@ function apriPreview(lang) {
   } else {
     // Lingue: apri direttamente da GitHub Pages
     var prefix = tipoMenuCorrente === 'dolci' ? 'menu-dolci-' : 'menu-';
-    var base = 'https://santamonicagenova-a11y.github.io/SantaWeb/' + prefix + lang + '.html';
+    var base = BASE_FETCH_URL + '/' + prefix + lang + '.html';
     window.open(base + '?v=' + Date.now(), '_blank').focus();
   }
 }
@@ -824,7 +830,7 @@ function toast(msg) {
 // MENU ALLERGENI — funzioni admin
 // ═══════════════════════════════════════════════════════
 
-var ALLERGENI_URL  = 'https://santamonicagenova-a11y.github.io/SantaWeb/menu-allergeni.html';
+var ALLERGENI_URL  = BASE_FETCH_URL + '/menu-allergeni.html';
 var ALLERGENI_PATH = 'menu-allergeni.html';
 var datiAllergeni    = null;   // { sezioni: [...] } estratto da ALLERGENI_DATA
 var tplAllBefore     = '';
@@ -1092,7 +1098,7 @@ function traduciEPubblicaAllergeni() {
 // ═══════════════════════════════════════════════════════
 
 var VINI_PATH = 'menu-vini.html';
-var VINI_URL  = 'https://santamonicagenova-a11y.github.io/SantaWeb/menu-vini.html';
+var VINI_URL  = BASE_FETCH_URL + '/menu-vini.html';
 
 function apriSezioneVini() {
   document.getElementById('carica-menu').classList.remove('open');

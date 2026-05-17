@@ -1,6 +1,6 @@
 // functions/api/translate.js
 // Proxy DeepL per Cloudflare Pages Functions
-// v 2026.05.17.01 — porting da api/translate.js Vercel v 2026.05.14.01 (F0.2)
+// v 2026.05.17.02 — added pages.dev to CORS allowlist (F0.1b done)
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -10,8 +10,8 @@ export async function onRequest(context) {
     'https://santamonicagenova-a11y.github.io',
     'https://santa-web-peach.vercel.app',
     'https://santamonicagenova.it',
-    'https://nuovo.santamonicagenova.it'
-    // TODO post-F0.1b: aggiungere URL <project>.pages.dev quando creato
+    'https://nuovo.santamonicagenova.it',
+    'https://santamonica-web.pages.dev'
   ];
   const origin = request.headers.get('origin') || '';
   const corsHeaders = {

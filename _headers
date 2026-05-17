@@ -1,0 +1,7 @@
+# Santamonica Web — Cloudflare Pages headers
+# v 2026.05.17.01
+# F0.3 — staging noindex globale via X-Robots-Tag
+# Ignorato da GitHub Pages; effetto solo su Cloudflare Pages
+
+/*
+  X-Robots-Tag: noindex, nofollow

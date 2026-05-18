@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.05.17.08 — F0.9 finalize: link footer Privacy/Cookies in new tab (target=_blank + rel=noopener noreferrer) -->
 <!-- v 2026.05.17.07 — F0.9: integrazione effettiva tag link + script vanilla-cookieconsent v3.1.0 (bundle locale) -->
 <!-- v 2026.05.17.06 — F0.9: rimosso GA4 (G-YP71EKXSXX) + banner DIY · predisposto CSS footer-policy + bottone data-cc + allineamento testo a cookies.html + privacy.html v2026.05.16.02 -->
 <!-- v 2026.05.17.02 — F0.6: aggiunto footer commento versione HTML -->
@@ -586,11 +587,11 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.17.07</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.17.08</a></p>
   </div>
   <div class="footer-policy">
-    <a href="/privacy.html" data-i18n="footer_privacy">Privacy</a>
-    <a href="/cookies.html" data-i18n="footer_cookies">Cookie Policy</a>
+    <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>
+    <a href="/cookies.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_cookies">Cookie Policy</a>
     <button type="button" class="cc-manage-link" data-cc="show-preferencesModal" data-i18n="footer_cc_manage">Gestisci preferenze cookie</button>
   </div>
 </footer>
@@ -799,6 +800,6 @@
 <script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
 <script defer src="/cookieconsent-config.js"></script>
 
-<!-- v 2026.05.17.07 -->
+<!-- v 2026.05.17.08 -->
 </body>
 </html>

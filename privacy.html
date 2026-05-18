@@ -2,7 +2,7 @@
   ─────────────────────────────────────────────────────────────────────────
   privacy.html — Informativa Privacy
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.05.17.01
+  Versione: v 2026.05.17.02
   Ultimo aggiornamento: 2026-05-17
   Lingua: IT (versione ufficiale)
   Stato: BOZZA DIY pubblicata · F0.8 revisione legale sospesa (decisione utente 17-05-2026)
@@ -18,6 +18,10 @@
   <title>Informativa Privacy — Santamonica</title>
   <meta name="description" content="Informativa sul trattamento dei dati personali del ristorante Santamonica (Il Giuliano di Andrea Giachino e C. S.a.s.), ai sensi del Reg. UE 2016/679 (GDPR) e del D.Lgs. 196/2003.">
   <link rel="canonical" href="https://santamonicagenova.it/privacy.html">
+
+  <!-- F0.9: vanilla-cookieconsent v3.1.0 (bundle locale) -->
+  <link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.css">
+
   <style>
     :root {
       --bg: #faf8f4;
@@ -506,8 +510,10 @@
 
   <h3>Storico delle versioni</h3>
   <dl class="changelog">
+    <dt>v 2026.05.17.02 — 17 maggio 2026</dt>
+    <dd>Integrazione effettiva dei tag <code>&lt;link&gt;</code> e <code>&lt;script&gt;</code> per il caricamento del banner di consenso (vanilla-cookieconsent v3.1.0, bundle locale) nel rilascio operativo F0.9 del ROADMAP v.11. Nessuna modifica sostanziale al testo dell'informativa.</dd>
     <dt>v 2026.05.17.01 — 17 maggio 2026</dt>
-    <dd>Integrazione del banner di consenso cookie (vanilla-cookieconsent v3.1.0, bundle locale) eseguita nel rilascio operativo F0.9 del ROADMAP v.08. Nessuna modifica sostanziale al testo dell'informativa.</dd>
+    <dd>Predisposizione testuale per integrazione del banner di consenso cookie. Nessuna modifica sostanziale al testo dell'informativa.</dd>
     <dt>v 2026.05.16.02 — 16 maggio 2026</dt>
     <dd>Revisione interna iterativa pre-revisione legale: correzione termini di riscontro DSAR (1 mese + 2 di proroga); rimozione di art.&nbsp;12 come «base giuridica»; integrazione informativa al destinatario di voucher ex art.&nbsp;14 GDPR; precisazioni su audit log HMAC; allineamento sezione minori; aggiornamento riferimenti trasferimenti USA al quadro DPF; lessico «sub-responsabile» (art.&nbsp;28 GDPR).</dd>
     <dt>v 2026.05.16.01 — 16 maggio 2026</dt>
@@ -515,11 +521,15 @@
   </dl>
 
   <footer class="legal-foot">
-    Informativa Privacy · v&nbsp;2026.05.17.01 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
+    Informativa Privacy · v&nbsp;2026.05.17.02 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
   </footer>
 
 </main>
 
+<!-- F0.9: cookie consent — bundle locale + config -->
+<script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
+<script defer src="/cookieconsent-config.js"></script>
+
 </body>
 </html>
-<!-- Fine privacy.html · v 2026.05.17.01 -->
+<!-- Fine privacy.html · v 2026.05.17.02 -->

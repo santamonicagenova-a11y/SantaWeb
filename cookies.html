@@ -2,7 +2,7 @@
   ─────────────────────────────────────────────────────────────────────────
   cookies.html — Cookie Policy
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.05.17.01
+  Versione: v 2026.05.17.02
   Ultimo aggiornamento: 2026-05-17
   Lingua: IT (versione ufficiale)
   Stato: BOZZA DIY pubblicata · F0.8 revisione legale sospesa (decisione utente 17-05-2026)
@@ -18,6 +18,10 @@
   <title>Cookie Policy — Santamonica</title>
   <meta name="description" content="Cookie policy del ristorante Santamonica (Il Giuliano di Andrea Giachino e C. S.a.s.), ai sensi dell'art. 122 del D.Lgs. 196/2003 e dei provvedimenti del Garante per la protezione dei dati personali.">
   <link rel="canonical" href="https://santamonicagenova.it/cookies.html">
+
+  <!-- F0.9: vanilla-cookieconsent v3.1.0 (bundle locale) -->
+  <link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.css">
+
   <style>
     :root {
       --bg: #faf8f4;
@@ -312,8 +316,10 @@
 
   <h3>Storico delle versioni</h3>
   <dl class="changelog">
+    <dt>v 2026.05.17.02 — 17 maggio 2026</dt>
+    <dd>Integrazione effettiva dei tag <code>&lt;link&gt;</code> e <code>&lt;script&gt;</code> per il caricamento del banner di consenso (vanilla-cookieconsent v3.1.0, bundle locale, IT/EN/FR) nel rilascio operativo F0.9 del ROADMAP v.11. Il pulsante «Gestisci preferenze cookie» presente in §3 è ora effettivamente funzionante via attributo <code>data-cc="show-preferencesModal"</code>. Nessuna modifica sostanziale al testo della policy.</dd>
     <dt>v 2026.05.17.01 — 17 maggio 2026</dt>
-    <dd>Integrazione operativa del banner di consenso (vanilla-cookieconsent v3.1.0, bundle locale, IT) eseguita nel rilascio F0.9 del ROADMAP v.08. Il pulsante «Gestisci preferenze cookie» presente in §3 è ora funzionante via attributo <code>data-cc="show-preferencesModal"</code>. Nessuna modifica sostanziale al testo della policy.</dd>
+    <dd>Predisposizione testuale per integrazione del banner di consenso e del pulsante «Gestisci preferenze cookie». Nessuna modifica sostanziale al testo della policy.</dd>
     <dt>v 2026.05.16.02 — 16 maggio 2026</dt>
     <dd>Revisione interna iterativa pre-revisione legale: rimozione di un titolo di provvedimento del Garante non verificabile; integrazione della dichiarazione di assenza di cookie wall; precisazione che i cookie Cloudflare sono di prima parte sul dominio del sito; sostituzione del trigger del pannello preferenze con attributo standard <code>data-cc</code> della libreria (CSP-compliant); rimozione del riferimento al fingerprinting (tecnica non utilizzata) dall'elenco di tecnologie analoghe; precisazione che la libreria di consenso è ospitata in locale.</dd>
     <dt>v 2026.05.16.01 — 16 maggio 2026</dt>
@@ -321,11 +327,15 @@
   </dl>
 
   <footer class="legal-foot">
-    Cookie Policy · v&nbsp;2026.05.17.01 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
+    Cookie Policy · v&nbsp;2026.05.17.02 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
   </footer>
 
 </main>
 
+<!-- F0.9: cookie consent — bundle locale + config -->
+<script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
+<script defer src="/cookieconsent-config.js"></script>
+
 </body>
 </html>
-<!-- Fine cookies.html · v 2026.05.17.01 -->
+<!-- Fine cookies.html · v 2026.05.17.02 -->

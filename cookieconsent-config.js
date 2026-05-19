@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════════
    cookieconsent-config.js
    Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-   v 2026.05.17.01
+   v 2026.05.19.01
    F0.9 — Configurazione vanilla-cookieconsent v3.1.0 (bundle locale)
    ───────────────────────────────────────────────────────────────────────
    Dipendenze:  /lib/cookieconsent/cookieconsent.umd.js (caricato prima)
@@ -10,6 +10,24 @@
    Categorie:   necessary (always on) · embeds (opt-in, default off)
    Conformità:  GDPR Reg. UE 2016/679 + D.Lgs. 196/2003 art. 122
                 Linee guida Garante 10-06-2021 (no cookie wall · parità accept/reject)
+   ───────────────────────────────────────────────────────────────────────
+   STORICO MODIFICHE
+   - v 2026.05.19.01 (Passata 2 sostanziale F0.9 — 3 correzioni):
+       · [#8 P2] aggiunto mode: 'opt-in' esplicito (era default implicito v3)
+                 → robustezza vs eventuali breaking changes futuri lib
+       · [#4 P2] regex autoClear googleMaps corretta a /^(NID|SOCS|OGPC)$/
+                 rimosso __Secure-* che matchava cookie Google account
+                 (3PSID, 1PAPISID, …) → falsi positivi su utenti loggati Google
+                 + integrità sessione utente violata
+       · [#1 P2] rewording IT/EN/FR consentModal.description + sezione embeds
+                 preferencesModal: rimossa menzione esplicita "Google Maps /
+                 mappe Google / cartes Google" (prematura prima di F0.12)
+                 → testo generico "contenuti incorporati / mappe interattive"
+       · F0.12 TODO: aggiungere callback onConsent + onChange per gestire
+                 iframe Maps dinamico (caricamento condizionato al consenso)
+   - v 2026.05.17.01: prima emissione · IT/EN/FR simmetriche · 2 categorie
+                      (necessary + embeds predisposta per F0.12) · revision 1
+                      cookie 6 mesi · equalWeightButtons true entrambi modali
    ─────────────────────────────────────────────────────────────────────── */
 
 (function () {
@@ -21,6 +39,9 @@
   }
 
   CookieConsent.run({
+
+    /* ─── Modalità consenso esplicita (default lib v3 ma dichiarato per chiarezza) ─── */
+    mode: 'opt-in',
 
     /* ─── Revisione: incrementare se le categorie cambiano (forza nuovo consenso) ─── */
     revision: 1,
@@ -64,7 +85,11 @@
           googleMaps: {
             label: 'Google Maps',
             cookies: [
-              { name: /^(NID|SOCS|__Secure-)/ }
+              /* [v 2026.05.19.01 #4 P2] regex stretta: solo cookie effettivamente
+                 posati da Maps Embed API. NID (principale), SOCS e OGPC (occasionali).
+                 Rimosso __Secure-* perché matchava cookie Google account
+                 (3PSID, 1PAPISID, …) → falsi positivi su utenti loggati Google. */
+              { name: /^(NID|SOCS|OGPC)$/ }
             ]
           }
         }
@@ -82,7 +107,7 @@
         it: {
           consentModal: {
             title: 'Cookie e privacy',
-            description: 'Questo sito utilizza solo cookie tecnici necessari al funzionamento. Con il tuo consenso possiamo caricare contenuti di terze parti integrati (es. mappe Google) per arricchire l\'esperienza. Maggiori dettagli nella nostra <a href="/cookies.html">Cookie Policy</a> e nell\'<a href="/privacy.html">Informativa sulla Privacy</a>.',
+            description: 'Questo sito utilizza solo cookie tecnici necessari al funzionamento. Con il tuo consenso possiamo caricare contenuti incorporati di terze parti (ad es. mappe interattive) per arricchire l\'esperienza. Maggiori dettagli nella nostra <a href="/cookies.html">Cookie Policy</a> e nell\'<a href="/privacy.html">Informativa sulla Privacy</a>.',
             acceptAllBtn: 'Accetta tutti',
             acceptNecessaryBtn: 'Rifiuta tutti',
             showPreferencesBtn: 'Personalizza',
@@ -107,7 +132,7 @@
               },
               {
                 title: 'Contenuti incorporati',
-                description: 'Se attivi questa categoria potremo caricare contenuti di terze parti, come le mappe di Google. Questi servizi possono impostare cookie propri al momento del caricamento. Senza il tuo consenso, i contenuti incorporati restano disabilitati.',
+                description: 'Se attivi questa categoria potremo caricare contenuti incorporati di terze parti (ad es. mappe interattive). Questi servizi possono impostare cookie propri al momento del caricamento. Senza il tuo consenso, i contenuti incorporati restano disabilitati.',
                 linkedCategory: 'embeds'
               },
               {
@@ -122,7 +147,7 @@
         en: {
           consentModal: {
             title: 'Cookies & privacy',
-            description: 'This website uses only technical cookies required for basic operation. With your consent we can also load third-party embedded content (e.g. Google Maps) to enhance your experience. Read more in our <a href="/cookies.html">Cookie Policy</a> and <a href="/privacy.html">Privacy Policy</a>.',
+            description: 'This website uses only technical cookies required for basic operation. With your consent we can also load third-party embedded content (e.g. interactive maps) to enhance your experience. Read more in our <a href="/cookies.html">Cookie Policy</a> and <a href="/privacy.html">Privacy Policy</a>.',
             acceptAllBtn: 'Accept all',
             acceptNecessaryBtn: 'Reject all',
             showPreferencesBtn: 'Customise',
@@ -147,7 +172,7 @@
               },
               {
                 title: 'Embedded content',
-                description: 'If you enable this category we can load third-party content such as Google Maps. These services may set their own cookies when loaded. Without your consent, embedded content remains disabled.',
+                description: 'If you enable this category we can load third-party embedded content (e.g. interactive maps). These services may set their own cookies when loaded. Without your consent, embedded content remains disabled.',
                 linkedCategory: 'embeds'
               },
               {
@@ -162,7 +187,7 @@
         fr: {
           consentModal: {
             title: 'Cookies et confidentialité',
-            description: 'Ce site utilise uniquement des cookies techniques nécessaires au fonctionnement. Avec votre consentement, nous pouvons également charger des contenus tiers intégrés (par ex. cartes Google) pour enrichir votre expérience. Plus de détails dans notre <a href="/cookies.html">Politique des cookies</a> et notre <a href="/privacy.html">Politique de confidentialité</a>.',
+            description: 'Ce site utilise uniquement des cookies techniques nécessaires au fonctionnement. Avec votre consentement, nous pouvons également charger des contenus intégrés de tiers (par ex. cartes interactives) pour enrichir votre expérience. Plus de détails dans notre <a href="/cookies.html">Politique des cookies</a> et notre <a href="/privacy.html">Politique de confidentialité</a>.',
             acceptAllBtn: 'Tout accepter',
             acceptNecessaryBtn: 'Tout refuser',
             showPreferencesBtn: 'Personnaliser',
@@ -187,7 +212,7 @@
               },
               {
                 title: 'Contenus intégrés',
-                description: 'Si vous activez cette catégorie, nous pourrons charger des contenus tiers comme Google Maps. Ces services peuvent déposer leurs propres cookies au moment du chargement. Sans votre consentement, les contenus intégrés restent désactivés.',
+                description: 'Si vous activez cette catégorie, nous pourrons charger des contenus intégrés de tiers (par ex. cartes interactives). Ces services peuvent déposer leurs propres cookies au moment du chargement. Sans votre consentement, les contenus intégrés restent désactivés.',
                 linkedCategory: 'embeds'
               },
               {
@@ -205,4 +230,4 @@
 
 })();
 
-/* v 2026.05.17.01 */
+/* v 2026.05.19.01 */

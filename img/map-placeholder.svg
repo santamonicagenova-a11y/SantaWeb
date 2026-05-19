@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  map-placeholder.svg
+  Versione progetto: v 2026.05.19.05 (F0.12 introduzione)
+  Scopo: segnaposto statico mappa per sezione #info di index.html (D-F0.12-4 opt-b).
+  Sostituisce iframe OpenStreetMap (rimosso in F0.12 per coerenza convenzione no-iframe-hardcoded, dec. #21).
+  Cliccando si naviga a /dove-siamo.html#mappa dove c'è la mappa Google gestita da iframemanager.
+  Palette allineata a index.html: terracotta #c4734a + sand #f5f0e8 + ink #1a1814 + gold #b89d6a.
+  Caratteristiche: zero cookie, zero rete, zero JS.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 380" role="img"
+     aria-labelledby="mapPlaceholderTitle mapPlaceholderDesc" preserveAspectRatio="xMidYMid slice">
+  <title id="mapPlaceholderTitle">Mappa di Ristorante Santamonica — Lungomare Lombardo 27, Genova</title>
+  <desc id="mapPlaceholderDesc">Segnaposto schematico della mappa. Clicca per aprire la pagina "Dove siamo" con mappa interattiva e indicazioni stradali.</desc>
+
+  <!-- Sfondo sand (warm) -->
+  <rect width="800" height="380" fill="#f5f0e8"/>
+
+  <!-- Reticolo schematico strade (linee sottili neutre, divider tone) -->
+  <g stroke="rgba(26,24,20,0.10)" stroke-width="2" fill="none" stroke-linecap="round">
+    <!-- orizzontali -->
+    <line x1="0"   y1="70"  x2="800" y2="70"/>
+    <line x1="0"   y1="140" x2="800" y2="140"/>
+    <line x1="0"   y1="215" x2="800" y2="215"/>
+    <!-- verticali -->
+    <line x1="120" y1="0" x2="120" y2="380"/>
+    <line x1="260" y1="0" x2="260" y2="380"/>
+    <line x1="400" y1="0" x2="400" y2="380"/>
+    <line x1="540" y1="0" x2="540" y2="380"/>
+    <line x1="680" y1="0" x2="680" y2="380"/>
+  </g>
+
+  <!-- Lungomare strada principale (gold soft) -->
+  <line x1="0" y1="260" x2="800" y2="260" stroke="#b89d6a" stroke-width="16" stroke-linecap="round" opacity="0.65"/>
+  <line x1="0" y1="260" x2="800" y2="260" stroke="#f5f0e8" stroke-width="2" stroke-dasharray="22 16"/>
+
+  <!-- Mare stilizzato sotto il lungomare -->
+  <rect x="0" y="282" width="800" height="98" fill="#a8bcc4" opacity="0.40"/>
+  <!-- Onde -->
+  <g stroke="#88a0a9" stroke-width="1.5" fill="none" opacity="0.55">
+    <path d="M 0 305 Q 40 297 80 305 T 160 305 T 240 305 T 320 305 T 400 305 T 480 305 T 560 305 T 640 305 T 720 305 T 800 305"/>
+    <path d="M 0 340 Q 40 332 80 340 T 160 340 T 240 340 T 320 340 T 400 340 T 480 340 T 560 340 T 640 340 T 720 340 T 800 340"/>
+  </g>
+
+  <!-- Pin posizione (terracotta, centro-alto) -->
+  <g transform="translate(400 180)">
+    <!-- ombra -->
+    <ellipse cx="0" cy="42" rx="24" ry="6" fill="#1a1814" opacity="0.15"/>
+    <!-- corpo pin -->
+    <path d="M 0 -46 C -24 -46 -42 -28 -42 -6 C -42 16 -14 32 0 42 C 14 32 42 16 42 -6 C 42 -28 24 -46 0 -46 Z"
+          fill="#c4734a" stroke="#9f5733" stroke-width="2"/>
+    <!-- cerchio interno -->
+    <circle cx="0" cy="-9" r="12" fill="#f5f0e8"/>
+    <!-- iniziale "S" -->
+    <text x="0" y="-3" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, 'Times New Roman', serif"
+          font-size="18" font-weight="500" font-style="italic" fill="#c4734a">S</text>
+  </g>
+
+  <!-- Etichetta indirizzo (cartiglio sand su pin) -->
+  <g transform="translate(400 250)">
+    <rect x="-160" y="-19" width="320" height="36" rx="2" ry="2"
+          fill="#faf8f4" stroke="#c4734a" stroke-width="1.5"/>
+    <text x="0" y="-1" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, serif"
+          font-size="13" font-weight="500" fill="#1a1814" letter-spacing="0.08em" style="text-transform: uppercase;">SANTAMONICA</text>
+    <text x="0" y="13" text-anchor="middle" font-family="'Jost', -apple-system, BlinkMacSystemFont, sans-serif"
+          font-size="10.5" font-weight="300" fill="#3a3630" letter-spacing="0.04em">Lungomare Lombardo 27 · 16145 Genova</text>
+  </g>
+
+  <!-- CTA in basso a sinistra -->
+  <g transform="translate(28 30)">
+    <rect x="0" y="0" width="248" height="40" rx="0" ry="0"
+          fill="#c4734a"/>
+    <text x="124" y="25" text-anchor="middle" font-family="'Jost', -apple-system, BlinkMacSystemFont, sans-serif"
+          font-size="11" font-weight="400" fill="#faf8f4" letter-spacing="0.18em" style="text-transform: uppercase;">
+      Vedi dove siamo &#8594;
+    </text>
+  </g>
+
+  <!-- Nota piccola in basso a destra (provenienza segnaposto) -->
+  <text x="772" y="370" text-anchor="end" font-family="'Jost', -apple-system, BlinkMacSystemFont, sans-serif"
+        font-size="9.5" fill="#3a3630" opacity="0.55" letter-spacing="0.05em">
+    segnaposto statico · nessun cookie
+  </text>
+
+</svg>

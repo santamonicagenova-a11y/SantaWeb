@@ -1,8 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════════════
    cookieconsent-config.js
    Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-   v 2026.05.19.01
-   F0.9 — Configurazione vanilla-cookieconsent v3.1.0 (bundle locale)
+   v 2026.05.19.02
+   F0.9 chiusura + F0.9-post tweak (P3.5 + P3.8) + bug fix UX link banner
    ───────────────────────────────────────────────────────────────────────
    Dipendenze:  /lib/cookieconsent/cookieconsent.umd.js (caricato prima)
    Espone:      window.CookieConsent (globale, già attivo dopo run)
@@ -12,6 +12,27 @@
                 Linee guida Garante 10-06-2021 (no cookie wall · parità accept/reject)
    ───────────────────────────────────────────────────────────────────────
    STORICO MODIFICHE
+   - v 2026.05.19.02 (chiusura F0.9 post-verifica funzionale — 3 modifiche):
+       · [BUG FIX UX] aggiunto target="_blank" rel="noopener noreferrer"
+                 a tutti i 15 link policy (/privacy.html, /cookies.html) nelle
+                 3 traduzioni IT/EN/FR · consentModal.description (2 link/lingua)
+                 + consentModal.footer (2 link/lingua) + preferencesModal
+                 sections[0].description (1 link/lingua) = 5 × 3 = 15 link.
+                 Scoperto in verifica funzionale post-deploy F0.9 (incoerenza UX
+                 con footer pagina che già usa target=_blank).
+                 I link mailto: NON modificati (non beneficiano di target=_blank).
+       · [P3.5 F0.9-post] aggiunto hideFromBots: true (default v3 ma esplicitato)
+                 → bot crawler/lighthouse non vedono banner · evita falsi positivi
+                 in audit SEO/accessibilità Lighthouse e indicizzazione contenuto.
+       · [P3.8 F0.9-post opzione b] autoShow disabilitato condizionalmente su
+                 pagine policy (privacy.html, cookies.html) · banner appare
+                 ovunque tranne quando l'utente sta leggendo la policy stessa
+                 (anti-paradosso "leggi la policy per acconsentire al banner che
+                 ti chiede di acconsentire alla policy") · check via regex su
+                 window.location.pathname prima del run · bottone "Gestisci
+                 preferenze cookie" del footer pagina rimane operativo
+                 (CookieConsent.showPreferences() invocato manualmente via
+                 data-cc="show-preferencesModal").
    - v 2026.05.19.01 (Passata 2 sostanziale F0.9 — 3 correzioni):
        · [#8 P2] aggiunto mode: 'opt-in' esplicito (era default implicito v3)
                  → robustezza vs eventuali breaking changes futuri lib
@@ -38,10 +59,23 @@
     return;
   }
 
+  /* ─── [P3.8 opzione b · v 2026.05.19.02] autoShow condizionale ───
+     Banner NON appare automaticamente quando l'utente sta leggendo
+     privacy.html o cookies.html. Su queste pagine rimane disponibile
+     solo il bottone "Gestisci preferenze cookie" del footer (data-cc).
+     Anti-paradosso UX + non blocca lettura policy.                    */
+  const isPolicyPage = /\/(privacy|cookies)\.html$/i.test(window.location.pathname);
+
   CookieConsent.run({
 
     /* ─── Modalità consenso esplicita (default lib v3 ma dichiarato per chiarezza) ─── */
     mode: 'opt-in',
+
+    /* ─── [P3.8 v 2026.05.19.02] autoShow condizionale su pagine policy ─── */
+    autoShow: !isPolicyPage,
+
+    /* ─── [P3.5 v 2026.05.19.02] Banner nascosto a bot/crawler (default v3, esplicito) ─── */
+    hideFromBots: true,
 
     /* ─── Revisione: incrementare se le categorie cambiano (forza nuovo consenso) ─── */
     revision: 1,
@@ -107,11 +141,11 @@
         it: {
           consentModal: {
             title: 'Cookie e privacy',
-            description: 'Questo sito utilizza solo cookie tecnici necessari al funzionamento. Con il tuo consenso possiamo caricare contenuti incorporati di terze parti (ad es. mappe interattive) per arricchire l\'esperienza. Maggiori dettagli nella nostra <a href="/cookies.html">Cookie Policy</a> e nell\'<a href="/privacy.html">Informativa sulla Privacy</a>.',
+            description: 'Questo sito utilizza solo cookie tecnici necessari al funzionamento. Con il tuo consenso possiamo caricare contenuti incorporati di terze parti (ad es. mappe interattive) per arricchire l\'esperienza. Maggiori dettagli nella nostra <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy</a> e nell\'<a href="/privacy.html" target="_blank" rel="noopener noreferrer">Informativa sulla Privacy</a>.',
             acceptAllBtn: 'Accetta tutti',
             acceptNecessaryBtn: 'Rifiuta tutti',
             showPreferencesBtn: 'Personalizza',
-            footer: '<a href="/privacy.html">Privacy Policy</a>\n<a href="/cookies.html">Cookie Policy</a>'
+            footer: '<a href="/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>\n<a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy</a>'
           },
           preferencesModal: {
             title: 'Preferenze cookie',
@@ -123,7 +157,7 @@
             sections: [
               {
                 title: 'Uso dei cookie',
-                description: 'Questo sito utilizza solo i cookie strettamente necessari al funzionamento. Eventuali altri cookie sono opzionali e si attivano soltanto con il tuo consenso. Trovi il dettaglio completo nella <a href="/cookies.html">Cookie Policy</a>.'
+                description: 'Questo sito utilizza solo i cookie strettamente necessari al funzionamento. Eventuali altri cookie sono opzionali e si attivano soltanto con il tuo consenso. Trovi il dettaglio completo nella <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy</a>.'
               },
               {
                 title: 'Cookie strettamente necessari',
@@ -147,11 +181,11 @@
         en: {
           consentModal: {
             title: 'Cookies & privacy',
-            description: 'This website uses only technical cookies required for basic operation. With your consent we can also load third-party embedded content (e.g. interactive maps) to enhance your experience. Read more in our <a href="/cookies.html">Cookie Policy</a> and <a href="/privacy.html">Privacy Policy</a>.',
+            description: 'This website uses only technical cookies required for basic operation. With your consent we can also load third-party embedded content (e.g. interactive maps) to enhance your experience. Read more in our <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy</a> and <a href="/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.',
             acceptAllBtn: 'Accept all',
             acceptNecessaryBtn: 'Reject all',
             showPreferencesBtn: 'Customise',
-            footer: '<a href="/privacy.html">Privacy Policy</a>\n<a href="/cookies.html">Cookie Policy</a>'
+            footer: '<a href="/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>\n<a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy</a>'
           },
           preferencesModal: {
             title: 'Cookie preferences',
@@ -163,7 +197,7 @@
             sections: [
               {
                 title: 'Cookie usage',
-                description: 'This site uses only strictly necessary cookies. Any other cookies are optional and activated only with your consent. Full details in our <a href="/cookies.html">Cookie Policy</a>.'
+                description: 'This site uses only strictly necessary cookies. Any other cookies are optional and activated only with your consent. Full details in our <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy</a>.'
               },
               {
                 title: 'Strictly necessary cookies',
@@ -187,11 +221,11 @@
         fr: {
           consentModal: {
             title: 'Cookies et confidentialité',
-            description: 'Ce site utilise uniquement des cookies techniques nécessaires au fonctionnement. Avec votre consentement, nous pouvons également charger des contenus intégrés de tiers (par ex. cartes interactives) pour enrichir votre expérience. Plus de détails dans notre <a href="/cookies.html">Politique des cookies</a> et notre <a href="/privacy.html">Politique de confidentialité</a>.',
+            description: 'Ce site utilise uniquement des cookies techniques nécessaires au fonctionnement. Avec votre consentement, nous pouvons également charger des contenus intégrés de tiers (par ex. cartes interactives) pour enrichir votre expérience. Plus de détails dans notre <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Politique des cookies</a> et notre <a href="/privacy.html" target="_blank" rel="noopener noreferrer">Politique de confidentialité</a>.',
             acceptAllBtn: 'Tout accepter',
             acceptNecessaryBtn: 'Tout refuser',
             showPreferencesBtn: 'Personnaliser',
-            footer: '<a href="/privacy.html">Politique de confidentialité</a>\n<a href="/cookies.html">Politique des cookies</a>'
+            footer: '<a href="/privacy.html" target="_blank" rel="noopener noreferrer">Politique de confidentialité</a>\n<a href="/cookies.html" target="_blank" rel="noopener noreferrer">Politique des cookies</a>'
           },
           preferencesModal: {
             title: 'Préférences des cookies',
@@ -203,7 +237,7 @@
             sections: [
               {
                 title: 'Utilisation des cookies',
-                description: 'Ce site utilise uniquement des cookies strictement nécessaires au fonctionnement. Les autres cookies sont optionnels et activés uniquement avec votre consentement. Détails complets dans notre <a href="/cookies.html">Politique des cookies</a>.'
+                description: 'Ce site utilise uniquement des cookies strictement nécessaires au fonctionnement. Les autres cookies sont optionnels et activés uniquement avec votre consentement. Détails complets dans notre <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Politique des cookies</a>.'
               },
               {
                 title: 'Cookies strictement nécessaires',
@@ -230,4 +264,4 @@
 
 })();
 
-/* v 2026.05.19.01 */
+/* v 2026.05.19.02 */

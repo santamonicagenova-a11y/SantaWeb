@@ -2,11 +2,25 @@
   ─────────────────────────────────────────────────────────────────────────
   privacy.html — Informativa Privacy
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.05.17.02
-  Ultimo aggiornamento: 2026-05-17
+  Versione: v 2026.05.19.01
+  Ultimo aggiornamento: 2026-05-19
   Lingua: IT (versione ufficiale)
   Stato: BOZZA DIY pubblicata · F0.8 revisione legale sospesa (decisione utente 17-05-2026)
   Schema di riferimento: v3 (ROADMAP_Santamonica_Web v.08 §F0.8)
+
+  Modifiche v 2026.05.19.01 (Passata 3 loop F0.9):
+  - [P3.21] Rimosso blocco duplicato con path errati (/assets/cookieconsent/v3/...
+            e /assets/js/cookieconsent-config.js) che generava 3 richieste 404
+            ad ogni pageload. I path corretti (/lib/cookieconsent/... e
+            /cookieconsent-config.js) erano già presenti.
+  - [P3.22c] Aggiunto disclaimer in §12 «Cookie e tecnologie simili» per
+             chiarire che Google Maps e Stripe sono in predisposizione tecnica
+             e non ancora operativi sul sito (rimozione disclaimer prevista
+             a F0.12 e F0.13).
+  - [fix UI] Corretta discrepanza pre-esistente: la sigla versione visibile
+             nell'header della pagina (legal-meta) riportava v 2026.05.17.01
+             mentre header commento e footer riportavano v 2026.05.17.02.
+             Allineato tutto a v 2026.05.19.01.
   ─────────────────────────────────────────────────────────────────────────
 -->
 <!DOCTYPE html>
@@ -83,10 +97,6 @@
       th, td { padding: 0.55rem 0.5rem; }
     }
   </style>
-  <!-- Cookie consent · vanilla-cookieconsent v3.1.0 (bundle locale) · F0.9 -->
-  <link rel="stylesheet" href="/assets/cookieconsent/v3/cookieconsent.css">
-  <script defer src="/assets/cookieconsent/v3/cookieconsent.umd.js"></script>
-  <script defer src="/assets/js/cookieconsent-config.js"></script>
 </head>
 <body>
 
@@ -96,7 +106,7 @@
     <div class="breadcrumb"><a href="/">Santamonica</a> &nbsp;›&nbsp; Privacy</div>
     <h1>Informativa sulla Privacy</h1>
     <p class="legal-meta">
-      Ultimo aggiornamento: <strong>17 maggio 2026</strong> · Versione&nbsp;<strong>v&nbsp;2026.05.17.01</strong> · Lingua&nbsp;ufficiale: italiano
+      Ultimo aggiornamento: <strong>19 maggio 2026</strong> · Versione&nbsp;<strong>v&nbsp;2026.05.19.01</strong> · Lingua&nbsp;ufficiale: italiano
     </p>
   </header>
 
@@ -496,6 +506,8 @@
     <strong>In breve:</strong> usiamo pochissimi cookie, tutti descritti nella <a href="/cookies.html">Cookie Policy</a> dedicata. Puoi rivedere o ritirare il consenso in qualunque momento dal pannello «Gestisci preferenze».
   </div>
 
+  <p><strong>Nota — stato attuale di sviluppo.</strong> La mappa di Google e il sistema di pagamento dei voucher tramite Stripe menzionati di seguito sono attualmente in fase di predisposizione tecnica e <strong>non sono ancora operativi</strong> sul sito. Finché non saranno attivati, nessun cookie di terze parti viene installato sul tuo dispositivo. Questa sezione descrive la configurazione che sarà in vigore una volta completata l'integrazione, prevista nelle prossime settimane.</p>
+
   <p>Il sito utilizza esclusivamente cookie tecnici necessari al funzionamento e — previo consenso espresso tramite il banner — eventuali cookie non strettamente tecnici (es. quelli impostati da Stripe nella pagina di checkout o da Google Maps nella mappa incorporata). Non utilizziamo cookie analitici di profilazione: la web analytics adottata (Cloudflare Web Analytics) funziona <em>senza</em> impostare cookie nel browser.</p>
   <p>Per il dettaglio aggiornato dei cookie utilizzati, della loro durata e delle modalità di gestione delle preferenze, consulta la <a href="/cookies.html"><strong>Cookie Policy</strong></a>.</p>
 
@@ -510,6 +522,8 @@
 
   <h3>Storico delle versioni</h3>
   <dl class="changelog">
+    <dt>v 2026.05.19.01 — 19 maggio 2026</dt>
+    <dd>Loop 3 passate F0.9 — Passata 3 (autocritica + adversarial): rimosso blocco duplicato di tag con path errati (<code>/assets/cookieconsent/v3/…</code>) che generava errori 404 ad ogni pageload (P3.21); aggiunto disclaimer in §12 per chiarire che Google Maps e Stripe sono in fase di predisposizione tecnica e non ancora operativi (P3.22c); corretta discrepanza pre-esistente sulla sigla versione visibile nell'header della pagina. Nessuna modifica sostanziale al testo dell'informativa.</dd>
     <dt>v 2026.05.17.02 — 17 maggio 2026</dt>
     <dd>Integrazione effettiva dei tag <code>&lt;link&gt;</code> e <code>&lt;script&gt;</code> per il caricamento del banner di consenso (vanilla-cookieconsent v3.1.0, bundle locale) nel rilascio operativo F0.9 del ROADMAP v.11. Nessuna modifica sostanziale al testo dell'informativa.</dd>
     <dt>v 2026.05.17.01 — 17 maggio 2026</dt>
@@ -521,7 +535,7 @@
   </dl>
 
   <footer class="legal-foot">
-    Informativa Privacy · v&nbsp;2026.05.17.02 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
+    Informativa Privacy · v&nbsp;2026.05.19.01 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
   </footer>
 
 </main>
@@ -532,4 +546,4 @@
 
 </body>
 </html>
-<!-- Fine privacy.html · v 2026.05.17.02 -->
+<!-- Fine privacy.html · v 2026.05.19.01 -->

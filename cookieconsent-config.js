@@ -2,7 +2,7 @@
    cookieconsent-config.js
    Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
    v 2026.05.19.02
-   F0.9 chiusura + F0.9-post tweak (P3.5 + P3.8) + bug fix UX link banner
+   F0.9 — Configurazione vanilla-cookieconsent v3.1.0 (bundle locale)
    ───────────────────────────────────────────────────────────────────────
    Dipendenze:  /lib/cookieconsent/cookieconsent.umd.js (caricato prima)
    Espone:      window.CookieConsent (globale, già attivo dopo run)
@@ -12,27 +12,24 @@
                 Linee guida Garante 10-06-2021 (no cookie wall · parità accept/reject)
    ───────────────────────────────────────────────────────────────────────
    STORICO MODIFICHE
-   - v 2026.05.19.02 (chiusura F0.9 post-verifica funzionale — 3 modifiche):
-       · [BUG FIX UX] aggiunto target="_blank" rel="noopener noreferrer"
-                 a tutti i 15 link policy (/privacy.html, /cookies.html) nelle
-                 3 traduzioni IT/EN/FR · consentModal.description (2 link/lingua)
-                 + consentModal.footer (2 link/lingua) + preferencesModal
-                 sections[0].description (1 link/lingua) = 5 × 3 = 15 link.
-                 Scoperto in verifica funzionale post-deploy F0.9 (incoerenza UX
-                 con footer pagina che già usa target=_blank).
-                 I link mailto: NON modificati (non beneficiano di target=_blank).
-       · [P3.5 F0.9-post] aggiunto hideFromBots: true (default v3 ma esplicitato)
-                 → bot crawler/lighthouse non vedono banner · evita falsi positivi
-                 in audit SEO/accessibilità Lighthouse e indicizzazione contenuto.
-       · [P3.8 F0.9-post opzione b] autoShow disabilitato condizionalmente su
-                 pagine policy (privacy.html, cookies.html) · banner appare
-                 ovunque tranne quando l'utente sta leggendo la policy stessa
-                 (anti-paradosso "leggi la policy per acconsentire al banner che
-                 ti chiede di acconsentire alla policy") · check via regex su
-                 window.location.pathname prima del run · bottone "Gestisci
-                 preferenze cookie" del footer pagina rimane operativo
-                 (CookieConsent.showPreferences() invocato manualmente via
-                 data-cc="show-preferencesModal").
+   - v 2026.05.19.02 (verifica funzionale F0.9 — 3 modifiche):
+       · [bug fix scoperto in verifica funzionale] aggiunto
+                 target="_blank" rel="noopener noreferrer" a 15 link policy
+                 (Privacy + Cookie) nelle traduzioni IT/EN/FR
+                 (consentModal.description + .footer + preferencesModal.sections[0])
+                 → coerenza con convenzione "Link footer Privacy/Cookies in
+                 index.html: target=_blank rel=noopener noreferrer" già adottata
+                 → fix UX: click link dal banner non sposta più l'utente
+                 dal modale cookie corrente
+       · [P3.5 backlog F0.9-post] aggiunto hideFromBots: true esplicito
+                 (è già default v3, dichiarazione per robustezza vs
+                 eventuali breaking changes futuri lib)
+       · [P3.8 backlog F0.9-post · opzione b confermata utente] aggiunto
+                 autoShow: !isPolicyPage con detection via window.location.pathname
+                 → banner NON auto-mostrato su /privacy.html e /cookies.html
+                 → utente atterrato direttamente su policy può leggerla senza
+                 interruzioni · bottone "Gestisci preferenze cookie" del footer
+                 rimane operativo (data-cc="show-preferencesModal")
    - v 2026.05.19.01 (Passata 2 sostanziale F0.9 — 3 correzioni):
        · [#8 P2] aggiunto mode: 'opt-in' esplicito (era default implicito v3)
                  → robustezza vs eventuali breaking changes futuri lib
@@ -59,26 +56,25 @@
     return;
   }
 
-  /* ─── [P3.8 opzione b · v 2026.05.19.02] autoShow condizionale ───
-     Banner NON appare automaticamente quando l'utente sta leggendo
-     privacy.html o cookies.html. Su queste pagine rimane disponibile
-     solo il bottone "Gestisci preferenze cookie" del footer (data-cc).
-     Anti-paradosso UX + non blocca lettura policy.                    */
-  const isPolicyPage = /\/(privacy|cookies)\.html$/i.test(window.location.pathname);
+  /* [v 2026.05.19.02 P3.8] Rileva pagine policy per disabilitare auto-show del banner.
+     Su /privacy.html e /cookies.html l'utente può leggere la policy senza che il banner
+     interrompa la lettura. Il bottone "Gestisci preferenze cookie" del footer rimane
+     operativo (azionato da data-cc="show-preferencesModal" nel markup). */
+  const isPolicyPage = /\/(privacy|cookies)\.html$/.test(window.location.pathname);
 
   CookieConsent.run({
 
     /* ─── Modalità consenso esplicita (default lib v3 ma dichiarato per chiarezza) ─── */
     mode: 'opt-in',
 
-    /* ─── [P3.8 v 2026.05.19.02] autoShow condizionale su pagine policy ─── */
-    autoShow: !isPolicyPage,
-
-    /* ─── [P3.5 v 2026.05.19.02] Banner nascosto a bot/crawler (default v3, esplicito) ─── */
-    hideFromBots: true,
-
     /* ─── Revisione: incrementare se le categorie cambiano (forza nuovo consenso) ─── */
     revision: 1,
+
+    /* ─── [v 2026.05.19.02 P3.8] Auto-show condizionato: no su pagine policy ─── */
+    autoShow: !isPolicyPage,
+
+    /* ─── [v 2026.05.19.02 P3.5] Anti-falsi positivi crawler (è già default v3) ─── */
+    hideFromBots: true,
 
     /* ─── Cookie di stato del consenso ─── */
     cookie: {

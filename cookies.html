@@ -2,11 +2,26 @@
   ─────────────────────────────────────────────────────────────────────────
   cookies.html — Cookie Policy
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.05.19.01
+  Versione: v 2026.05.19.02
   Ultimo aggiornamento: 2026-05-19
   Lingua: IT (versione ufficiale)
   Stato: BOZZA DIY pubblicata · F0.8 revisione legale sospesa (decisione utente 17-05-2026)
   Schema di riferimento: v3 (ROADMAP_Santamonica_Web v.08 §F0.8)
+
+  Modifiche v 2026.05.19.02 (F0.9 chiusura — release coordinata):
+  - Bump versioning per coerenza con release F0.9 chiusura del 19-05-2026 sera
+            (cookieconsent-config.js v 2026.05.19.02 + privacy.html v 2026.05.19.02).
+            Convenzione progetto §12 ROADMAP: «per release di sessione usare lo
+            stesso NN su tutti i file coinvolti».
+  - Nessuna modifica funzionale al testo o al markup della policy. Il bottone
+            «Gestisci preferenze cookie» (data-cc="show-preferencesModal", §3)
+            era già operativo dalla v 2026.05.17.02 e resta invariato.
+  - Effetto della modifica al config v 2026.05.19.02 su questa pagina:
+            l'auto-show del banner è ora disabilitato anche su /cookies.html
+            (autoShow: !isPolicyPage in cookieconsent-config.js), per evitare
+            il paradosso UX «leggi la policy per acconsentire al banner che ti
+            chiede di acconsentire alla policy». Il bottone in §3 resta l'unico
+            trigger del preferences modal su questa pagina.
 
   Modifiche v 2026.05.19.01 (Passata 3 loop F0.9):
   - [P3.21] Rimosso blocco duplicato con path errati (/assets/cookieconsent/v3/...
@@ -133,7 +148,7 @@
     <div class="breadcrumb"><a href="/">Santamonica</a> &nbsp;›&nbsp; Cookie Policy</div>
     <h1>Cookie Policy</h1>
     <p class="legal-meta">
-      Ultimo aggiornamento: <strong>19 maggio 2026</strong> · Versione&nbsp;<strong>v&nbsp;2026.05.19.01</strong> · Lingua&nbsp;ufficiale: italiano
+      Ultimo aggiornamento: <strong>19 maggio 2026</strong> · Versione&nbsp;<strong>v&nbsp;2026.05.19.02</strong> · Lingua&nbsp;ufficiale: italiano
     </p>
   </header>
 
@@ -328,6 +343,8 @@
 
   <h3>Storico delle versioni</h3>
   <dl class="changelog">
+    <dt>v 2026.05.19.02 — 19 maggio 2026</dt>
+    <dd>F0.9 chiusura — release coordinata con <code>cookieconsent-config.js</code> v 2026.05.19.02 e <a href="/privacy.html">privacy.html</a> v 2026.05.19.02. Bump versioning per coerenza (convenzione progetto: stesso <code>NN</code> sui file rilasciati nella stessa sessione). Nessuna modifica funzionale al testo o al markup della policy. Il bottone «Gestisci preferenze cookie» in §3 era già operativo dalla v 2026.05.17.02 e resta invariato. Effetto del nuovo config su questa pagina: l'auto-show del banner è ora disabilitato (autoShow conditional in <code>cookieconsent-config.js</code>); il bottone in §3 resta l'unico trigger del preferences modal.</dd>
     <dt>v 2026.05.19.01 — 19 maggio 2026</dt>
     <dd>Loop 3 passate F0.9 — Passata 3 (autocritica + adversarial): rimosso blocco duplicato di tag con path errati (<code>/assets/cookieconsent/v3/…</code>) che generava errori 404 ad ogni pageload (P3.21); aggiunto disclaimer in apertura §4 per chiarire che Google Maps e Stripe sono in fase di predisposizione tecnica e non ancora operativi (P3.22c); corretta discrepanza pre-esistente sulla sigla versione visibile nell'header della pagina. Nessuna modifica sostanziale al testo della policy.</dd>
     <dt>v 2026.05.17.02 — 17 maggio 2026</dt>
@@ -341,7 +358,7 @@
   </dl>
 
   <footer class="legal-foot">
-    Cookie Policy · v&nbsp;2026.05.19.01 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
+    Cookie Policy · v&nbsp;2026.05.19.02 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
   </footer>
 
 </main>
@@ -352,4 +369,4 @@
 
 </body>
 </html>
-<!-- Fine cookies.html · v 2026.05.19.01 -->
+<!-- Fine cookies.html · v 2026.05.19.02 -->

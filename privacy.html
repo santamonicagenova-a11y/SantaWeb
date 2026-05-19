@@ -2,11 +2,23 @@
   ─────────────────────────────────────────────────────────────────────────
   privacy.html — Informativa Privacy
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.05.19.01
+  Versione: v 2026.05.19.02
   Ultimo aggiornamento: 2026-05-19
   Lingua: IT (versione ufficiale)
   Stato: BOZZA DIY pubblicata · F0.8 revisione legale sospesa (decisione utente 17-05-2026)
   Schema di riferimento: v3 (ROADMAP_Santamonica_Web v.08 §F0.8)
+
+  Modifiche v 2026.05.19.02 (F0.9 chiusura — verifica funzionale):
+  - [bug fix scoperto in verifica P3.8] Aggiunto bottone «Gestisci preferenze cookie»
+            attivo (data-cc="show-preferencesModal", classe .cc-manage) al termine
+            della §12 «Cookie e tecnologie simili». Prima non esisteva un trigger
+            per riaprire il preferences modal da questa pagina: combinato con
+            autoShow disabilitato su /privacy.html (P3.8 opzione b applicata in
+            cookieconsent-config.js v 2026.05.19.02), l'utente atterrato direttamente
+            non aveva alcun modo di gestire le preferenze cookie. Coerente con
+            il bottone già presente in cookies.html §3 (v 2026.05.17.02).
+  - Aggiunto blocco CSS button.cc-manage (copiato da cookies.html per coerenza
+            stilistica). Nessuna modifica sostanziale al testo dell'informativa.
 
   Modifiche v 2026.05.19.01 (Passata 3 loop F0.9):
   - [P3.21] Rimosso blocco duplicato con path errati (/assets/cookieconsent/v3/...
@@ -73,6 +85,21 @@
     li { margin: 0.35rem 0; }
     a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(139, 58, 46, 0.3); }
     a:hover { border-bottom-color: var(--accent); }
+    button.cc-manage {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.7rem 1.4rem;
+      font-family: var(--sans);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      margin: 0.5rem 0;
+      border-radius: 2px;
+      transition: background .15s;
+    }
+    button.cc-manage:hover { background: #6d2c23; }
     .summary { background: var(--summary-bg); border-left: 3px solid var(--accent); padding: 1rem 1.2rem; margin: 1rem 0 1.5rem; font-size: 0.95rem; }
     .summary strong { color: var(--accent); }
     table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.92rem; }
@@ -106,7 +133,7 @@
     <div class="breadcrumb"><a href="/">Santamonica</a> &nbsp;›&nbsp; Privacy</div>
     <h1>Informativa sulla Privacy</h1>
     <p class="legal-meta">
-      Ultimo aggiornamento: <strong>19 maggio 2026</strong> · Versione&nbsp;<strong>v&nbsp;2026.05.19.01</strong> · Lingua&nbsp;ufficiale: italiano
+      Ultimo aggiornamento: <strong>19 maggio 2026</strong> · Versione&nbsp;<strong>v&nbsp;2026.05.19.02</strong> · Lingua&nbsp;ufficiale: italiano
     </p>
   </header>
 
@@ -511,6 +538,8 @@
   <p>Il sito utilizza esclusivamente cookie tecnici necessari al funzionamento e — previo consenso espresso tramite il banner — eventuali cookie non strettamente tecnici (es. quelli impostati da Stripe nella pagina di checkout o da Google Maps nella mappa incorporata). Non utilizziamo cookie analitici di profilazione: la web analytics adottata (Cloudflare Web Analytics) funziona <em>senza</em> impostare cookie nel browser.</p>
   <p>Per il dettaglio aggiornato dei cookie utilizzati, della loro durata e delle modalità di gestione delle preferenze, consulta la <a href="/cookies.html"><strong>Cookie Policy</strong></a>.</p>
 
+  <p><button type="button" class="cc-manage" data-cc="show-preferencesModal">Gestisci preferenze cookie</button></p>
+
   <h2 id="s13">13. Modifiche all'informativa</h2>
 
   <div class="summary">
@@ -522,6 +551,8 @@
 
   <h3>Storico delle versioni</h3>
   <dl class="changelog">
+    <dt>v 2026.05.19.02 — 19 maggio 2026</dt>
+    <dd>F0.9 chiusura — verifica funzionale: aggiunto bottone «Gestisci preferenze cookie» attivo (<code>data-cc="show-preferencesModal"</code>) al termine della §12 «Cookie e tecnologie simili». Coerente con il bottone già presente in <a href="/cookies.html">cookies.html</a> §3 dalla v 2026.05.17.02. Disposizione necessaria a seguito dell'introduzione, in <code>cookieconsent-config.js</code> v 2026.05.19.02, di <code>autoShow: !isPolicyPage</code> che disabilita l'auto-mostra del banner su questa pagina (paradosso UX: «leggi la policy per acconsentire al banner che ti chiede di acconsentire alla policy»). Aggiunto blocco CSS <code>button.cc-manage</code>. Nessuna modifica sostanziale al testo dell'informativa.</dd>
     <dt>v 2026.05.19.01 — 19 maggio 2026</dt>
     <dd>Loop 3 passate F0.9 — Passata 3 (autocritica + adversarial): rimosso blocco duplicato di tag con path errati (<code>/assets/cookieconsent/v3/…</code>) che generava errori 404 ad ogni pageload (P3.21); aggiunto disclaimer in §12 per chiarire che Google Maps e Stripe sono in fase di predisposizione tecnica e non ancora operativi (P3.22c); corretta discrepanza pre-esistente sulla sigla versione visibile nell'header della pagina. Nessuna modifica sostanziale al testo dell'informativa.</dd>
     <dt>v 2026.05.17.02 — 17 maggio 2026</dt>
@@ -535,7 +566,7 @@
   </dl>
 
   <footer class="legal-foot">
-    Informativa Privacy · v&nbsp;2026.05.19.01 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
+    Informativa Privacy · v&nbsp;2026.05.19.02 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
   </footer>
 
 </main>
@@ -546,4 +577,4 @@
 
 </body>
 </html>
-<!-- Fine privacy.html · v 2026.05.19.01 -->
+<!-- Fine privacy.html · v 2026.05.19.02 -->

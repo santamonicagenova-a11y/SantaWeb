@@ -2,10 +2,23 @@
   ─────────────────────────────────────────────────────────────────────────
   dove-siamo.html — Dove siamo / Contatti
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.05.19.05
-  Ultimo aggiornamento: 2026-05-19
+  Versione: v 2026.05.20.01
+  Ultimo aggiornamento: 2026-05-20
   Lingua: IT (versione ufficiale)
-  Stato: BOZZA INFORMATIVA · F0.12 del ROADMAP v.14
+  Stato: BOZZA INFORMATIVA · F0.12 chiusa (hotfix layout)
+
+  Modifiche v 2026.05.20.01 (HOTFIX layout iframe post-F0.12):
+  - [bug rilevato post-deploy F0.12] L'iframe Google Maps inserito
+    dinamicamente da iframemanager dopo il consenso veniva renderizzato
+    con larghezza ridotta (~50% del contenitore .map-wrap) anziché full-width.
+    Causa: iframemanager.js crea l'<iframe> con attributi HTML inline width/height
+    di default (≈300x150 px) che hanno priorità sul CSS senza !important.
+    Fix: aggiunti !important sulle regole .map-wrap iframe { width: 100%; height: ... }
+    + regola esplicita sul wrapper [data-service="google-maps"] per garantire
+    full-width anche del wrapper figlio iframemanager.
+  - Nessuna modifica al markup HTML né alla configurazione iframemanager.
+  - File coordinati v.05 (cookieconsent-config.js, lib/iframemanager/*, etc.)
+    INVARIATI: la fix è interamente lato CSS in questa pagina.
 
   Modifiche v 2026.05.19.05 (F0.12 — Maps + iframemanager · 6 modifiche):
   - [F0.12 core] Iframe OpenStreetMap rimosso. Sostituito con placeholder
@@ -39,15 +52,15 @@
   - Click-to-call · click-to-mail · intent geo:
   - Banner cookie integrato (auto-show non è policy page)
 
-  TODO pre-pubblicazione (aggiornato F0.12):
+  TODO pre-pubblicazione (aggiornato post-hotfix):
   - [F0.11-post] Sostituire URL logo placeholder "/img/logo-santamonica.png"
     con asset reale (N9).
   - [F0.11-post] Sostituire URL foto principale placeholder "/img/og-home.jpg"
     con asset reale (N10).
-  - [F0.12-post] Test funzionale loop 3 passate P3 adversarial:
-    · Atterraggio fresh → solo segnaposto (no chiamate maps.googleapis.com)
-    · Accept all dal banner → iframe Maps appare automatico
-    · Revoca da preferences → iframe smontato + cookie NID/SOCS/OGPC puliti
+  - [F0.12-post] ✅ Test funzionale post-deploy positivo: pipeline iframemanager
+    funziona (consenso → iframe Maps si carica). Restano: verifica DevTools
+    cookies posati da Google su .google.com (NID/SOCS/OGPC), revoca consenso
+    → smontaggio iframe + pulizia cookie.
   - [F2.2] Tradurre in EN/FR (versione di cortesia).
   ─────────────────────────────────────────────────────────────────────────
 -->
@@ -266,31 +279,44 @@
       margin-left: 0.3rem;
     }
 
-    /* ═══ MAPPA — F0.12 placeholder iframemanager ═══
+    /* ═══ MAPPA — F0.12 placeholder iframemanager · hotfix v 2026.05.20.01 ═══
        Wrapper esterno: stesso style della v.04 (border + radius + overflow).
        iframemanager.css upstream gestisce la struttura interna:
        - .c-mp-wrap (wrapper iframemanager · ratio mantenuto)
        - .c-ph-thumbnail (segnaposto SVG)
        - .c-ld-btn (bottone "Carica la mappa")
        - .c-n-cookies (testo notice consenso)
-       Override locali sotto per integrare la palette del sito. */
+       Override locali sotto per integrare la palette del sito.
+
+       HOTFIX v 2026.05.20.01: l'iframe Google Maps inserito da iframemanager
+       post-consenso ha attributi HTML inline (width/height ≈300x150) che
+       sovrascrivono il CSS senza !important → mappa renderizzata a 50% del
+       contenitore. Fix: !important su width/height/display dell'iframe +
+       garanzia di full-width sul wrapper [data-service="google-maps"]. */
     .map-wrap {
       margin: 1rem 0 1.5rem;
       border: 1px solid var(--rule);
       border-radius: 4px;
       overflow: hidden;
       background: var(--surface);
+      width: 100%;
     }
-    /* iframe Google Maps (post-consenso, inserito da iframemanager) */
+    /* iframe Google Maps (post-consenso, inserito da iframemanager).
+       !important necessari per battere gli attributi HTML inline dell'iframe. */
     .map-wrap iframe {
+      display: block !important;
+      width: 100% !important;
+      height: 320px !important;
+      border: 0 !important;
+      max-width: 100% !important;
+    }
+    /* Placeholder iframemanager pre-consenso + wrapper post-consenso:
+       garantiscono full-width del contenitore .map-wrap. */
+    .map-wrap [data-service="google-maps"] {
       display: block;
       width: 100%;
-      height: 320px;
-      border: 0;
-    }
-    /* Placeholder iframemanager: altezza coerente con iframe finale */
-    .map-wrap [data-service="google-maps"] {
       min-height: 320px;
+      box-sizing: border-box;
     }
     /* Override estetica iframemanager (luminosità coerente con palette legal) */
     .map-wrap .c-n-cookies {
@@ -384,7 +410,7 @@
       h1 { font-size: 2.25rem; }
       h2 { font-size: 1.5rem; }
       .contact-block { grid-template-columns: repeat(2, 1fr); }
-      .map-wrap iframe { height: 380px; }
+      .map-wrap iframe { height: 380px !important; }
       .map-wrap [data-service="google-maps"] { min-height: 380px; }
     }
   </style>
@@ -525,7 +551,7 @@
   </div>
 
   <footer class="legal-foot">
-    Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991 · v&nbsp;2026.05.19.05
+    Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991 · v&nbsp;2026.05.20.01
     <div class="foot-links">
       <a href="/">Home</a>
       <a href="/regala.html">Voucher regalo</a>
@@ -559,4 +585,4 @@
 
 </body>
 </html>
-<!-- Fine dove-siamo.html · v 2026.05.19.05 -->
+<!-- Fine dove-siamo.html · v 2026.05.20.01 -->

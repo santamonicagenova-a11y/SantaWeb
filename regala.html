@@ -1,0 +1,348 @@
+<!--
+  ─────────────────────────────────────────────────────────────────────────
+  regala.html — Voucher Regalo Santamonica
+  Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
+  Versione: v 2026.05.19.03
+  Ultimo aggiornamento: 2026-05-19
+  Lingua: IT (versione ufficiale)
+  Stato: BOZZA INFORMATIVA · Pre-F0.13 (Stripe Payment Links non ancora attivi)
+
+  Note v 2026.05.19.03 (prima emissione F0.10):
+  - Pagina informativa minima sui voucher regalo del ristorante
+  - Tagli: 100 / 150 / 200 € (decisione utente A1 sessione 19-05)
+  - Validità: 6 mesi (decisione A3)
+  - CTA pre-F0.13: form Formspree per richiesta voucher (decisione B1)
+  - Decisione T5: checkbox opt-in marketing presente nel form (B2)
+  - Solo IT per ora (decisione C1) · F2.2 tradurrà in EN/FR
+  - Stessa palette di privacy.html/cookies.html (decisione C2)
+  - Link a /voucher-termini.html anche se file non ancora esistente (decisione D1)
+    → 404 temporaneo accettato fino a F0.14
+  - Banner cookie integrato completo: link Privacy/Cookies footer target=_blank,
+    auto-show abilitato (non è policy page → isPolicyPage=false) (decisione D2)
+
+  TODO pre-pubblicazione operativa (NON F0.10):
+  - [F0.10-post] Sostituire Formspree endpoint placeholder REPLACE_ME_VOUCHER
+    con quello reale del form voucher (campo `action` del <form>).
+  - [F0.10-post] Sostituire testi descrittivi placeholder [TESTO DA COMPLETARE]
+    con copy reale fornito dal Titolare.
+  - [F0.13] Quando Stripe Payment Links sarà attivo, sostituire il form
+    Formspree con 3 bottoni di acquisto diretto + rimuovere disclaimer
+    "in fase di predisposizione".
+  - [F0.14] Quando voucher-termini.html sarà pubblicato, il link cesserà
+    di restituire 404.
+  - [F2.2] Tradurre la pagina in EN/FR (versione di cortesia, l'italiano
+    resta lingua ufficiale).
+  ─────────────────────────────────────────────────────────────────────────
+-->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index, follow">
+  <title>Voucher Regalo — Santamonica</title>
+  <meta name="description" content="Voucher regalo del ristorante Santamonica (Il Giuliano di Andrea Giachino e C. S.a.s.): tagli da 100, 150 e 200 euro, validità 6 mesi. Richiedi un voucher per un'occasione speciale.">
+  <link rel="canonical" href="https://santamonicagenova.it/regala.html">
+
+  <!-- F0.9: vanilla-cookieconsent v3.1.0 (bundle locale) -->
+  <link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.css">
+
+  <style>
+    :root {
+      --bg: #faf8f4;
+      --surface: #ffffff;
+      --text: #2a2520;
+      --text-soft: #5a544c;
+      --accent: #8b3a2e;
+      --rule: #e6dfd4;
+      --summary-bg: #f3ede2;
+      --code-bg: #efe9dd;
+      --serif: "Cormorant Garamond", "Georgia", "Times New Roman", serif;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--sans);
+      font-size: 1rem;
+      line-height: 1.65;
+      color: var(--text);
+      background: var(--bg);
+    }
+    main.legal-page { max-width: 760px; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
+    header.legal-head { border-bottom: 1px solid var(--rule); padding-bottom: 1.5rem; margin-bottom: 2.5rem; }
+    header.legal-head .breadcrumb { font-size: 0.85rem; color: var(--text-soft); margin-bottom: 1rem; }
+    header.legal-head .breadcrumb a { color: var(--text-soft); text-decoration: none; border-bottom: 1px dotted var(--text-soft); }
+    h1 { font-family: var(--serif); font-weight: 500; font-size: 2.25rem; line-height: 1.2; margin: 0 0 0.5rem; color: var(--text); }
+    .legal-meta { font-size: 0.875rem; color: var(--text-soft); }
+    h2 { font-family: var(--serif); font-weight: 500; font-size: 1.5rem; margin: 2.5rem 0 0.75rem; color: var(--accent); }
+    h3 { font-family: var(--sans); font-weight: 600; font-size: 1.05rem; margin: 1.75rem 0 0.5rem; color: var(--text); }
+    p { margin: 0.75rem 0; }
+    ul, ol { padding-left: 1.4rem; margin: 0.75rem 0; }
+    li { margin: 0.35rem 0; }
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(139, 58, 46, 0.3); }
+    a:hover { border-bottom-color: var(--accent); }
+    .summary { background: var(--summary-bg); border-left: 3px solid var(--accent); padding: 1rem 1.2rem; margin: 1rem 0 1.5rem; font-size: 0.95rem; }
+    .summary strong { color: var(--accent); }
+
+    /* Cards voucher tagli */
+    .vouchers { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0 2.5rem; }
+    .voucher-card { background: var(--surface); border: 1px solid var(--rule); padding: 1.75rem 1.25rem; text-align: center; border-radius: 2px; }
+    .voucher-card .price { font-family: var(--serif); font-weight: 500; font-size: 2.75rem; color: var(--accent); margin: 0.25rem 0 0.5rem; line-height: 1; }
+    .voucher-card .price small { font-size: 1.25rem; color: var(--text-soft); font-weight: 400; margin-left: 0.15em; }
+    .voucher-card .voucher-desc { font-size: 0.92rem; color: var(--text-soft); margin: 0.5rem 0 0; }
+
+    /* Form richiesta voucher */
+    .voucher-form { background: var(--surface); border: 1px solid var(--rule); padding: 1.75rem 1.5rem; margin: 1.5rem 0 2rem; border-radius: 2px; }
+    .voucher-form .field { margin: 1rem 0; }
+    .voucher-form label { display: block; margin: 0 0 0.35rem; font-weight: 500; font-size: 0.92rem; color: var(--text); }
+    .voucher-form label .req { color: var(--accent); margin-left: 0.15em; }
+    .voucher-form input[type="text"],
+    .voucher-form input[type="email"],
+    .voucher-form input[type="tel"],
+    .voucher-form select,
+    .voucher-form textarea {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--rule);
+      background: var(--bg);
+      font-family: var(--sans);
+      font-size: 0.95rem;
+      color: var(--text);
+      border-radius: 2px;
+    }
+    .voucher-form input:focus,
+    .voucher-form select:focus,
+    .voucher-form textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(139, 58, 46, 0.15);
+    }
+    .voucher-form textarea { min-height: 90px; resize: vertical; }
+    .voucher-form .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      margin: 1.25rem 0 0.5rem;
+      font-size: 0.92rem;
+    }
+    .voucher-form .checkbox-row input[type="checkbox"] { width: auto; margin-top: 0.3rem; flex-shrink: 0; }
+    .voucher-form .checkbox-row label { margin: 0; font-weight: 400; color: var(--text-soft); }
+    .voucher-form .gdpr-note {
+      font-size: 0.82rem;
+      color: var(--text-soft);
+      margin: 1.25rem 0 0.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--rule);
+      line-height: 1.5;
+    }
+    .voucher-form button[type="submit"] {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.85rem 2rem;
+      font-family: var(--sans);
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 1.25rem;
+      border-radius: 2px;
+      transition: background .15s;
+    }
+    .voucher-form button[type="submit"]:hover { background: #6d2c23; }
+    .voucher-form .honeypot {
+      position: absolute;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+
+    footer.legal-foot {
+      margin-top: 4rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--rule);
+      font-size: 0.82rem;
+      color: var(--text-soft);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+      align-items: center;
+    }
+    footer.legal-foot .foot-links a {
+      color: var(--text-soft);
+      border-bottom-color: transparent;
+      margin-right: 0.75rem;
+    }
+    footer.legal-foot .foot-links a:hover { border-bottom-color: var(--text-soft); }
+    .changelog { font-size: 0.88rem; }
+    .changelog dt { font-weight: 600; margin-top: 0.5rem; }
+    .changelog dd { margin-left: 1.2rem; color: var(--text-soft); }
+
+    @media (max-width: 600px) {
+      main.legal-page { padding: 2rem 1.1rem 3.5rem; }
+      h1 { font-size: 1.8rem; }
+      h2 { font-size: 1.3rem; }
+      .voucher-card .price { font-size: 2.25rem; }
+      .voucher-form { padding: 1.25rem 1rem; }
+      footer.legal-foot { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<main class="legal-page" id="content">
+
+  <header class="legal-head">
+    <div class="breadcrumb"><a href="/">Santamonica</a> &nbsp;›&nbsp; Regala</div>
+    <h1>Voucher Regalo</h1>
+    <p class="legal-meta">
+      Validità <strong>6 mesi</strong> dalla data di emissione · Tagli da <strong>100&nbsp;€</strong>, <strong>150&nbsp;€</strong>, <strong>200&nbsp;€</strong>
+    </p>
+  </header>
+
+  <div class="summary">
+    <strong>In breve:</strong> regala un'esperienza al ristorante Santamonica. Tre tagli a scelta — 100, 150, 200 euro — validi sei mesi dall'emissione. Compila il modulo qui sotto per ricevere il voucher; ti contatteremo per finalizzare la richiesta.
+  </div>
+
+  <p>[TESTO DA COMPLETARE — descrizione introduttiva: cosa rende speciale un voucher Santamonica, occasioni tipiche (compleanno, anniversario, ringraziamento, regalo aziendale), valore esperienziale, cucina del territorio, ecc. Inserire 1-2 paragrafi di copy curato.]</p>
+
+  <h2>I tagli disponibili</h2>
+
+  <div class="vouchers" role="list">
+    <div class="voucher-card" role="listitem">
+      <div class="price">100<small>&nbsp;€</small></div>
+      <p class="voucher-desc">[TESTO DA COMPLETARE — descrizione breve esperienza tipo: es. "Cena per due, scelta libera tra carta o degustazione del momento"]</p>
+    </div>
+    <div class="voucher-card" role="listitem">
+      <div class="price">150<small>&nbsp;€</small></div>
+      <p class="voucher-desc">[TESTO DA COMPLETARE — descrizione taglio intermedio]</p>
+    </div>
+    <div class="voucher-card" role="listitem">
+      <div class="price">200<small>&nbsp;€</small></div>
+      <p class="voucher-desc">[TESTO DA COMPLETARE — descrizione taglio premium, magari con vini in abbinamento o degustazione completa]</p>
+    </div>
+  </div>
+
+  <h2>Come funziona</h2>
+
+  <ol>
+    <li><strong>Richiedi il voucher</strong> compilando il modulo qui sotto. Ti contatteremo entro 1-2 giorni lavorativi per concordare modalità di pagamento, eventuale personalizzazione e consegna.</li>
+    <li><strong>Ricevi il voucher</strong> via email (PDF) oppure cartaceo ritirandolo al ristorante. Riporta un codice univoco di validazione.</li>
+    <li><strong>Regalalo o usalo</strong> entro <strong>6 mesi</strong> dalla data di emissione. La prenotazione del tavolo va effettuata in anticipo per verificare disponibilità.</li>
+  </ol>
+
+  <h2>Termini essenziali</h2>
+
+  <ul>
+    <li><strong>Validità:</strong> 6 mesi dalla data di emissione indicata sul voucher. Trascorso il termine, il voucher non è più utilizzabile né rimborsabile.</li>
+    <li><strong>Cumulabilità:</strong> più voucher possono essere utilizzati nella stessa serata, purché coprano l'intero importo del conto o, in caso di importo inferiore, ne anticipino una parte (l'eventuale residuo è a carico del cliente).</li>
+    <li><strong>Resto:</strong> non si dà resto in contanti su voucher di importo superiore alla spesa effettiva.</li>
+    <li><strong>Smarrimento:</strong> il codice di validazione è il solo titolo per usufruire del voucher; conservare l'email o il documento cartaceo con cura.</li>
+    <li><strong>Modalità di consegna:</strong> elettronica (PDF) o cartacea (ritiro al ristorante). La scelta si concorda al momento dell'emissione.</li>
+  </ul>
+
+  <p>I termini integrali sono disponibili nella pagina dedicata: <a href="/voucher-termini.html">Termini e condizioni del voucher</a>.</p>
+
+  <h2>Richiedi un voucher</h2>
+
+  <p>Compila il modulo: ti contatteremo per finalizzare la richiesta. I campi contrassegnati con <span style="color:var(--accent);">*</span> sono obbligatori.</p>
+
+  <!-- ═══ FORM RICHIESTA VOUCHER ═══
+       TODO F0.10-post: sostituire REPLACE_ME_VOUCHER con endpoint Formspree reale.
+       Dashboard Formspree → New Form "Voucher Santamonica" → copiare endpoint
+       (formato https://formspree.io/f/xxxxxxxx) e sostituire qui sotto. -->
+  <form class="voucher-form" action="https://formspree.io/f/REPLACE_ME_VOUCHER" method="POST" novalidate>
+
+    <!-- Honeypot anti-spam (visibile solo a bot) -->
+    <input class="honeypot" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+    <!-- Subject email destinatario -->
+    <input type="hidden" name="_subject" value="Richiesta voucher dal sito Santamonica">
+
+    <div class="field">
+      <label for="vf-name">Nome e cognome <span class="req" aria-hidden="true">*</span></label>
+      <input id="vf-name" type="text" name="name" required autocomplete="name">
+    </div>
+
+    <div class="field">
+      <label for="vf-email">Email <span class="req" aria-hidden="true">*</span></label>
+      <input id="vf-email" type="email" name="email" required autocomplete="email">
+    </div>
+
+    <div class="field">
+      <label for="vf-phone">Telefono <span style="color:var(--text-soft); font-weight:400; font-size:0.85em;">(facoltativo)</span></label>
+      <input id="vf-phone" type="tel" name="phone" autocomplete="tel">
+    </div>
+
+    <div class="field">
+      <label for="vf-amount">Taglio del voucher <span class="req" aria-hidden="true">*</span></label>
+      <select id="vf-amount" name="amount" required>
+        <option value="">— Seleziona —</option>
+        <option value="100">100 €</option>
+        <option value="150">150 €</option>
+        <option value="200">200 €</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="vf-occasion">Occasione / note <span style="color:var(--text-soft); font-weight:400; font-size:0.85em;">(facoltativo)</span></label>
+      <textarea id="vf-occasion" name="occasion" placeholder="Es. regalo di compleanno, anniversario, ringraziamento per un cliente…"></textarea>
+    </div>
+
+    <!-- T5 decisione: checkbox opt-in marketing (NON pre-spuntato) -->
+    <div class="checkbox-row">
+      <input id="vf-marketing" type="checkbox" name="marketing_consent" value="yes">
+      <label for="vf-marketing">Acconsento a ricevere comunicazioni periodiche dal ristorante Santamonica (eventi, menu stagionali, novità). Posso revocare il consenso in qualunque momento scrivendo a <a href="mailto:privacy@santamonicagenova.it">privacy@santamonicagenova.it</a>.</label>
+    </div>
+
+    <p class="gdpr-note">
+      I dati inseriti sono trattati esclusivamente per gestire la tua richiesta di voucher. Il conferimento dei campi obbligatori è necessario per poterti contattare. Per dettagli sul trattamento, sui tempi di conservazione e sui tuoi diritti consulta l'<a href="/privacy.html" target="_blank" rel="noopener noreferrer">Informativa sulla Privacy</a>. Titolare del trattamento: Il Giuliano di Andrea Giachino e C. S.a.s. — P.IVA 02395420991.
+    </p>
+
+    <button type="submit">Invia richiesta</button>
+
+  </form>
+
+  <h2>Domande frequenti</h2>
+
+  <h3>Posso scegliere se ricevere il voucher in PDF o su carta?</h3>
+  <p>Sì. La preferenza si concorda quando ti contattiamo per finalizzare la richiesta. La versione PDF è inviata via email; quella cartacea si ritira al ristorante (su appuntamento concordato).</p>
+
+  <h3>Cosa succede se il voucher non viene usato entro 6 mesi?</h3>
+  <p>Il voucher non è più valido né rimborsabile. La data di scadenza è indicata in modo chiaro sul voucher stesso.</p>
+
+  <h3>Si può estendere la scadenza?</h3>
+  <p>Eventuali proroghe sono valutate caso per caso e non costituiscono un diritto. Scrivere a <a href="mailto:info@santamonicagenova.it">info@santamonicagenova.it</a> spiegando la situazione.</p>
+
+  <h3>I voucher si possono cumulare?</h3>
+  <p>Sì, all'interno della stessa serata. Vedi i <a href="/voucher-termini.html">termini integrali</a> per i dettagli.</p>
+
+  <h2>Storico delle versioni</h2>
+
+  <dl class="changelog">
+    <dt>v 2026.05.19.03 — 19 maggio 2026</dt>
+    <dd>Prima emissione (F0.10 del ROADMAP v.13). Pagina informativa minima sui voucher regalo del ristorante: tre tagli (100, 150, 200&nbsp;€), validità 6 mesi, form Formspree per richiesta. Decisioni operative consolidate in sessione 19-05-2026: A1 (tagli), A3 (validità), B1 (CTA form), B2 (checkbox opt-in marketing presente — dec. T5), C1 (solo italiano per ora), C2 (palette coerente con privacy.html / cookies.html), D1 (link a voucher-termini.html anche se temporaneamente 404 fino a F0.14), D2 (banner cookie integrato con auto-show abilitato).</dd>
+  </dl>
+
+  <footer class="legal-foot">
+    <div class="foot-meta">
+      Voucher Regalo · v&nbsp;2026.05.19.03 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
+    </div>
+    <div class="foot-links">
+      <a href="/privacy.html" target="_blank" rel="noopener noreferrer">Privacy</a>
+      <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie</a>
+      <a href="/voucher-termini.html">Termini voucher</a>
+    </div>
+  </footer>
+
+</main>
+
+<!-- F0.9: cookie consent — bundle locale + config -->
+<script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
+<script defer src="/cookieconsent-config.js"></script>
+
+</body>
+</html>
+<!-- Fine regala.html · v 2026.05.19.03 -->

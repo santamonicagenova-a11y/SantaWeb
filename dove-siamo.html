@@ -2,35 +2,52 @@
   ─────────────────────────────────────────────────────────────────────────
   dove-siamo.html — Dove siamo / Contatti
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.05.19.04
+  Versione: v 2026.05.19.05
   Ultimo aggiornamento: 2026-05-19
   Lingua: IT (versione ufficiale)
-  Stato: BOZZA INFORMATIVA · F0.11 del ROADMAP v.13
+  Stato: BOZZA INFORMATIVA · F0.12 del ROADMAP v.14
 
-  Note v 2026.05.19.04 (prima emissione F0.11):
-  - Pagina dedicata "Dove siamo" mobile-first (decisione D12 opt-c "fai quella
-    più adattiva per lettura da cellulare").
-  - Schema.org JSON-LD ItalianRestaurant (decisione M5 opt-b) duplicato qui
-    e nella homepage per massimizzare segnali SEO.
-  - Mappa OpenStreetMap iframe (decisione D13 opt-b): NO cookie tracker,
-    soluzione transitoria fino a F0.12 (Google Maps con consent banner).
-    Coordinate marker: 44.3913353, 8.9646575 (estratte da URL Google Maps).
-  - Place ID Google: ChIJGzMzZqlD0xIRKRomfkk1F2c (fornito utente N7).
-  - Range prezzi: €€€ (decisione M6 opt-c).
-  - Orari dichiarati dal Titolare (M4): mar-ven solo cena 19:30-22:30,
-    sab-dom anche pranzo 12:30-14:30. Lunedì chiuso.
-  - Click-to-call su telefono, click-to-mail su email, intent geo: link per
-    apertura nativa app maps su mobile.
-  - Banner cookie integrato (auto-show abilitato, non è policy page).
-  - Logo + foto principale: placeholder URL [TBD] da sostituire (N9, N10).
+  Modifiche v 2026.05.19.05 (F0.12 — Maps + iframemanager · 6 modifiche):
+  - [F0.12 core] Iframe OpenStreetMap rimosso. Sostituito con placeholder
+    iframemanager: <div data-service="google-maps" data-id="44.3913353,8.9646575">.
+    Pattern coordinate lat,lng (P3 loop F0.12: cambio da Place ID per
+    evitare interstitial Google). Place ID resta in Schema.org @id e nei
+    link map-actions (Google Maps Directions API destination_place_id).
+    Caricamento dell'iframe Google Maps avviene SOLO dopo consenso utente
+    (categoria "embeds" del banner cookie). Senza consenso, viene mostrato
+    il segnaposto SVG locale (/img/map-placeholder.svg) con bottone "Carica
+    la mappa" → click attiva il servizio per questa sessione. Pattern
+    conforme convenzione dec. #21 (no-iframe-hardcoded di terze parti).
+  - [F0.12 dep.] Aggiunti <link> e <script defer> per iframemanager v1.3.0
+    (bundle locale in /lib/iframemanager/). Ordine di caricamento:
+    iframemanager → cookieconsent → cookieconsent-config (gestito via defer).
+  - [F0.12 dep.] cookieconsent-config.js bumpato a v 2026.05.19.05
+    (revision: 2, inizializzazione iframemanager, callback consent gate).
+  - [P3.16 chiuso · D-F0.12-2 opt-a] Label service banner "Google Maps"
+    mantenuta (massima trasparenza GDPR Art. 13).
+  - [P3.10 chiuso] preferencesModal sezione embeds menziona ora
+    esplicitamente Google LLC USA + DPF UE-USA (lato config).
+  - [CSS] .map-wrap aggiornato per accogliere placeholder iframemanager
+    (struttura simile a iframe ma classi diverse a runtime: .c-mp-wrap,
+    .c-ph-thumbnail, .c-ld-btn — gestite da iframemanager.css upstream).
+  - [Testo .map-note] Aggiornato: rimosso riferimento a OpenStreetMap,
+    riformulato per spiegare il consent gate.
 
-  TODO pre-pubblicazione:
+  Modifiche v 2026.05.19.04 (prima emissione F0.11):
+  - Pagina dedicata "Dove siamo" mobile-first (D12 opt-c)
+  - Schema.org JSON-LD ItalianRestaurant duplicato + @id linking
+  - Click-to-call · click-to-mail · intent geo:
+  - Banner cookie integrato (auto-show non è policy page)
+
+  TODO pre-pubblicazione (aggiornato F0.12):
   - [F0.11-post] Sostituire URL logo placeholder "/img/logo-santamonica.png"
-    con asset reale quando caricato (decisione N9).
+    con asset reale (N9).
   - [F0.11-post] Sostituire URL foto principale placeholder "/img/og-home.jpg"
-    con asset reale (decisione N10 = decisione aperta ROADMAP §8 #7).
-  - [F0.12] Sostituire iframe OpenStreetMap con embed Google Maps gestito
-    dal consent banner (categoria embeds attivabile).
+    con asset reale (N10).
+  - [F0.12-post] Test funzionale loop 3 passate P3 adversarial:
+    · Atterraggio fresh → solo segnaposto (no chiamate maps.googleapis.com)
+    · Accept all dal banner → iframe Maps appare automatico
+    · Revoca da preferences → iframe smontato + cookie NID/SOCS/OGPC puliti
   - [F2.2] Tradurre in EN/FR (versione di cortesia).
   ─────────────────────────────────────────────────────────────────────────
 -->
@@ -54,6 +71,9 @@
 
   <!-- F0.9: vanilla-cookieconsent v3.1.0 (bundle locale) -->
   <link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.css">
+
+  <!-- F0.12: iframemanager v1.3.0 (bundle locale) — gate consenso per Google Maps -->
+  <link rel="stylesheet" href="/lib/iframemanager/iframemanager.css">
 
   <!-- ═══ F0.11: Schema.org JSON-LD ItalianRestaurant ═══ -->
   <script type="application/ld+json">
@@ -246,7 +266,14 @@
       margin-left: 0.3rem;
     }
 
-    /* ═══ MAPPA ═══ */
+    /* ═══ MAPPA — F0.12 placeholder iframemanager ═══
+       Wrapper esterno: stesso style della v.04 (border + radius + overflow).
+       iframemanager.css upstream gestisce la struttura interna:
+       - .c-mp-wrap (wrapper iframemanager · ratio mantenuto)
+       - .c-ph-thumbnail (segnaposto SVG)
+       - .c-ld-btn (bottone "Carica la mappa")
+       - .c-n-cookies (testo notice consenso)
+       Override locali sotto per integrare la palette del sito. */
     .map-wrap {
       margin: 1rem 0 1.5rem;
       border: 1px solid var(--rule);
@@ -254,11 +281,29 @@
       overflow: hidden;
       background: var(--surface);
     }
+    /* iframe Google Maps (post-consenso, inserito da iframemanager) */
     .map-wrap iframe {
       display: block;
       width: 100%;
       height: 320px;
       border: 0;
+    }
+    /* Placeholder iframemanager: altezza coerente con iframe finale */
+    .map-wrap [data-service="google-maps"] {
+      min-height: 320px;
+    }
+    /* Override estetica iframemanager (luminosità coerente con palette legal) */
+    .map-wrap .c-n-cookies {
+      background: rgba(255, 255, 255, 0.92) !important;
+      color: var(--text) !important;
+    }
+    .map-wrap .c-n-cookies a {
+      color: var(--accent) !important;
+    }
+    .map-wrap .c-l-b {
+      background: var(--accent) !important;
+      color: #fff !important;
+      border-radius: 2px !important;
     }
     .map-note {
       font-size: 0.82rem;
@@ -340,6 +385,7 @@
       h2 { font-size: 1.5rem; }
       .contact-block { grid-template-columns: repeat(2, 1fr); }
       .map-wrap iframe { height: 380px; }
+      .map-wrap [data-service="google-maps"] { min-height: 380px; }
     }
   </style>
 </head>
@@ -428,19 +474,25 @@
 
   <p style="font-size: 0.88rem; color: var(--text-soft);">La prenotazione è consigliata. Eventuali chiusure straordinarie (festività, ferie) vengono comunicate sui profili social del ristorante.</p>
 
-  <h2>Mappa</h2>
+  <h2 id="mappa">Mappa</h2>
 
   <!--
-    F0.11 · D13 opt-b: iframe OpenStreetMap.
-    Soluzione transitoria fino a F0.12 (Google Maps con cookie consent banner).
-    OSM Mapnik tile non installa cookie tracker → nessun consenso richiesto.
+    F0.12 · D-F0.12-1 opt-a + D-F0.12-2 opt-a:
+    Placeholder iframemanager per Google Maps Embed.
+    - Senza consenso "embeds": viene mostrato il thumbnail /img/map-placeholder.svg
+      + bottone "Carica la mappa" (testo i18n IT/EN/FR in cookieconsent-config.js).
+    - Con consenso "embeds": l'iframe Google Maps viene inserito automaticamente
+      al posto del placeholder (via im.acceptService('google-maps') chiamato
+      dai callback onConsent/onChange di CookieConsent).
+    - data-id contiene le coordinate lat,lng del ristorante (pattern coordinate
+      Google Maps share-embed senza API key, P3 in-session loop F0.12).
+      Il Place ID resta in Schema.org JSON-LD e nei map-actions.
+    Pattern conforme dec. #21 (no <iframe> hardcoded di terze parti).
   -->
   <div class="map-wrap">
-    <iframe
-      src="https://www.openstreetmap.org/export/embed.html?bbox=8.9622%2C44.3893%2C8.9672%2C44.3933&amp;layer=mapnik&amp;marker=44.3913353%2C8.9646575"
-      loading="lazy"
-      title="Mappa OpenStreetMap del Ristorante Santamonica, Lungomare Lombardo 27, Genova"></iframe>
-    <p class="map-note">Mappa fornita da OpenStreetMap · nessun cookie di tracciamento. Per indicazioni dettagliate, apri l'indirizzo in Google Maps o nell'app mappe del tuo dispositivo.</p>
+    <div data-service="google-maps" data-id="44.3913353,8.9646575"
+         aria-label="Mappa Google del Ristorante Santamonica, Lungomare Lombardo 27, Genova"></div>
+    <p class="map-note">La mappa è fornita da <strong>Google LLC</strong> (USA): viene caricata solo dopo il tuo consenso. Senza consenso non viene inviato alcun dato a Google. Puoi modificare la scelta in qualunque momento dal pulsante «Gestisci preferenze cookie» (in fondo a ogni pagina).</p>
   </div>
 
   <div class="map-actions">
@@ -473,7 +525,7 @@
   </div>
 
   <footer class="legal-foot">
-    Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991 · v&nbsp;2026.05.19.04
+    Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991 · v&nbsp;2026.05.19.05
     <div class="foot-links">
       <a href="/">Home</a>
       <a href="/regala.html">Voucher regalo</a>
@@ -496,10 +548,15 @@
 })();
 </script>
 
+<!-- F0.12: iframemanager v1.3.0 — DEVE caricare prima di cookieconsent-config.js
+     perché cookieconsent-config.js inizializza window.iframemanager().
+     L'ordine garantito dal defer è quello di apparizione nel DOM. -->
+<script defer src="/lib/iframemanager/iframemanager.umd.js"></script>
+
 <!-- F0.9: cookie consent — bundle locale + config -->
 <script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
 <script defer src="/cookieconsent-config.js"></script>
 
 </body>
 </html>
-<!-- Fine dove-siamo.html · v 2026.05.19.04 -->
+<!-- Fine dove-siamo.html · v 2026.05.19.05 -->

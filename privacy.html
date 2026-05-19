@@ -2,37 +2,35 @@
   ─────────────────────────────────────────────────────────────────────────
   privacy.html — Informativa Privacy
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.05.19.02
+  Versione: v 2026.05.19.03
   Ultimo aggiornamento: 2026-05-19
   Lingua: IT (versione ufficiale)
   Stato: BOZZA DIY pubblicata · F0.8 revisione legale sospesa (decisione utente 17-05-2026)
-  Schema di riferimento: v3 (ROADMAP_Santamonica_Web v.08 §F0.8)
+  Schema di riferimento: v3 (ROADMAP_Santamonica_Web v.14 §F0.12)
+
+  Modifiche v 2026.05.19.03 (F0.12 — Maps attivo · P3.22c parte Maps rimosso):
+  - [P3.22c parte Maps rimosso] Riformulato il disclaimer di §12 «Cookie e
+    tecnologie simili»: rimossa la menzione di Google Maps come servizio
+    «in fase di predisposizione tecnica e non ancora operativo» (la mappa
+    è ora effettivamente operativa, gestita da iframemanager con consent
+    gate). La nota per Stripe è stata riformulata per coprire solo il
+    sistema di pagamento voucher (rimozione completa prevista a F0.13).
+  - [release coordinata] Bump versioning per coerenza con release F0.12
+    (cookieconsent-config.js v 2026.05.19.05 + cookies.html v 2026.05.19.03
+    + dove-siamo.html v 2026.05.19.05 + index.html v 2026.05.19.05).
+    Convenzione progetto §12 ROADMAP: stesso NN sui file rilasciati nella
+    stessa sessione.
 
   Modifiche v 2026.05.19.02 (F0.9 chiusura — verifica funzionale):
-  - [bug fix scoperto in verifica P3.8] Aggiunto bottone «Gestisci preferenze cookie»
-            attivo (data-cc="show-preferencesModal", classe .cc-manage) al termine
-            della §12 «Cookie e tecnologie simili». Prima non esisteva un trigger
-            per riaprire il preferences modal da questa pagina: combinato con
-            autoShow disabilitato su /privacy.html (P3.8 opzione b applicata in
-            cookieconsent-config.js v 2026.05.19.02), l'utente atterrato direttamente
-            non aveva alcun modo di gestire le preferenze cookie. Coerente con
-            il bottone già presente in cookies.html §3 (v 2026.05.17.02).
-  - Aggiunto blocco CSS button.cc-manage (copiato da cookies.html per coerenza
-            stilistica). Nessuna modifica sostanziale al testo dell'informativa.
+  - [bug fix scoperto in verifica P3.8] Aggiunto bottone «Gestisci preferenze
+    cookie» attivo (data-cc="show-preferencesModal", classe .cc-manage) al
+    termine della §12.
+  - Aggiunto blocco CSS button.cc-manage.
 
   Modifiche v 2026.05.19.01 (Passata 3 loop F0.9):
-  - [P3.21] Rimosso blocco duplicato con path errati (/assets/cookieconsent/v3/...
-            e /assets/js/cookieconsent-config.js) che generava 3 richieste 404
-            ad ogni pageload. I path corretti (/lib/cookieconsent/... e
-            /cookieconsent-config.js) erano già presenti.
-  - [P3.22c] Aggiunto disclaimer in §12 «Cookie e tecnologie simili» per
-             chiarire che Google Maps e Stripe sono in predisposizione tecnica
-             e non ancora operativi sul sito (rimozione disclaimer prevista
-             a F0.12 e F0.13).
-  - [fix UI] Corretta discrepanza pre-esistente: la sigla versione visibile
-             nell'header della pagina (legal-meta) riportava v 2026.05.17.01
-             mentre header commento e footer riportavano v 2026.05.17.02.
-             Allineato tutto a v 2026.05.19.01.
+  - [P3.21] Rimosso blocco duplicato con path errati che generava 404.
+  - [P3.22c] Aggiunto disclaimer in §12 (rimosso parte Maps in v.03).
+  - [fix UI] Allineata sigla versione legal-meta header.
   ─────────────────────────────────────────────────────────────────────────
 -->
 <!DOCTYPE html>
@@ -133,7 +131,7 @@
     <div class="breadcrumb"><a href="/">Santamonica</a> &nbsp;›&nbsp; Privacy</div>
     <h1>Informativa sulla Privacy</h1>
     <p class="legal-meta">
-      Ultimo aggiornamento: <strong>19 maggio 2026</strong> · Versione&nbsp;<strong>v&nbsp;2026.05.19.02</strong> · Lingua&nbsp;ufficiale: italiano
+      Ultimo aggiornamento: <strong>19 maggio 2026</strong> · Versione&nbsp;<strong>v&nbsp;2026.05.19.03</strong> · Lingua&nbsp;ufficiale: italiano
     </p>
   </header>
 
@@ -533,9 +531,9 @@
     <strong>In breve:</strong> usiamo pochissimi cookie, tutti descritti nella <a href="/cookies.html">Cookie Policy</a> dedicata. Puoi rivedere o ritirare il consenso in qualunque momento dal pannello «Gestisci preferenze».
   </div>
 
-  <p><strong>Nota — stato attuale di sviluppo.</strong> La mappa di Google e il sistema di pagamento dei voucher tramite Stripe menzionati di seguito sono attualmente in fase di predisposizione tecnica e <strong>non sono ancora operativi</strong> sul sito. Finché non saranno attivati, nessun cookie di terze parti viene installato sul tuo dispositivo. Questa sezione descrive la configurazione che sarà in vigore una volta completata l'integrazione, prevista nelle prossime settimane.</p>
+  <p><strong>Nota — sistema pagamenti voucher (Stripe).</strong> Il sistema di pagamento dei voucher regalo tramite <strong>Stripe</strong> è attualmente in fase di predisposizione tecnica e <strong>non è ancora operativo</strong> sul sito. Finché non sarà attivato (previsto nelle prossime settimane), i cookie Stripe descritti nella Cookie Policy verranno installati esclusivamente nel momento in cui l'utente clicchi su «Acquista voucher» e venga reindirizzato a <code>checkout.stripe.com</code>. La mappa di Google nella pagina «Dove siamo» è invece <strong>operativa</strong> ed è gestita da un <em>content blocker</em> (libreria <em>iframemanager</em>) che impedisce qualsiasi caricamento prima del consenso espresso al banner.</p>
 
-  <p>Il sito utilizza esclusivamente cookie tecnici necessari al funzionamento e — previo consenso espresso tramite il banner — eventuali cookie non strettamente tecnici (es. quelli impostati da Stripe nella pagina di checkout o da Google Maps nella mappa incorporata). Non utilizziamo cookie analitici di profilazione: la web analytics adottata (Cloudflare Web Analytics) funziona <em>senza</em> impostare cookie nel browser.</p>
+  <p>Il sito utilizza esclusivamente cookie tecnici necessari al funzionamento e — previo consenso espresso tramite il banner — eventuali cookie non strettamente tecnici (es. quelli impostati da Google Maps nella mappa incorporata o, in futuro, da Stripe nella pagina di checkout). Non utilizziamo cookie analitici di profilazione: la web analytics adottata (Cloudflare Web Analytics) funziona <em>senza</em> impostare cookie nel browser.</p>
   <p>Per il dettaglio aggiornato dei cookie utilizzati, della loro durata e delle modalità di gestione delle preferenze, consulta la <a href="/cookies.html"><strong>Cookie Policy</strong></a>.</p>
 
   <p><button type="button" class="cc-manage" data-cc="show-preferencesModal">Gestisci preferenze cookie</button></p>
@@ -551,6 +549,8 @@
 
   <h3>Storico delle versioni</h3>
   <dl class="changelog">
+    <dt>v 2026.05.19.03 — 19 maggio 2026</dt>
+    <dd>F0.12 — Google Maps attiva con consent gate (iframemanager). Riformulato il disclaimer di §12 «Cookie e tecnologie simili»: rimossa la menzione di Google Maps come servizio in fase di predisposizione (ora effettivamente operativo, gestito da <em>content blocker</em> iframemanager con consent gate). La nota relativa a Stripe è stata mantenuta e ristretta al solo sistema di pagamento voucher (rimozione completa prevista a F0.13 con l'attivazione effettiva dei Payment Links). Release coordinata con <code>cookieconsent-config.js</code> v 2026.05.19.05, <a href="/cookies.html">cookies.html</a> v 2026.05.19.03 (tabella dettagliata cookie Maps in §4, chiusura P3.9), <code>dove-siamo.html</code> v 2026.05.19.05 (placeholder iframemanager al posto di iframe OSM) e <code>index.html</code> v 2026.05.19.05 (sezione #info semplificata con segnaposto SVG cliccabile). Nessuna modifica al testo sostanziale dell'informativa al di fuori della §12.</dd>
     <dt>v 2026.05.19.02 — 19 maggio 2026</dt>
     <dd>F0.9 chiusura — verifica funzionale: aggiunto bottone «Gestisci preferenze cookie» attivo (<code>data-cc="show-preferencesModal"</code>) al termine della §12 «Cookie e tecnologie simili». Coerente con il bottone già presente in <a href="/cookies.html">cookies.html</a> §3 dalla v 2026.05.17.02. Disposizione necessaria a seguito dell'introduzione, in <code>cookieconsent-config.js</code> v 2026.05.19.02, di <code>autoShow: !isPolicyPage</code> che disabilita l'auto-mostra del banner su questa pagina (paradosso UX: «leggi la policy per acconsentire al banner che ti chiede di acconsentire alla policy»). Aggiunto blocco CSS <code>button.cc-manage</code>. Nessuna modifica sostanziale al testo dell'informativa.</dd>
     <dt>v 2026.05.19.01 — 19 maggio 2026</dt>
@@ -566,7 +566,7 @@
   </dl>
 
   <footer class="legal-foot">
-    Informativa Privacy · v&nbsp;2026.05.19.02 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
+    Informativa Privacy · v&nbsp;2026.05.19.03 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
   </footer>
 
 </main>
@@ -577,4 +577,4 @@
 
 </body>
 </html>
-<!-- Fine privacy.html · v 2026.05.19.02 -->
+<!-- Fine privacy.html · v 2026.05.19.03 -->

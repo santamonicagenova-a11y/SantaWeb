@@ -1,0 +1,505 @@
+<!--
+  ─────────────────────────────────────────────────────────────────────────
+  dove-siamo.html — Dove siamo / Contatti
+  Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
+  Versione: v 2026.05.19.04
+  Ultimo aggiornamento: 2026-05-19
+  Lingua: IT (versione ufficiale)
+  Stato: BOZZA INFORMATIVA · F0.11 del ROADMAP v.13
+
+  Note v 2026.05.19.04 (prima emissione F0.11):
+  - Pagina dedicata "Dove siamo" mobile-first (decisione D12 opt-c "fai quella
+    più adattiva per lettura da cellulare").
+  - Schema.org JSON-LD ItalianRestaurant (decisione M5 opt-b) duplicato qui
+    e nella homepage per massimizzare segnali SEO.
+  - Mappa OpenStreetMap iframe (decisione D13 opt-b): NO cookie tracker,
+    soluzione transitoria fino a F0.12 (Google Maps con consent banner).
+    Coordinate marker: 44.3913353, 8.9646575 (estratte da URL Google Maps).
+  - Place ID Google: ChIJGzMzZqlD0xIRKRomfkk1F2c (fornito utente N7).
+  - Range prezzi: €€€ (decisione M6 opt-c).
+  - Orari dichiarati dal Titolare (M4): mar-ven solo cena 19:30-22:30,
+    sab-dom anche pranzo 12:30-14:30. Lunedì chiuso.
+  - Click-to-call su telefono, click-to-mail su email, intent geo: link per
+    apertura nativa app maps su mobile.
+  - Banner cookie integrato (auto-show abilitato, non è policy page).
+  - Logo + foto principale: placeholder URL [TBD] da sostituire (N9, N10).
+
+  TODO pre-pubblicazione:
+  - [F0.11-post] Sostituire URL logo placeholder "/img/logo-santamonica.png"
+    con asset reale quando caricato (decisione N9).
+  - [F0.11-post] Sostituire URL foto principale placeholder "/img/og-home.jpg"
+    con asset reale (decisione N10 = decisione aperta ROADMAP §8 #7).
+  - [F0.12] Sostituire iframe OpenStreetMap con embed Google Maps gestito
+    dal consent banner (categoria embeds attivabile).
+  - [F2.2] Tradurre in EN/FR (versione di cortesia).
+  ─────────────────────────────────────────────────────────────────────────
+-->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index, follow">
+  <title>Dove siamo — Ristorante Santamonica · Genova</title>
+  <meta name="description" content="Ristorante Santamonica a Genova, Lungomare Lombardo 27. Cucina italiana di mare, vista mare, terrazza estiva. Aperto da martedì a domenica. Telefono +39 010 5533155.">
+  <link rel="canonical" href="https://santamonicagenova.it/dove-siamo.html">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="restaurant.restaurant">
+  <meta property="og:title" content="Ristorante Santamonica · Genova">
+  <meta property="og:description" content="Cucina italiana di mare sul Lungomare Lombardo. Vista sul mare, terrazza estiva, menu degustazione.">
+  <meta property="og:url" content="https://santamonicagenova.it/dove-siamo.html">
+  <meta property="og:image" content="https://santamonicagenova.it/img/og-home.jpg">
+  <meta property="og:locale" content="it_IT">
+
+  <!-- F0.9: vanilla-cookieconsent v3.1.0 (bundle locale) -->
+  <link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.css">
+
+  <!-- ═══ F0.11: Schema.org JSON-LD ItalianRestaurant ═══ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItalianRestaurant",
+    "@id": "https://santamonicagenova.it/#restaurant",
+    "name": "Ristorante Santamonica",
+    "alternateName": "Santamonica",
+    "url": "https://santamonicagenova.it/",
+    "logo": "https://santamonicagenova.it/img/logo-santamonica.png",
+    "image": "https://santamonicagenova.it/img/og-home.jpg",
+    "telephone": "+390105533155",
+    "email": "info@santamonicagenova.it",
+    "priceRange": "€€€",
+    "servesCuisine": ["Italian", "Seafood", "Ligurian"],
+    "acceptsReservations": "True",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Lungomare Lombardo 27",
+      "addressLocality": "Genova",
+      "addressRegion": "GE",
+      "postalCode": "16145",
+      "addressCountry": "IT"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 44.3913353,
+      "longitude": 8.9646575
+    },
+    "hasMap": "https://www.google.com/maps/place/?q=place_id:ChIJGzMzZqlD0xIRKRomfkk1F2c",
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "19:30",
+        "closes": "22:30"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Saturday", "Sunday"],
+        "opens": "12:30",
+        "closes": "14:30"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Saturday", "Sunday"],
+        "opens": "19:30",
+        "closes": "22:30"
+      }
+    ],
+    "sameAs": [
+      "https://www.instagram.com/ristorantesantamonica/",
+      "https://www.facebook.com/santamonicage"
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --bg: #faf8f4;
+      --surface: #ffffff;
+      --text: #2a2520;
+      --text-soft: #5a544c;
+      --accent: #8b3a2e;
+      --rule: #e6dfd4;
+      --summary-bg: #f3ede2;
+      --serif: "Cormorant Garamond", "Georgia", "Times New Roman", serif;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--sans);
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+      -webkit-text-size-adjust: 100%;
+    }
+    main.legal-page {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2rem 1.1rem 3.5rem;
+    }
+    header.legal-head {
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .breadcrumb {
+      font-size: 0.85rem;
+      color: var(--text-soft);
+      margin-bottom: 0.75rem;
+    }
+    .breadcrumb a {
+      color: var(--text-soft);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--text-soft);
+    }
+    h1 {
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: 1.85rem;
+      line-height: 1.2;
+      margin: 0 0 0.4rem;
+    }
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-soft);
+      margin: 0;
+    }
+    h2 {
+      font-family: var(--serif);
+      font-weight: 500;
+      font-size: 1.35rem;
+      margin: 2rem 0 0.75rem;
+      color: var(--accent);
+    }
+    p { margin: 0.6rem 0; }
+    a { color: var(--accent); }
+
+    /* ═══ CONTATTI CLICK-TO-ACTION (mobile-first) ═══ */
+    .contact-block {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+      margin: 1rem 0 1.5rem;
+    }
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.85rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color .15s, transform .1s;
+    }
+    .contact-row:active { transform: scale(0.98); }
+    .contact-row:hover { border-color: var(--accent); }
+    .contact-row .icon {
+      font-size: 1.4rem;
+      width: 1.6rem;
+      text-align: center;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .contact-row .label {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.1rem;
+    }
+    .contact-row .value {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text);
+      word-break: break-word;
+    }
+    .contact-row .col { flex: 1; min-width: 0; }
+
+    /* ═══ ORARI ═══ */
+    .hours {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin: 1rem 0 1.5rem;
+    }
+    .hours tr { border-bottom: 1px solid var(--rule); }
+    .hours tr:last-child { border-bottom: none; }
+    .hours td {
+      padding: 0.65rem 0.4rem;
+      vertical-align: top;
+    }
+    .hours td.day { font-weight: 500; width: 38%; }
+    .hours td.time { color: var(--text-soft); }
+    .hours tr.closed td.time { color: #aaa; font-style: italic; }
+    .hours tr.today td.day { color: var(--accent); }
+    .hours tr.today td.day::after {
+      content: "  oggi";
+      font-size: 0.7em;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      font-weight: 600;
+      margin-left: 0.3rem;
+    }
+
+    /* ═══ MAPPA ═══ */
+    .map-wrap {
+      margin: 1rem 0 1.5rem;
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .map-wrap iframe {
+      display: block;
+      width: 100%;
+      height: 320px;
+      border: 0;
+    }
+    .map-note {
+      font-size: 0.82rem;
+      color: var(--text-soft);
+      padding: 0.6rem 0.85rem;
+      border-top: 1px solid var(--rule);
+      background: var(--bg);
+    }
+    .map-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin: 0.5rem 0 1.5rem;
+    }
+    .map-actions a {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      padding: 0.7rem 1.2rem;
+      border-radius: 2px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background .15s;
+    }
+    .map-actions a:hover { background: #6d2c23; }
+    .map-actions a.secondary {
+      background: var(--surface);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+    .map-actions a.secondary:hover { background: var(--summary-bg); }
+
+    /* ═══ SOCIAL ═══ */
+    .social-list {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin: 0.75rem 0 1rem;
+    }
+    .social-list a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.92rem;
+      border-radius: 2px;
+      transition: border-color .15s;
+    }
+    .social-list a:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ═══ FOOTER ═══ */
+    footer.legal-foot {
+      margin-top: 3rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--rule);
+      font-size: 0.82rem;
+      color: var(--text-soft);
+    }
+    footer.legal-foot .foot-links {
+      margin-top: 0.5rem;
+    }
+    footer.legal-foot .foot-links a {
+      color: var(--text-soft);
+      text-decoration: none;
+      margin-right: 0.85rem;
+      border-bottom: 1px dotted transparent;
+    }
+    footer.legal-foot .foot-links a:hover { border-bottom-color: var(--text-soft); }
+
+    /* ═══ DESKTOP — breakpoint up ═══ */
+    @media (min-width: 640px) {
+      main.legal-page { padding: 3rem 1.5rem 4rem; }
+      h1 { font-size: 2.25rem; }
+      h2 { font-size: 1.5rem; }
+      .contact-block { grid-template-columns: repeat(2, 1fr); }
+      .map-wrap iframe { height: 380px; }
+    }
+  </style>
+</head>
+<body>
+
+<main class="legal-page" id="content">
+
+  <header class="legal-head">
+    <div class="breadcrumb"><a href="/">Santamonica</a> &nbsp;›&nbsp; Dove siamo</div>
+    <h1>Dove siamo</h1>
+    <p class="subtitle">Lungomare Lombardo 27 · 16145 Genova · vista mare in zona Albaro</p>
+  </header>
+
+  <h2>Contatti</h2>
+
+  <div class="contact-block">
+
+    <a class="contact-row" href="tel:+390105533155" aria-label="Chiama il ristorante">
+      <span class="icon" aria-hidden="true">📞</span>
+      <span class="col">
+        <span class="label">Telefono</span>
+        <span class="value">+39 010 5533155</span>
+      </span>
+    </a>
+
+    <a class="contact-row" href="mailto:info@santamonicagenova.it" aria-label="Scrivi al ristorante">
+      <span class="icon" aria-hidden="true">✉️</span>
+      <span class="col">
+        <span class="label">Email</span>
+        <span class="value">info@santamonicagenova.it</span>
+      </span>
+    </a>
+
+    <a class="contact-row" href="https://www.google.com/maps/place/?q=place_id:ChIJGzMzZqlD0xIRKRomfkk1F2c" target="_blank" rel="noopener noreferrer" aria-label="Apri l'indirizzo nelle mappe">
+      <span class="icon" aria-hidden="true">📍</span>
+      <span class="col">
+        <span class="label">Indirizzo</span>
+        <span class="value">Lungomare Lombardo 27, 16145 Genova GE</span>
+      </span>
+    </a>
+
+    <a class="contact-row" href="geo:44.3913353,8.9646575?q=Ristorante+Santamonica" aria-label="Apri l'indirizzo nell'app mappe del dispositivo">
+      <span class="icon" aria-hidden="true">🧭</span>
+      <span class="col">
+        <span class="label">Indicazioni stradali</span>
+        <span class="value">Apri nell'app mappe</span>
+      </span>
+    </a>
+
+  </div>
+
+  <h2>Orari di apertura</h2>
+
+  <table class="hours" aria-label="Orari settimanali">
+    <tbody>
+      <tr id="day-mon" class="closed">
+        <td class="day">Lunedì</td>
+        <td class="time">chiuso</td>
+      </tr>
+      <tr id="day-tue">
+        <td class="day">Martedì</td>
+        <td class="time">19:30 – 22:30</td>
+      </tr>
+      <tr id="day-wed">
+        <td class="day">Mercoledì</td>
+        <td class="time">19:30 – 22:30</td>
+      </tr>
+      <tr id="day-thu">
+        <td class="day">Giovedì</td>
+        <td class="time">19:30 – 22:30</td>
+      </tr>
+      <tr id="day-fri">
+        <td class="day">Venerdì</td>
+        <td class="time">19:30 – 22:30</td>
+      </tr>
+      <tr id="day-sat">
+        <td class="day">Sabato</td>
+        <td class="time">12:30 – 14:30 &nbsp;·&nbsp; 19:30 – 22:30</td>
+      </tr>
+      <tr id="day-sun">
+        <td class="day">Domenica</td>
+        <td class="time">12:30 – 14:30 &nbsp;·&nbsp; 19:30 – 22:30</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p style="font-size: 0.88rem; color: var(--text-soft);">La prenotazione è consigliata. Eventuali chiusure straordinarie (festività, ferie) vengono comunicate sui profili social del ristorante.</p>
+
+  <h2>Mappa</h2>
+
+  <!--
+    F0.11 · D13 opt-b: iframe OpenStreetMap.
+    Soluzione transitoria fino a F0.12 (Google Maps con cookie consent banner).
+    OSM Mapnik tile non installa cookie tracker → nessun consenso richiesto.
+  -->
+  <div class="map-wrap">
+    <iframe
+      src="https://www.openstreetmap.org/export/embed.html?bbox=8.9622%2C44.3893%2C8.9672%2C44.3933&amp;layer=mapnik&amp;marker=44.3913353%2C8.9646575"
+      loading="lazy"
+      title="Mappa OpenStreetMap del Ristorante Santamonica, Lungomare Lombardo 27, Genova"></iframe>
+    <p class="map-note">Mappa fornita da OpenStreetMap · nessun cookie di tracciamento. Per indicazioni dettagliate, apri l'indirizzo in Google Maps o nell'app mappe del tuo dispositivo.</p>
+  </div>
+
+  <div class="map-actions">
+    <a href="https://www.google.com/maps/dir/?api=1&destination=44.3913353,8.9646575&destination_place_id=ChIJGzMzZqlD0xIRKRomfkk1F2c" target="_blank" rel="noopener noreferrer">Apri in Google Maps</a>
+    <a class="secondary" href="https://www.openstreetmap.org/?mlat=44.3913353&amp;mlon=8.9646575#map=17/44.39134/8.96466" target="_blank" rel="noopener noreferrer">Apri in OpenStreetMap</a>
+  </div>
+
+  <h2>Come arrivare</h2>
+
+  <h3 style="font-family: var(--sans); font-weight: 600; font-size: 1rem; margin: 1.5rem 0 0.4rem;">In auto</h3>
+  <p>Da Corso Italia, scendere verso il mare imboccando una delle traverse pedonali / carrabili che conducono al Lungomare Lombardo. Parcheggio libero o a pagamento lungo la strada — disponibilità variabile, in alta stagione consigliata partenza con anticipo.</p>
+
+  <h3 style="font-family: var(--sans); font-weight: 600; font-size: 1rem; margin: 1.25rem 0 0.4rem;">Con i mezzi pubblici</h3>
+  <p>Linee AMT che fermano in Corso Italia (fermate San Giuliano / Boccadasse / Albaro a seconda del percorso); da lì circa 5-8 minuti a piedi scendendo verso il mare. Consultare <a href="https://www.amt.genova.it" target="_blank" rel="noopener noreferrer">amt.genova.it</a> per orari aggiornati.</p>
+
+  <h3 style="font-family: var(--sans); font-weight: 600; font-size: 1rem; margin: 1.25rem 0 0.4rem;">A piedi</h3>
+  <p>Dal centro città, una passeggiata lungo Corso Italia in direzione Boccadasse offre una bella vista sul mare. L'ingresso del ristorante è a livello del Lungomare, raggiungibile dalle scalinate che scendono da Corso Italia.</p>
+
+  <h2>Seguici</h2>
+
+  <div class="social-list">
+    <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank" rel="noopener noreferrer" aria-label="Instagram Santamonica">
+      <span aria-hidden="true">📷</span>
+      <span>Instagram</span>
+    </a>
+    <a href="https://www.facebook.com/santamonicage" target="_blank" rel="noopener noreferrer" aria-label="Facebook Santamonica">
+      <span aria-hidden="true">📘</span>
+      <span>Facebook</span>
+    </a>
+  </div>
+
+  <footer class="legal-foot">
+    Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991 · v&nbsp;2026.05.19.04
+    <div class="foot-links">
+      <a href="/">Home</a>
+      <a href="/regala.html">Voucher regalo</a>
+      <a href="/privacy.html" target="_blank" rel="noopener noreferrer">Privacy</a>
+      <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie</a>
+    </div>
+  </footer>
+
+</main>
+
+<!-- ═══ JS: evidenzia il giorno corrente nella tabella orari ═══ -->
+<script>
+(function () {
+  'use strict';
+  // 0=Dom, 1=Lun, ..., 6=Sab
+  var dayMap = ['day-sun','day-mon','day-tue','day-wed','day-thu','day-fri','day-sat'];
+  var todayId = dayMap[new Date().getDay()];
+  var row = document.getElementById(todayId);
+  if (row) row.classList.add('today');
+})();
+</script>
+
+<!-- F0.9: cookie consent — bundle locale + config -->
+<script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
+<script defer src="/cookieconsent-config.js"></script>
+
+</body>
+</html>
+<!-- Fine dove-siamo.html · v 2026.05.19.04 -->

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.05.19.04 — F0.11: aggiornato Schema.org JSON-LD da @type Restaurant a ItalianRestaurant (decisione M5b) con dati TARGET pre-go-live (orari giugno 2026, email info@santamonicagenova.it ora attiva, geo coordinate da Place ID Google) · aggiunto @id per linking semantico con dove-siamo.html · aggiornate coordinate marker mappa OSM in sezione #info per coerenza · aggiunto link "Dettagli completi e indicazioni stradali → /dove-siamo.html" in #info · contenuti orari/email HTML visibili in #info NON modificati: allineamento finale al check pre-F0.21 (memoria operativa #5) -->
 <!-- v 2026.05.19.01 — F0.9 P3 cleanup: rimosso blocco duplicato con path errati (/assets/cookieconsent/v3/...) che generava 3 richieste 404 ad ogni pageload. I path corretti (/lib/cookieconsent/... e /cookieconsent-config.js) erano già presenti nel head e prima di </body> -->
 <!-- v 2026.05.17.08 — F0.9 finalize: link footer Privacy/Cookies in new tab (target=_blank + rel=noopener noreferrer) -->
 <!-- v 2026.05.17.07 — F0.9: integrazione effettiva tag link + script vanilla-cookieconsent v3.1.0 (bundle locale) -->
@@ -38,17 +39,27 @@
 <meta name="twitter:description" content="Ristorante gourmet di pesce fresco sul Lungomare Lombardo di Genova. Prenota online.">
 <meta name="twitter:image" content="https://santamonicagenova.it/img/hero.jpg">
 
-<!-- Schema.org JSON-LD -->
+<!-- Schema.org JSON-LD · F0.11 v 2026.05.19.04 · dati TARGET pre-go-live (allineato dove-siamo.html) -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Restaurant",
-  "name": "Santamonica",
+  "@type": "ItalianRestaurant",
+  "@id": "https://santamonicagenova.it/#restaurant",
+  "name": "Ristorante Santamonica",
+  "alternateName": "Santamonica",
   "description": "Ristorante gourmet di pesce fresco sul Lungomare Lombardo di Genova, segnalato dalla Guida Michelin. Cucina del territorio ligure, cantina curata, vista mare.",
-  "url": "https://santamonicagenova.it",
+  "url": "https://santamonicagenova.it/",
+  "logo": "https://santamonicagenova.it/img/logo-santamonica.png",
   "image": "https://santamonicagenova.it/img/hero.jpg",
   "telephone": "+390105533155",
-  "email": "santamonicagenova@gmail.com",
+  "email": "info@santamonicagenova.it",
+  "priceRange": "€€€",
+  "currenciesAccepted": "EUR",
+  "paymentAccepted": "Cash, Credit Card, Debit Card, Contactless",
+  "servesCuisine": ["Italian", "Seafood", "Ligurian"],
+  "menu": "https://santamonicagenova.it/menu.html",
+  "acceptsReservations": "True",
+  "award": "Guida Michelin - Good Cooking",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Lungomare Lombardo 27",
@@ -59,11 +70,30 @@
   },
   "geo": {
     "@type": "GeoCoordinates",
-    "latitude": 44.391726,
-    "longitude": 8.964593
+    "latitude": 44.3913353,
+    "longitude": 8.9646575
   },
-  "servesCuisine": ["Cucina di Mare", "Cucina Ligure", "Pesce Fresco", "Gourmet"],
-  "priceRange": "€€€",
+  "hasMap": "https://www.google.com/maps/place/?q=place_id:ChIJGzMzZqlD0xIRKRomfkk1F2c",
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "19:30",
+      "closes": "22:30"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Saturday", "Sunday"],
+      "opens": "12:30",
+      "closes": "14:30"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Saturday", "Sunday"],
+      "opens": "19:30",
+      "closes": "22:30"
+    }
+  ],
   "employee": [
     {
       "@type": "Person",
@@ -76,34 +106,8 @@
       "jobTitle": "Sommelier"
     }
   ],
-  "award": "Guida Michelin - Good Cooking",
-  "acceptsReservations": true,
-  "currenciesAccepted": "EUR",
-  "paymentAccepted": "Cash, Credit Card, Debit Card, Contactless",
-  "menu": "https://santamonicagenova.it/menu.html",
-  "hasMap": "https://www.openstreetmap.org/?mlat=44.391726&mlon=8.964593",
-  "openingHoursSpecification": [
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": "Tuesday",
-      "opens": "19:30",
-      "closes": "22:30"
-    },
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Wednesday","Thursday","Friday","Saturday"],
-      "opens": "12:30",
-      "closes": "22:30"
-    },
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": "Sunday",
-      "opens": "12:30",
-      "closes": "14:30"
-    }
-  ],
   "sameAs": [
-    "https://www.instagram.com/santamonicaristorante/",
+    "https://www.instagram.com/ristorantesantamonica/",
     "https://www.facebook.com/santamonicage"
   ]
 }
@@ -535,14 +539,17 @@
       </div>
       <div>
         <div class="map-wrapper">
-          <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=8.960702%2C44.387346%2C8.968702%2C44.395346&layer=mapnik&marker=44.391346%2C8.964702" height="380" allowfullscreen loading="lazy" title="Mappa Santamonica Genova"></iframe>
+          <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=8.9622%2C44.3893%2C8.9672%2C44.3933&layer=mapnik&marker=44.3913353%2C8.9646575" height="380" allowfullscreen loading="lazy" title="Mappa Santamonica Genova"></iframe>
           <div class="map-bar">
             <div class="map-bar-address"><span class="map-bar-label">Santamonica</span>Lungomare Lombardo 27 &mdash; Genova</div>
-            <a href="https://www.openstreetmap.org/?mlat=44.391346&mlon=8.964702#map=17/44.391346/8.964702" target="_blank" class="map-bar-link" data-i18n="map_apri">Apri in Maps &rarr;</a>
+            <a href="https://www.openstreetmap.org/?mlat=44.3913353&mlon=8.9646575#map=17/44.3913353/8.9646575" target="_blank" rel="noopener noreferrer" class="map-bar-link" data-i18n="map_apri">Apri in Maps &rarr;</a>
           </div>
         </div>
       </div>
     </div>
+    <p class="reveal" style="margin-top:2rem;text-align:center;font-family:'Jost',sans-serif;font-size:0.85rem;letter-spacing:0.05em;">
+      <a href="/dove-siamo.html" style="color:var(--terracotta);border-bottom:1px solid var(--terracotta);text-decoration:none;padding-bottom:2px;" data-i18n="info_dettagli_link">Dettagli completi e indicazioni stradali &rarr;</a>
+    </p>
   </div>
 </section>
 
@@ -797,6 +804,6 @@
 <script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
 <script defer src="/cookieconsent-config.js"></script>
 
-<!-- v 2026.05.19.01 -->
+<!-- v 2026.05.19.04 -->
 </body>
 </html>

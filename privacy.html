@@ -2,11 +2,26 @@
   ─────────────────────────────────────────────────────────────────────────
   privacy.html — Informativa Privacy
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.05.19.03
-  Ultimo aggiornamento: 2026-05-19
+  Versione: v 2026.05.20.01
+  Ultimo aggiornamento: 2026-05-20
   Lingua: IT (versione ufficiale)
   Stato: BOZZA DIY pubblicata · F0.8 revisione legale sospesa (decisione utente 17-05-2026)
-  Schema di riferimento: v3 (ROADMAP_Santamonica_Web v.14 §F0.12)
+  Schema di riferimento: v3 (ROADMAP_Santamonica_Web v.16 §F0.13)
+
+  Modifiche v 2026.05.20.01 (F0.13 — Stripe Payment Links attivi · P3.22c parte Stripe rimosso):
+  - [P3.22c parte Stripe rimosso] Eliminato il disclaimer di §12 «Nota —
+    sistema pagamenti voucher (Stripe)»: il sistema di pagamento voucher
+    tramite Stripe Payment Links è ora effettivamente operativo
+    (regala.html v 2026.05.20.01 + 3 Payment Links Live mode + ToS via
+    voucher-termini.html). Rimossa anche la parentetica «o, in futuro, da
+    Stripe nella pagina di checkout» nel paragrafo successivo (Stripe ora
+    parte integrante dello stato corrente). Chiusura simmetrica al
+    F0.12 fatto su Maps (v 2026.05.19.03).
+  - [release coordinata] Bump versioning per coerenza con release F0.13
+    (regala.html v 2026.05.20.01 refactor Stripe + voucher-termini.html
+    v 2026.05.20.01 NUOVO F0.14 + cookies.html v 2026.05.20.01).
+    Convenzione progetto §12 ROADMAP: stesso NN sui file rilasciati nella
+    stessa sessione.
 
   Modifiche v 2026.05.19.03 (F0.12 — Maps attivo · P3.22c parte Maps rimosso):
   - [P3.22c parte Maps rimosso] Riformulato il disclaimer di §12 «Cookie e
@@ -131,7 +146,7 @@
     <div class="breadcrumb"><a href="/">Santamonica</a> &nbsp;›&nbsp; Privacy</div>
     <h1>Informativa sulla Privacy</h1>
     <p class="legal-meta">
-      Ultimo aggiornamento: <strong>19 maggio 2026</strong> · Versione&nbsp;<strong>v&nbsp;2026.05.19.03</strong> · Lingua&nbsp;ufficiale: italiano
+      Ultimo aggiornamento: <strong>20 maggio 2026</strong> · Versione&nbsp;<strong>v&nbsp;2026.05.20.01</strong> · Lingua&nbsp;ufficiale: italiano
     </p>
   </header>
 
@@ -531,9 +546,7 @@
     <strong>In breve:</strong> usiamo pochissimi cookie, tutti descritti nella <a href="/cookies.html">Cookie Policy</a> dedicata. Puoi rivedere o ritirare il consenso in qualunque momento dal pannello «Gestisci preferenze».
   </div>
 
-  <p><strong>Nota — sistema pagamenti voucher (Stripe).</strong> Il sistema di pagamento dei voucher regalo tramite <strong>Stripe</strong> è attualmente in fase di predisposizione tecnica e <strong>non è ancora operativo</strong> sul sito. Finché non sarà attivato (previsto nelle prossime settimane), i cookie Stripe descritti nella Cookie Policy verranno installati esclusivamente nel momento in cui l'utente clicchi su «Acquista voucher» e venga reindirizzato a <code>checkout.stripe.com</code>. La mappa di Google nella pagina «Dove siamo» è invece <strong>operativa</strong> ed è gestita da un <em>content blocker</em> (libreria <em>iframemanager</em>) che impedisce qualsiasi caricamento prima del consenso espresso al banner.</p>
-
-  <p>Il sito utilizza esclusivamente cookie tecnici necessari al funzionamento e — previo consenso espresso tramite il banner — eventuali cookie non strettamente tecnici (es. quelli impostati da Google Maps nella mappa incorporata o, in futuro, da Stripe nella pagina di checkout). Non utilizziamo cookie analitici di profilazione: la web analytics adottata (Cloudflare Web Analytics) funziona <em>senza</em> impostare cookie nel browser.</p>
+  <p>Il sito utilizza esclusivamente cookie tecnici necessari al funzionamento e — previo consenso espresso tramite il banner — eventuali cookie non strettamente tecnici (es. quelli impostati da Google Maps nella mappa incorporata). I cookie di Stripe vengono installati esclusivamente nel momento in cui l'utente clicchi su «Acquista» nella pagina <a href="/regala.html">regala</a> e venga reindirizzato a <code>checkout.stripe.com</code> (sito esterno del fornitore del servizio di pagamento). Non utilizziamo cookie analitici di profilazione: la web analytics adottata (Cloudflare Web Analytics) funziona <em>senza</em> impostare cookie nel browser.</p>
   <p>Per il dettaglio aggiornato dei cookie utilizzati, della loro durata e delle modalità di gestione delle preferenze, consulta la <a href="/cookies.html"><strong>Cookie Policy</strong></a>.</p>
 
   <p><button type="button" class="cc-manage" data-cc="show-preferencesModal">Gestisci preferenze cookie</button></p>
@@ -549,6 +562,8 @@
 
   <h3>Storico delle versioni</h3>
   <dl class="changelog">
+    <dt>v 2026.05.20.01 — 20 maggio 2026</dt>
+    <dd>F0.13 — Stripe Payment Links attivati. Rimosso il disclaimer di §12 «Nota — sistema pagamenti voucher (Stripe)»: il sistema di pagamento voucher tramite <strong>Stripe Payment Links</strong> è ora effettivamente operativo (chiusura simmetrica del F0.12 fatto su Maps). Riformulato il paragrafo successivo per descrivere lo stato corrente di entrambi i servizi terzi (Google Maps via iframemanager + Stripe via reindirizzamento checkout esterno). Chiusura completa del backlog P3.22c (loop 3 passate F0.9, Passata 3 autocritica + adversarial). Release coordinata con <a href="/regala.html">regala.html</a> v 2026.05.20.01 (refactor: rimozione form Formspree + 3 bottoni Stripe Payment Links + link a voucher-termini operativo), <a href="/voucher-termini.html">voucher-termini.html</a> v 2026.05.20.01 (NUOVO · F0.14 · 20 sezioni · loop 3 passate inline applicato), <a href="/cookies.html">cookies.html</a> v 2026.05.20.01 (rimozione simmetrica disclaimer §4). Nessuna modifica al testo sostanziale dell'informativa al di fuori della §12.</dd>
     <dt>v 2026.05.19.03 — 19 maggio 2026</dt>
     <dd>F0.12 — Google Maps attiva con consent gate (iframemanager). Riformulato il disclaimer di §12 «Cookie e tecnologie simili»: rimossa la menzione di Google Maps come servizio in fase di predisposizione (ora effettivamente operativo, gestito da <em>content blocker</em> iframemanager con consent gate). La nota relativa a Stripe è stata mantenuta e ristretta al solo sistema di pagamento voucher (rimozione completa prevista a F0.13 con l'attivazione effettiva dei Payment Links). Release coordinata con <code>cookieconsent-config.js</code> v 2026.05.19.05, <a href="/cookies.html">cookies.html</a> v 2026.05.19.03 (tabella dettagliata cookie Maps in §4, chiusura P3.9), <code>dove-siamo.html</code> v 2026.05.19.05 (placeholder iframemanager al posto di iframe OSM) e <code>index.html</code> v 2026.05.19.05 (sezione #info semplificata con segnaposto SVG cliccabile). Nessuna modifica al testo sostanziale dell'informativa al di fuori della §12.</dd>
     <dt>v 2026.05.19.02 — 19 maggio 2026</dt>
@@ -566,7 +581,7 @@
   </dl>
 
   <footer class="legal-foot">
-    Informativa Privacy · v&nbsp;2026.05.19.03 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
+    Informativa Privacy · v&nbsp;2026.05.20.01 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
   </footer>
 
 </main>
@@ -577,4 +592,4 @@
 
 </body>
 </html>
-<!-- Fine privacy.html · v 2026.05.19.03 -->
+<!-- Fine privacy.html · v 2026.05.20.01 -->

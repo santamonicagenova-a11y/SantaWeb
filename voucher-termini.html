@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<!--
+  voucher-termini.html
+  Versione: v 2026.05.20.01
+  Pagina: Termini e condizioni d'uso buoni regalo (voucher) Santamonica
+  Fase progetto: F0.14 (sessione 2026-05-20)
+  Lingua: it (IT only, dec. F0.10 C1)
+  Note: pagina legale sobria, coerente con privacy.html / cookies.html (palette legal pages).
+        Banner cookieconsent integrato (autoShow attivo, non è policy page).
+        Bottone .cc-manage in footer per coerenza UX cross-page.
+-->
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Termini e condizioni d'uso dei buoni regalo (voucher) Santamonica · ristorante a Genova · validità 6 mesi.">
+  <meta name="robots" content="noindex,nofollow"><!-- staging CF Pages, rimozione globale F0.21 -->
+  <title>Termini d'uso buoni regalo · Santamonica Genova</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===== Palette legal pages (coerente privacy.html / cookies.html) ===== */
+    :root {
+      --ink: #1a1814;
+      --sand: #f5f0e8;
+      --paper: #fbf8f3;
+      --terracotta: #c4734a;
+      --terracotta-dark: #8b3a2e;
+      --gold: #b89d6a;
+      --rule: #e3d9c6;
+      --muted: #6b6358;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      color: var(--ink);
+      background: var(--paper);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 48px 24px 96px;
+    }
+
+    /* ===== Header ===== */
+    .legal-header {
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 32px;
+      margin-bottom: 40px;
+    }
+
+    .legal-header .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 600;
+      font-size: clamp(28px, 5vw, 40px);
+      line-height: 1.15;
+      margin: 0 0 16px;
+      color: var(--ink);
+    }
+
+    .legal-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px 28px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 20px;
+    }
+
+    .legal-meta strong { color: var(--ink); font-weight: 600; }
+
+    /* ===== Table of contents ===== */
+    nav.toc {
+      background: var(--sand);
+      border-left: 3px solid var(--terracotta);
+      padding: 24px 28px;
+      margin: 0 0 48px;
+      border-radius: 0 4px 4px 0;
+    }
+
+    nav.toc h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--terracotta-dark);
+      margin: 0 0 16px;
+      font-weight: 600;
+    }
+
+    nav.toc ol {
+      margin: 0;
+      padding-left: 0;
+      list-style: none;
+      counter-reset: toc-counter;
+      column-count: 2;
+      column-gap: 32px;
+      column-rule: 1px solid var(--rule);
+    }
+
+    nav.toc li {
+      counter-increment: toc-counter;
+      padding: 4px 0;
+      break-inside: avoid;
+    }
+
+    nav.toc li::before {
+      content: counter(toc-counter) ". ";
+      color: var(--gold);
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      margin-right: 4px;
+    }
+
+    nav.toc a {
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 14px;
+      border-bottom: 1px dotted transparent;
+      transition: border-color 0.2s ease;
+    }
+
+    nav.toc a:hover { border-bottom-color: var(--terracotta); }
+
+    @media (max-width: 540px) {
+      nav.toc ol { column-count: 1; }
+    }
+
+    /* ===== Sections ===== */
+    section.legal-section {
+      margin-bottom: 36px;
+      scroll-margin-top: 24px;
+    }
+
+    h2.section-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 600;
+      font-size: 24px;
+      margin: 0 0 16px;
+      color: var(--ink);
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    h2.section-title .num {
+      color: var(--gold);
+      font-variant-numeric: tabular-nums;
+      font-size: 0.7em;
+    }
+
+    h3 {
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: 0.02em;
+      margin: 24px 0 10px;
+      color: var(--terracotta-dark);
+    }
+
+    p { margin: 0 0 14px; }
+
+    p.lead {
+      font-size: 17px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    ul, ol { padding-left: 22px; margin: 0 0 14px; }
+    li { margin-bottom: 6px; }
+
+    strong { color: var(--ink); font-weight: 600; }
+
+    a { color: var(--terracotta-dark); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+    a:hover { color: var(--terracotta); }
+
+    /* ===== Definizioni box ===== */
+    dl.definitions {
+      background: var(--sand);
+      padding: 20px 24px;
+      border-radius: 4px;
+      margin: 12px 0 20px;
+      font-size: 14px;
+    }
+
+    dl.definitions dt {
+      font-weight: 600;
+      color: var(--terracotta-dark);
+      margin-top: 10px;
+    }
+
+    dl.definitions dt:first-child { margin-top: 0; }
+
+    dl.definitions dd { margin: 4px 0 0; color: var(--ink); }
+
+    /* ===== Highlight box (info important) ===== */
+    .highlight {
+      background: #fff8e6;
+      border-left: 3px solid var(--gold);
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 14.5px;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .highlight strong { color: var(--terracotta-dark); }
+
+    /* ===== Footer ===== */
+    footer.legal-footer {
+      margin-top: 64px;
+      padding-top: 32px;
+      border-top: 1px solid var(--rule);
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    footer.legal-footer .footer-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    footer.legal-footer .cross-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+
+    footer.legal-footer .cross-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    footer.legal-footer .cross-links a:hover { color: var(--terracotta); }
+
+    footer.legal-footer .version-tag {
+      font-family: 'Inter', monospace;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      color: var(--gold);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Bottone gestione cookie (dec. #22, coerente con privacy.html §12 + cookies.html §3) */
+    .cc-manage {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: 1px solid var(--rule);
+      color: var(--ink);
+      padding: 8px 14px;
+      border-radius: 4px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .cc-manage:hover {
+      background: var(--sand);
+      border-color: var(--terracotta);
+    }
+
+    /* Print-friendly */
+    @media print {
+      .cc-manage, nav.toc { display: none; }
+      body { background: white; font-size: 11pt; }
+      .container { max-width: 100%; padding: 0; }
+      h1 { font-size: 20pt; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- ===== HEADER ===== -->
+    <header class="legal-header">
+      <div class="eyebrow">Termini e condizioni</div>
+      <h1>Buoni regalo Santamonica<br><small style="color:var(--muted);font-weight:500;font-size:0.55em;">Condizioni d'uso e informazioni al consumatore</small></h1>
+
+      <div class="legal-meta">
+        <span><strong>Versione:</strong> v 2026.05.20.01</span>
+        <span><strong>Ultimo aggiornamento:</strong> 20 maggio 2026</span>
+        <span><strong>Titolare:</strong> Santamonica · Genova</span>
+        <span><strong>Lingua:</strong> Italiano</span>
+      </div>
+    </header>
+
+    <!-- ===== INDEX ===== -->
+    <nav class="toc" aria-label="Indice">
+      <h2>Indice</h2>
+      <ol>
+        <li><a href="#s1">Titolare e finalità</a></li>
+        <li><a href="#s2">Definizioni</a></li>
+        <li><a href="#s3">Tagli disponibili e prezzo</a></li>
+        <li><a href="#s4">Acquisto e pagamento</a></li>
+        <li><a href="#s5">Consegna del voucher</a></li>
+        <li><a href="#s6">Codice voucher</a></li>
+        <li><a href="#s7">Validità</a></li>
+        <li><a href="#s8">Modalità di riscatto</a></li>
+        <li><a href="#s9">Ambito di utilizzo</a></li>
+        <li><a href="#s10">Uso parziale e residuo</a></li>
+        <li><a href="#s11">Cumulabilità</a></li>
+        <li><a href="#s12">Trasferibilità</a></li>
+        <li><a href="#s13">Smarrimento del codice</a></li>
+        <li><a href="#s14">Diritto di recesso</a></li>
+        <li><a href="#s15">Rimborsi</a></li>
+        <li><a href="#s16">Reclami e contatti</a></li>
+        <li><a href="#s17">Trattamento dati personali</a></li>
+        <li><a href="#s18">Modifiche delle condizioni</a></li>
+        <li><a href="#s19">Legge applicabile e foro</a></li>
+        <li><a href="#s20">Risoluzione stragiudiziale (ODR)</a></li>
+      </ol>
+    </nav>
+
+    <p class="lead">Le presenti condizioni regolano l'acquisto e l'utilizzo dei buoni regalo emessi dal ristorante Santamonica. Leggile con attenzione prima di procedere all'acquisto: completando il pagamento accetti integralmente quanto qui descritto.</p>
+
+    <!-- ===== §1 ===== -->
+    <section class="legal-section" id="s1">
+      <h2 class="section-title"><span class="num">1.</span> Titolare e finalità</h2>
+      <p>I buoni regalo (di seguito "<strong>Voucher</strong>") sono emessi dal ristorante <strong>Santamonica</strong>, con sede operativa in Lungomare Lombardo 27, 16145 Genova (di seguito "<strong>Ristorante</strong>" o "<strong>noi</strong>"). I dati identificativi completi del titolare sono riportati nella <a href="/privacy.html#titolare">Privacy Policy §1</a>.</p>
+      <p>Il presente documento descrive le condizioni commerciali di emissione, consegna, utilizzo, rimborso e recesso dei Voucher, nel rispetto del Codice del Consumo (D.Lgs. 206/2005 e successive modifiche).</p>
+    </section>
+
+    <!-- ===== §2 ===== -->
+    <section class="legal-section" id="s2">
+      <h2 class="section-title"><span class="num">2.</span> Definizioni</h2>
+      <dl class="definitions">
+        <dt>Voucher</dt>
+        <dd>Buono regalo nominale o al portatore emesso da Santamonica, di valore predeterminato (vedi §3), utilizzabile presso il Ristorante secondo le presenti condizioni.</dd>
+
+        <dt>Acquirente</dt>
+        <dd>La persona fisica (consumatore) che acquista il Voucher tramite il sito santamonicagenova.it.</dd>
+
+        <dt>Beneficiario</dt>
+        <dd>La persona che presenta il Voucher al Ristorante per il riscatto. L'Acquirente e il Beneficiario possono coincidere o essere persone diverse.</dd>
+
+        <dt>Codice voucher</dt>
+        <dd>Stringa alfanumerica univoca nel formato <code>SM-YYYY-NNN</code> riportata sul PDF voucher, necessaria per il riscatto.</dd>
+
+        <dt>Emissione</dt>
+        <dd>Data in cui il Ristorante invia all'Acquirente il PDF del Voucher. Coincide convenzionalmente con la data di decorrenza della validità.</dd>
+
+        <dt>Riscatto</dt>
+        <dd>Utilizzo del Voucher presso il Ristorante a fronte di una consumazione, mediante presentazione del Codice voucher.</dd>
+      </dl>
+    </section>
+
+    <!-- ===== §3 ===== -->
+    <section class="legal-section" id="s3">
+      <h2 class="section-title"><span class="num">3.</span> Tagli disponibili e prezzo</h2>
+      <p>I Voucher sono disponibili nei seguenti tre tagli di valore nominale:</p>
+      <ul>
+        <li><strong>100 €</strong> — Buono Regalo Santamonica 100</li>
+        <li><strong>150 €</strong> — Buono Regalo Santamonica 150</li>
+        <li><strong>200 €</strong> — Buono Regalo Santamonica 200</li>
+      </ul>
+      <p>Il prezzo di acquisto coincide con il valore nominale del Voucher: non sono previste maggiorazioni, commissioni o spese di emissione/consegna a carico dell'Acquirente. Tutti i prezzi sono espressi in Euro (€) e si intendono comprensivi di ogni eventuale imposta dovuta secondo la normativa fiscale applicabile.</p>
+    </section>
+
+    <!-- ===== §4 ===== -->
+    <section class="legal-section" id="s4">
+      <h2 class="section-title"><span class="num">4.</span> Acquisto e pagamento</h2>
+      <p>L'acquisto avviene <strong>online</strong> tramite la pagina <a href="/regala.html">santamonicagenova.it/regala.html</a>, selezionando il taglio desiderato e completando la procedura di pagamento sulla piattaforma sicura <strong>Stripe Payments Europe Ltd</strong> (Irlanda).</p>
+      <p>Sono accettati i principali circuiti di carte di credito e debito; potrebbero essere disponibili ulteriori metodi di pagamento a discrezione di Stripe. Il contratto si perfeziona al buon esito del pagamento, momento in cui l'Acquirente riceverà una ricevuta automatica da Stripe all'indirizzo email indicato in fase di checkout.</p>
+      <p>Durante il checkout l'Acquirente può facoltativamente fornire: nome del Beneficiario, email del Beneficiario (se diversa dalla propria), un messaggio personale che verrà riportato sul PDF del Voucher. Tali informazioni sono utilizzate esclusivamente per la personalizzazione del Voucher e non vengono utilizzate per finalità ulteriori se non previo specifico consenso.</p>
+    </section>
+
+    <!-- ===== §5 ===== -->
+    <section class="legal-section" id="s5">
+      <h2 class="section-title"><span class="num">5.</span> Consegna del voucher</h2>
+      <p>Entro <strong>24 ore lavorative</strong> dall'avvenuto pagamento, il Ristorante invia all'indirizzo email dell'Acquirente (o del Beneficiario, se diverso e indicato in fase di checkout) un <strong>PDF nominativo</strong> contenente:</p>
+      <ul>
+        <li>Codice voucher univoco (formato <code>SM-YYYY-NNN</code>)</li>
+        <li>Valore nominale</li>
+        <li>Data di emissione e data di scadenza (6 mesi dopo, vedi §7)</li>
+        <li>Nome del Beneficiario, se fornito</li>
+        <li>Messaggio personale, se fornito</li>
+        <li>Sintesi delle condizioni di utilizzo</li>
+      </ul>
+      <p>In caso di mancata ricezione entro 48 ore dall'acquisto (verifica anche la cartella spam/promozioni), contattare <a href="mailto:info@santamonicagenova.it">info@santamonicagenova.it</a> indicando i dati di pagamento.</p>
+    </section>
+
+    <!-- ===== §6 ===== -->
+    <section class="legal-section" id="s6">
+      <h2 class="section-title"><span class="num">6.</span> Codice voucher</h2>
+      <p>Ciascun Voucher è identificato da un codice alfanumerico univoco nel formato <code>SM-YYYY-NNN</code>, dove <code>YYYY</code> è l'anno di emissione e <code>NNN</code> il progressivo nell'anno. Il Codice è riportato in chiaro sul PDF del Voucher e deve essere conservato con cura: la sua presentazione è condizione necessaria per il riscatto.</p>
+      <p>Il Codice è univoco e <strong>non riutilizzabile</strong>: una volta che il valore nominale del Voucher è stato interamente riscattato, il Codice non può essere utilizzato per ulteriori consumazioni. Per la gestione di un riscatto parziale, vedi §10.</p>
+    </section>
+
+    <!-- ===== §7 ===== -->
+    <section class="legal-section" id="s7">
+      <h2 class="section-title"><span class="num">7.</span> Validità</h2>
+      <p>Il Voucher è valido per <strong>6 mesi (sei) a decorrere dalla data di emissione</strong> indicata sul PDF. La data di scadenza è riportata in chiaro sul Voucher stesso.</p>
+      <div class="highlight">
+        <strong>Importante:</strong> il Voucher non riscattato entro la data di scadenza perde efficacia e non è più utilizzabile né rimborsabile. Non sono previste proroghe, salvo casi eccezionali a discrezione del Ristorante.
+      </div>
+    </section>
+
+    <!-- ===== §8 ===== -->
+    <section class="legal-section" id="s8">
+      <h2 class="section-title"><span class="num">8.</span> Modalità di riscatto</h2>
+      <p>Per riscattare il Voucher il Beneficiario deve:</p>
+      <ol>
+        <li><strong>Prenotare il tavolo</strong> contattando il Ristorante e <strong>indicando esplicitamente che intende utilizzare un voucher</strong> al momento della prenotazione. La prenotazione è obbligatoria.</li>
+        <li>Al momento del conto, presentare il PDF del Voucher (stampato o su dispositivo) o comunicare il Codice voucher al personale del Ristorante.</li>
+      </ol>
+      <p>Il Ristorante si riserva di chiedere al Beneficiario un documento d'identità per finalità di verifica antifrode in caso di Codice voucher non univocamente abbinato a una prenotazione registrata.</p>
+    </section>
+
+    <!-- ===== §9 ===== -->
+    <section class="legal-section" id="s9">
+      <h2 class="section-title"><span class="num">9.</span> Ambito di utilizzo</h2>
+      <p>Il Voucher è utilizzabile <strong>esclusivamente presso il ristorante Santamonica</strong> per la consumazione in loco di qualsiasi voce del menù comunemente disponibile, <strong>incluse le bevande</strong> (analcoliche, vini da carta, distillati, caffetteria). Il Voucher non è utilizzabile per:</p>
+      <ul>
+        <li>acquisti per asporto, delivery o vendita di prodotti enogastronomici da consumare fuori dal locale;</li>
+        <li>eventi privatizzati, banchetti dedicati o servizi di catering esterni;</li>
+        <li>l'acquisto di altri voucher o gift card.</li>
+      </ul>
+    </section>
+
+    <!-- ===== §10 ===== -->
+    <section class="legal-section" id="s10">
+      <h2 class="section-title"><span class="num">10.</span> Uso parziale e residuo</h2>
+      <p>Se l'importo del conto è <strong>inferiore</strong> al valore nominale del Voucher, l'eventuale differenza (residuo) non è rimborsabile in contanti né monetizzabile.</p>
+      <p>Il residuo rimane tuttavia <strong>utilizzabile come credito</strong> presso il Ristorante in una o più visite successive, <strong>entro la data di scadenza originale</strong> del Voucher (vedi §7). Il Ristorante annoterà il residuo nel registro interno dei voucher abbinato al Codice e ne darà conferma al Beneficiario al momento del conto.</p>
+      <p>Se l'importo del conto è <strong>superiore</strong> al valore del Voucher, la differenza è dovuta dal Beneficiario con i normali mezzi di pagamento accettati dal Ristorante.</p>
+    </section>
+
+    <!-- ===== §11 ===== -->
+    <section class="legal-section" id="s11">
+      <h2 class="section-title"><span class="num">11.</span> Cumulabilità</h2>
+      <p>Il Voucher <strong>non è cumulabile</strong> con altre promozioni, sconti, menu fissi a tema, convenzioni o accordi commerciali eventualmente in essere presso il Ristorante. Non è cumulabile con altri voucher Santamonica nella stessa transazione.</p>
+    </section>
+
+    <!-- ===== §12 ===== -->
+    <section class="legal-section" id="s12">
+      <h2 class="section-title"><span class="num">12.</span> Trasferibilità</h2>
+      <p>Il Voucher è <strong>trasferibile</strong>: chiunque presenti un Codice voucher valido, non scaduto e non già riscattato presso il Ristorante (con prenotazione regolarmente registrata, §8) ne può effettuare il riscatto. È quindi pienamente idoneo all'uso come regalo.</p>
+      <p>Il Ristorante non assume responsabilità in caso di trasferimento improprio del Codice voucher a terzi non autorizzati dall'Acquirente o dal Beneficiario.</p>
+    </section>
+
+    <!-- ===== §13 ===== -->
+    <section class="legal-section" id="s13">
+      <h2 class="section-title"><span class="num">13.</span> Smarrimento del codice</h2>
+      <p>Il Codice voucher equivale a uno strumento di pagamento al portatore: in caso di <strong>smarrimento, furto, distruzione o appropriazione indebita</strong> del PDF o del Codice, il Voucher <strong>non è sostituibile né rimborsabile</strong>. Si raccomanda di conservare il PDF in luogo sicuro e di non condividerlo con soggetti diversi dal Beneficiario.</p>
+    </section>
+
+    <!-- ===== §14 ===== -->
+    <section class="legal-section" id="s14">
+      <h2 class="section-title"><span class="num">14.</span> Diritto di recesso</h2>
+      <p>Ai sensi degli artt. 52 e seguenti del Codice del Consumo (D.Lgs. 206/2005), l'Acquirente in qualità di consumatore ha diritto di recedere dal contratto di acquisto del Voucher senza dover fornire alcuna motivazione, <strong>entro 14 (quattordici) giorni</strong> dalla data di emissione del Voucher.</p>
+      <div class="highlight">
+        <strong>Condizione essenziale:</strong> il diritto di recesso è esercitabile <strong>esclusivamente se il Voucher non è ancora stato utilizzato</strong> (riscattato in tutto o in parte) presso il Ristorante. Una volta avvenuto il riscatto, anche parziale, il diritto di recesso decade.
+      </div>
+
+      <h3>Come esercitare il recesso</h3>
+      <p>Prima della scadenza dei 14 giorni, l'Acquirente deve inviare una comunicazione scritta a <a href="mailto:info@santamonicagenova.it">info@santamonicagenova.it</a> dichiarando la propria volontà di recedere, indicando:</p>
+      <ul>
+        <li>nome e cognome dell'Acquirente,</li>
+        <li>indirizzo email utilizzato in fase di acquisto,</li>
+        <li>Codice voucher (o numero ordine Stripe),</li>
+        <li>importo e data di acquisto.</li>
+      </ul>
+      <p>Può essere utilizzato qualsiasi modulo o testo che esprima chiaramente la decisione di recedere, ivi compreso il modulo tipo allegato al D.Lgs. 21/2014.</p>
+    </section>
+
+    <!-- ===== §15 ===== -->
+    <section class="legal-section" id="s15">
+      <h2 class="section-title"><span class="num">15.</span> Rimborsi</h2>
+      <p>Salvo l'esercizio del diritto di recesso ai sensi del §14, <strong>non sono previsti rimborsi</strong> sull'acquisto del Voucher. In particolare:</p>
+      <ul>
+        <li>non è rimborsabile il Voucher scaduto e non riscattato;</li>
+        <li>non è rimborsabile il Voucher smarrito o sottratto (§13);</li>
+        <li>non è rimborsabile, neppure parzialmente, il residuo di un Voucher utilizzato in parte (§10).</li>
+      </ul>
+
+      <h3>Modalità di rimborso in caso di recesso</h3>
+      <p>In caso di recesso esercitato nei termini e nelle condizioni del §14, il Ristorante provvederà al rimborso dell'importo pagato <strong>entro 14 giorni</strong> dalla data in cui ha ricevuto la comunicazione di recesso (Art. 56 Codice del Consumo), con lo stesso metodo di pagamento utilizzato per l'acquisto, salvo diverso accordo. Nessun costo è posto a carico del consumatore per il rimborso.</p>
+    </section>
+
+    <!-- ===== §16 ===== -->
+    <section class="legal-section" id="s16">
+      <h2 class="section-title"><span class="num">16.</span> Reclami e contatti</h2>
+      <p>Per qualsiasi richiesta, reclamo o assistenza inerente l'acquisto o il riscatto di un Voucher è possibile contattare:</p>
+      <ul>
+        <li>email: <a href="mailto:info@santamonicagenova.it">info@santamonicagenova.it</a></li>
+        <li>indirizzo: Santamonica, Lungomare Lombardo 27, 16145 Genova</li>
+        <li>recapiti telefonici e ulteriori canali: vedi <a href="/dove-siamo.html">dove-siamo.html</a></li>
+      </ul>
+      <p>Il Ristorante si impegna a fornire riscontro tempestivo, di norma entro 5 giorni lavorativi dal ricevimento del reclamo.</p>
+    </section>
+
+    <!-- ===== §17 ===== -->
+    <section class="legal-section" id="s17">
+      <h2 class="section-title"><span class="num">17.</span> Trattamento dati personali</h2>
+      <p>I dati personali raccolti in fase di acquisto del Voucher (nominativo, email, eventuali dati del Beneficiario, messaggio personale, dati di pagamento gestiti da Stripe) sono trattati nel rispetto del Regolamento UE 2016/679 (GDPR).</p>
+      <p>Per finalità, basi giuridiche, conservazione, destinatari (ivi inclusi Stripe e i servizi di hosting), diritti dell'interessato e modalità di esercizio, consulta la <a href="/privacy.html">Privacy Policy</a>. Il consenso facoltativo all'invio di comunicazioni promozionali (se prestato in fase di checkout Stripe) può essere revocato in ogni momento contattando i recapiti del §16.</p>
+    </section>
+
+    <!-- ===== §18 ===== -->
+    <section class="legal-section" id="s18">
+      <h2 class="section-title"><span class="num">18.</span> Modifiche delle condizioni</h2>
+      <p>Il Ristorante si riserva la facoltà di modificare le presenti condizioni in qualsiasi momento, dandone evidenza tramite aggiornamento di questa pagina. Le condizioni applicabili a un Voucher sono <strong>quelle vigenti al momento del suo acquisto</strong>: modifiche successive non incidono sui Voucher già emessi, salvo che si tratti di previsioni più favorevoli al consumatore.</p>
+      <p>La versione attualmente in vigore è indicata in alto a questa pagina (e in calce).</p>
+    </section>
+
+    <!-- ===== §19 ===== -->
+    <section class="legal-section" id="s19">
+      <h2 class="section-title"><span class="num">19.</span> Legge applicabile e foro competente</h2>
+      <p>Le presenti condizioni sono regolate dalla <strong>legge italiana</strong>. Per ogni controversia connessa all'acquisto o all'utilizzo dei Voucher, il foro competente è quello del <strong>luogo di residenza o domicilio del consumatore</strong>, ai sensi dell'art. 66-bis del Codice del Consumo, ove ubicato in Italia o in altro Stato membro dell'Unione Europea.</p>
+    </section>
+
+    <!-- ===== §20 ===== -->
+    <section class="legal-section" id="s20">
+      <h2 class="section-title"><span class="num">20.</span> Risoluzione stragiudiziale (ODR)</h2>
+      <p>Ai sensi del Regolamento UE 524/2013, il consumatore residente nell'Unione Europea ha facoltà di ricorrere alla piattaforma europea di risoluzione delle controversie online (ODR), disponibile all'indirizzo <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a>, per la risoluzione extragiudiziale di eventuali controversie connesse all'acquisto dei Voucher.</p>
+      <p>Il ricorso alla piattaforma ODR è facoltativo e non pregiudica la possibilità di adire le ordinarie vie giudiziali.</p>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="legal-footer">
+      <div class="footer-grid">
+        <div class="cross-links">
+          <a href="/regala.html">← Torna a Regala un'esperienza</a>
+          <a href="/privacy.html">Privacy</a>
+          <a href="/cookies.html">Cookie</a>
+          <a href="/dove-siamo.html">Dove siamo</a>
+          <a href="/">Home</a>
+        </div>
+        <button type="button" class="cc-manage" data-cc="show-preferencesModal" aria-label="Gestisci preferenze cookie">
+          ⚙ Preferenze cookie
+        </button>
+      </div>
+
+      <p style="margin: 0; font-size: 12px;">
+        © 2026 Santamonica · Genova · Tutti i diritti riservati.<br>
+        <span class="version-tag">voucher-termini.html · v 2026.05.20.01</span>
+      </p>
+    </footer>
+
+  </div>
+
+  <!-- Cookie consent (banner globale + integrazione iframemanager F0.12) -->
+  <script defer src="/lib/iframemanager/iframemanager.umd.js"></script>
+  <script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
+  <script defer src="/cookieconsent-config.js"></script>
+
+</body>
+</html>

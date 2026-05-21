@@ -1,14 +1,14 @@
 /* ═══════════════════════════════════════════════════════════════════════
    cookieconsent-config.js
    Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-   v 2026.05.19.05
+   v 2026.05.21.01
    F0.12 — Integrazione Google Maps via iframemanager + revision: 2
    ───────────────────────────────────────────────────────────────────────
    Dipendenze:  /lib/cookieconsent/cookieconsent.umd.js (caricato prima)
                 /lib/iframemanager/iframemanager.umd.js (caricato prima · F0.12)
    Espone:      window.CookieConsent (globale, già attivo dopo run)
                 window.iframemanager (globale dell'istanza, dopo init)
-   Lingue:      IT (default) · EN · FR  — auto-detect via navigator.language
+   Lingue:      IT (default) · EN · FR  — auto-detect via <html lang> del documento (default IT)
    Categorie:   necessary (always on) · embeds (opt-in, default off)
    Servizi:     embeds → googleMaps (Google Maps Embed, gestito da iframemanager)
    Conformità:  GDPR Reg. UE 2016/679 · D.Lgs. 196/2003 art. 122
@@ -18,6 +18,10 @@
                 EU-U.S. Data Privacy Framework (decisione adeguatezza 10-07-2023)
    ───────────────────────────────────────────────────────────────────────
    STORICO MODIFICHE
+   - v 2026.05.21.01 (F0.20 — finding C3): language.autoDetect 'browser' -> 'document'.
+       Il banner seguiva la lingua del BROWSER (es. utente con browser EN su sito IT
+       vedeva il banner in inglese al primo load). Ora segue <html lang> del documento
+       (default 'it'), coerente con "IT default" e con lo switch lingua del sito.
    - v 2026.05.19.05 (F0.12 — introduzione Google Maps con consent gate):
        · [F0.12 core] Inizializzazione iframemanager prima di CookieConsent.run().
                  Servizio "google-maps" registrato con embedUrl share-link Google
@@ -328,7 +332,7 @@
     /* ─── Lingue e traduzioni ─── */
     language: {
       default: 'it',
-      autoDetect: 'browser',
+      autoDetect: 'document',
 
       translations: {
 
@@ -459,4 +463,4 @@
 
 })();
 
-/* v 2026.05.19.05 */
+/* v 2026.05.21.01 */

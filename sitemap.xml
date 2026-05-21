@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Santamonica Web — sitemap.xml — v 2026.05.21.01 (F0.17) -->
+<!-- Host canonico: https://santamonicagenova.it (apex, no www) -->
+<!-- Lingue: IT per tutte le pagine; cluster hreflang IT/EN/FR solo per menu.html e menu-dolci.html (varianti fisiche esistenti). -->
+<!-- Escluse: menu-it.html, menu-dolci-it.html (versioni stampa, Disallow robots.txt), login.html (admin), menu-de/es (301). -->
+<!-- NB: URL TARGET di produzione (dec. #25). In staging CF Pages X-Robots-Tag noindex blocca il crawl fino a F0.21. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://santamonicagenova.it/</loc>
+    <lastmod>2026-05-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Menu principale — cluster hreflang IT/EN/FR -->
+  <url>
+    <loc>https://santamonicagenova.it/menu.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/menu.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/menu-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/menu-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/menu.html"/>
+  </url>
+  <url>
+    <loc>https://santamonicagenova.it/menu-en.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/menu.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/menu-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/menu-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/menu.html"/>
+  </url>
+  <url>
+    <loc>https://santamonicagenova.it/menu-fr.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/menu.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/menu-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/menu-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/menu.html"/>
+  </url>
+
+  <!-- Menu dolci — cluster hreflang IT/EN/FR -->
+  <url>
+    <loc>https://santamonicagenova.it/menu-dolci.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/menu-dolci.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/menu-dolci-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/menu-dolci-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/menu-dolci.html"/>
+  </url>
+  <url>
+    <loc>https://santamonicagenova.it/menu-dolci-en.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/menu-dolci.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/menu-dolci-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/menu-dolci-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/menu-dolci.html"/>
+  </url>
+  <url>
+    <loc>https://santamonicagenova.it/menu-dolci-fr.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/menu-dolci.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/menu-dolci-en.html"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/menu-dolci-fr.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/menu-dolci.html"/>
+  </url>
+
+  <!-- Menu allergeni (IT only) -->
+  <url>
+    <loc>https://santamonicagenova.it/menu-allergeni.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Carta dei vini (IT only) -->
+  <url>
+    <loc>https://santamonicagenova.it/menu-vini.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Dove siamo / contatti (IT only) -->
+  <url>
+    <loc>https://santamonicagenova.it/dove-siamo.html</loc>
+    <lastmod>2026-05-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Voucher regalo (IT only) -->
+  <url>
+    <loc>https://santamonicagenova.it/regala.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Termini voucher (IT only) -->
+  <url>
+    <loc>https://santamonicagenova.it/voucher-termini.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- Privacy policy (IT only) -->
+  <url>
+    <loc>https://santamonicagenova.it/privacy.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- Cookie policy (IT only) -->
+  <url>
+    <loc>https://santamonicagenova.it/cookies.html</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+</urlset>

@@ -1,7 +1,42 @@
 # Santamonica Web — Cloudflare Pages headers
-# v 2026.05.17.01
-# F0.3 — staging noindex globale via X-Robots-Tag
-# Ignorato da GitHub Pages; effetto solo su Cloudflare Pages
+# v 2026.05.21.01
+# Storico: v 2026.05.17.01 (F0.3 noindex) -> v 2026.05.21.01 (F0.18: CSP + security headers)
+# NB: file ignorato da GitHub Pages; effetto solo su Cloudflare Pages.
 
 /*
   X-Robots-Tag: noindex, nofollow
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Cross-Origin-Opener-Policy: same-origin
+  Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=(), browsing-topics=()
+  Strict-Transport-Security: max-age=31536000
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://maps.google.com https://www.google.com; connect-src 'self' https://sibforms.com https://*.sibforms.com; form-action 'self' https://formspree.io https://sibforms.com https://*.sibforms.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+
+# ─────────────────────────────────────────────────────────────
+# NOTE OPERATIVE F0.18
+#
+# 1) X-Robots-Tag noindex: PRESERVATO da v 2026.05.17.01. Rimuovere SOLO a F0.21
+#    (go-live), insieme alla rimozione del noindex per tutto il sito.
+#
+# 2) HSTS: impostato conservativo (max-age 1 anno, SENZA includeSubDomains/preload).
+#    A F0.21, sul dominio custom, valutare aggiunta di "; includeSubDomains; preload".
+#    NON aggiungere includeSubDomains finché si serve su *.pages.dev (suffisso condiviso).
+#
+# 3) CSP — script-src usa 'unsafe-inline' perché le pagine contengono script inline
+#    eseguibili (protezione placeholder regala.html, print menu, init iframemanager)
+#    e handler inline (onchange setLang, onclick window.print). HARDENING FUTURO
+#    (chiusura P3.A5): esternalizzare gli script inline in /lib/ + sostituire i 3
+#    handler inline con addEventListener, poi rimuovere 'unsafe-inline' da script-src.
+#
+# 4) frame-src: solo Google Maps (embed via iframemanager su consenso). Se in futuro
+#    si aggiungono altri embed (es. video), estendere qui.
+#
+# 5) form-action: include Formspree (prenotazioni) e sibforms.com (newsletter Brevo
+#    GIA' presente in index.html). Riconciliare con F0.15 (audit log HMAC P3.7).
+#
+# 6) img-src include https: (permissivo) per non rompere eventuali immagini Brevo.
+#    Restringere a 'self' data:' dopo audit completo Brevo (F0.15).
+#
+# 7) TEST in F0.20 (E2E su staging pages.dev, dove la CSP è già attiva): verificare
+#    caricamento font, apertura mappa su consenso, invio form prenotazione e newsletter.

@@ -1,10 +1,8 @@
 # Santamonica Web — Cloudflare Pages headers
-# v 2026.05.21.02
-# Storico: v 2026.05.17.01 (F0.3 noindex) -> v 2026.05.21.01 (F0.18: CSP + security headers) -> v 2026.05.21.02 (F0.20 fix C2: +https://formspree.io in connect-src)
+# v 2026.05.22.01
+# Storico: v 2026.05.17.01 (F0.3 noindex) -> v 2026.05.21.01 (F0.18: CSP + security headers) -> v 2026.05.21.02 (F0.20 fix C2: +https://formspree.io in connect-src) -> v 2026.05.22.01 (F0.21 go-live: rimosso noindex GLOBALE; noindex SCOPED su /regala* fino a sblocco dec.#28; HSTS invariato — vedi nota 2)
 # NB: file ignorato da GitHub Pages; effetto solo su Cloudflare Pages.
-
 /*
-  X-Robots-Tag: noindex, nofollow
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
@@ -13,15 +11,24 @@
   Strict-Transport-Security: max-age=31536000
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://maps.google.com https://www.google.com; connect-src 'self' https://formspree.io https://sibforms.com https://*.sibforms.com; form-action 'self' https://formspree.io https://sibforms.com https://*.sibforms.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
 
+# [F0.21] Gift-card NON finalizzata (placeholder + Stripe non-live, dec.#28):
+# noindex mantenuto SOLO su /regala* finché non è pronta. Le regole _headers sono
+# cumulative: /regala riceve gli header di /* PIÙ questo X-Robots-Tag.
+# RIMUOVERE questo blocco alla finalizzazione voucher/prezzi (FINAL CHECK).
+/regala*
+  X-Robots-Tag: noindex, nofollow
 # ─────────────────────────────────────────────────────────────
-# NOTE OPERATIVE F0.18
+# NOTE OPERATIVE
 #
-# 1) X-Robots-Tag noindex: PRESERVATO da v 2026.05.17.01. Rimuovere SOLO a F0.21
-#    (go-live), insieme alla rimozione del noindex per tutto il sito.
+# 1) X-Robots-Tag noindex: era GLOBALE (v 2026.05.17.01 → v 2026.05.21.02). A F0.21
+#    (go-live, v 2026.05.22.01) RIMOSSO da /* e mantenuto SCOPED su /regala* finché
+#    la gift-card non è finalizzata (dec.#28). Resto del sito ora indicizzabile.
 #
-# 2) HSTS: impostato conservativo (max-age 1 anno, SENZA includeSubDomains/preload).
-#    A F0.21, sul dominio custom, valutare aggiunta di "; includeSubDomains; preload".
-#    NON aggiungere includeSubDomains finché si serve su *.pages.dev (suffisso condiviso).
+# 2) HSTS: conservativo (max-age 1 anno, SENZA includeSubDomains/preload). NON aggiungere
+#    includeSubDomains/preload QUI: il file è servito anche su santamonica-web.pages.dev
+#    (suffisso condiviso *.pages.dev). Per l'HSTS forte usare la config a livello ZONA
+#    Cloudflare (SSL/TLS → Edge Certificates → HSTS), che si applica solo all'apex.
+#    In alternativa, disabilitare prima il sottodominio *.pages.dev.
 #
 # 3) CSP — script-src usa 'unsafe-inline' perché le pagine contengono script inline
 #    eseguibili (protezione placeholder regala.html, print menu, init iframemanager)

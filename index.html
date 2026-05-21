@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.05.21.05 — FINAL CHECK INFO (orari · dec. #25): ristrutturato il blocco orari #info al TARGET giugno 2026. Da [Mar / Mer-Sab / Dom / Lun chiuso] a [Mar-Ven solo cena 19:30-22:30 / Sab-Dom pranzo 12:30-14:30 + cena 19:30-22:30 / Lun chiuso]. Chiavi i18n rinominate: info_orari_mar→info_orari_marven, info_orari_mersab→info_orari_sabdom, rimossa info_orari_dom (vedi translations.json v 2026.05.21.01). Schema.org JSON-LD già TARGET (invariato). dove-siamo.html già TARGET (hardcoded, invariato). FINAL CHECK residuo: voucher/prezzi. -->
 <!-- v 2026.05.21.04 — FINAL CHECK INFO (parziale · dec. #25): email contatto allineata al TARGET. Sostituito santamonicagenova@gmail.com → info@santamonicagenova.it in DUE punti: (1) bottone "Richiedi un buono" sezione regalo (mailto), (2) blocco #info contatti (mailto + testo visibile). RESTANO da allineare al FINAL CHECK (richiedono conferma valori + translations.json EN/FR): orari #info (non combaciano col TARGET giugno 2026), telefono, indirizzo. Schema.org JSON-LD già su dati TARGET. -->
 <!-- v 2026.05.21.03 — UX (OP): link "Dettagli completi e indicazioni stradali → /dove-siamo.html" in #info ora apre in NUOVA SCHEDA (target=_blank + rel=noopener noreferrer). Modifica cosmetica/UX, non security-critical, nessuna logica nuova. Gli altri link a /dove-siamo.html#mappa (map-cta-link, map-bar-link "Vedi dove siamo") restano same-tab invariati. -->
 <!-- v 2026.05.21.02 — F0.15 (PARZIALE · solo bugfix, fase resta APERTA): newsletter Brevo · (1) FIX error-as-success: il blocco fetch passa a mode:'no-cors' (endpoint Brevo hosted è cross-origin senza header CORS → risposta opaca, status 0). Ora un'eccezione = fallimento di rete reale (offline/DNS) e mostra il messaggio di errore; prima OGNI esito (anche fallimento) mostrava "iscrizione avvenuta". (2) FIX email: messaggio d'errore allineato a info@santamonicagenova.it (era santamonicagenova@gmail.com — coerenza FINAL CHECK pre-F0.21). (3) Allineata versione UI footer a quella file (era v 2026.05.19.01: drift pre-esistente). NON implementati: proxy server-side + audit log HMAC consenso (P3.7/P3.18) → decisione A/B rimandata, F0.15 ⏳ aperta. -->
@@ -526,12 +527,10 @@
       <div>
         <p class="info-block-label" data-i18n="info_orari_label">Orari</p>
         <div class="info-block-content">
-          <span data-i18n="info_orari_mar">Marted&igrave;</span><br>
+          <span data-i18n="info_orari_marven">Marted&igrave; &ndash; Venerd&igrave;</span><br>
           <strong style="color:var(--ink);font-weight:400">19:30 &ndash; 22:30</strong><br><br>
-          <span data-i18n="info_orari_mersab">Mercoled&igrave; &ndash; Sabato</span><br>
+          <span data-i18n="info_orari_sabdom">Sabato &ndash; Domenica</span><br>
           <strong style="color:var(--ink);font-weight:400">12:30 &ndash; 14:30 &nbsp;/&nbsp; 19:30 &ndash; 22:30</strong><br><br>
-          <span data-i18n="info_orari_dom">Domenica</span><br>
-          <strong style="color:var(--ink);font-weight:400">12:30 &ndash; 14:30</strong><br><br>
           <em style="font-size:0.78rem" data-i18n="info_orari_lun">Luned&igrave; chiuso</em>
         </div>
       </div>
@@ -617,7 +616,7 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.21.04</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.21.05</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>
@@ -832,6 +831,6 @@
 <script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
 <script defer src="/cookieconsent-config.js"></script>
 
-<!-- v 2026.05.21.04 -->
+<!-- v 2026.05.21.05 -->
 </body>
 </html>

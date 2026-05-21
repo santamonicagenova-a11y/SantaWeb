@@ -1,13 +1,13 @@
 {
   "_meta": {
-    "version": "v 2026.05.17.02",
+    "version": "v 2026.05.21.01",
     "languages": [
       "it",
       "en",
       "fr"
     ],
-    "last_updated": "2026-05-17",
-    "note": "F0.9 — Rimosse chiavi cookie_text/cookie_decline/cookie_accept (banner DIY sostituito da vanilla-cookieconsent v3 bundle locale). Aggiunte footer_privacy/footer_cookies/footer_cc_manage."
+    "last_updated": "2026-05-21",
+    "note": "F0.20/F0.21 FINAL CHECK orari (dec. #25): chiavi orari ristrutturate al TARGET giugno 2026 — info_orari_mar/mersab/dom sostituite da info_orari_marven (Mar-Ven) + info_orari_sabdom (Sab-Dom). Allineato a index.html v 2026.05.21.05. (Storico F0.9: rimosse cookie_text/decline/accept; aggiunte footer_privacy/cookies/cc_manage.)"
   },
   "it": {
     "page_title": "Ristorante Santamonica Genova | Pesce Fresco Gourmet sul Lungomare",
@@ -81,9 +81,8 @@
     "info_label": "Come raggiungerci",
     "info_title": "Orari &amp; <em>Contatti</em>",
     "info_orari_label": "Orari",
-    "info_orari_mar": "Marted&igrave;",
-    "info_orari_mersab": "Mercoled&igrave; &ndash; Sabato",
-    "info_orari_dom": "Domenica",
+    "info_orari_marven": "Marted&igrave; &ndash; Venerd&igrave;",
+    "info_orari_sabdom": "Sabato &ndash; Domenica",
     "info_orari_lun": "Luned&igrave; chiuso",
     "info_dove_label": "Dove siamo",
     "info_note_text": "Si prega di segnalare eventuali allergie o intolleranze al momento della prenotazione.",
@@ -165,9 +164,8 @@
     "info_label": "How to find us",
     "info_title": "Hours &amp; <em>Contacts</em>",
     "info_orari_label": "Opening hours",
-    "info_orari_mar": "Tuesday",
-    "info_orari_mersab": "Wednesday &ndash; Saturday",
-    "info_orari_dom": "Sunday",
+    "info_orari_marven": "Tuesday &ndash; Friday",
+    "info_orari_sabdom": "Saturday &ndash; Sunday",
     "info_orari_lun": "Closed on Monday",
     "info_dove_label": "Where we are",
     "info_note_text": "Please inform us of any allergies or intolerances when booking.",
@@ -249,9 +247,8 @@
     "info_label": "Comment nous trouver",
     "info_title": "Horaires &amp; <em>Contacts</em>",
     "info_orari_label": "Horaires",
-    "info_orari_mar": "Mardi",
-    "info_orari_mersab": "Mercredi &ndash; Samedi",
-    "info_orari_dom": "Dimanche",
+    "info_orari_marven": "Mardi &ndash; Vendredi",
+    "info_orari_sabdom": "Samedi &ndash; Dimanche",
     "info_orari_lun": "Ferm&eacute; le lundi",
     "info_dove_label": "O&ugrave; nous sommes",
     "info_note_text": "Veuillez signaler toute allergie ou intol&eacute;rance au moment de la r&eacute;servation.",

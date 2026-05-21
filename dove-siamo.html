@@ -2,10 +2,18 @@
   ─────────────────────────────────────────────────────────────────────────
   dove-siamo.html — Dove siamo / Contatti
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.05.20.01
-  Ultimo aggiornamento: 2026-05-20
+  Versione: v 2026.05.22.01
+  Ultimo aggiornamento: 2026-05-22
   Lingua: IT (versione ufficiale)
   Stato: BOZZA INFORMATIVA · F0.12 chiusa (hotfix layout)
+
+  Modifiche v 2026.05.22.01 (F0.21 — refactor FONTE UNICA orari):
+  - Tabella orari (id="orari-tbody") e JSON-LD openingHoursSpecification
+    ora generati da /orari.js (unico punto di verità).
+  - Rimossi: tabella <tr> hardcoded, openingHoursSpecification statico,
+    vecchio <script> "evidenzia giorno" (ora in orari.js: class="today").
+  - Schedule in /orari.js: Lun chiuso · Mar cena · Mer–Sab pranzo+cena · Dom pranzo.
+  - meta description "Aperto da martedì a domenica" invariata (resta corretta).
 
   Modifiche v 2026.05.20.01 (HOTFIX layout iframe post-F0.12):
   - [bug rilevato post-deploy F0.12] L'iframe Google Maps inserito
@@ -118,32 +126,16 @@
       "longitude": 8.9646575
     },
     "hasMap": "https://www.google.com/maps/place/?q=place_id:ChIJGzMzZqlD0xIRKRomfkk1F2c",
-    "openingHoursSpecification": [
-      {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday"],
-        "opens": "19:30",
-        "closes": "22:30"
-      },
-      {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Saturday", "Sunday"],
-        "opens": "12:30",
-        "closes": "14:30"
-      },
-      {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Saturday", "Sunday"],
-        "opens": "19:30",
-        "closes": "22:30"
-      }
-    ],
+    "_comment_orari": "openingHoursSpecification iniettato a runtime da /orari.js (fonte unica orari)",
     "sameAs": [
       "https://www.instagram.com/ristorantesantamonica/",
       "https://www.facebook.com/santamonicage"
     ]
   }
   </script>
+
+  <!-- FONTE UNICA orari · /orari.js -->
+  <script src="/orari.js"></script>
 
   <style>
     :root {
@@ -466,36 +458,7 @@
   <h2>Orari di apertura</h2>
 
   <table class="hours" aria-label="Orari settimanali">
-    <tbody>
-      <tr id="day-mon" class="closed">
-        <td class="day">Lunedì</td>
-        <td class="time">chiuso</td>
-      </tr>
-      <tr id="day-tue">
-        <td class="day">Martedì</td>
-        <td class="time">19:30 – 22:30</td>
-      </tr>
-      <tr id="day-wed">
-        <td class="day">Mercoledì</td>
-        <td class="time">19:30 – 22:30</td>
-      </tr>
-      <tr id="day-thu">
-        <td class="day">Giovedì</td>
-        <td class="time">19:30 – 22:30</td>
-      </tr>
-      <tr id="day-fri">
-        <td class="day">Venerdì</td>
-        <td class="time">19:30 – 22:30</td>
-      </tr>
-      <tr id="day-sat">
-        <td class="day">Sabato</td>
-        <td class="time">12:30 – 14:30 &nbsp;·&nbsp; 19:30 – 22:30</td>
-      </tr>
-      <tr id="day-sun">
-        <td class="day">Domenica</td>
-        <td class="time">12:30 – 14:30 &nbsp;·&nbsp; 19:30 – 22:30</td>
-      </tr>
-    </tbody>
+    <tbody id="orari-tbody"><!-- popolato da /orari.js (fonte unica orari) --></tbody>
   </table>
 
   <p style="font-size: 0.88rem; color: var(--text-soft);">La prenotazione è consigliata. Eventuali chiusure straordinarie (festività, ferie) vengono comunicate sui profili social del ristorante.</p>
@@ -551,7 +514,7 @@
   </div>
 
   <footer class="legal-foot">
-    Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991 · v&nbsp;2026.05.20.01
+    Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991 · v&nbsp;2026.05.22.01
     <div class="foot-links">
       <a href="/">Home</a>
       <a href="/regala.html">Voucher regalo</a>
@@ -562,17 +525,7 @@
 
 </main>
 
-<!-- ═══ JS: evidenzia il giorno corrente nella tabella orari ═══ -->
-<script>
-(function () {
-  'use strict';
-  // 0=Dom, 1=Lun, ..., 6=Sab
-  var dayMap = ['day-sun','day-mon','day-tue','day-wed','day-thu','day-fri','day-sat'];
-  var todayId = dayMap[new Date().getDay()];
-  var row = document.getElementById(todayId);
-  if (row) row.classList.add('today');
-})();
-</script>
+<!-- ═══ Tabella orari + evidenza giorno corrente: ora gestiti da /orari.js (fonte unica) ═══ -->
 
 <!-- F0.12: iframemanager v1.3.0 — DEVE caricare prima di cookieconsent-config.js
      perché cookieconsent-config.js inizializza window.iframemanager().
@@ -585,4 +538,4 @@
 
 </body>
 </html>
-<!-- Fine dove-siamo.html · v 2026.05.20.01 -->
+<!-- Fine dove-siamo.html · v 2026.05.22.01 -->

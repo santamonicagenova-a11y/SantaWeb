@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.05.22.01 — F0.21 refactor orari FONTE UNICA (/orari.js): orari NON più hardcoded. Rimossi (1) blocco orari #info, ora <div id="orari-info"> riempito da orari.js; (2) openingHoursSpecification statico nel JSON-LD, ora iniettato a runtime da orari.js; (3) chiavi i18n info_orari_marven/sabdom/lun (etichette giorni ora in orari.js). NUOVO schedule reale (≠ giugno): Mar solo cena 19:30-22:30 · Mer-Sab pranzo 12:30-14:30 + cena 19:30-22:30 · Dom solo pranzo 12:30-14:30 · Lun chiuso. Per cambiare orari: editare SOLO orari.js. -->
 <!-- v 2026.05.21.05 — FINAL CHECK INFO (orari · dec. #25): ristrutturato il blocco orari #info al TARGET giugno 2026. Da [Mar / Mer-Sab / Dom / Lun chiuso] a [Mar-Ven solo cena 19:30-22:30 / Sab-Dom pranzo 12:30-14:30 + cena 19:30-22:30 / Lun chiuso]. Chiavi i18n rinominate: info_orari_mar→info_orari_marven, info_orari_mersab→info_orari_sabdom, rimossa info_orari_dom (vedi translations.json v 2026.05.21.01). Schema.org JSON-LD già TARGET (invariato). dove-siamo.html già TARGET (hardcoded, invariato). FINAL CHECK residuo: voucher/prezzi. -->
 <!-- v 2026.05.21.04 — FINAL CHECK INFO (parziale · dec. #25): email contatto allineata al TARGET. Sostituito santamonicagenova@gmail.com → info@santamonicagenova.it in DUE punti: (1) bottone "Richiedi un buono" sezione regalo (mailto), (2) blocco #info contatti (mailto + testo visibile). RESTANO da allineare al FINAL CHECK (richiedono conferma valori + translations.json EN/FR): orari #info (non combaciano col TARGET giugno 2026), telefono, indirizzo. Schema.org JSON-LD già su dati TARGET. -->
 <!-- v 2026.05.21.03 — UX (OP): link "Dettagli completi e indicazioni stradali → /dove-siamo.html" in #info ora apre in NUOVA SCHEDA (target=_blank + rel=noopener noreferrer). Modifica cosmetica/UX, non security-critical, nessuna logica nuova. Gli altri link a /dove-siamo.html#mappa (map-cta-link, map-bar-link "Vedi dove siamo") restano same-tab invariati. -->
@@ -79,26 +80,6 @@
     "longitude": 8.9646575
   },
   "hasMap": "https://www.google.com/maps/place/?q=place_id:ChIJGzMzZqlD0xIRKRomfkk1F2c",
-  "openingHoursSpecification": [
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday"],
-      "opens": "19:30",
-      "closes": "22:30"
-    },
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Saturday", "Sunday"],
-      "opens": "12:30",
-      "closes": "14:30"
-    },
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Saturday", "Sunday"],
-      "opens": "19:30",
-      "closes": "22:30"
-    }
-  ],
   "employee": [
     {
       "@type": "Person",
@@ -117,6 +98,8 @@
   ]
 }
 </script>
+<!-- FONTE UNICA orari · genera #info (#orari-info) + inietta openingHoursSpecification nel JSON-LD soprastante -->
+<script src="/orari.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
 
@@ -526,12 +509,8 @@
     <div class="info-grid reveal" style="transition-delay:0.1s">
       <div>
         <p class="info-block-label" data-i18n="info_orari_label">Orari</p>
-        <div class="info-block-content">
-          <span data-i18n="info_orari_marven">Marted&igrave; &ndash; Venerd&igrave;</span><br>
-          <strong style="color:var(--ink);font-weight:400">19:30 &ndash; 22:30</strong><br><br>
-          <span data-i18n="info_orari_sabdom">Sabato &ndash; Domenica</span><br>
-          <strong style="color:var(--ink);font-weight:400">12:30 &ndash; 14:30 &nbsp;/&nbsp; 19:30 &ndash; 22:30</strong><br><br>
-          <em style="font-size:0.78rem" data-i18n="info_orari_lun">Luned&igrave; chiuso</em>
+        <div class="info-block-content" id="orari-info">
+          <!-- generato da orari.js (fonte unica orari) -->
         </div>
       </div>
       <div>
@@ -616,7 +595,7 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.21.05</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.22.01</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>
@@ -676,6 +655,7 @@
     if (dolciBtn && t.dolci_btn_link) dolciBtn.href = t.dolci_btn_link;
     document.getElementById('lang-select-nav').value = lang;
     document.getElementById('lang-select-mobile').value = lang;
+    if (window.renderOrari) window.renderOrari(lang);
   }
 
   function setLang(lang) {
@@ -831,6 +811,6 @@
 <script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
 <script defer src="/cookieconsent-config.js"></script>
 
-<!-- v 2026.05.21.05 -->
+<!-- v 2026.05.22.01 -->
 </body>
 </html>

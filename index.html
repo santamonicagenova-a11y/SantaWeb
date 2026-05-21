@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.05.21.04 — FINAL CHECK INFO (parziale · dec. #25): email contatto allineata al TARGET. Sostituito santamonicagenova@gmail.com → info@santamonicagenova.it in DUE punti: (1) bottone "Richiedi un buono" sezione regalo (mailto), (2) blocco #info contatti (mailto + testo visibile). RESTANO da allineare al FINAL CHECK (richiedono conferma valori + translations.json EN/FR): orari #info (non combaciano col TARGET giugno 2026), telefono, indirizzo. Schema.org JSON-LD già su dati TARGET. -->
 <!-- v 2026.05.21.03 — UX (OP): link "Dettagli completi e indicazioni stradali → /dove-siamo.html" in #info ora apre in NUOVA SCHEDA (target=_blank + rel=noopener noreferrer). Modifica cosmetica/UX, non security-critical, nessuna logica nuova. Gli altri link a /dove-siamo.html#mappa (map-cta-link, map-bar-link "Vedi dove siamo") restano same-tab invariati. -->
 <!-- v 2026.05.21.02 — F0.15 (PARZIALE · solo bugfix, fase resta APERTA): newsletter Brevo · (1) FIX error-as-success: il blocco fetch passa a mode:'no-cors' (endpoint Brevo hosted è cross-origin senza header CORS → risposta opaca, status 0). Ora un'eccezione = fallimento di rete reale (offline/DNS) e mostra il messaggio di errore; prima OGNI esito (anche fallimento) mostrava "iscrizione avvenuta". (2) FIX email: messaggio d'errore allineato a info@santamonicagenova.it (era santamonicagenova@gmail.com — coerenza FINAL CHECK pre-F0.21). (3) Allineata versione UI footer a quella file (era v 2026.05.19.01: drift pre-esistente). NON implementati: proxy server-side + audit log HMAC consenso (P3.7/P3.18) → decisione A/B rimandata, F0.15 ⏳ aperta. -->
 <!-- v 2026.05.19.05 — F0.12: semplificazione sezione #info (D-F0.12-4 opt-b): rimosso iframe OpenStreetMap, sostituito con segnaposto statico SVG (/img/map-placeholder.svg) racchiuso in <a href="/dove-siamo.html#mappa"> per CTA "Vedi dove siamo" · zero cookie su homepage · iframe Maps gestita ora solo in dove-siamo.html via iframemanager F0.12 · Schema.org JSON-LD invariato · contenuti orari/email HTML visibili in #info NON modificati (allineamento al check pre-F0.21) -->
@@ -439,7 +440,7 @@
       <p class="section-label" data-i18n="regalo_label">Un dono speciale</p>
       <h2 class="section-title" data-i18n="regalo_title">Buoni <em>regalo</em></h2>
       <p class="regalo-body" data-i18n="regalo_body">Regala un pranzo o una cena al Santamonica. I Buoni Regalo sono utilizzabili tutti i giorni (salvo disponibilit&agrave;) escluso Sabato e festivi, con validit&agrave; di 6 mesi dall&rsquo;acquisto. Contattaci per acquistarlo.</p>
-      <a href="mailto:santamonicagenova@gmail.com?subject=Buono Regalo Santamonica" class="btn-primary" data-i18n="regalo_btn">Richiedi un buono</a>
+      <a href="mailto:info@santamonicagenova.it?subject=Buono Regalo Santamonica" class="btn-primary" data-i18n="regalo_btn">Richiedi un buono</a>
     </div>
   </div>
 </section>
@@ -539,7 +540,7 @@
         <div class="info-block-content">
           Lungomare Lombardo 27<br>16145 Genova &mdash; Italy<br><br>
           <a href="tel:+390105533155">+39 010 553 31 55</a><br>
-          <a href="mailto:santamonicagenova@gmail.com">santamonicagenova@gmail.com</a><br><br>
+          <a href="mailto:info@santamonicagenova.it">info@santamonicagenova.it</a><br><br>
           <span data-i18n="info_note_text">Si prega di segnalare eventuali allergie o intolleranze al momento della prenotazione.</span><br><br>
           <span data-i18n="info_animali">&#x1F43E; Accettiamo animali di tutte le taglie.</span>
         </div>
@@ -616,7 +617,7 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.21.03</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.21.04</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>
@@ -831,6 +832,6 @@
 <script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
 <script defer src="/cookieconsent-config.js"></script>
 
-<!-- v 2026.05.21.03 -->
+<!-- v 2026.05.21.04 -->
 </body>
 </html>

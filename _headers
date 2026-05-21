@@ -1,6 +1,6 @@
 # Santamonica Web — Cloudflare Pages headers
-# v 2026.05.21.01
-# Storico: v 2026.05.17.01 (F0.3 noindex) -> v 2026.05.21.01 (F0.18: CSP + security headers)
+# v 2026.05.21.02
+# Storico: v 2026.05.17.01 (F0.3 noindex) -> v 2026.05.21.01 (F0.18: CSP + security headers) -> v 2026.05.21.02 (F0.20 fix C2: +https://formspree.io in connect-src)
 # NB: file ignorato da GitHub Pages; effetto solo su Cloudflare Pages.
 
 /*
@@ -11,7 +11,7 @@
   Cross-Origin-Opener-Policy: same-origin
   Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=(), browsing-topics=()
   Strict-Transport-Security: max-age=31536000
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://maps.google.com https://www.google.com; connect-src 'self' https://sibforms.com https://*.sibforms.com; form-action 'self' https://formspree.io https://sibforms.com https://*.sibforms.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://maps.google.com https://www.google.com; connect-src 'self' https://formspree.io https://sibforms.com https://*.sibforms.com; form-action 'self' https://formspree.io https://sibforms.com https://*.sibforms.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
 
 # ─────────────────────────────────────────────────────────────
 # NOTE OPERATIVE F0.18
@@ -32,11 +32,19 @@
 # 4) frame-src: solo Google Maps (embed via iframemanager su consenso). Se in futuro
 #    si aggiungono altri embed (es. video), estendere qui.
 #
-# 5) form-action: include Formspree (prenotazioni) e sibforms.com (newsletter Brevo
-#    GIA' presente in index.html). Riconciliare con F0.15 (audit log HMAC P3.7).
+# 5) connect-src + form-action: includono ENTRAMBI Formspree (prenotazioni) e
+#    sibforms.com (newsletter Brevo). Il form prenotazione invia via JS fetch() →
+#    governato da connect-src (NON da form-action); per questo formspree.io è stato
+#    aggiunto a connect-src in v 2026.05.21.02 (vedi nota 8). Riconciliare con F0.15.
 #
 # 6) img-src include https: (permissivo) per non rompere eventuali immagini Brevo.
 #    Restringere a 'self' data:' dopo audit completo Brevo (F0.15).
 #
 # 7) TEST in F0.20 (E2E su staging pages.dev, dove la CSP è già attiva): verificare
 #    caricamento font, apertura mappa su consenso, invio form prenotazione e newsletter.
+#
+# 8) [F0.20 · finding C2 · v 2026.05.21.02] Il form prenotazione (fetch → Formspree)
+#    era BLOCCATO dalla CSP: connect-src non includeva formspree.io (solo 'self' +
+#    sibforms). form-action lo aveva già, ma non si applica alle richieste fetch/XHR.
+#    Fix: aggiunto https://formspree.io a connect-src. Newsletter Brevo (sibforms) era
+#    già coperta. Ri-testare §7.2 (validazione "almeno un contatto") dopo il rebuild.

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.05.21.02 — F0.15 (PARZIALE · solo bugfix, fase resta APERTA): newsletter Brevo · (1) FIX error-as-success: il blocco fetch passa a mode:'no-cors' (endpoint Brevo hosted è cross-origin senza header CORS → risposta opaca, status 0). Ora un'eccezione = fallimento di rete reale (offline/DNS) e mostra il messaggio di errore; prima OGNI esito (anche fallimento) mostrava "iscrizione avvenuta". (2) FIX email: messaggio d'errore allineato a info@santamonicagenova.it (era santamonicagenova@gmail.com — coerenza FINAL CHECK pre-F0.21). (3) Allineata versione UI footer a quella file (era v 2026.05.19.01: drift pre-esistente). NON implementati: proxy server-side + audit log HMAC consenso (P3.7/P3.18) → decisione A/B rimandata, F0.15 ⏳ aperta. -->
 <!-- v 2026.05.19.05 — F0.12: semplificazione sezione #info (D-F0.12-4 opt-b): rimosso iframe OpenStreetMap, sostituito con segnaposto statico SVG (/img/map-placeholder.svg) racchiuso in <a href="/dove-siamo.html#mappa"> per CTA "Vedi dove siamo" · zero cookie su homepage · iframe Maps gestita ora solo in dove-siamo.html via iframemanager F0.12 · Schema.org JSON-LD invariato · contenuti orari/email HTML visibili in #info NON modificati (allineamento al check pre-F0.21) -->
 <!-- v 2026.05.19.04 — F0.11: aggiornato Schema.org JSON-LD da @type Restaurant a ItalianRestaurant (decisione M5b) con dati TARGET pre-go-live (orari giugno 2026, email info@santamonicagenova.it ora attiva, geo coordinate da Place ID Google) · aggiunto @id per linking semantico con dove-siamo.html · aggiornate coordinate marker mappa OSM in sezione #info per coerenza · aggiunto link "Dettagli completi e indicazioni stradali → /dove-siamo.html" in #info · contenuti orari/email HTML visibili in #info NON modificati: allineamento finale al check pre-F0.21 (memoria operativa #5) -->
 <!-- v 2026.05.19.01 — F0.9 P3 cleanup: rimosso blocco duplicato con path errati (/assets/cookieconsent/v3/...) che generava 3 richieste 404 ad ogni pageload. I path corretti (/lib/cookieconsent/... e /cookieconsent-config.js) erano già presenti nel head e prima di </body> -->
@@ -600,7 +601,7 @@
           Iscrizione avvenuta correttamente. Controlla la tua email per confermare.
         </div>
         <div id="brevo-error" style="display:none;margin-top:0.75rem;padding:0.75rem 1rem;background:#ffeded;color:#661d1d;font-size:0.82rem;font-family:'Jost',sans-serif;">
-          Errore. Riprova o scrivici a santamonicagenova@gmail.com
+          Errore. Riprova o scrivici a info@santamonicagenova.it
         </div>
       </div>
     </div>
@@ -614,7 +615,7 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.19.01</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.21.02</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>
@@ -801,21 +802,23 @@
         formData.append('CONFERMA', '1');
         formData.append('email_address_check', '');
         formData.append('locale', 'it');
-        var res = await fetch('https://02558e4e.sibforms.com/serve/MUIFAP19U4mM3rIDX53JK3s315yNrbOdpn3j1-YETv1PVNkmqBoijV8pS5p9qV5NT2TztdDdAv6tuCnTRMTr3zNeVcsX7T40lLd10aDJHQEthGprUBgunsdVREeveVwg-_99TGHVoCiY5AFBlCJWawGgAMwzu8xDFope7UcYEFNQqvHwdEcATBYMGn36okvCRDd8nnSv2JLEzuFc1w==', {
+        // Endpoint Brevo hosted: cross-origin senza header CORS. Con mode:'no-cors'
+        // la richiesta parte ma la risposta è opaca (status 0, non leggibile):
+        // non possiamo verificare l'esito lato client. Un'eccezione qui significa
+        // quindi un fallimento di rete REALE (offline/DNS) → mostriamo l'errore.
+        // La conferma effettiva avviene via double opt-in (email di conferma Brevo).
+        await fetch('https://02558e4e.sibforms.com/serve/MUIFAP19U4mM3rIDX53JK3s315yNrbOdpn3j1-YETv1PVNkmqBoijV8pS5p9qV5NT2TztdDdAv6tuCnTRMTr3zNeVcsX7T40lLd10aDJHQEthGprUBgunsdVREeveVwg-_99TGHVoCiY5AFBlCJWawGgAMwzu8xDFope7UcYEFNQqvHwdEcATBYMGn36okvCRDd8nnSv2JLEzuFc1w==', {
           method: 'POST',
-          body: formData,
-          headers: { 'Accept': 'application/json, text/javascript, */*' }
+          mode: 'no-cors',
+          body: formData
         });
-        if (res.ok || res.status === 0) {
-          successEl.style.display = 'block';
-          brevoForm.style.display = 'none';
-        } else {
-          throw new Error(res.status);
-        }
-      } catch(err) {
-        // Brevo redirect = success (no-cors mode returns status 0 as opaque)
         successEl.style.display = 'block';
         brevoForm.style.display = 'none';
+      } catch(err) {
+        errorEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Iscriviti';
+        return;
       }
       btn.disabled = false;
       btn.textContent = 'Iscriviti';
@@ -827,6 +830,6 @@
 <script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
 <script defer src="/cookieconsent-config.js"></script>
 
-<!-- v 2026.05.19.05 -->
+<!-- v 2026.05.21.02 -->
 </body>
 </html>

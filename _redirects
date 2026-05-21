@@ -1,41 +1,8 @@
 # Santamonica Web — Cloudflare Pages redirects
-# v 2026.05.21.01
-# Storico: v 2026.05.17.01 (F0.4 DE/ES) -> v 2026.05.21.01 (F0.16: canonical host + mapping Wix completo)
-# NB: questa v 2026.05.21.01 sostituisce la bozza .01 di apertura sessione (non ancora committata).
-# NB2: Cloudflare _redirects NON ammette commenti inline -> ogni nota sta su riga propria.
+# v 2026.05.17.01
+# F0.4 — DE/ES ritirati: redirect 301 verso versione IT pubblica
+# TODO F0.16: estendere con redirect 301 da URL Wix vecchi
 
-# ─────────────────────────────────────────────────────────────
-# F0.16 — Normalizzazione host canonico (www -> apex)
-# Tutti i <link rel="canonical"> usano l'apex SENZA www.
-# VERIFICARE in F0.20 (E2E) che non confligga con la config dominio CF Pages
-# (se CF Pages forza già apex a livello dominio, DISATTIVARE per evitare loop).
-https://www.santamonicagenova.it/*   https://santamonicagenova.it/:splat   301
-
-# ─────────────────────────────────────────────────────────────
-# F0.16 — Mapping 301 da URL Wix vecchi (fonte: pages-sitemap.xml Wix, 11 URL)
-
-# --- Mappature CERTE ---
-/men%C3%B9            /menu.html         301
-/menù                 /menu.html         301
-/regala               /regala.html       301
-/contatti             /dove-siamo.html   301
-/privacy-policy       /privacy.html      301
-/copia-di-cookies     /cookies.html      301
-
-# --- Mappature confermate (ex best-guess) ---
-# /cantina -> /menu-vini.html (cantina è sezione integrata in index.html)
-/cantina                        /menu-vini.html   301
-# /filosofiadicucina -> pagina eliminata, nessun equivalente -> homepage
-/filosofiadicucina              /                 301
-# /about-3 -> homepage
-/about-3                        /                 301
-# /copia-di-natale-e-capodanno -> pagina eliminata, nessun equivalente -> homepage
-/copia-di-natale-e-capodanno    /                 301
-# /hidden -> pagina eliminata -> homepage
-/hidden                         /                 301
-
-# ─────────────────────────────────────────────────────────────
-# F0.4 — Lingue DE/ES ritirate: redirect 301 verso versione IT pubblica
 /menu-de.html         /menu.html         301
 /menu-es.html         /menu.html         301
 /menu-dolci-de.html   /menu-dolci.html   301

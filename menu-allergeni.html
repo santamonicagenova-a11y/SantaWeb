@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v 2026.04.17.03 -->
+<!-- v 2026.05.22.01 — F0.21-e: allineamento vocabolario allergeni: "latte" -> "latticini" (coerenza con menu-dolci e output EN/FR). -->
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
@@ -201,45 +201,27 @@
 const ALLERGENI_DATA = {
   "sezioni": [
     {
-      "titolo": "Antipasti",
+      "titolo": "Sfiziosi",
       "piatti": [
         {
-          "nome": "Calamaro nostrano, piselli freschi, bagna cauda, kefir",
-          "allergeni": [
-            "pesce",
-            "latte",
-            "solfiti",
-            "molluschi"
-          ]
+          "nome": "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir",
+          "allergeni": ["latticini", "pesce", "solfiti", "molluschi"]
         },
         {
-          "nome": "Gamberi viola crudi alla puttanesca",
-          "allergeni": [
-            "crostacei"
-          ]
+          "nome": "Cavolo cappuccio, miso, lamponi, anacardi",
+          "allergeni": ["soia", "frutta a guscio"]
         },
         {
           "nome": "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce",
-          "allergeni": [
-            "pesce",
-            "latte",
-            "frutta a guscio",
-            "solfiti"
-          ]
+          "allergeni": ["latticini", "frutta a guscio", "solfiti", "pesce"]
         },
         {
-          "nome": "Dentice reale nostrano crudo, ricci di mare, limone, mandorle",
-          "allergeni": [
-            "glutine",
-            "pesce",
-            "frutta a guscio"
-          ]
+          "nome": "Ali di razza, fave nostrane, mela verde, mandorle",
+          "allergeni": ["latticini", "pesce", "frutta a guscio", "lupini"]
         },
         {
-          "nome": "“Non formaggi”",
-          "allergeni": [
-            "frutta a guscio"
-          ]
+          "nome": "\u201cNon formaggi\u201d",
+          "allergeni": ["frutta a guscio"]
         }
       ]
     },
@@ -247,37 +229,20 @@ const ALLERGENI_DATA = {
       "titolo": "Amidi e Carboidrati",
       "piatti": [
         {
-          "nome": "Spaghettoni quadrati Mancini, anemoni di mare, nduja, maggiorana",
-          "allergeni": [
-            "glutine",
-            "latte"
-          ]
+          "nome": "Riso \u201cRiserva San Massimo\u201d, rag\u00f9 di lepre, cime di rapa, Parmigiano Reggiano",
+          "allergeni": ["sedano", "latticini", "solfiti"]
         },
         {
           "nome": "Tortelli di cinghiale, dashi di orata, cipollina, shiso",
-          "allergeni": [
-            "glutine",
-            "pesce",
-            "latte",
-            "sedano",
-            "solfiti"
-          ]
+          "allergeni": ["latticini", "glutine", "pesce", "sedano", "solfiti"]
         },
         {
-          "nome": "Tubetti Mancini, baccalà, erba silene, kosho di agrumi",
-          "allergeni": [
-            "glutine",
-            "pesce",
-            "soia",
-            "latte"
-          ]
+          "nome": "Tubetti \u201cMancini\u201d, baccal\u00e0, il nostro kosho di agrumi fermentato, borlotti",
+          "allergeni": ["glutine", "pesce", "soia", "latticini"]
         },
         {
-          "nome": "Riso Riserva San Massimo, ostriche, asparago bianco, vaniglia",
-          "allergeni": [
-            "latte",
-            "molluschi"
-          ]
+          "nome": "Spaghettoni quadrati \u201cMancini\u201d, anemoni di mare, nduja, maggiorana",
+          "allergeni": ["glutine", "latticini"]
         }
       ]
     },
@@ -285,35 +250,20 @@ const ALLERGENI_DATA = {
       "titolo": "Non Solo Mare",
       "piatti": [
         {
-          "nome": "Ricciola nostrana pescata ad amo, crema di peperonata, purea di melanzane BBQ, tahina",
-          "allergeni": [
-            "pesce"
-          ]
+          "nome": "Ombrina nostrana pescata ad amo, salicornia, indivia belga",
+          "allergeni": ["pesce", "sedano", "latticini"]
+        },
+        {
+          "nome": "Polpo nostrano, rabarbaro, piselli",
+          "allergeni": ["molluschi"]
+        },
+        {
+          "nome": "Picanha, cardoncelli, fondo di manzo",
+          "allergeni": ["soia", "latticini", "sedano"]
         },
         {
           "nome": "Zucchina alla scapece, menta, yogurt, pepe Timut",
-          "allergeni": [
-            "latte"
-          ]
-        },
-        {
-          "nome": "Ombrina nostrana pescata ad amo, vignarola, crema di piselli",
-          "allergeni": [
-            "pesce",
-            "sedano",
-            "solfiti"
-          ]
-        },
-        {
-          "nome": "\"Tournedos alla Rossini\"?",
-          "allergeni": [
-            "crostacei",
-            "pesce",
-            "latte",
-            "sedano",
-            "solfiti",
-            "molluschi"
-          ]
+          "allergeni": ["latticini"]
         }
       ]
     }
@@ -323,7 +273,7 @@ const ALLERGENI_DATA = {
 
 const TUTTI_ALLERGENI = [
   "glutine","crostacei","uova","pesce","arachidi",
-  "soia","latte","frutta a guscio","sedano",
+  "soia","latticini","frutta a guscio","sedano",
   "senape","sesamo","solfiti","lupini","molluschi"
 ];
 
@@ -391,7 +341,7 @@ function render() {
 
 render();
 
-/* versione v 2026.04.17.03 */
+/* versione v 2026.05.22.01 */
 </script>
 </body>
 </html>

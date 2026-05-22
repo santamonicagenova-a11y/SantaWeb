@@ -1,5 +1,6 @@
 // Core functions per menu-admin Santamonica
 // v 2026.05.22.01 — F0.21-d: accorpa dolci nella CARTA EN/FR (fetch live menu-dolci.html + DeepL fresco, fallback statico). filesDolci NON genera piu menu-dolci-en/fr.html. Nuovi helper _estraiMenu/_dolciCartaLive/costruisciDolciPerCarta. IT invariato.
+// v 2026.05.22.02 — F0.21-e: pagina ALLERGENI completa (carta+dolci) in coda alla CARTA EN/FR. Fetch live menu-allergeni.html + dolci; termini via dizionario controllato 14 allergeni UE (ALLERGENI_DIZIONARIO/VARIANTI), nomi piatti via DeepL/fallback. Iniezione renderAllergeniPage+CSS nel template lingua. menu-allergeni.html IT invariato (stampa). IT carta invariata.
 // v 2026.05.17.04 — F0.6bis: migrate fetch admin GH Pages → CF Pages (BASE_FETCH_URL centralizzato, 7 occorrenze)
 // v 2026.05.17.03 — F0.4: rimosse lingue DE + ES (langs array, TRADUZIONI_DOLCI, qrLinks, langPair)
 // v 2026.05.15.04 — Documento generico: toggle centratura verticale del testo nella pagina
@@ -632,6 +633,9 @@ function eseguiPubblicazione(token) {
       m.sezioni = m.sezioni.concat(mDolci.sezioni);
       m.pagine  = (m.pagine || []).concat(mDolci.pagine);
     }
+    // F0.21-e: pagina allergeni completa (carta+dolci) in MENU.allergeni (solo EN/FR; renderizzata da renderAllergeniPage).
+    var mAll = costruisciAllergeniPerCarta(lang);
+    if (mAll) m.allergeni = mAll;
     var SEP = '/* ' + '\u2550'.repeat(57) + ' */\n';
     var i1 = html.indexOf('const MENU = {');
     var i2 = html.indexOf(SEP, i1) + SEP.length;
@@ -653,6 +657,44 @@ function eseguiPubblicazione(token) {
     html = html.replace(/English Menu<br>\s*Carte en Fran[^<]*<br>\s*Speisekarte auf Deutsch<br>\s*Carta en Espa\u00f1ol/, qrLinks.join('<br>\n            '));
     // Inietta canonical + index per la lingua specifica
     html = iniettaSeoLingua(html, lang);
+    // F0.21-e: inietta CSS + renderer pagina allergeni e lo chiama dopo renderCarta().
+    var algCss = '\n    /* F0.21-e allergeni */\n' +
+      '    #layout-carta .pg.alg-pg { }\n' +
+      '    .alg-header{text-align:center;margin-bottom:6mm;padding-bottom:3mm;border-bottom:1.5px solid var(--ink,#1a1714);}\n' +
+      '    .alg-title{font-size:1.7rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;line-height:1;}\n' +
+      '    .alg-nota{font-style:italic;font-size:.72rem;color:var(--stone,#8c7e6e);text-align:center;line-height:1.6;margin-bottom:6mm;padding-bottom:4mm;border-bottom:1px solid var(--rule,#d4c9b8);}\n' +
+      '    .alg-sez{margin-bottom:5mm;}\n' +
+      '    .alg-sez-titolo{font-size:1rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:2mm;padding-bottom:1mm;border-bottom:1px solid var(--rule,#d4c9b8);}\n' +
+      '    .alg-row{display:flex;align-items:baseline;gap:4mm;padding:1.6mm 0;border-bottom:1px dotted var(--rule,#d4c9b8);}\n' +
+      '    .alg-row:last-child{border-bottom:none;}\n' +
+      '    .alg-nome{flex:0 0 40%;font-size:.86rem;line-height:1.3;}\n' +
+      '    .alg-all{flex:1;font-style:italic;font-size:.8rem;line-height:1.4;}\n' +
+      '    .alg-all.vuoto{color:var(--stone,#8c7e6e);}\n' +
+      '    .alg-legenda{margin-top:auto;padding-top:4mm;border-top:1px solid var(--rule,#d4c9b8);font-size:.66rem;color:var(--stone,#8c7e6e);font-style:italic;line-height:1.6;text-align:center;}\n' +
+      '    .alg-legenda strong{font-style:normal;font-weight:600;color:var(--ink,#1a1714);}\n  ';
+    html = html.replace('</style>', algCss + '</style>');
+    var algFn = '\n/* F0.21-e: pagina allergeni (carta+dolci) */\n' +
+      'function renderAllergeniPage(){\n' +
+      '  if (typeof MENU === "undefined" || !MENU.allergeni) return;\n' +
+      '  var A = MENU.allergeni, root = document.getElementById("layout-carta"); if(!root) return;\n' +
+      '  var esc = function(x){ return String(x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };\n' +
+      '  var pg = document.createElement("div"); pg.className = "pg alg-pg";\n' +
+      '  var h = "<div class=\\"alg-header\\"><div class=\\"alg-title\\">"+esc(A.header)+"</div></div>";\n' +
+      '  h += "<div class=\\"alg-nota\\">"+esc(A.nota)+"</div>";\n' +
+      '  A.sezioni.forEach(function(sez){\n' +
+      '    h += "<div class=\\"alg-sez\\"><div class=\\"alg-sez-titolo\\">"+esc(sez.titolo_display)+"</div>";\n' +
+      '    (sez.piatti||[]).forEach(function(p){\n' +
+      '      var has = p.allergeni && p.allergeni.length;\n' +
+      '      h += "<div class=\\"alg-row\\"><div class=\\"alg-nome\\">"+p.nome+"</div>" +\n' +
+      '           "<div class=\\"alg-all"+(has?"":" vuoto")+"\\">"+(has?esc(p.allergeni.join(", ")):esc(A.vuoto))+"</div></div>";\n' +
+      '    });\n' +
+      '    h += "</div>";\n' +
+      '  });\n' +
+      '  h += "<div class=\\"alg-legenda\\"><strong>"+esc(A.legendaTitolo)+"</strong><br>"+A.legenda.map(esc).join(" &bull; ")+"</div>";\n' +
+      '  pg.innerHTML = h; root.appendChild(pg);\n' +
+      '}\n';
+    // inserisci la funzione subito prima della init "renderCarta();" e aggiungi la chiamata dopo renderCarta()
+    html = html.replace('renderCarta();\n', algFn + 'renderCarta();\nrenderAllergeniPage();\n');
     files.push({ path: 'menu-' + lang + '.html', content: html, label: lang.toUpperCase() });
     });
   }
@@ -704,6 +746,110 @@ function _estraiMenu(src) {
 // ── F0.21-d: dati dolci LIVE (fetch menu-dolci.html) usati per accorpare i dolci nella carta in lingua.
 //    Popolato async in traduciEPubblica prima della passata DeepL. null = non disponibile (si usa il fallback statico).
 var _dolciCartaLive = null;
+
+// ── F0.21-e: ALLERGENI — dizionario controllato 14 allergeni UE (Reg. 1169/2011).
+// Varianti IT (forme diverse usate nelle due fonti) -> forma canonica IT.
+var ALLERGENI_VARIANTI = {
+  'latticini': 'latte', 'latte e derivati': 'latte',
+  'uovo': 'uova',
+  'solforosa': 'solfiti', 'anidride solforosa': 'solfiti', 'anidride solforosa e solfiti': 'solfiti',
+  'cereali contenenti glutine': 'glutine',
+  'semi di sesamo': 'sesamo'
+};
+// Canonico IT -> {en, fr} (termini ufficiali EU FIC).
+var ALLERGENI_DIZIONARIO = {
+  'glutine':         { en: 'gluten',      fr: 'gluten' },
+  'crostacei':       { en: 'crustaceans', fr: 'crustac\u00e9s' },
+  'uova':            { en: 'eggs',        fr: '\u0153ufs' },
+  'pesce':           { en: 'fish',        fr: 'poisson' },
+  'arachidi':        { en: 'peanuts',     fr: 'arachides' },
+  'soia':            { en: 'soya',        fr: 'soja' },
+  'latte':           { en: 'milk',        fr: 'lait' },
+  'frutta a guscio': { en: 'nuts',        fr: 'fruits \u00e0 coque' },
+  'sedano':          { en: 'celery',      fr: 'c\u00e9leri' },
+  'senape':          { en: 'mustard',     fr: 'moutarde' },
+  'sesamo':          { en: 'sesame',      fr: 's\u00e9same' },
+  'solfiti':         { en: 'sulphites',   fr: 'sulfites' },
+  'lupini':          { en: 'lupin',       fr: 'lupin' },
+  'molluschi':       { en: 'molluscs',    fr: 'mollusques' }
+};
+// I 14 allergeni nell'ordine canonico (per la legenda).
+var ALLERGENI_14 = ['glutine','crostacei','uova','pesce','arachidi','soia','latte','frutta a guscio','sedano','senape','sesamo','solfiti','lupini','molluschi'];
+// Testi legali fissi per lingua.
+var ALLERGENI_TESTI = {
+  en: {
+    header: 'Allergens',
+    nota: 'Information pursuant to Regulation (EU) No 1169/2011. For further information on allergens in our dishes, please ask our staff.',
+    legendaTitolo: 'Regulated allergens (Reg. EU 1169/2011):',
+    vuoto: 'no declared allergen',
+    dolciTitolo: 'Desserts'
+  },
+  fr: {
+    header: 'Allerg\u00e8nes',
+    nota: 'Information conform\u00e9ment au R\u00e8glement (UE) n\u00b0 1169/2011. Pour plus d\u2019informations sur les allerg\u00e8nes pr\u00e9sents dans nos plats, veuillez vous adresser \u00e0 notre personnel.',
+    legendaTitolo: 'Allerg\u00e8nes r\u00e9glement\u00e9s (R\u00e8gl. UE 1169/2011) :',
+    vuoto: 'aucun allerg\u00e8ne d\u00e9clar\u00e9',
+    dolciTitolo: 'Desserts'
+  }
+};
+
+// Dati allergeni CARTA (ALLERGENI_DATA) recuperati live da menu-allergeni.html. null = non disponibile.
+var _allergeniCartaLive = null;
+
+// Normalizza la lista allergeni di un piatto (array da carta | stringa "a, b" da dolci) -> array canonico IT.
+function _normAllergeni(raw) {
+  var arr = Array.isArray(raw) ? raw : (typeof raw === 'string' ? raw.split(',') : []);
+  return arr.map(function(x) {
+    var k = String(x).trim().toLowerCase();
+    return ALLERGENI_VARIANTI[k] || k;
+  }).filter(function(x){ return x; });
+}
+// Traduce un allergene canonico nella lingua; fallback = termine originale (non perdere info).
+function _trAllergene(canon, lang) {
+  var d = ALLERGENI_DIZIONARIO[canon];
+  return (d && d[lang]) || canon;
+}
+// Costruisce la pagina allergeni (carta + dolci) tradotta per la lingua. Ritorna oggetto o null.
+function costruisciAllergeniPerCarta(lang) {
+  var T = ALLERGENI_TESTI[lang];
+  if (!T) return null;
+  var dynPiatti = (TRANSLATIONS[lang] && TRANSLATIONS[lang].piatti) || {};
+  var dynSez    = (TRANSLATIONS[lang] && TRANSLATIONS[lang].sezioni) || {};
+  function trNome(n) { var c = String(n).replace(/<[^>]+>/g, ''); return dynPiatti[c] || dynPiatti[n] || c; }
+  function trSez(t)  { return dynSez[t] || t; }
+  var sezioni = [];
+  // 1) CARTA (da menu-allergeni.html)
+  if (_allergeniCartaLive && _allergeniCartaLive.sezioni) {
+    _allergeniCartaLive.sezioni.forEach(function(sez) {
+      sezioni.push({
+        titolo_display: trSez(sez.titolo),
+        piatti: (sez.piatti || []).map(function(p) {
+          return { nome: trNome(p.nome), allergeni: _normAllergeni(p.allergeni).map(function(a){ return _trAllergene(a, lang); }) };
+        })
+      });
+    });
+  }
+  // 2) DOLCI (da menu-dolci.html, campo MENU.allergeni)
+  var dolciAll = (_dolciCartaLive && _dolciCartaLive.allergeni) ||
+                 (typeof MENU_DOLCI_IT !== 'undefined' && MENU_DOLCI_IT && MENU_DOLCI_IT.allergeni) || null;
+  if (dolciAll && dolciAll.length) {
+    sezioni.push({
+      titolo_display: (typeof TRADUZIONI_DOLCI !== 'undefined' && TRADUZIONI_DOLCI[lang] && TRADUZIONI_DOLCI[lang].sezione) || T.dolciTitolo,
+      piatti: dolciAll.map(function(p) {
+        return { nome: trNome(p.nome), allergeni: _normAllergeni(p.allergeni).map(function(a){ return _trAllergene(a, lang); }) };
+      })
+    });
+  }
+  if (!sezioni.length) return null;
+  return {
+    header: T.header,
+    nota: T.nota,
+    vuoto: T.vuoto,
+    legendaTitolo: T.legendaTitolo,
+    legenda: ALLERGENI_14.map(function(a){ return _trAllergene(a, lang); }),
+    sezioni: sezioni
+  };
+}
 
 // ── F0.21-d: sezione dolci + pagina, tradotta, da accorpare alla CARTA in lingua (solo EN/FR).
 //    Fonte dolci: _dolciCartaLive (live) con fallback su MENU_DOLCI_IT.
@@ -861,7 +1007,9 @@ function traduciEPubblica() {
   // F0.21-d: per la CARTA, prima della traduzione recupera i dolci LIVE e accoda i loro piatti
   // alla coda DeepL, cosi la sezione dolci accorpata nella carta in lingua e sempre fresca. IT non coinvolto.
   if (tipoMenuCorrente === 'carta') {
-    fetch(DOLCI_URL + '?nocache=' + Date.now() + '_' + Math.random().toString(36).slice(2), { cache: 'no-store' })
+    // F0.21-d/e: per la CARTA recupera LIVE dolci + allergeni, poi avvia traduzione/pubblicazione.
+    var _nc = function(){ return '?nocache=' + Date.now() + '_' + Math.random().toString(36).slice(2); };
+    var pDolci = fetch(DOLCI_URL + _nc(), { cache: 'no-store' })
       .then(function(r) { return r.ok ? r.text() : Promise.reject(new Error('HTTP ' + r.status)); })
       .then(function(src) {
         _dolciCartaLive = _estraiMenu(src);
@@ -874,11 +1022,27 @@ function traduciEPubblica() {
           });
         }
       })
-      .catch(function(ex) {
-        _dolciCartaLive = null;
-        console.warn('[Dolci] fetch live fallito, uso fallback statico: ' + ex.message);
+      .catch(function(ex) { _dolciCartaLive = null; console.warn('[Dolci] fetch live fallito, fallback statico: ' + ex.message); });
+    var pAll = fetch(ALLERGENI_URL + _nc(), { cache: 'no-store' })
+      .then(function(r) { return r.ok ? r.text() : Promise.reject(new Error('HTTP ' + r.status)); })
+      .then(function(src) {
+        try {
+          var START = 'const ALLERGENI_DATA = ';
+          var SEP = '/* ' + '\u2550'.repeat(57) + ' */';
+          var i1 = src.indexOf(START), i2 = src.indexOf(SEP, i1);
+          if (i1 >= 0 && i2 > i1) {
+            _allergeniCartaLive = Function('"use strict";' + src.slice(i1, i2).trim() + ';return ALLERGENI_DATA;')();
+            // nomi piatti allergeni carta -> coda DeepL (combaciano coi piatti carta, ma per sicurezza)
+            if (_allergeniCartaLive && _allergeniCartaLive.sezioni) {
+              _allergeniCartaLive.sezioni.forEach(function(sez) {
+                (sez.piatti||[]).forEach(function(p){ if (p && p.nome) testi.push(String(p.nome).replace(/<[^>]+>/g,'')); });
+              });
+            }
+          } else { _allergeniCartaLive = null; }
+        } catch(e) { _allergeniCartaLive = null; console.warn('[Allergeni] parse fallito: ' + e.message); }
       })
-      .then(_avvia);
+      .catch(function(ex) { _allergeniCartaLive = null; console.warn('[Allergeni] fetch live fallito: ' + ex.message); });
+    Promise.all([pDolci, pAll]).then(_avvia);
   } else {
     _avvia();
   }

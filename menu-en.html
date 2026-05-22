@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://santamonicagenova.it/menu-en.html">
+  <title>Menu — Santamonica</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --cream: #faf7f2;
+      --ink:   #1a1714;
+      --stone: #8c7e6e;
+      --rust:  #9e4a2a;
+      --rule:  #d4c9b8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 400;
+    }
+
+    /* ══════════════════════════════════════
+       BARRA CONTROLLI
+    ══════════════════════════════════════ */
+    .ctrl-bar {
+      text-align: center;
+      padding: .9rem 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--cream);
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      gap: .7rem;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .ctrl-btn {
+      padding: .4rem 1.3rem;
+      background: transparent;
+      border: 1px solid var(--ink);
+      font-family: 'Jost', sans-serif;
+      font-size: .68rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      color: var(--ink);
+      transition: background .2s, color .2s;
+    }
+    .ctrl-btn:hover, .ctrl-btn.active {
+      background: var(--ink);
+      color: var(--cream);
+    }
+    .ctrl-sep {
+      width: 1px;
+      height: 1.4rem;
+      background: var(--rule);
+    }
+
+    /* ══════════════════════════════════════
+       PAGINA  (shared)
+    ══════════════════════════════════════ */
+    .pg {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 2rem auto;
+      padding: 18mm 24mm 16mm;
+      background: #fff;
+      box-shadow: 0 2px 24px rgba(0,0,0,.10);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ══════════════════════════════════════
+       LAYOUT: MENÙ ALLA CARTA
+    ══════════════════════════════════════ */
+    #layout-carta { display: block; }
+    #layout-orario { display: none; }
+
+    /* ── intestazione ── */
+    .pg-header {
+      text-align: center;
+      margin-bottom: 9mm;
+      padding-bottom: 5mm;
+      border-bottom: 1px solid var(--rule);
+    }
+    .logo {
+      font-size: 2.5rem;
+      font-weight: 300;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    .logo em { font-style: italic; color: var(--stone); }
+    .logo-sub {
+      margin-top: .45rem;
+      font-family: 'Jost', sans-serif;
+      font-size: .67rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--stone);
+    }
+
+    /* ── degustazione ── */
+    .degu {
+      text-align: center;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4mm 0;
+    }
+    .degu-titolo {
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      margin-bottom: 5mm;
+    }
+    .degu-prezzi {
+      font-style: italic;
+      font-size: .98rem;
+      line-height: 1.4;
+      margin-bottom: 2mm;
+    }
+    .degu-nota {
+      font-style: italic;
+      font-size: .98rem;
+      color: var(--ink);
+      margin-bottom: 14mm;
+    }
+    .degu-nota strong {
+      font-style: normal;
+      font-weight: 400;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      color: var(--ink);
+    }
+    .percorso { margin-bottom: 12mm; }
+    .percorso-label {
+      font-style: italic;
+      font-weight: 700;
+      font-size: 1.25rem;
+      margin-bottom: 3mm;
+    }
+    .percorso-piatto { font-size: .96rem; line-height: 1.95; font-style: normal; }
+    .percorso-piatto em { font-style: normal; }
+    .percorso-libero { font-size: .96rem; line-height: 1.95; font-style: normal; }
+
+    /* ── sezioni carta ── */
+    .pg-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .sezione { margin-bottom: 14mm; }
+    .sezione-titolo {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: normal;
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 5mm;
+      padding-bottom: 2mm;
+    }
+
+    /* ── piatti carta ── */
+    .piatto {
+      text-align: center;
+      padding: .5mm 0;
+      font-size: .96rem;
+      line-height: 1.4;
+    }
+    .piatto-prezzo {
+      font-size: .8rem;
+      color: var(--stone);
+      margin-left: .3rem;
+    }
+    .piatto-unita {
+      font-size: .76rem;
+      color: var(--stone);
+      margin-left: .1rem;
+    }
+    .piatto-desc {
+      font-style: italic;
+      font-size: 0.7em;
+      line-height: 1.25;
+      color: var(--stone);
+      display: block;
+      margin-top: 0.3mm;
+    }
+    .percorso-desc {
+      font-style: italic;
+      font-size: 0.7em;
+      line-height: 1.25;
+      color: var(--stone);
+      display: block;
+      margin-top: 0.3mm;
+    }
+    .piatto-staccato { margin-top: 3.5mm; }
+
+    .eco::after {
+      content: ' *';
+      color: var(--rust);
+      font-size: .76em;
+    }
+
+    /* ── note ospite carta ── */
+    .note-ospite {
+      margin-top: auto;
+      font-style: italic;
+      font-size: .73rem;
+      color: var(--stone);
+      text-align: center;
+      line-height: 1.65;
+      padding-top: 5mm;
+      border-top: 1px solid var(--rule);
+    }
+    .note-ospite-titolo {
+      text-decoration: underline;
+      display: block;
+      margin-bottom: 1.2mm;
+    }
+    .note-ospite u { text-decoration: underline; }
+
+    /* ══════════════════════════════════════
+       LAYOUT: FOGLIO ORARIO (1 pagina, 2 col)
+    ══════════════════════════════════════ */
+    .pg-orario {
+      padding: 6mm 8mm 8mm;
+    }
+
+    .orario-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.8rem;
+      font-style: italic;
+      font-weight: 300;
+      letter-spacing: .08em;
+      text-align: center;
+      margin-bottom: 5mm;
+      line-height: 1;
+    }
+
+    .orario-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 1.5px solid var(--ink);
+      flex: 1;
+    }
+
+    .orario-col {
+      padding: 6mm 8mm;
+      display: flex;
+      flex-direction: column;
+      gap: 6mm;
+    }
+
+    .orario-col:first-child {
+      border-right: 1.5px solid var(--ink);
+    }
+
+    /* separatore tratteggiato interno (dopo ostriche) */
+    .orario-sep {
+      border: none;
+      border-top: 1px dashed var(--stone);
+      margin: 1mm 0;
+    }
+
+    .orario-sez { text-align: center; }
+
+    .orario-sez-titolo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 3mm;
+    }
+
+    .orario-piatto {
+      font-size: 1.2rem;
+      line-height: 1.35;
+      text-align: center;
+      margin-bottom: .55rem;
+    }
+    .orario-piatto:last-child { margin-bottom: 0; }
+
+    .orario-piatto .eco::after {
+      content: ' *';
+      color: var(--rust);
+      font-size: .76em;
+    }
+
+    /* ── sezione orario in basso ── */
+    .orario-footer-col {
+      display: flex;
+      flex-direction: column;
+      gap: 4mm;
+    }
+
+    .orario-links {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: normal;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      line-height: 2.1;
+      text-align: center;
+    }
+    .orario-links u { text-decoration: none; }
+
+    .orario-qr {
+      width: 45mm;
+      height: 45mm;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .orario-servizio {
+      font-style: italic;
+      font-size: 1rem;
+      line-height: 1.85;
+      text-align: center;
+    }
+    .orario-servizio-titolo {
+      text-decoration: underline;
+      font-style: italic;
+      display: block;
+      margin-bottom: 2mm;
+    }
+
+    .orario-nota {
+      font-size: .72rem;
+      color: var(--stone);
+      line-height: 1.6;
+      text-align: center;
+      border-top: 1px solid var(--rule);
+      padding-top: 3mm;
+      margin-top: auto;
+    }
+
+    /* ══════════════════════════════════════
+       STAMPA
+    ══════════════════════════════════════ */
+    @media print {
+      @page { size: A4 portrait; margin: 0; }
+      html { font-size: 20px; } /* +25% leggibilita\u0301 stampa (v 2026.05.14.03) */
+      body { background: white; }
+      .ctrl-bar { display: none; }
+
+      /* carta: 3 pagine */
+      #layout-carta .pg {
+        width: 210mm;
+        height: 297mm;
+        min-height: unset;
+        margin: 0;
+        padding: 15mm 22mm 14mm;
+        box-shadow: none;
+        page-break-after: always;
+      }
+      #layout-carta .pg:last-child { page-break-after: avoid; }
+
+      /* orario: 1 pagina */
+      #layout-orario .pg {
+        width: 210mm;
+        height: 297mm;
+        min-height: unset;
+        margin: 0;
+        box-shadow: none;
+        page-break-after: avoid;
+      }
+
+      /* ----- v 2026.05.17.02: scaling dedicato orario per evitare trabocco A4 (riduzione aggressiva) ----- */
+      #layout-orario .pg-orario { padding: 3mm 5mm; }
+      #layout-orario .orario-logo { font-size: 2.9rem; margin-bottom: 3mm; }
+      #layout-orario .orario-col { padding: 3mm 5mm; gap: 3mm; }
+      #layout-orario .orario-sez-titolo { font-size: 1.18rem; margin-bottom: 2mm; }
+      #layout-orario .orario-piatto { font-size: .9rem; line-height: 1.25; margin-bottom: .4rem; }
+      #layout-orario .orario-links { font-size: .85rem; line-height: 1.75; }
+      #layout-orario .orario-qr { width: 35mm; height: 35mm; }
+      #layout-orario .orario-servizio { font-size: .82rem; line-height: 1.65; }
+      #layout-orario .orario-nota { font-size: .56rem; padding-top: 2mm; line-height: 1.45; }
+    }
+  </style>
+</head>
+<body>
+<div id="layout-carta"></div>
+<div id="layout-orario"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   MENÙ  —  modifica solo qui per aggiornare tutto
+   ═══════════════════════════════════════════════════════ */
+const MENU = {
+  "degustazione": {
+    "opzioni": [
+      {
+        "portate": 6,
+        "prezzo": 90,
+        "vini": 60
+      },
+      {
+        "portate": 7,
+        "prezzo": 110,
+        "vini": 70
+      }
+    ],
+    "nota": "Price per person, menu to be shared by the whole table.<br>Menus are available until 1:30 PM for lunch and 9:30 PM for dinner.",
+    "percorsi": {
+      "Sei": [
+        {
+          "nome": "Local squid, fresh peas, bagna cauda, kefir",
+          "sostenibile": true
+        },
+        {
+          "nome": "Veal sweetbreads, celeriac, hazelnuts, fish stock",
+          "sostenibile": true
+        },
+        {
+          "nome": "<em>Mancini</em> square spaghettoni, sea anemones, nduja, marjoram",
+          "sostenibile": true
+        },
+        {
+          "nome": "<em>Mancini</em> pasta tubes, salted cod, silene, citrus kosho",
+          "sostenibile": true
+        },
+        {
+          "nome": "&quot;Tournedos à la Rossini&quot;?",
+          "sostenibile": true
+        },
+        {
+          "nome": "Black lemon, lovage and lime ice cream with milk biscuits"
+        }
+      ],
+      "Sette": "Chef's free interpretation menu"
+    },
+    "percorso_label_6": "Sei",
+    "percorso_label_7": "Sette"
+  },
+  "sezioni": [
+    {
+      "titolo": "Crudi",
+      "piatti": [
+        {
+          "nome": "Fine de Claire oysters",
+          "prezzo": 4,
+          "unita": "ea."
+        },
+        {
+          "nome": "Antilope Oysters",
+          "prezzo": 7,
+          "unita": "ea."
+        },
+        {
+          "nome": "Enrico IV Oysters",
+          "prezzo": 8,
+          "unita": "ea."
+        },
+        {
+          "nome": "Local scampi",
+          "prezzo": 17,
+          "unita": "ea.",
+          "sostenibile": true
+        },
+        {
+          "nome": "Local purple prawns",
+          "prezzo": 5,
+          "unita": "ea.",
+          "sostenibile": true
+        },
+        {
+          "nome": "A selection of locally caught fish, caught with a hook and line",
+          "prezzo": 37,
+          "sostenibile": true,
+          "staccato": true
+        },
+        {
+          "nome": "Seafood tasting",
+          "prezzo": 80,
+          "sostenibile": true,
+          "staccato": true
+        }
+      ],
+      "titolo_display": "Raw"
+    },
+    {
+      "titolo": "Sfiziosi",
+      "piatti": [
+        {
+          "nome": "Local squid, fresh peas, bagna cauda, kefir",
+          "prezzo": 20,
+          "sostenibile": true
+        },
+        {
+          "nome": "Raw purple prawns with puttanesca sauce",
+          "prezzo": 25,
+          "sostenibile": true
+        },
+        {
+          "nome": "Veal sweetbreads, celeriac, hazelnuts, fish stock reduction",
+          "prezzo": 22,
+          "sostenibile": true
+        },
+        {
+          "nome": "Raw local red seabream, sea urchins, lemon, almonds",
+          "prezzo": 29,
+          "sostenibile": true
+        },
+        {
+          "nome": "“Not cheese”",
+          "prezzo": 22,
+          "descrizione": "(Tasting of vegan artisanal cheeses made from cashews and almond milk)"
+        }
+      ],
+      "titolo_display": "Starters"
+    },
+    {
+      "titolo": "Amidi e Carboidrati",
+      "piatti": [
+        {
+          "nome": "<em>Mancini</em> square spaghettoni, sea anemones, nduja, marjoram",
+          "prezzo": 32,
+          "sostenibile": true
+        },
+        {
+          "nome": "Wild boar tortelli, sea bream dashi, spring onion, shiso",
+          "prezzo": 26,
+          "sostenibile": true
+        },
+        {
+          "nome": "<em>Mancini</em> pasta tubes, salted cod, silene, citrus kosho",
+          "prezzo": 24,
+          "sostenibile": true
+        },
+        {
+          "nome": "<em>San Massimo Riserva</em> rice, oysters, white asparagus, vanilla",
+          "prezzo": 37,
+          "sostenibile": true
+        }
+      ],
+      "titolo_display": "Pasta & Grains"
+    },
+    {
+      "titolo": "Non Solo Mare",
+      "piatti": [
+        {
+          "nome": "Locally caught yellowtail caught on a hook, pepper cream, BBQ aubergine purée, tahini",
+          "prezzo": 34,
+          "sostenibile": true
+        },
+        {
+          "nome": "Zucchini alla scapece, mint, yoghurt, Timut pepper",
+          "prezzo": 18
+        },
+        {
+          "nome": "Locally caught croaker, caught on a hook, with vine-leaf sauce and a pea purée",
+          "prezzo": 34,
+          "sostenibile": true
+        },
+        {
+          "nome": "&quot;Tournedos à la Rossini&quot;?",
+          "prezzo": 35,
+          "descrizione": "(Lamb, monkfish liver, purple prawn butter, seaweed and sea truffles)",
+          "sostenibile": true
+        }
+      ],
+      "titolo_display": "Not Only Sea"
+    },
+    {
+      "titolo": "Golosità",
+      "piatti": [
+        {
+          "nome": "Black lemon, lovage and lime ice cream with milk biscuits",
+          "prezzo": 14
+        },
+        {
+          "nome": "Pineapple, charcoal parfait, coffee caramel",
+          "prezzo": 14
+        },
+        {
+          "nome": "Porcini mushroom ice cream, strawberries, chocolate crumble",
+          "prezzo": 14
+        },
+        {
+          "nome": "Sacripantina",
+          "prezzo": 11
+        },
+        {
+          "nome": "Ligurian blue cheese and Picolit Zorzettig",
+          "prezzo": 12
+        }
+      ],
+      "titolo_display": "Sweets"
+    }
+  ],
+  "pagine": [
+    {
+      "sezioni": [
+        "Crudi",
+        "Sfiziosi"
+      ]
+    },
+    {
+      "sezioni": [
+        "Amidi e Carboidrati",
+        "Non Solo Mare"
+      ]
+    },
+    {
+      "sezioni": [
+        "Golosità"
+      ]
+    }
+  ],
+  "orario": {
+    "colSinistra": [
+      "Crudi",
+      "Non Solo Mare"
+    ],
+    "colDestra": [
+      "Amidi e Carboidrati",
+      "Sfiziosi"
+    ],
+    "separatoreDopo": "Crudi",
+    "orarioServizio": [
+      {
+        "giorno": "Tuesday",
+        "fasce": [
+          "19:30 – 22:30"
+        ]
+      },
+      {
+        "giorno": "Wednesday to Saturday",
+        "fasce": [
+          "12:30 – 14:30",
+          "19:30 – 22:30"
+        ]
+      },
+      {
+        "giorno": "Sunday",
+        "fasce": [
+          "12:30 – 14:30"
+        ]
+      }
+    ]
+  }
+};
+/* ═════════════════════════════════════════════════════════ */
+
+/* ── helpers condivisi ── */
+const NOTE_CARTA = `
+  <span class="note-ospite-titolo">Guest notes</span>
+  To maintain consistent quality and organoleptic characteristics of raw ingredients, fresh fish products are blast-frozen after purchase. These products are marked with the symbol * for clear and transparent customer information.<br>
+  The list of allergens is available on the last page of this menu.
+`;
+
+const NOTE_ORARIO = `To maintain consistent quality standards and organoleptic characteristics, fresh fish products are blast-frozen. These products are marked with the symbol: *`;
+
+function getSez(titolo) {
+  var found = MENU.sezioni.find(s => s.titolo === titolo);
+  if (!found) {
+    // Fallback: cerca per titolo_display o per indice
+    var idx = ['Crudi','Sfiziosi','Amidi e Carboidrati','Non Solo Mare'].indexOf(titolo);
+    if (idx >= 0 && MENU.sezioni[idx]) found = MENU.sezioni[idx];
+  }
+  return found;
+}
+
+function buildPiatto(p) {
+  const eco = p.sostenibile ? ' eco' : '';
+  const staccato = p.staccato ? ' piatto-staccato' : '';
+  const unitaHtml = p.unita ? `<span class="piatto-unita">${p.unita}</span>` : '';
+  const prezzoHtml = p.prezzo != null
+    ? `<span class="piatto-prezzo">${p.prezzo}${unitaHtml}</span>` : '';
+  const descHtml = p.descrizione
+    ? `<span class="piatto-desc">${p.descrizione}</span>` : '';
+  return `<div class="piatto${staccato}"><span class="piatto-riga${eco}">${p.nome}</span>${prezzoHtml}${descHtml}</div>`;
+}
+
+function buildSezione(s) {
+  const label = s.titolo_display || s.titolo;
+  return `
+    <div class="sezione">
+      <div class="sezione-titolo">${label}</div>
+      ${s.piatti.map(buildPiatto).join('')}
+    </div>`;
+}
+
+function buildDegu(degu) {
+  const optsHtml = degu.opzioni.map(o =>
+    `${o.portate} courses &nbsp;${o.prezzo}, wine pairing ${o.vini}`
+  ).join('<br>');
+
+  let percorsiHtml = '';
+  for (const [n, piatti] of Object.entries(degu.percorsi)) {
+    if (typeof piatti === 'string') {
+      percorsiHtml += `
+        <div class="percorso">
+          <div class="percorso-label">&ldquo;${n}&rdquo;</div>
+          <div class="percorso-piatto percorso-libero">${piatti}</div>
+        </div>`;
+    } else {
+      const righe = piatti.map(p => {
+        const descHtml = p.descrizione ? `<span class="percorso-desc">${p.descrizione}</span>` : '';
+        return `<div class="percorso-piatto${p.sostenibile ? ' eco' : ''}">${p.nome}${descHtml}</div>`;
+      }).join('');
+      percorsiHtml += `
+        <div class="percorso">
+          <div class="percorso-label">&ldquo;${n}&rdquo;</div>
+          ${righe}
+        </div>`;
+    }
+  }
+
+  return `
+    <div class="degu">
+      <div class="degu-titolo">Tasting Menu</div>
+      <div class="degu-prezzi">${optsHtml}</div>
+      <div class="degu-nota">${degu.nota.replace("l'intero tavolo", "<strong>l\u2019intero tavolo</strong>")}</div>
+      ${percorsiHtml}
+    </div>`;
+}
+
+/* ══════════════════════════════════════
+   RENDER: MENÙ ALLA CARTA
+══════════════════════════════════════ */
+function renderCarta() {
+  const root = document.getElementById('layout-carta');
+  root.innerHTML = '';
+
+  // Pag 1: intestazione + degustazione
+  const pag1 = document.createElement('div');
+  pag1.className = 'pg';
+  pag1.innerHTML = `
+    ${buildDegu(MENU.degustazione)}
+    <div class="note-ospite">${NOTE_CARTA}</div>
+  `;
+  root.appendChild(pag1);
+
+  // Pag 2 e 3: sezioni
+  MENU.pagine.forEach(pg => {
+    const div = document.createElement('div');
+    div.className = 'pg';
+    div.innerHTML = `
+      <div class="pg-content">
+        ${pg.sezioni.map(t => buildSezione(getSez(t))).join('')}
+      </div>
+      <div class="note-ospite">${NOTE_CARTA}</div>
+    `;
+    root.appendChild(div);
+  });
+}
+
+/* ══════════════════════════════════════
+   RENDER: FOGLIO ORARIO
+══════════════════════════════════════ */
+function buildOrarioColonna(titoli, sepDopo) {
+  return titoli.map(titolo => {
+    const s = getSez(titolo);
+    const piatti = s.piatti.map(p => {
+      const eco = p.sostenibile ? ' eco' : '';
+      const unitaHtml = p.unita ? ` ${p.unita}` : '';
+      const prezzoHtml = p.prezzo != null ? ` ${p.prezzo}${unitaHtml}` : '';
+      return `<div class="orario-piatto"><span class="${'piatto-riga' + eco}">${p.nome}${prezzoHtml}</span></div>`;
+    }).join('');
+
+    const sep = (titolo === sepDopo) ? '<hr class="orario-sep">' : '';
+    // ogni sezione in uno slot flex:1 centrato verticalmente
+    return `
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+        <div class="orario-sez">
+          <div class="orario-sez-titolo">${s.titolo_display || s.titolo}</div>
+          ${piatti}
+        </div>
+      </div>${sep}`;
+  }).join('');
+}
+
+function renderOrario() {
+  const root = document.getElementById('layout-orario');
+  root.innerHTML = '';
+  const cfg = MENU.orario;
+
+  const orarioHtml = cfg.orarioServizio.map(o =>
+    `<div><em>${o.giorno}</em></div>` + o.fasce.map(f => `<div>${f}</div>`).join('')
+  ).join('');
+
+  const pg = document.createElement('div');
+  pg.className = 'pg pg-orario';
+  pg.innerHTML = `
+    <div class="orario-logo">Santamonica</div>
+    <div class="orario-grid" style="flex:1">
+
+      <!-- colonna sinistra -->
+      <div class="orario-col">
+        ${buildOrarioColonna(cfg.colSinistra, cfg.separatoreDopo)}
+
+        <!-- footer sinistra: link + QR -->
+        <div class="orario-footer-col">
+          <hr style="border:none;border-top:1px solid var(--ink);margin:2mm 0">
+          <div class="orario-links">
+            <a href="menu-en.html"><u>English Menu</u></a><br>
+            <a href="menu-fr.html"><u>Carte en Français</u></a>
+          </div>
+          <img src="https://santamonicagenova-a11y.github.io/SantaWeb/orario-qr.png" alt="QR code" style="width:45mm;height:45mm;display:block;margin:0 auto;" />
+        </div>
+      </div>
+
+      <!-- colonna destra -->
+      <div class="orario-col">
+        ${buildOrarioColonna(cfg.colDestra, "Amidi e Carboidrati")}
+
+        <!-- footer destra: orario + nota -->
+        <div class="orario-footer-col">
+          <hr style="border:none;border-top:1px solid var(--ink);margin:2mm 0">
+          <div class="orario-servizio">
+            <span class="orario-servizio-titolo"><em>OPENING HOURS:</em></span>
+            ${orarioHtml}
+          </div>
+          <div class="orario-nota">${NOTE_ORARIO}</div>
+        </div>
+      </div>
+
+    </div>
+  `;
+  root.appendChild(pg);
+}
+
+/* ══════════════════════════════════════
+   SWITCH LAYOUT
+══════════════════════════════════════ */
+function showLayout(which) {
+  document.getElementById('layout-carta').style.display  = which === 'carta'  ? 'block' : 'none';
+  document.getElementById('layout-orario').style.display = which === 'orario' ? 'block' : 'none';
+  var bc=document.getElementById('btn-carta'); if(bc) bc.classList.toggle('active',which==='carta');
+  var bo=document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active',which==='orario');
+}
+
+/* ── init ── */
+renderCarta();
+renderOrario();
+showLayout('carta');
+</script>
+</body>
+</html>

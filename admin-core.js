@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.05.22.01 — F0.21-d: accorpa dolci nella CARTA EN/FR (fetch live menu-dolci.html + DeepL fresco, fallback statico). filesDolci NON genera piu menu-dolci-en/fr.html. Nuovi helper _estraiMenu/_dolciCartaLive/costruisciDolciPerCarta. IT invariato.
 // v 2026.05.17.04 — F0.6bis: migrate fetch admin GH Pages → CF Pages (BASE_FETCH_URL centralizzato, 7 occorrenze)
 // v 2026.05.17.03 — F0.4: rimosse lingue DE + ES (langs array, TRADUZIONI_DOLCI, qrLinks, langPair)
 // v 2026.05.15.04 — Documento generico: toggle centratura verticale del testo nella pagina
@@ -625,6 +626,12 @@ function eseguiPubblicazione(token) {
     // Parti dalla versione pubblica IT (senza pulsanti) e traduci
     var html = costruisciMenuItPub();
     var m = costruisciMenuTradotto(leggi(), t);
+    // F0.21-d: accorpa i dolci nella carta SOLO per le lingue (IT resta separato/stampato).
+    var mDolci = costruisciDolciPerCarta(lang);
+    if (mDolci) {
+      m.sezioni = m.sezioni.concat(mDolci.sezioni);
+      m.pagine  = (m.pagine || []).concat(mDolci.pagine);
+    }
     var SEP = '/* ' + '\u2550'.repeat(57) + ' */\n';
     var i1 = html.indexOf('const MENU = {');
     var i2 = html.indexOf(SEP, i1) + SEP.length;
@@ -681,6 +688,50 @@ function eseguiPubblicazione(token) {
 }
 
 
+// ── F0.21-d: estrazione "pura" del MENU da un sorgente HTML (nessun side-effect su `dati`).
+function _estraiMenu(src) {
+  var START = 'const MENU = {';
+  var SEP   = '/* ' + '\u2550'.repeat(57) + ' */';
+  var i1 = src.indexOf(START);
+  if (i1 < 0) return null;
+  var i2 = src.indexOf(SEP, i1);
+  if (i2 < 0) return null;
+  var js = src.slice(i1, i2).trim();
+  try { return Function('"use strict";' + js + ';return MENU;')(); }
+  catch (e) { return null; }
+}
+
+// ── F0.21-d: dati dolci LIVE (fetch menu-dolci.html) usati per accorpare i dolci nella carta in lingua.
+//    Popolato async in traduciEPubblica prima della passata DeepL. null = non disponibile (si usa il fallback statico).
+var _dolciCartaLive = null;
+
+// ── F0.21-d: sezione dolci + pagina, tradotta, da accorpare alla CARTA in lingua (solo EN/FR).
+//    Fonte dolci: _dolciCartaLive (live) con fallback su MENU_DOLCI_IT.
+//    Traduzione piatti: dizionario dinamico DeepL TRANSLATIONS[lang].piatti, fallback statico TRADUZIONI_DOLCI[lang].
+//    Allergeni dolci NON portati in carta (la carta non li renderizza): gap noto -> task Allergeni dedicato.
+//    Ritorna { sezioni:[...], pagine:[...] } oppure null.
+function costruisciDolciPerCarta(lang) {
+  var srcDolci = _dolciCartaLive || (typeof MENU_DOLCI_IT !== 'undefined' ? MENU_DOLCI_IT : null);
+  if (!srcDolci || !srcDolci.sezioni) return null;
+  var d = JSON.parse(JSON.stringify(srcDolci));
+  var tStatic = (typeof TRADUZIONI_DOLCI !== 'undefined' && TRADUZIONI_DOLCI[lang]) || {};
+  var staticPiatti = tStatic.piatti || {};
+  var dynPiatti = (TRANSLATIONS[lang] && TRANSLATIONS[lang].piatti) || {};
+  function trad(n) { return dynPiatti[n] || staticPiatti[n] || n; }
+  d.sezioni.forEach(function(sez) {
+    sez.titolo_display = dynPiatti[sez.titolo] || tStatic.sezione || staticPiatti[sez.titolo] || sez.titolo;
+    sez.piatti.forEach(function(p) {
+      if (!p) return;
+      p.nome = trad(p.nome);
+      if (p.descrizione) p.descrizione = trad(p.descrizione);
+    });
+  });
+  var pagine = (d.pagine && d.pagine.length)
+    ? d.pagine
+    : [{ sezioni: d.sezioni.map(function(s){ return s.titolo; }) }];
+  return { sezioni: d.sezioni, pagine: pagine };
+}
+
 function costruisciMenuDolciTradotto(lang) {
   var m = JSON.parse(JSON.stringify(leggi())); // usa i dati aggiornati dal form
   var tStatic = TRADUZIONI_DOLCI[lang] || {};
@@ -707,21 +758,10 @@ function costruisciMenuDolciTradotto(lang) {
 }
 
 function filesDolci() {
-  var files = [{ path: DOLCI_PATH, content: outputCorrente, label: 'Dolci IT' }];
-  ['en','fr'].forEach(function(lang) {
-    var m = costruisciMenuDolciTradotto(lang);
-    if (!m) return;
-    var html = outputCorrente;
-    var SEP = '/* ' + '\u2550'.repeat(57) + ' */\n';
-    var i1 = html.indexOf('const MENU = {');
-    var i2 = html.indexOf(SEP, i1) + SEP.length;
-    html = html.slice(0, i1) + 'const MENU = ' + JSON.stringify(m, null, 2) + ';\n' + SEP + html.slice(i2);
-    html = html.replace('<html lang="it">', '<html lang="' + lang + '">');
-    var t = TRADUZIONI_DOLCI[lang];
-    html = html.replace(/<title>[^<]*<\/title>/, '<title>' + t.title + '<\/title>');
-    files.push({ path: 'menu-dolci-' + lang + '.html', content: html, label: 'Dolci ' + lang.toUpperCase() });
-  });
-  return files;
+  // F0.21-d: i dolci in lingua sono ora ACCORPATI nella carta (menu-en/fr.html li includono come pagina finale).
+  // Qui si genera SOLO l'IT (menu-dolci.html), che resta stampato. menu-dolci-en/fr.html NON piu generati
+  // (vecchi URL gestiti da redirect 301 in _redirects). costruisciMenuDolciTradotto resta definita per eventuale uso futuro.
+  return [{ path: DOLCI_PATH, content: outputCorrente, label: 'Dolci IT' }];
 }
 
 function traduciEPubblica() {
@@ -755,6 +795,7 @@ function traduciEPubblica() {
       if (a.allergeni) testi.push(a.allergeni);
     });
   }
+  function _avvia() {
   testi = testi.filter(function(v, i, a) { return v && a.indexOf(v) === i; });
 
   var langs = ['en', 'fr'];
@@ -816,6 +857,31 @@ function traduciEPubblica() {
       });
   }
   traduciVoce(0);
+  }
+  // F0.21-d: per la CARTA, prima della traduzione recupera i dolci LIVE e accoda i loro piatti
+  // alla coda DeepL, cosi la sezione dolci accorpata nella carta in lingua e sempre fresca. IT non coinvolto.
+  if (tipoMenuCorrente === 'carta') {
+    fetch(DOLCI_URL + '?nocache=' + Date.now() + '_' + Math.random().toString(36).slice(2), { cache: 'no-store' })
+      .then(function(r) { return r.ok ? r.text() : Promise.reject(new Error('HTTP ' + r.status)); })
+      .then(function(src) {
+        _dolciCartaLive = _estraiMenu(src);
+        if (_dolciCartaLive && _dolciCartaLive.sezioni) {
+          _dolciCartaLive.sezioni.forEach(function(sez) {
+            sez.piatti.forEach(function(p) {
+              if (p && p.nome) testi.push(p.nome);
+              if (p && p.descrizione) testi.push(p.descrizione);
+            });
+          });
+        }
+      })
+      .catch(function(ex) {
+        _dolciCartaLive = null;
+        console.warn('[Dolci] fetch live fallito, uso fallback statico: ' + ex.message);
+      })
+      .then(_avvia);
+  } else {
+    _avvia();
+  }
 }
 
 

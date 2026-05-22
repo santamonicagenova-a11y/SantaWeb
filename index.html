@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.05.22.02 — F0.21-d: bottone "Menù dolci" (#dolci-btn) mostrato SOLO in IT; in EN/FR i dolci sono accorpati nella carta (menu-en/fr.html) quindi il bottone separato viene nascosto via applyLang. -->
 <!-- v 2026.05.22.01 — F0.21 refactor orari FONTE UNICA (/orari.js): orari NON più hardcoded. Rimossi (1) blocco orari #info, ora <div id="orari-info"> riempito da orari.js; (2) openingHoursSpecification statico nel JSON-LD, ora iniettato a runtime da orari.js; (3) chiavi i18n info_orari_marven/sabdom/lun (etichette giorni ora in orari.js). NUOVO schedule reale (≠ giugno): Mar solo cena 19:30-22:30 · Mer-Sab pranzo 12:30-14:30 + cena 19:30-22:30 · Dom solo pranzo 12:30-14:30 · Lun chiuso. Per cambiare orari: editare SOLO orari.js. -->
 <!-- v 2026.05.21.05 — FINAL CHECK INFO (orari · dec. #25): ristrutturato il blocco orari #info al TARGET giugno 2026. Da [Mar / Mer-Sab / Dom / Lun chiuso] a [Mar-Ven solo cena 19:30-22:30 / Sab-Dom pranzo 12:30-14:30 + cena 19:30-22:30 / Lun chiuso]. Chiavi i18n rinominate: info_orari_mar→info_orari_marven, info_orari_mersab→info_orari_sabdom, rimossa info_orari_dom (vedi translations.json v 2026.05.21.01). Schema.org JSON-LD già TARGET (invariato). dove-siamo.html già TARGET (hardcoded, invariato). FINAL CHECK residuo: voucher/prezzi. -->
 <!-- v 2026.05.21.04 — FINAL CHECK INFO (parziale · dec. #25): email contatto allineata al TARGET. Sostituito santamonicagenova@gmail.com → info@santamonicagenova.it in DUE punti: (1) bottone "Richiedi un buono" sezione regalo (mailto), (2) blocco #info contatti (mailto + testo visibile). RESTANO da allineare al FINAL CHECK (richiedono conferma valori + translations.json EN/FR): orari #info (non combaciano col TARGET giugno 2026), telefono, indirizzo. Schema.org JSON-LD già su dati TARGET. -->
@@ -595,7 +596,7 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.22.01</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.22.02</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>
@@ -652,7 +653,11 @@
     var menuBtn = document.getElementById('menu-btn');
     if (menuBtn && t.cucina_btn_link) menuBtn.href = t.cucina_btn_link;
     var dolciBtn = document.getElementById('dolci-btn');
-    if (dolciBtn && t.dolci_btn_link) dolciBtn.href = t.dolci_btn_link;
+    if (dolciBtn) {
+      // F0.21-d: dolci accorpati nella carta per EN/FR -> bottone "Menù dolci" SOLO in IT
+      if (lang === 'it') { dolciBtn.style.display = ''; if (t.dolci_btn_link) dolciBtn.href = t.dolci_btn_link; }
+      else { dolciBtn.style.display = 'none'; }
+    }
     document.getElementById('lang-select-nav').value = lang;
     document.getElementById('lang-select-mobile').value = lang;
     if (window.renderOrari) window.renderOrari(lang);
@@ -811,6 +816,6 @@
 <script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
 <script defer src="/cookieconsent-config.js"></script>
 
-<!-- v 2026.05.22.01 -->
+<!-- v 2026.05.22.02 -->
 </body>
 </html>

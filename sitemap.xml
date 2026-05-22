@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Santamonica Web — sitemap.xml — v 2026.05.21.01 (F0.17) -->
+<!-- Santamonica Web — sitemap.xml — v 2026.05.22.01 (F0.21-d) -->
 <!-- Host canonico: https://santamonicagenova.it (apex, no www) -->
-<!-- Lingue: IT per tutte le pagine; cluster hreflang IT/EN/FR solo per menu.html e menu-dolci.html (varianti fisiche esistenti). -->
+<!-- Lingue: IT per tutte le pagine; cluster hreflang IT/EN/FR solo per menu.html (carta). -->
+<!-- F0.21-d: dolci accorpati nella carta EN/FR -> menu-dolci.html ora IT-only (no cluster); menu-dolci-en/fr rimossi (301 -> menu-en/fr). -->
 <!-- Escluse: menu-it.html, menu-dolci-it.html (versioni stampa, Disallow robots.txt), login.html (admin), menu-de/es (301). -->
 <!-- NB: URL TARGET di produzione (dec. #25). In staging CF Pages X-Robots-Tag noindex blocca il crawl fino a F0.21. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -44,33 +45,11 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/menu.html"/>
   </url>
 
-  <!-- Menu dolci — cluster hreflang IT/EN/FR -->
+  <!-- Menu dolci (IT only — dolci EN/FR accorpati nella carta) -->
   <url>
     <loc>https://santamonicagenova.it/menu-dolci.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/menu-dolci.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/menu-dolci-en.html"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/menu-dolci-fr.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/menu-dolci.html"/>
-  </url>
-  <url>
-    <loc>https://santamonicagenova.it/menu-dolci-en.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/menu-dolci.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/menu-dolci-en.html"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/menu-dolci-fr.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/menu-dolci.html"/>
-  </url>
-  <url>
-    <loc>https://santamonicagenova.it/menu-dolci-fr.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/menu-dolci.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/menu-dolci-en.html"/>
-    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/menu-dolci-fr.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/menu-dolci.html"/>
   </url>
 
   <!-- Menu allergeni (IT only) -->

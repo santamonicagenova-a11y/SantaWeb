@@ -1,6 +1,6 @@
 # Santamonica Web — Cloudflare Pages redirects
-# v 2026.05.21.02
-# Storico: v 2026.05.17.01 (F0.4 DE/ES) -> v 2026.05.21.01 (F0.16: canonical host + mapping Wix completo) -> v 2026.05.21.02 (F0.20 fix: rimossa riga /regala -> loop ERR_TOO_MANY_REDIRECTS con clean-URL CF Pages)
+# v 2026.05.22.01
+# Storico: v 2026.05.17.01 (F0.4 DE/ES) -> v 2026.05.21.01 (F0.16: canonical host + mapping Wix completo) -> v 2026.05.21.02 (F0.20 fix: rimossa riga /regala -> loop ERR_TOO_MANY_REDIRECTS con clean-URL CF Pages) -> v 2026.05.22.01 (F0.21-d: dolci accorpati nella carta EN/FR -> 301 menu-dolci-en/fr -> menu-en/fr; pagine dolci EN/FR rimosse dal repo)
 # NB: Cloudflare _redirects NON ammette commenti inline -> ogni nota sta su riga propria.
 # ─────────────────────────────────────────────────────────────
 # F0.16 — Normalizzazione host canonico (www -> apex)
@@ -41,3 +41,14 @@ https://www.santamonicagenova.it/*   https://santamonicagenova.it/:splat   301
 /menu-es.html         /menu.html         301
 /menu-dolci-de.html   /menu-dolci.html   301
 /menu-dolci-es.html   /menu-dolci.html   301
+# ─────────────────────────────────────────────────────────────
+# F0.21-d — Dolci accorpati nella carta EN/FR.
+# Le pagine menu-dolci-en/fr NON esistono piu (rimosse dal repo, non piu generate
+# dall'admin). Redirect 301 verso la carta corrispondente (che ora include i dolci).
+# Destinazione = URL clean (/menu-en, /menu-fr) per chiudere in 1 hop col clean-URL CF.
+# Entrambe le forme (clean + .html) coperte, perche' senza file la clean-URL non
+# normalizza piu /menu-dolci-en.html.
+/menu-dolci-en        /menu-en           301
+/menu-dolci-en.html   /menu-en           301
+/menu-dolci-fr        /menu-fr           301
+/menu-dolci-fr.html   /menu-fr           301

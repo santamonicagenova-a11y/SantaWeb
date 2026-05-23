@@ -1,6 +1,6 @@
 # Santamonica Web — Cloudflare Pages headers
-# v 2026.05.22.02
-# Storico: v 2026.05.17.01 (F0.3 noindex) -> v 2026.05.21.01 (F0.18: CSP + security headers) -> v 2026.05.21.02 (F0.20 fix C2: +https://formspree.io in connect-src) -> v 2026.05.22.01 (F0.21 go-live: rimosso noindex GLOBALE; noindex SCOPED su /regala* fino a sblocco dec.#28; HSTS invariato) -> v 2026.05.22.02 (F0.21-b: HSTS +includeSubDomains, preload ancora ESCLUSO — vedi nota 2)
+# v 2026.05.23.01
+# Storico: v 2026.05.17.01 (F0.3 noindex) -> v 2026.05.21.01 (F0.18: CSP + security headers) -> v 2026.05.21.02 (F0.20 fix C2: +https://formspree.io in connect-src) -> v 2026.05.22.01 (F0.21 go-live: rimosso noindex GLOBALE; noindex SCOPED su /regala* fino a sblocco dec.#28; HSTS invariato) -> v 2026.05.22.02 (F0.21-b: HSTS +includeSubDomains, preload ancora ESCLUSO — vedi nota 2) -> v 2026.05.23.01 (landing campagna: noindex SCOPED su /10anni*, pagina effimera anniversario — vedi nota 3)
 # NB: file ignorato da GitHub Pages; effetto solo su Cloudflare Pages.
 /*
   X-Content-Type-Options: nosniff
@@ -10,12 +10,17 @@
   Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=(), browsing-topics=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://maps.google.com https://www.google.com; connect-src 'self' https://formspree.io https://sibforms.com https://*.sibforms.com; form-action 'self' https://formspree.io https://sibforms.com https://*.sibforms.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
-
 # [F0.21] Gift-card NON finalizzata (placeholder + Stripe non-live, dec.#28):
 # noindex mantenuto SOLO su /regala* finché non è pronta. Le regole _headers sono
 # cumulative: /regala riceve gli header di /* PIÙ questo X-Robots-Tag.
 # RIMUOVERE questo blocco alla finalizzazione voucher/prezzi (FINAL CHECK).
 /regala*
+  X-Robots-Tag: noindex, nofollow
+# [F0.23] Landing campagna anniversario 10 anni (pagina effimera):
+# /10anni vive di traffico paid/social, NON di organico → noindex scoped (stesso
+# meccanismo di /regala*). NON inserita in sitemap/hreflang.
+# RIMUOVERE questo blocco dopo l'evento (1 luglio 2026), insieme alla pagina.
+/10anni*
   X-Robots-Tag: noindex, nofollow
 # ─────────────────────────────────────────────────────────────
 # NOTE OPERATIVE
@@ -29,4 +34,11 @@
 #    (suffisso condiviso *.pages.dev) e il preload avvelenerebbe l'intero suffisso —
 #    NON aggiungere preload QUI. includeSubDomains è invece sicuro: sull'apex copre
 #    *.santamonicagenova.it (nessun sottodominio browser solo-HTTP) e su pages.dev
-#    copre
+#    copre solo eventuali sottolivelli di santamonica-web.pages.dev (inesistenti) →
+#    innocuo. [NB: frase ricostruita — paste sorgente troncato qui, verificare.]
+#
+# 3) /10anni* (aggiunto v 2026.05.23.01, campagna Meta anniversario): noindex scoped,
+#    pagina effimera. Niente CSP nuova: la landing usa solo Formspree (già in
+#    connect-src/form-action) e Google Fonts (già permessi). L'estensione CSP per
+#    Pixel Meta + GA4 verrà fatta nello step tracking (domini facebook/google),
+#    NON qui. RIMUOVERE blocco + pagina dopo il 1 luglio 2026.

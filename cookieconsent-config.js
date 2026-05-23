@@ -1,23 +1,46 @@
 /* ═══════════════════════════════════════════════════════════════════════
    cookieconsent-config.js
    Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-   v 2026.05.21.01
-   F0.12 — Integrazione Google Maps via iframemanager + revision: 2
+   v 2026.05.23.01
+   F0.23 — Categorie tracking (analytics GA4 + advertising Meta Pixel) · revision: 3
    ───────────────────────────────────────────────────────────────────────
    Dipendenze:  /lib/cookieconsent/cookieconsent.umd.js (caricato prima)
                 /lib/iframemanager/iframemanager.umd.js (caricato prima · F0.12)
    Espone:      window.CookieConsent (globale, già attivo dopo run)
                 window.iframemanager (globale dell'istanza, dopo init)
    Lingue:      IT (default) · EN · FR  — auto-detect via <html lang> del documento (default IT)
-   Categorie:   necessary (always on) · embeds (opt-in, default off)
-   Servizi:     embeds → googleMaps (Google Maps Embed, gestito da iframemanager)
+   Categorie:   necessary (always on) · embeds (opt-in) · analytics (opt-in) · advertising (opt-in)
+   Servizi:     embeds → googleMaps · analytics → ga4 · advertising → metaPixel
    Conformità:  GDPR Reg. UE 2016/679 · D.Lgs. 196/2003 art. 122
-                Linee guida Garante 10-06-2021 (no cookie wall · parità accept/reject)
-                Art. 13 GDPR (informativa specifica per servizio) · P3.10 backlog F0.9
-                Art. 44+ GDPR (trasferimento extra-UE) → Google LLC USA
-                EU-U.S. Data Privacy Framework (decisione adeguatezza 10-07-2023)
+                Linee guida Garante 10-06-2021 (no cookie wall · parità accept/reject · granularità finalità)
+                Art. 13 GDPR (informativa specifica per servizio) · Art. 22 (no profilazione senza consenso)
+                Art. 44+ GDPR (trasferimento extra-UE) → Google LLC USA · Meta Platforms Inc. USA
+                EU-U.S. Data Privacy Framework (decisione adeguatezza 10-07-2023; Google e Meta auto-certificati)
    ───────────────────────────────────────────────────────────────────────
    STORICO MODIFICHE
+   - v 2026.05.23.01 (F0.23 — categorie tracking per campagna anniversario / funnel invernale):
+       · [nuove categorie] Aggiunte 'analytics' (servizio ga4) e 'advertising'
+                 (servizio metaPixel), entrambe opt-in (enabled:false, readOnly:false).
+                 DECISIONE D-F0.23-1: due categorie GRANULARI separate (statistica vs
+                 marketing) invece di una combinata — finalità distinte, scelta separata
+                 (best-practice Garante). Accorpabili in futuro se richiesto.
+       · [gating] onFirstConsent/onConsent/onChange estesi: 'analytics' → loadGA4(),
+                 'advertising' → loadMetaPixel(); revoca → disableGA4() / cookie ripuliti
+                 da autoClear. Stesso pattern del gate Maps F0.12.
+       · [loader STUB] GA4_MEASUREMENT_ID e META_PIXEL_ID inizializzati VUOTI:
+                 i loader sono INERTI finché gli ID non sono compilati (TODO).
+                 → deploy sicuro anche senza ID (nessuno script di tracking parte).
+       · [autoClear] analytics: _ga, _ga_*, _gid, _gat* · advertising: _fbp, _fbc, fr.
+       · [testi] consentModal description IT/EN/FR riscritta: ora il sito USA (su consenso)
+                 cookie di statistica e marketing → la vecchia dicitura "solo cookie tecnici"
+                 era diventata fuorviante (rischio violazione informativa). preferencesModal:
+                 due nuove sezioni IT/EN/FR con vendor (Google LLC / Meta Platforms), trasferimento
+                 USA e base DPF.
+       · [revision] 2 → 3: nuovo trattamento (statistica + marketing/profilazione) e nuovi
+                 trasferimenti extra-UE → consenso richiesto nuovamente a tutti.
+       · [DIPENDENZA #7] Pixel/GA4, anche con ID compilati, restano BLOCCATI dalla CSP
+                 finché _headers non include i domini Meta/Google in script-src/img-src/
+                 connect-src (vedi handover MetaAds v2026.05.23.01, prerequisito #7).
    - v 2026.05.21.01 (F0.20 — finding C3): language.autoDetect 'browser' -> 'document'.
        Il banner seguiva la lingua del BROWSER (es. utente con browser EN su sito IT
        vedeva il banner in inglese al primo load). Ora segue <html lang> del documento
@@ -121,6 +144,60 @@
   const imLang = ['it', 'en', 'fr'].includes(browserLang) ? browserLang : 'it';
 
   /* ═══════════════════════════════════════════════════════════════════════
+     [v 2026.05.23.01 F0.23] LOADER TRACKING — GA4 + Meta Pixel (gated)
+     ═══════════════════════════════════════════════════════════════════════
+     I loader sono INERTI finché gli ID restano vuoti: deploy sicuro senza ID.
+     Quando arrivano gli ID (lato committente: account Meta / proprietà GA4):
+       1) compilare le due costanti qui sotto;
+       2) estendere la CSP in _headers (prerequisito #7 handover MetaAds) coi
+          domini Meta/Google, altrimenti gli script vengono BLOCCATI a runtime
+          (stesso meccanismo del bug C2 su Formspree).
+     I loader vengono chiamati SOLO dai callback di consenso (onConsent/onChange/
+     onFirstConsent): nulla parte prima del consenso esplicito.
+     ─────────────────────────────────────────────────────────────────────── */
+  var GA4_MEASUREMENT_ID = '';   // TODO F0.23 → inserire 'G-XXXXXXXXXX' (proprietà GA4)
+  var META_PIXEL_ID      = '';   // TODO F0.23 → inserire l'ID Pixel (solo cifre)
+
+  var ga4Loaded = false, pixelLoaded = false;
+
+  function loadGA4() {
+    if (ga4Loaded || !GA4_MEASUREMENT_ID) return;
+    ga4Loaded = true;
+    window['ga-disable-' + GA4_MEASUREMENT_ID] = false;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+    window.gtag('js', new Date());
+    // anonymize_ip: minimizzazione · consent già acquisito (load solo su opt-in)
+    window.gtag('config', GA4_MEASUREMENT_ID, { anonymize_ip: true });
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA4_MEASUREMENT_ID);
+    document.head.appendChild(s);
+  }
+
+  function disableGA4() {
+    // Non è possibile "scaricare" gtag.js già iniettato in-sessione: lo neutralizziamo
+    // col flag ufficiale Google (blocca ulteriori hit) + autoClear rimuove i cookie _ga*.
+    if (GA4_MEASUREMENT_ID) window['ga-disable-' + GA4_MEASUREMENT_ID] = true;
+  }
+
+  function loadMetaPixel() {
+    if (pixelLoaded || !META_PIXEL_ID) return;
+    pixelLoaded = true;
+    !function (f, b, e, v, n, t, s) {
+      if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); };
+      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = [];
+      t = b.createElement(e); t.async = !0; t.src = v; s = b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t, s);
+    }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+    window.fbq('init', META_PIXEL_ID);
+    window.fbq('track', 'PageView');
+    // NB: il Pixel non si "scarica" in-sessione dopo revoca. Mitigazione: non si
+    // re-inizializza (guardia pixelLoaded) e autoClear rimuove _fbp/_fbc/fr. Lo
+    // smontaggio reale avviene al ricaricamento pagina senza consenso.
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
      INIZIALIZZAZIONE IFRAMEMANAGER (PRIMA di CookieConsent.run)
      ═══════════════════════════════════════════════════════════════════════
      Pattern: registriamo il servizio 'google-maps' ma NON lo accettiamo qui.
@@ -202,7 +279,7 @@
   } // fine if (hasIframemanager)
 
   /* ═══════════════════════════════════════════════════════════════════════
-     CONFIGURAZIONE COOKIECONSENT (con callback onConsent/onChange F0.12)
+     CONFIGURAZIONE COOKIECONSENT (con callback onConsent/onChange F0.12 + F0.23)
      ═══════════════════════════════════════════════════════════════════════ */
 
   CookieConsent.run({
@@ -210,12 +287,12 @@
     /* ─── Modalità consenso esplicita (default lib v3 ma dichiarato per chiarezza) ─── */
     mode: 'opt-in',
 
-    /* ─── Revisione: incrementata in F0.12 (dec. #20 propagation):
-           nuovo trattamento Google Maps effettivamente attivo,
-           nuovo trasferimento extra-UE Google LLC USA,
-           nuovi cookie effettivamente posati su consenso.
-           Bump 1 → 2 forza richiesta nuovo consenso a tutti. ─── */
-    revision: 2,
+    /* ─── Revisione:
+           F0.12 (dec.#20): 1 → 2 (attivazione Google Maps, extra-UE Google).
+           F0.23: 2 → 3 (nuove categorie statistica + marketing/profilazione,
+                  nuovi trasferimenti extra-UE Google LLC + Meta Platforms Inc.).
+           Bump forza richiesta nuovo consenso a tutti gli utenti. ─── */
+    revision: 3,
 
     /* ─── [v 2026.05.19.02 P3.8] Auto-show condizionato: no su pagine policy ─── */
     autoShow: !isPolicyPage,
@@ -248,46 +325,54 @@
     },
 
     /* ═══════════════════════════════════════════════════════════════════
-       CALLBACK F0.12 — Ponte tra CookieConsent ed iframemanager
+       CALLBACK — Ponte CookieConsent ↔ servizi gated
        ═══════════════════════════════════════════════════════════════════
-       Strategia (decisione finale dopo loop 3 passate F0.12):
-       - onFirstConsent: prima volta che l'utente esprime una scelta.
-                         Se accetta 'embeds' → attiva google-maps.
-       - onConsent:      eseguito a ogni page-load se l'utente ha già un consenso
-                         valido. Se ha 'embeds' → attiva google-maps su questa pagina.
-       - onChange:       eseguito quando l'utente modifica la scelta (dal modale
-                         preferenze). Sincronizza iframemanager con lo stato corrente.
+       F0.12: embeds → iframemanager google-maps.
+       F0.23: analytics → GA4 · advertising → Meta Pixel.
 
-       Edge case (P3 adversarial loop F0.12):
-       - Consenso revocato in altra tab: il prossimo onConsent in questa tab
-         vedrà cookie aggiornato (sameSite=Lax) e disattiverà il servizio.
-       - Consenso scaduto (>182gg): revision check costringe nuovo consenso.
+       - onFirstConsent: prima scelta dell'utente.
+       - onConsent:      ogni page-load con consenso valido → riapplica lo stato.
+       - onChange:       modifica dal modale preferenze → sincronizza i servizi.
+
+       Tutte le attivazioni sono idempotenti (guardie loaded + ID vuoto).
        ─────────────────────────────────────────────────────────────────── */
 
     onFirstConsent: function ({ cookie }) {
-      // cookie.categories è array es. ['necessary', 'embeds']
-      if (cookie.categories.indexOf('embeds') !== -1) {
+      var cats = cookie.categories;
+      // embeds → google maps
+      if (cats.indexOf('embeds') !== -1) {
         if (window.im && typeof window.im.acceptService === 'function') {
           window.im.acceptService('google-maps');
         }
       }
+      // analytics → GA4
+      if (cats.indexOf('analytics') !== -1) loadGA4();
+      // advertising → Meta Pixel
+      if (cats.indexOf('advertising') !== -1) loadMetaPixel();
     },
 
     onConsent: function ({ cookie }) {
-      if (cookie.categories.indexOf('embeds') !== -1) {
+      var cats = cookie.categories;
+      // embeds → google maps
+      if (cats.indexOf('embeds') !== -1) {
         if (window.im && typeof window.im.acceptService === 'function') {
           window.im.acceptService('google-maps');
         }
       } else {
-        // L'utente aveva consenso ma ora 'embeds' non c'è più → sicurezza
         if (window.im && typeof window.im.rejectService === 'function') {
           window.im.rejectService('google-maps');
         }
       }
+      // analytics → GA4
+      if (cats.indexOf('analytics') !== -1) loadGA4(); else disableGA4();
+      // advertising → Meta Pixel
+      if (cats.indexOf('advertising') !== -1) loadMetaPixel();
     },
 
     onChange: function ({ cookie /*, changedCategories, changedServices */ }) {
-      if (cookie.categories.indexOf('embeds') !== -1) {
+      var cats = cookie.categories;
+      // embeds → google maps
+      if (cats.indexOf('embeds') !== -1) {
         if (window.im && typeof window.im.acceptService === 'function') {
           window.im.acceptService('google-maps');
         }
@@ -296,6 +381,10 @@
           window.im.rejectService('google-maps');
         }
       }
+      // analytics → GA4
+      if (cats.indexOf('analytics') !== -1) loadGA4(); else disableGA4();
+      // advertising → Meta Pixel
+      if (cats.indexOf('advertising') !== -1) loadMetaPixel();
     },
 
     /* ─── Categorie consenso ─── */
@@ -326,6 +415,46 @@
           }
 
         }
+      },
+
+      /* [v 2026.05.23.01 F0.23] Statistica — Google Analytics 4.
+         autoClear rimuove i cookie GA alla revoca: _ga (2 anni), _ga_<container>,
+         _gid (24h), _gat* (1 min throttling). */
+      analytics: {
+        enabled: false,
+        readOnly: false,
+        autoClear: {
+          cookies: [
+            { name: /^_ga/ },
+            { name: /^_gid$/ },
+            { name: /^_gat/ }
+          ]
+        },
+        services: {
+          ga4: {
+            label: 'Google Analytics 4 (GA4)'
+          }
+        }
+      },
+
+      /* [v 2026.05.23.01 F0.23] Marketing — Meta Pixel (Facebook/Instagram).
+         autoClear rimuove i cookie del Pixel alla revoca: _fbp (3 mesi),
+         _fbc (clickID, 3 mesi), fr (cookie Meta, 3 mesi). */
+      advertising: {
+        enabled: false,
+        readOnly: false,
+        autoClear: {
+          cookies: [
+            { name: /^_fbp$/ },
+            { name: /^_fbc$/ },
+            { name: /^fr$/ }
+          ]
+        },
+        services: {
+          metaPixel: {
+            label: 'Meta Pixel (Facebook / Instagram)'
+          }
+        }
       }
     },
 
@@ -340,7 +469,7 @@
         it: {
           consentModal: {
             title: 'Cookie e privacy',
-            description: 'Questo sito utilizza solo cookie tecnici necessari al funzionamento. Con il tuo consenso possiamo caricare contenuti incorporati di terze parti (ad es. mappe interattive) per arricchire l\'esperienza. Maggiori dettagli nella nostra <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy</a> e nell\'<a href="/privacy.html" target="_blank" rel="noopener noreferrer">Informativa sulla Privacy</a>.',
+            description: 'Questo sito utilizza cookie tecnici necessari al funzionamento. Solo con il tuo consenso possiamo usare cookie di statistica (Google Analytics), cookie di marketing (Meta Pixel) e caricare contenuti incorporati di terze parti (ad es. mappe interattive). Puoi accettare, rifiutare o scegliere per categoria. Maggiori dettagli nella nostra <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy</a> e nell\'<a href="/privacy.html" target="_blank" rel="noopener noreferrer">Informativa sulla Privacy</a>.',
             acceptAllBtn: 'Accetta tutti',
             acceptNecessaryBtn: 'Rifiuta tutti',
             showPreferencesBtn: 'Personalizza',
@@ -356,12 +485,22 @@
             sections: [
               {
                 title: 'Uso dei cookie',
-                description: 'Questo sito utilizza solo i cookie strettamente necessari al funzionamento. Eventuali altri cookie sono opzionali e si attivano soltanto con il tuo consenso. Trovi il dettaglio completo nella <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy</a>.'
+                description: 'Questo sito utilizza cookie tecnici necessari al funzionamento e, solo con il tuo consenso, cookie di statistica e di marketing e contenuti incorporati di terze parti. Puoi attivarli o disattivarli per categoria qui sotto. Trovi il dettaglio completo nella <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy</a>.'
               },
               {
                 title: 'Cookie strettamente necessari',
                 description: 'Indispensabili per il funzionamento del sito. Non possono essere disattivati e non richiedono consenso.',
                 linkedCategory: 'necessary'
+              },
+              {
+                title: 'Cookie di statistica',
+                description: 'Se attivi questa categoria useremo <strong>Google Analytics 4</strong> per capire in forma aggregata come viene usato il sito (pagine viste, provenienza del traffico). Il servizio è fornito da <strong>Google LLC</strong> (Mountain View, California, USA), che imposta cookie propri (es. <code>_ga</code>, <code>_ga_*</code>, <code>_gid</code>). L\'indirizzo IP è trattato in forma anonimizzata. Il trasferimento dei dati negli Stati Uniti si fonda sulla decisione di adeguatezza UE-USA (<em>EU-U.S. Data Privacy Framework</em>, 10 luglio 2023). Dettaglio dei cookie nella <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy §5</a>.',
+                linkedCategory: 'analytics'
+              },
+              {
+                title: 'Cookie di marketing',
+                description: 'Se attivi questa categoria useremo il <strong>Meta Pixel</strong> per misurare le nostre campagne su Facebook e Instagram e mostrarti contenuti più pertinenti. Il servizio è fornito da <strong>Meta Platforms Ireland Ltd</strong>, con trasferimenti a <strong>Meta Platforms, Inc.</strong> (USA); imposta cookie propri (es. <code>_fbp</code>, <code>_fbc</code>, <code>fr</code>). Il trasferimento negli Stati Uniti si fonda sulla decisione di adeguatezza UE-USA (<em>EU-U.S. Data Privacy Framework</em>, 10 luglio 2023). Senza il tuo consenso il Pixel non viene caricato. Dettaglio dei cookie nella <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy §5</a>.',
+                linkedCategory: 'advertising'
               },
               {
                 title: 'Contenuti incorporati',
@@ -380,7 +519,7 @@
         en: {
           consentModal: {
             title: 'Cookies & privacy',
-            description: 'This website uses only technical cookies required for basic operation. With your consent we can also load third-party embedded content (e.g. interactive maps) to enhance your experience. Read more in our <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy</a> and <a href="/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.',
+            description: 'This website uses technical cookies required for basic operation. Only with your consent we may also use statistics cookies (Google Analytics), marketing cookies (Meta Pixel) and load third-party embedded content (e.g. interactive maps). You can accept, reject or choose by category. Read more in our <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy</a> and <a href="/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.',
             acceptAllBtn: 'Accept all',
             acceptNecessaryBtn: 'Reject all',
             showPreferencesBtn: 'Customise',
@@ -396,12 +535,22 @@
             sections: [
               {
                 title: 'Cookie usage',
-                description: 'This site uses only strictly necessary cookies. Any other cookies are optional and activated only with your consent. Full details in our <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy</a>.'
+                description: 'This site uses technical cookies required to function and, only with your consent, statistics and marketing cookies and third-party embedded content. You can enable or disable them by category below. Full details in our <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy</a>.'
               },
               {
                 title: 'Strictly necessary cookies',
                 description: 'Essential for the website to function. They cannot be disabled and do not require consent.',
                 linkedCategory: 'necessary'
+              },
+              {
+                title: 'Statistics cookies',
+                description: 'If you enable this category we will use <strong>Google Analytics 4</strong> to understand, in aggregate form, how the site is used (page views, traffic sources). The service is provided by <strong>Google LLC</strong> (Mountain View, California, USA), which sets its own cookies (e.g. <code>_ga</code>, <code>_ga_*</code>, <code>_gid</code>). The IP address is processed in anonymised form. The transfer of data to the United States relies on the EU-U.S. adequacy decision (<em>EU-U.S. Data Privacy Framework</em>, 10 July 2023). Cookie details in our <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy §5</a>.',
+                linkedCategory: 'analytics'
+              },
+              {
+                title: 'Marketing cookies',
+                description: 'If you enable this category we will use the <strong>Meta Pixel</strong> to measure our Facebook and Instagram campaigns and show you more relevant content. The service is provided by <strong>Meta Platforms Ireland Ltd</strong>, with transfers to <strong>Meta Platforms, Inc.</strong> (USA); it sets its own cookies (e.g. <code>_fbp</code>, <code>_fbc</code>, <code>fr</code>). The transfer to the United States relies on the EU-U.S. adequacy decision (<em>EU-U.S. Data Privacy Framework</em>, 10 July 2023). Without your consent the Pixel is not loaded. Cookie details in our <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Cookie Policy §5</a>.',
+                linkedCategory: 'advertising'
               },
               {
                 title: 'Embedded content',
@@ -420,7 +569,7 @@
         fr: {
           consentModal: {
             title: 'Cookies et confidentialité',
-            description: 'Ce site utilise uniquement des cookies techniques nécessaires au fonctionnement. Avec votre consentement, nous pouvons également charger des contenus intégrés de tiers (par ex. cartes interactives) pour enrichir votre expérience. Plus de détails dans notre <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Politique des cookies</a> et notre <a href="/privacy.html" target="_blank" rel="noopener noreferrer">Politique de confidentialité</a>.',
+            description: 'Ce site utilise des cookies techniques nécessaires au fonctionnement. Uniquement avec votre consentement, nous pouvons aussi utiliser des cookies de statistique (Google Analytics), des cookies de marketing (Meta Pixel) et charger des contenus intégrés de tiers (par ex. cartes interactives). Vous pouvez accepter, refuser ou choisir par catégorie. Plus de détails dans notre <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Politique des cookies</a> et notre <a href="/privacy.html" target="_blank" rel="noopener noreferrer">Politique de confidentialité</a>.',
             acceptAllBtn: 'Tout accepter',
             acceptNecessaryBtn: 'Tout refuser',
             showPreferencesBtn: 'Personnaliser',
@@ -436,12 +585,22 @@
             sections: [
               {
                 title: 'Utilisation des cookies',
-                description: 'Ce site utilise uniquement des cookies strictement nécessaires au fonctionnement. Les autres cookies sont optionnels et activés uniquement avec votre consentement. Détails complets dans notre <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Politique des cookies</a>.'
+                description: 'Ce site utilise des cookies techniques nécessaires au fonctionnement et, uniquement avec votre consentement, des cookies de statistique et de marketing ainsi que des contenus intégrés de tiers. Vous pouvez les activer ou les désactiver par catégorie ci-dessous. Détails complets dans notre <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Politique des cookies</a>.'
               },
               {
                 title: 'Cookies strictement nécessaires',
                 description: 'Indispensables au fonctionnement du site. Ils ne peuvent pas être désactivés et ne nécessitent pas de consentement.',
                 linkedCategory: 'necessary'
+              },
+              {
+                title: 'Cookies de statistique',
+                description: 'Si vous activez cette catégorie, nous utiliserons <strong>Google Analytics 4</strong> pour comprendre, de façon agrégée, comment le site est utilisé (pages vues, origine du trafic). Le service est fourni par <strong>Google LLC</strong> (Mountain View, Californie, USA), qui dépose ses propres cookies (par ex. <code>_ga</code>, <code>_ga_*</code>, <code>_gid</code>). L\'adresse IP est traitée sous forme anonymisée. Le transfert des données aux États-Unis se fonde sur la décision d\'adéquation UE-USA (<em>EU-U.S. Data Privacy Framework</em>, 10 juillet 2023). Détail des cookies dans notre <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Politique des cookies §5</a>.',
+                linkedCategory: 'analytics'
+              },
+              {
+                title: 'Cookies de marketing',
+                description: 'Si vous activez cette catégorie, nous utiliserons le <strong>Meta Pixel</strong> pour mesurer nos campagnes sur Facebook et Instagram et vous proposer des contenus plus pertinents. Le service est fourni par <strong>Meta Platforms Ireland Ltd</strong>, avec des transferts vers <strong>Meta Platforms, Inc.</strong> (USA) ; il dépose ses propres cookies (par ex. <code>_fbp</code>, <code>_fbc</code>, <code>fr</code>). Le transfert aux États-Unis se fonde sur la décision d\'adéquation UE-USA (<em>EU-U.S. Data Privacy Framework</em>, 10 juillet 2023). Sans votre consentement, le Pixel n\'est pas chargé. Détail des cookies dans notre <a href="/cookies.html" target="_blank" rel="noopener noreferrer">Politique des cookies §5</a>.',
+                linkedCategory: 'advertising'
               },
               {
                 title: 'Contenus intégrés',
@@ -463,4 +622,4 @@
 
 })();
 
-/* v 2026.05.21.01 */
+/* v 2026.05.23.01 */

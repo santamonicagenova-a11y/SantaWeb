@@ -469,13 +469,32 @@
             <div class="pf-row">
               <div class="pf-group"><label for="p-data" data-i18n="prenota_f_data">Data desiderata</label><input type="date" id="p-data" name="data" required></div>
               <div class="pf-group">
-                <label for="p-persone" data-i18n="prenota_f_persone">Numero di persone</label>
-                <select id="p-persone" name="persone" required>
-                  <option value="" disabled selected data-i18n="prenota_f_persone_sel">Seleziona</option>
-                  <option>1</option><option>2</option><option>3</option><option>4</option>
-                  <option>5</option><option>6</option><option>7-10</option><option>+10</option>
+                <label for="p-orario" data-i18n="prenota_f_orario">Orario</label>
+                <select id="p-orario" name="orario" required>
+                  <option value="" disabled selected data-i18n="prenota_f_orario_sel">Seleziona</option>
+                  <optgroup label="Pranzo" data-i18n-label="prenota_f_orario_pranzo">
+                    <option value="12:30">12:30</option>
+                    <option value="13:00">13:00</option>
+                    <option value="13:30">13:30</option>
+                    <option value="14:00">14:00</option>
+                  </optgroup>
+                  <optgroup label="Cena" data-i18n-label="prenota_f_orario_cena">
+                    <option value="19:30">19:30</option>
+                    <option value="20:00">20:00</option>
+                    <option value="20:30">20:30</option>
+                    <option value="21:00">21:00</option>
+                    <option value="21:30">21:30</option>
+                  </optgroup>
                 </select>
               </div>
+            </div>
+            <div class="pf-group">
+              <label for="p-persone" data-i18n="prenota_f_persone">Numero di persone</label>
+              <select id="p-persone" name="persone" required>
+                <option value="" disabled selected data-i18n="prenota_f_persone_sel">Seleziona</option>
+                <option>1</option><option>2</option><option>3</option><option>4</option>
+                <option>5</option><option>6</option><option>7-10</option><option>+10</option>
+              </select>
             </div>
             <div class="pf-group">
               <label for="p-occasione" data-i18n="prenota_f_occasione">Occasione (opzionale)</label>

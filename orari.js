@@ -119,6 +119,13 @@
 
   global.renderOrari = function (lang) { renderInfo(lang); renderTable(lang); };
 
+  global.getServicesByDay = function (jsDayIndex) {
+    var dayMap = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'];
+    var key = dayMap[jsDayIndex];
+    var day = SETTIMANA.find(function (d) { return d.day === key; });
+    return day ? day.services.slice() : [];
+  };
+
   injectJsonLd();
   if (typeof document !== 'undefined') {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { renderInfo('it'); renderTable('it'); });

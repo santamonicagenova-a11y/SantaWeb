@@ -708,6 +708,35 @@
   var pForm = document.getElementById('prenota-form');
   var pBtn = document.getElementById('prenota-btn');
   var pStatus = document.getElementById('prenota-status');
+
+  function updateOrarioSlots() {
+    var dataInput = document.getElementById('p-data');
+    var orarioSelect = document.getElementById('p-orario');
+    if (!dataInput || !orarioSelect) return;
+    var optgroups = orarioSelect.querySelectorAll('optgroup');
+    if (!dataInput.value) {
+      optgroups.forEach(function (g) { g.style.display = ''; });
+      return;
+    }
+    var d = new Date(dataInput.value);
+    var jsDay = d.getDay();
+    var services = (typeof window.getServicesByDay === 'function')
+      ? window.getServicesByDay(jsDay)
+      : ['pranzo', 'cena'];
+    optgroups.forEach(function (g) {
+      var key = g.getAttribute('data-i18n-label') || '';
+      var s = key.indexOf('cena') !== -1 ? 'cena' : 'pranzo';
+      g.style.display = services.indexOf(s) !== -1 ? '' : 'none';
+    });
+    var currentVal = orarioSelect.value;
+    if (currentVal) {
+      var opt = orarioSelect.querySelector('option[value="' + currentVal + '"]');
+      if (opt && opt.parentElement && opt.parentElement.style.display === 'none') {
+        orarioSelect.value = '';
+      }
+    }
+  }
+  document.getElementById('p-data').addEventListener('change', updateOrarioSlots);
   pForm.addEventListener('submit', async function(e) {
     e.preventDefault(); pBtn.disabled = true;
     var telVal = document.getElementById('p-tel').value.trim();

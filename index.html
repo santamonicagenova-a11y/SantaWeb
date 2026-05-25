@@ -654,6 +654,10 @@
       var key = el.getAttribute('data-i18n-placeholder');
       if (t[key] !== undefined) el.setAttribute('placeholder', t[key]);
     });
+    document.querySelectorAll('[data-i18n-label]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n-label');
+      if (t[key] !== undefined) el.setAttribute('label', t[key]);
+    });
     // Aggiorna title e meta description per SEO e social sharing
     if (t.page_title) {
       document.title = t.page_title;

@@ -1,6 +1,6 @@
 # Santamonica Web — Cloudflare Pages headers
-# v 2026.05.27.01
-# Storico: v 2026.05.17.01 (F0.3 noindex) -> v 2026.05.21.01 (F0.18: CSP + security headers) -> v 2026.05.21.02 (F0.20 fix C2: +https://formspree.io in connect-src) -> v 2026.05.22.01 (F0.21 go-live: rimosso noindex GLOBALE; noindex SCOPED su /regala* fino a sblocco dec.#28; HSTS invariato) -> v 2026.05.22.02 (F0.21-b: HSTS +includeSubDomains, preload ancora ESCLUSO — vedi nota 2) -> v 2026.05.27.01 (F0.23 attivazione GA4+Pixel: CSP estesa con domini Google/Meta in script-src e connect-src — vedi nota 3)
+# v 2026.05.27.02
+# Storico: v 2026.05.17.01 (F0.3 noindex) -> v 2026.05.21.01 (F0.18: CSP + security headers) -> v 2026.05.21.02 (F0.20 fix C2: +https://formspree.io in connect-src) -> v 2026.05.22.01 (F0.21 go-live: rimosso noindex GLOBALE; noindex SCOPED su /regala* fino a sblocco dec.#28; HSTS invariato) -> v 2026.05.22.02 (F0.21-b: HSTS +includeSubDomains, preload ancora ESCLUSO — vedi nota 2) -> v 2026.05.27.01 (F0.23 attivazione GA4+Pixel: CSP estesa con domini Google/Meta in script-src e connect-src) -> v 2026.05.27.02 (F0.23 fix C5: sostituito https://www.google-analytics.com con wildcard https://*.google-analytics.com in connect-src — GA4 routa hit su endpoint regionali region1/region2/ecc., il pattern www-only li bloccava)
 # NB: file ignorato da GitHub Pages; effetto solo su Cloudflare Pages.
 /*
   X-Content-Type-Options: nosniff
@@ -9,7 +9,7 @@
   Cross-Origin-Opener-Policy: same-origin
   Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=(), browsing-topics=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://maps.google.com https://www.google.com; connect-src 'self' https://formspree.io https://sibforms.com https://*.sibforms.com https://www.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.facebook.com; form-action 'self' https://formspree.io https://sibforms.com https://*.sibforms.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://maps.google.com https://www.google.com; connect-src 'self' https://formspree.io https://sibforms.com https://*.sibforms.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.facebook.com; form-action 'self' https://formspree.io https://sibforms.com https://*.sibforms.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
 
 # [F0.21] Gift-card NON finalizzata (placeholder + Stripe non-live, dec.#28):
 # noindex mantenuto SOLO su /regala* finché non è pronta. Le regole _headers sono

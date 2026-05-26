@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════════
    cookieconsent-config.js
    Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-   v 2026.05.23.01
+   v 2026.05.27.01
    F0.23 — Categorie tracking (analytics GA4 + advertising Meta Pixel) · revision: 3
    ───────────────────────────────────────────────────────────────────────
    Dipendenze:  /lib/cookieconsent/cookieconsent.umd.js (caricato prima)
@@ -18,6 +18,23 @@
                 EU-U.S. Data Privacy Framework (decisione adeguatezza 10-07-2023; Google e Meta auto-certificati)
    ───────────────────────────────────────────────────────────────────────
    STORICO MODIFICHE
+   - v 2026.05.27.01 (F0.23 attivazione — ID GA4 e Pixel compilati):
+       · [activation] Compilato GA4_MEASUREMENT_ID = 'G-YP71EKXSXX' (property
+                 "Ristorante Santamonica", account a389116650 / property 530308563
+                 / stream web 14272268330, URL santamonicagenova.it, verificato
+                 in Google Analytics da andrea.giachino@gmail.com il 2026-05-27).
+       · [activation] Compilato META_PIXEL_ID = '927118130347955' (dataset
+                 "Santamonica" creato nel BM "Monica Capurro" il 2026-05-27,
+                 installazione manuale — codice JS Meta NON usato per evitare
+                 doppia iniezione con questo loader gated GDPR).
+       · [DIPENDENZA CSP] Attivazione effettiva richiede contestuale estensione
+                 di _headers v 2026.05.27.01 (script-src + connect-src per
+                 googletagmanager.com + connect.facebook.net + google-analytics +
+                 www.facebook.com). Senza quello, gli script di tracking
+                 vengono BLOCCATI dal browser anche con consenso pieno.
+       · [smoke test atteso] Post-deploy + consenso pieno → typeof window.gtag
+                 === 'function' && typeof window.fbq === 'function'; banner
+                 arancione GA4 "raccolta dati non attiva" sparisce entro 24-48h.
    - v 2026.05.23.01 (F0.23 — categorie tracking per campagna anniversario / funnel invernale):
        · [nuove categorie] Aggiunte 'analytics' (servizio ga4) e 'advertising'
                  (servizio metaPixel), entrambe opt-in (enabled:false, readOnly:false).
@@ -155,8 +172,8 @@
      I loader vengono chiamati SOLO dai callback di consenso (onConsent/onChange/
      onFirstConsent): nulla parte prima del consenso esplicito.
      ─────────────────────────────────────────────────────────────────────── */
-  var GA4_MEASUREMENT_ID = '';   // TODO F0.23 → inserire 'G-XXXXXXXXXX' (proprietà GA4)
-  var META_PIXEL_ID      = '';   // TODO F0.23 → inserire l'ID Pixel (solo cifre)
+  var GA4_MEASUREMENT_ID = 'G-YP71EKXSXX';     // [v 2026.05.27.01] property GA4 "Ristorante Santamonica" · stream santamonicagenova.it
+  var META_PIXEL_ID      = '927118130347955';  // [v 2026.05.27.01] dataset Meta "Santamonica" · BM Monica Capurro
 
   var ga4Loaded = false, pixelLoaded = false;
 
@@ -622,4 +639,4 @@
 
 })();
 
-/* v 2026.05.23.01 */
+/* v 2026.05.27.01 */

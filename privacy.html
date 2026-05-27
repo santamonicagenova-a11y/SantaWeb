@@ -2,11 +2,52 @@
   ─────────────────────────────────────────────────────────────────────────
   privacy.html — Informativa Privacy
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.05.20.01
-  Ultimo aggiornamento: 2026-05-20
+  Versione: v 2026.05.27.01
+  Ultimo aggiornamento: 2026-05-27
   Lingua: IT (versione ufficiale)
   Stato: BOZZA DIY pubblicata · F0.8 revisione legale sospesa (decisione utente 17-05-2026)
-  Schema di riferimento: v3 (ROADMAP_Santamonica_Web v.16 §F0.13)
+  Schema di riferimento: v3 (ROADMAP_Santamonica_Web v.16 §F0.24)
+
+  Modifiche v 2026.05.27.01 (F0.24 — GA4 + Meta Pixel attivati live · allineamento informativa):
+  - [§3 corretta dichiarazione obsoleta] Riscritto il paragrafo a chiusura della
+    tabella «Quali dati raccogliamo»: rimossa la frase «non utilizziamo Google
+    Analytics né Facebook Pixel» (non più vera dal 27 maggio 2026). Conservata
+    la dichiarazione veridica sull'assenza di geolocalizzazione precisa, con
+    rinvio espresso alla §12 e alla Cookie Policy per la disciplina dei
+    trattamenti GA4 e Meta Pixel.
+  - [§4 +1 riga base giuridica] Aggiunta riga «Misurazione del traffico del sito
+    e dell'efficacia delle campagne pubblicitarie» — base giuridica art. 6(1)(a)
+    GDPR (consenso) e art. 122 D.Lgs. 196/2003 (ePrivacy) — dati interessati:
+    identificativi pseudonimi e dati di navigazione gestiti da GA4 e Meta Pixel.
+  - [§6 +1 riga conservazione] Aggiunta riga rimando alle durate dei cookie GA4
+    e Meta Pixel (dettaglio in cookies.html §4-§5: _ga/_ga_<ID> 2 anni, _fbp/_fbc
+    3 mesi; revoca consenso = cancellazione automatica).
+  - [§7 tabella destinatari aggiornata] Estesa la riga Google Ireland Limited /
+    Google LLC per includere «Google Analytics 4 (misurazione del traffico del
+    sito) — solo previo consenso esplicito». Aggiunta riga nuova «Meta Platforms
+    Ireland Limited / Meta Platforms, Inc. — Meta Pixel (misurazione campagne
+    pubblicitarie e creazione di pubblici di retargeting) — solo previo
+    consenso esplicito — Irlanda / Stati Uniti».
+  - [§8 trasferimenti USA] Aggiunto «Meta» all'elenco dei fornitori statunitensi
+    certificati al EU-U.S. Data Privacy Framework, in coerenza con quanto
+    riportato nel registro pubblico dataprivacyframework.gov.
+  - [§12 cookie riformulato] Riscritto il paragrafo §12: rimossa la frase «Non
+    utilizziamo cookie analitici di profilazione» (non più veridica). Inserita
+    la descrizione corretta dello stato attuale: oltre a Cloudflare Web Analytics
+    (privacy-first, senza cookie, sempre attivo per legittimo interesse alla
+    sicurezza e statistiche aggregate), il sito carica — previo consenso esplicito
+    raccolto tramite il banner CookieConsent v3 nelle categorie «Statistica»
+    (GA4) e «Marketing» (Meta Pixel) — gli script di tracciamento corrispondenti.
+    Rinvio alla Cookie Policy per il dettaglio analitico dei cookie posati,
+    durate e modalità di gestione/revoca delle preferenze.
+  - [release coordinata] Bump versioning come release F0.24: privacy.html
+    v 2026.05.27.01 (questo file) coordinato con cookieconsent-config.js
+    v 2026.05.27.01 (compilate costanti GA4_MEASUREMENT_ID e META_PIXEL_ID) e
+    _headers v 2026.05.27.02 (estensione CSP per GA4/Meta + fix wildcard
+    *.google-analytics.com per endpoint regionali europei). Convenzione
+    progetto §12 ROADMAP: stesso NN sui file rilasciati nella stessa sessione.
+    cookies.html resta a v 2026.05.23.01 (già allineata in F0.23 con tabelle
+    cookie GA4/Meta).
 
   Modifiche v 2026.05.20.01 (F0.13 — Stripe Payment Links attivi · P3.22c parte Stripe rimosso):
   - [P3.22c parte Stripe rimosso] Eliminato il disclaimer di §12 «Nota —
@@ -146,7 +187,7 @@
     <div class="breadcrumb"><a href="/">Santamonica</a> &nbsp;›&nbsp; Privacy</div>
     <h1>Informativa sulla Privacy</h1>
     <p class="legal-meta">
-      Ultimo aggiornamento: <strong>20 maggio 2026</strong> · Versione&nbsp;<strong>v&nbsp;2026.05.20.01</strong> · Lingua&nbsp;ufficiale: italiano
+      Ultimo aggiornamento: <strong>27 maggio 2026</strong> · Versione&nbsp;<strong>v&nbsp;2026.05.27.01</strong> · Lingua&nbsp;ufficiale: italiano
     </p>
   </header>
 
@@ -247,7 +288,7 @@
     </tbody>
   </table>
 
-  <p>Non raccogliamo dati di geolocalizzazione precisa, non utilizziamo Google Analytics né Facebook Pixel né strumenti analoghi di profilazione comportamentale.</p>
+  <p>Non raccogliamo dati di geolocalizzazione precisa né effettuiamo profilazione comportamentale dell'utente. Il sito si avvale di <strong>Google Analytics 4</strong> per la misurazione aggregata del traffico e di <strong>Meta Pixel</strong> per la misurazione dell'efficacia delle campagne pubblicitarie su Facebook e Instagram: entrambi i servizi sono attivati <strong>esclusivamente previo consenso esplicito</strong> dell'interessato, raccolto tramite il banner cookie (categorie «Statistica» e «Marketing»), e possono essere revocati in qualunque momento dal pannello «Gestisci preferenze». Il dettaglio operativo dei trattamenti, dei cookie posati, delle durate e delle modalità di revoca è descritto al §&nbsp;12 «Cookie e tecnologie simili» e nella <a href="/cookies.html">Cookie Policy</a> dedicata.</p>
 
   <p><strong>Una nota sui voucher regalo.</strong> Quando acquisti un voucher per un'altra persona, ci fornisci alcuni dati che la riguardano (nome, email, eventuale dedica). La persona destinataria riceverà questa informativa, in forma sintetica e tramite link, contestualmente all'email di consegna del voucher, ai sensi dell'art.&nbsp;14 GDPR. Ti chiediamo di assicurarti, prima dell'acquisto, che la persona sia informata e d'accordo con il fatto che ci comunichi i suoi dati.</p>
 
@@ -298,6 +339,11 @@
         <td>IP, log di accesso, statistiche aggregate Cloudflare</td>
       </tr>
       <tr>
+        <td>Misurare il traffico del sito e l'efficacia delle campagne pubblicitarie (Google Analytics 4 e Meta Pixel)</td>
+        <td>Art.&nbsp;6(1)(a) GDPR — <strong>consenso</strong> raccolto tramite il banner cookie; art.&nbsp;122 D.Lgs.&nbsp;196/2003 (ePrivacy) per l'archiviazione di informazioni nel dispositivo dell'utente; revocabile in qualunque momento dal pannello «Gestisci preferenze»</td>
+        <td>Identificativi pseudonimi (cookie <code>_ga</code>, <code>_ga_&lt;ID&gt;</code>, <code>_fbp</code>, <code>_fbc</code>), pagine visitate, eventi di interazione, sorgente del traffico</td>
+      </tr>
+      <tr>
         <td>Rispondere alle richieste di esercizio dei diritti (DSAR) e adempiere all'obbligo di riscontro</td>
         <td>Art.&nbsp;6(1)(c) GDPR — obbligo legale derivante dagli artt.&nbsp;12 e&nbsp;15-22 GDPR; art.&nbsp;6(1)(f) per la conservazione difensiva del registro DSAR</td>
         <td>Email, oggetto della richiesta, esito</td>
@@ -310,7 +356,7 @@
     </tbody>
   </table>
 
-  <p>Nessuna delle finalità sopra elencate comporta processi decisionali automatizzati o profilazione di cui all'art.&nbsp;22 GDPR.</p>
+  <p>Nessuna delle finalità sopra elencate comporta processi decisionali automatizzati o profilazione produttivi di effetti giuridici o significativamente incidenti sulla persona ai sensi dell'art.&nbsp;22 GDPR. In particolare, le misurazioni statistiche operate da Google Analytics 4 e da Meta Pixel — pur potendo costituire profilazione in senso lato sui sistemi di Google e Meta come titolari autonomi — non sono utilizzate dal Titolare per assumere decisioni automatizzate nei confronti dell'utente.</p>
 
   <h2 id="s5">5. Come li proteggiamo (misure di sicurezza)</h2>
 
@@ -391,6 +437,16 @@
         <td>Art.&nbsp;6(1)(f) — sicurezza dei sistemi</td>
       </tr>
       <tr>
+        <td>Cookie e dati di misurazione Google Analytics 4 (se acconsentiti)</td>
+        <td>Da 1&nbsp;minuto (<code>_gat</code>) e 24&nbsp;ore (<code>_gid</code>) fino a 2&nbsp;anni (<code>_ga</code>, <code>_ga_&lt;ID&gt;</code>); dati conservati nella property GA4 fino a 14&nbsp;mesi (impostazione di default); cancellazione automatica alla revoca del consenso</td>
+        <td>Art.&nbsp;6(1)(a) GDPR · art.&nbsp;122 D.Lgs.&nbsp;196/2003 · dettaglio in <a href="/cookies.html#s4-ga4-cookies">cookies.html §4</a></td>
+      </tr>
+      <tr>
+        <td>Cookie e dati di misurazione Meta Pixel (se acconsentiti)</td>
+        <td>3&nbsp;mesi (<code>_fbp</code>, <code>_fbc</code>, <code>fr</code>); cancellazione automatica alla revoca del consenso</td>
+        <td>Art.&nbsp;6(1)(a) GDPR · art.&nbsp;122 D.Lgs.&nbsp;196/2003 · dettaglio in <a href="/cookies.html#s4-meta-cookies">cookies.html §4</a></td>
+      </tr>
+      <tr>
         <td>Registro richieste di esercizio diritti (DSAR)</td>
         <td>5 anni dalla risposta</td>
         <td>Art.&nbsp;12 GDPR · esigenze di difesa</td>
@@ -445,7 +501,12 @@
       </tr>
       <tr>
         <td>Google Ireland Limited / Google LLC</td>
-        <td>Mappa di Google Maps incorporata; aggregazione recensioni pubbliche tramite Places API (nessun dato personale degli utenti del sito viene inviato)</td>
+        <td>Mappa di Google Maps incorporata (consent gate via iframemanager); aggregazione recensioni pubbliche tramite Places API (nessun dato personale degli utenti del sito viene inviato); <strong>Google Analytics 4</strong> per la misurazione del traffico del sito — solo previo consenso esplicito tramite il banner cookie (categoria «Statistica»)</td>
+        <td>Irlanda / Stati Uniti</td>
+      </tr>
+      <tr>
+        <td>Meta Platforms Ireland Limited / Meta Platforms, Inc.</td>
+        <td><strong>Meta Pixel</strong> per la misurazione dell'efficacia delle campagne pubblicitarie su Facebook e Instagram e per la creazione di pubblici di retargeting — solo previo consenso esplicito tramite il banner cookie (categoria «Marketing»). Meta opera come titolare autonomo del trattamento dei dati raccolti tramite il Pixel, secondo la propria informativa.</td>
         <td>Irlanda / Stati Uniti</td>
       </tr>
       <tr>
@@ -476,7 +537,7 @@
     <strong>In breve:</strong> alcuni fornitori hanno server negli Stati Uniti. In quei casi il trasferimento avviene sulla base del <em>Data Privacy Framework</em> UE-USA, integrato — ove necessario — da Clausole Contrattuali Standard. Monitoriamo l'evoluzione giurisprudenziale e normativa europea in materia.
   </div>
 
-  <p>Alcuni dei fornitori sopra elencati (Cloudflare, Stripe, Google, GitHub) hanno sede o operano server negli Stati Uniti e risultano certificati al <em>EU-U.S. Data Privacy Framework</em>. Per altri fornitori statunitensi (in particolare Formspree), la verifica della certificazione DPF è in corso e, nelle more, il trasferimento avviene sulla base di Clausole Contrattuali Standard. Il trasferimento dei dati al di fuori dello Spazio Economico Europeo avviene quindi nel rispetto degli artt.&nbsp;44 e seguenti del GDPR, attraverso una combinazione di:</p>
+  <p>Alcuni dei fornitori sopra elencati (Cloudflare, Stripe, Google, Meta, GitHub) hanno sede o operano server negli Stati Uniti e risultano certificati al <em>EU-U.S. Data Privacy Framework</em>. Per altri fornitori statunitensi (in particolare Formspree), la verifica della certificazione DPF è in corso e, nelle more, il trasferimento avviene sulla base di Clausole Contrattuali Standard. Il trasferimento dei dati al di fuori dello Spazio Economico Europeo avviene quindi nel rispetto degli artt.&nbsp;44 e seguenti del GDPR, attraverso una combinazione di:</p>
   <ul>
     <li>adesione del fornitore al <strong>EU-U.S. Data Privacy Framework</strong> (decisione di adeguatezza della Commissione europea del 10&nbsp;luglio&nbsp;2023);</li>
     <li>Clausole Contrattuali Standard approvate dalla Commissione (decisione di esecuzione (UE) 2021/914) integrate nei contratti con i fornitori;</li>
@@ -546,7 +607,15 @@
     <strong>In breve:</strong> usiamo pochissimi cookie, tutti descritti nella <a href="/cookies.html">Cookie Policy</a> dedicata. Puoi rivedere o ritirare il consenso in qualunque momento dal pannello «Gestisci preferenze».
   </div>
 
-  <p>Il sito utilizza esclusivamente cookie tecnici necessari al funzionamento e — previo consenso espresso tramite il banner — eventuali cookie non strettamente tecnici (es. quelli impostati da Google Maps nella mappa incorporata). I cookie di Stripe vengono installati esclusivamente nel momento in cui l'utente clicchi su «Acquista» nella pagina <a href="/regala.html">regala</a> e venga reindirizzato a <code>checkout.stripe.com</code> (sito esterno del fornitore del servizio di pagamento). Non utilizziamo cookie analitici di profilazione: la web analytics adottata (Cloudflare Web Analytics) funziona <em>senza</em> impostare cookie nel browser.</p>
+  <p>Il sito utilizza cookie tecnici necessari al funzionamento (sempre attivi: gestione del consenso, sicurezza, preferenze di lingua) e, <strong>previo consenso espresso tramite il banner</strong>, cookie non strettamente tecnici nelle seguenti categorie:</p>
+  <ul>
+    <li><strong>Statistica</strong> — <em>Google Analytics 4</em> (Google Ireland Limited / Google LLC): misurazione aggregata del traffico del sito, delle pagine visitate, della sorgente di provenienza e degli eventi di interazione. Cookie di prima parte posati sul dominio <code>santamonicagenova.it</code>: <code>_ga</code> e <code>_ga_&lt;ID&gt;</code> (durata 2 anni), <code>_gid</code> (24 ore), <code>_gat</code> (1 minuto). Property GA4: <em>Ristorante Santamonica</em>. Indirizzo IP raccolto in forma anonimizzata.</li>
+    <li><strong>Marketing</strong> — <em>Meta Pixel</em> (Meta Platforms Ireland Limited / Meta Platforms, Inc.): misurazione dell'efficacia delle campagne pubblicitarie su Facebook e Instagram e creazione di pubblici di retargeting. Cookie di prima parte: <code>_fbp</code>, <code>_fbc</code>, <code>fr</code> (durata 3 mesi).</li>
+    <li><strong>Contenuti esterni</strong> — <em>Google Maps</em> (mappa incorporata della pagina «Dove siamo»): caricamento subordinato al consenso e gestito tramite content blocker (<em>iframemanager</em>).</li>
+  </ul>
+  <p>Gli script di Google Analytics 4 e di Meta Pixel sono iniettati nella pagina <strong>esclusivamente dopo la prestazione del consenso</strong> dell'utente per le rispettive categorie tramite il banner <em>vanilla-cookieconsent</em> (v3). La revoca del consenso, sempre disponibile dal pannello «Gestisci preferenze», comporta la cancellazione automatica dei cookie già posati e l'interruzione immediata dell'iniezione degli script.</p>
+  <p>Indipendentemente dal consenso, il sito utilizza <strong>Cloudflare Web Analytics</strong> per raccogliere statistiche aggregate di traffico in forma privacy-first <em>senza</em> impostare cookie nel browser dell'utente (base giuridica: art.&nbsp;6(1)(f) GDPR — legittimo interesse alla sicurezza e all'analisi statistica anonima dei sistemi).</p>
+  <p>I cookie di Stripe vengono installati esclusivamente nel momento in cui l'utente clicchi su «Acquista» nella pagina <a href="/regala.html">regala</a> e venga reindirizzato a <code>checkout.stripe.com</code> (sito esterno del fornitore del servizio di pagamento).</p>
   <p>Per il dettaglio aggiornato dei cookie utilizzati, della loro durata e delle modalità di gestione delle preferenze, consulta la <a href="/cookies.html"><strong>Cookie Policy</strong></a>.</p>
 
   <p><button type="button" class="cc-manage" data-cc="show-preferencesModal">Gestisci preferenze cookie</button></p>
@@ -562,6 +631,8 @@
 
   <h3>Storico delle versioni</h3>
   <dl class="changelog">
+    <dt>v 2026.05.27.01 — 27 maggio 2026</dt>
+    <dd>F0.24 — Allineamento informativa all'attivazione effettiva di <strong>Google Analytics 4</strong> (Measurement ID <code>G-YP71EKXSXX</code>) e <strong>Meta Pixel</strong> (Pixel ID <code>927118130347955</code>) sul live <code>santamonicagenova.it</code> in data 27 maggio 2026. Modifiche sostanziali: (1) §3 — rimossa la dichiarazione obsoleta «non utilizziamo Google Analytics né Facebook Pixel» (non più veridica), riformulato il paragrafo per descrivere correttamente lo stato attuale con rinvio a §12 e alla Cookie Policy; (2) §4 — aggiunta riga «Misurazione del traffico e dell'efficacia delle campagne pubblicitarie» nella tabella delle basi giuridiche (consenso art.&nbsp;6(1)(a) GDPR + art.&nbsp;122 D.Lgs.&nbsp;196/2003); (3) §4 — precisata la portata della clausola sull'art.&nbsp;22 GDPR a fronte dell'introduzione di GA4/Pixel; (4) §6 — aggiunte due righe alla tabella di conservazione con il dettaglio delle durate dei cookie GA4 (<code>_ga</code>, <code>_ga_&lt;ID&gt;</code>, <code>_gid</code>, <code>_gat</code>) e Meta (<code>_fbp</code>, <code>_fbc</code>, <code>fr</code>); (5) §7 — estesa la riga «Google Ireland Limited / Google LLC» per includere GA4; aggiunta nuova riga «Meta Platforms Ireland Limited / Meta Platforms, Inc.» fra i destinatari; (6) §8 — aggiunto «Meta» all'elenco dei fornitori statunitensi certificati al EU-U.S. Data Privacy Framework; (7) §12 — riscritto integralmente il paragrafo «Cookie e tecnologie simili»: rimossa la dichiarazione obsoleta «Non utilizziamo cookie analitici di profilazione», sostituita con la descrizione corretta delle categorie «Statistica» (GA4) e «Marketing» (Meta Pixel) attivate previo consenso, dei cookie posati, delle durate e delle modalità di revoca. Release coordinata con <code>cookieconsent-config.js</code> v 2026.05.27.01 (compilate costanti <code>GA4_MEASUREMENT_ID</code> e <code>META_PIXEL_ID</code>) e <code>_headers</code> v 2026.05.27.02 (estensione CSP per googletagmanager.com, connect.facebook.net, *.google-analytics.com con wildcard per endpoint regionali europei, www.facebook.com). <a href="/cookies.html">cookies.html</a> resta a v 2026.05.23.01 (già allineata in F0.23 con tabelle cookie GA4/Meta).</dd>
     <dt>v 2026.05.20.01 — 20 maggio 2026</dt>
     <dd>F0.13 — Stripe Payment Links attivati. Rimosso il disclaimer di §12 «Nota — sistema pagamenti voucher (Stripe)»: il sistema di pagamento voucher tramite <strong>Stripe Payment Links</strong> è ora effettivamente operativo (chiusura simmetrica del F0.12 fatto su Maps). Riformulato il paragrafo successivo per descrivere lo stato corrente di entrambi i servizi terzi (Google Maps via iframemanager + Stripe via reindirizzamento checkout esterno). Chiusura completa del backlog P3.22c (loop 3 passate F0.9, Passata 3 autocritica + adversarial). Release coordinata con <a href="/regala.html">regala.html</a> v 2026.05.20.01 (refactor: rimozione form Formspree + 3 bottoni Stripe Payment Links + link a voucher-termini operativo), <a href="/voucher-termini.html">voucher-termini.html</a> v 2026.05.20.01 (NUOVO · F0.14 · 20 sezioni · loop 3 passate inline applicato), <a href="/cookies.html">cookies.html</a> v 2026.05.20.01 (rimozione simmetrica disclaimer §4). Nessuna modifica al testo sostanziale dell'informativa al di fuori della §12.</dd>
     <dt>v 2026.05.19.03 — 19 maggio 2026</dt>
@@ -581,7 +652,7 @@
   </dl>
 
   <footer class="legal-foot">
-    Informativa Privacy · v&nbsp;2026.05.20.01 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
+    Informativa Privacy · v&nbsp;2026.05.27.01 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
   </footer>
 
 </main>
@@ -592,4 +663,4 @@
 
 </body>
 </html>
-<!-- Fine privacy.html · v 2026.05.20.01 -->
+<!-- Fine privacy.html · v 2026.05.27.01 -->

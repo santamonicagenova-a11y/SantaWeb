@@ -2,11 +2,38 @@
   ─────────────────────────────────────────────────────────────────────────
   privacy.html — Informativa Privacy
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.05.27.01
+  Versione: v 2026.05.27.02
   Ultimo aggiornamento: 2026-05-27
   Lingua: IT (versione ufficiale)
   Stato: BOZZA DIY pubblicata · F0.8 revisione legale sospesa (decisione utente 17-05-2026)
   Schema di riferimento: v3 (ROADMAP_Santamonica_Web v.16 §F0.24)
+
+  Modifiche v 2026.05.27.02 (F0.25 — go-live flusso prenotazioni con carta di garanzia, Fase 1):
+  - [§4 +1 riga base giuridica] Aggiunta riga per il trattamento di tokenizzazione
+    carta di credito a garanzia della prenotazione (Stripe SetupIntent, nessun
+    addebito immediato). Base giuridica art. 6(1)(b) GDPR esecuzione del
+    contratto di ristorazione + art. 6(1)(f) legittimo interesse al recupero
+    del danno da no-show. Specificato PCI DSS Level 1 di Stripe e che il PAN
+    non transita mai dai sistemi del Titolare.
+  - [§6 +1 riga conservazione] Aggiunta riga «Token Stripe della carta di
+    garanzia su prenotazione»: conservazione massima 30 giorni dopo la
+    prenotazione, poi cleanup automatico via job pg_cron Supabase.
+  - [§7 +2 destinatari, +1 estensione] Aggiunti Supabase, Inc. (database
+    operativo prenotazioni e Edge Functions, server AWS EU eu-west-1) e
+    Resend, Inc. (mail transazionali del flusso prenotazioni). Estesa la
+    descrizione di Stripe Payments Europe Limited per includere la garanzia
+    carta sulle prenotazioni oltre ai voucher.
+  - [§8 trasferimenti USA] Aggiunti Resend e Supabase all'elenco dei
+    fornitori statunitensi certificati DPF. Precisato che il database
+    operativo Supabase risiede su server AWS in Irlanda (UE) e il
+    trasferimento verso la società madre USA riguarda solo le funzioni
+    amministrative del servizio.
+  - [release coordinata] Bump versioning come release F0.25: privacy.html
+    v 2026.05.27.02 (questo file) coordinato con index.html v 2026.05.27.06
+    (form prenotazioni cablato a Edge Function Supabase) e translations.json
+    v 2026.05.27.06 (chiavi nuove form e schermata thankyou). Edge Function
+    backend in produzione: submit-reservation v4 su Supabase project
+    xbksultfskvzgncncada.
 
   Modifiche v 2026.05.27.01 (F0.24 — GA4 + Meta Pixel attivati live · allineamento informativa):
   - [§3 corretta dichiarazione obsoleta] Riscritto il paragrafo a chiusura della
@@ -187,7 +214,7 @@
     <div class="breadcrumb"><a href="/">Santamonica</a> &nbsp;›&nbsp; Privacy</div>
     <h1>Informativa sulla Privacy</h1>
     <p class="legal-meta">
-      Ultimo aggiornamento: <strong>27 maggio 2026</strong> · Versione&nbsp;<strong>v&nbsp;2026.05.27.01</strong> · Lingua&nbsp;ufficiale: italiano
+      Ultimo aggiornamento: <strong>27 maggio 2026</strong> · Versione&nbsp;<strong>v&nbsp;2026.05.27.02</strong> · Lingua&nbsp;ufficiale: italiano
     </p>
   </header>
 
@@ -309,6 +336,11 @@
         <td>Identificativi, contatti, dati di prenotazione</td>
       </tr>
       <tr>
+        <td>Acquisire una garanzia sulla prenotazione tramite tokenizzazione carta di credito (autorizzazione di pagamento <em>SetupIntent</em>, nessun addebito immediato) e poter addebitare una penale in caso di mancata presentazione (no-show) entro i termini di disdetta indicati</td>
+        <td>Art.&nbsp;6(1)(b) GDPR — esecuzione del contratto di ristorazione; art.&nbsp;6(1)(f) — legittimo interesse del Titolare al recupero del danno da mancata presentazione. Il dato del numero di carta non transita né viene memorizzato dai sistemi del Titolare: la raccolta avviene sulla pagina sicura del fornitore Stripe, certificato PCI&nbsp;DSS Level&nbsp;1. Il Titolare detiene esclusivamente un identificativo tokenizzato del metodo di pagamento</td>
+        <td>Token Stripe del metodo di pagamento (<code>payment_method_id</code>), identificativo cliente Stripe, importo della penale e ore di disdetta concordate</td>
+      </tr>
+      <tr>
         <td>Tenere conto di allergie e intolleranze in cucina</td>
         <td><strong>Art.&nbsp;9(2)(a) GDPR — consenso esplicito</strong>, raccolto con checkbox dedicata e separata da quella della prenotazione</td>
         <td>Allergie/intolleranze dichiarate</td>
@@ -412,6 +444,11 @@
         <td>Art.&nbsp;5(1)(e) GDPR — limitazione della conservazione</td>
       </tr>
       <tr>
+        <td>Token Stripe della carta di garanzia su prenotazione</td>
+        <td>Fino a 30 giorni dopo la data della prenotazione, salvo addebito penale in caso di no-show; trascorsi i 30 giorni il token viene cancellato e il cliente Stripe è cessato</td>
+        <td>Art.&nbsp;5(1)(e) GDPR · principio di minimizzazione</td>
+      </tr>
+      <tr>
         <td>Voucher attivi non ancora riscattati</td>
         <td>Fino alla data di scadenza (12 mesi dall'acquisto) + 5 anni</td>
         <td>Art.&nbsp;6(1)(c) · DPR&nbsp;600/1973</td>
@@ -481,8 +518,18 @@
       </tr>
       <tr>
         <td>Stripe Payments Europe Limited (con sub-responsabile Stripe, Inc.)</td>
-        <td>Processo dei pagamenti per i voucher regalo</td>
+        <td>Processo dei pagamenti per i voucher regalo; tokenizzazione della carta di credito a garanzia sulle prenotazioni (autorizzazione di pagamento <em>SetupIntent</em>, nessun addebito immediato) ed eventuale addebito della penale in caso di no-show</td>
         <td>Dublino (Irlanda) + Stati Uniti</td>
+      </tr>
+      <tr>
+        <td>Supabase, Inc. (con sub-responsabile Amazon Web Services EMEA SARL)</td>
+        <td>Database delle prenotazioni e <em>Edge Functions</em> serverless che ricevono il form prenotazioni del sito e inoltrano le mail transazionali al provider Resend</td>
+        <td>Server in Irlanda (UE — <code>eu-west-1</code>) · società Supabase Inc. con sede negli Stati Uniti</td>
+      </tr>
+      <tr>
+        <td>Resend, Inc.</td>
+        <td>Invio delle mail transazionali del flusso prenotazioni (conferma di presa in carico al cliente, notifica al ristorante)</td>
+        <td>Stati Uniti</td>
       </tr>
       <tr>
         <td>Sendinblue SAS («Brevo»)</td>
@@ -537,7 +584,7 @@
     <strong>In breve:</strong> alcuni fornitori hanno server negli Stati Uniti. In quei casi il trasferimento avviene sulla base del <em>Data Privacy Framework</em> UE-USA, integrato — ove necessario — da Clausole Contrattuali Standard. Monitoriamo l'evoluzione giurisprudenziale e normativa europea in materia.
   </div>
 
-  <p>Alcuni dei fornitori sopra elencati (Cloudflare, Stripe, Google, Meta, GitHub) hanno sede o operano server negli Stati Uniti e risultano certificati al <em>EU-U.S. Data Privacy Framework</em>. Per altri fornitori statunitensi (in particolare Formspree), la verifica della certificazione DPF è in corso e, nelle more, il trasferimento avviene sulla base di Clausole Contrattuali Standard. Il trasferimento dei dati al di fuori dello Spazio Economico Europeo avviene quindi nel rispetto degli artt.&nbsp;44 e seguenti del GDPR, attraverso una combinazione di:</p>
+  <p>Alcuni dei fornitori sopra elencati (Cloudflare, Stripe, Google, Meta, GitHub, Resend, Supabase) hanno sede o operano server negli Stati Uniti e risultano certificati al <em>EU-U.S. Data Privacy Framework</em>. Si precisa che il database operativo Supabase relativo alle prenotazioni del sito risiede su server Amazon Web Services nell'Unione Europea (Irlanda, <code>eu-west-1</code>): il trasferimento verso la società madre Supabase Inc. (USA) riguarda esclusivamente le funzioni di gestione amministrativa del servizio (dashboard di amministrazione, fatturazione). Per altri fornitori statunitensi (in particolare Formspree), la verifica della certificazione DPF è in corso e, nelle more, il trasferimento avviene sulla base di Clausole Contrattuali Standard. Il trasferimento dei dati al di fuori dello Spazio Economico Europeo avviene quindi nel rispetto degli artt.&nbsp;44 e seguenti del GDPR, attraverso una combinazione di:</p>
   <ul>
     <li>adesione del fornitore al <strong>EU-U.S. Data Privacy Framework</strong> (decisione di adeguatezza della Commissione europea del 10&nbsp;luglio&nbsp;2023);</li>
     <li>Clausole Contrattuali Standard approvate dalla Commissione (decisione di esecuzione (UE) 2021/914) integrate nei contratti con i fornitori;</li>
@@ -631,6 +678,8 @@
 
   <h3>Storico delle versioni</h3>
   <dl class="changelog">
+    <dt>v 2026.05.27.02 — 27 maggio 2026</dt>
+    <dd>F0.25 — Allineamento informativa al go-live del flusso prenotazioni con carta di garanzia (Fase 1). Modifiche sostanziali: (1) §4 — aggiunta riga nella tabella delle basi giuridiche per il trattamento «Acquisire una garanzia sulla prenotazione tramite tokenizzazione carta di credito (<em>Stripe SetupIntent</em>, nessun addebito immediato)»; base giuridica art.&nbsp;6(1)(b) GDPR esecuzione del contratto + art.&nbsp;6(1)(f) legittimo interesse al recupero del danno da no-show. Specificato che il numero di carta non transita né è memorizzato dai sistemi del Titolare (raccolta sulla pagina Stripe certificata PCI&nbsp;DSS Level&nbsp;1). (2) §6 — aggiunta riga nella tabella di conservazione per il token Stripe della carta di garanzia: conservazione massima 30 giorni dopo la data della prenotazione, salvo addebito penale in caso di no-show. (3) §7 — estesa la descrizione del fornitore Stripe Payments Europe Limited per includere la tokenizzazione carta a garanzia delle prenotazioni; aggiunti due nuovi fornitori: <strong>Supabase, Inc.</strong> (database operativo prenotazioni e Edge Functions, server in Irlanda con sub-responsabile AWS EMEA SARL) e <strong>Resend, Inc.</strong> (invio mail transazionali di conferma presa in carico al cliente e notifica al ristorante). (4) §8 — aggiunti Resend e Supabase all'elenco dei fornitori statunitensi certificati al EU-U.S. Data Privacy Framework; precisato che il database operativo Supabase risiede su server Amazon Web Services in Irlanda (UE) e che il trasferimento verso la società madre USA riguarda solo le funzioni amministrative. Release coordinata con: <code>_archivio-export/SafeTable/supabase/functions/submit-reservation/index.ts</code> v4 (Edge Function backend prenotazioni), <code>translations.json</code> v 2026.05.27.06 (chiavi nuove form: <code>prenota_f_marketing_consent</code>, <code>prenota_thankyou_*</code>, <code>prenota_error_*</code>), <code>index.html</code> v 2026.05.27.06 (form prenotazioni cablato a Edge Function Supabase, telefono <code>required</code>, checkbox marketing opt-in, honeypot, schermata thankyou). Documento di design autoritativo: <code>progetto-sito/DESIGN_carta_garanzia_prenotazioni_v2026.05.27.01.md</code> v 2026.05.27.05.</dd>
     <dt>v 2026.05.27.01 — 27 maggio 2026</dt>
     <dd>F0.24 — Allineamento informativa all'attivazione effettiva di <strong>Google Analytics 4</strong> (Measurement ID <code>G-YP71EKXSXX</code>) e <strong>Meta Pixel</strong> (Pixel ID <code>927118130347955</code>) sul live <code>santamonicagenova.it</code> in data 27 maggio 2026. Modifiche sostanziali: (1) §3 — rimossa la dichiarazione obsoleta «non utilizziamo Google Analytics né Facebook Pixel» (non più veridica), riformulato il paragrafo per descrivere correttamente lo stato attuale con rinvio a §12 e alla Cookie Policy; (2) §4 — aggiunta riga «Misurazione del traffico e dell'efficacia delle campagne pubblicitarie» nella tabella delle basi giuridiche (consenso art.&nbsp;6(1)(a) GDPR + art.&nbsp;122 D.Lgs.&nbsp;196/2003); (3) §4 — precisata la portata della clausola sull'art.&nbsp;22 GDPR a fronte dell'introduzione di GA4/Pixel; (4) §6 — aggiunte due righe alla tabella di conservazione con il dettaglio delle durate dei cookie GA4 (<code>_ga</code>, <code>_ga_&lt;ID&gt;</code>, <code>_gid</code>, <code>_gat</code>) e Meta (<code>_fbp</code>, <code>_fbc</code>, <code>fr</code>); (5) §7 — estesa la riga «Google Ireland Limited / Google LLC» per includere GA4; aggiunta nuova riga «Meta Platforms Ireland Limited / Meta Platforms, Inc.» fra i destinatari; (6) §8 — aggiunto «Meta» all'elenco dei fornitori statunitensi certificati al EU-U.S. Data Privacy Framework; (7) §12 — riscritto integralmente il paragrafo «Cookie e tecnologie simili»: rimossa la dichiarazione obsoleta «Non utilizziamo cookie analitici di profilazione», sostituita con la descrizione corretta delle categorie «Statistica» (GA4) e «Marketing» (Meta Pixel) attivate previo consenso, dei cookie posati, delle durate e delle modalità di revoca. Release coordinata con <code>cookieconsent-config.js</code> v 2026.05.27.01 (compilate costanti <code>GA4_MEASUREMENT_ID</code> e <code>META_PIXEL_ID</code>) e <code>_headers</code> v 2026.05.27.02 (estensione CSP per googletagmanager.com, connect.facebook.net, *.google-analytics.com con wildcard per endpoint regionali europei, www.facebook.com). <a href="/cookies.html">cookies.html</a> resta a v 2026.05.23.01 (già allineata in F0.23 con tabelle cookie GA4/Meta).</dd>
     <dt>v 2026.05.20.01 — 20 maggio 2026</dt>
@@ -652,7 +701,7 @@
   </dl>
 
   <footer class="legal-foot">
-    Informativa Privacy · v&nbsp;2026.05.27.01 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
+    Informativa Privacy · v&nbsp;2026.05.27.02 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
   </footer>
 
 </main>
@@ -663,4 +712,4 @@
 
 </body>
 </html>
-<!-- Fine privacy.html · v 2026.05.27.01 -->
+<!-- Fine privacy.html · v 2026.05.27.02 -->

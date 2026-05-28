@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<!-- v 2026.05.27.06 — F0.25 (sessione 11 del 27/5): form prenotazioni cablato a Edge Function backend Supabase `submit-reservation` (era Formspree mkopjnvq). Modifiche form #prenota: (1) `<form>` perde l'attributo `action` Formspree e i campi nascosti `tipo`+`_subject` (gestione subject lato backend Resend); (2) telefono ora `required` (era opzionale) — decisione sessione 8: mail+cellulare entrambi obbligatori, fallback chiamata se rimbalza mail; (3) hint contatto cambiato da «almeno uno tra telefono ed email» a «email e telefono entrambi obbligatori»; (4) textarea `name="richieste"` rinominato `name="note"` per allineamento backend; (5) aggiunta checkbox `marketing_consent` (i18n key `prenota_f_marketing_consent`); (6) honeypot anti-bot `_hp` nascosto; (7) submit handler riscritto: validazione client-side, fetch JSON a `https://xbksultfskvzgncncada.supabase.co/functions/v1/submit-reservation`, gestione response 201/400/429/altro, schermata thankyou `#prenota-thankyou` mostrata su successo. -->
+<!-- v 2026.05.27.05 — SYNC archivio↔live sessione 5 del 27/5: sovrascritto archivio col raw del live (santamonicagenova-a11y/SantaWeb branch main) per recuperare gli 8 commit del 26/5 sessione 1 (form prenotazioni esteso: <select id="p-orario"> con optgroup Pranzo/Cena, persone 1-6, reset orario al cambio data via getServicesByDay, loop data-i18n-label in applyLang). L'archivio era fermo a v 2026.05.22.02 strutturalmente ma il LIVE aveva ancora lo stesso header v 2026.05.22.02 col contenuto già esteso — drift silenzioso (stesso header, contenuto diverso) risolto. Backup pre-sync strutturale in _pre-sync-2026-05-27/index.html.PRE-SYNC. -->
 <!-- v 2026.05.22.02 — F0.21-d: bottone "Menù dolci" (#dolci-btn) mostrato SOLO in IT; in EN/FR i dolci sono accorpati nella carta (menu-en/fr.html) quindi il bottone separato viene nascosto via applyLang. -->
 <!-- v 2026.05.22.01 — F0.21 refactor orari FONTE UNICA (/orari.js): orari NON più hardcoded. Rimossi (1) blocco orari #info, ora <div id="orari-info"> riempito da orari.js; (2) openingHoursSpecification statico nel JSON-LD, ora iniettato a runtime da orari.js; (3) chiavi i18n info_orari_marven/sabdom/lun (etichette giorni ora in orari.js). NUOVO schedule reale (≠ giugno): Mar solo cena 19:30-22:30 · Mer-Sab pranzo 12:30-14:30 + cena 19:30-22:30 · Dom solo pranzo 12:30-14:30 · Lun chiuso. Per cambiare orari: editare SOLO orari.js. -->
 <!-- v 2026.05.21.05 — FINAL CHECK INFO (orari · dec. #25): ristrutturato il blocco orari #info al TARGET giugno 2026. Da [Mar / Mer-Sab / Dom / Lun chiuso] a [Mar-Ven solo cena 19:30-22:30 / Sab-Dom pranzo 12:30-14:30 + cena 19:30-22:30 / Lun chiuso]. Chiavi i18n rinominate: info_orari_mar→info_orari_marven, info_orari_mersab→info_orari_sabdom, rimossa info_orari_dom (vedi translations.json v 2026.05.21.01). Schema.org JSON-LD già TARGET (invariato). dove-siamo.html già TARGET (hardcoded, invariato). FINAL CHECK residuo: voucher/prezzi. -->
@@ -457,15 +459,15 @@
       </div>
       <div class="reveal" style="transition-delay:0.15s">
         <div class="prenota-form-box">
-          <form id="prenota-form" action="https://formspree.io/f/mkopjnvq" method="POST">
-            <input type="hidden" name="tipo" id="p-tipo" value="standard">
-            <input type="hidden" name="_subject" id="p-subject" value="Prenotazione tavolo - Santamonica">
+          <form id="prenota-form" novalidate>
+            <!-- honeypot anti-bot (campo nascosto, gli umani non lo vedono) -->
+            <input type="text" name="_hp" id="p-hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" aria-hidden="true">
             <div class="pf-group"><label for="p-nome" data-i18n="prenota_f_nome">Nome</label><input type="text" id="p-nome" name="nome" required></div>
             <div class="pf-row">
-              <div class="pf-group"><label for="p-tel" data-i18n="prenota_f_tel">Telefono</label><input type="tel" id="p-tel" name="telefono"></div>
-              <div class="pf-group"><label for="p-email" data-i18n="prenota_f_email">Email</label><input type="email" id="p-email" name="email"></div>
+              <div class="pf-group"><label for="p-tel" data-i18n="prenota_f_tel">Telefono</label><input type="tel" id="p-tel" name="telefono" required></div>
+              <div class="pf-group"><label for="p-email" data-i18n="prenota_f_email">Email</label><input type="email" id="p-email" name="email" required></div>
             </div>
-            <p class="pf-hint" data-i18n="prenota_contatto_hint">Almeno uno tra telefono ed email &egrave; obbligatorio.</p>
+            <p class="pf-hint" data-i18n="prenota_contatto_hint">Email e telefono sono entrambi obbligatori per ricontattarti rapidamente.</p>
             <div class="pf-row">
               <div class="pf-group"><label for="p-data" data-i18n="prenota_f_data">Data desiderata</label><input type="date" id="p-data" name="data" required></div>
               <div class="pf-group">
@@ -511,12 +513,22 @@
               </select>
             </div>
             <div class="pf-group"><label for="p-intolleranze" data-i18n="prenota_f_intolleranze">Intolleranze o allergie</label><input type="text" id="p-intolleranze" name="intolleranze" required data-i18n-placeholder="prenota_f_intolleranze_ph" placeholder="Scrivi 'nessuna' se non hai allergie"></div>
-            <div class="pf-group"><label for="p-richieste" data-i18n="prenota_f_richieste">Richieste particolari</label><textarea id="p-richieste" name="richieste"></textarea></div>
+            <div class="pf-group"><label for="p-richieste" data-i18n="prenota_f_richieste">Richieste particolari</label><textarea id="p-richieste" name="note"></textarea></div>
+            <div class="pf-group pf-checkbox" style="margin-top:0.75rem;display:flex;align-items:flex-start;gap:0.5rem;">
+              <input type="checkbox" id="p-marketing" name="marketing_consent" style="margin-top:0.2rem;flex-shrink:0;">
+              <label for="p-marketing" data-i18n="prenota_f_marketing_consent" style="font-size:0.875rem;line-height:1.4;font-weight:normal;cursor:pointer;">Acconsento a ricevere comunicazioni sul ristorante (eventi, serate a tema, novit&agrave;). Facoltativo, revocabile in qualsiasi momento.</label>
+            </div>
             <div style="margin-top:1.5rem;">
               <button type="submit" id="prenota-btn" class="btn-primary" style="cursor:pointer;font-family:'Jost',sans-serif;border:none;width:100%;text-align:center;" data-i18n="prenota_f_btn">Invia la richiesta</button>
             </div>
             <div class="pf-status" id="prenota-status"></div>
           </form>
+          <!-- Schermata thankyou (nascosta finché il form non viene submittato con successo) -->
+          <div id="prenota-thankyou" style="display:none;text-align:center;padding:2rem 0;">
+            <div style="font-size:3rem;margin-bottom:1rem;">&#x2709;&#xFE0F;</div>
+            <h3 data-i18n="prenota_thankyou_title" style="margin:0 0 1rem;font-weight:normal;">Richiesta ricevuta</h3>
+            <p data-i18n="prenota_thankyou_body" style="font-size:1rem;line-height:1.6;color:#555;">Grazie. Abbiamo ricevuto la tua richiesta di prenotazione e ti abbiamo inviato una mail di conferma. Ti contattiamo a breve con i passi finali.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -616,7 +628,7 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.22.02</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.27.05</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>
@@ -737,26 +749,69 @@
     }
   }
   document.getElementById('p-data').addEventListener('change', updateOrarioSlots);
+  // Endpoint backend prenotazioni (Edge Function Supabase, Fase 1 carta-garanzia)
+  var EDGE_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/submit-reservation';
+
   pForm.addEventListener('submit', async function(e) {
-    e.preventDefault(); pBtn.disabled = true;
-    var telVal = document.getElementById('p-tel').value.trim();
-    var emailVal = document.getElementById('p-email').value.trim();
-    if (!telVal && !emailVal) {
-      pStatus.textContent = (T[currentLang] && T[currentLang].prenota_err_contatto) || 'Inserisci almeno un contatto tra telefono ed email.';
+    e.preventDefault();
+    pBtn.disabled = true;
+    pStatus.textContent = '';
+    pStatus.className = 'pf-status';
+
+    var payload = {
+      nome: document.getElementById('p-nome').value.trim(),
+      email: document.getElementById('p-email').value.trim(),
+      telefono: document.getElementById('p-tel').value.trim(),
+      data: document.getElementById('p-data').value,
+      orario: document.getElementById('p-orario').value,
+      persone: parseInt(document.getElementById('p-persone').value, 10),
+      intolleranze: document.getElementById('p-intolleranze').value.trim(),
+      occasione: document.getElementById('p-occasione').value,
+      note: document.getElementById('p-richieste').value.trim(),
+      marketing_consent: document.getElementById('p-marketing').checked,
+      user_agent: navigator.userAgent || '',
+      _hp: document.getElementById('p-hp').value
+    };
+
+    // Validazione client-side base
+    if (!payload.nome || !payload.email || !payload.telefono || !payload.data || !payload.orario || !payload.persone) {
+      pStatus.textContent = (T[currentLang] && T[currentLang].prenota_error_validation) || 'Compila tutti i campi obbligatori.';
       pStatus.className = 'pf-status error';
       pBtn.disabled = false;
       return;
     }
-    var occVal = document.getElementById('p-occasione').value;
-    var isSpeciale = occVal && occVal !== 'Cena standard';
-    document.getElementById('p-tipo').value = isSpeciale ? 'speciale' : 'standard';
-    document.getElementById('p-subject').value = isSpeciale ? 'Prenotazione speciale - Santamonica' : 'Prenotazione tavolo - Santamonica';
+
     try {
-      var res = await fetch(pForm.action, { method: 'POST', body: new FormData(pForm), headers: { 'Accept': 'application/json' } });
-      if (res.ok) { pStatus.textContent = T[currentLang] ? T[currentLang].prenota_ok : 'Inviato!'; pStatus.className = 'pf-status success'; pForm.reset(); }
-      else { throw new Error(); }
-    } catch(err) { pStatus.textContent = T[currentLang] ? T[currentLang].prenota_err : 'Errore.'; pStatus.className = 'pf-status error'; }
-    pBtn.disabled = false;
+      var res = await fetch(EDGE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.status === 201) {
+        // Successo: nascondo form, mostro schermata thankyou
+        pForm.style.display = 'none';
+        document.getElementById('prenota-thankyou').style.display = '';
+        // Scroll fluido sulla thankyou per visibilità
+        var ty = document.getElementById('prenota-thankyou');
+        if (ty && ty.scrollIntoView) ty.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (res.status === 429) {
+        pStatus.textContent = (T[currentLang] && T[currentLang].prenota_error_rate_limit) || 'Troppe richieste in poco tempo. Riprova tra un\'ora o chiamaci al 010 5533155.';
+        pStatus.className = 'pf-status error';
+        pBtn.disabled = false;
+      } else if (res.status === 400) {
+        var errBody = {};
+        try { errBody = await res.json(); } catch (_) {}
+        pStatus.textContent = errBody.error || (T[currentLang] && T[currentLang].prenota_error_validation) || 'Verifica i dati inseriti.';
+        pStatus.className = 'pf-status error';
+        pBtn.disabled = false;
+      } else {
+        throw new Error('HTTP ' + res.status);
+      }
+    } catch (err) {
+      pStatus.textContent = (T[currentLang] && T[currentLang].prenota_error_generic) || 'Errore di connessione. Riprova o chiamaci al 010 5533155.';
+      pStatus.className = 'pf-status error';
+      pBtn.disabled = false;
+    }
   });
 
   var galleryImages = [];
@@ -810,7 +865,7 @@
         if (d[k] && d[k].alt) el.alt = d[k].alt;
       });
     })
-    .catch(function() { /* fallback: src locali gi\u00e0 presenti negli <img> */ });
+    .catch(function() { /* fallback: src locali già presenti negli <img> */ });
   function openLightbox(i) { currentImg = i; document.getElementById('lightbox-img').src = galleryImages[i].src; document.getElementById('lightbox').classList.add('visible'); document.body.style.overflow = 'hidden'; }
   function closeLightbox() { document.getElementById('lightbox').classList.remove('visible'); document.body.style.overflow = ''; }
   function changeLightbox(dir) { currentImg = (currentImg + dir + galleryImages.length) % galleryImages.length; document.getElementById('lightbox-img').src = galleryImages[currentImg].src; }
@@ -869,6 +924,6 @@
 <script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
 <script defer src="/cookieconsent-config.js"></script>
 
-<!-- v 2026.05.22.02 -->
+<!-- v 2026.05.27.05 -->
 </body>
 </html>

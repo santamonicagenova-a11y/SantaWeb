@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.05.27.07 — F0.25 fix CSS marketing checkbox (sessione 11 del 27/5, post go-live commit iniziali): aggiunte regole CSS specifiche `.pf-checkbox` e `.pf-checkbox label` nel `<style>` del file per override delle proprietà `text-transform: uppercase`, `letter-spacing: 0.2em`, `display: block`, `font-family: Jost` ereditate da `.pf-group label`. Andrea ha verificato in incognito post-deploy del primo commit (v 2026.05.27.06) che il label «Acconsento a ricevere comunicazioni…» appariva renderizzato ALL CAPS in colonna verticale invece di in linea con la checkbox; problema CSS strutturale risolto rendendo `.pf-checkbox` un componente isolato dalle regole del form esistente. Rimossi anche gli style inline ridondanti dal markup HTML. -->
 <!-- v 2026.05.27.06 — F0.25 (sessione 11 del 27/5): form prenotazioni cablato a Edge Function backend Supabase `submit-reservation` (era Formspree mkopjnvq). Modifiche form #prenota: (1) `<form>` perde l'attributo `action` Formspree e i campi nascosti `tipo`+`_subject` (gestione subject lato backend Resend); (2) telefono ora `required` (era opzionale) — decisione sessione 8: mail+cellulare entrambi obbligatori, fallback chiamata se rimbalza mail; (3) hint contatto cambiato da «almeno uno tra telefono ed email» a «email e telefono entrambi obbligatori»; (4) textarea `name="richieste"` rinominato `name="note"` per allineamento backend; (5) aggiunta checkbox `marketing_consent` (i18n key `prenota_f_marketing_consent`); (6) honeypot anti-bot `_hp` nascosto; (7) submit handler riscritto: validazione client-side, fetch JSON a `https://xbksultfskvzgncncada.supabase.co/functions/v1/submit-reservation`, gestione response 201/400/429/altro, schermata thankyou `#prenota-thankyou` mostrata su successo. -->
 <!-- v 2026.05.27.05 — SYNC archivio↔live sessione 5 del 27/5: sovrascritto archivio col raw del live (santamonicagenova-a11y/SantaWeb branch main) per recuperare gli 8 commit del 26/5 sessione 1 (form prenotazioni esteso: <select id="p-orario"> con optgroup Pranzo/Cena, persone 1-6, reset orario al cambio data via getServicesByDay, loop data-i18n-label in applyLang). L'archivio era fermo a v 2026.05.22.02 strutturalmente ma il LIVE aveva ancora lo stesso header v 2026.05.22.02 col contenuto già esteso — drift silenzioso (stesso header, contenuto diverso) risolto. Backup pre-sync strutturale in _pre-sync-2026-05-27/index.html.PRE-SYNC. -->
 <!-- v 2026.05.22.02 — F0.21-d: bottone "Menù dolci" (#dolci-btn) mostrato SOLO in IT; in EN/FR i dolci sono accorpati nella carta (menu-en/fr.html) quindi il bottone separato viene nascosto via applyLang. -->
@@ -228,6 +229,11 @@
   .pf-status { display: none; margin-top: 1rem; font-size: 0.85rem; padding: 0.75rem 1rem; }
   .pf-status.success { display: block; background: #eaf3de; color: #3b6d11; }
   .pf-status.error { display: block; background: #fcebeb; color: #a32d2d; }
+  /* F0.25 v 2026.05.27.07 — checkbox marketing opt-in: regole specifiche per override
+     dei valori ereditati da .pf-group label (uppercase, letter-spacing, display:block, font Jost). */
+  .pf-checkbox { display: flex; align-items: flex-start; gap: 0.6rem; margin-top: 1rem; margin-bottom: 0.5rem; }
+  .pf-checkbox input[type="checkbox"] { margin-top: 0.25rem; flex-shrink: 0; width: 1rem; height: 1rem; cursor: pointer; }
+  .pf-checkbox label { display: inline; font-size: 0.82rem; line-height: 1.45; color: var(--ink-soft); font-family: Georgia, serif; font-weight: normal; text-transform: none; letter-spacing: normal; margin: 0; cursor: pointer; }
 
   .contatti-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
   .form-group { margin-bottom: 1.5rem; }
@@ -514,9 +520,9 @@
             </div>
             <div class="pf-group"><label for="p-intolleranze" data-i18n="prenota_f_intolleranze">Intolleranze o allergie</label><input type="text" id="p-intolleranze" name="intolleranze" required data-i18n-placeholder="prenota_f_intolleranze_ph" placeholder="Scrivi 'nessuna' se non hai allergie"></div>
             <div class="pf-group"><label for="p-richieste" data-i18n="prenota_f_richieste">Richieste particolari</label><textarea id="p-richieste" name="note"></textarea></div>
-            <div class="pf-group pf-checkbox" style="margin-top:0.75rem;display:flex;align-items:flex-start;gap:0.5rem;">
-              <input type="checkbox" id="p-marketing" name="marketing_consent" style="margin-top:0.2rem;flex-shrink:0;">
-              <label for="p-marketing" data-i18n="prenota_f_marketing_consent" style="font-size:0.875rem;line-height:1.4;font-weight:normal;cursor:pointer;">Acconsento a ricevere comunicazioni sul ristorante (eventi, serate a tema, novit&agrave;). Facoltativo, revocabile in qualsiasi momento.</label>
+            <div class="pf-checkbox">
+              <input type="checkbox" id="p-marketing" name="marketing_consent">
+              <label for="p-marketing" data-i18n="prenota_f_marketing_consent">Acconsento a ricevere comunicazioni sul ristorante (eventi, serate a tema, novit&agrave;). Facoltativo, revocabile in qualsiasi momento.</label>
             </div>
             <div style="margin-top:1.5rem;">
               <button type="submit" id="prenota-btn" class="btn-primary" style="cursor:pointer;font-family:'Jost',sans-serif;border:none;width:100%;text-align:center;" data-i18n="prenota_f_btn">Invia la richiesta</button>

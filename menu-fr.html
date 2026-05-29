@@ -398,6 +398,21 @@
       #layout-orario .orario-servizio { font-size: .82rem; line-height: 1.65; }
       #layout-orario .orario-nota { font-size: .56rem; padding-top: 2mm; line-height: 1.45; }
     }
+  
+    /* F0.21-e allergeni */
+    #layout-carta .pg.alg-pg { }
+    .alg-header{text-align:center;margin-bottom:6mm;padding-bottom:3mm;border-bottom:1.5px solid var(--ink,#1a1714);}
+    .alg-title{font-size:1.7rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;line-height:1;}
+    .alg-nota{font-style:italic;font-size:.72rem;color:var(--stone,#8c7e6e);text-align:center;line-height:1.6;margin-bottom:6mm;padding-bottom:4mm;border-bottom:1px solid var(--rule,#d4c9b8);}
+    .alg-sez{margin-bottom:5mm;}
+    .alg-sez-titolo{font-size:1rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-bottom:2mm;padding-bottom:1mm;border-bottom:1px solid var(--rule,#d4c9b8);}
+    .alg-row{display:flex;align-items:baseline;gap:4mm;padding:1.6mm 0;border-bottom:1px dotted var(--rule,#d4c9b8);}
+    .alg-row:last-child{border-bottom:none;}
+    .alg-nome{flex:0 0 40%;font-size:.86rem;line-height:1.3;}
+    .alg-all{flex:1;font-style:italic;font-size:.8rem;line-height:1.4;}
+    .alg-all.vuoto{color:var(--stone,#8c7e6e);}
+    .alg-legenda{margin-top:auto;padding-top:4mm;border-top:1px solid var(--rule,#d4c9b8);font-size:.66rem;color:var(--stone,#8c7e6e);font-style:italic;line-height:1.6;text-align:center;}
+    .alg-legenda strong{font-style:normal;font-weight:600;color:var(--ink,#1a1714);}
   </style>
 </head>
 <body>
@@ -438,7 +453,7 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Tubetti <em>Mancini</em>, morue, silène, kosho aux agrumes",
+          "nome": "Tubetti <em>Mancini</em>, morue, preboggion, kosho aux agrumes",
           "sostenibile": true
         },
         {
@@ -446,7 +461,7 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Glace au citron noir, au livèche et au citron vert, accompagnée de crackers au lait"
+          "nome": "Glace au citron noir, au livèche et au citron vert, accompagnée de biscuits au lait"
         }
       ],
       "Sette": "Menu carte blanche du Chef"
@@ -587,7 +602,7 @@ const MENU = {
       "titolo": "Golosità",
       "piatti": [
         {
-          "nome": "Glace au citron noir, au livèche et au citron vert, accompagnée de crackers au lait",
+          "nome": "Glace au citron noir, au livèche et au citron vert, accompagnée de biscuits au lait",
           "prezzo": 14
         },
         {
@@ -657,6 +672,190 @@ const MENU = {
         "giorno": "Dimanche",
         "fasce": [
           "12:30 – 14:30"
+        ]
+      }
+    ]
+  },
+  "allergeni": {
+    "header": "Allergènes",
+    "nota": "Information conformément au Règlement (UE) n° 1169/2011. Pour plus d’informations sur les allergènes présents dans nos plats, veuillez vous adresser à notre personnel.",
+    "vuoto": "aucun allergène déclaré",
+    "legendaTitolo": "Allergènes réglementés (Règl. UE 1169/2011) :",
+    "legenda": [
+      "gluten",
+      "crustacés",
+      "œufs",
+      "poisson",
+      "arachides",
+      "soja",
+      "lait",
+      "fruits à coque",
+      "céleri",
+      "moutarde",
+      "sésame",
+      "sulfites",
+      "lupin",
+      "mollusques"
+    ],
+    "sezioni": [
+      {
+        "titolo_display": "Antipasti",
+        "piatti": [
+          {
+            "nome": "Calamars locaux, petits pois frais, bagna cauda, kéfir",
+            "allergeni": [
+              "poisson",
+              "lait",
+              "sulfites",
+              "mollusques"
+            ]
+          },
+          {
+            "nome": "Crevettes roses crues à la puttanesca",
+            "allergeni": [
+              "crustacés"
+            ]
+          },
+          {
+            "nome": "Ris de veau, céleri-rave, noisettes, réduction de fond de poisson",
+            "allergeni": [
+              "poisson",
+              "fruits à coque",
+              "sulfites"
+            ]
+          },
+          {
+            "nome": "Denté royal local cru, oursins, citron, amandes",
+            "allergeni": [
+              "gluten",
+              "poisson",
+              "fruits à coque"
+            ]
+          },
+          {
+            "nome": "« Pas de fromages »",
+            "allergeni": [
+              "fruits à coque"
+            ]
+          }
+        ]
+      },
+      {
+        "titolo_display": "Pâtes & Céréales",
+        "piatti": [
+          {
+            "nome": "Spaghettoni carrés Mancini, anémones de mer, nduja, marjolaine",
+            "allergeni": [
+              "gluten",
+              "lait"
+            ]
+          },
+          {
+            "nome": "Tortelli au sanglier, bouillon de dorade, oignon nouveau, shiso",
+            "allergeni": [
+              "gluten",
+              "œufs",
+              "poisson",
+              "céleri",
+              "sulfites"
+            ]
+          },
+          {
+            "nome": "Tubetti Mancini, morue, silène, kosho aux agrumes",
+            "allergeni": [
+              "gluten",
+              "poisson",
+              "soja",
+              "lait"
+            ]
+          },
+          {
+            "nome": "Riz Riserva San Massimo, huîtres, asperges blanches, vanille",
+            "allergeni": [
+              "lait",
+              "mollusques"
+            ]
+          }
+        ]
+      },
+      {
+        "titolo_display": "Pas Seulement la Mer",
+        "piatti": [
+          {
+            "nome": "Sériole locale pêchée à la ligne, crème de poivrons, purée d&#x27;aubergines au barbecue, tahini",
+            "allergeni": [
+              "poisson"
+            ]
+          },
+          {
+            "nome": "Courgette à la scapece, menthe, yaourt, poivre de Timut",
+            "allergeni": [
+              "lait"
+            ]
+          },
+          {
+            "nome": "Ombrine locale pêchée à la ligne, vignarola, crème de petits pois",
+            "allergeni": [
+              "poisson",
+              "céleri",
+              "sulfites"
+            ]
+          },
+          {
+            "nome": "« Des tournedos à la Rossini » ?",
+            "allergeni": [
+              "crustacés",
+              "poisson",
+              "lait",
+              "céleri",
+              "sulfites",
+              "mollusques"
+            ]
+          }
+        ]
+      },
+      {
+        "titolo_display": "Gourmandises",
+        "piatti": [
+          {
+            "nome": "Gelato al limone nero",
+            "allergeni": [
+              "gluten",
+              "lait"
+            ]
+          },
+          {
+            "nome": "Gelato porcino",
+            "allergeni": [
+              "lait",
+              "œufs"
+            ]
+          },
+          {
+            "nome": "Ananas",
+            "allergeni": [
+              "œufs",
+              "gluten",
+              "lait"
+            ]
+          },
+          {
+            "nome": "Sacripantina",
+            "allergeni": [
+              "fruits à coque",
+              "œufs",
+              "gluten",
+              "lait",
+              "sulfites"
+            ]
+          },
+          {
+            "nome": "Erborinato e Picolit",
+            "allergeni": [
+              "lait",
+              "sulfites"
+            ]
+          }
         ]
       }
     ]
@@ -854,7 +1053,29 @@ function showLayout(which) {
 }
 
 /* ── init ── */
+
+/* F0.21-e: pagina allergeni (carta+dolci) */
+function renderAllergeniPage(){
+  if (typeof MENU === "undefined" || !MENU.allergeni) return;
+  var A = MENU.allergeni, root = document.getElementById("layout-carta"); if(!root) return;
+  var esc = function(x){ return String(x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
+  var pg = document.createElement("div"); pg.className = "pg alg-pg";
+  var h = "<div class=\"alg-header\"><div class=\"alg-title\">"+esc(A.header)+"</div></div>";
+  h += "<div class=\"alg-nota\">"+esc(A.nota)+"</div>";
+  A.sezioni.forEach(function(sez){
+    h += "<div class=\"alg-sez\"><div class=\"alg-sez-titolo\">"+esc(sez.titolo_display)+"</div>";
+    (sez.piatti||[]).forEach(function(p){
+      var has = p.allergeni && p.allergeni.length;
+      h += "<div class=\"alg-row\"><div class=\"alg-nome\">"+p.nome+"</div>" +
+           "<div class=\"alg-all"+(has?"":" vuoto")+"\">"+(has?esc(p.allergeni.join(", ")):esc(A.vuoto))+"</div></div>";
+    });
+    h += "</div>";
+  });
+  h += "<div class=\"alg-legenda\"><strong>"+esc(A.legendaTitolo)+"</strong><br>"+A.legenda.map(esc).join(" &bull; ")+"</div>";
+  pg.innerHTML = h; root.appendChild(pg);
+}
 renderCarta();
+renderAllergeniPage();
 renderOrario();
 showLayout('carta');
 </script>

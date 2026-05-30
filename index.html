@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.05.30.02 — Aperture straordinarie (sessione 13b del 30/5): il form considera anche le aperture straordinarie lette da reservations-status (campo openings). Nuove funzioni openingsForDate() e servicesForDate() = (schedule normale orari.js ∪ aperture) − chiusure; updateOrarioSlots usa servicesForDate per mostrare/nascondere gli optgroup. Footer/commento finale allineati a v 2026.05.30.02. NB: il calendario colorato lato cliente (aperture/chiusure in 2 colori) è una possibile evoluzione separata non ancora implementata. -->
 <!-- v 2026.05.30.01 — Blocco prenotazioni online (sessione 13 del 30/5): il form #prenota legge lo stato da Edge Function reservations-status all'apertura. (1) Se le prenotazioni online sono globalmente CHIUSE → il form è nascosto e si mostra il banner #prenota-closed; (2) per ogni data scelta, gli optgroup Pranzo/Cena chiusi dall'admin vengono nascosti (oltre al filtro getServicesByDay esistente); (3) se il giorno sarebbe aperto ma è chiuso del tutto dall'admin → messaggio #p-date-closed; (4) il submit gestisce ora anche la risposta 403 (chiuso) con messaggio dedicato. Lo stato è gestito da menu-admin.html (interruttore + calendario chiusure) e applicato server-side da submit-reservation v7. Nuove chiavi i18n: prenota_closed_title, prenota_closed_body, prenota_date_closed, prenota_error_closed. -->
 <!-- v 2026.05.27.07 — F0.25 fix CSS marketing checkbox (sessione 11 del 27/5, post go-live commit iniziali): aggiunte regole CSS specifiche `.pf-checkbox` e `.pf-checkbox label` nel `<style>` del file per override delle proprietà `text-transform: uppercase`, `letter-spacing: 0.2em`, `display: block`, `font-family: Jost` ereditate da `.pf-group label`. Andrea ha verificato in incognito post-deploy del primo commit (v 2026.05.27.06) che il label «Acconsento a ricevere comunicazioni…» appariva renderizzato ALL CAPS in colonna verticale invece di in linea con la checkbox; problema CSS strutturale risolto rendendo `.pf-checkbox` un componente isolato dalle regole del form esistente. Rimossi anche gli style inline ridondanti dal markup HTML. -->
 <!-- v 2026.05.27.06 — F0.25 (sessione 11 del 27/5): form prenotazioni cablato a Edge Function backend Supabase `submit-reservation` (era Formspree mkopjnvq). Modifiche form #prenota: (1) `<form>` perde l'attributo `action` Formspree e i campi nascosti `tipo`+`_subject` (gestione subject lato backend Resend); (2) telefono ora `required` (era opzionale) — decisione sessione 8: mail+cellulare entrambi obbligatori, fallback chiamata se rimbalza mail; (3) hint contatto cambiato da «almeno uno tra telefono ed email» a «email e telefono entrambi obbligatori»; (4) textarea `name="richieste"` rinominato `name="note"` per allineamento backend; (5) aggiunta checkbox `marketing_consent` (i18n key `prenota_f_marketing_consent`); (6) honeypot anti-bot `_hp` nascosto; (7) submit handler riscritto: validazione client-side, fetch JSON a `https://xbksultfskvzgncncada.supabase.co/functions/v1/submit-reservation`, gestione response 201/400/429/altro, schermata thankyou `#prenota-thankyou` mostrata su successo. -->
@@ -642,7 +643,7 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.30.01</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.30.02</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>
@@ -740,6 +741,7 @@
   var STATUS_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/reservations-status';
   var resOnlineOpen = true;
   var resClosures = [];
+  var resOpenings = [];
 
   function closuresForDate(dateStr) {
     var set = { pranzo: false, cena: false };
@@ -749,6 +751,33 @@
       else if (c.service === 'pranzo') { set.pranzo = true; }
       else if (c.service === 'cena') { set.cena = true; }
     });
+    return set;
+  }
+
+  function openingsForDate(dateStr) {
+    var set = { pranzo: false, cena: false };
+    resOpenings.forEach(function (o) {
+      if (o.date !== dateStr) return;
+      if (o.service === 'tutto') { set.pranzo = true; set.cena = true; }
+      else if (o.service === 'pranzo') { set.pranzo = true; }
+      else if (o.service === 'cena') { set.cena = true; }
+    });
+    return set;
+  }
+
+  // Servizi disponibili per una data = (schedule normale ∪ aperture straordinarie) − chiusure.
+  function servicesForDate(dateStr) {
+    var d = new Date(dateStr + 'T00:00:00');
+    var base = (typeof window.getServicesByDay === 'function')
+      ? window.getServicesByDay(d.getDay())
+      : ['pranzo', 'cena'];
+    var set = { pranzo: base.indexOf('pranzo') !== -1, cena: base.indexOf('cena') !== -1 };
+    var op = openingsForDate(dateStr);
+    if (op.pranzo) set.pranzo = true;
+    if (op.cena) set.cena = true;
+    var cl = closuresForDate(dateStr);
+    if (cl.pranzo) set.pranzo = false;
+    if (cl.cena) set.cena = false;
     return set;
   }
 
@@ -771,6 +800,7 @@
       .then(function (d) {
         resOnlineOpen = !(d && d.online_open === false);
         resClosures = (d && d.closures) || [];
+        resOpenings = (d && d.openings) || [];
         applyReservationsStatus();
         updateOrarioSlots();
       })
@@ -788,17 +818,12 @@
       if (dateMsg) dateMsg.style.display = 'none';
       return;
     }
-    var d = new Date(dataInput.value);
-    var jsDay = d.getDay();
-    var services = (typeof window.getServicesByDay === 'function')
-      ? window.getServicesByDay(jsDay)
-      : ['pranzo', 'cena'];
-    var closed = closuresForDate(dataInput.value);
+    var svc = servicesForDate(dataInput.value);
     var anyOpen = false;
     optgroups.forEach(function (g) {
       var key = g.getAttribute('data-i18n-label') || '';
       var s = key.indexOf('cena') !== -1 ? 'cena' : 'pranzo';
-      var visible = services.indexOf(s) !== -1 && !closed[s];
+      var visible = !!svc[s];
       g.style.display = visible ? '' : 'none';
       if (visible) anyOpen = true;
     });
@@ -809,10 +834,10 @@
         orarioSelect.value = '';
       }
     }
-    // Messaggio "non disponibile per questa data" solo se il giorno sarebbe
-    // aperto ma è stato chiuso dall'admin (non per chiusura settimanale normale).
+    // Nessuno slot disponibile per la data scelta (giorno chiuso o non aperto in
+    // via straordinaria): mostra il messaggio con il telefono.
     if (dateMsg) {
-      dateMsg.style.display = (services.length > 0 && !anyOpen) ? '' : 'none';
+      dateMsg.style.display = anyOpen ? 'none' : '';
     }
   }
   document.getElementById('p-data').addEventListener('change', updateOrarioSlots);
@@ -1000,6 +1025,6 @@
 <script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
 <script defer src="/cookieconsent-config.js"></script>
 
-<!-- v 2026.05.30.01 -->
+<!-- v 2026.05.30.02 -->
 </body>
 </html>

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.05.30.01 — Blocco prenotazioni online (sessione 13 del 30/5): il form #prenota legge lo stato da Edge Function reservations-status all'apertura. (1) Se le prenotazioni online sono globalmente CHIUSE → il form è nascosto e si mostra il banner #prenota-closed; (2) per ogni data scelta, gli optgroup Pranzo/Cena chiusi dall'admin vengono nascosti (oltre al filtro getServicesByDay esistente); (3) se il giorno sarebbe aperto ma è chiuso del tutto dall'admin → messaggio #p-date-closed; (4) il submit gestisce ora anche la risposta 403 (chiuso) con messaggio dedicato. Lo stato è gestito da menu-admin.html (interruttore + calendario chiusure) e applicato server-side da submit-reservation v7. Nuove chiavi i18n: prenota_closed_title, prenota_closed_body, prenota_date_closed, prenota_error_closed. -->
 <!-- v 2026.05.27.07 — F0.25 fix CSS marketing checkbox (sessione 11 del 27/5, post go-live commit iniziali): aggiunte regole CSS specifiche `.pf-checkbox` e `.pf-checkbox label` nel `<style>` del file per override delle proprietà `text-transform: uppercase`, `letter-spacing: 0.2em`, `display: block`, `font-family: Jost` ereditate da `.pf-group label`. Andrea ha verificato in incognito post-deploy del primo commit (v 2026.05.27.06) che il label «Acconsento a ricevere comunicazioni…» appariva renderizzato ALL CAPS in colonna verticale invece di in linea con la checkbox; problema CSS strutturale risolto rendendo `.pf-checkbox` un componente isolato dalle regole del form esistente. Rimossi anche gli style inline ridondanti dal markup HTML. -->
 <!-- v 2026.05.27.06 — F0.25 (sessione 11 del 27/5): form prenotazioni cablato a Edge Function backend Supabase `submit-reservation` (era Formspree mkopjnvq). Modifiche form #prenota: (1) `<form>` perde l'attributo `action` Formspree e i campi nascosti `tipo`+`_subject` (gestione subject lato backend Resend); (2) telefono ora `required` (era opzionale) — decisione sessione 8: mail+cellulare entrambi obbligatori, fallback chiamata se rimbalza mail; (3) hint contatto cambiato da «almeno uno tra telefono ed email» a «email e telefono entrambi obbligatori»; (4) textarea `name="richieste"` rinominato `name="note"` per allineamento backend; (5) aggiunta checkbox `marketing_consent` (i18n key `prenota_f_marketing_consent`); (6) honeypot anti-bot `_hp` nascosto; (7) submit handler riscritto: validazione client-side, fetch JSON a `https://xbksultfskvzgncncada.supabase.co/functions/v1/submit-reservation`, gestione response 201/400/429/altro, schermata thankyou `#prenota-thankyou` mostrata su successo. -->
 <!-- v 2026.05.27.05 — SYNC archivio↔live sessione 5 del 27/5: sovrascritto archivio col raw del live (santamonicagenova-a11y/SantaWeb branch main) per recuperare gli 8 commit del 26/5 sessione 1 (form prenotazioni esteso: <select id="p-orario"> con optgroup Pranzo/Cena, persone 1-6, reset orario al cambio data via getServicesByDay, loop data-i18n-label in applyLang). L'archivio era fermo a v 2026.05.22.02 strutturalmente ma il LIVE aveva ancora lo stesso header v 2026.05.22.02 col contenuto già esteso — drift silenzioso (stesso header, contenuto diverso) risolto. Backup pre-sync strutturale in _pre-sync-2026-05-27/index.html.PRE-SYNC. -->
@@ -497,6 +498,7 @@
                 </select>
               </div>
             </div>
+            <p class="pf-hint" id="p-date-closed" style="display:none;color:#9e4a2a;" data-i18n="prenota_date_closed">Per questa data non accettiamo prenotazioni online. Per la disponibilit&agrave; dell'ultimo minuto puoi chiamarci allo 010 5533155.</p>
             <div class="pf-group">
               <label for="p-persone" data-i18n="prenota_f_persone">Numero di persone</label>
               <select id="p-persone" name="persone" required>
@@ -529,6 +531,12 @@
             </div>
             <div class="pf-status" id="prenota-status"></div>
           </form>
+          <!-- Banner mostrato quando le prenotazioni online sono globalmente chiuse (sostituisce il form) -->
+          <div id="prenota-closed" style="display:none;text-align:center;padding:2rem 0;">
+            <div style="font-size:2.5rem;margin-bottom:1rem;">&#x1F4DE;</div>
+            <h3 data-i18n="prenota_closed_title" style="margin:0 0 1rem;font-weight:normal;">Prenotazioni online momentaneamente chiuse</h3>
+            <p data-i18n="prenota_closed_body" style="font-size:1rem;line-height:1.6;color:#555;">Al momento non accettiamo prenotazioni online. Per la disponibilit&agrave; dell'ultimo minuto puoi chiamarci allo 010 5533155.</p>
+          </div>
           <!-- Schermata thankyou (nascosta finché il form non viene submittato con successo) -->
           <div id="prenota-thankyou" style="display:none;text-align:center;padding:2rem 0;">
             <div style="font-size:3rem;margin-bottom:1rem;">&#x2709;&#xFE0F;</div>
@@ -727,13 +735,57 @@
   var pBtn = document.getElementById('prenota-btn');
   var pStatus = document.getElementById('prenota-status');
 
+  // Stato prenotazioni online (interruttore globale + chiusure per giorno/servizio).
+  // Gestito da menu-admin; letto qui via Edge Function reservations-status.
+  var STATUS_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/reservations-status';
+  var resOnlineOpen = true;
+  var resClosures = [];
+
+  function closuresForDate(dateStr) {
+    var set = { pranzo: false, cena: false };
+    resClosures.forEach(function (c) {
+      if (c.date !== dateStr) return;
+      if (c.service === 'tutto') { set.pranzo = true; set.cena = true; }
+      else if (c.service === 'pranzo') { set.pranzo = true; }
+      else if (c.service === 'cena') { set.cena = true; }
+    });
+    return set;
+  }
+
+  function applyReservationsStatus() {
+    var closedBanner = document.getElementById('prenota-closed');
+    var thankyou = document.getElementById('prenota-thankyou');
+    var thankyouOpen = thankyou && thankyou.style.display !== 'none';
+    if (!resOnlineOpen) {
+      if (pForm) pForm.style.display = 'none';
+      if (closedBanner) closedBanner.style.display = '';
+    } else {
+      if (closedBanner) closedBanner.style.display = 'none';
+      if (pForm && !thankyouOpen) pForm.style.display = '';
+    }
+  }
+
+  function loadReservationsStatus() {
+    fetch(STATUS_URL, { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        resOnlineOpen = !(d && d.online_open === false);
+        resClosures = (d && d.closures) || [];
+        applyReservationsStatus();
+        updateOrarioSlots();
+      })
+      .catch(function () { /* fail-open: il form resta usabile, il blocco è comunque server-side */ });
+  }
+
   function updateOrarioSlots() {
     var dataInput = document.getElementById('p-data');
     var orarioSelect = document.getElementById('p-orario');
     if (!dataInput || !orarioSelect) return;
     var optgroups = orarioSelect.querySelectorAll('optgroup');
+    var dateMsg = document.getElementById('p-date-closed');
     if (!dataInput.value) {
       optgroups.forEach(function (g) { g.style.display = ''; });
+      if (dateMsg) dateMsg.style.display = 'none';
       return;
     }
     var d = new Date(dataInput.value);
@@ -741,10 +793,14 @@
     var services = (typeof window.getServicesByDay === 'function')
       ? window.getServicesByDay(jsDay)
       : ['pranzo', 'cena'];
+    var closed = closuresForDate(dataInput.value);
+    var anyOpen = false;
     optgroups.forEach(function (g) {
       var key = g.getAttribute('data-i18n-label') || '';
       var s = key.indexOf('cena') !== -1 ? 'cena' : 'pranzo';
-      g.style.display = services.indexOf(s) !== -1 ? '' : 'none';
+      var visible = services.indexOf(s) !== -1 && !closed[s];
+      g.style.display = visible ? '' : 'none';
+      if (visible) anyOpen = true;
     });
     var currentVal = orarioSelect.value;
     if (currentVal) {
@@ -753,8 +809,14 @@
         orarioSelect.value = '';
       }
     }
+    // Messaggio "non disponibile per questa data" solo se il giorno sarebbe
+    // aperto ma è stato chiuso dall'admin (non per chiusura settimanale normale).
+    if (dateMsg) {
+      dateMsg.style.display = (services.length > 0 && !anyOpen) ? '' : 'none';
+    }
   }
   document.getElementById('p-data').addEventListener('change', updateOrarioSlots);
+  loadReservationsStatus();
   // Endpoint backend prenotazioni (Edge Function Supabase, Fase 1 carta-garanzia)
   var EDGE_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/submit-reservation';
 
@@ -804,6 +866,14 @@
         pStatus.textContent = (T[currentLang] && T[currentLang].prenota_error_rate_limit) || 'Troppe richieste in poco tempo. Riprova tra un\'ora o chiamaci al 010 5533155.';
         pStatus.className = 'pf-status error';
         pBtn.disabled = false;
+      } else if (res.status === 403) {
+        var ebClosed = {};
+        try { ebClosed = await res.json(); } catch (_) {}
+        pStatus.textContent = ebClosed.error || (T[currentLang] && T[currentLang].prenota_error_closed) || 'Per questa data non accettiamo prenotazioni online. Chiamaci al 010 5533155.';
+        pStatus.className = 'pf-status error';
+        pBtn.disabled = false;
+        // Aggiorna lo stato per riflettere eventuali chiusure appena impostate
+        loadReservationsStatus();
       } else if (res.status === 400) {
         var errBody = {};
         try { errBody = await res.json(); } catch (_) {}

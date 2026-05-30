@@ -1,13 +1,13 @@
 {
   "_meta": {
-    "version": "v 2026.05.27.06",
+    "version": "v 2026.05.30.01",
     "languages": [
       "it",
       "en",
       "fr"
     ],
-    "last_updated": "2026-05-27",
-    "note": "v 2026.05.27.06 (sessione 11 del 27/5 — F0.25 cablaggio form prenotazioni a Edge Function Supabase): aggiornata chiave 'prenota_contatto_hint' (era «almeno uno tra telefono ed email» → ora «entrambi obbligatori») in tutte e 3 le lingue per riflettere il nuovo requisito backend (telefono nel form ora `required`, decisione sessione 8 strategia errori Resend). Aggiunte 6 chiavi nuove in IT/EN/FR: 'prenota_f_marketing_consent' (label checkbox marketing opt-in), 'prenota_thankyou_title' + 'prenota_thankyou_body' (schermata di ringraziamento post-submit OK), 'prenota_error_validation' (errore 400 backend), 'prenota_error_rate_limit' (errore 429), 'prenota_error_generic' (errore connessione/500). Tutte in Unicode diretto per coerenza con la lezione del bug i18n FR setAttribute (memoria persistente). (Storico: v 2026.05.27.05 SYNC archivio↔live + chiavi optgroup orario; v 2026.05.26.01 fix FR Unicode 80 stringhe; v 2026.05.22.01 refactor FONTE UNICA orari.)"
+    "last_updated": "2026-05-30",
+    "note": "v 2026.05.30.01 (sessione 13 del 30/5 — blocco prenotazioni online): aggiunte 4 chiavi in IT/EN/FR: 'prenota_closed_title' + 'prenota_closed_body' (banner mostrato quando le prenotazioni online sono globalmente chiuse), 'prenota_date_closed' (messaggio sotto l'orario quando il giorno scelto è chiuso dall'admin), 'prenota_error_closed' (risposta 403 dal backend). Tutte in Unicode diretto. STORICO: v 2026.05.27.06 (sessione 11 del 27/5 — F0.25 cablaggio form prenotazioni a Edge Function Supabase): aggiornata chiave 'prenota_contatto_hint' (era «almeno uno tra telefono ed email» → ora «entrambi obbligatori») in tutte e 3 le lingue per riflettere il nuovo requisito backend (telefono nel form ora `required`, decisione sessione 8 strategia errori Resend). Aggiunte 6 chiavi nuove in IT/EN/FR: 'prenota_f_marketing_consent' (label checkbox marketing opt-in), 'prenota_thankyou_title' + 'prenota_thankyou_body' (schermata di ringraziamento post-submit OK), 'prenota_error_validation' (errore 400 backend), 'prenota_error_rate_limit' (errore 429), 'prenota_error_generic' (errore connessione/500). Tutte in Unicode diretto per coerenza con la lezione del bug i18n FR setAttribute (memoria persistente). (Storico: v 2026.05.27.05 SYNC archivio↔live + chiavi optgroup orario; v 2026.05.26.01 fix FR Unicode 80 stringhe; v 2026.05.22.01 refactor FONTE UNICA orari.)"
   },
   "it": {
     "page_title": "Ristorante Santamonica Genova | Pesce Fresco Gourmet sul Lungomare",
@@ -65,6 +65,10 @@
     "prenota_error_validation": "Verifica i dati inseriti. Tutti i campi obbligatori devono essere compilati.",
     "prenota_error_rate_limit": "Troppe richieste in poco tempo. Riprova tra un'ora oppure chiamaci al 010 5533155.",
     "prenota_error_generic": "Errore di connessione. Riprova oppure chiamaci direttamente al 010 5533155.",
+    "prenota_closed_title": "Prenotazioni online momentaneamente chiuse",
+    "prenota_closed_body": "Al momento non accettiamo prenotazioni online. Per la disponibilità dell'ultimo minuto puoi chiamarci allo 010 5533155.",
+    "prenota_date_closed": "Per questa data non accettiamo prenotazioni online. Per la disponibilità dell'ultimo minuto puoi chiamarci allo 010 5533155.",
+    "prenota_error_closed": "Per questa data non accettiamo prenotazioni online. Chiamaci allo 010 5533155.",
     "prenota_f_data": "Data desiderata",
     "prenota_f_orario": "Orario",
     "prenota_f_orario_sel": "Seleziona",
@@ -155,6 +159,10 @@
     "prenota_error_validation": "Please check the data you entered. All required fields must be filled in.",
     "prenota_error_rate_limit": "Too many requests in a short time. Try again in an hour or call us at +39 010 5533155.",
     "prenota_error_generic": "Connection error. Try again or call us directly at +39 010 5533155.",
+    "prenota_closed_title": "Online bookings temporarily closed",
+    "prenota_closed_body": "We are not accepting online bookings at the moment. For last-minute availability, please call us at +39 010 5533155.",
+    "prenota_date_closed": "We are not accepting online bookings for this date. For last-minute availability, please call us at +39 010 5533155.",
+    "prenota_error_closed": "We are not accepting online bookings for this date. Please call us at +39 010 5533155.",
     "prenota_f_data": "Preferred date",
     "prenota_f_orario": "Time",
     "prenota_f_orario_sel": "Select",
@@ -245,6 +253,10 @@
     "prenota_error_validation": "Vérifiez les données saisies. Tous les champs obligatoires doivent être remplis.",
     "prenota_error_rate_limit": "Trop de demandes en peu de temps. Réessayez dans une heure ou appelez-nous au +39 010 5533155.",
     "prenota_error_generic": "Erreur de connexion. Réessayez ou appelez-nous directement au +39 010 5533155.",
+    "prenota_closed_title": "Réservations en ligne momentanément fermées",
+    "prenota_closed_body": "Nous n'acceptons pas de réservations en ligne pour le moment. Pour les disponibilités de dernière minute, appelez-nous au +39 010 5533155.",
+    "prenota_date_closed": "Nous n'acceptons pas de réservations en ligne pour cette date. Pour les disponibilités de dernière minute, appelez-nous au +39 010 5533155.",
+    "prenota_error_closed": "Nous n'acceptons pas de réservations en ligne pour cette date. Appelez-nous au +39 010 5533155.",
     "prenota_f_data": "Date souhaitée",
     "prenota_f_orario": "Heure",
     "prenota_f_orario_sel": "Sélectionner",

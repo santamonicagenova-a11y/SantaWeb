@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- versione v 2026.05.30.01 — Sessione 13 (30/5): nuova sezione "Prenotazioni online" (voce dropdown "🔒 Prenotazioni online" → #prenotazioni-section). Interruttore globale aperte/chiuse + calendario chiusure per giorno e servizio (pranzo/cena/tutto) con lista rimovibile. Legge lo stato da Edge Function reservations-status e scrive via set-reservations-config, autenticando col token GitHub gh_token già usato per la pubblicazione (nessuna password nuova). Blocco effettivo lato server in submit-reservation v7; form del sito (index.html v 2026.05.30.01) si disabilita/filtra slot di conseguenza. -->
 <!-- versione v 2026.05.17.03 — F0.6bis: FOTO_BASE migrata da GH Pages → CF Pages (santamonica-web.pages.dev) -->
 <!-- v 2026.05.17.02 — F0.6: rimosso ref admin-templates.js legacy + footer versione allineato + commento HTML -->
 <!-- v 2026.05.17.01 — F0.4: rimosse lingue DE + ES dal dropdown preview -->
@@ -92,6 +93,7 @@
         <a onclick="apriGestoreFotoSito()">🏛️ Foto sito</a>
         <a onclick="apriSezioneVini()">🍷 Menù Vini</a>
         <a onclick="apriSezioneDocGenerico()">📄 Documento generico</a>
+        <a onclick="apriSezionePrenotazioni()">🔒 Prenotazioni online</a>
       </div>
     </div>
     <button class="btn btn-load" onclick="document.getElementById('file-input').click()">↑ Carica da file</button>
@@ -198,12 +200,191 @@
   </div>
 </div>
 
+<div id="prenotazioni-section" style="max-width:700px;margin:1.5rem auto;padding:0 1rem;display:none;">
+  <div class="fs">
+    <div class="fs-head">Prenotazioni online — Interruttore &amp; chiusure</div>
+    <div class="fs-body">
+      <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">
+        Da qui controlli le prenotazioni dal sito. L'<strong>interruttore generale</strong> chiude tutto;
+        il <strong>calendario</strong> chiude un singolo giorno (pranzo, cena o tutto). Quando &egrave; chiuso,
+        il form del sito si disabilita e <strong>non arriva nessuna mail di prenotazione</strong>.
+        Le modifiche usano il tuo token GitHub (lo stesso della pubblicazione).
+      </p>
+
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.4rem;padding-bottom:1.2rem;border-bottom:1px solid var(--rule);">
+        <span class="opt-lbl" style="margin:0;">Stato prenotazioni online</span>
+        <strong id="pren-stato-label" style="font-size:.9rem;">&hellip;</strong>
+        <button class="btn btn-publish" id="pren-toggle-btn" onclick="togglePrenOpen()" style="margin-left:auto;">&hellip;</button>
+      </div>
+
+      <div class="sub" style="margin-top:0;">Chiudi un giorno specifico</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
+        <div>
+          <span class="opt-lbl">Data</span>
+          <input type="date" id="pren-closure-date" style="width:auto;" />
+        </div>
+        <div>
+          <span class="opt-lbl">Servizio</span>
+          <select id="pren-closure-service" style="padding:.3rem .5rem;border:1px solid var(--rule);background:var(--cream);font-family:Jost,sans-serif;font-size:.82rem;color:var(--ink);">
+            <option value="tutto">Tutto il giorno</option>
+            <option value="pranzo">Solo pranzo</option>
+            <option value="cena">Solo cena</option>
+          </select>
+        </div>
+        <button class="btn btn-publish" onclick="addPrenClosure()">+ Aggiungi chiusura</button>
+      </div>
+
+      <div class="sub">Chiusure attive (da oggi in poi)</div>
+      <div id="pren-closures-list" style="font-size:.85rem;">&hellip;</div>
+
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
+        <button class="btn btn-load" onclick="chiudiSezionePrenotazioni()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
+        <span id="pren-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast">✓ Scaricato!</div>
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js"></script>
 <script src="admin-core.js"></script>
 <script>
+// ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
+// Stato letto da Edge Function reservations-status; modifiche via
+// set-reservations-config, autenticate col token GitHub (gh_token) gia'
+// usato per la pubblicazione. Vedi progetto-sito CLAUDE.md sessione 13.
+var PREN_STATUS_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/reservations-status';
+var PREN_CONFIG_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/set-reservations-config';
+var prenState = { online_open: true, closures: [] };
+
+function apriSezionePrenotazioni() {
+  document.getElementById('carica-menu').classList.remove('open');
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('wrap').classList.remove('on');
+  document.getElementById('prenotazioni-section').style.display = 'block';
+  var di = document.getElementById('pren-closure-date');
+  if (di) di.min = new Date().toISOString().slice(0, 10);
+  loadPrenStatus();
+}
+
+function chiudiSezionePrenotazioni() {
+  document.getElementById('prenotazioni-section').style.display = 'none';
+  if (!document.getElementById('wrap').classList.contains('on'))
+    document.getElementById('intro').style.display = '';
+}
+
+function _prenSetStatus(msg, isErr) {
+  var el = document.getElementById('pren-status');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
+}
+
+function _prenServiceLabel(s) {
+  return s === 'tutto' ? 'Tutto il giorno' : (s === 'pranzo' ? 'Solo pranzo' : 'Solo cena');
+}
+
+function _prenFormatDate(d) {
+  var p = (d || '').split('-');
+  return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : d;
+}
+
+function renderPrenUI() {
+  var lbl = document.getElementById('pren-stato-label');
+  var btn = document.getElementById('pren-toggle-btn');
+  if (lbl) {
+    lbl.textContent = prenState.online_open ? 'APERTE' : 'CHIUSE';
+    lbl.style.color = prenState.online_open ? '#2d6a4f' : 'var(--rust)';
+  }
+  if (btn) btn.textContent = prenState.online_open ? 'Chiudi tutte le prenotazioni' : 'Riapri le prenotazioni';
+  var list = document.getElementById('pren-closures-list');
+  if (!list) return;
+  if (!prenState.closures.length) {
+    list.innerHTML = '<span style="color:var(--stone);">Nessuna chiusura attiva.</span>';
+    return;
+  }
+  list.innerHTML = '';
+  prenState.closures.forEach(function (c) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:.6rem;padding:.35rem 0;border-bottom:1px dotted var(--rule);';
+    var txt = document.createElement('span');
+    txt.textContent = _prenFormatDate(c.date) + ' — ' + _prenServiceLabel(c.service);
+    var rm = document.createElement('button');
+    rm.className = 'btn btn-load';
+    rm.style.cssText = 'border:1px solid var(--rust);color:var(--rust);padding:.25rem .8rem;font-size:.62rem;margin-left:auto;';
+    rm.textContent = '✕ Rimuovi';
+    rm.onclick = function () { removePrenClosure(c.date, c.service); };
+    row.appendChild(txt);
+    row.appendChild(rm);
+    list.appendChild(row);
+  });
+}
+
+function loadPrenStatus() {
+  _prenSetStatus('Caricamento stato…');
+  fetch(PREN_STATUS_URL, { cache: 'no-store' })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      prenState.online_open = !(d && d.online_open === false);
+      prenState.closures = (d && d.closures) || [];
+      renderPrenUI();
+      _prenSetStatus('');
+    })
+    .catch(function () { _prenSetStatus('Errore nel caricamento dello stato.', true); });
+}
+
+function _prenGhToken() {
+  var t = localStorage.getItem('gh_token') || '';
+  if (!t) {
+    t = (window.prompt('Incolla il tuo token GitHub (lo stesso della pubblicazione):') || '').trim();
+    if (t) localStorage.setItem('gh_token', t);
+  }
+  return t;
+}
+
+function _prenConfig(payload, okMsg) {
+  var token = _prenGhToken();
+  if (!token) { _prenSetStatus('Operazione annullata: serve il token GitHub.', true); return; }
+  payload.github_token = token;
+  _prenSetStatus('Salvataggio…');
+  fetch(PREN_CONFIG_URL, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+  })
+    .then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); })
+    .then(function (res) {
+      if (res.status === 200 && res.body && res.body.ok) {
+        prenState.online_open = !(res.body.online_open === false);
+        prenState.closures = res.body.closures || [];
+        renderPrenUI();
+        _prenSetStatus(okMsg || 'Fatto.');
+      } else if (res.status === 401) {
+        _prenSetStatus('Token GitHub non valido o senza permessi. Reimpostalo col tasto 🔑.', true);
+      } else {
+        _prenSetStatus((res.body && res.body.error) || 'Errore.', true);
+      }
+    })
+    .catch(function () { _prenSetStatus('Errore di connessione.', true); });
+}
+
+function togglePrenOpen() {
+  var newOpen = !prenState.online_open;
+  if (!newOpen && !window.confirm('Chiudere TUTTE le prenotazioni online? Il form del sito si disabiliterà finché non riapri.')) return;
+  _prenConfig({ action: 'set_open', open: newOpen }, newOpen ? 'Prenotazioni riaperte.' : 'Prenotazioni chiuse.');
+}
+
+function addPrenClosure() {
+  var date = document.getElementById('pren-closure-date').value;
+  var service = document.getElementById('pren-closure-service').value;
+  if (!date) { _prenSetStatus('Scegli una data.', true); return; }
+  _prenConfig({ action: 'add_closure', date: date, service: service }, 'Chiusura aggiunta.');
+}
+
+function removePrenClosure(date, service) {
+  _prenConfig({ action: 'remove_closure', date: date, service: service }, 'Chiusura rimossa.');
+}
+
 // ══ FOTO CUCINA ══════════════════════════════════════════
 var fotoDati = [null,null,null,null,null,null];
 var FOTO_BASE = 'https://santamonica-web.pages.dev/';

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- versione v 2026.05.30.03 — Sessione 13d (30/5): nella sezione "Prenotazioni online" aggiunti due blocchi "Chiudi un singolo orario" e "Apri un singolo orario extra" (data + tendina orari + lista rimovibile). Stato slot_closures/slot_openings letto da reservations-status v3 e scritto via set-reservations-config v3 (azioni add/remove_slot_closure e add/remove_slot_opening). Gestione conflitti speculare a quella servizio: se chiudi un orario già aperto extra (o viceversa) → avviso + conferma + rimozione dell'opposto. Blocco server-side in submit-reservation v10. -->
 <!-- versione v 2026.05.30.02 — Sessione 13b (30/5): nella sezione "Prenotazioni online" aggiunto il blocco "Aperture straordinarie" (calendario + servizio + lista rimovibile, per aprire un giorno/servizio normalmente chiuso). Gestione conflitti: se aggiungi una chiusura in conflitto con un'apertura (o viceversa), avviso e chiedo conferma; se confermi, rimuovo l'elemento in conflitto e procedo. Refactor _prenConfig in _prenFetch/_prenApply per concatenare le azioni. Backend: reservation_openings + reservations-status v2 + set-reservations-config v2 + submit-reservation v9. -->
 <!-- versione v 2026.05.30.01 — Sessione 13 (30/5): nuova sezione "Prenotazioni online" (voce dropdown "🔒 Prenotazioni online" → #prenotazioni-section). Interruttore globale aperte/chiuse + calendario chiusure per giorno e servizio (pranzo/cena/tutto) con lista rimovibile. Legge lo stato da Edge Function reservations-status e scrive via set-reservations-config, autenticando col token GitHub gh_token già usato per la pubblicazione (nessuna password nuova). Blocco effettivo lato server in submit-reservation v7; form del sito (index.html v 2026.05.30.01) si disabilita/filtra slot di conseguenza. -->
 <!-- versione v 2026.05.17.03 — F0.6bis: FOTO_BASE migrata da GH Pages → CF Pages (santamonica-web.pages.dev) -->
@@ -257,6 +258,50 @@
       <div class="sub">Aperture attive (da oggi in poi)</div>
       <div id="pren-openings-list" style="font-size:.85rem;">&hellip;</div>
 
+      <div class="sub" style="margin-top:1.4rem;">Chiudi un singolo orario (lasciando aperti gli altri)</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
+        <div>
+          <span class="opt-lbl">Data</span>
+          <input type="date" id="pren-slot-closure-date" style="width:auto;" />
+        </div>
+        <div>
+          <span class="opt-lbl">Orario</span>
+          <select id="pren-slot-closure-time" style="padding:.3rem .5rem;border:1px solid var(--rule);background:var(--cream);font-family:Jost,sans-serif;font-size:.82rem;color:var(--ink);">
+            <optgroup label="Pranzo">
+              <option value="12:30">12:30</option><option value="13:00">13:00</option><option value="13:30">13:30</option><option value="14:00">14:00</option>
+            </optgroup>
+            <optgroup label="Cena">
+              <option value="19:30">19:30</option><option value="20:00">20:00</option><option value="20:30">20:30</option><option value="21:00">21:00</option><option value="21:30">21:30</option><option value="22:00">22:00</option>
+            </optgroup>
+          </select>
+        </div>
+        <button class="btn btn-publish" onclick="addPrenSlotClosure()">+ Chiudi orario</button>
+      </div>
+      <div class="sub">Orari chiusi (da oggi in poi)</div>
+      <div id="pren-slot-closures-list" style="font-size:.85rem;">&hellip;</div>
+
+      <div class="sub" style="margin-top:1.4rem;">Apri un singolo orario extra (fuori dagli orari normali)</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
+        <div>
+          <span class="opt-lbl">Data</span>
+          <input type="date" id="pren-slot-opening-date" style="width:auto;" />
+        </div>
+        <div>
+          <span class="opt-lbl">Orario</span>
+          <select id="pren-slot-opening-time" style="padding:.3rem .5rem;border:1px solid var(--rule);background:var(--cream);font-family:Jost,sans-serif;font-size:.82rem;color:var(--ink);">
+            <optgroup label="Pranzo">
+              <option value="12:30">12:30</option><option value="13:00">13:00</option><option value="13:30">13:30</option><option value="14:00">14:00</option>
+            </optgroup>
+            <optgroup label="Cena">
+              <option value="19:30">19:30</option><option value="20:00">20:00</option><option value="20:30">20:30</option><option value="21:00">21:00</option><option value="21:30">21:30</option><option value="22:00">22:00</option>
+            </optgroup>
+          </select>
+        </div>
+        <button class="btn btn-publish" onclick="addPrenSlotOpening()" style="background:#2d6a4f;">+ Apri orario</button>
+      </div>
+      <div class="sub">Orari aperti extra (da oggi in poi)</div>
+      <div id="pren-slot-openings-list" style="font-size:.85rem;">&hellip;</div>
+
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
         <button class="btn btn-load" onclick="chiudiSezionePrenotazioni()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
         <span id="pren-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
@@ -277,7 +322,7 @@
 // usato per la pubblicazione. Vedi progetto-sito CLAUDE.md sessione 13.
 var PREN_STATUS_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/reservations-status';
 var PREN_CONFIG_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/set-reservations-config';
-var prenState = { online_open: true, closures: [], openings: [] };
+var prenState = { online_open: true, closures: [], openings: [], slot_closures: [], slot_openings: [] };
 
 function apriSezionePrenotazioni() {
   document.getElementById('carica-menu').classList.remove('open');
@@ -287,8 +332,12 @@ function apriSezionePrenotazioni() {
   var today = new Date().toISOString().slice(0, 10);
   var dc = document.getElementById('pren-closure-date');
   var doo = document.getElementById('pren-opening-date');
+  var dsc = document.getElementById('pren-slot-closure-date');
+  var dso = document.getElementById('pren-slot-opening-date');
   if (dc) dc.min = today;
   if (doo) doo.min = today;
+  if (dsc) dsc.min = today;
+  if (dso) dso.min = today;
   loadPrenStatus();
 }
 
@@ -338,6 +387,31 @@ function _prenRenderList(elId, items, emptyMsg, borderColor, removeFn) {
   });
 }
 
+// Renderer per le liste a livello di SINGOLO orario (items {date, time}).
+function _prenRenderSlotList(elId, items, emptyMsg, borderColor, removeFn) {
+  var list = document.getElementById(elId);
+  if (!list) return;
+  if (!items.length) {
+    list.innerHTML = '<span style="color:var(--stone);">' + emptyMsg + '</span>';
+    return;
+  }
+  list.innerHTML = '';
+  items.forEach(function (it) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:.6rem;padding:.35rem 0;border-bottom:1px dotted var(--rule);';
+    var txt = document.createElement('span');
+    txt.textContent = _prenFormatDate(it.date) + ' — ore ' + it.time;
+    var rm = document.createElement('button');
+    rm.className = 'btn btn-load';
+    rm.style.cssText = 'border:1px solid ' + borderColor + ';color:' + borderColor + ';padding:.25rem .8rem;font-size:.62rem;margin-left:auto;';
+    rm.textContent = '✕ Rimuovi';
+    rm.onclick = function () { removeFn(it.date, it.time); };
+    row.appendChild(txt);
+    row.appendChild(rm);
+    list.appendChild(row);
+  });
+}
+
 function renderPrenUI() {
   var lbl = document.getElementById('pren-stato-label');
   var btn = document.getElementById('pren-toggle-btn');
@@ -348,6 +422,8 @@ function renderPrenUI() {
   if (btn) btn.textContent = prenState.online_open ? 'Chiudi tutte le prenotazioni' : 'Riapri le prenotazioni';
   _prenRenderList('pren-closures-list', prenState.closures || [], 'Nessuna chiusura attiva.', 'var(--rust)', removePrenClosure);
   _prenRenderList('pren-openings-list', prenState.openings || [], 'Nessuna apertura straordinaria attiva.', '#2d6a4f', removePrenOpening);
+  _prenRenderSlotList('pren-slot-closures-list', prenState.slot_closures || [], 'Nessun orario chiuso singolarmente.', 'var(--rust)', removePrenSlotClosure);
+  _prenRenderSlotList('pren-slot-openings-list', prenState.slot_openings || [], 'Nessun orario aperto extra.', '#2d6a4f', removePrenSlotOpening);
 }
 
 // Conflitto: stessa data, servizio che si sovrappone (uguale, oppure uno dei
@@ -371,6 +447,8 @@ function loadPrenStatus() {
       prenState.online_open = !(d && d.online_open === false);
       prenState.closures = (d && d.closures) || [];
       prenState.openings = (d && d.openings) || [];
+      prenState.slot_closures = (d && d.slot_closures) || [];
+      prenState.slot_openings = (d && d.slot_openings) || [];
       renderPrenUI();
       _prenSetStatus('');
     })
@@ -400,6 +478,8 @@ function _prenApply(res, okMsg) {
     prenState.online_open = !(res.body.online_open === false);
     prenState.closures = res.body.closures || [];
     prenState.openings = res.body.openings || [];
+    prenState.slot_closures = res.body.slot_closures || [];
+    prenState.slot_openings = res.body.slot_openings || [];
     renderPrenUI();
     _prenSetStatus(okMsg || 'Fatto.');
   } else if (res.status === 401) {
@@ -475,6 +555,62 @@ function addPrenOpening() {
 
 function removePrenOpening(date, service) {
   _prenConfig({ action: 'remove_opening', date: date, service: service }, 'Apertura rimossa.');
+}
+
+// ── Chiusure/aperture di SINGOLI orari ──
+// Conflitto = stessa data e stesso orario nella lista opposta.
+function _prenSlotConflicts(items, date, time) {
+  return (items || []).filter(function (it) { return it.date === date && it.time === time; });
+}
+
+// Rimuove in sequenza i conflitti slot (per data+orario), poi esegue l'azione finale.
+function _prenResolveSlotThen(conflicts, removeAction, finalPayload, okMsg) {
+  _prenSetStatus('Salvataggio…');
+  var chain = Promise.resolve();
+  conflicts.forEach(function (c) {
+    chain = chain.then(function () { return _prenFetch({ action: removeAction, date: c.date, time: c.time }); });
+  });
+  chain.then(function () { return _prenFetch(finalPayload); })
+    .then(function (res) { _prenApply(res, okMsg); })
+    .catch(function (e) { _prenErr(e, 'Errore durante la risoluzione del conflitto.'); });
+}
+
+function addPrenSlotClosure() {
+  var date = document.getElementById('pren-slot-closure-date').value;
+  var time = document.getElementById('pren-slot-closure-time').value;
+  if (!date) { _prenSetStatus('Scegli una data.', true); return; }
+  var conflicts = _prenSlotConflicts(prenState.slot_openings, date, time);
+  if (conflicts.length) {
+    if (!window.confirm('Attenzione: per ' + _prenFormatDate(date) + ' alle ' + time + ' c\'è già un\'apertura extra in conflitto con questa chiusura.\n\nVuoi rimuovere l\'apertura e procedere con la chiusura?')) {
+      _prenSetStatus('Operazione annullata (conflitto con un\'apertura).', true); return;
+    }
+    _prenResolveSlotThen(conflicts, 'remove_slot_opening', { action: 'add_slot_closure', date: date, time: time }, 'Orario chiuso (apertura in conflitto rimossa).');
+  } else {
+    _prenConfig({ action: 'add_slot_closure', date: date, time: time }, 'Orario chiuso.');
+  }
+}
+
+function removePrenSlotClosure(date, time) {
+  _prenConfig({ action: 'remove_slot_closure', date: date, time: time }, 'Orario riaperto.');
+}
+
+function addPrenSlotOpening() {
+  var date = document.getElementById('pren-slot-opening-date').value;
+  var time = document.getElementById('pren-slot-opening-time').value;
+  if (!date) { _prenSetStatus('Scegli una data.', true); return; }
+  var conflicts = _prenSlotConflicts(prenState.slot_closures, date, time);
+  if (conflicts.length) {
+    if (!window.confirm('Attenzione: per ' + _prenFormatDate(date) + ' alle ' + time + ' c\'è già una chiusura di quell\'orario in conflitto con questa apertura.\n\nVuoi rimuovere la chiusura e procedere con l\'apertura?')) {
+      _prenSetStatus('Operazione annullata (conflitto con una chiusura).', true); return;
+    }
+    _prenResolveSlotThen(conflicts, 'remove_slot_closure', { action: 'add_slot_opening', date: date, time: time }, 'Orario aperto extra (chiusura in conflitto rimossa).');
+  } else {
+    _prenConfig({ action: 'add_slot_opening', date: date, time: time }, 'Orario aperto extra.');
+  }
+}
+
+function removePrenSlotOpening(date, time) {
+  _prenConfig({ action: 'remove_slot_opening', date: date, time: time }, 'Apertura orario rimossa.');
 }
 
 // ══ FOTO CUCINA ══════════════════════════════════════════
@@ -911,7 +1047,7 @@ async function _eseguiPubblicaFotoSito(token) {
 <script src="admin-templates-shared.js"></script>
 <script src="admin-core.js"></script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.05.30.02</div>
-<!-- v 2026.05.30.02 -->
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.05.30.03</div>
+<!-- v 2026.05.30.03 -->
 </body>
 </html>

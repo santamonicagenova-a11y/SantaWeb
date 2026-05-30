@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.05.30.03 — Chiusura/apertura di SINGOLI orari (sessione 13d del 30/5): oltre ai servizi (pranzo/cena/tutto) ora si possono chiudere o aprire singoli slot orario. Il form legge slot_closures/slot_openings da reservations-status; updateOrarioSlots nasconde le <option> chiuse e mostra quelle aperte in via straordinaria (visibile = slotOpen || (servizio disponibile && !slotClosed)). Blocco server-side speculare in submit-reservation v10. -->
 <!-- v 2026.05.30.02 — Aperture straordinarie (sessione 13b del 30/5): il form considera anche le aperture straordinarie lette da reservations-status (campo openings). Nuove funzioni openingsForDate() e servicesForDate() = (schedule normale orari.js ∪ aperture) − chiusure; updateOrarioSlots usa servicesForDate per mostrare/nascondere gli optgroup. Footer/commento finale allineati a v 2026.05.30.02. NB: il calendario colorato lato cliente (aperture/chiusure in 2 colori) è una possibile evoluzione separata non ancora implementata. -->
 <!-- v 2026.05.30.01 — Blocco prenotazioni online (sessione 13 del 30/5): il form #prenota legge lo stato da Edge Function reservations-status all'apertura. (1) Se le prenotazioni online sono globalmente CHIUSE → il form è nascosto e si mostra il banner #prenota-closed; (2) per ogni data scelta, gli optgroup Pranzo/Cena chiusi dall'admin vengono nascosti (oltre al filtro getServicesByDay esistente); (3) se il giorno sarebbe aperto ma è chiuso del tutto dall'admin → messaggio #p-date-closed; (4) il submit gestisce ora anche la risposta 403 (chiuso) con messaggio dedicato. Lo stato è gestito da menu-admin.html (interruttore + calendario chiusure) e applicato server-side da submit-reservation v7. Nuove chiavi i18n: prenota_closed_title, prenota_closed_body, prenota_date_closed, prenota_error_closed. -->
 <!-- v 2026.05.27.07 — F0.25 fix CSS marketing checkbox (sessione 11 del 27/5, post go-live commit iniziali): aggiunte regole CSS specifiche `.pf-checkbox` e `.pf-checkbox label` nel `<style>` del file per override delle proprietà `text-transform: uppercase`, `letter-spacing: 0.2em`, `display: block`, `font-family: Jost` ereditate da `.pf-group label`. Andrea ha verificato in incognito post-deploy del primo commit (v 2026.05.27.06) che il label «Acconsento a ricevere comunicazioni…» appariva renderizzato ALL CAPS in colonna verticale invece di in linea con la checkbox; problema CSS strutturale risolto rendendo `.pf-checkbox` un componente isolato dalle regole del form esistente. Rimossi anche gli style inline ridondanti dal markup HTML. -->
@@ -643,7 +644,7 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.30.02</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.30.03</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>
@@ -742,6 +743,15 @@
   var resOnlineOpen = true;
   var resClosures = [];
   var resOpenings = [];
+  var resSlotClosures = [];
+  var resSlotOpenings = [];
+
+  function slotClosedFor(dateStr, time) {
+    return resSlotClosures.some(function (s) { return s.date === dateStr && s.time === time; });
+  }
+  function slotOpenFor(dateStr, time) {
+    return resSlotOpenings.some(function (s) { return s.date === dateStr && s.time === time; });
+  }
 
   function closuresForDate(dateStr) {
     var set = { pranzo: false, cena: false };
@@ -801,6 +811,8 @@
         resOnlineOpen = !(d && d.online_open === false);
         resClosures = (d && d.closures) || [];
         resOpenings = (d && d.openings) || [];
+        resSlotClosures = (d && d.slot_closures) || [];
+        resSlotOpenings = (d && d.slot_openings) || [];
         applyReservationsStatus();
         updateOrarioSlots();
       })
@@ -814,28 +826,42 @@
     var optgroups = orarioSelect.querySelectorAll('optgroup');
     var dateMsg = document.getElementById('p-date-closed');
     if (!dataInput.value) {
-      optgroups.forEach(function (g) { g.style.display = ''; });
+      optgroups.forEach(function (g) {
+        g.style.display = '';
+        g.querySelectorAll('option').forEach(function (o) { o.style.display = ''; o.disabled = false; });
+      });
       if (dateMsg) dateMsg.style.display = 'none';
       return;
     }
-    var svc = servicesForDate(dataInput.value);
+    var dateStr = dataInput.value;
+    var svc = servicesForDate(dateStr);
     var anyOpen = false;
     optgroups.forEach(function (g) {
       var key = g.getAttribute('data-i18n-label') || '';
       var s = key.indexOf('cena') !== -1 ? 'cena' : 'pranzo';
-      var visible = !!svc[s];
-      g.style.display = visible ? '' : 'none';
-      if (visible) anyOpen = true;
+      var serviceVisible = !!svc[s];
+      var groupHasVisible = false;
+      g.querySelectorAll('option').forEach(function (o) {
+        var t = o.value;
+        // Visibile = aperto in via straordinaria su quell'orario, OPPURE
+        //            (il servizio è disponibile E l'orario non è chiuso singolarmente).
+        var vis = slotOpenFor(dateStr, t) || (serviceVisible && !slotClosedFor(dateStr, t));
+        o.style.display = vis ? '' : 'none';
+        o.disabled = !vis;
+        if (vis) groupHasVisible = true;
+      });
+      g.style.display = groupHasVisible ? '' : 'none';
+      if (groupHasVisible) anyOpen = true;
     });
     var currentVal = orarioSelect.value;
     if (currentVal) {
       var opt = orarioSelect.querySelector('option[value="' + currentVal + '"]');
-      if (opt && opt.parentElement && opt.parentElement.style.display === 'none') {
+      if (opt && (opt.style.display === 'none' || (opt.parentElement && opt.parentElement.style.display === 'none'))) {
         orarioSelect.value = '';
       }
     }
-    // Nessuno slot disponibile per la data scelta (giorno chiuso o non aperto in
-    // via straordinaria): mostra il messaggio con il telefono.
+    // Nessuno slot disponibile per la data scelta (giorno chiuso, non aperto in
+    // via straordinaria, o tutti gli orari chiusi singolarmente): mostra il messaggio.
     if (dateMsg) {
       dateMsg.style.display = anyOpen ? 'none' : '';
     }
@@ -1025,6 +1051,6 @@
 <script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
 <script defer src="/cookieconsent-config.js"></script>
 
-<!-- v 2026.05.30.02 -->
+<!-- v 2026.05.30.03 -->
 </body>
 </html>

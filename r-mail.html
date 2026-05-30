@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Apri nuova mail al cliente — Ristorante Santamonica</title>
+<meta name="robots" content="noindex,nofollow">
+<!-- v 2026.05.30.01 -->
+<!--
+  Pagina-ponte per il bottone "Rispondi al cliente" della mail M1bis
+  (notifica admin di nuova prenotazione).
+  Su iPhone con client mail di terze parti (es. Aruba Mail) i tap diretti
+  su mailto: parametrizzati spesso non triggerano niente. Aprendo questo
+  link https:// Safari prende il controllo, esegue il redirect a mailto:
+  e iOS apre regolarmente il composer dell'app mail di sistema.
+  Se nessun handler raccoglie il mailto:, restano i dati copiabili a video.
+-->
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; margin: 0; padding: 30px 20px; background: #f7f5f0; color: #2c2c2c; line-height: 1.5; }
+  .wrap { max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e0dcd0; padding: 25px 30px; border-radius: 4px; }
+  h1 { font-size: 20px; margin: 0 0 12px; color: #2c2c2c; font-weight: 600; }
+  p { margin: 0 0 14px; font-size: 15px; }
+  .btn { display: inline-block; padding: 14px 28px; background: #2c6e49; color: #ffffff !important; text-decoration: none; font-weight: 600; border-radius: 4px; font-size: 15px; margin: 8px 0 18px; }
+  .data { background: #faf8f3; border: 1px solid #e0dcd0; padding: 14px 16px; margin: 18px 0 0; font-size: 14px; border-radius: 4px; }
+  .data dt { font-weight: 600; color: #666; margin-top: 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .data dt:first-of-type { margin-top: 0; }
+  .data dd { margin: 3px 0 0; word-break: break-word; }
+  .copybox { background: #1e1e1e; color: #d4d4d4; padding: 12px; font-family: ui-monospace, "SF Mono", Monaco, Consolas, monospace; font-size: 12px; white-space: pre-wrap; word-break: break-word; border-radius: 4px; line-height: 1.5; margin: 4px 0 0; }
+  small { color: #888; font-size: 12px; line-height: 1.5; display: block; margin-top: 18px; }
+  .err { background: #fff3f3; border: 1px solid #f0c8c8; padding: 14px; border-radius: 4px; color: #8a2c2c; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Apertura nuova mail al cliente…</h1>
+  <p id="status">Sto provando ad aprire l'app mail con i dati pre-compilati. Se non si apre automaticamente, tocca il pulsante qui sotto.</p>
+
+  <p><a id="mailtoLink" class="btn" href="#">✉ Apri nuova mail al cliente</a></p>
+
+  <div class="data" id="fallbackBox" style="display:none;">
+    <p style="margin:0 0 10px;font-size:13px;color:#666;"><strong>Se nessuna app si apre</strong>, copia questi dati e incollali in una nuova mail dell'app che usi:</p>
+    <dt>Destinatario</dt><dd id="toData">—</dd>
+    <dt>Oggetto</dt><dd id="subjData">—</dd>
+    <dt>Corpo</dt><dd><div class="copybox" id="bodyData">—</div></dd>
+  </div>
+
+  <small>Questa pagina è un semplice ponte verso la tua app mail. Non salva dati, non traccia, non lascia traccia nel sito.</small>
+</div>
+<script>
+(function () {
+  function qs(name) {
+    var m = location.search.match(new RegExp("[?&]" + name + "=([^&]*)"));
+    return m ? decodeURIComponent(m[1].replace(/\+/g, " ")) : "";
+  }
+  var to = qs("to");
+  var subject = qs("subject");
+  var body = qs("body");
+  var statusEl = document.getElementById("status");
+  var btnEl = document.getElementById("mailtoLink");
+  var fallback = document.getElementById("fallbackBox");
+
+  if (!to) {
+    statusEl.innerHTML = '<span class="err">Manca il destinatario. Apri il link dalla mail di notifica di nuova prenotazione.</span>';
+    btnEl.style.display = "none";
+    return;
+  }
+
+  // Costruisce mailto pulito
+  var url = "mailto:" + encodeURIComponent(to);
+  var parts = [];
+  if (subject) parts.push("subject=" + encodeURIComponent(subject));
+  if (body) parts.push("body=" + encodeURIComponent(body));
+  if (parts.length) url += "?" + parts.join("&");
+
+  btnEl.setAttribute("href", url);
+  document.getElementById("toData").textContent = to;
+  document.getElementById("subjData").textContent = subject || "(vuoto)";
+  document.getElementById("bodyData").textContent = body || "(vuoto)";
+
+  // Mostra il fallback dopo 1.2s, nel caso l'app mail non si apra
+  setTimeout(function () {
+    fallback.style.display = "block";
+  }, 1200);
+
+  // Tentativo di redirect automatico al mailto:
+  // (su iPhone Safari triggera il prompt di sistema "Apri in Mail?")
+  setTimeout(function () {
+    try { window.location.href = url; } catch (e) { /* silent */ }
+  }, 200);
+})();
+</script>
+</body>
+</html>

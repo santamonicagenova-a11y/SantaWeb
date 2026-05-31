@@ -2,10 +2,16 @@
   ─────────────────────────────────────────────────────────────────────────
   dove-siamo.html — Dove siamo / Contatti
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.05.22.01
-  Ultimo aggiornamento: 2026-05-22
+  Versione: v 2026.05.31.01
+  Ultimo aggiornamento: 2026-05-31
   Lingua: IT (versione ufficiale)
   Stato: BOZZA INFORMATIVA · F0.12 chiusa (hotfix layout)
+
+  Modifiche v 2026.05.31.01 (sessione 15 SEO):
+  - Fix Schema.org @type da "ItalianRestaurant" a "Restaurant" (tipo non
+    riconosciuto da schema.org → JSON-LD ignorato da Google in toto).
+  - Specificità "ristorante italiano" già preservata nel campo servesCuisine.
+  - Identico fix anche in index.html. Diagnosi via validator.schema.org.
 
   Modifiche v 2026.05.22.01 (F0.21 — refactor FONTE UNICA orari):
   - Tabella orari (id="orari-tbody") e JSON-LD openingHoursSpecification
@@ -96,11 +102,11 @@
   <!-- F0.12: iframemanager v1.3.0 (bundle locale) — gate consenso per Google Maps -->
   <link rel="stylesheet" href="/lib/iframemanager/iframemanager.css">
 
-  <!-- ═══ F0.11: Schema.org JSON-LD ItalianRestaurant ═══ -->
+  <!-- ═══ v 2026.05.31.01 (sessione 15 SEO): fix @type "ItalianRestaurant" (non riconosciuto da schema.org → JSON-LD ignorato da Google) a "Restaurant". Specificità "ristorante italiano" è già in servesCuisine. Era F0.11 ═══ -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "ItalianRestaurant",
+    "@type": "Restaurant",
     "@id": "https://santamonicagenova.it/#restaurant",
     "name": "Ristorante Santamonica",
     "alternateName": "Santamonica",

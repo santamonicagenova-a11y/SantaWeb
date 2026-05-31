@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.05.31.01 — sessione 15 SEO: fix Schema.org @type da "ItalianRestaurant" (NON riconosciuto da schema.org → JSON-LD ignorato da Google) a "Restaurant" (tipo formale). La specificità "ristorante italiano" è già preservata nel campo servesCuisine. Identico fix anche in dove-siamo.html. Diagnosi via validator.schema.org. -->
 <!-- v 2026.05.30.03 — Chiusura/apertura di SINGOLI orari (sessione 13d del 30/5): oltre ai servizi (pranzo/cena/tutto) ora si possono chiudere o aprire singoli slot orario. Il form legge slot_closures/slot_openings da reservations-status; updateOrarioSlots nasconde le <option> chiuse e mostra quelle aperte in via straordinaria (visibile = slotOpen || (servizio disponibile && !slotClosed)). Blocco server-side speculare in submit-reservation v10. -->
 <!-- v 2026.05.30.02 — Aperture straordinarie (sessione 13b del 30/5): il form considera anche le aperture straordinarie lette da reservations-status (campo openings). Nuove funzioni openingsForDate() e servicesForDate() = (schedule normale orari.js ∪ aperture) − chiusure; updateOrarioSlots usa servicesForDate per mostrare/nascondere gli optgroup. Footer/commento finale allineati a v 2026.05.30.02. NB: il calendario colorato lato cliente (aperture/chiusure in 2 colori) è una possibile evoluzione separata non ancora implementata. -->
 <!-- v 2026.05.30.01 — Blocco prenotazioni online (sessione 13 del 30/5): il form #prenota legge lo stato da Edge Function reservations-status all'apertura. (1) Se le prenotazioni online sono globalmente CHIUSE → il form è nascosto e si mostra il banner #prenota-closed; (2) per ogni data scelta, gli optgroup Pranzo/Cena chiusi dall'admin vengono nascosti (oltre al filtro getServicesByDay esistente); (3) se il giorno sarebbe aperto ma è chiuso del tutto dall'admin → messaggio #p-date-closed; (4) il submit gestisce ora anche la risposta 403 (chiuso) con messaggio dedicato. Lo stato è gestito da menu-admin.html (interruttore + calendario chiusure) e applicato server-side da submit-reservation v7. Nuove chiavi i18n: prenota_closed_title, prenota_closed_body, prenota_date_closed, prenota_error_closed. -->
@@ -52,11 +53,11 @@
 <meta name="twitter:description" content="Ristorante gourmet di pesce fresco sul Lungomare Lombardo di Genova. Prenota online.">
 <meta name="twitter:image" content="https://santamonicagenova.it/img/hero.jpg">
 
-<!-- Schema.org JSON-LD · F0.11 v 2026.05.19.04 (invariato in v.05 F0.12) · dati TARGET pre-go-live (allineato dove-siamo.html) -->
+<!-- Schema.org JSON-LD · v 2026.05.31.01 (sessione 15 SEO): fix @type da "ItalianRestaurant" (non riconosciuto da schema.org → JSON-LD ignorato da Google) a "Restaurant" (tipo formale). La specificità "ristorante italiano" è già preservata nel campo servesCuisine sottostante. Era F0.11 v 2026.05.19.04 (invariato in v.05 F0.12) -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "ItalianRestaurant",
+  "@type": "Restaurant",
   "@id": "https://santamonicagenova.it/#restaurant",
   "name": "Ristorante Santamonica",
   "alternateName": "Santamonica",

@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<!-- Santamonica · Editor Landing 10 Anni · v 2026.06.02.01 -->
+<!-- Pagina-strumento interna: NON indicizzata. Modifica i testi, anteprima live, push diretto su GitHub (10anni.html). -->
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Editor · Dieci Anni · Santamonica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gold:#b89d6a;--sand:#f5f0e8;--ink:#1a1814;--sea:#4a7c8a;--bg:#faf8f4;
+    --line:rgba(26,24,20,.14);--serif:"Cormorant Garamond",serif;--sans:"Jost",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300;-webkit-font-smoothing:antialiased}
+
+  /* ---------- TOP BAR ---------- */
+  .bar{
+    position:sticky;top:0;z-index:50;display:flex;flex-wrap:wrap;align-items:center;gap:14px;
+    padding:14px 22px;background:var(--ink);color:var(--sand);border-bottom:1px solid var(--gold);
+  }
+  .bar h1{font-family:var(--serif);font-weight:400;font-size:1.4rem;letter-spacing:.01em;margin-right:auto}
+  .bar h1 span{color:var(--gold)}
+  .bar .tok{display:flex;align-items:center;gap:8px;font-size:.82rem}
+  .bar input[type=password]{
+    font-family:var(--sans);font-size:.85rem;padding:8px 10px;border:1px solid rgba(245,240,232,.3);
+    border-radius:3px;background:#2a2620;color:var(--sand);width:210px;
+  }
+  .bar input[type=password]:focus{outline:none;border-color:var(--gold)}
+  .btn{
+    font-family:var(--sans);font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;font-weight:500;
+    border:none;border-radius:3px;padding:11px 22px;cursor:pointer;transition:.25s;
+  }
+  .btn-go{background:var(--gold);color:var(--ink)}
+  .btn-go:hover{background:#cdb583}
+  .btn-go:disabled{opacity:.5;cursor:wait}
+  .btn-ghost{background:transparent;color:var(--sand);border:1px solid rgba(245,240,232,.4)}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+  .status{width:100%;font-size:.85rem;margin-top:2px;display:none}
+  .status.show{display:block}
+  .status.ok{color:#9fd8b0}
+  .status.err{color:#f0a48d}
+  .status.work{color:var(--gold)}
+
+  /* ---------- LAYOUT ---------- */
+  .app{display:grid;grid-template-columns:minmax(360px,460px) 1fr;min-height:calc(100vh - 60px)}
+  .edit{padding:26px 24px;border-right:1px solid var(--line);overflow:auto;background:#fffdfa}
+  .preview-pane{overflow:auto;background:var(--bg)}
+  @media(max-width:900px){
+    .app{grid-template-columns:1fr}
+    .edit{border-right:none;border-bottom:1px solid var(--line)}
+  }
+
+  /* ---------- EDIT FORM ---------- */
+  .help{
+    background:var(--sand);border:1px solid var(--line);border-radius:4px;
+    padding:14px 16px;margin-bottom:24px;font-size:.84rem;line-height:1.55;color:#3a352c;
+  }
+  .help b{font-weight:500}
+  .help code{background:#fff;border:1px solid var(--line);padding:1px 6px;border-radius:3px;font-family:monospace;font-size:.8rem;color:var(--sea)}
+  details.help-tok{margin-bottom:24px;border:1px solid var(--line);border-radius:4px;background:var(--sand)}
+  details.help-tok summary{padding:12px 16px;cursor:pointer;font-size:.85rem;font-weight:500;color:var(--ink)}
+  details.help-tok .inner{padding:0 16px 14px;font-size:.82rem;line-height:1.6;color:#3a352c}
+  details.help-tok ol{margin:8px 0 0 18px}
+  details.help-tok li{margin-bottom:5px}
+  details.help-tok a{color:var(--sea)}
+
+  .group{margin-bottom:26px}
+  .group > .gh{
+    font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--sea);
+    font-weight:500;margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid var(--line);
+  }
+  .f{margin-bottom:16px}
+  .f label{display:block;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:#6a655b;margin-bottom:6px;font-weight:400}
+  .f input[type=text],.f textarea{
+    font-family:var(--sans);font-size:.95rem;font-weight:300;color:var(--ink);
+    background:#fffdfa;border:1px solid var(--line);border-radius:3px;padding:10px 12px;width:100%;transition:.2s;
+  }
+  .f input[type=text]:focus,.f textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,157,106,.14)}
+  .f textarea{resize:vertical;min-height:64px;line-height:1.5}
+  .f .two{display:flex;gap:12px}
+  .f .two > div{flex:1}
+  .tip{font-size:.74rem;color:#9a948a;margin-top:4px;font-style:italic}
+
+  /* ---------- PREVIEW (stessa estetica della landing) ---------- */
+  .pv{font-family:var(--sans);font-weight:300;line-height:1.7;color:var(--ink)}
+  .pv .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+  .pv .hero{display:flex;flex-direction:column;justify-content:center;position:relative;padding:64px 0 52px;
+    background:radial-gradient(120% 80% at 80% 0%, rgba(74,124,138,.10), transparent 60%),radial-gradient(100% 90% at 0% 100%, rgba(184,157,106,.12), transparent 55%);}
+  .pv .eyebrow{font-size:.78rem;letter-spacing:.42em;text-transform:uppercase;color:var(--sea);font-weight:400;margin-bottom:30px}
+  .pv .eyebrow::before{content:"";display:inline-block;width:42px;height:1px;background:var(--gold);vertical-align:middle;margin-right:16px;transform:translateY(-3px)}
+  .pv .decade{font-family:var(--serif);font-weight:300;font-size:clamp(4rem,12vw,11rem);line-height:.86;letter-spacing:-.02em}
+  .pv .decade em{font-style:italic;color:var(--gold)}
+  .pv .span-years{display:block;font-family:var(--sans);font-weight:200;font-size:clamp(.9rem,2vw,1.1rem);letter-spacing:.5em;text-transform:uppercase;color:var(--ink);margin-top:26px;padding-left:.5em}
+  .pv .lede{font-family:var(--serif);font-size:clamp(1.4rem,3vw,1.9rem);font-weight:300;font-style:italic;line-height:1.45;max-width:24ch;margin-top:42px;color:#3a352c}
+  .pv .scroll-cue{margin-top:44px;font-size:.74rem;letter-spacing:.3em;text-transform:uppercase}
+  .pv .scroll-cue a{color:inherit;text-decoration:none;border-bottom:1px solid var(--gold);padding-bottom:3px}
+  .pv section{padding:clamp(56px,8vw,96px) 0}
+  .pv .rule{width:46px;height:1px;background:var(--gold);margin-bottom:26px}
+  .pv h2{font-family:var(--serif);font-weight:400;font-size:clamp(1.9rem,4vw,2.8rem);line-height:1.1;letter-spacing:-.01em;margin-bottom:24px}
+  .pv .story p{font-size:1.06rem;max-width:60ch;color:#3a352c;margin-bottom:16px}
+  .pv .story .key{color:var(--ink);font-weight:400;border-bottom:1px dotted var(--gold)}
+  .pv .video-note{margin-top:18px;font-size:.86rem;color:#6a655b;font-style:italic}
+  .pv .serata{background:var(--ink);color:var(--sand)}
+  .pv .serata h2{color:var(--sand)}
+  .pv .serata .rule{background:var(--gold)}
+  .pv .serata .meta{display:flex;flex-wrap:wrap;gap:32px;margin-top:34px}
+  .pv .serata .meta .lab{font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:7px}
+  .pv .serata .meta .val{font-family:var(--serif);font-size:1.55rem;font-weight:300}
+  .pv .serata .key{color:#fff;border-bottom:1px dotted var(--gold)}
+  .pv .serata p{max-width:58ch;color:#d8d2c5;margin-top:26px;font-size:1.04rem}
+  .pv .book{background:var(--sand)}
+  .pv .book .intro{max-width:50ch;color:#3a352c;margin-bottom:10px;font-size:1.04rem}
+  .pv .book .key{color:var(--ink);font-weight:400;border-bottom:1px dotted var(--gold)}
+  .pv .formhint{font-size:.82rem;color:#9a948a;font-style:italic;margin-top:18px}
+  .pv footer{background:var(--bg);border-top:1px solid var(--line);padding:34px 0;font-size:.82rem;color:#6a655b}
+</style>
+</head>
+<body>
+
+  <div class="bar">
+    <h1>Editor &middot; <span>Dieci Anni</span></h1>
+    <div class="tok">
+      <label for="ghtoken" style="letter-spacing:.04em">Token GitHub</label>
+      <input type="password" id="ghtoken" placeholder="incolla qui il token" autocomplete="off">
+    </div>
+    <button class="btn btn-ghost" id="downloadBtn">Scarica file</button>
+    <button class="btn btn-go" id="pushBtn">Pubblica sul sito</button>
+    <p class="status" id="status"></p>
+  </div>
+
+  <div class="app">
+    <!-- ============ PANNELLO EDITOR ============ -->
+    <div class="edit">
+      <div class="help">
+        Modifica i testi qui a sinistra: l'anteprima a destra si aggiorna mentre scrivi.
+        Per evidenziare una parola <b>in oro</b> mettila tra asterischi: <code>*cos&igrave;*</code>.
+        Quando sei soddisfatto, premi <b>Pubblica sul sito</b> in alto: aggiorna la pagina <code>/10anni.html</code> e va online da sola in 1&ndash;2 minuti.
+      </div>
+
+      <details class="help-tok">
+        <summary>Come ottengo il token GitHub? (una volta sola)</summary>
+        <div class="inner">
+          Il <b>token</b> &egrave; una password speciale che permette a questa pagina di salvare le modifiche sul sito al posto tuo. Si crea una volta e resta salvato in questo browser.
+          <ol>
+            <li>Vai su <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com &rarr; Fine-grained token</a> (devi essere loggato col tuo account GitHub).</li>
+            <li>Nome a piacere (es. <i>Editor 10 anni</i>), scadenza lunga.</li>
+            <li>In <b>Repository access</b> scegli <i>Only select repositories</i> &rarr; seleziona <code>santamonicagenova-a11y/SantaWeb</code>.</li>
+            <li>In <b>Permissions &rarr; Repository &rarr; Contents</b> imposta <b>Read and write</b>.</li>
+            <li>Genera, copia il token e incollalo nel campo <b>Token GitHub</b> qui in alto.</li>
+          </ol>
+          Il token resta solo nel tuo browser (non lo vede nessun altro). Se cambi computer lo reincolli.
+        </div>
+      </details>
+
+      <div class="f">
+        <label for="f_version">Versione pagina (per lo storico)</label>
+        <input type="text" id="f_version" value="2026.06.02.01">
+        <div class="tip">Conviene aumentare l'ultimo numero a ogni pubblicazione: .01 &rarr; .02 &rarr; &hellip;</div>
+      </div>
+
+      <div class="group">
+        <div class="gh">Apertura (hero)</div>
+        <div class="f">
+          <label for="f_eyebrow">Sopratitolo</label>
+          <input type="text" id="f_eyebrow" value="Santamonica &middot; Genova &middot; dal 2016">
+        </div>
+        <div class="f">
+          <div class="two">
+            <div>
+              <label for="f_titlePre">Titolo</label>
+              <input type="text" id="f_titlePre" value="Dieci">
+            </div>
+            <div>
+              <label for="f_titleEm">parola in oro</label>
+              <input type="text" id="f_titleEm" value="anni">
+            </div>
+          </div>
+        </div>
+        <div class="f">
+          <label for="f_years">Anni</label>
+          <input type="text" id="f_years" value="2016 &mdash; 2026">
+        </div>
+        <div class="f">
+          <label for="f_lede">Frase di apertura</label>
+          <textarea id="f_lede">Il primo luglio si torna a brindare con il vino della prima sera. Una sera in piedi, dieci anni di cucina di mare.</textarea>
+        </div>
+        <div class="f">
+          <label for="f_scroll">Link "scendi"</label>
+          <input type="text" id="f_scroll" value="la serata">
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="gh">Storia / Mill&egrave;</div>
+        <div class="f">
+          <label for="f_storyH">Titolo sezione</label>
+          <input type="text" id="f_storyH" value="Dieci anni con il Mill&egrave;">
+        </div>
+        <div class="f">
+          <label for="f_storyP1">Paragrafo 1</label>
+          <textarea id="f_storyP1">Nel 2016 abbiamo aperto le porte sul lungomare con un'idea semplice: *il pesce del giorno, trattato con rispetto*. La prima bottiglia che abbiamo aperto era un *Franciacorta Mill&egrave; di Cantina Muratori*.</textarea>
+          <div class="tip">Le parti tra *asterischi* diventano oro.</div>
+        </div>
+        <div class="f">
+          <label for="f_storyP2">Paragrafo 2</label>
+          <textarea id="f_storyP2">Dieci anni dopo, torniamo a brindare con il Mill&egrave; in una nuova versione, presentata da chi lo fa. Due ambassador di Cantina Muratori saranno con noi quella sera per raccontarlo.</textarea>
+        </div>
+        <div class="f">
+          <label for="f_storyNote">Riga di chiusura (corsivo)</label>
+          <textarea id="f_storyNote">2016 &mdash; 2026. Dieci estati, una cantina, un vino che ci ha accompagnato.</textarea>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="gh">La serata</div>
+        <div class="f">
+          <label for="f_serataH">Titolo sezione</label>
+          <input type="text" id="f_serataH" value="La serata">
+        </div>
+        <div class="f">
+          <label for="f_sWhen">Quando</label>
+          <input type="text" id="f_sWhen" value="Mercoled&igrave; 1 luglio &middot; dalle 20:30">
+        </div>
+        <div class="f">
+          <label for="f_sWhere">Dove</label>
+          <input type="text" id="f_sWhere" value="Santamonica &middot; Lungomare Lombardo 27 &middot; Genova">
+        </div>
+        <div class="f">
+          <label for="f_sFormat">Format</label>
+          <input type="text" id="f_sFormat" value="Cena in piedi &middot; musica jazz dal vivo">
+        </div>
+        <div class="f">
+          <label for="f_sWine">Vino</label>
+          <input type="text" id="f_sWine" value="Franciacorta Mill&egrave; &middot; Cantina Muratori">
+        </div>
+        <div class="f">
+          <label for="f_sPrice">Quota</label>
+          <input type="text" id="f_sPrice" value="75 &euro; a persona &middot; tutto incluso">
+        </div>
+        <div class="f">
+          <label for="f_serataP">Descrizione serata</label>
+          <textarea id="f_serataP" style="min-height:130px">Una cena in piedi per festeggiare dieci anni di cucina di mare. I piatti girano fra gli ospiti, curati dallo Chef Nicol&ograve; Lazzaroni; tre ore di musica jazz acustica dal vivo; le stazioni vino con la sommelier Monica Capurro e i due ambassador di Cantina Muratori. Alle 21:30 un breve momento dedicato alla nuova versione del Mill&egrave;, raccontata da chi lo produce. Nessun coperto assegnato, nessun discorso a microfono: si racconta a piccoli gruppi, come una sera fra amici. Solo pi&ugrave; amici del solito.</textarea>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="gh">Prenotazione</div>
+        <div class="f">
+          <label for="f_bookH">Titolo sezione</label>
+          <input type="text" id="f_bookH" value="Tieni un posto">
+        </div>
+        <div class="f">
+          <label for="f_bookIntro">Testo introduttivo</label>
+          <textarea id="f_bookIntro" style="min-height:110px">Sessanta persone in tutto. Compila i tuoi dati e ti ricontattiamo per confermare. La quota &egrave; di 75 &euro; a persona, tutto incluso, e si salda all'ingresso la sera della festa. Lasciaci almeno un recapito tra telefono ed email.</textarea>
+        </div>
+        <div class="tip">Il modulo di prenotazione (campi nome, telefono, email&hellip;) resta invariato: non &egrave; modificabile da qui per non romperne il funzionamento.</div>
+      </div>
+    </div>
+
+    <!-- ============ ANTEPRIMA ============ -->
+    <div class="preview-pane">
+      <div class="pv">
+        <header class="hero">
+          <div class="wrap">
+            <p class="eyebrow" id="pv_eyebrow"></p>
+            <h1 class="decade" id="pv_title"></h1>
+            <p class="lede" id="pv_lede"></p>
+            <p class="scroll-cue" id="pv_scroll"></p>
+          </div>
+        </header>
+        <section class="story">
+          <div class="wrap">
+            <div class="rule"></div>
+            <h2 id="pv_storyH"></h2>
+            <p id="pv_storyP1"></p>
+            <p id="pv_storyP2"></p>
+            <p class="video-note" id="pv_storyNote"></p>
+          </div>
+        </section>
+        <section class="serata">
+          <div class="wrap">
+            <div class="rule"></div>
+            <h2 id="pv_serataH"></h2>
+            <div class="meta">
+              <div class="item"><div class="lab">Quando</div><div class="val" id="pv_sWhen"></div></div>
+              <div class="item"><div class="lab">Dove</div><div class="val" id="pv_sWhere"></div></div>
+              <div class="item"><div class="lab">Format</div><div class="val" id="pv_sFormat"></div></div>
+              <div class="item"><div class="lab">Vino</div><div class="val" id="pv_sWine"></div></div>
+              <div class="item"><div class="lab">Quota</div><div class="val" id="pv_sPrice"></div></div>
+            </div>
+            <p id="pv_serataP"></p>
+          </div>
+        </section>
+        <section class="book">
+          <div class="wrap">
+            <div class="rule"></div>
+            <h2 id="pv_bookH"></h2>
+            <p class="intro" id="pv_bookIntro"></p>
+            <p class="formhint">&darr; qui sotto, sul sito, c'&egrave; il modulo di prenotazione (non modificabile da qui).</p>
+          </div>
+        </section>
+        <footer>
+          <div class="wrap">Santamonica &middot; Genova &middot; anteprima &mdash; <span id="pv_version"></span></div>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TEMPLATE PAGINA FINALE (testo grezzo, placeholder {{...}}) ============ -->
+  <script type="text/template" id="pageTpl"><!DOCTYPE html>
+<!-- Santamonica · Landing 10 Anni · v {{version}} -->
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Pagina effimera: esclusa dai motori. Backup canonico: regola scoped in _headers su /10anni* -->
+<meta name="robots" content="noindex, nofollow">
+<title>Dieci Anni · Santamonica Genova · 1 luglio 2026</title>
+<meta name="description" content="Il primo luglio 2026 il Santamonica compie dieci anni. Una cena in piedi, musica jazz dal vivo e un brindisi insieme alla Cantina Muratori che è con noi dalla prima sera.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.css">
+
+<style>
+  :root{
+    --gold:#b89d6a;--sand:#f5f0e8;--ink:#1a1814;--sea:#4a7c8a;--bg:#faf8f4;
+    --line:rgba(26,24,20,.14);--serif:"Cormorant Garamond",serif;--sans:"Jost",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+  .hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;position:relative;padding:80px 0 60px;
+    background:radial-gradient(120% 80% at 80% 0%, rgba(74,124,138,.10), transparent 60%),radial-gradient(100% 90% at 0% 100%, rgba(184,157,106,.12), transparent 55%);}
+  .hero .wrap{width:100%}
+  .eyebrow{font-size:.78rem;letter-spacing:.42em;text-transform:uppercase;color:var(--sea);font-weight:400;margin-bottom:34px;opacity:0;animation:rise .9s .15s ease forwards}
+  .eyebrow::before{content:"";display:inline-block;width:42px;height:1px;background:var(--gold);vertical-align:middle;margin-right:16px;transform:translateY(-3px)}
+  .decade{font-family:var(--serif);font-weight:300;font-size:clamp(5rem,22vw,17rem);line-height:.86;letter-spacing:-.02em;opacity:0;animation:rise 1.1s .3s ease forwards}
+  .decade em{font-style:italic;color:var(--gold)}
+  .span-years{display:block;font-family:var(--sans);font-weight:200;font-size:clamp(.9rem,2.4vw,1.15rem);letter-spacing:.5em;text-transform:uppercase;color:var(--ink);margin-top:30px;padding-left:.5em;opacity:0;animation:rise 1s .55s ease forwards}
+  .lede{font-family:var(--serif);font-size:clamp(1.4rem,3.4vw,2.05rem);font-weight:300;font-style:italic;line-height:1.45;max-width:24ch;margin-top:48px;color:#3a352c;opacity:0;animation:rise 1s .8s ease forwards}
+  .scroll-cue{margin-top:56px;font-size:.74rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink);opacity:0;animation:rise 1s 1.05s ease forwards}
+  .scroll-cue a{color:inherit;text-decoration:none;border-bottom:1px solid var(--gold);padding-bottom:3px}
+  section{padding:clamp(70px,11vw,130px) 0}
+  .rule{width:46px;height:1px;background:var(--gold);margin-bottom:30px}
+  h2{font-family:var(--serif);font-weight:400;font-size:clamp(2rem,5vw,3.1rem);line-height:1.1;letter-spacing:-.01em;margin-bottom:26px}
+  .story p{font-size:1.08rem;max-width:60ch;color:#3a352c;margin-bottom:18px}
+  .story .key{color:var(--ink);font-weight:400}
+  .video-note{margin-top:22px;font-size:.86rem;color:#6a655b;font-style:italic}
+  .serata{background:var(--ink);color:var(--sand)}
+  .serata h2{color:var(--sand)}
+  .serata .rule{background:var(--gold)}
+  .serata .meta{display:flex;flex-wrap:wrap;gap:38px;margin-top:40px}
+  .serata .meta .item .lab{font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+  .serata .meta .item .val{font-family:var(--serif);font-size:1.7rem;font-weight:300}
+  .serata p{max-width:58ch;color:#d8d2c5;margin-top:30px;font-size:1.05rem}
+  .book{background:var(--sand)}
+  .book .intro{max-width:50ch;color:#3a352c;margin-bottom:46px;font-size:1.05rem}
+  form{max-width:620px}
+  .row{display:flex;gap:18px;flex-wrap:wrap}
+  .field{flex:1;min-width:200px;margin-bottom:22px;display:flex;flex-direction:column}
+  .field.full{flex-basis:100%}
+  label{font-size:.74rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);margin-bottom:9px;font-weight:400}
+  .hint{font-size:.78rem;color:#6a655b;margin:-12px 0 22px;font-style:italic}
+  input,textarea,select{font-family:var(--sans);font-size:1rem;font-weight:300;color:var(--ink);background:#fffdfa;border:1px solid var(--line);border-radius:2px;padding:13px 15px;width:100%;transition:.25s}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,157,106,.16)}
+  textarea{resize:vertical;min-height:90px}
+  .check{display:flex;align-items:flex-start;gap:12px;margin:6px 0 30px;cursor:pointer}
+  .check input{width:18px;height:18px;margin-top:3px;accent-color:var(--gold);flex:none}
+  .check span{font-size:.95rem;color:#3a352c;text-transform:none;letter-spacing:0;font-weight:300}
+  button[type=submit]{font-family:var(--sans);font-size:.82rem;letter-spacing:.26em;text-transform:uppercase;font-weight:400;background:var(--ink);color:var(--sand);border:none;border-radius:2px;padding:17px 42px;cursor:pointer;transition:.3s}
+  button[type=submit]:hover{background:var(--gold);color:var(--bg)}
+  button[type=submit]:disabled{opacity:.5;cursor:wait}
+  .form-msg{margin-top:24px;font-size:.98rem;display:none}
+  .form-msg.ok{display:block;color:var(--sea);font-family:var(--serif);font-style:italic;font-size:1.3rem}
+  .form-msg.err{display:block;color:#a8472f}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  footer{background:var(--bg);border-top:1px solid var(--line);padding:46px 0;font-size:.85rem;color:#6a655b}
+  footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:18px;align-items:center}
+  footer a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--gold)}
+  .ver{font-size:.72rem;letter-spacing:.1em;color:#9a948a}
+  @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+  @media(max-width:600px){.serata .meta{gap:26px}}
+</style>
+</head>
+<body>
+
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">{{eyebrow}}</p>
+      <h1 class="decade">{{titlePre}}&nbsp;<em>{{titleEm}}</em>
+        <span class="span-years">{{years}}</span>
+      </h1>
+      <p class="lede">{{lede}}</p>
+      <p class="scroll-cue"><a href="#serata">{{scroll}} &darr;</a></p>
+    </div>
+  </header>
+
+  <section class="story">
+    <div class="wrap">
+      <div class="rule"></div>
+      <h2>{{storyH}}</h2>
+      <p>{{storyP1}}</p>
+      <p>{{storyP2}}</p>
+      <p class="video-note">{{storyNote}}</p>
+    </div>
+  </section>
+
+  <section class="serata" id="serata">
+    <div class="wrap">
+      <div class="rule"></div>
+      <h2>{{serataH}}</h2>
+      <div class="meta">
+        <div class="item"><div class="lab">Quando</div><div class="val">{{sWhen}}</div></div>
+        <div class="item"><div class="lab">Dove</div><div class="val">{{sWhere}}</div></div>
+        <div class="item"><div class="lab">Format</div><div class="val">{{sFormat}}</div></div>
+        <div class="item"><div class="lab">Vino</div><div class="val">{{sWine}}</div></div>
+        <div class="item"><div class="lab">Quota</div><div class="val">{{sPrice}}</div></div>
+      </div>
+      <p>{{serataP}}</p>
+    </div>
+  </section>
+
+  <section class="book" id="prenota">
+    <div class="wrap">
+      <div class="rule"></div>
+      <h2>{{bookH}}</h2>
+      <p class="intro">{{bookIntro}}</p>
+
+      <form id="bookingForm" action="https://formspree.io/f/mkopjnvq" method="POST" novalidate>
+        <input type="hidden" name="_subject" value="Prenotazione · 10 Anni Santamonica · 1 luglio 2026">
+        <input type="hidden" name="campagna" value="decennale-2026">
+        <input type="hidden" name="utm_source" id="utm_source" value="">
+        <input type="hidden" name="utm_medium" id="utm_medium" value="">
+        <input type="hidden" name="utm_campaign" id="utm_campaign" value="">
+        <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+        <div class="row">
+          <div class="field">
+            <label for="nome">Nome e cognome</label>
+            <input type="text" id="nome" name="nome" required>
+          </div>
+          <div class="field">
+            <label for="persone">Numero di persone</label>
+            <input type="number" id="persone" name="persone" min="1" max="20" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="tel">Telefono</label>
+            <input type="tel" id="tel" name="telefono" autocomplete="tel">
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" autocomplete="email">
+          </div>
+        </div>
+        <p class="hint">Indica almeno uno tra telefono ed email.</p>
+
+        <div class="field full">
+          <label for="note">Note (allergie, richieste)</label>
+          <textarea id="note" name="note"></textarea>
+        </div>
+
+        <label class="check">
+          <input type="checkbox" name="newsletter" value="si">
+          <span>Tienimi aggiornato sulle prossime serate e novità del Santamonica (newsletter).</span>
+        </label>
+
+        <button type="submit" id="submitBtn">Invia richiesta</button>
+        <p class="form-msg" id="formMsg" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div>Santamonica · Genova · <a href="mailto:info@santamonicagenova.it">info@santamonicagenova.it</a></div>
+      <div><a href="/">Torna al sito</a> · <a href="/privacy.html">Privacy</a> · <a href="/cookies.html">Cookie</a></div>
+      <div class="ver">v {{version}}</div>
+    </div>
+  </footer>
+
+  <script src="/lib/cookieconsent/cookieconsent.umd.js">@@SE@@
+  <script src="/cookieconsent-config.js">@@SE@@
+
+  <script>
+    (function(){
+      var p = new URLSearchParams(location.search);
+      ['utm_source','utm_medium','utm_campaign'].forEach(function(k){
+        var v = p.get(k); if(v){ var el=document.getElementById(k); if(el) el.value=v; }
+      });
+    })();
+
+    (function(){
+      var form = document.getElementById('bookingForm');
+      var btn  = document.getElementById('submitBtn');
+      var msg  = document.getElementById('formMsg');
+
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        msg.className = 'form-msg'; msg.textContent = '';
+
+        var tel = form.telefono.value.trim();
+        var email = form.email.value.trim();
+        if(!form.nome.value.trim() || !form.persone.value){
+          msg.className='form-msg err'; msg.textContent='Inserisci nome e numero di persone.'; return;
+        }
+        if(!tel && !email){
+          msg.className='form-msg err'; msg.textContent='Lasciaci almeno un recapito: telefono o email.'; return;
+        }
+
+        btn.disabled = true; var orig = btn.textContent; btn.textContent = 'Invio…';
+
+        fetch(form.action, {
+          method:'POST',
+          body: new FormData(form),
+          headers:{ 'Accept':'application/json' }
+        })
+        .then(function(r){
+          if(r.ok){
+            form.reset();
+            msg.className='form-msg ok';
+            msg.textContent='Grazie. Abbiamo ricevuto la tua richiesta: ti ricontattiamo per confermare.';
+            btn.style.display='none';
+          } else {
+            throw new Error('bad status');
+          }
+        })
+        .catch(function(){
+          msg.className='form-msg err';
+          msg.innerHTML='Qualcosa è andato storto nell\'invio. Scrivici a <a href="mailto:info@santamonicagenova.it">info@santamonicagenova.it</a> e ti rispondiamo subito.';
+          btn.disabled=false; btn.textContent=orig;
+        });
+      });
+    })();
+  @@SE@@
+</body>
+</html></script>
+
+  <!-- ============ LOGICA EDITOR ============ -->
+  <script>
+  (function(){
+    var REPO_OWNER = 'santamonicagenova-a11y';
+    var REPO_NAME  = 'SantaWeb';
+    var FILE_PATH  = '10anni.html';
+    var TOKEN_KEY  = 'santaweb_gh_token';
+
+    // campi: id elemento editor -> {pv: id anteprima, rich: bool}
+    var FIELDS = {
+      version:   {},
+      eyebrow:   {pv:'pv_eyebrow'},
+      titlePre:  {},
+      titleEm:   {},
+      years:     {},
+      lede:      {pv:'pv_lede', rich:true},
+      scroll:    {pv:'pv_scroll'},
+      storyH:    {pv:'pv_storyH'},
+      storyP1:   {pv:'pv_storyP1', rich:true},
+      storyP2:   {pv:'pv_storyP2', rich:true},
+      storyNote: {pv:'pv_storyNote', rich:true},
+      serataH:   {pv:'pv_serataH'},
+      sWhen:     {pv:'pv_sWhen'},
+      sWhere:    {pv:'pv_sWhere'},
+      sFormat:   {pv:'pv_sFormat'},
+      sWine:     {pv:'pv_sWine'},
+      sPrice:    {pv:'pv_sPrice'},
+      serataP:   {pv:'pv_serataP', rich:true},
+      bookH:     {pv:'pv_bookH'},
+      bookIntro: {pv:'pv_bookIntro', rich:true}
+    };
+    var RICH = {lede:1,storyP1:1,storyP2:1,storyNote:1,serataP:1,bookIntro:1};
+
+    function escHtml(s){
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    function rich(s){
+      return escHtml(s).replace(/\*([^*]+)\*/g,'<span class="key">$1</span>').replace(/\n/g,'<br>');
+    }
+    function fieldHtml(key, val){
+      return RICH[key] ? rich(val) : escHtml(val);
+    }
+    function getVal(key){
+      var el = document.getElementById('f_'+key);
+      return el ? el.value : '';
+    }
+
+    // ---- anteprima live ----
+    function renderPreview(){
+      Object.keys(FIELDS).forEach(function(key){
+        var cfg = FIELDS[key];
+        if(!cfg.pv) return;
+        var node = document.getElementById(cfg.pv);
+        if(node) node.innerHTML = fieldHtml(key, getVal(key));
+      });
+      // titolo (composito) + anni
+      var t = document.getElementById('pv_title');
+      if(t) t.innerHTML = escHtml(getVal('titlePre'))+'&nbsp;<em>'+escHtml(getVal('titleEm'))+'</em>'+
+                          '<span class="span-years">'+escHtml(getVal('years'))+'</span>';
+      // link scroll
+      var sc = document.getElementById('pv_scroll');
+      if(sc) sc.innerHTML = '<a href="#">'+escHtml(getVal('scroll'))+' &darr;</a>';
+      var v = document.getElementById('pv_version');
+      if(v) v.textContent = 'v '+getVal('version');
+    }
+
+    // ---- genera HTML finale ----
+    function buildHTML(){
+      var tpl = document.getElementById('pageTpl').textContent;
+      tpl = tpl.replace(/\{\{(\w+)\}\}/g, function(m, key){
+        if(!(key in FIELDS)) return m;
+        return fieldHtml(key, getVal(key));
+      });
+      tpl = tpl.split('@@SE@@').join('</'+'script>');
+      return tpl.replace(/^\s+/, '');
+    }
+
+    // ---- stato ----
+    var statusEl = document.getElementById('status');
+    function setStatus(msg, kind){
+      statusEl.textContent = msg;
+      statusEl.className = 'status show ' + (kind||'');
+    }
+
+    // ---- base64 UTF-8 ----
+    function b64(str){
+      return btoa(unescape(encodeURIComponent(str)));
+    }
+
+    // ---- push su GitHub ----
+    var pushBtn = document.getElementById('pushBtn');
+    async function push(){
+      var token = document.getElementById('ghtoken').value.trim();
+      if(!token){ setStatus('Manca il token GitHub: incollalo nel campo in alto (vedi istruzioni).', 'err'); return; }
+      localStorage.setItem(TOKEN_KEY, token);
+
+      if(!confirm('Pubblicare le modifiche sulla pagina /10anni del sito?\\nVa online in 1-2 minuti.')) return;
+
+      pushBtn.disabled = true;
+      var api = 'https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+FILE_PATH;
+      var headers = { 'Authorization':'Bearer '+token, 'Accept':'application/vnd.github+json' };
+
+      try{
+        setStatus('Leggo la versione attuale sul sito…', 'work');
+        var sha = null;
+        var g = await fetch(api, {headers:headers});
+        if(g.status === 200){ sha = (await g.json()).sha; }
+        else if(g.status === 404){ sha = null; } // primo caricamento
+        else if(g.status === 401){ throw new Error('Token non valido o scaduto (401).'); }
+        else if(g.status === 403){ throw new Error('Permessi insufficienti del token (403). Serve Contents: Read and write su SantaWeb.'); }
+        else { throw new Error('Errore lettura GitHub ('+g.status+').'); }
+
+        setStatus('Pubblico la pagina…', 'work');
+        var body = {
+          message: 'Aggiorna 10anni.html v '+getVal('version')+' (editor)',
+          content: b64(buildHTML())
+        };
+        if(sha) body.sha = sha;
+
+        var p = await fetch(api, {method:'PUT', headers:headers, body:JSON.stringify(body)});
+        if(p.status === 200 || p.status === 201){
+          var info = await p.json();
+          var url = (info.commit && info.commit.html_url) ? info.commit.html_url : '';
+          setStatus('Fatto! Pagina pubblicata. Online sul sito tra 1-2 minuti.' + (url?' Commit registrato.':''), 'ok');
+        } else {
+          var err = await p.json().catch(function(){return {};});
+          throw new Error('Pubblicazione fallita ('+p.status+'). '+(err.message||''));
+        }
+      } catch(e){
+        setStatus('Errore: '+e.message+' — puoi usare "Scarica file" e caricarlo a mano su GitHub.', 'err');
+      } finally {
+        pushBtn.disabled = false;
+      }
+    }
+
+    // ---- download fallback ----
+    function download(){
+      var blob = new Blob([buildHTML()], {type:'text/html;charset=utf-8'});
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = '10anni.html';
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      setStatus('File 10anni.html scaricato. Caricalo su GitHub al posto del vecchio.', 'ok');
+    }
+
+    // ---- init ----
+    function init(){
+      // bind tutti i campi all'anteprima
+      Object.keys(FIELDS).forEach(function(key){
+        var el = document.getElementById('f_'+key);
+        if(el) el.addEventListener('input', renderPreview);
+      });
+      // token salvato
+      var saved = localStorage.getItem(TOKEN_KEY);
+      if(saved) document.getElementById('ghtoken').value = saved;
+
+      pushBtn.addEventListener('click', push);
+      document.getElementById('downloadBtn').addEventListener('click', download);
+      renderPreview();
+    }
+    init();
+  })();
+  </script>
+</body>
+</html>

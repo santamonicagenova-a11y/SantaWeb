@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.06.04.01 — SEO home: title + meta description IT riscritti per intercettare i cluster di ricerca non-brand reali (pesce / sul mare / Corso Italia), fonte dati GSC 90gg. Title: "Ristorante Pesce e Vista Mare a Genova | Santamonica". I valori effettivi sono governati da translations.json (page_title/page_description IT); l'HTML statico è allineato per gli scraper social che leggono il markup grezzo. Gate produzione: P1+P2 (Claude) + P3 Revisione Oppositiva via DeepSeek + Grok (Gemini ko per quota) + sign-off Andrea (meta senza CTA). -->
 <!-- v 2026.05.31.01 — sessione 15 SEO: fix Schema.org @type da "ItalianRestaurant" (NON riconosciuto da schema.org → JSON-LD ignorato da Google) a "Restaurant" (tipo formale). La specificità "ristorante italiano" è già preservata nel campo servesCuisine. Identico fix anche in dove-siamo.html. Diagnosi via validator.schema.org. -->
 <!-- v 2026.05.30.03 — Chiusura/apertura di SINGOLI orari (sessione 13d del 30/5): oltre ai servizi (pranzo/cena/tutto) ora si possono chiudere o aprire singoli slot orario. Il form legge slot_closures/slot_openings da reservations-status; updateOrarioSlots nasconde le <option> chiuse e mostra quelle aperte in via straordinaria (visibile = slotOpen || (servizio disponibile && !slotClosed)). Blocco server-side speculare in submit-reservation v10. -->
 <!-- v 2026.05.30.02 — Aperture straordinarie (sessione 13b del 30/5): il form considera anche le aperture straordinarie lette da reservations-status (campo openings). Nuove funzioni openingsForDate() e servicesForDate() = (schedule normale orari.js ∪ aperture) − chiusure; updateOrarioSlots usa servicesForDate per mostrare/nascondere gli optgroup. Footer/commento finale allineati a v 2026.05.30.02. NB: il calendario colorato lato cliente (aperture/chiusure in 2 colori) è una possibile evoluzione separata non ancora implementata. -->
@@ -25,8 +26,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ristorante Santamonica Genova | Pesce Fresco Gourmet sul Lungomare</title>
-<meta name="description" content="Ristorante gourmet di pesce fresco sul Lungomare Lombardo di Genova. Cucina del territorio ligure, cantina curata, vista mare. Prenota il tuo tavolo online.">
+<title>Ristorante Pesce e Vista Mare a Genova | Santamonica</title>
+<meta name="description" content="Ristorante di pesce sul mare a Genova, sul Lungomare Lombardo vicino a Corso Italia. Cucina ligure di territorio e cantina curata.">
 <meta name="robots" content="index, follow">
 
 <!-- Canonical -->
@@ -40,8 +41,8 @@
 
 <!-- Open Graph -->
 <meta property="og:type" content="restaurant">
-<meta property="og:title" content="Ristorante Santamonica Genova | Pesce Fresco Gourmet sul Lungomare">
-<meta property="og:description" content="Ristorante gourmet di pesce fresco sul Lungomare Lombardo di Genova. Cucina del territorio ligure, cantina curata, vista mare.">
+<meta property="og:title" content="Ristorante Pesce e Vista Mare a Genova | Santamonica">
+<meta property="og:description" content="Ristorante di pesce sul mare a Genova, sul Lungomare Lombardo vicino a Corso Italia. Cucina ligure di territorio e cantina curata.">
 <meta property="og:url" content="https://santamonicagenova.it/">
 <meta property="og:image" content="https://santamonicagenova.it/img/hero.jpg">
 <meta property="og:locale" content="it_IT">
@@ -49,8 +50,8 @@
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Ristorante Santamonica Genova | Pesce Fresco Gourmet">
-<meta name="twitter:description" content="Ristorante gourmet di pesce fresco sul Lungomare Lombardo di Genova. Prenota online.">
+<meta name="twitter:title" content="Ristorante Pesce e Vista Mare a Genova | Santamonica">
+<meta name="twitter:description" content="Ristorante di pesce sul mare a Genova, sul Lungomare Lombardo vicino a Corso Italia. Cucina ligure di territorio e cantina curata.">
 <meta name="twitter:image" content="https://santamonicagenova.it/img/hero.jpg">
 
 <!-- Schema.org JSON-LD · v 2026.05.31.01 (sessione 15 SEO): fix @type da "ItalianRestaurant" (non riconosciuto da schema.org → JSON-LD ignorato da Google) a "Restaurant" (tipo formale). La specificità "ristorante italiano" è già preservata nel campo servesCuisine sottostante. Era F0.11 v 2026.05.19.04 (invariato in v.05 F0.12) -->
@@ -645,7 +646,7 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.05.30.03</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.06.04.01</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>
@@ -1052,6 +1053,6 @@
 <script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
 <script defer src="/cookieconsent-config.js"></script>
 
-<!-- v 2026.05.30.03 -->
+<!-- v 2026.06.04.01 -->
 </body>
 </html>

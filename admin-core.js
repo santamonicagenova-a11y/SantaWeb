@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.06.05.01 — Fix CSP "caricaDalSito": BASE_FETCH_URL da assoluto (santamonica-web.pages.dev) a relativo (''). Fetch ora same-origin → coperto da connect-src 'self', niente cross-origin/CORS. L'URL assoluto F0.6bis non serve piu (admin e menu sullo stesso deploy CF).
 // v 2026.05.22.01 — F0.21-d: accorpa dolci nella CARTA EN/FR (fetch live menu-dolci.html + DeepL fresco, fallback statico). filesDolci NON genera piu menu-dolci-en/fr.html. Nuovi helper _estraiMenu/_dolciCartaLive/costruisciDolciPerCarta. IT invariato.
 // v 2026.05.22.02 — F0.21-e: pagina ALLERGENI completa (carta+dolci) in coda alla CARTA EN/FR. Fetch live menu-allergeni.html + dolci; termini via dizionario controllato 14 allergeni UE (ALLERGENI_DIZIONARIO/VARIANTI), nomi piatti via DeepL/fallback. Iniezione renderAllergeniPage+CSS nel template lingua. menu-allergeni.html IT invariato (stampa). IT carta invariata.
 // v 2026.05.17.04 — F0.6bis: migrate fetch admin GH Pages → CF Pages (BASE_FETCH_URL centralizzato, 7 occorrenze)
@@ -12,9 +13,12 @@
 // v 2026.05.14.01 — Proxy DeepL via Vercel function (bypass CORS) + report errori traduzione
 
 // ═══════════════════════════════════════════════════════
-// CONFIG — F0.6bis: URL base fetch admin (CF Pages, era GH Pages)
+// CONFIG — URL base fetch admin
+// v 2026.06.05.01: relativo (same-origin) per non violare la CSP connect-src.
+// Admin e menu stanno sullo stesso deploy Cloudflare → '/menu-it.html' ecc.
+// risolvono sul dominio corrente (santamonicagenova.it o *.pages.dev). Vuoto = 'self'.
 // ═══════════════════════════════════════════════════════
-var BASE_FETCH_URL = 'https://santamonica-web.pages.dev';
+var BASE_FETCH_URL = '';
 
 // ═══════════════════════════════════════════════════════
 // TRADUZIONE — proxy Vercel verso DeepL

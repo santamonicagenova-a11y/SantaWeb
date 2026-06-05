@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.06.05.02 — Guard anti-crash in eseguiPubblicazione: se dati===null (menu non caricato, es. publish via modale-token dopo un refresh) avvisa "Prima carica il menu" invece di crashare su "dati.degustazione" (TypeError null).
 // v 2026.06.05.01 — Fix CSP (2 parti): (a) BASE_FETCH_URL da assoluto (santamonica-web.pages.dev) a relativo (''): fetch same-origin, coperto da connect-src 'self', niente cross-origin/CORS — l'URL assoluto F0.6bis non serve piu (admin e menu sullo stesso deploy CF). (b) Rimosso Function()/eval (4 siti: MENU x2, ALLERGENI_DATA x2): violava script-src (niente 'unsafe-eval'). Nuovo helper _parseDataBlock usa JSON.parse — i blocchi sono prodotti via JSON.stringify, quindi JSON puro: round-trip garantito, CSP del sito invariata.
 // v 2026.05.22.01 — F0.21-d: accorpa dolci nella CARTA EN/FR (fetch live menu-dolci.html + DeepL fresco, fallback statico). filesDolci NON genera piu menu-dolci-en/fr.html. Nuovi helper _estraiMenu/_dolciCartaLive/costruisciDolciPerCarta. IT invariato.
 // v 2026.05.22.02 — F0.21-e: pagina ALLERGENI completa (carta+dolci) in coda alla CARTA EN/FR. Fetch live menu-allergeni.html + dolci; termini via dizionario controllato 14 allergeni UE (ALLERGENI_DIZIONARIO/VARIANTI), nomi piatti via DeepL/fallback. Iniezione renderAllergeniPage+CSS nel template lingua. menu-allergeni.html IT invariato (stampa). IT carta invariata.
@@ -570,6 +571,9 @@ function costruisciMenuItPub() {
 }
 
 function eseguiPubblicazione(token) {
+  // Guard: senza menu caricato (dati===null) leggi() crasherebbe su "dati.degustazione".
+  // Puo' capitare dal percorso modale-token (confermaPubblica) dopo un refresh senza ricaricare il menu.
+  if (!dati) { alert('Prima carica il menù (Carica dal sito o da file), poi pubblica.'); return; }
 
   var headers = {
     'Authorization': 'token ' + token,

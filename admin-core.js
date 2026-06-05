@@ -1,5 +1,5 @@
 // Core functions per menu-admin Santamonica
-// v 2026.06.05.01 — Fix CSP "caricaDalSito": BASE_FETCH_URL da assoluto (santamonica-web.pages.dev) a relativo (''). Fetch ora same-origin → coperto da connect-src 'self', niente cross-origin/CORS. L'URL assoluto F0.6bis non serve piu (admin e menu sullo stesso deploy CF).
+// v 2026.06.05.01 — Fix CSP (2 parti): (a) BASE_FETCH_URL da assoluto (santamonica-web.pages.dev) a relativo (''): fetch same-origin, coperto da connect-src 'self', niente cross-origin/CORS — l'URL assoluto F0.6bis non serve piu (admin e menu sullo stesso deploy CF). (b) Rimosso Function()/eval (4 siti: MENU x2, ALLERGENI_DATA x2): violava script-src (niente 'unsafe-eval'). Nuovo helper _parseDataBlock usa JSON.parse — i blocchi sono prodotti via JSON.stringify, quindi JSON puro: round-trip garantito, CSP del sito invariata.
 // v 2026.05.22.01 — F0.21-d: accorpa dolci nella CARTA EN/FR (fetch live menu-dolci.html + DeepL fresco, fallback statico). filesDolci NON genera piu menu-dolci-en/fr.html. Nuovi helper _estraiMenu/_dolciCartaLive/costruisciDolciPerCarta. IT invariato.
 // v 2026.05.22.02 — F0.21-e: pagina ALLERGENI completa (carta+dolci) in coda alla CARTA EN/FR. Fetch live menu-allergeni.html + dolci; termini via dizionario controllato 14 allergeni UE (ALLERGENI_DIZIONARIO/VARIANTI), nomi piatti via DeepL/fallback. Iniezione renderAllergeniPage+CSS nel template lingua. menu-allergeni.html IT invariato (stampa). IT carta invariata.
 // v 2026.05.17.04 — F0.6bis: migrate fetch admin GH Pages → CF Pages (BASE_FETCH_URL centralizzato, 7 occorrenze)
@@ -84,6 +84,15 @@ function carica(input) {
   r.readAsText(f, 'utf-8');
 }
 
+// ── Helper: estrae l'oggetto dati da un blocco "const X = {...};".
+// I blocchi sono prodotti via JSON.stringify (vedi costruisciOutput) => JSON puro.
+// JSON.parse evita Function()/eval, vietato dalla CSP (niente 'unsafe-eval').
+function _parseDataBlock(js, varName) {
+  var a = js.indexOf('{'), b = js.lastIndexOf('}');
+  if (a < 0 || b < 0 || b < a) throw new Error('Blocco ' + (varName || 'dati') + ' non parsabile.');
+  return JSON.parse(js.slice(a, b + 1));
+}
+
 function analizza(src) {
   var START = 'const MENU = {';
   var END   = '/* \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */';
@@ -94,7 +103,7 @@ function analizza(src) {
   var i2end = src.indexOf('\n', i2) + 1;
 
   var js = src.slice(i1, i2).trim(); // "const MENU = { ... };"
-  dati = Function('"use strict";' + js + ';return MENU;')();
+  dati = _parseDataBlock(js, 'MENU');
   datiOriginali = JSON.parse(JSON.stringify(dati)); // copia immutabile
 
   tplBefore = src.slice(0, i1);
@@ -743,7 +752,7 @@ function _estraiMenu(src) {
   var i2 = src.indexOf(SEP, i1);
   if (i2 < 0) return null;
   var js = src.slice(i1, i2).trim();
-  try { return Function('"use strict";' + js + ';return MENU;')(); }
+  try { return _parseDataBlock(js, 'MENU'); }
   catch (e) { return null; }
 }
 
@@ -1035,7 +1044,7 @@ function traduciEPubblica() {
           var SEP = '/* ' + '\u2550'.repeat(57) + ' */';
           var i1 = src.indexOf(START), i2 = src.indexOf(SEP, i1);
           if (i1 >= 0 && i2 > i1) {
-            _allergeniCartaLive = Function('"use strict";' + src.slice(i1, i2).trim() + ';return ALLERGENI_DATA;')();
+            _allergeniCartaLive = _parseDataBlock(src.slice(i1, i2).trim(), 'ALLERGENI_DATA');
             // nomi piatti allergeni carta -> coda DeepL (combaciano coi piatti carta, ma per sicurezza)
             if (_allergeniCartaLive && _allergeniCartaLive.sezioni) {
               _allergeniCartaLive.sezioni.forEach(function(sez) {
@@ -1125,7 +1134,7 @@ function analizzaAllergeni(src) {
   var i2end = src.indexOf('\n', i2) + 1;
 
   var js = src.slice(i1, i2).trim();
-  datiAllergeni = Function('"use strict";' + js + ';return ALLERGENI_DATA;')();
+  datiAllergeni = _parseDataBlock(js, 'ALLERGENI_DATA');
 
   tplAllBefore = src.slice(0, i1);
   tplAllAfter  = src.slice(i2end);

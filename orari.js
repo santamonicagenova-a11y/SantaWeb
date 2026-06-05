@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════
    orari.js — FONTE UNICA orari di apertura · Santamonica Web
-   v 2026.05.22.01
+   v 2026.06.05.01
    ───────────────────────────────────────────────────────────────────────
    PER CAMBIARE GLI ORARI: modifica SOLO gli oggetti SERVIZI e SETTIMANA.
    Tutto il resto (display #info, tabella dove-siamo, Schema.org JSON-LD su
@@ -14,6 +14,28 @@
    (entità con @type *Restaurant). Lo script gira sincrono in <head> → Googlebot
    esegue il rendering JS e legge structured data iniettati. Le pagine NON
    contengono più openingHoursSpecification statico.
+   ═══════════════════════════════════════════════════════════════════════
+
+   STORICO
+   - v 2026.06.05.01 (nuovi orari dal 7 giugno 2026): mer e gio passano a
+     SOLA CENA (prima pranzo+cena); dom passa a PRANZO+CENA (prima solo pranzo).
+     Invariati: lun chiuso, mar solo cena, ven/sab pranzo+cena. Aggiorna in
+     automatico #orari-info, tabella dove-siamo, Schema.org e le tendine del
+     form (getServicesByDay). Speculare lato server: VALID_SLOTS in
+     submit-reservation (Edge Function SafeTable).
+   - v 2026.05.27.05 (sessione SYNC archivio↔live · sessione 5 del 27/5):
+       · [recovered from live] Sostituito l'archivio con la versione live
+         del repo santamonicagenova-a11y/SantaWeb (branch main). L'archivio
+         era fermo a v 2026.05.22.01 SENZA la export `getServicesByDay`
+         aggiunta direttamente sul live nei 8 commit del 26/5 sessione 1
+         (form prenotazioni esteso). Drift unidirezionale (live → archivio)
+         risolto sovrascrivendo archivio col contenuto raw del live.
+       · [aggiunta runtime] global.getServicesByDay(jsDayIndex): ritorna
+         l'array dei servizi attivi per il giorno (es. ['pranzo','cena']),
+         consumato da updateOrarioSlots() in index.html per filtrare gli
+         optgroup dello <select id="p-orario"> alla scelta della data.
+   - v 2026.05.22.01 (F0.21 — refactor orari FONTE UNICA): SERVIZI e SETTIMANA
+         introdotte come unica fonte, generano #orari-info + tabella + JSON-LD.
    ═══════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
@@ -27,21 +49,21 @@
   var SETTIMANA = [
     { day: 'lun', services: [] },
     { day: 'mar', services: ['cena'] },
-    { day: 'mer', services: ['pranzo', 'cena'] },
-    { day: 'gio', services: ['pranzo', 'cena'] },
+    { day: 'mer', services: ['cena'] },
+    { day: 'gio', services: ['cena'] },
     { day: 'ven', services: ['pranzo', 'cena'] },
     { day: 'sab', services: ['pranzo', 'cena'] },
-    { day: 'dom', services: ['pranzo'] }
+    { day: 'dom', services: ['pranzo', 'cena'] }
   ];
   // ═════════════════════════════════════════════════════
 
   var L = {
-    it: { lun: 'Luned\u00EC', mar: 'Marted\u00EC', mer: 'Mercoled\u00EC', gio: 'Gioved\u00EC', ven: 'Venerd\u00EC', sab: 'Sabato', dom: 'Domenica', chiuso: 'chiuso', chiusoLine: '%s chiuso' },
+    it: { lun: 'Lunedì', mar: 'Martedì', mer: 'Mercoledì', gio: 'Giovedì', ven: 'Venerdì', sab: 'Sabato', dom: 'Domenica', chiuso: 'chiuso', chiusoLine: '%s chiuso' },
     en: { lun: 'Monday', mar: 'Tuesday', mer: 'Wednesday', gio: 'Thursday', ven: 'Friday', sab: 'Saturday', dom: 'Sunday', chiuso: 'closed', chiusoLine: 'Closed %s' },
-    fr: { lun: 'Lundi', mar: 'Mardi', mer: 'Mercredi', gio: 'Jeudi', ven: 'Vendredi', sab: 'Samedi', dom: 'Dimanche', chiuso: 'ferm\u00E9', chiusoLine: 'Ferm\u00E9 %s' }
+    fr: { lun: 'Lundi', mar: 'Mardi', mer: 'Mercredi', gio: 'Jeudi', ven: 'Vendredi', sab: 'Samedi', dom: 'Dimanche', chiuso: 'fermé', chiusoLine: 'Fermé %s' }
   };
   var EN_DAY = { lun: 'Monday', mar: 'Tuesday', mer: 'Wednesday', gio: 'Thursday', ven: 'Friday', sab: 'Saturday', dom: 'Sunday' };
-  var NDASH = ' \u2013 ';
+  var NDASH = ' – ';
 
   function fmt(s) { return SERVIZI[s].opens + NDASH + SERVIZI[s].closes; }
   function sig(services) { return services.join('|'); }
@@ -95,7 +117,7 @@
   function renderInfo(lang) {
     if (typeof document === 'undefined') return;
     var box = document.getElementById('orari-info'); if (!box) return;
-    var lab = labels(lang), g = buildGroups(lang, '\u00A0/\u00A0'), html = '';
+    var lab = labels(lang), g = buildGroups(lang, ' / '), html = '';
     g.aperti.forEach(function (grp) {
       html += '<span>' + grp.label + '</span><br><strong style="color:var(--ink);font-weight:400">' + grp.times + '</strong><br><br>';
     });
@@ -109,7 +131,7 @@
   function renderTable(lang) {
     if (typeof document === 'undefined') return;
     var tb = document.getElementById('orari-tbody'); if (!tb) return;
-    var rows = buildTableRows(lang || 'it', '\u00A0\u00B7\u00A0');
+    var rows = buildTableRows(lang || 'it', ' · ');
     var todayKey = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'][new Date().getDay()];
     tb.innerHTML = rows.map(function (r) {
       var cls = ((r.closed ? 'closed' : '') + (r.day === todayKey ? ' today' : '')).trim();

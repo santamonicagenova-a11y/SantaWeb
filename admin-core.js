@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.06.05.03 — Pagina orario (versione 1 pagina): blocco QR ridotto da 4 a 2 lingue. Aggiornata la regex di sostituzione link EN/FR (riga ~674) per matchare 2 righe invece di 4 (rimossi Deutsch/Espanol, coerente con F0.4). Allineato a admin-templates-shared.js e menu-it.html.
 // v 2026.06.05.02 — Guard anti-crash in eseguiPubblicazione: se dati===null (menu non caricato, es. publish via modale-token dopo un refresh) avvisa "Prima carica il menu" invece di crashare su "dati.degustazione" (TypeError null).
 // v 2026.06.05.01 — Fix CSP (2 parti): (a) BASE_FETCH_URL da assoluto (santamonica-web.pages.dev) a relativo (''): fetch same-origin, coperto da connect-src 'self', niente cross-origin/CORS — l'URL assoluto F0.6bis non serve piu (admin e menu sullo stesso deploy CF). (b) Rimosso Function()/eval (4 siti: MENU x2, ALLERGENI_DATA x2): violava script-src (niente 'unsafe-eval'). Nuovo helper _parseDataBlock usa JSON.parse — i blocchi sono prodotti via JSON.stringify, quindi JSON puro: round-trip garantito, CSP del sito invariata.
 // v 2026.05.22.01 — F0.21-d: accorpa dolci nella CARTA EN/FR (fetch live menu-dolci.html + DeepL fresco, fallback statico). filesDolci NON genera piu menu-dolci-en/fr.html. Nuovi helper _estraiMenu/_dolciCartaLive/costruisciDolciPerCarta. IT invariato.
@@ -671,7 +672,7 @@ function eseguiPubblicazione(token) {
       '<a href="menu-en.html"><u>English Menu</u></a>',
       '<a href="menu-fr.html"><u>Carte en Français</u></a>'
     ];
-    html = html.replace(/English Menu<br>\s*Carte en Fran[^<]*<br>\s*Speisekarte auf Deutsch<br>\s*Carta en Espa\u00f1ol/, qrLinks.join('<br>\n            '));
+    html = html.replace(/English Menu<br>\s*Carte en Fran[^<]*/, qrLinks.join('<br>\n            '));
     // Inietta canonical + index per la lingua specifica
     html = iniettaSeoLingua(html, lang);
     // F0.21-e: inietta CSS + renderer pagina allergeni e lo chiama dopo renderCarta().

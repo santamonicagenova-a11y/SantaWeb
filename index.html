@@ -909,6 +909,9 @@
         body: JSON.stringify(payload)
       });
       if (res.status === 201) {
+        // [v 2026.06.06] Conversione GA4 — richiesta di prenotazione (lead). GDPR-safe: scatta solo con consenso analytics.
+        try { if (typeof gtag === 'function') gtag('event', 'generate_lead', { form_location: 'home_reservation', currency: 'EUR', value: 0 }); } catch(e){}
+        try { if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'Prenotazione sito', content_category: 'prenotazione' }); } catch(e){}
         // Successo: nascondo form, mostro schermata thankyou
         pForm.style.display = 'none';
         document.getElementById('prenota-thankyou').style.display = '';

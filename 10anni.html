@@ -314,6 +314,7 @@
             // Evento di conversione Meta Pixel: scatta SOLO se il consenso advertising
             // ha caricato il Pixel (fbq definito). Senza consenso = nessun evento (GDPR-safe).
             try { if (typeof fbq === 'function') fbq('track', 'Lead', {content_name:'Decennale 1 luglio 2026', content_category:'evento'}); } catch(e){}
+            try { if (typeof gtag === 'function') gtag('event', 'generate_lead', { form_location: 'landing_10anni', currency: 'EUR', value: 0 }); } catch(e){}
             form.reset();
             msg.className='form-msg ok';
             msg.textContent='Grazie. Abbiamo ricevuto la tua richiesta: ti ricontattiamo per confermare.';

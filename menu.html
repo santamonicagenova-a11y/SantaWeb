@@ -424,7 +424,6 @@
 </head>
 <body>
 <main>
-<h1 style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">Menù — Ristorante Santamonica</h1>
 <div id="layout-carta"></div>
 <div id="layout-orario"></div>
 
@@ -722,7 +721,7 @@ function buildDegu(degu) {
 
   return `
     <div class="degu">
-      <div class="degu-titolo">Men&ugrave;&rsquo; Degustazione</div>
+      <h1 class="degu-titolo">Men&ugrave;&rsquo; Degustazione</h1>
       <div class="degu-prezzi">${optsHtml}</div>
       <div class="degu-nota">${degu.nota.replace("l'intero tavolo", "<strong>l\u2019intero tavolo</strong>")}</div>
       ${percorsiHtml}

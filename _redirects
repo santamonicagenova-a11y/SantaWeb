@@ -1,42 +1,18 @@
-# Santamonica Web — Cloudflare Pages headers
-# v 2026.05.21.01
-# Storico: v 2026.05.17.01 (F0.3 noindex) -> v 2026.05.21.01 (F0.18: CSP + security headers)
+# Santamonica Web — Cloudflare Pages redirects
+# v 2026.06.08.01
 # NB: file ignorato da GitHub Pages; effetto solo su Cloudflare Pages.
+#
+# Storico: il vecchio _redirects era una copia STANTIA di header (X-Robots-Tag,
+#   CSP) malnominata, senza regole di redirect -> ignorata da Cloudflare. Gli
+#   header veri stanno in _headers (v 2026.06.05.02). Questo file ora contiene
+#   SOLO redirect. Stato live verificato il 2026-06-08: nessuna regola redirect
+#   reale presente, sostituzione integrale sicura.
+#
+# Sintassi Cloudflare: <sorgente>  <destinazione>  <codice>
 
-/*
-  X-Robots-Tag: noindex, nofollow
-  X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
-  Referrer-Policy: strict-origin-when-cross-origin
-  Cross-Origin-Opener-Policy: same-origin
-  Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=(), browsing-topics=()
-  Strict-Transport-Security: max-age=31536000
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://maps.google.com https://www.google.com; connect-src 'self' https://sibforms.com https://*.sibforms.com; form-action 'self' https://formspree.io https://sibforms.com https://*.sibforms.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+# Legacy URL Wix /cucina (soft-404 in GSC) -- PIANO_SILOING §6
+# SUBITO: porta a home (toglie il soft-404, recupera segnale/backlink legacy).
+/cucina    /    301
 
-# ─────────────────────────────────────────────────────────────
-# NOTE OPERATIVE F0.18
-#
-# 1) X-Robots-Tag noindex: PRESERVATO da v 2026.05.17.01. Rimuovere SOLO a F0.21
-#    (go-live), insieme alla rimozione del noindex per tutto il sito.
-#
-# 2) HSTS: impostato conservativo (max-age 1 anno, SENZA includeSubDomains/preload).
-#    A F0.21, sul dominio custom, valutare aggiunta di "; includeSubDomains; preload".
-#    NON aggiungere includeSubDomains finché si serve su *.pages.dev (suffisso condiviso).
-#
-# 3) CSP — script-src usa 'unsafe-inline' perché le pagine contengono script inline
-#    eseguibili (protezione placeholder regala.html, print menu, init iframemanager)
-#    e handler inline (onchange setLang, onclick window.print). HARDENING FUTURO
-#    (chiusura P3.A5): esternalizzare gli script inline in /lib/ + sostituire i 3
-#    handler inline con addEventListener, poi rimuovere 'unsafe-inline' da script-src.
-#
-# 4) frame-src: solo Google Maps (embed via iframemanager su consenso). Se in futuro
-#    si aggiungono altri embed (es. video), estendere qui.
-#
-# 5) form-action: include Formspree (prenotazioni) e sibforms.com (newsletter Brevo
-#    GIA' presente in index.html). Riconciliare con F0.15 (audit log HMAC P3.7).
-#
-# 6) img-src include https: (permissivo) per non rompere eventuali immagini Brevo.
-#    Restringere a 'self' data:' dopo audit completo Brevo (F0.15).
-#
-# 7) TEST in F0.20 (E2E su staging pages.dev, dove la CSP è già attiva): verificare
-#    caricamento font, apertura mappa su consenso, invio form prenotazione e newsletter.
+# AL GO-LIVE della pillar #1: ripuntare a /cucina-di-pesce
+# (sostituire la riga sopra con:  /cucina  /cucina-di-pesce  301).

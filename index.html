@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.06.08.01 — Favicon: aggiunti i tag <link> dell'icona nel <head> (favicon.ico + favicon.svg + apple-touch-icon.png). favicon.svg già generato (monogramma SM, crema su bruno); favicon.ico e apple-touch-icon.png da generare dalla Favicon.jpg e da caricare in radice del repo. I tag sono già pronti: quando i 2 raster sono in radice, l'icona è completa senza altre modifiche HTML. -->
 <!-- v 2026.06.04.01 — SEO home: title + meta description IT riscritti per intercettare i cluster di ricerca non-brand reali (pesce / sul mare / Corso Italia), fonte dati GSC 90gg. Title: "Ristorante Pesce e Vista Mare a Genova | Santamonica". I valori effettivi sono governati da translations.json (page_title/page_description IT); l'HTML statico è allineato per gli scraper social che leggono il markup grezzo. Gate produzione: P1+P2 (Claude) + P3 Revisione Oppositiva via DeepSeek + Grok (Gemini ko per quota) + sign-off Andrea (meta senza CTA). -->
 <!-- v 2026.05.31.01 — sessione 15 SEO: fix Schema.org @type da "ItalianRestaurant" (NON riconosciuto da schema.org → JSON-LD ignorato da Google) a "Restaurant" (tipo formale). La specificità "ristorante italiano" è già preservata nel campo servesCuisine. Identico fix anche in dove-siamo.html. Diagnosi via validator.schema.org. -->
 <!-- v 2026.05.30.03 — Chiusura/apertura di SINGOLI orari (sessione 13d del 30/5): oltre ai servizi (pranzo/cena/tutto) ora si possono chiudere o aprire singoli slot orario. Il form legge slot_closures/slot_openings da reservations-status; updateOrarioSlots nasconde le <option> chiuse e mostra quelle aperte in via straordinaria (visibile = slotOpen || (servizio disponibile && !slotClosed)). Blocco server-side speculare in submit-reservation v10. -->
@@ -53,6 +54,11 @@
 <meta name="twitter:title" content="Ristorante Pesce e Vista Mare a Genova | Santamonica">
 <meta name="twitter:description" content="Ristorante di pesce sul mare a Genova, sul Lungomare Lombardo vicino a Corso Italia. Cucina ligure di territorio e cantina curata.">
 <meta name="twitter:image" content="https://santamonicagenova.it/img/hero.jpg">
+
+<!-- Favicon (v 2026.06.08.01) — file in radice del sito -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
 <!-- Schema.org JSON-LD · v 2026.05.31.01 (sessione 15 SEO): fix @type da "ItalianRestaurant" (non riconosciuto da schema.org → JSON-LD ignorato da Google) a "Restaurant" (tipo formale). La specificità "ristorante italiano" è già preservata nel campo servesCuisine sottostante. Era F0.11 v 2026.05.19.04 (invariato in v.05 F0.12) -->
 <script type="application/ld+json">
@@ -110,9 +116,7 @@
 <!-- FONTE UNICA orari · genera #info (#orari-info) + inietta openingHoursSpecification nel JSON-LD soprastante -->
 <script src="/orari.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="image" href="img/sito/hero.webp" fetchpriority="high">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet"></noscript>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
 
 <!-- F0.9: vanilla-cookieconsent v3.1.0 (bundle locale) -->
 <link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.css">
@@ -134,7 +138,7 @@
   nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 2rem; background: transparent; transition: background 0.4s, backdrop-filter 0.4s; }
   nav.scrolled { background: rgba(250,248,244,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--divider); }
   .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
-  .nav-logo .sub { font-size: 1rem; letter-spacing: 0.12em; opacity: 0.7; font-weight: 300; text-transform: lowercase; }
+  .nav-logo .sub { font-size: 1rem; letter-spacing: 0.12em; opacity: 0.55; font-weight: 300; text-transform: lowercase; }
   .nav-links { display: flex; gap: 1.5rem; list-style: none; align-items: center; }
   .nav-links a { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); text-decoration: none; transition: color 0.2s; }
   .nav-links a:hover { color: var(--terracotta); }
@@ -275,8 +279,8 @@
   .footer-social { display: flex; gap: 1.5rem; justify-self: center; }
   .footer-social a { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); text-decoration: none; transition: color 0.2s; }
   .footer-social a:hover { color: var(--sand); }
-  .footer-copy { font-size: 0.68rem; color: rgba(245,240,232,0.6); letter-spacing: 0.1em; justify-self: end; text-align: right; }
-  .footer-version { color: var(--terracotta); text-decoration: none; ;text-decoration:underline;text-decoration:underline}
+  .footer-copy { font-size: 0.68rem; color: rgba(245,240,232,0.4); letter-spacing: 0.1em; justify-self: end; text-align: right; }
+  .footer-version { color: var(--terracotta); text-decoration: none; }
   .footer-version:hover { text-decoration: underline; }
 
   .mobile-menu { display: none; position: fixed; inset: 0; z-index: 200; background: var(--warm-white); flex-direction: column; justify-content: center; align-items: center; gap: 2.5rem; }
@@ -335,7 +339,7 @@
     <li><a href="#info" data-i18n="nav_contatti">Contatti</a></li>
   </ul>
   <div class="nav-right">
-    <select class="lang-select" id="lang-select-nav" onchange="setLang(this.value)" aria-label="Lingua">
+    <select class="lang-select" id="lang-select-nav" onchange="setLang(this.value)">
       <option value="it" selected>IT</option>
       <option value="en">EN</option>
       <option value="fr">FR</option>
@@ -360,8 +364,7 @@
   <a href="#prenota" style="font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-style:normal;background:var(--ink);color:var(--warm-white);padding:0.9rem 2.5rem;" data-i18n="nav_prenota">Prenota</a>
 </div>
 
-<main>
-  <section class="hero" style="padding:0;position:relative;">
+<section class="hero" style="padding:0;position:relative;">
   <div class="hero-text-panel">
     <p class="hero-eyebrow" data-i18n="hero_eyebrow">Ristorante &middot; Genova</p>
     <h1 class="hero-title" data-i18n="hero_title">Cucina <em>viva</em><br>sul mare</h1>
@@ -642,7 +645,6 @@
   </div>
 </section>
 
-</main>
 <footer>
   <div class="footer-inner">
     <span class="footer-brand">Santamonica</span>
@@ -913,9 +915,6 @@
         body: JSON.stringify(payload)
       });
       if (res.status === 201) {
-        // [v 2026.06.06] Conversione GA4 — richiesta di prenotazione (lead). GDPR-safe: scatta solo con consenso analytics.
-        try { if (typeof gtag === 'function') gtag('event', 'generate_lead', { form_location: 'home_reservation', currency: 'EUR', value: 0 }); } catch(e){}
-        try { if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'Prenotazione sito', content_category: 'prenotazione' }); } catch(e){}
         // Successo: nascondo form, mostro schermata thankyou
         pForm.style.display = 'none';
         document.getElementById('prenota-thankyou').style.display = '';

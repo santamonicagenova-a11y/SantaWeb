@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.06.09.01 — Mobile (≤900px) coerenza grafica: (1) allineamento testo CENTRATO in tutte le sezioni (hero, cucina, cantina, galleria, prenota, contatti) — prima erano a sinistra mentre "Buoni regalo"/newsletter erano già centrate; scelta Andrea = tutto centrato. I campi del form (input/textarea/select) restano text-align:left per leggibilità. (2) CTA uniformati: .hero-actions e .cucina-actions passano a colonna, ogni pulsante a piena larghezza e di uguale dimensione (prima si dimensionavano sul testo → larghezze diverse, hero impilato vs cucina affiancato). Solo CSS nel blocco @media (max-width:900px); nessuna modifica a contenuti/markup. Verifica preview mobile 390px + smoke test live da Andrea. -->
 <!-- v 2026.06.08.01 — Favicon: aggiunti i tag <link> dell'icona nel <head> (favicon.ico + favicon.svg + apple-touch-icon.png). favicon.svg già generato (monogramma SM, crema su bruno); favicon.ico e apple-touch-icon.png da generare dalla Favicon.jpg e da caricare in radice del repo. I tag sono già pronti: quando i 2 raster sono in radice, l'icona è completa senza altre modifiche HTML. -->
 <!-- v 2026.06.04.01 — SEO home: title + meta description IT riscritti per intercettare i cluster di ricerca non-brand reali (pesce / sul mare / Corso Italia), fonte dati GSC 90gg. Title: "Ristorante Pesce e Vista Mare a Genova | Santamonica". I valori effettivi sono governati da translations.json (page_title/page_description IT); l'HTML statico è allineato per gli scraper social che leggono il markup grezzo. Gate produzione: P1+P2 (Claude) + P3 Revisione Oppositiva via DeepSeek + Grok (Gemini ko per quota) + sign-off Andrea (meta senza CTA). -->
 <!-- v 2026.05.31.01 — sessione 15 SEO: fix Schema.org @type da "ItalianRestaurant" (NON riconosciuto da schema.org → JSON-LD ignorato da Google) a "Restaurant" (tipo formale). La specificità "ristorante italiano" è già preservata nel campo servesCuisine. Identico fix anche in dove-siamo.html. Diagnosi via validator.schema.org. -->
@@ -319,6 +320,11 @@
     .footer-brand, .footer-social, .footer-copy { justify-self: center; text-align: center; }
     .galleria-grid { grid-template-columns: repeat(2, 1fr); }
     .galleria-item.grande { grid-column: span 2; aspect-ratio: 3/2; }
+    /* v 2026.06.09.01 — mobile: testo centrato in tutte le sezioni + CTA a piena larghezza, uguali e impilati */
+    section, .hero-text-panel, .section-inner, .regalo-inner { text-align: center; }
+    input, textarea, select { text-align: left; }
+    .hero-actions, .cucina-actions { flex-direction: column; align-items: stretch; }
+    .hero-actions > a, .cucina-actions > a { width: 100%; }
   }
   @media (max-width: 600px) {
     .galleria-grid { grid-template-columns: 1fr; }
@@ -652,7 +658,7 @@
       <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.06.04.01</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.06.09.01</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>

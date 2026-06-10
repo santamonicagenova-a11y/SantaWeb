@@ -8,8 +8,7 @@
   <meta http-equiv="Expires" content="0" />
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://santamonicagenova.it/menu-fr.html">
-  <title>Menu — Santamonica · Restaurant de poisson à Gênes</title>
-<meta name="description" content="Le menu du restaurant Santamonica à Gênes : poissons de la côte ligure, pâtes maison, salle avec vue sur la mer. Sélectionné par le Guide Michelin."/>
+  <title>Menu — Santamonica</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
 
@@ -21,6 +20,7 @@
       --rust:  #9e4a2a;
       --rule:  #d4c9b8;
     }
+    @media (max-width:640px){.pg{width:auto!important;max-width:100%!important;min-height:0!important;margin:0!important;padding:26px 16px!important;box-shadow:none!important;}.logo{font-size:1.9rem!important;letter-spacing:.1em!important;}.logo-sub{font-size:.6rem!important;}.lista-titolo{font-size:1.05rem!important;letter-spacing:.12em!important;}.sez-titolo{font-size:1.3rem!important;letter-spacing:.08em!important;}.sommelier{font-size:.62rem!important;}html,body{overflow-x:hidden!important;}}
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -462,7 +462,7 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Glace au citron noir, au livèche et au citron vert, accompagnée de crackers au lait"
+          "nome": "Glace au citron noir, au fenouil, au citron vert et aux biscuits au lait"
         }
       ],
       "Sette": "Menu carte blanche du Chef"
@@ -603,7 +603,7 @@ const MENU = {
       "titolo": "Golosità",
       "piatti": [
         {
-          "nome": "Glace au citron noir, au livèche et au citron vert, accompagnée de crackers au lait",
+          "nome": "Glace au citron noir, au fenouil, au citron vert et aux biscuits au lait",
           "prezzo": 14
         },
         {
@@ -657,22 +657,16 @@ const MENU = {
     "separatoreDopo": "Crudi",
     "orarioServizio": [
       {
-        "giorno": "Mardi",
+        "giorno": "Dal martedì al giovedì",
         "fasce": [
           "19:30 – 22:30"
         ]
       },
       {
-        "giorno": "Du mercredi au samedi",
+        "giorno": "Dal venerdì alla domenica",
         "fasce": [
           "12:30 – 14:30",
           "19:30 – 22:30"
-        ]
-      },
-      {
-        "giorno": "Dimanche",
-        "fasce": [
-          "12:30 – 14:30"
         ]
       }
     ]
@@ -752,11 +746,13 @@ const MENU = {
             ]
           },
           {
-            "nome": "Tortelli au sanglier, bouillon de dorade, oignon nouveau, shiso",
+            "nome": "Cappellacci au sanglier, aux cardoncelli, aux orties et aux myrtilles",
             "allergeni": [
               "gluten",
               "œufs",
               "poisson",
+              "soja",
+              "lait",
               "céleri",
               "sulfites"
             ]
@@ -1018,8 +1014,7 @@ function renderOrario() {
           <hr style="border:none;border-top:1px solid var(--ink);margin:2mm 0">
           <div class="orario-links">
             <a href="menu-en.html"><u>English Menu</u></a><br>
-            <a href="menu-fr.html"><u>Carte en Français</u></a>
-          </div>
+            <a href="menu-fr.html"><u>Carte en Français</u></a></div>
           <img src="https://santamonicagenova-a11y.github.io/SantaWeb/orario-qr.png" alt="QR code" style="width:45mm;height:45mm;display:block;margin:0 auto;" />
         </div>
       </div>

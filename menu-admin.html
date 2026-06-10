@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.06.10.05 — cursore caratteri attivo anche sui dolci: bump ?v= di admin-core.js a 2026.06.10.04 (rimosso il guard) + footer-version. menu-dolci.html v.04 aggiornato col meccanismo --fs. -->
 <!-- v 2026.06.10.04 — cache-busting ?v= su admin-templates-shared.js e admin-core.js: questi .js non avevano versione → il browser teneva la cache vecchia dopo i commit (cursore caratteri non attivo). Da ora, bumpando il ?v= a ogni modifica di quei file, il browser scarica subito la versione nuova senza hard-refresh. -->
 
 <!-- versione v 2026.05.30.03 — Sessione 13d (30/5): nella sezione "Prenotazioni online" aggiunti due blocchi "Chiudi un singolo orario" e "Apri un singolo orario extra" (data + tendina orari + lista rimovibile). Stato slot_closures/slot_openings letto da reservations-status v3 e scritto via set-reservations-config v3 (azioni add/remove_slot_closure e add/remove_slot_opening). Gestione conflitti speculare a quella servizio: se chiudi un orario già aperto extra (o viceversa) → avviso + conferma + rimozione dell'opposto. Blocco server-side in submit-reservation v10. -->
@@ -316,7 +317,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.06.10.04"></script>
-<script src="admin-core.js?v=2026.06.10.03"></script>
+<script src="admin-core.js?v=2026.06.10.04"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -1045,7 +1046,7 @@ async function _eseguiPubblicaFotoSito(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.06.10.04</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.06.10.05</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

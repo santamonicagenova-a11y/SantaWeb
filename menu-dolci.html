@@ -1,9 +1,7 @@
 <!DOCTYPE html>
+<!-- v 2026.06.10.04 — Dimensione caratteri regolabile (come la carta): font-size del testo leggibile ora calc(<orig>rem * var(--fs,1.12)); renderCarta() imposta --fs da MENU.fontScale (round-trippa via leggi(), pilotato dal cursore in menu-admin). .note-ospite ESCLUSO. + Stampa entro area stampabile: @page margin 8mm + #layout-carta .pg width auto/height 281mm/padding 9-14-8; foglio orario isolato e invariato via @page nominata "orarioPage" (margin 0). -->
 <!-- v 2026.05.22.01 — F0.21-e: allineamento vocabolario allergeni: "uovo" -> "uova", "solforosa" -> "solfiti". (Versione introdotta: il file ne era privo.) -->
 <html lang="it">
-  <style>
-@media (max-width:640px){.pg{width:auto!important;max-width:100%!important;min-height:0!important;margin:0!important;padding:26px 16px!important;box-shadow:none!important;}.logo{font-size:1.9rem!important;letter-spacing:.1em!important;}.logo-sub{font-size:.6rem!important;}.lista-titolo{font-size:1.05rem!important;letter-spacing:.12em!important;}.sez-titolo{font-size:1.3rem!important;letter-spacing:.08em!important;}.sommelier{font-size:.62rem!important;}html,body{overflow-x:hidden!important;}}
-</style>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -134,7 +132,7 @@
       padding: 4mm 0;
     }
     .degu-titolo {
-      font-size: 1.4rem;
+      font-size: calc(1.4rem * var(--fs, 1.12));
       font-weight: 600;
       letter-spacing: .16em;
       text-transform: uppercase;
@@ -142,13 +140,13 @@
     }
     .degu-prezzi {
       font-style: italic;
-      font-size: .98rem;
+      font-size: calc(.98rem * var(--fs, 1.12));
       line-height: 1.4;
       margin-bottom: 2mm;
     }
     .degu-nota {
       font-style: italic;
-      font-size: .98rem;
+      font-size: calc(.98rem * var(--fs, 1.12));
       color: var(--ink);
       margin-bottom: 14mm;
     }
@@ -163,12 +161,12 @@
     .percorso-label {
       font-style: italic;
       font-weight: 700;
-      font-size: 1.25rem;
+      font-size: calc(1.25rem * var(--fs, 1.12));
       margin-bottom: 3mm;
     }
-    .percorso-piatto { font-size: .96rem; line-height: 1.95; font-style: normal; }
+    .percorso-piatto { font-size: calc(.96rem * var(--fs, 1.12)); line-height: 1.95; font-style: normal; }
     .percorso-piatto em { font-style: normal; }
-    .percorso-libero { font-size: .96rem; line-height: 1.95; font-style: normal; }
+    .percorso-libero { font-size: calc(.96rem * var(--fs, 1.12)); line-height: 1.95; font-style: normal; }
 
     /* ── sezioni carta ── */
     .pg-content {
@@ -181,7 +179,7 @@
     .sezione-titolo {
       font-family: 'Cormorant Garamond', serif;
       font-style: normal;
-      font-size: 1.5rem;
+      font-size: calc(1.5rem * var(--fs, 1.12));
       font-weight: 600;
       letter-spacing: .14em;
       text-transform: uppercase;
@@ -193,16 +191,16 @@
     .piatto {
       text-align: center;
       padding: .5mm 0;
-      font-size: .96rem;
+      font-size: calc(.96rem * var(--fs, 1.12));
       line-height: 1.4;
     }
     .piatto-prezzo {
-      font-size: .8rem;
+      font-size: calc(.8rem * var(--fs, 1.12));
       color: var(--stone);
       margin-left: .3rem;
     }
     .piatto-unita {
-      font-size: .76rem;
+      font-size: calc(.76rem * var(--fs, 1.12));
       color: var(--stone);
       margin-left: .1rem;
     }
@@ -359,17 +357,18 @@
        STAMPA
     ══════════════════════════════════════ */
     @media print {
-      @page { size: A4 portrait; margin: 0; }
+      @page { size: A4 portrait; margin: 8mm; }
+      @page orarioPage { size: A4 portrait; margin: 0; }
       body { background: white; }
       .ctrl-bar { display: none; }
 
       /* carta: 3 pagine */
       #layout-carta .pg {
-        width: 210mm;
-        height: 297mm;
+        width: auto;
+        height: 281mm;
         min-height: unset;
         margin: 0;
-        padding: 15mm 22mm 14mm;
+        padding: 9mm 14mm 8mm;
         box-shadow: none;
         page-break-after: always;
       }
@@ -377,6 +376,7 @@
 
       /* orario: 1 pagina */
       #layout-orario .pg {
+        page: orarioPage;
         width: 210mm;
         height: 297mm;
         min-height: unset;
@@ -546,6 +546,7 @@ function buildAllergeni(allergeni) {
 function renderCarta() {
   const root = document.getElementById('layout-carta');
   root.innerHTML = '';
+  if (MENU.fontScale) root.style.setProperty('--fs', MENU.fontScale);
 
   if (MENU.degustazione) {
     // Menu carta normale

@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.06.10.04 — Cursore "Dimensione caratteri" ora attivo ANCHE sul menu dolci (rimosso il guard tipoMenuCorrente!=='carta'). Funziona perché menu-dolci.html v.04 ha lo stesso meccanismo --fs (calc + renderCarta). Testo di aiuto generalizzato (carta o dolci).
 // v 2026.06.10.03 — Cursore "Dimensione caratteri menù (stampa)" in cima al form della carta (costruisci()): range 90%–135%, default 112%, scrive dati.fontScale (round-trippa nel JSON pubblicato via leggi() → letto da renderCarta in admin-templates-shared.js v.04 che imposta var(--fs)). Regola solo i font leggibili della carta; "Note per l'ospite" esclusa. Va usato poi con Anteprima/Pubblica.
 // v 2026.06.10.02 — SEO meta description (durevole, template): _VINI_TPL ora include <title> "Carta dei Vini | Ristorante Santamonica Genova" + <meta name="description"> (carta vini); iniettaSeoLingua estesa con dizionario SEO_LL (title+description per en/fr, override del title dopo t.title — gira al passo 678 dopo il replace 663, quindi vince). Allinea i template alla patch live dei 4 file menu-*.html (gate completo P1+P2 + P3 3 vendor + sign-off Andrea 10/6). Le future pubblicazioni escono già con title+description corretti.
 // v 2026.06.10.01 — Mobile lista vini: aggiunta media query @media (max-width:640px) nel <style> di _VINI_TPL. Le pagine generate (menu-vini.html) erano disegnate come foglio A4 (.pg{width:210mm}) senza CSS responsive → su telefono sbordavano oltre lo schermo (testo tagliato a destra). La media query sgancia la larghezza A4 (.pg width:auto/max-width:100%, padding ridotto, no box-shadow), scala logo/titoli e mette overflow-x:hidden. Tutte le regole sono !important (stanno prima di .pg base nel cascade). Print invariato. Il fix vale per le NUOVE pubblicazioni; i file già online vanno patchati a parte o ripubblicati.
@@ -148,7 +149,6 @@ function costruisci() {
 
   /* --- DIMENSIONE CARATTERI (stampa carta) --- */
   (function(){
-    if (tipoMenuCorrente !== 'carta') return; // il menu dolci usa un template proprio, niente --fs
     var cur = (m.fontScale != null ? m.fontScale : 1.12);
     var fsf = el('div','fs');
     fsf.appendChild(el('div','fs-head','Dimensione caratteri menù (stampa)'));
@@ -166,7 +166,7 @@ function costruisci() {
     });
     row.appendChild(rng); row.appendChild(out);
     fb.appendChild(row);
-    var hint = el('div','', 'Vale per il menù alla carta stampato (100% = base). Le “Note per l’ospite” restano invariate. Dopo aver scelto, controlla con Anteprima e poi Pubblica.');
+    var hint = el('div','', 'Vale per il menù stampato (carta o dolci, 100% = base). Le “Note per l’ospite” restano invariate. Dopo aver scelto, controlla con Anteprima e poi Pubblica.');
     hint.style.cssText = 'font-size:.72rem;color:var(--stone);margin-top:.6rem;line-height:1.5';
     fb.appendChild(hint);
     fsf.appendChild(fb); wrap.appendChild(fsf);

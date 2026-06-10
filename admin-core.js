@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.06.10.10 — Impostazioni stampa carta/dolci spostate da CURSORI (admin) a PULSANTI nella barra della PREVIEW (come il documento generico). Rimosso il pannello cursori da costruisci(). Nuova costante _SIZE_BTNS (A+/A−, interlinea, spazio, sposta su/giù, reset) aggiunta alla CTRL_BAR della carta; per i dolci (senza barra nel file) la barra è iniettata SOLO nella preview da apriPreview (non finisce nel file pubblicato). Le funzioni live _sz* stanno in CARTA_TPL_A e menu-dolci.html. Aggiornata la regex di strip della ctrl-bar in costruisciMenuItPub (ora taglia l'intera barra fino a <div id="layout-carta">, non più "fino a Stampa").
 // v 2026.06.10.09 — Carta vini RIFATTA: niente più estrazione testo (output "orrendo"). Ogni pagina del PDF è renderizzata via PDF.js a immagine ad alta risoluzione (scale 2.2, JPEG 0.92) e impaginata 1:1 su A4 (copertina inclusa) → riproduzione fedele del PDF. Nuova _generaHtmlViniImmagini; _leggiEConvertiVini ora rende immagini. Rimosso il pannello cursori vini (irrilevante sulle immagini). _VINI_TPL/_generaHtmlVini (testo) restano nel file ma non più usati.
 // v 2026.06.10.08 — Carta vini: aggiunto text-align-last:justify su .vino (anche le righe singole/ultima riga distese su entrambi i margini).
 // v 2026.06.10.07 — (1) FIX pulizia pagina: helper _pulisciViste() (nasconde tutte le sezioni + svuota #wrap) chiamato a OGNI caricamento (carta/dolci/allergeni/vini/foto/foto-sito/doc generico/prenotazioni) → non resta più la vista precedente in fondo. (2) MENU VINI: font/interlinea/spazio della carta vini ora calc(var(--fs/--lh/--gap)) + fix stampa @page 8mm; pannello a 3 cursori + reset in vini-section (_viniMontaPannello), valori iniettati in <body> via _viniStyleAttr (default 1/1/1 = attuale); .version (footer) escluso. (3) DOCUMENTO GENERICO: .doc-corpo font/interlinea/spazio in calc(var) + fix stampa @page 8mm; nella toolbar del preview aggiunti A+/A−, interlinea, spazio, reset (_docVar/_docResetVars); la posizione verticale è il bottone "Centro V" già esistente.
@@ -163,56 +164,9 @@ function costruisci() {
   wrap.innerHTML = '';
   var m = dati;
 
-  /* --- IMPOSTAZIONI STAMPA (caratteri + interlinea + spazio + posizione) --- */
-  (function(){
-    var fsf = el('div','fs');
-    fsf.appendChild(el('div','fs-head','Impostazioni stampa menù'));
-    var fb = el('div','fs-body');
-    var controls = [];
-    function slider(label, prop, mn, mx, st, def, fmt){
-      var cur = (m[prop] != null ? m[prop] : def);
-      var lab = el('div','', label);
-      lab.style.cssText = 'font-size:.72rem;letter-spacing:.04em;color:var(--stone);margin-bottom:.2rem';
-      var row = el('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:.9rem';
-      var rng = document.createElement('input');
-      rng.type = 'range'; rng.id = prop;
-      rng.min = String(mn); rng.max = String(mx); rng.step = String(st); rng.value = cur;
-      rng.style.cssText = 'flex:1;min-width:200px';
-      var out = el('span','', fmt(cur));
-      out.id = prop + '-out';
-      out.style.cssText = 'font-weight:500;min-width:62px;text-align:right';
-      rng.addEventListener('input', function(){
-        dati[prop] = +rng.value;
-        out.textContent = fmt(+rng.value);
-      });
-      row.appendChild(rng); row.appendChild(out);
-      fb.appendChild(lab); fb.appendChild(row);
-      controls.push({ rng: rng, out: out, prop: prop, def: def, fmt: fmt });
-    }
-    var pct = function(v){ return Math.round(v*100) + '%'; };
-    var mm  = function(v){ return (v > 0 ? '+' : '') + v + ' mm'; };
-    slider('Dimensione caratteri', 'fontScale', 0.9, 1.35, 0.01, 1.12, pct);
-    slider('Interlinea (spazio tra le righe)', 'lineScale', 0.85, 1.4, 0.05, 1, pct);
-    slider('Spazio tra i piatti e le sezioni', 'gapScale', 0.6, 1.6, 0.05, 1, pct);
-    slider('Posizione sul foglio (su / giù)', 'shift', -15, 15, 1, 0, mm);
-    var resetBtn = document.createElement('button');
-    resetBtn.type = 'button';
-    resetBtn.textContent = '↺ Ripristina valori predefiniti';
-    resetBtn.style.cssText = "margin:.2rem 0 .8rem;padding:.4rem 1rem;background:transparent;border:1px solid var(--ink);font-family:'Jost',sans-serif;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;color:var(--ink)";
-    resetBtn.addEventListener('click', function(){
-      controls.forEach(function(c){
-        c.rng.value = c.def;
-        c.out.textContent = c.fmt(c.def);
-        dati[c.prop] = c.def;
-      });
-    });
-    fb.appendChild(resetBtn);
-    var hint = el('div','', 'Valgono per il menù stampato (carta e dolci, 100% = base). Le “Note per l’ospite” restano sempre invariate. Dopo aver scelto, controlla con Anteprima e poi Pubblica.');
-    hint.style.cssText = 'font-size:.72rem;color:var(--stone);margin-top:.2rem;line-height:1.5';
-    fb.appendChild(hint);
-    fsf.appendChild(fb); wrap.appendChild(fsf);
-  })();
+  /* Le impostazioni stampa (caratteri/interlinea/spazio/posizione) sono ora PULSANTI nella
+     barra della preview, non più cursori qui. Carta: vedi CTRL_BAR in costruisciOutput +
+     funzioni _sz* in CARTA_TPL_A. Dolci: barra iniettata in apriPreview + _sz* in menu-dolci.html. */
 
   /* --- DEGUSTAZIONE --- */
   if (m.degustazione) {
@@ -423,6 +377,8 @@ function costruisciOutput() {
       + '  <button class="ctrl-btn" id="btn-orario" onclick="showLayout(\'orario\')">\u261e Foglio orario (1 pag.)</button>\n'
       + '  <div class="ctrl-sep"></div>\n'
       + '  <button class="ctrl-btn" onclick="window.print()">\u26a1 Stampa</button>\n'
+      + '  <div class="ctrl-sep"></div>\n'
+      + _SIZE_BTNS
       + '</div>\n';
     html = html.replace('<body>\n', '<body>\n' + CTRL_BAR);
     return html;
@@ -446,14 +402,37 @@ document.addEventListener('click', function() {
 var tplBefore = '', tplAfter = '', dati = null, datiOriginali = null;
 var _qrBase64 = null;   // base64 del nuovo QR selezionato (separato dal MENU)
 
+// Pulsanti dimensione/spaziatura per la barra della preview (carta + dolci).
+// Chiamano le funzioni _sz* definite nello <script> della pagina (CARTA_TPL_A / menu-dolci.html).
+var _SIZE_BTNS =
+    '  <button class="ctrl-btn" onclick="_szF(0.03)" title="Caratteri piu grandi">A+</button>\n'
+  + '  <button class="ctrl-btn" onclick="_szF(-0.03)" title="Caratteri piu piccoli">A−</button>\n'
+  + '  <button class="ctrl-btn" onclick="_szL(0.05)" title="Interlinea +">↕+</button>\n'
+  + '  <button class="ctrl-btn" onclick="_szL(-0.05)" title="Interlinea −">↕−</button>\n'
+  + '  <button class="ctrl-btn" onclick="_szG(0.05)" title="Spazio +">¶+</button>\n'
+  + '  <button class="ctrl-btn" onclick="_szG(-0.05)" title="Spazio −">¶−</button>\n'
+  + '  <button class="ctrl-btn" onclick="_szS(2)" title="Sposta giu">⬇</button>\n'
+  + '  <button class="ctrl-btn" onclick="_szS(-2)" title="Sposta su">⬆</button>\n'
+  + '  <button class="ctrl-btn" onclick="_szR()" title="Ripristina dimensioni">↺</button>\n';
+
 function apriPreview(lang) {
   if (tipoMenuCorrente === 'allergeni') { apriPreviewAllergeni(); return; }
   if (!dati) { alert('Prima carica il menù'); return; }
   document.getElementById('preview-menu').classList.remove('open');
   outputCorrente = costruisciOutput();
   if (!lang || lang === 'it') {
-    // Italiano: genera al volo
-    var blob = new Blob([outputCorrente], { type: 'text/html;charset=utf-8' });
+    // Italiano: genera al volo. I dolci non hanno ctrl-bar nel file: iniettiamo una barra
+    // (Stampa + pulsanti dimensione) SOLO nella preview, non nel file pubblicato.
+    var previewHtml = outputCorrente;
+    if (tipoMenuCorrente === 'dolci') {
+      var DOLCI_BAR = '<div class="ctrl-bar">\n'
+        + '  <button class="ctrl-btn" onclick="window.print()">⚡ Stampa</button>\n'
+        + '  <div class="ctrl-sep"></div>\n'
+        + _SIZE_BTNS
+        + '</div>\n';
+      previewHtml = previewHtml.replace('<body>', '<body>\n' + DOLCI_BAR);
+    }
+    var blob = new Blob([previewHtml], { type: 'text/html;charset=utf-8' });
     window.open(URL.createObjectURL(blob), '_blank').focus();
   } else {
     // Lingue: apri direttamente da GitHub Pages
@@ -638,7 +617,7 @@ function pubblicaFile(token, headers, path, content, rawBase64) {
 function costruisciMenuItPub() {
   // Menu italiano pubblico: outputCorrente senza la ctrl-bar (switch carta/orario + stampa)
   // La ctrl-bar contiene div interni (ctrl-sep), quindi matchiamo fino al </div> che precede layout-carta
-  var html = outputCorrente.replace(/<div class="ctrl-bar">[\s\S]*?Stampa<\/button>\s*<\/div>\s*/, '');
+  var html = outputCorrente.replace(/<div class="ctrl-bar">[\s\S]*?<\/div>\s*<div id="layout-carta">/, '<div id="layout-carta">');
   html = html.replace("  document.getElementById('btn-carta').classList.toggle('active',  which === 'carta');\n  document.getElementById('btn-orario').classList.toggle('active', which === 'orario');", "  var bc=document.getElementById('btn-carta'); if(bc) bc.classList.toggle('active',which==='carta');\n  var bo=document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active',which==='orario');");
   return html;
 }

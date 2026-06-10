@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.06.10.06 — Funzioni live _sz* nello <script>: i pulsanti della barra (iniettata in preview da apriPreview) regolano caratteri/interlinea/spazio/posizione in tempo reale (--fs/--lh/--gap/--shift). _szApply all'init. -->
 <!-- v 2026.06.10.05 — Aggiunti interlinea (--lh), spazio tra i piatti (--gap) e posizione sul foglio (--shift, translateY su .degu/.pg-content) regolabili dai cursori in menu-admin; renderCarta legge lineScale/gapScale/shift. .note-ospite sempre escluso. -->
 <!-- v 2026.06.10.04 — Dimensione caratteri regolabile (come la carta): font-size del testo leggibile ora calc(<orig>rem * var(--fs,1.12)); renderCarta() imposta --fs da MENU.fontScale (round-trippa via leggi(), pilotato dal cursore in menu-admin). .note-ospite ESCLUSO. + Stampa entro area stampabile: @page margin 8mm + #layout-carta .pg width auto/height 281mm/padding 9-14-8; foglio orario isolato e invariato via @page nominata "orarioPage" (margin 0). -->
 <!-- v 2026.05.22.01 — F0.21-e: allineamento vocabolario allergeni: "uovo" -> "uova", "solforosa" -> "solfiti". (Versione introdotta: il file ne era privo.) -->
@@ -674,9 +675,17 @@ function showLayout(which) {
 }
 
 /* ── init ── */
+var _sz={fs:(MENU.fontScale!=null?MENU.fontScale:1.12),lh:(MENU.lineScale!=null?MENU.lineScale:1),gap:(MENU.gapScale!=null?MENU.gapScale:1),shift:(MENU.shift!=null?MENU.shift:0)};
+function _szApply(){var r=document.getElementById('layout-carta');if(!r)return;r.style.setProperty('--fs',_sz.fs);r.style.setProperty('--lh',_sz.lh);r.style.setProperty('--gap',_sz.gap);r.style.setProperty('--shift',_sz.shift+'mm');}
+function _szF(d){_sz.fs=Math.max(0.85,Math.min(1.4,Math.round((_sz.fs+d)*100)/100));_szApply();}
+function _szL(d){_sz.lh=Math.max(0.8,Math.min(1.5,Math.round((_sz.lh+d)*100)/100));_szApply();}
+function _szG(d){_sz.gap=Math.max(0.6,Math.min(1.7,Math.round((_sz.gap+d)*100)/100));_szApply();}
+function _szS(d){_sz.shift=Math.max(-25,Math.min(25,_sz.shift+d));_szApply();}
+function _szR(){_sz={fs:1.12,lh:1,gap:1,shift:0};_szApply();}
 renderCarta();
 renderOrario();
 showLayout('carta');
+_szApply();
 </script>
 </body>
 </html>

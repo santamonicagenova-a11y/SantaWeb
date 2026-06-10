@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.06.10.11 — Dolci allineato alla carta: filesDolci() pubblica DUE file → menu-dolci.html (pubblico, senza barra) + menu-dolci-it.html (admin/preview, con barra Stampa + pulsanti dimensione, noindex). La preview dolci (apriPreview) usa _dolciCtrlBar() (stessa barra). Così la preview dolci ha i pulsanti come la carta.
 // v 2026.06.10.10 — Impostazioni stampa carta/dolci spostate da CURSORI (admin) a PULSANTI nella barra della PREVIEW (come il documento generico). Rimosso il pannello cursori da costruisci(). Nuova costante _SIZE_BTNS (A+/A−, interlinea, spazio, sposta su/giù, reset) aggiunta alla CTRL_BAR della carta; per i dolci (senza barra nel file) la barra è iniettata SOLO nella preview da apriPreview (non finisce nel file pubblicato). Le funzioni live _sz* stanno in CARTA_TPL_A e menu-dolci.html. Aggiornata la regex di strip della ctrl-bar in costruisciMenuItPub (ora taglia l'intera barra fino a <div id="layout-carta">, non più "fino a Stampa").
 // v 2026.06.10.09 — Carta vini RIFATTA: niente più estrazione testo (output "orrendo"). Ogni pagina del PDF è renderizzata via PDF.js a immagine ad alta risoluzione (scale 2.2, JPEG 0.92) e impaginata 1:1 su A4 (copertina inclusa) → riproduzione fedele del PDF. Nuova _generaHtmlViniImmagini; _leggiEConvertiVini ora rende immagini. Rimosso il pannello cursori vini (irrilevante sulle immagini). _VINI_TPL/_generaHtmlVini (testo) restano nel file ma non più usati.
 // v 2026.06.10.08 — Carta vini: aggiunto text-align-last:justify su .vino (anche le righe singole/ultima riga distese su entrambi i margini).
@@ -415,6 +416,15 @@ var _SIZE_BTNS =
   + '  <button class="ctrl-btn" onclick="_szS(-2)" title="Sposta su">⬆</button>\n'
   + '  <button class="ctrl-btn" onclick="_szR()" title="Ripristina dimensioni">↺</button>\n';
 
+// Barra admin per i dolci (Stampa + pulsanti dimensione). Va in menu-dolci-it.html e nella preview.
+function _dolciCtrlBar() {
+  return '<div class="ctrl-bar">\n'
+    + '  <button class="ctrl-btn" onclick="window.print()">⚡ Stampa</button>\n'
+    + '  <div class="ctrl-sep"></div>\n'
+    + _SIZE_BTNS
+    + '</div>\n';
+}
+
 function apriPreview(lang) {
   if (tipoMenuCorrente === 'allergeni') { apriPreviewAllergeni(); return; }
   if (!dati) { alert('Prima carica il menù'); return; }
@@ -425,12 +435,7 @@ function apriPreview(lang) {
     // (Stampa + pulsanti dimensione) SOLO nella preview, non nel file pubblicato.
     var previewHtml = outputCorrente;
     if (tipoMenuCorrente === 'dolci') {
-      var DOLCI_BAR = '<div class="ctrl-bar">\n'
-        + '  <button class="ctrl-btn" onclick="window.print()">⚡ Stampa</button>\n'
-        + '  <div class="ctrl-sep"></div>\n'
-        + _SIZE_BTNS
-        + '</div>\n';
-      previewHtml = previewHtml.replace('<body>', '<body>\n' + DOLCI_BAR);
+      previewHtml = previewHtml.replace('<body>', '<body>\n' + _dolciCtrlBar());
     }
     var blob = new Blob([previewHtml], { type: 'text/html;charset=utf-8' });
     window.open(URL.createObjectURL(blob), '_blank').focus();
@@ -993,7 +998,16 @@ function filesDolci() {
   // F0.21-d: i dolci in lingua sono ora ACCORPATI nella carta (menu-en/fr.html li includono come pagina finale).
   // Qui si genera SOLO l'IT (menu-dolci.html), che resta stampato. menu-dolci-en/fr.html NON piu generati
   // (vecchi URL gestiti da redirect 301 in _redirects). costruisciMenuDolciTradotto resta definita per eventuale uso futuro.
-  return [{ path: DOLCI_PATH, content: outputCorrente, label: 'Dolci IT' }];
+  // Come la carta: file pubblico (menu-dolci.html, senza barra) + file admin/preview
+  // (menu-dolci-it.html, con barra Stampa + pulsanti dimensione, noindex).
+  var pub = outputCorrente;
+  var adm = outputCorrente
+    .replace('<body>', '<body>\n' + _dolciCtrlBar())
+    .replace('<meta name="robots" content="index, follow">', '<meta name="robots" content="noindex, nofollow">');
+  return [
+    { path: 'menu-dolci.html',    content: pub, label: 'Dolci IT (pubblico)' },
+    { path: 'menu-dolci-it.html', content: adm, label: 'Dolci IT (admin/preview)' }
+  ];
 }
 
 function traduciEPubblica() {

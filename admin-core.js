@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.06.10.06 — Aggiunto pulsante "↺ Ripristina valori predefiniti" nel pannello stampa: riporta i 4 cursori ai default (fontScale 1.12, lineScale 1, gapScale 1, shift 0) e aggiorna dati. Vale per carta e dolci (stesso costruisci()).
 // v 2026.06.10.05 — Pannello "Impostazioni stampa menù" con 4 cursori (helper slider()): Dimensione caratteri (fontScale), Interlinea (lineScale), Spazio tra i piatti (gapScale), Posizione sul foglio (shift, in mm). Scrivono dati.<prop>, round-trippano via leggi() e su EN/FR, letti da renderCarta (carta + dolci). Default neutri tranne fontScale 1.12.
 // v 2026.06.10.04 — Cursore "Dimensione caratteri" ora attivo ANCHE sul menu dolci (rimosso il guard tipoMenuCorrente!=='carta'). Funziona perché menu-dolci.html v.04 ha lo stesso meccanismo --fs (calc + renderCarta). Testo di aiuto generalizzato (carta o dolci).
 // v 2026.06.10.03 — Cursore "Dimensione caratteri menù (stampa)" in cima al form della carta (costruisci()): range 90%–135%, default 112%, scrive dati.fontScale (round-trippa nel JSON pubblicato via leggi() → letto da renderCarta in admin-templates-shared.js v.04 che imposta var(--fs)). Regola solo i font leggibili della carta; "Note per l'ospite" esclusa. Va usato poi con Anteprima/Pubblica.
@@ -153,6 +154,7 @@ function costruisci() {
     var fsf = el('div','fs');
     fsf.appendChild(el('div','fs-head','Impostazioni stampa menù'));
     var fb = el('div','fs-body');
+    var controls = [];
     function slider(label, prop, mn, mx, st, def, fmt){
       var cur = (m[prop] != null ? m[prop] : def);
       var lab = el('div','', label);
@@ -172,6 +174,7 @@ function costruisci() {
       });
       row.appendChild(rng); row.appendChild(out);
       fb.appendChild(lab); fb.appendChild(row);
+      controls.push({ rng: rng, out: out, prop: prop, def: def, fmt: fmt });
     }
     var pct = function(v){ return Math.round(v*100) + '%'; };
     var mm  = function(v){ return (v > 0 ? '+' : '') + v + ' mm'; };
@@ -179,6 +182,18 @@ function costruisci() {
     slider('Interlinea (spazio tra le righe)', 'lineScale', 0.85, 1.4, 0.05, 1, pct);
     slider('Spazio tra i piatti e le sezioni', 'gapScale', 0.6, 1.6, 0.05, 1, pct);
     slider('Posizione sul foglio (su / giù)', 'shift', -15, 15, 1, 0, mm);
+    var resetBtn = document.createElement('button');
+    resetBtn.type = 'button';
+    resetBtn.textContent = '↺ Ripristina valori predefiniti';
+    resetBtn.style.cssText = "margin:.2rem 0 .8rem;padding:.4rem 1rem;background:transparent;border:1px solid var(--ink);font-family:'Jost',sans-serif;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;color:var(--ink)";
+    resetBtn.addEventListener('click', function(){
+      controls.forEach(function(c){
+        c.rng.value = c.def;
+        c.out.textContent = c.fmt(c.def);
+        dati[c.prop] = c.def;
+      });
+    });
+    fb.appendChild(resetBtn);
     var hint = el('div','', 'Valgono per il menù stampato (carta e dolci, 100% = base). Le “Note per l’ospite” restano sempre invariate. Dopo aver scelto, controlla con Anteprima e poi Pubblica.');
     hint.style.cssText = 'font-size:.72rem;color:var(--stone);margin-top:.2rem;line-height:1.5';
     fb.appendChild(hint);

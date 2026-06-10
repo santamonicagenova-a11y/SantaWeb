@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.06.10.07 — aggiunto pulsante "Ripristina valori predefiniti" nel pannello stampa: bump ?v= admin-core.js a 2026.06.10.06 + footer-version. -->
 <!-- v 2026.06.10.06 — pannello "Impostazioni stampa menù" a 4 cursori (caratteri + interlinea + spazio + posizione): bump ?v= di admin-core.js e admin-templates-shared.js a 2026.06.10.05 + footer-version. menu-dolci.html v.05. -->
 <!-- v 2026.06.10.05 — cursore caratteri attivo anche sui dolci: bump ?v= di admin-core.js a 2026.06.10.04 (rimosso il guard) + footer-version. menu-dolci.html v.04 aggiornato col meccanismo --fs. -->
 <!-- v 2026.06.10.04 — cache-busting ?v= su admin-templates-shared.js e admin-core.js: questi .js non avevano versione → il browser teneva la cache vecchia dopo i commit (cursore caratteri non attivo). Da ora, bumpando il ?v= a ogni modifica di quei file, il browser scarica subito la versione nuova senza hard-refresh. -->
@@ -318,7 +319,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.06.10.05"></script>
-<script src="admin-core.js?v=2026.06.10.05"></script>
+<script src="admin-core.js?v=2026.06.10.06"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -1047,7 +1048,7 @@ async function _eseguiPubblicaFotoSito(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.06.10.06</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.06.10.07</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.06.10.09 — Carta vini RIFATTA: niente più estrazione testo (output "orrendo"). Ogni pagina del PDF è renderizzata via PDF.js a immagine ad alta risoluzione (scale 2.2, JPEG 0.92) e impaginata 1:1 su A4 (copertina inclusa) → riproduzione fedele del PDF. Nuova _generaHtmlViniImmagini; _leggiEConvertiVini ora rende immagini. Rimosso il pannello cursori vini (irrilevante sulle immagini). _VINI_TPL/_generaHtmlVini (testo) restano nel file ma non più usati.
 // v 2026.06.10.08 — Carta vini: aggiunto text-align-last:justify su .vino (anche le righe singole/ultima riga distese su entrambi i margini).
 // v 2026.06.10.07 — (1) FIX pulizia pagina: helper _pulisciViste() (nasconde tutte le sezioni + svuota #wrap) chiamato a OGNI caricamento (carta/dolci/allergeni/vini/foto/foto-sito/doc generico/prenotazioni) → non resta più la vista precedente in fondo. (2) MENU VINI: font/interlinea/spazio della carta vini ora calc(var(--fs/--lh/--gap)) + fix stampa @page 8mm; pannello a 3 cursori + reset in vini-section (_viniMontaPannello), valori iniettati in <body> via _viniStyleAttr (default 1/1/1 = attuale); .version (footer) escluso. (3) DOCUMENTO GENERICO: .doc-corpo font/interlinea/spazio in calc(var) + fix stampa @page 8mm; nella toolbar del preview aggiunti A+/A−, interlinea, spazio, reset (_docVar/_docResetVars); la posizione verticale è il bottone "Centro V" già esistente.
 // v 2026.06.10.06 — Aggiunto pulsante "↺ Ripristina valori predefiniti" nel pannello stampa: riporta i 4 cursori ai default (fontScale 1.12, lineScale 1, gapScale 1, shift 0) e aggiorna dati. Vale per carta e dolci (stesso costruisci()).
@@ -1476,7 +1477,6 @@ function apriSezioneVini() {
   document.getElementById('carica-menu').classList.remove('open');
   document.getElementById('intro').style.display = 'none';
   _pulisciViste();
-  _viniMontaPannello();
   var vs = document.getElementById('vini-section');
   if (vs) vs.style.display = 'block';
 }
@@ -1518,17 +1518,23 @@ async function _leggiEConvertiVini(file, statusEl) {
   try {
     var ab = await file.arrayBuffer();
     var pdf = await pdfjsLib.getDocument({ data: ab }).promise;
-    statusEl.textContent = '⏳ Estrazione testo (' + pdf.numPages + ' pagine)…';
-
-    var pagine = [];
+    var SCALE = 2.2;                       // ~150 dpi: nitido in stampa, peso contenuto
+    var imgs = [];
     for (var i = 1; i <= pdf.numPages; i++) {
+      statusEl.textContent = '⏳ Rendering pagina ' + i + ' / ' + pdf.numPages + '…';
       var page = await pdf.getPage(i);
-      var tc = await page.getTextContent();
-      pagine.push(_ricostruisciPagina(tc.items));
+      var viewport = page.getViewport({ scale: SCALE });
+      var canvas = document.createElement('canvas');
+      canvas.width = Math.round(viewport.width);
+      canvas.height = Math.round(viewport.height);
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+      imgs.push(canvas.toDataURL('image/jpeg', 0.92));
     }
 
     statusEl.textContent = '⏳ Generazione HTML…';
-    var html = _generaHtmlVini(pagine);
+    var html = _generaHtmlViniImmagini(imgs);
 
     // Preview
     var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
@@ -1548,6 +1554,44 @@ async function _leggiEConvertiVini(file, statusEl) {
     statusEl.style.color = 'var(--rust)';
     statusEl.textContent = '✗ Errore: ' + e.message;
   }
+}
+
+// Carta vini = immagini fedeli del PDF (1 pagina PDF = 1 foglio A4). Copertina inclusa.
+function _generaHtmlViniImmagini(imgs) {
+  var now = new Date();
+  var ver = 'v ' + now.getFullYear() + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' +
+    String(now.getDate()).padStart(2,'0') + '.01';
+  var pages = imgs.map(function(src, i){
+    return '<div class="pg"><img src="' + src + '" alt="Carta dei vini Santamonica — pagina ' + (i+1) + '"/></div>';
+  }).join('\n');
+  return [
+    '<!DOCTYPE html>',
+    '<!-- ' + ver + ' -->',
+    '<html lang="it"><head>',
+    '<meta charset="UTF-8"/>',
+    '<meta name="viewport" content="width=device-width,initial-scale=1.0"/>',
+    '<title>Carta dei Vini | Ristorante Santamonica Genova</title>',
+    '<meta name="description" content="La carta dei vini del ristorante Santamonica a Genova: bollicine e Champagne, bianchi liguri e cantine da tutta Italia. Selezione della sommelier Monica Capurro."/>',
+    '<style>',
+    '*{margin:0;padding:0;box-sizing:border-box;}',
+    'body{background:#3a3a3a;padding:12px 0;}',
+    '.pg{width:210mm;max-width:96%;margin:0 auto 10px;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.35);}',
+    '.pg img{display:block;width:100%;height:auto;}',
+    '.ver{text-align:center;color:#bbb;font-family:sans-serif;font-size:10px;letter-spacing:.1em;padding:6px 0 2px;}',
+    '@media print{',
+    '  @page{size:A4 portrait;margin:0;}',
+    '  body{background:#fff;padding:0;}',
+    '  .pg{width:210mm;height:297mm;max-width:none;margin:0;box-shadow:none;page-break-after:always;overflow:hidden;display:flex;align-items:center;justify-content:center;}',
+    '  .pg:last-child{page-break-after:avoid;}',
+    '  .pg img{width:210mm;height:297mm;object-fit:contain;}',
+    '  .ver{display:none;}',
+    '}',
+    '</style>',
+    '</head><body>',
+    pages,
+    '<div class="ver">' + ver + '</div>',
+    '</body></html>'
+  ].join('\n');
 }
 
 function _ricostruisciPagina(items) {

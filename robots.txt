@@ -1,12 +1,43 @@
-User-agent: *
-Allow: /
+# robots.txt · santamonicagenova.it · v 2026.06.10.01
+# Policy crawler AI (POLICY_CRAWLER_AI): retrieval/risposta CONSENTITI, training BLOCCATO.
+# Content signals: search consentito, uso per risposte AI (ai-input) consentito, training (ai-train) NO.
+# Sostituisce il "Robots.txt gestito" di Cloudflare (da disattivare in AI Crawl Control > Segnali).
 
+User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Allow: /
 # Pagine private (stampa menu) — non indicizzare
 Disallow: /menu-it.html
 Disallow: /menu-dolci-it.html
-
 # Admin e login — non indicizzare
 Disallow: /login.html
 
-# Sitemap
+# --- Crawler di TRAINING AI: bloccati (no addestramento sui nostri contenuti) ---
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+# --- CONSENTITI di proposito (NON elencati = consentiti) ---
+# Retrieval/risposta: Claude-User, Claude-SearchBot, PerplexityBot, Perplexity-User,
+#   OAI-SearchBot, ChatGPT-User, Applebot, MistralAI-User, DuckAssistBot
+# Gemini: Google-Extended + Google-CloudVertexBot (sbloccati per la visibilità su Gemini)
+# Motori di ricerca: Googlebot, Bingbot
+
 Sitemap: https://santamonicagenova.it/sitemap.xml

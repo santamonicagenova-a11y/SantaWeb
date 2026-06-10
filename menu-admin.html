@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<!-- v 2026.06.10.04 — cache-busting ?v= su admin-templates-shared.js e admin-core.js: questi .js non avevano versione → il browser teneva la cache vecchia dopo i commit (cursore caratteri non attivo). Da ora, bumpando il ?v= a ogni modifica di quei file, il browser scarica subito la versione nuova senza hard-refresh. -->
+
 <!-- versione v 2026.05.30.03 — Sessione 13d (30/5): nella sezione "Prenotazioni online" aggiunti due blocchi "Chiudi un singolo orario" e "Apri un singolo orario extra" (data + tendina orari + lista rimovibile). Stato slot_closures/slot_openings letto da reservations-status v3 e scritto via set-reservations-config v3 (azioni add/remove_slot_closure e add/remove_slot_opening). Gestione conflitti speculare a quella servizio: se chiudi un orario già aperto extra (o viceversa) → avviso + conferma + rimozione dell'opposto. Blocco server-side in submit-reservation v10. -->
 <!-- versione v 2026.05.30.02 — Sessione 13b (30/5): nella sezione "Prenotazioni online" aggiunto il blocco "Aperture straordinarie" (calendario + servizio + lista rimovibile, per aprire un giorno/servizio normalmente chiuso). Gestione conflitti: se aggiungi una chiusura in conflitto con un'apertura (o viceversa), avviso e chiedo conferma; se confermi, rimuovo l'elemento in conflitto e procedo. Refactor _prenConfig in _prenFetch/_prenApply per concatenare le azioni. Backend: reservation_openings + reservations-status v2 + set-reservations-config v2 + submit-reservation v9. -->
 <!-- versione v 2026.05.30.01 — Sessione 13 (30/5): nuova sezione "Prenotazioni online" (voce dropdown "🔒 Prenotazioni online" → #prenotazioni-section). Interruttore globale aperte/chiuse + calendario chiusure per giorno e servizio (pranzo/cena/tutto) con lista rimovibile. Legge lo stato da Edge Function reservations-status e scrive via set-reservations-config, autenticando col token GitHub gh_token già usato per la pubblicazione (nessuna password nuova). Blocco effettivo lato server in submit-reservation v7; form del sito (index.html v 2026.05.30.01) si disabilita/filtra slot di conseguenza. -->
@@ -313,8 +315,8 @@
 <div class="toast" id="toast">✓ Scaricato!</div>
 
 <script src="admin-translations.js"></script>
-<script src="admin-templates-shared.js"></script>
-<script src="admin-core.js"></script>
+<script src="admin-templates-shared.js?v=2026.06.10.04"></script>
+<script src="admin-core.js?v=2026.06.10.03"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -1043,7 +1045,7 @@ async function _eseguiPubblicaFotoSito(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.06.05.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.06.10.04</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

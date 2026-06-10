@@ -148,6 +148,7 @@ function costruisci() {
 
   /* --- DIMENSIONE CARATTERI (stampa carta) --- */
   (function(){
+    if (tipoMenuCorrente !== 'carta') return; // il menu dolci usa un template proprio, niente --fs
     var cur = (m.fontScale != null ? m.fontScale : 1.12);
     var fsf = el('div','fs');
     fsf.appendChild(el('div','fs-head','Dimensione caratteri menù (stampa)'));

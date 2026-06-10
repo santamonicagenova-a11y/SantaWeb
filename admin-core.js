@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.06.10.07 — (1) FIX pulizia pagina: helper _pulisciViste() (nasconde tutte le sezioni + svuota #wrap) chiamato a OGNI caricamento (carta/dolci/allergeni/vini/foto/foto-sito/doc generico/prenotazioni) → non resta più la vista precedente in fondo. (2) MENU VINI: font/interlinea/spazio della carta vini ora calc(var(--fs/--lh/--gap)) + fix stampa @page 8mm; pannello a 3 cursori + reset in vini-section (_viniMontaPannello), valori iniettati in <body> via _viniStyleAttr (default 1/1/1 = attuale); .version (footer) escluso. (3) DOCUMENTO GENERICO: .doc-corpo font/interlinea/spazio in calc(var) + fix stampa @page 8mm; nella toolbar del preview aggiunti A+/A−, interlinea, spazio, reset (_docVar/_docResetVars); la posizione verticale è il bottone "Centro V" già esistente.
 // v 2026.06.10.06 — Aggiunto pulsante "↺ Ripristina valori predefiniti" nel pannello stampa: riporta i 4 cursori ai default (fontScale 1.12, lineScale 1, gapScale 1, shift 0) e aggiorna dati. Vale per carta e dolci (stesso costruisci()).
 // v 2026.06.10.05 — Pannello "Impostazioni stampa menù" con 4 cursori (helper slider()): Dimensione caratteri (fontScale), Interlinea (lineScale), Spazio tra i piatti (gapScale), Posizione sul foglio (shift, in mm). Scrivono dati.<prop>, round-trippano via leggi() e su EN/FR, letti da renderCarta (carta + dolci). Default neutri tranne fontScale 1.12.
 // v 2026.06.10.04 — Cursore "Dimensione caratteri" ora attivo ANCHE sul menu dolci (rimosso il guard tipoMenuCorrente!=='carta'). Funziona perché menu-dolci.html v.04 ha lo stesso meccanismo --fs (calc + renderCarta). Testo di aiuto generalizzato (carta o dolci).
@@ -142,6 +143,17 @@ function chk(id, v) {
   e.type = 'checkbox'; e.id = id; e.checked = !!v;
   e.style.cssText = 'display:block;margin:auto';
   return e;
+}
+
+// Nasconde TUTTE le viste/sezioni e svuota il form della carta.
+// Va chiamata a ogni caricamento (carta, dolci, allergeni, vini, foto, documento generico,
+// prenotazioni) così la pagina non trascina la vista precedente in fondo.
+function _pulisciViste() {
+  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section'].forEach(function(id){
+    var e = document.getElementById(id); if (e) e.style.display = 'none';
+  });
+  var w = document.getElementById('wrap');
+  if (w) { w.classList.remove('on'); w.innerHTML = ''; }
 }
 
 function costruisci() {
@@ -458,6 +470,7 @@ function caricaDalSito(tipo) {
   tipo = tipo || 'carta';
   tipoMenuCorrente = tipo;
   document.getElementById('carica-menu').classList.remove('open');
+  _pulisciViste();
   if (tipo === 'allergeni') { caricaAllergeniDalSito(); return; }
   var url = tipo === 'dolci' ? DOLCI_URL : MENU_URL;
   var btn = document.querySelector('.btn-load');
@@ -1421,12 +1434,48 @@ function traduciEPubblicaAllergeni() {
 
 var VINI_PATH = 'menu-vini.html';
 var VINI_URL  = BASE_FETCH_URL + '/menu-vini.html';
+var _viniPrint = { fs: 1, lh: 1, gap: 1 };   // default = dimensioni attuali
+function _viniStyleAttr() {
+  var p = _viniPrint;
+  if (p.fs === 1 && p.lh === 1 && p.gap === 1) return '';
+  return ' style="--fs:' + p.fs + ';--lh:' + p.lh + ';--gap:' + p.gap + '"';
+}
+function _viniMontaPannello() {
+  var vs = document.getElementById('vini-section');
+  if (!vs || document.getElementById('vini-print-panel')) return;
+  var box = el('div','fs'); box.id = 'vini-print-panel'; box.style.marginBottom = '1.5rem';
+  box.appendChild(el('div','fs-head','Impostazioni stampa carta vini'));
+  var body = el('div','fs-body');
+  var ctrls = [];
+  function slider(label, key, mn, mx, st){
+    var lab = el('div','', label); lab.style.cssText = 'font-size:.72rem;color:var(--stone);margin-bottom:.2rem';
+    var row = el('div'); row.style.cssText = 'display:flex;align-items:center;gap:1rem;margin-bottom:.9rem';
+    var rng = document.createElement('input'); rng.type='range'; rng.min=mn; rng.max=mx; rng.step=st; rng.value=_viniPrint[key];
+    rng.style.cssText = 'flex:1;min-width:200px';
+    var out = el('span','', Math.round(_viniPrint[key]*100)+'%'); out.style.cssText = 'font-weight:500;min-width:60px;text-align:right';
+    rng.addEventListener('input', function(){ _viniPrint[key] = +rng.value; out.textContent = Math.round(rng.value*100)+'%'; });
+    row.appendChild(rng); row.appendChild(out); body.appendChild(lab); body.appendChild(row);
+    ctrls.push({ rng: rng, out: out, key: key });
+  }
+  slider('Dimensione caratteri', 'fs', '0.8', '1.4', '0.05');
+  slider('Interlinea (spazio tra le righe)', 'lh', '0.8', '1.5', '0.05');
+  slider('Spazio tra le voci', 'gap', '0.6', '1.6', '0.05');
+  var rb = document.createElement('button'); rb.type='button'; rb.textContent = '↺ Ripristina valori predefiniti';
+  rb.style.cssText = "margin:.2rem 0 .6rem;padding:.4rem 1rem;background:transparent;border:1px solid var(--ink);font-family:'Jost',sans-serif;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;color:var(--ink)";
+  rb.addEventListener('click', function(){ ctrls.forEach(function(c){ _viniPrint[c.key]=1; c.rng.value=1; c.out.textContent='100%'; }); });
+  body.appendChild(rb);
+  var hint = el('div','', 'Valgono per la carta vini stampata (100% = base). Si applicano alla prossima Converti e Pubblica.');
+  hint.style.cssText = 'font-size:.72rem;color:var(--stone);margin-top:.2rem;line-height:1.5';
+  body.appendChild(hint);
+  box.appendChild(body);
+  vs.insertBefore(box, vs.firstChild);
+}
 
 function apriSezioneVini() {
   document.getElementById('carica-menu').classList.remove('open');
   document.getElementById('intro').style.display = 'none';
-  document.getElementById('wrap').classList.remove('on');
-  document.getElementById('foto-section').style.display = 'none';
+  _pulisciViste();
+  _viniMontaPannello();
   var vs = document.getElementById('vini-section');
   if (vs) vs.style.display = 'block';
 }
@@ -1558,10 +1607,10 @@ function _generaHtmlVini(pagine) {
     String(now.getMonth()+1).padStart(2,'0') + '.' +
     String(now.getDate()).padStart(2,'0') + '.01';
 
-  return _VINI_TPL.replace('{{CONTENT}}', content).replace(/\{\{VER\}\}/g, ver);
+  return _VINI_TPL.replace('{{CONTENT}}', content).replace('{{VINISTYLE}}', _viniStyleAttr()).replace(/\{\{VER\}\}/g, ver);
 }
 
-var _VINI_TPL = '<!DOCTYPE html>\n<!-- {{VER}} -->\n<html lang="it">\n<head>\n<meta charset="UTF-8"/>\n<meta name="viewport" content="width=device-width,initial-scale=1.0"/>\n<title>Carta dei Vini | Ristorante Santamonica Genova</title>\n<meta name="description" content="La carta dei vini del Santamonica a Genova: bollicine e Champagne, bianchi liguri, cantine da tutta Italia. Selezione della sommelier Monica Capurro."/>\n<link rel="preconnect" href="https://fonts.googleapis.com"/>\n<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>\n<style>\n:root{--cream:#faf7f2;--ink:#1a1714;--stone:#8c7e6e;--rust:#9e4a2a;--rule:#d4c9b8;}\n@media (max-width:640px){.pg{width:auto!important;max-width:100%!important;min-height:0!important;margin:0!important;padding:26px 16px!important;box-shadow:none!important;}.logo{font-size:1.9rem!important;letter-spacing:.1em!important;}.logo-sub{font-size:.6rem!important;}.lista-titolo{font-size:1.05rem!important;letter-spacing:.12em!important;}.sez-titolo{font-size:1.3rem!important;letter-spacing:.08em!important;}.sommelier{font-size:.62rem!important;}html,body{overflow-x:hidden!important;}}\n*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}\nbody{background:var(--cream);color:var(--ink);font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:400;}\n.pg{width:210mm;margin:2rem auto;padding:14mm 22mm 14mm;background:#fff;box-shadow:0 2px 24px rgba(0,0,0,.10);}\n.pg-header{text-align:center;margin-bottom:8mm;padding-bottom:5mm;border-bottom:1px solid var(--rule);}\n.logo{font-size:3.3rem;font-weight:300;letter-spacing:.22em;text-transform:uppercase;line-height:1;}\n.logo em{font-style:italic;color:var(--stone);}\n.logo-sub{margin-top:.45rem;font-family:\'Jost\',sans-serif;font-size:.67rem;letter-spacing:.22em;text-transform:uppercase;color:var(--stone);}\n.lista-titolo{font-size:1.5rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;text-align:center;margin:4mm 0 1mm;}\n.sommelier{font-family:\'Jost\',sans-serif;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--stone);text-align:center;margin-bottom:6mm;}\n.sez-titolo{font-size:1.98rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;text-align:center;margin:7mm 0 4mm;padding-bottom:2mm;border-bottom:1px solid var(--rule);}\n.sottosez-titolo{font-family:\'Jost\',sans-serif;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--stone);margin:5mm 0 3mm;}\n.vino{margin-bottom:3.5mm;text-align:justify;font-size:1.0rem;line-height:1.52;}\n.version{text-align:center;padding:6px 0;font-family:\'Jost\',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;}\n@media print{@page{size:A4 portrait;margin:0;}body{background:white;}.pg{width:210mm;margin:0;box-shadow:none;page-break-after:always;}}\n</style>\n</head>\n<body>\n<div class="pg">\n<div class="pg-header"><div class="logo">Santa<em>monica</em></div><div class="logo-sub">Lungomare Lombardo 27 \u2014 Genova</div></div>\n<div class="lista-titolo">Lista Vini &mdash; Wine List</div>\n<div class="sommelier">Sommelier Professionista Monica Capurro</div>\n{{CONTENT}}\n</div>\n<div class="version">{{VER}}</div>\n</body>\n</html>';
+var _VINI_TPL = '<!DOCTYPE html>\n<!-- {{VER}} -->\n<html lang="it">\n<head>\n<meta charset="UTF-8"/>\n<meta name="viewport" content="width=device-width,initial-scale=1.0"/>\n<title>Carta dei Vini | Ristorante Santamonica Genova</title>\n<meta name="description" content="La carta dei vini del Santamonica a Genova: bollicine e Champagne, bianchi liguri, cantine da tutta Italia. Selezione della sommelier Monica Capurro."/>\n<link rel="preconnect" href="https://fonts.googleapis.com"/>\n<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>\n<style>\n:root{--cream:#faf7f2;--ink:#1a1714;--stone:#8c7e6e;--rust:#9e4a2a;--rule:#d4c9b8;}\n@media (max-width:640px){.pg{width:auto!important;max-width:100%!important;min-height:0!important;margin:0!important;padding:26px 16px!important;box-shadow:none!important;}.logo{font-size:1.9rem!important;letter-spacing:.1em!important;}.logo-sub{font-size:.6rem!important;}.lista-titolo{font-size:1.05rem!important;letter-spacing:.12em!important;}.sez-titolo{font-size:1.3rem!important;letter-spacing:.08em!important;}.sommelier{font-size:.62rem!important;}html,body{overflow-x:hidden!important;}}\n*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}\nbody{background:var(--cream);color:var(--ink);font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:400;}\n.pg{width:210mm;margin:2rem auto;padding:14mm 22mm 14mm;background:#fff;box-shadow:0 2px 24px rgba(0,0,0,.10);}\n.pg-header{text-align:center;margin-bottom:8mm;padding-bottom:5mm;border-bottom:1px solid var(--rule);}\n.logo{font-size:3.3rem;font-weight:300;letter-spacing:.22em;text-transform:uppercase;line-height:1;}\n.logo em{font-style:italic;color:var(--stone);}\n.logo-sub{margin-top:.45rem;font-family:\'Jost\',sans-serif;font-size:.67rem;letter-spacing:.22em;text-transform:uppercase;color:var(--stone);}\n.lista-titolo{font-size:calc(1.5rem*var(--fs,1));font-weight:600;letter-spacing:.22em;text-transform:uppercase;text-align:center;margin:4mm 0 1mm;}\n.sommelier{font-family:\'Jost\',sans-serif;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--stone);text-align:center;margin-bottom:6mm;}\n.sez-titolo{font-size:calc(1.98rem*var(--fs,1));font-weight:600;letter-spacing:.16em;text-transform:uppercase;text-align:center;margin:calc(7mm*var(--gap,1)) 0 calc(4mm*var(--gap,1));padding-bottom:2mm;border-bottom:1px solid var(--rule);}\n.sottosez-titolo{font-family:\'Jost\',sans-serif;font-size:calc(.72rem*var(--fs,1));letter-spacing:.18em;text-transform:uppercase;color:var(--stone);margin:calc(5mm*var(--gap,1)) 0 calc(3mm*var(--gap,1));}\n.vino{margin-bottom:calc(3.5mm*var(--gap,1));text-align:justify;font-size:calc(1.0rem*var(--fs,1));line-height:calc(1.52*var(--lh,1));}\n.version{text-align:center;padding:6px 0;font-family:\'Jost\',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;}\n@media print{@page{size:A4 portrait;margin:8mm;}body{background:white;}.pg{width:auto;margin:0;box-shadow:none;page-break-after:always;}}\n</style>\n</head>\n<body{{VINISTYLE}}>\n<div class="pg">\n<div class="pg-header"><div class="logo">Santa<em>monica</em></div><div class="logo-sub">Lungomare Lombardo 27 \u2014 Genova</div></div>\n<div class="lista-titolo">Lista Vini &mdash; Wine List</div>\n<div class="sommelier">Sommelier Professionista Monica Capurro</div>\n{{CONTENT}}\n</div>\n<div class="version">{{VER}}</div>\n</body>\n</html>';
 
 function _pubblicaMenuVini(token, html, statusEl) {
   var headers = { 'Authorization':'token '+token, 'Accept':'application/vnd.github.v3+json', 'Content-Type':'application/json' };
@@ -1589,10 +1638,7 @@ function _pubblicaMenuVini(token, html, statusEl) {
 function apriSezioneDocGenerico() {
   document.getElementById('carica-menu').classList.remove('open');
   document.getElementById('intro').style.display = 'none';
-  document.getElementById('wrap').classList.remove('on');
-  var fs = document.getElementById('foto-section');       if (fs) fs.style.display = 'none';
-  var fss = document.getElementById('foto-sito-section'); if (fss) fss.style.display = 'none';
-  var vs = document.getElementById('vini-section');       if (vs) vs.style.display = 'none';
+  _pulisciViste();
   var ds = document.getElementById('doc-section');        if (ds) ds.style.display = 'block';
   var st = document.getElementById('doc-generico-status');
   if (st) { st.textContent = ''; st.style.color = 'var(--stone)'; }
@@ -1740,8 +1786,8 @@ function _docGen_costruisciHTML(titolo, corpoHtml) {
     '.doc-toolbar .align-grp button.active{background:var(--stone,#8c7e6e);}',
     '.pg{width:210mm;margin:2rem auto;padding:18mm 22mm;background:#fff;box-shadow:0 2px 24px rgba(0,0,0,.10);min-height:260mm;box-sizing:border-box;}',
     '.pg.center-v{display:flex;flex-direction:column;justify-content:center;}',
-    '.doc-corpo{font-family:"Cormorant Garamond",Georgia,serif;font-size:1.05rem;line-height:1.6;color:var(--ink,#1a1714);}',
-    '.doc-corpo p{margin:0 0 .7rem;}',
+    '.doc-corpo{font-family:"Cormorant Garamond",Georgia,serif;font-size:calc(1.05rem*var(--fs,1));line-height:calc(1.6*var(--lh,1));color:var(--ink,#1a1714);}',
+    '.doc-corpo p{margin:0 0 calc(.7rem*var(--gap,1));}',
     '.doc-corpo.align-justify p{text-align:justify;}',
     '.doc-corpo.align-left p{text-align:left;}',
     '.doc-corpo.align-center p{text-align:center;}',
@@ -1758,11 +1804,11 @@ function _docGen_costruisciHTML(titolo, corpoHtml) {
     '.doc-corpo th,.doc-corpo td{border:1px solid var(--rule,#d4c9b8);padding:.4rem .6rem;text-align:left;font-size:.95rem;}',
     '.doc-corpo th{background:var(--sand,#f0ebe0);font-weight:600;}',
     '@media print{',
-    '  @page{size:A4 portrait;margin:0;}',
+    '  @page{size:A4 portrait;margin:8mm;}',
     '  html{font-size:24px;}',
     '  body{background:#fff;}',
     '  .doc-toolbar{display:none;}',
-    '  .pg{width:210mm;margin:0;padding:18mm 22mm;box-shadow:none;page-break-after:always;}',
+    '  .pg{width:auto;margin:0;padding:10mm 14mm;box-shadow:none;page-break-after:always;}',
     '}',
     '</style>',
     '</head><body>',
@@ -1770,6 +1816,15 @@ function _docGen_costruisciHTML(titolo, corpoHtml) {
     '  <button onclick="window.print()">🖨️ Stampa</button>',
     '  <button class="btn-sec" onclick="_docScaricaHTML()">💾 Scarica HTML</button>',
     '  <button class="btn-sec" onclick="window.close()">✕ Chiudi</button>',
+    '  <div style="display:flex;gap:.3rem;">',
+    '    <button class="btn-sec" onclick="_docVar(\'--fs\',0.05)" title="Caratteri più grandi">A+</button>',
+    '    <button class="btn-sec" onclick="_docVar(\'--fs\',-0.05)" title="Caratteri più piccoli">A−</button>',
+    '    <button class="btn-sec" onclick="_docVar(\'--lh\',0.1)" title="Interlinea +">↕+</button>',
+    '    <button class="btn-sec" onclick="_docVar(\'--lh\',-0.1)" title="Interlinea −">↕−</button>',
+    '    <button class="btn-sec" onclick="_docVar(\'--gap\',0.1)" title="Spazio tra paragrafi +">¶+</button>',
+    '    <button class="btn-sec" onclick="_docVar(\'--gap\',-0.1)" title="Spazio tra paragrafi −">¶−</button>',
+    '    <button class="btn-sec" onclick="_docResetVars()" title="Ripristina dimensioni">↺</button>',
+    '  </div>',
     '  <div class="align-grp">',
     '    <button id="align-justify" class="active" onclick="_docAlign(\'justify\')" title="Giustificato">≡ Giust.</button>',
     '    <button id="align-left" onclick="_docAlign(\'left\')" title="Allinea a sinistra">⇤ Sx</button>',
@@ -1805,6 +1860,12 @@ function _docGen_costruisciHTML(titolo, corpoHtml) {
     '  document.body.appendChild(a); a.click(); document.body.removeChild(a);',
     '  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);',
     '}',
+    'var _docVars={"--fs":1,"--lh":1,"--gap":1};',
+    'function _docVar(k,d){',
+    '  _docVars[k]=Math.max(0.6,Math.min(2,Math.round((_docVars[k]+d)*100)/100));',
+    '  document.getElementById("doc-pg").style.setProperty(k,_docVars[k]);',
+    '}',
+    'function _docResetVars(){_docVars={"--fs":1,"--lh":1,"--gap":1};var p=document.getElementById("doc-pg");p.style.removeProperty("--fs");p.style.removeProperty("--lh");p.style.removeProperty("--gap");}',
     '<\/script>',
     '</body></html>'
   ].join('\n');

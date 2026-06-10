@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.06.10.08 — pulizia pagina a ogni caricamento (_pulisciViste) + controlli stampa estesi a menu vini (pannello 3 cursori) e documento generico (toolbar live nel preview): bump ?v= admin-core.js a 2026.06.10.07 + footer-version. -->
 <!-- v 2026.06.10.07 — aggiunto pulsante "Ripristina valori predefiniti" nel pannello stampa: bump ?v= admin-core.js a 2026.06.10.06 + footer-version. -->
 <!-- v 2026.06.10.06 — pannello "Impostazioni stampa menù" a 4 cursori (caratteri + interlinea + spazio + posizione): bump ?v= di admin-core.js e admin-templates-shared.js a 2026.06.10.05 + footer-version. menu-dolci.html v.05. -->
 <!-- v 2026.06.10.05 — cursore caratteri attivo anche sui dolci: bump ?v= di admin-core.js a 2026.06.10.04 (rimosso il guard) + footer-version. menu-dolci.html v.04 aggiornato col meccanismo --fs. -->
@@ -319,7 +320,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.06.10.05"></script>
-<script src="admin-core.js?v=2026.06.10.06"></script>
+<script src="admin-core.js?v=2026.06.10.07"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -332,7 +333,7 @@ var prenState = { online_open: true, closures: [], openings: [], slot_closures: 
 function apriSezionePrenotazioni() {
   document.getElementById('carica-menu').classList.remove('open');
   document.getElementById('intro').style.display = 'none';
-  document.getElementById('wrap').classList.remove('on');
+  _pulisciViste();
   document.getElementById('prenotazioni-section').style.display = 'block';
   var today = new Date().toISOString().slice(0, 10);
   var dc = document.getElementById('pren-closure-date');
@@ -625,7 +626,7 @@ var FOTO_BASE = 'https://santamonica-web.pages.dev/';
 function apriGestoreFoto() {
   document.getElementById('carica-menu').classList.remove('open');
   document.getElementById('intro').style.display = 'none';
-  document.getElementById('wrap').classList.remove('on');
+  _pulisciViste();
   document.getElementById('foto-section').style.display = 'block';
   fotoDati = [null,null,null,null,null,null];
   document.getElementById('foto-status').style.color = 'var(--stone)';
@@ -829,8 +830,7 @@ var fotoSitoDati = {};
 function apriGestoreFotoSito() {
   document.getElementById('carica-menu').classList.remove('open');
   document.getElementById('intro').style.display = 'none';
-  document.getElementById('wrap').classList.remove('on');
-  document.getElementById('foto-section').style.display = 'none';
+  _pulisciViste();
   document.getElementById('foto-sito-section').style.display = 'block';
   fotoSitoDati = {};
   FOTO_SITO_KEYS.forEach(function(k){ fotoSitoDati[k.key] = null; });
@@ -1048,7 +1048,7 @@ async function _eseguiPubblicaFotoSito(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.06.10.07</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.06.10.08</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

@@ -1,9 +1,6 @@
 <!DOCTYPE html>
-<!-- v 2026.05.15.01 -->
+<!-- v 2026.06.10.01 -->
 <html lang="it">
-  <style>
-@media (max-width:640px){.pg{width:auto!important;max-width:100%!important;min-height:0!important;margin:0!important;padding:26px 16px!important;box-shadow:none!important;}.logo{font-size:1.9rem!important;letter-spacing:.1em!important;}.logo-sub{font-size:.6rem!important;}.lista-titolo{font-size:1.05rem!important;letter-spacing:.12em!important;}.sez-titolo{font-size:1.3rem!important;letter-spacing:.08em!important;}.sommelier{font-size:.62rem!important;}html,body{overflow-x:hidden!important;}}
-</style>
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -13,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
 :root{--cream:#faf7f2;--ink:#1a1714;--stone:#8c7e6e;--rust:#9e4a2a;--rule:#d4c9b8;}
+@media (max-width:640px){.pg{width:auto!important;max-width:100%!important;min-height:0!important;margin:0!important;padding:26px 16px!important;box-shadow:none!important;}.logo{font-size:1.9rem!important;letter-spacing:.1em!important;}.logo-sub{font-size:.6rem!important;}.lista-titolo{font-size:1.05rem!important;letter-spacing:.12em!important;}.sez-titolo{font-size:1.3rem!important;letter-spacing:.08em!important;}.sommelier{font-size:.62rem!important;}html,body{overflow-x:hidden!important;}}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;font-weight:400;}
 .pg{width:210mm;margin:2rem auto;padding:14mm 22mm 14mm;background:#fff;box-shadow:0 2px 24px rgba(0,0,0,.10);}
@@ -20,13 +18,13 @@ body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',G
 .logo{font-size:3.3rem;font-weight:300;letter-spacing:.22em;text-transform:uppercase;line-height:1;}
 .logo em{font-style:italic;color:var(--stone);}
 .logo-sub{margin-top:.45rem;font-family:'Jost',sans-serif;font-size:.67rem;letter-spacing:.22em;text-transform:uppercase;color:var(--stone);}
-.lista-titolo{font-size:1.5rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;text-align:center;margin:4mm 0 1mm;}
+.lista-titolo{font-size:calc(1.5rem*var(--fs,1));font-weight:600;letter-spacing:.22em;text-transform:uppercase;text-align:center;margin:4mm 0 1mm;}
 .sommelier{font-family:'Jost',sans-serif;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--stone);text-align:center;margin-bottom:6mm;}
-.sez-titolo{font-size:1.98rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;text-align:center;margin:7mm 0 4mm;padding-bottom:2mm;border-bottom:1px solid var(--rule);}
-.sottosez-titolo{font-family:'Jost',sans-serif;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--stone);margin:5mm 0 3mm;}
-.vino{margin-bottom:3.5mm;text-align:justify;font-size:1.0rem;line-height:1.52;}
+.sez-titolo{font-size:calc(1.98rem*var(--fs,1));font-weight:600;letter-spacing:.16em;text-transform:uppercase;text-align:center;margin:calc(7mm*var(--gap,1)) 0 calc(4mm*var(--gap,1));padding-bottom:2mm;border-bottom:1px solid var(--rule);}
+.sottosez-titolo{font-family:'Jost',sans-serif;font-size:calc(.72rem*var(--fs,1));letter-spacing:.18em;text-transform:uppercase;color:var(--stone);margin:calc(5mm*var(--gap,1)) 0 calc(3mm*var(--gap,1));}
+.vino{margin-bottom:calc(3.5mm*var(--gap,1));text-align:justify;font-size:calc(1.0rem*var(--fs,1));line-height:calc(1.52*var(--lh,1));}
 .version{text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;}
-@media print{@page{size:A4 portrait;margin:0;}body{background:white;}.pg{width:210mm;margin:0;box-shadow:none;page-break-after:always;}}
+@media print{@page{size:A4 portrait;margin:8mm;}body{background:white;}.pg{width:auto;margin:0;box-shadow:none;page-break-after:always;}}
 </style>
 </head>
 <body>
@@ -36,16 +34,11 @@ body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',G
 <div class="sommelier">Sommelier Professionista Monica Capurro</div>
 <h2 class="sez-titolo">BOLLICINE</h2>
 <h2 class="sez-titolo">LIGURIA</h2>
-<p class="vino">“ Andalora ” Spumante Brut - Cascina Praiè 1 1 % - Uve: Rossese 1 0 0% - € 36, € 10 . Metodo Martinotti .</p>
-<p class="vino">Profumo di mare e sapidità.</p>
 <p class="vino">“ Axillo ” - A. Bruzzone (IGT 2022) 1 2 % - Uve: Vermentino e Bianchetta - € 3 7 , € 1 1 . Profumo è fine</p>
 <p class="vino">e con sentori di fiori bianchi. Frizzante in modo delicato .</p>
 <p class="vino">“ Janua ” Spumante Brut Millesimato - A. Bruzzone ( DOP 202 1 ) 1 2 % - Uve: Vermentino e Bianchetta -</p>
 <p class="vino">€ 45, € 1 2 . Oltre 30 mesi di affinamento sui lieviti. Bolle piccole e persistenti, Vino fresco e sapido.</p>
 <h2 class="sez-titolo">ALTRE REGIONI</h2>
-<p class="vino">“ 100 ” Ancestrale - Castello di Stefanago 12 ,5 % - Uve: Pinot Nero 1 0 0% - Lombardia - € 65 .</p>
-<p class="vino">Rifermentato in bottiglia sui lieviti per 100 mesi . Rosa e viola essiccati , frutto rosso in confettura,</p>
-<p class="vino">ricordi di forno e sentori minerali intensi.</p>
 <p class="vino">“ Animante ” Franciacorta Dosaggio Zero - Barone Pizzini ( sboccatura 9 - 20 2 5 ) 12% - Uve Chardonnay</p>
 <p class="vino">70 % , Pinot Nero 1 3 % , Pinot Bianco 1 0 % , Erbamat 7 % - Lombardia - € 5 4 , € 1 3 . Affinato in bottiglia</p>
 <p class="vino">per 20 - 30 mesi. Profumi floreali, agrumi e miele d’acacia, albicocca e frutta fresca. Avvolgente,</p>
@@ -53,8 +46,9 @@ body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',G
 <p class="vino">“ Animante ” Lungo Affinamento Franciacorta Dosaggio Zero - Barone Pizzini (sboccatura 6 - 20 2 4 ) 12%</p>
 <p class="vino">- Uve : Chardonnay 94 % , Pinot Nero 3 % , Pinot Bianco 3 % - Lombardia - € 6 5 . Affinato in bottiglia</p>
 <p class="vino">per 7 8 mesi. Fruttato, floreale, agrumi, albicocca, frutta secca e miele. Corposo e sapido.</p>
-<p class="vino">“ Filari Ginevra ” - Alberto Lot 1 0,5 % - Uve : Glera 100% - Veneto - € 32 , € 9 . Fiori bianchi ed agrumi,</p>
-<p class="vino">albicocca e rosa. Avvolgente ed equilibrato.</p>
+<p class="vino">“ Cisiolo ” Franciacorta Dosaggio Zero - Tenuta Villa Crespia Franciacorta ( sboccatura 20 25 ) 1 2,5 % -</p>
+<p class="vino">Uve: Pinot Nero 100% - Lombardia - € 59 . Affinato in bottiglia sui lieviti per oltre 18 mesi . Pompelmo</p>
+<p class="vino">rosa, frutto acerbo, persistenza.</p>
 <p class="vino">“ Ossigeno” - Robb de Matt ( 20 23 ) 1 1 % - Uve: Falanghina 8 0% , Coda di Pecora 2 0% - Campania -</p>
 <p class="vino">€ 39 . Rifermentato in bottiglia , macerazione di 7 giorni. Non filtrato né chiarificato e senza solfiti</p>
 <p class="vino">aggiunti. Acidità audace, frutti, agrumi e salinità. Denso e complesso.</p>
@@ -68,17 +62,14 @@ body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',G
 <p class="vino">Prosecco Superiore Brut Pas Dosé “ S . C . 1931 ” - Bellenda ( DOCG 2021 , sboccatura 10 - 20 24 ) 1 1,5 % -</p>
 <p class="vino">Uve: Glera 100% - Veneto - € 39, € 12 . Metodo classico . F rutta a polpa bianca e nocciole con</p>
 <p class="vino">sentori di miele d’acacia.</p>
-<p class="vino">“ Zero Infinito ” - Pojer e Sandri (20 2 3 ) 12% - Uve: Solaris 100 % - Trentino - € 39 . N on filtrato, metodo</p>
-<p class="vino">ancestrale, rifermentato in bottiglia . Profumo floreale e leggermente aromatico. Fiori di sambuco,</p>
-<p class="vino">mela, pera, albicocca. Gusto succoso e fresco.</p>
+<p class="vino">“ Simbiotico ” Franciacorta Brut - Tenuta Villa Crespia Franciacorta ( sboccatura 20 25 ) 1 2,5 % - Uve:</p>
+<p class="vino">Chardonnay 100% - Lombardia - € 65 . Affinato in bottiglia sui lieviti per oltre 18 mesi . Ginestra,</p>
+<p class="vino">cedro maturo e crosta di pane.</p>
 <h2 class="sez-titolo">BOLLICINE ROSÉ</h2>
 <h2 class="sez-titolo">LIGURIA</h2>
 <p class="vino">“ Axillo ” Rosé - A. Bruzzone 1 2 ,5 % - Uve: Ciliegiolo 10 0% - € 3 9 , € 1 2 . Profumi ampi e fruttati .</p>
 <p class="vino">Frizzante in modo delicato .</p>
 <h2 class="sez-titolo">ALTRE REGIONI</h2>
-<p class="vino">“ 60 ” Ancestrale - Castello di Stefanago 12 ,5 % - Uve: Pinot Nero 100% - Lombardia - € 5 7 .</p>
-<p class="vino">Rifermentato in bottiglia sui lieviti per 100 mesi . Rosa e viola essiccati , frutto rosso in confettura,</p>
-<p class="vino">ricordi di forno e sentori minerali intensi.</p>
 <p class="vino">“ Big Bang ” - Robb de Matt ( 20 23 ) 1 1 % - Uve: Falanghina 7 0% , Coda di Pecora 3 0% - Campania -</p>
 <p class="vino">€ 34 . Rifermentato in bottiglia , macerazione di 7 giorni. Non filtrato né chiarificato. Senza solfiti</p>
 <p class="vino">aggiunti. Pesca, ginestra, lieviti ed erbe aromatiche.</p>
@@ -171,8 +162,8 @@ body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',G
 <p class="vino">aggiunti . Fermentazione sulle bucce per 5 giorni, 6 mesi di affinamento in anfora . F resco, agile e</p>
 <p class="vino">accattivante. In apparenza esile, si muove su profumi che spaziano dai fiori, alla frutta, fino a</p>
 <p class="vino">sfumature salmastre e terrose,</p>
-<p class="vino">“ Bonazolae ” - Cà du Ferrà ( DOP 20 2 5 ) 1 3 % - Uve: Vermentino 65 %, Albarola 3 0% , Bosco 5 % - € 42 ,</p>
-<p class="vino">€ 1 2 . R ichiami fruttati e di erbe spontanee, sorso avvolgente, profondo e soddisfacente. Il sole, il</p>
+<p class="vino">“ Bonazolae ” - Cà du Ferrà ( DOP 20 2 5 ) 1 3 % - Uve: Vermentino 65 %, Albarola 3 0% , Bosco 5 % - € 4 9 ,</p>
+<p class="vino">€ 1 4 . R ichiami fruttati e di erbe spontanee, sorso avvolgente, profondo e soddisfacente. Il sole, il</p>
 <p class="vino">vento, la pietra mai doma caratterizzano un vino dagli accenti profondamente ligustici.</p>
 <p class="vino">Cimixà “ Giamin ” - Az. Agricola U Cantin (20 20 ) 13 % - Uve: Cimixà 100% - € 46 . Macerato n on filtrato ,</p>
 <p class="vino">27 mesi di acciaio e 6 di bottiglia . Sapido, fruttato e molto minerale .</p>
@@ -192,28 +183,29 @@ body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',G
 <p class="vino">in acciaio. Vino volutamente n on acido, austero .</p>
 <p class="vino">Annata 20 21 - € 4 9</p>
 <p class="vino">Annata 20 22 - € 4 5</p>
+<p class="vino">“ Leviathan ” - Luna Mater (IGT 20 22 ) 1 3 ,5% - Uve: Vermentino, Albarola, Trebbiano e Malvasia -</p>
+<p class="vino">€ 55 . Macerazione sulle bucce di 8 giorni poi sulle fecce fino a primavera. Ossidazione per circa 1</p>
+<p class="vino">anno, successivamente un ripasso sulle vinacce del passito per 60 giorni. Ossidato molto elegante</p>
+<p class="vino">che ti prende per la gola.</p>
 <p class="vino">“ Loup Garou ” - Stefano Legnani ( 20 20 ) 1 3 % - Uve: vitigni autoctoni - € 7 4 . Macerato, non filtrato.</p>
-<p class="vino">Fermentazione spontanea con lieviti indigeni e macerazione di 5 giorni sulle bucce. Legnani preleva</p>
-<p class="vino">1/3 del contenuto della vasca di Ponte Di Toi e poi lo lascia sulle fecce fini fino ad agosto.</p>
-<p class="vino">Affinamento in acciaio.</p>
+<p class="vino">Fermentazione spontanea con lieviti indigeni e macerazione di 5 giorni sulle bucce. 1/3 del</p>
+<p class="vino">contenuto della vasca di Ponte Di Toi viene lascia to sulle fecce fini fino ad agosto.</p>
 <p class="vino">“ Particella 906 ” - Luna Mater (IGT 20 2 1 ) 1 3 ,5% - Uve: Vermentino 60 % , Albarola Trebbiano Malvasia</p>
-<p class="vino">40 % - € 42 . Vermentino macerato per 18 ore, gli altri per 5 giorni . Acido, fresco e terrosamente</p>
+<p class="vino">40 % - € 4 9 . Vermentino macerato per 18 ore, gli altri per 5 giorni . Acido, fresco e terrosamente</p>
 <p class="vino">corposo .</p>
+<p class="vino">“ Particella Elementare ” - Luna Mater (IGT 20 25 ) 1 2 ,5% - Uve: Trebbiano 60 % , Vermentino 30 % ,</p>
+<p class="vino">Malvasia 1 0 % - € 42 . Ognuno macerato separatamente poi lasciato sulle fecce per tutto l’inverno.</p>
+<p class="vino">Elegante, fresco, agrumato. Erbe mediterranee, mela, fiori bianchi . A chiudere pesca ed albicocca.</p>
 <p class="vino">“ Pentesilea ” - Cerrolungo (20 20 ) 1 3 % - Uve: Vermentino, Albarola, Bosco - € 42 . Non filtrato e</p>
 <p class="vino">macerato per 6/10 giorni , Note floreali e minerali, miele e rosmarino. Cremoso e materico .</p>
 <p class="vino">“ Ponte di Toi ” - Stefano Legnani 12,5 - Uve: vitigni autoctoni . Macerato, non filtrato. Fermentazione</p>
 <p class="vino">spontanea con macerazione di 7 giorni, sosta in acciaio per l'inverno prima dell'imbottigliamento.</p>
 <p class="vino">Sapido, lungo e croccante con note balsamiche.</p>
-<p class="vino">Annata 20 21 1 1 % - € 69</p>
-<p class="vino">Annata 20 23 1 3 % - € 59</p>
+<p class="vino">Annata 20 23 1 3 % - € 5 4</p>
 <p class="vino">Annata 20 24 1 3 % - € 49</p>
 <p class="vino">“ Raixe ” - Giorgia Grande (20 22 ) 1 2,5 % - € 44 . Uve: Vermentino, Bosco, Albarola. Macerazione di 3</p>
 <p class="vino">giorni sulle bucce ed affinamento in acciaio per 6 mesi . Fiori bianchi, frutti maturi e note sapide e</p>
 <p class="vino">minerali.</p>
-<p class="vino">Ruzzese “ Zero Tolleranza per il Silenzio ” - Cà du Ferrà ( DOP 20 23 ) 13% - Uve: Ruzzese 100% - € 95 .</p>
-<p class="vino">8 mesi in botti di rovere e 9 di affinamento in bottiglia, solo 500 bottiglie prodotte. Cedro, arancia</p>
-<p class="vino">candita e note di macchia mediterranea. Fresco, minerale, di buona struttura. Finale dolce e</p>
-<p class="vino">persistente.</p>
 <p class="vino">Vermentino “ A Posa ” - Az. Agricola U Cantin (20 22 ) 13 % - Uve: Vermentino 100% - € 39 . N on filtrato ,</p>
 <p class="vino">6 mesi di acciaio e 6 di bottiglia . Sapido, fresco e beverino.</p>
 <p class="vino">Vermentino “ Atys ” - La Ghiaia (DOC 20 2 3 ) 1 3 ,5 % - Uve: Vermentino 100% - € 3 7 , € 11 . E rbette</p>
@@ -228,22 +220,24 @@ body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',G
 <p class="vino">sulle bucce per 14 giorni, 6 mesi di affinamento in anfora . Sapido e materico, terroso e floreale.</p>
 <p class="vino">Vermentino “ Ithaa ” - La Ghiaia ( IGT 20 2 4 ) 1 2,5 % - Uve: Vermentino 100% - € 42 . Vecchie vigne di 60</p>
 <p class="vino">anni, m acera zione di 2 mesi , non filtrato né chiarificato . I ntense note agrumate e floreali quali</p>
-<p class="vino">bergamo tto, pompelmo e fiori d'arancio. S trutturato, fresc o , sapid o con un buon corpo . T annini</p>
-<p class="vino">lievement e morbidi e raffinati .</p>
-<p class="vino">Vermentino “ Luccicante ” - Cà du Ferrà ( DOP 20 2 4 ) 13% - Uve: Vermentino 100% - € 52 , € 14 . Fi ori</p>
+<p class="vino">bergamo tto, pompelmo e fiori d'arancio. S trutturato, fresc o , sapid o con un buon corpo .</p>
+<p class="vino">Vermentino “ Luccicante ” - Cà du Ferrà ( DOP 20 2 4 ) 13% - Uve: Vermentino 100% - € 5 9 , € 1 5 . Fi ori</p>
 <p class="vino">di campo, camomilla, erbe aromatiche e sentori fruttati di pesca a polpa bianca, mandorla non</p>
 <p class="vino">tostata, mela gol den . V ivace, sapido, armonico e di lunga persistenza .</p>
 <p class="vino">Vermentino “ Oua 2 ” - La Ricolla ( IGT 20 23 ) 1 3 % - Uve: Vermentino 100% - € 46 . Macerazione sulle</p>
 <p class="vino">bucce per 1 50 giorni, 6 mesi di affinamento in anfora . Complesso e lungo. Agrumi, pesca, erbe</p>
 <p class="vino">mediterranee . Piacevolmente amarognolo.</p>
+<p class="vino">Vermentino “ V ” - Luna Mater (IGT 20 25 ) 1 2 % - Uve: Vermentino 100% - € 42 , € 12 . Macerazione</p>
+<p class="vino">sulle bucce per 18 ore e permanenza sulle fecce fino a primavera. Leggera filtrazione. Limone e</p>
+<p class="vino">pompelmo; fresco , erbaceo e beverino.</p>
 <h2 class="sez-titolo">GENOVA</h2>
 <p class="vino">Bianchetta - Villa Cambiaso (DO C 20 24 ) 1 2,5 % - Uve: Bianchetta 100% - € 34, € 10 . Mela verde e</p>
 <p class="vino">fiori d’arancio. Sapido, caldo, fresco con un lieve fondo amarognolo .</p>
 <p class="vino">Cimixà - Andrea Bruzzone (DO P 20 2 4 ) 1 3 ,5 % - Uve: Cimixà 100% - € 29 . Frutti tropicali e note vegetali .</p>
 <p class="vino">Vino fresco, sapido e minerale. Lunga persistenza .</p>
-<p class="vino">Coronata “ o Cônâ ” - Villa Cambiaso (DO C 20 2 1 ) 1 3 % - Uve: Bianchetta Genovese, Albarola e</p>
-<p class="vino">Vermentino - € 33 , € 9 . Profumo delicato, fruttato, persistente. Sentori di erbe e fiori di campo .</p>
-<p class="vino">Sapore secco, sapido e armonico.</p>
+<p class="vino">Coronata - Terre delle Vigne (DO C 20 22 ) 1 2,5 % - Uve: Bianchetta Genovese, Albarola e Vermentino</p>
+<p class="vino">- € 39, € 13 . Profumo delicato, fruttato, persistente. Sentori di erbe e fiori di campo . Sapore secco,</p>
+<p class="vino">sapido e armonico.</p>
 <p class="vino">“Patiscimile” - Andrea Bruzzone ( 20 23 ) 1 2,5 % - Uve: Bianchetta 100% - € 37, € 10 . La vigna migliore</p>
 <p class="vino">invecchiata 6 mesi in botti di cemento. Profumo fruttato con sentori di fiori di campo. Delicato e</p>
 <p class="vino">morbido.</p>
@@ -265,18 +259,16 @@ body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',G
 <p class="vino">leggermente astringente.</p>
 <p class="vino">Vermentino - Müragni (DOC 20 2 5 ) 1 3,5 % - Uve: Vermentino 100% - € 4 9 , € 1 4 . Erbe aromatiche e</p>
 <p class="vino">frutta bianca . Fresco minerale con un finale amarognolo.</p>
-<p class="vino">Vermentino “ Giada ” - La Casetta ( IGT 20 24 ) 1 3 % - Uve: Vermentino 100% - € 32, € 9 . Breve</p>
-<p class="vino">macerazione senza aggiunta di solfiti. Fruttato e floreale dal sapore sapido e fresco.</p>
 <p class="vino">Vermentino “ TreCrù ” - Terrazze Singhie ( IGT 2024 ) 12% - Uve: Vermentino 100 % - € 54 . M acerazione</p>
 <p class="vino">di circa 20 giorni ed affinamento di 12 mesi in botte. S apido e delicato.</p>
-<h2 class="sez-titolo">CAMPANIA</h2>
-<p class="vino">“ Privo L’eretico 20 2 3 ” - Ale.P.A. ( IGT 20 2 1 ) 1 2 ,5 % - Uve: Pallagrello 100% - € 49 . Nessuna filtrazione</p>
-<p class="vino">o chiarifica. Macerazione di 8 giorni cui segue un affinamento di 12 mesi in acciaio e castagno.</p>
-<p class="vino">Albicocche essiccate, miele, arance, polpa di mela e spezie orientali. Fresco , ben sapido, dal</p>
-<p class="vino">persistente finale speziato.</p>
-<p class="vino">“ Riccio Bi anco ” - Ale.P.A. ( IGT 20 2 4 ) 1 3,5 % - Uve: Pallagrello 100% - € 42 . Uno dei pochi vitigni al</p>
-<p class="vino">mondo ad avere entrambe le varietà, bacca bianca e rossa. Affinato solo in acciaio . Frutta bianca ,</p>
-<p class="vino">sal e , noce moscata. Fresco e leggermente sapid o con aromi di frutta gialla e agrum i .</p>
+<h2 class="sez-titolo">EMILIA - ROMAGNA</h2>
+<p class="vino">Malvasia “ Vej 2 4 0 ” - Podere Pradarolo ( IGT 20 22 ) 1 2,5 % - Uve: Malvasia di Candia Aromatica 100% .</p>
+<p class="vino">€ 42. Ma cerazione sulle bucce in vasche di cemento . Nessuna filtrazione, chiarifica, aggiunta di</p>
+<p class="vino">lieviti. R osa antica , c orpo importante e tannini spiccati, floreale e fresco in bocca.</p>
+<p class="vino">“ Ripa di Sopravento ” - Vittorio Graziano (20 24 ) 1 2 % - Uve: Trebbiano ed altri vitigni locali - € 42 .</p>
+<p class="vino">Metodo ancestrale rifermentato in vetroresina. Fresco, sapido e minerale di buona struttura.</p>
+<p class="vino">“ Rorippa ” - Lusenti (20 21 ) 1 2 % - Uve: Chardonnay 9 0% , Malvasia 1 0% - € 42 . Non filtrato, macerato</p>
+<p class="vino">in anfora per 6 mesi . Mineralità e sapidità. Frutta, crema e cocco.</p>
 <p class="vino">EMILIA - ROMAGNA (Val Trebbia)</p>
 <p class="vino">“ Ageno ” – La Stoppa (20 20 ) 1 2,5 % - Uve: Malvasia di Candia 100% - € 59 . 4 mesi di macerazione</p>
 <p class="vino">sulle bucce e seguente affinamento in botte . Miele e spezie, tannico e persistente .</p>
@@ -302,18 +294,13 @@ body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',G
 <p class="vino">“ Solata ” - Montepascolo (20 22 ) 1 2 % - Uve: Malvasia di Candia, Sauvignon, Moscato - € 36 .</p>
 <p class="vino">Macerazione di 60 giorni, affinamento di 12 mesi in cemento ed altri 12 in bottiglia. Leggermente</p>
 <p class="vino">petillant .</p>
-<h2 class="sez-titolo">EMILIA - ROMAGNA</h2>
-<p class="vino">Malvasia “ Vej 2 4 0 ” - Podere Pradarolo ( IGT 20 22 ) 1 2,5 % - Uve: Malvasia di Candia Aromatica 100% .</p>
-<p class="vino">€ 42. Ma cerazione sulle bucce in vasche di cemento . Nessuna filtrazione, chiarifica, aggiunta di</p>
-<p class="vino">lieviti. R osa antica , c orpo importante e tannini spiccati, floreale e fresco in bocca.</p>
-<p class="vino">“ Ripa di Sopravento ” - Vittorio Graziano (20 24 ) 1 2 % - Uve: Trebbiano ed altri vitigni locali - € 42 .</p>
-<p class="vino">Metodo ancestrale rifermentato in vetroresina. Fresco, sapido e minerale di buona struttura.</p>
-<p class="vino">“ Rorippa ” - Lusenti (20 21 ) 1 2 % - Uve: Chardonnay 9 0% , Malvasia 1 0% - € 42 . Non filtrato, macerato</p>
-<p class="vino">in anfora per 6 mesi . Mineralità e sapidità. Frutta, crema e cocco.</p>
 <h2 class="sez-titolo">FRIULI</h2>
-<p class="vino">“ I Fiori di Leonie ” - Zorzettig (DOC 20 20 ) 1 3,5 % - Uve: Pinot Bianco, Friulano, Sauvignon - € 69 .</p>
-<p class="vino">L eggera nota floreale e richiami fruttati di mela G olden e crema pasticcera . Equilibrato e</p>
-<p class="vino">avvolgente, di buona persistenza e struttura, con un finale balsamico .</p>
+<p class="vino">Bianco “ Breg ” - Gravner ( IGT 20 11 ) 1 6 % - Uve: Sauvignon, Chardonnay, Riesling Italico - € 130 .</p>
+<p class="vino">C orposo e intenso, vinificato in anfora e invecchiato per 72 mesi in legno. Il risultato è di straordinaria</p>
+<p class="vino">complessità aromatica: profumi ricchi, espressivi e inimitabili e un gusto morbido, caldo e setoso.</p>
+<p class="vino">Friulano - Zorzettig (DOC 20 2 4 ) 1 3 % - Uve: Tokaj Friulano 100% - € 44, € 12 . A grumato, elegante e</p>
+<p class="vino">ampio c on note speziate di liquirizia e pera matura. Al gusto è fresco, morbido, sapido, pieno e</p>
+<p class="vino">persistente . Al retrogusto, u na nota di mandorla dolce.</p>
 <p class="vino">Malvasia “ Orange ” – Le Vigne di Zamò ( IGT 20 22 ) 1 3 % - Uve: Malvasia 100% - € 4 9 , € 1 3 .</p>
 <p class="vino">Macerazione di 6 mesi in anfora, non filtrato. Pompelmo, albicocca, pesca e muschio con tannini</p>
 <p class="vino">ben integrati.</p>
@@ -321,11 +308,12 @@ body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',G
 <p class="vino">note di camomilla e fiori di acacia , mela e albicocca. Grazie al buono stato di maturazione delle</p>
 <p class="vino">uve raccolte evidenzia al palato la caratteristica nota acida smorzata e ben bilanciata da una ampia</p>
 <p class="vino">complessità di corpo. Buona sapidità che rende il finale lungo di grande piacevolezza .</p>
+<p class="vino">Sauvig non - Zorzettig (DOC 20 2 4 ) 1 3 % - Uve: Sauvignon 100% - € 44, € 12 . F rutta tropicale e rimandi</p>
+<p class="vino">di erbe selvatiche. Al palato entra con un ingresso morbido, armonioso . Chiude con un finale lungo,</p>
+<p class="vino">di matrice sapida.</p>
 <h2 class="sez-titolo">LOMBARDIA</h2>
 <p class="vino">Riesling “ San Rocco ” - Stefanago ( IGP 20 16 ) 1 3 % - Uve: Riesling 1 0 0% - Lombardia - € 48 . 1 2 mesi</p>
 <p class="vino">in botti di acacia e 12 mesi in bottiglia. Sapido, fresco, equilibrato e persistente.</p>
-<p class="vino">Traminer “ Arò ” - Stefanago ( IGP 202 3 ) 1 3 % - Uve: T raminer 100% - € 3 6 . A rancia, fiori di rosa, litchi,</p>
-<p class="vino">zenzero e coriandolo. Succoso e aromatico, allo stesso tempo</p>
 <h2 class="sez-titolo">PIEMONTE</h2>
 <p class="vino">Arneis - Renato Fenocchio ( DOC 20 23 ) 1 2,5 % - Uve: Arneis 100% - € 32 , € 9 . Ginestra, camomilla e</p>
 <p class="vino">frutta fresca . Acidulo, pieno e persistente.</p>
@@ -334,16 +322,11 @@ body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',G
 <p class="vino">Chardonnay “ An Piota ” - Forti del Vento ( 20 22 ) 1 3,5 % - Uve: Chardonnay 100% - € 34 , € 9 . 2 mesi</p>
 <p class="vino">di macerazione e quindi 6 mesi di affinamento in anfora . Non il solito Chardonnay . Fresco e</p>
 <p class="vino">minerale, naso complesso con richiami di scorza di arancia.</p>
-<p class="vino">Cortese “ Maia ” - Forti del Vento ( 20 22 ) 1 2,5 % - Uve: Cortese 100% - € 32 , € 9 . 3 mesi di macerazione</p>
-<p class="vino">e quindi 8 mesi di affinamento in acciaio . Vino secco , affilato e minerale. Con una beva di gran</p>
-<p class="vino">carattere.</p>
-<p class="vino">Riesling “ Marin ” - Fontanafredda (DOC 20 21 ) 1 3 % - Uve: Riesling 100% - € 37 , € 10 . A grumi, pesca</p>
-<p class="vino">bianca, alloro e rosmarino uniti all’idrocarburo e all’acidità del Riesling . Retrogusto lungo e sapido.</p>
 <p class="vino">Timorasso “ C.C.C ” - Az. Agr. Ricci 1 4 % - Uve: Timorasso 100% - € 79. Vino superorange.</p>
 <p class="vino">Macerazione di 3 giorni e lungo invecchiamento ossidativo in botte per 12 mesi. No filtrazioni né</p>
 <p class="vino">chiarifiche. Frutta gialla matura, miele, fiori di campo, camomilla, cenni salmastri e sfumature</p>
 <p class="vino">ossidative. Il sorso è ampio e lungo, con una prevalenza di sensazioni terziarie di particolare</p>
-<p class="vino">intensità espressiva. Il finale è legg ermente tannico, fresco e salino .</p>
+<p class="vino">intensità espressiva. Il finale è leggermente tannico, fresco e salino .</p>
 <p class="vino">Timorasso “ Io Cammino da Solo ” - Az. Agr. Ricci ( 201 9 ) 1 3, 5 % - Uve: Timorasso 100% - € 6 9 .</p>
 <p class="vino">Macerazione di 100 giorni sulle bucce in anfore interrate e affinato di 12 mesi in legni di castagno.</p>
 <p class="vino">Da bere rigorosamente a temperatura ambiente.</p>
@@ -355,8 +338,6 @@ body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',G
 <p class="vino">mesi sulle fecce. Frutta gialla matura. Avvolgente, fresco, delicato e marino.</p>
 <p class="vino">Grillo “ Magico Ariddu ” – Ferracane (IGP 202 3 ) 1 2 % - Uve: Grillo 100% - € 32 . 2 giorni di macerazione</p>
 <p class="vino">sulle bucce . Frutt ato con sentori di pesca e fiori d’arancio. Equilibrata morbidezza e buon corpo.</p>
-<p class="vino">Grillo “ Note di Bianco ” - Alessandro Viola ( IG P 20 24 ) 1 2 ,5 % - Uve: Grillo 100% - € 35 . Non filtrato,</p>
-<p class="vino">macerato 6 mesi sulle fecce. Frutta gialla matura. Avvolgente, fresco, delicato e marino.</p>
 <p class="vino">Grillo “ Pinzeri ” - Funaro ( DOC 20 24 ) 1 3 % - Uve: Grillo 100% - € 32 . Al naso sentori floreali e fruttati</p>
 <p class="vino">(melone giallo e pesca). Morbido e pieno con lunga persistenza.</p>
 <h2 class="sez-titolo">TOSCANA</h2>
@@ -384,15 +365,10 @@ body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',G
 <p class="vino">Intensi sentori floreali , vena minerale e spezie dolci.</p>
 <p class="vino">Garganega “ Pico ” – Angiolino Maule ( IGT 20 23 ) 1 2 % - Uve: Garganega 100% - € 49 . Miele di acacia</p>
 <p class="vino">e fiori di campo. Gusto diretto, minerale e persistente. Buona freschezza.</p>
-<p class="vino">Sauvignon “ Sudigiri ” – Villa Job ( IGT 20 22 ) 1 3 % - Uve: Sauvignon 100% - € 39 , € 11 . Macerazione</p>
-<p class="vino">sulle bucce per 3 giorni e seguente affinamento di 6 mesi in cemento e 3 mesi in botte. Ortica e</p>
-<p class="vino">sambuco, pompelmo e frutto della passione . Bella struttura con spalla erbacea.</p>
 <p class="vino">“ Togo ” - Il Ceo (20 23 ) 1 1,5 % - Uve: Vespaiola, Glera Lunga e Pedevenda - € 38 , € 11 . Nespola e</p>
 <p class="vino">tiglio. Sapido e croccante con una spiccata freschezza finale.</p>
 <h2 class="sez-titolo">VINI ROSATI</h2>
 <h2 class="sez-titolo">LIGURIA</h2>
-<p class="vino">“ La Foce “ - La Cornice (IGT 20 22 ) 13% - Uve: Sang iovese, Canaiolo e Syrah - € 32 . F rutti di bosco</p>
-<p class="vino">e rosa canina, calendula e melissa . Buona acidità e tannino sfumato.</p>
 <p class="vino">“ La P oggia ” - Luna Mater (IGT 202 4 ) 1 4 % - Uve: Syrah 100% - € 44 . Elegante ed equilibrato.</p>
 <p class="vino">“ Lappazucche ” - Berry&amp;Berry (20 23 ) 1 1 ,5% - Uve: Barbarossa 80% , altri vitigni autoctoni 20% - € 34 ,</p>
 <p class="vino">€ 10 . Aromi fruttati e floreali con una piacevole nota speziata.</p>
@@ -407,31 +383,23 @@ body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',G
 <p class="vino">Cerasuolo d’Abruzzo “ Suffonte ” - Az. Agr. Ludovico ( DOC 20 20 ) 1 4 % - Abruzzo - Uve: Montepulciano</p>
 <p class="vino">d’Abruzzo 10 0% - € 39 . Macerazione di 7 giorni ed affinamento in acciaio. Nessuna chiarifica o</p>
 <p class="vino">filtrazione. Frutto croccante , sapidità, freschezza e struttura.</p>
-<p class="vino">“ Il Sole di Leo” - UCCI Cantina Urbana ( 20 23 ) 1 2,5 % - Uve: Freisa 10 0% - Piemonte - € 33. Lampone</p>
-<p class="vino">e rosa . Fresco, croccante, di buona sapidità.</p>
-<p class="vino">“ Il Sole di Leo” Botte Scolma - UCCI Cantina Urbana ( 20 17 ) 1 4 % - Uve: Freisa 10 0% - Piemonte -</p>
-<p class="vino">€ 46. Vinificato in legno ed affinato in botte scolma . Tabacco e cioccolato, leggermente ossidato e</p>
-<p class="vino">di buon corpo.</p>
-<p class="vino">Pinot Grigio “ Macerato ” - Stefanago ( IGP 202 3 ) 1 3,5 % - Uve: Pinot Grigio 100% - Lombardia - € 3 6 .</p>
-<p class="vino">Pera e frutta fresca . Vino giovane e non impegnativo, sapido ed asciutto.</p>
 <h2 class="sez-titolo">VINI ROSSI</h2>
 <h2 class="sez-titolo">LIGURIA</h2>
 <p class="vino">“ Cuxii ” – Il Baggio Pellegrino (20 22 ) 1 2,5 % - Uve: Ormeasco 8 0% Cabernet - € 39 . Frutti di bosco,</p>
 <p class="vino">ribes, rosa canina. Persistente con tannino piacevole .</p>
-<p class="vino">Granaccia “ Bricco dei Bambini ” - Viarzo ( DOC 20 20 ) 1 4 ,5 % - Uve: Granaccia 100% - € 57 .</p>
-<p class="vino">Macerazione in cemento e seguente affinamento di 1 8 mes i in tonneau di rovere . Frutti rossi, note</p>
-<p class="vino">speziate, sentori di sottobosco e leggero tocco balsamico</p>
+<p class="vino">Granaccia - Luna Mater (IGT 20 22 ) 1 4,5 % - Uve: Merlot, Cabernet Sauvignon, Syrah e Sangiovese -</p>
+<p class="vino">€ 55 . Macerazione di almeno 10 giorni. Ogni uva vendemmiata e vinificata separatamente (parte</p>
 <p class="vino">Granaccia “ Trexenda ” - Viarzo ( IGT 20 20 ) 1 4 % - Uve: Granaccia 100% - € 4 7 . Macerazione in</p>
 <p class="vino">cemento e seguente affinamento di 1 0 mes i in tonneau di rovere .</p>
 <p class="vino">“ Ngilù ” - Cà du Ferrà ( DOP 20 20 ) 1 3,5 % - Uve: Sangiovese, Merlot, Ciliegiolo - € 4 8 , € 1 4 . M elograno,</p>
 <p class="vino">lampone e ciliegia rossa . V ivace ed armonico, di buona struttura e lunga persistenza .</p>
-<p class="vino">“ N iccolò V ” - Cantine Lunae Bosoni ( DOC 20 15 ) 1 4 % - Uve: Sangiovese, Merlot, Pollera Nera -</p>
-<p class="vino">€ 55 . 12 giorni di permanenza sulle bucce e successivo affinamento di 18 mesi in botte. Fragola</p>
-<p class="vino">matura e ciliegia, vaniglia e liquerizia. Trama tannica setosa e piacevolmente acida. Finale lungo e</p>
-<p class="vino">persistente.</p>
-<p class="vino">“ Poderino ” - Luna Mater (IGT 20 20 ) 1 4 % - Uve: Merlot, Cabernet Sauvignon, Syrah e Sangiovese -</p>
-<p class="vino">€ 3 9 . Macerazione di almeno 10 giorni. Ogni uva vendemmiata e vinificata separatamente (parte</p>
-<p class="vino">in acciaio e parte in botte di terzo passaggio). Dopo l’inverno si passa all’assemblaggio.</p>
+<p class="vino">“ Poderino ” - Luna Mater (IGT 20 20 ) 1 4 % - Uve: Merlot, Cabernet Pinot Nero - In der Eben ( IGT 20 20 )</p>
+<p class="vino">1 2 % - Uve: Pinot Nero 100% - € 65 . Fermentazione spontanea ed affinamento in botti grandi di</p>
+<p class="vino">rovere per 22 mesi. F resco e speziato. Fr utti rossi, terra, sottobosco e corteccia. In bocca entra</p>
+<p class="vino">dritto, teso ed asciutto .</p>
+<p class="vino">Sauvignon, Syrah e Sangiovese - € 3 9 . Macerazione di almeno 10 giorni. Ogni uva vendemmiata</p>
+<p class="vino">e vinificata separatamente (parte in acciaio e parte in botte di terzo passaggio). Dopo l’inverno si</p>
+<p class="vino">passa all’assemblaggio.</p>
 <p class="vino">Rossese di Dolceacqua - Cantina M u rag n i (DOC 20 2 5 ) 1 3 % - Uve: Rossese 100% - € 4 9, € 1 4 .</p>
 <p class="vino">Rosmarino, pepe nero ed un tannino morbido e maturo. Buona persistenza .</p>
 <p class="vino">Rossese di Dolceacqua Superiore “ Le Morghe ” - Cantina Muraghi (DOC 20 24 ) 1 4 % - Uve: Rossese</p>
@@ -467,25 +435,15 @@ body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',G
 <p class="vino">struttura.</p>
 <p class="vino">Dolcetto “ Ottotori ” - Forti del Vento ( 20 20 ) 1 3 % - Uve: Dolcetto 100% - € 32 , € 9 . Cru maturato un</p>
 <p class="vino">anno in legno ed affinato in bottiglia. Struttura, tannino e finezza. Buona acidità.</p>
-<p class="vino">Freisa “ Poco Dopo un Ferragosto ” - Cà del Prete (DOC 201 9 ) 1 4 % - Uve: Freisa 100% - € 36 . Affinato</p>
-<p class="vino">per 6 mesi sulle bucce. Intenso ed elegante, tannino avvolgente.</p>
+<p class="vino">Freisa “ nuda &amp; cruda ” - Cascina Gasparda ( 20 20 ) 1 4 % - Uve: Freisa 100% - € 32 , € 9 . Macerazione</p>
+<p class="vino">di 15 giorni ed a ffina men to per 12 mesi in acciaio . More, prugne e frutta rossa, note minerali e</p>
+<p class="vino">ferrose. Buon tannino.</p>
 <p class="vino">Nebbiolo - Andrea Ballarin (DOC 20 24 ) 1 3,5 % - Uve: Nebbiolo 100% - € 32 . Rosa e viola, in bocca</p>
 <p class="vino">sapido, dolce e persistente.</p>
-<h2 class="sez-titolo">SARDEGNA</h2>
-<p class="vino">“ Case Sparse ” - Az. Agr. Pusole ( IGT 20 2 1) 1 5 % - Uve: Cannonau 9 0% e Monica 10 % - € 4 9 . Raccolta</p>
-<p class="vino">tardiva e macerazione di 15 gg. Nessuna chimica né filtrazione. Piccoli frutti rossi, viola, pe pe nero,</p>
-<p class="vino">ciliegia e macchia mediterranea. V ino scorrevole, estivo, persistente e dal tannino equilibrato .</p>
 <h2 class="sez-titolo">SICILIA</h2>
 <p class="vino">“ Cost a Jatta ” - Biscaris ( IGP 20 24 ) 1 3 % - Uve: Frappato 100% - € 37 , € 11 . Fresco, c omplesso e</p>
 <p class="vino">variegato al naso, frutta scura matura e spezie.</p>
-<p class="vino">“ SP 68 ” - Arianna Occhipinti ( IGT 20 23 ) 1 2,5 % - Uve: Frappato di Vittoria, Nero d’Avola - € 37 .</p>
-<p class="vino">Macerazione di 15 giorni sulle bucce e fermentazione spontanea in tini di cemento per 7 mesi. Vino</p>
-<p class="vino">giovane, polposo e diretto, piacevolmente fresco. Pepe nero, pietra focaia, tabacco e note</p>
-<p class="vino">mentolate.</p>
 <h3 class="sottosez-titolo">TRENTINO ALTO - ADIGE</h3>
-<p class="vino">Pinot Nero - In der Eben ( IGT 20 20 ) 1 2 % - Uve: Pinot Nero 100% - € 65 . Fermentazione spontanea</p>
-<p class="vino">ed affinamento in botti grandi di rovere per 22 mesi. F resco e speziato. Fr utti rossi, terra, sottobosco</p>
-<p class="vino">e corteccia. In bocca entra dritto, teso ed asciutto .</p>
 <p class="vino">Pinot Nero “ Turmhof ” - Tiefenbrunner ( DOC 20 23 ) 1 4 % - Uve: Pinot Nero 100% - € 46, € 12 . 10 mesi</p>
 <p class="vino">in botte, 2 mesi in cemento e poi 5 mesi in bottiglia. More, lamponi e ciliegie. Morbido e pieno,</p>
 <p class="vino">elegante ed equilibrato.</p>
@@ -515,6 +473,6 @@ body{background:var(--cream);color:var(--ink);font-family:'Cormorant Garamond',G
 <p class="vino">Poretti analcolica - 0 % , bottiglia da 33 cl. € 9 .</p>
 
 </div>
-<div class="version">v 2026.05.15.01</div>
+<div class="version">v 2026.06.10.01</div>
 </body>
 </html>

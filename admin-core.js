@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.06.10.12 — Documento generico, "Scarica HTML": il file salvato ora NON contiene più la toolbar (pulsanti Stampa/Scarica/allineamento/dimensione) né gli script di controllo — si clona il DOM, si rimuovono .doc-toolbar e tutti gli <script>, restano documento + stile + stato corrente (classi/inline). Come il file pubblico dei dolci.
 // v 2026.06.10.11 — Dolci allineato alla carta: filesDolci() pubblica DUE file → menu-dolci.html (pubblico, senza barra) + menu-dolci-it.html (admin/preview, con barra Stampa + pulsanti dimensione, noindex). La preview dolci (apriPreview) usa _dolciCtrlBar() (stessa barra). Così la preview dolci ha i pulsanti come la carta.
 // v 2026.06.10.10 — Impostazioni stampa carta/dolci spostate da CURSORI (admin) a PULSANTI nella barra della PREVIEW (come il documento generico). Rimosso il pannello cursori da costruisci(). Nuova costante _SIZE_BTNS (A+/A−, interlinea, spazio, sposta su/giù, reset) aggiunta alla CTRL_BAR della carta; per i dolci (senza barra nel file) la barra è iniettata SOLO nella preview da apriPreview (non finisce nel file pubblicato). Le funzioni live _sz* stanno in CARTA_TPL_A e menu-dolci.html. Aggiornata la regex di strip della ctrl-bar in costruisciMenuItPub (ora taglia l'intera barra fino a <div id="layout-carta">, non più "fino a Stampa").
 // v 2026.06.10.09 — Carta vini RIFATTA: niente più estrazione testo (output "orrendo"). Ogni pagina del PDF è renderizzata via PDF.js a immagine ad alta risoluzione (scale 2.2, JPEG 0.92) e impaginata 1:1 su A4 (copertina inclusa) → riproduzione fedele del PDF. Nuova _generaHtmlViniImmagini; _leggiEConvertiVini ora rende immagini. Rimosso il pannello cursori vini (irrilevante sulle immagini). _VINI_TPL/_generaHtmlVini (testo) restano nel file ma non più usati.
@@ -1890,7 +1891,10 @@ function _docGen_costruisciHTML(titolo, corpoHtml) {
     '  btn.classList.toggle("active", pg.classList.contains("center-v"));',
     '}',
     'function _docScaricaHTML(){',
-    '  var html = document.documentElement.outerHTML;',
+    '  var clone = document.documentElement.cloneNode(true);',
+    '  var tb = clone.querySelector(".doc-toolbar"); if(tb){ tb.parentNode.removeChild(tb); }',
+    '  var scs = clone.querySelectorAll("script"); for(var i=0;i<scs.length;i++){ scs[i].parentNode.removeChild(scs[i]); }',
+    '  var html = "<!DOCTYPE html>\\n" + clone.outerHTML;',
     '  var blob = new Blob([html], {type:"text/html;charset=utf-8"});',
     '  var a = document.createElement("a");',
     '  a.href = URL.createObjectURL(blob);',

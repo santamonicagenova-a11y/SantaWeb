@@ -1,8 +1,5 @@
 <!DOCTYPE html>
 <html lang="it">
-  <style>
-@media (max-width:640px){.pg{width:auto!important;max-width:100%!important;min-height:0!important;margin:0!important;padding:26px 16px!important;box-shadow:none!important;}.logo{font-size:1.9rem!important;letter-spacing:.1em!important;}.logo-sub{font-size:.6rem!important;}.lista-titolo{font-size:1.05rem!important;letter-spacing:.12em!important;}.sez-titolo{font-size:1.3rem!important;letter-spacing:.08em!important;}.sommelier{font-size:.62rem!important;}html,body{overflow-x:hidden!important;}}
-</style>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -41,10 +38,11 @@
     :root {
       --cream: #faf7f2;
       --ink:   #1a1714;
-      --stone: #7d7062;
+      --stone: #8c7e6e;
       --rust:  #9e4a2a;
       --rule:  #d4c9b8;
     }
+    @media (max-width:640px){.pg{width:auto!important;max-width:100%!important;min-height:0!important;margin:0!important;padding:26px 16px!important;box-shadow:none!important;}.logo{font-size:1.9rem!important;letter-spacing:.1em!important;}.logo-sub{font-size:.6rem!important;}.lista-titolo{font-size:1.05rem!important;letter-spacing:.12em!important;}.sez-titolo{font-size:1.3rem!important;letter-spacing:.08em!important;}.sommelier{font-size:.62rem!important;}html,body{overflow-x:hidden!important;}}
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -426,7 +424,6 @@
   </style>
 </head>
 <body>
-<main>
 <div id="layout-carta"></div>
 <div id="layout-orario"></div>
 
@@ -724,7 +721,7 @@ function buildDegu(degu) {
 
   return `
     <div class="degu">
-      <h1 class="degu-titolo">Men&ugrave;&rsquo; Degustazione</h1>
+      <div class="degu-titolo">Men&ugrave;&rsquo; Degustazione</div>
       <div class="degu-prezzi">${optsHtml}</div>
       <div class="degu-nota">${degu.nota.replace("l'intero tavolo", "<strong>l\u2019intero tavolo</strong>")}</div>
       ${percorsiHtml}
@@ -851,6 +848,5 @@ renderCarta();
 renderOrario();
 showLayout('carta');
 </script>
-</main>
 </body>
 </html>

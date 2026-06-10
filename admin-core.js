@@ -1,5 +1,6 @@
 // Core functions per menu-admin Santamonica
-// v 2026.06.10.02 — SEO meta description (durevole, template): _VINI_TPL ora include <title> "Carta dei Vini | Ristorante Santamonica Genova" + <meta name="description"> (carta vini); iniettaSeoLingua estesa con dizionario SEO_LL (title+description per en/fr, override del title dopo t.title). Allinea i template alla patch live dei 4 file menu-*.html (gate completo P1+P2 + P3 3 vendor + sign-off Andrea 10/6). Le future pubblicazioni escono già corrette.
+// v 2026.06.10.03 — Cursore "Dimensione caratteri menù (stampa)" in cima al form della carta (costruisci()): range 90%–135%, default 112%, scrive dati.fontScale (round-trippa nel JSON pubblicato via leggi() → letto da renderCarta in admin-templates-shared.js v.04 che imposta var(--fs)). Regola solo i font leggibili della carta; "Note per l'ospite" esclusa. Va usato poi con Anteprima/Pubblica.
+// v 2026.06.10.02 — SEO meta description (durevole, template): _VINI_TPL ora include <title> "Carta dei Vini | Ristorante Santamonica Genova" + <meta name="description"> (carta vini); iniettaSeoLingua estesa con dizionario SEO_LL (title+description per en/fr, override del title dopo t.title — gira al passo 678 dopo il replace 663, quindi vince). Allinea i template alla patch live dei 4 file menu-*.html (gate completo P1+P2 + P3 3 vendor + sign-off Andrea 10/6). Le future pubblicazioni escono già con title+description corretti.
 // v 2026.06.10.01 — Mobile lista vini: aggiunta media query @media (max-width:640px) nel <style> di _VINI_TPL. Le pagine generate (menu-vini.html) erano disegnate come foglio A4 (.pg{width:210mm}) senza CSS responsive → su telefono sbordavano oltre lo schermo (testo tagliato a destra). La media query sgancia la larghezza A4 (.pg width:auto/max-width:100%, padding ridotto, no box-shadow), scala logo/titoli e mette overflow-x:hidden. Tutte le regole sono !important (stanno prima di .pg base nel cascade). Print invariato. Il fix vale per le NUOVE pubblicazioni; i file già online vanno patchati a parte o ripubblicati.
 // v 2026.06.05.03 — Pagina orario (versione 1 pagina): blocco QR ridotto da 4 a 2 lingue. Aggiornata la regex di sostituzione link EN/FR (riga ~674) per matchare 2 righe invece di 4 (rimossi Deutsch/Espanol, coerente con F0.4). Allineato a admin-templates-shared.js e menu-it.html.
 // v 2026.06.05.02 — Guard anti-crash in eseguiPubblicazione: se dati===null (menu non caricato, es. publish via modale-token dopo un refresh) avvisa "Prima carica il menu" invece di crashare su "dati.degustazione" (TypeError null).
@@ -144,6 +145,31 @@ function costruisci() {
   var wrap = document.getElementById('wrap');
   wrap.innerHTML = '';
   var m = dati;
+
+  /* --- DIMENSIONE CARATTERI (stampa carta) --- */
+  (function(){
+    var cur = (m.fontScale != null ? m.fontScale : 1.12);
+    var fsf = el('div','fs');
+    fsf.appendChild(el('div','fs-head','Dimensione caratteri menù (stampa)'));
+    var fb = el('div','fs-body');
+    var row = el('div'); row.style.cssText = 'display:flex;align-items:center;gap:1rem;flex-wrap:wrap';
+    var rng = document.createElement('input');
+    rng.type = 'range'; rng.id = 'font-scale';
+    rng.min = '0.9'; rng.max = '1.35'; rng.step = '0.01'; rng.value = cur;
+    rng.style.cssText = 'flex:1;min-width:200px';
+    var out = el('span','', Math.round(cur*100) + '%');
+    out.id = 'font-scale-out'; out.style.cssText = 'font-weight:500;min-width:48px;text-align:right';
+    rng.addEventListener('input', function(){
+      dati.fontScale = +rng.value;
+      out.textContent = Math.round(rng.value*100) + '%';
+    });
+    row.appendChild(rng); row.appendChild(out);
+    fb.appendChild(row);
+    var hint = el('div','', 'Vale per il menù alla carta stampato (100% = base). Le “Note per l’ospite” restano invariate. Dopo aver scelto, controlla con Anteprima e poi Pubblica.');
+    hint.style.cssText = 'font-size:.72rem;color:var(--stone);margin-top:.6rem;line-height:1.5';
+    fb.appendChild(hint);
+    fsf.appendChild(fb); wrap.appendChild(fsf);
+  })();
 
   /* --- DEGUSTAZIONE --- */
   if (m.degustazione) {
@@ -658,6 +684,7 @@ function eseguiPubblicazione(token) {
     // Parti dalla versione pubblica IT (senza pulsanti) e traduci
     var html = costruisciMenuItPub();
     var m = costruisciMenuTradotto(leggi(), t);
+    if (dati && dati.fontScale != null) m.fontScale = dati.fontScale; // scala caratteri carta anche su EN/FR
     // F0.21-d: accorpa i dolci nella carta SOLO per le lingue (IT resta separato/stampato).
     var mDolci = costruisciDolciPerCarta(lang);
     if (mDolci) {

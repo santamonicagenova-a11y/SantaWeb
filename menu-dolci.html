@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.06.10.05 — Aggiunti interlinea (--lh), spazio tra i piatti (--gap) e posizione sul foglio (--shift, translateY su .degu/.pg-content) regolabili dai cursori in menu-admin; renderCarta legge lineScale/gapScale/shift. .note-ospite sempre escluso. -->
 <!-- v 2026.06.10.04 — Dimensione caratteri regolabile (come la carta): font-size del testo leggibile ora calc(<orig>rem * var(--fs,1.12)); renderCarta() imposta --fs da MENU.fontScale (round-trippa via leggi(), pilotato dal cursore in menu-admin). .note-ospite ESCLUSO. + Stampa entro area stampabile: @page margin 8mm + #layout-carta .pg width auto/height 281mm/padding 9-14-8; foglio orario isolato e invariato via @page nominata "orarioPage" (margin 0). -->
 <!-- v 2026.05.22.01 — F0.21-e: allineamento vocabolario allergeni: "uovo" -> "uova", "solforosa" -> "solfiti". (Versione introdotta: il file ne era privo.) -->
 <html lang="it">
@@ -130,6 +131,7 @@
       flex-direction: column;
       justify-content: center;
       padding: 4mm 0;
+      transform: translateY(var(--shift, 0));
     }
     .degu-titolo {
       font-size: calc(1.4rem * var(--fs, 1.12));
@@ -141,7 +143,7 @@
     .degu-prezzi {
       font-style: italic;
       font-size: calc(.98rem * var(--fs, 1.12));
-      line-height: 1.4;
+      line-height: calc(1.4 * var(--lh, 1));
       margin-bottom: 2mm;
     }
     .degu-nota {
@@ -157,16 +159,16 @@
       text-underline-offset: 2px;
       color: var(--ink);
     }
-    .percorso { margin-bottom: 12mm; }
+    .percorso { margin-bottom: calc(12mm * var(--gap, 1)); }
     .percorso-label {
       font-style: italic;
       font-weight: 700;
       font-size: calc(1.25rem * var(--fs, 1.12));
       margin-bottom: 3mm;
     }
-    .percorso-piatto { font-size: calc(.96rem * var(--fs, 1.12)); line-height: 1.95; font-style: normal; }
+    .percorso-piatto { font-size: calc(.96rem * var(--fs, 1.12)); line-height: calc(1.95 * var(--lh, 1)); font-style: normal; }
     .percorso-piatto em { font-style: normal; }
-    .percorso-libero { font-size: calc(.96rem * var(--fs, 1.12)); line-height: 1.95; font-style: normal; }
+    .percorso-libero { font-size: calc(.96rem * var(--fs, 1.12)); line-height: calc(1.95 * var(--lh, 1)); font-style: normal; }
 
     /* ── sezioni carta ── */
     .pg-content {
@@ -174,8 +176,9 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      transform: translateY(var(--shift, 0));
     }
-    .sezione { margin-bottom: 14mm; }
+    .sezione { margin-bottom: calc(14mm * var(--gap, 1)); }
     .sezione-titolo {
       font-family: 'Cormorant Garamond', serif;
       font-style: normal;
@@ -190,9 +193,9 @@
     /* ── piatti carta ── */
     .piatto {
       text-align: center;
-      padding: .5mm 0;
+      padding: calc(.5mm * var(--gap, 1)) 0;
       font-size: calc(.96rem * var(--fs, 1.12));
-      line-height: 1.4;
+      line-height: calc(1.4 * var(--lh, 1));
     }
     .piatto-prezzo {
       font-size: calc(.8rem * var(--fs, 1.12));
@@ -210,7 +213,7 @@
       color: var(--stone);
       display: block;
     }
-    .piatto-staccato { margin-top: 3.5mm; }
+    .piatto-staccato { margin-top: calc(3.5mm * var(--gap, 1)); }
 
     .eco::after {
       content: ' *';
@@ -547,6 +550,9 @@ function renderCarta() {
   const root = document.getElementById('layout-carta');
   root.innerHTML = '';
   if (MENU.fontScale) root.style.setProperty('--fs', MENU.fontScale);
+  if (MENU.lineScale) root.style.setProperty('--lh', MENU.lineScale);
+  if (MENU.gapScale) root.style.setProperty('--gap', MENU.gapScale);
+  if (MENU.shift != null) root.style.setProperty('--shift', MENU.shift + 'mm');
 
   if (MENU.degustazione) {
     // Menu carta normale

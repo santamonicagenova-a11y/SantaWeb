@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.06.10.05 — Pannello "Impostazioni stampa menù" con 4 cursori (helper slider()): Dimensione caratteri (fontScale), Interlinea (lineScale), Spazio tra i piatti (gapScale), Posizione sul foglio (shift, in mm). Scrivono dati.<prop>, round-trippano via leggi() e su EN/FR, letti da renderCarta (carta + dolci). Default neutri tranne fontScale 1.12.
 // v 2026.06.10.04 — Cursore "Dimensione caratteri" ora attivo ANCHE sul menu dolci (rimosso il guard tipoMenuCorrente!=='carta'). Funziona perché menu-dolci.html v.04 ha lo stesso meccanismo --fs (calc + renderCarta). Testo di aiuto generalizzato (carta o dolci).
 // v 2026.06.10.03 — Cursore "Dimensione caratteri menù (stampa)" in cima al form della carta (costruisci()): range 90%–135%, default 112%, scrive dati.fontScale (round-trippa nel JSON pubblicato via leggi() → letto da renderCarta in admin-templates-shared.js v.04 che imposta var(--fs)). Regola solo i font leggibili della carta; "Note per l'ospite" esclusa. Va usato poi con Anteprima/Pubblica.
 // v 2026.06.10.02 — SEO meta description (durevole, template): _VINI_TPL ora include <title> "Carta dei Vini | Ristorante Santamonica Genova" + <meta name="description"> (carta vini); iniettaSeoLingua estesa con dizionario SEO_LL (title+description per en/fr, override del title dopo t.title — gira al passo 678 dopo il replace 663, quindi vince). Allinea i template alla patch live dei 4 file menu-*.html (gate completo P1+P2 + P3 3 vendor + sign-off Andrea 10/6). Le future pubblicazioni escono già con title+description corretti.
@@ -147,27 +148,39 @@ function costruisci() {
   wrap.innerHTML = '';
   var m = dati;
 
-  /* --- DIMENSIONE CARATTERI (stampa carta) --- */
+  /* --- IMPOSTAZIONI STAMPA (caratteri + interlinea + spazio + posizione) --- */
   (function(){
-    var cur = (m.fontScale != null ? m.fontScale : 1.12);
     var fsf = el('div','fs');
-    fsf.appendChild(el('div','fs-head','Dimensione caratteri menù (stampa)'));
+    fsf.appendChild(el('div','fs-head','Impostazioni stampa menù'));
     var fb = el('div','fs-body');
-    var row = el('div'); row.style.cssText = 'display:flex;align-items:center;gap:1rem;flex-wrap:wrap';
-    var rng = document.createElement('input');
-    rng.type = 'range'; rng.id = 'font-scale';
-    rng.min = '0.9'; rng.max = '1.35'; rng.step = '0.01'; rng.value = cur;
-    rng.style.cssText = 'flex:1;min-width:200px';
-    var out = el('span','', Math.round(cur*100) + '%');
-    out.id = 'font-scale-out'; out.style.cssText = 'font-weight:500;min-width:48px;text-align:right';
-    rng.addEventListener('input', function(){
-      dati.fontScale = +rng.value;
-      out.textContent = Math.round(rng.value*100) + '%';
-    });
-    row.appendChild(rng); row.appendChild(out);
-    fb.appendChild(row);
-    var hint = el('div','', 'Vale per il menù stampato (carta o dolci, 100% = base). Le “Note per l’ospite” restano invariate. Dopo aver scelto, controlla con Anteprima e poi Pubblica.');
-    hint.style.cssText = 'font-size:.72rem;color:var(--stone);margin-top:.6rem;line-height:1.5';
+    function slider(label, prop, mn, mx, st, def, fmt){
+      var cur = (m[prop] != null ? m[prop] : def);
+      var lab = el('div','', label);
+      lab.style.cssText = 'font-size:.72rem;letter-spacing:.04em;color:var(--stone);margin-bottom:.2rem';
+      var row = el('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:.9rem';
+      var rng = document.createElement('input');
+      rng.type = 'range'; rng.id = prop;
+      rng.min = String(mn); rng.max = String(mx); rng.step = String(st); rng.value = cur;
+      rng.style.cssText = 'flex:1;min-width:200px';
+      var out = el('span','', fmt(cur));
+      out.id = prop + '-out';
+      out.style.cssText = 'font-weight:500;min-width:62px;text-align:right';
+      rng.addEventListener('input', function(){
+        dati[prop] = +rng.value;
+        out.textContent = fmt(+rng.value);
+      });
+      row.appendChild(rng); row.appendChild(out);
+      fb.appendChild(lab); fb.appendChild(row);
+    }
+    var pct = function(v){ return Math.round(v*100) + '%'; };
+    var mm  = function(v){ return (v > 0 ? '+' : '') + v + ' mm'; };
+    slider('Dimensione caratteri', 'fontScale', 0.9, 1.35, 0.01, 1.12, pct);
+    slider('Interlinea (spazio tra le righe)', 'lineScale', 0.85, 1.4, 0.05, 1, pct);
+    slider('Spazio tra i piatti e le sezioni', 'gapScale', 0.6, 1.6, 0.05, 1, pct);
+    slider('Posizione sul foglio (su / giù)', 'shift', -15, 15, 1, 0, mm);
+    var hint = el('div','', 'Valgono per il menù stampato (carta e dolci, 100% = base). Le “Note per l’ospite” restano sempre invariate. Dopo aver scelto, controlla con Anteprima e poi Pubblica.');
+    hint.style.cssText = 'font-size:.72rem;color:var(--stone);margin-top:.2rem;line-height:1.5';
     fb.appendChild(hint);
     fsf.appendChild(fb); wrap.appendChild(fsf);
   })();
@@ -685,7 +698,12 @@ function eseguiPubblicazione(token) {
     // Parti dalla versione pubblica IT (senza pulsanti) e traduci
     var html = costruisciMenuItPub();
     var m = costruisciMenuTradotto(leggi(), t);
-    if (dati && dati.fontScale != null) m.fontScale = dati.fontScale; // scala caratteri carta anche su EN/FR
+    if (dati) { // impostazioni stampa (caratteri/interlinea/spazio/posizione) anche su EN/FR
+      if (dati.fontScale != null) m.fontScale = dati.fontScale;
+      if (dati.lineScale != null) m.lineScale = dati.lineScale;
+      if (dati.gapScale  != null) m.gapScale  = dati.gapScale;
+      if (dati.shift     != null) m.shift     = dati.shift;
+    }
     // F0.21-d: accorpa i dolci nella carta SOLO per le lingue (IT resta separato/stampato).
     var mDolci = costruisciDolciPerCarta(lang);
     if (mDolci) {

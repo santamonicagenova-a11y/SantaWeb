@@ -75,20 +75,8 @@
   </url>
 
   <!-- Voucher regalo (IT only) -->
-  <url>
-    <loc>https://santamonicagenova.it/regala.html</loc>
-    <lastmod>2026-05-20</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
 
   <!-- Termini voucher (IT only) -->
-  <url>
-    <loc>https://santamonicagenova.it/voucher-termini.html</loc>
-    <lastmod>2026-05-20</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.4</priority>
-  </url>
 
   <!-- Privacy policy (IT only) -->
   <url>

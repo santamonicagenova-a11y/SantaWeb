@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════
    orari.js — FONTE UNICA orari di apertura · Santamonica Web
-   v 2026.06.05.01
+   v 2026.06.11.01
    ───────────────────────────────────────────────────────────────────────
    PER CAMBIARE GLI ORARI: modifica SOLO gli oggetti SERVIZI e SETTIMANA.
    Tutto il resto (display #info, tabella dove-siamo, Schema.org JSON-LD su
@@ -12,11 +12,19 @@
 
    JSON-LD: iniettato nel blocco <script type="application/ld+json"> esistente
    (entità con @type *Restaurant). Lo script gira sincrono in <head> → Googlebot
-   esegue il rendering JS e legge structured data iniettati. Le pagine NON
-   contengono più openingHoursSpecification statico.
+   esegue il rendering JS e legge structured data iniettati.
+   ⚠️ v 2026.06.11.01: le pagine CONTENGONO di nuovo un openingHoursSpecification
+   STATICO (crawler-safe), perché i motori IA (Perplexity/Gemini/Grok) NON
+   eseguono JS e vedevano orari vuoti → riportavano orari stantii (GEO giro 2,
+   11/6). orari.js lo RI-INIETTA identico a runtime, quindi resta fonte unica per
+   i client JS. PER CAMBIARE GLI ORARI: aggiorna SETTIMANA/SERVIZI QUI **e** il
+   blocco statico openingHoursSpecification in index.html + dove-siamo.html.
    ═══════════════════════════════════════════════════════════════════════
 
    STORICO
+   - v 2026.06.11.01 (GEO giro 2): re-introdotto openingHoursSpecification
+     STATICO crawler-safe in index.html + dove-siamo.html (i crawler IA non
+     eseguono JS). Nessun cambio di codice qui: solo commento + nota desync.
    - v 2026.06.05.01 (nuovi orari dal 7 giugno 2026): mer e gio passano a
      SOLA CENA (prima pranzo+cena); dom passa a PRANZO+CENA (prima solo pranzo).
      Invariati: lun chiuso, mar solo cena, ven/sab pranzo+cena. Aggiorna in

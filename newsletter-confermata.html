@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<!--
+  newsletter-confermata.html — Pagina di conferma iscrizione newsletter
+  Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
+  Versione: v 2026.06.12.01
+
+  Atterraggio dopo il click sul link DOI di Brevo.
+  BREVO_DOI_REDIR in submit-reservation punta qui.
+  noindex: pagina transazionale, non per SEO.
+-->
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iscrizione confermata — Ristorante Santamonica</title>
+<meta name="robots" content="noindex, nofollow">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sabbia:   #f7f5f0;
+    --crema:    #faf8f3;
+    --oro:      #c9a961;
+    --inchiostro: #2c2c2c;
+    --bordo:    #e0dcd0;
+    --secondario: #6b6560;
+  }
+
+  body {
+    font-family: 'Jost', Arial, sans-serif;
+    font-weight: 300;
+    background: var(--sabbia);
+    color: var(--inchiostro);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .card {
+    background: #ffffff;
+    border: 1px solid var(--bordo);
+    max-width: 560px;
+    width: 100%;
+    padding: 48px 48px 40px;
+    text-align: center;
+  }
+
+  .icona {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 24px;
+    background: var(--crema);
+    border: 1px solid var(--bordo);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .icona svg {
+    width: 26px;
+    height: 26px;
+    stroke: var(--oro);
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .ristorante {
+    font-family: 'Cormorant', Georgia, serif;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--secondario);
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-family: 'Cormorant', Georgia, serif;
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--inchiostro);
+    margin-bottom: 16px;
+  }
+
+  .sottotitolo {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--secondario);
+    margin-bottom: 32px;
+  }
+
+  .divisore {
+    width: 40px;
+    height: 1px;
+    background: var(--oro);
+    margin: 0 auto 32px;
+  }
+
+  .cta {
+    display: inline-block;
+    padding: 13px 32px;
+    background: var(--inchiostro);
+    color: #ffffff;
+    text-decoration: none;
+    font-family: 'Jost', Arial, sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: background 0.2s;
+  }
+
+  .cta:hover {
+    background: #444;
+  }
+
+  footer {
+    margin-top: 24px;
+    font-size: 12px;
+    color: #aaa;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 480px) {
+    .card { padding: 36px 28px 32px; }
+    h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="icona">
+    <!-- checkmark -->
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  </div>
+
+  <p class="ristorante">Ristorante Santamonica</p>
+
+  <h1>Iscrizione confermata</h1>
+
+  <div class="divisore"></div>
+
+  <p class="sottotitolo">
+    Grazie. Da oggi riceverà le nostre news: il menu che cambia,<br>
+    le cene a tema, le piccole storie del ristorante.
+  </p>
+
+  <a href="https://santamonicagenova.it/" class="cta">Torna al sito</a>
+</div>
+
+<footer>Lungomare Lombardo 27 · Genova · <a href="https://santamonicagenova.it/privacy.html" style="color:#aaa;">Privacy</a></footer>
+
+</body>
+</html>

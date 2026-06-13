@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- Santamonica · Landing 10 Anni · v 2026.06.04.01 -->
+<!-- Santamonica · Landing 10 Anni · v 2026.06.13.01 -->
+<!-- v2026.06.06.01: + evento GA4 "generate_lead" gemello del Pixel Lead sul submit (gate #3 misurazione KPI SEO), GDPR-gated. -->
 <!-- v2026.06.04.01: + evento Pixel "Lead" sul submit (GDPR-gated) per tracciare le prenotazioni dal boost; + nota piano B maltempo. -->
 <!-- ATTENZIONE COMMIT: il dominio è servito da Cloudflare Pages; il branch GitHub `main` risulta stantio (v2026.05.23.01). Committare sul branch da cui deploya Cloudflare / usato dal 10anni-editor, NON su main. Verificare live dopo deploy. -->
 <html lang="it">
@@ -156,7 +157,37 @@
   footer{background:var(--bg);border-top:1px solid var(--line);padding:46px 0;font-size:.85rem;color:#6a655b}
   footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:18px;align-items:center}
   footer a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--gold)}
-  .ver{font-size:.72rem;letter-spacing:.1em;color:#706c65}
+  .ver{font-size:.72rem;letter-spacing:.1em;color:#9a948a}
+
+  /* ---------- PARTNER ---------- */
+  .partner-block{
+    margin-top:46px;padding-top:40px;
+    border-top:1px solid var(--line);
+  }
+  .partner-block .p-tag{
+    font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--sea);margin-bottom:24px;
+  }
+  .partner-logos{
+    display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;
+  }
+  .partner-item{
+    display:flex;align-items:center;gap:14px;
+  }
+  .partner-item img{
+    width:60px;height:60px;border-radius:4px;
+    object-fit:cover;object-position:center;flex:none;
+  }
+  .partner-item .p-name{
+    font-family:var(--serif);font-size:1.05rem;color:var(--ink);
+  }
+  .partner-item .p-role{
+    font-size:.82rem;color:#6a655b;margin-top:3px;font-style:italic;
+  }
+  @media(max-width:560px){
+    .partner-logos{gap:20px}
+    .partner-item img{width:50px;height:50px}
+  }
 
   @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
   @media (prefers-reduced-motion:reduce){*{animation:none!important}}
@@ -178,14 +209,40 @@
   </header>
 
   <!-- STORIA / PARTNERSHIP MURATORI -->
-  <main>
-<section class="story">
+  <section class="story">
     <div class="wrap">
       <div class="rule"></div>
       <h2>Dieci anni con il Millè</h2>
       <p>Nel 2016 abbiamo aperto le porte sul lungomare con un'idea semplice: <span class="key">il pesce del giorno, trattato con rispetto</span>. La prima bottiglia che abbiamo aperto era un <span class="key">Franciacorta Millè di Cantina Muratori</span>.</p>
-      <p>Dieci anni dopo, torniamo a brindare con il Millè in una nuova versione, presentata da chi lo fa. Due ambassador di Cantina Muratori saranno con noi quella sera per raccontarlo.</p>
-      <p class="video-note">2016 — 2026. Dieci estati, una cantina, un vino che ci ha accompagnato.</p>
+      <p>Dieci anni dopo, torniamo a brindare con lo stesso vino. Quella sera ci saranno anche i proprietari di <span class="key">Cà du Ferrà</span> di Bonassola — i bianchi di mare che portiamo in carta da qualche anno — e il nostro nuovo fornitore di caffè, <span class="key">Pascucci</span>.</p>
+      <p class="video-note">2016 — 2026. Dieci estati, molte bottiglie, un posto sul lungomare.</p>
+
+      <div class="partner-block">
+        <div class="p-tag">quella sera con noi</div>
+        <div class="partner-logos">
+          <div class="partner-item">
+            <img src="/assets/muratori-logo.png" alt="Cantina Muratori Franciacorta" width="60" height="60">
+            <div>
+              <div class="p-name">Cantina Muratori</div>
+              <div class="p-role">Franciacorta · il vino della prima sera</div>
+            </div>
+          </div>
+          <div class="partner-item">
+            <img src="/assets/caduferra-logo.png" alt="Cà du Ferrà" width="60" height="60">
+            <div>
+              <div class="p-name">Cà du Ferrà</div>
+              <div class="p-role">Bonassola · bianchi di mare</div>
+            </div>
+          </div>
+          <div class="partner-item">
+            <img src="/assets/pascucci-logo.png" alt="Pascucci Caffè" width="60" height="60">
+            <div>
+              <div class="p-name">Pascucci</div>
+              <div class="p-role">caffè · nuovo in cucina</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -198,10 +255,11 @@
         <div class="item"><div class="lab">Quando</div><div class="val">Mercoledì 1 luglio · dalle 20:30</div></div>
         <div class="item"><div class="lab">Dove</div><div class="val">Santamonica · Lungomare Lombardo 27 · Genova</div></div>
         <div class="item"><div class="lab">Format</div><div class="val">Cena in piedi · musica jazz dal vivo</div></div>
-        <div class="item"><div class="lab">Vino</div><div class="val">Franciacorta Millè · Cantina Muratori</div></div>
+        <div class="item"><div class="lab">Vino</div><div class="val">Muratori Franciacorta · Cà du Ferrà</div></div>
+        <div class="item"><div class="lab">Caffè</div><div class="val">Pascucci</div></div>
         <div class="item"><div class="lab">Quota</div><div class="val">75 € a persona · tutto incluso</div></div>
       </div>
-      <p>Una cena in piedi per festeggiare dieci anni di cucina di mare. I piatti girano fra gli ospiti, curati dallo Chef Nicolò Lazzaroni; tre ore di musica jazz acustica dal vivo; le stazioni vino con la sommelier Monica Capurro e i due ambassador di Cantina Muratori. Alle 21:30 un breve momento dedicato alla nuova versione del Millè, raccontata da chi lo produce. Nessun coperto assegnato, nessun discorso a microfono: si racconta a piccoli gruppi, come una sera fra amici. Solo più amici del solito.</p>
+      <p>Una cena in piedi per festeggiare dieci anni di cucina di mare. I piatti girano fra gli ospiti, curati dallo Chef Nicolò Lazzaroni; tre ore di musica jazz acustica dal vivo; i vini di due cantine — Muratori Franciacorta e Cà du Ferrà — con la sommelier Monica Capurro; il caffè Pascucci in chiusura. Nessun coperto assegnato, nessun discorso: si racconta a piccoli gruppi, come una sera fra amici. Solo più amici del solito.</p>
       <p class="weather-note">In caso di pioggia la serata si tiene comunque, all'interno, con lo stesso spirito.</p>
     </div>
   </section>
@@ -263,12 +321,11 @@
   </section>
 
   <!-- FOOTER -->
-  </main>
-<footer>
+  <footer>
     <div class="wrap">
       <div>Santamonica · Genova · <a href="mailto:info@santamonicagenova.it">info@santamonicagenova.it</a></div>
       <div><a href="/">Torna al sito</a> · <a href="/privacy.html">Privacy</a> · <a href="/cookies.html">Cookie</a></div>
-      <div class="ver">v 2026.06.04.01</div>
+      <div class="ver">v 2026.06.13.01</div>
     </div>
   </footer>
 
@@ -316,6 +373,7 @@
             // Evento di conversione Meta Pixel: scatta SOLO se il consenso advertising
             // ha caricato il Pixel (fbq definito). Senza consenso = nessun evento (GDPR-safe).
             try { if (typeof fbq === 'function') fbq('track', 'Lead', {content_name:'Decennale 1 luglio 2026', content_category:'evento'}); } catch(e){}
+            // Gemello GA4 (gate #3 KPI): richiesta di prenotazione come evento GA4. GDPR-safe come sopra (gtag definito solo con consenso analytics).
             try { if (typeof gtag === 'function') gtag('event', 'generate_lead', { form_location: 'landing_10anni', currency: 'EUR', value: 0 }); } catch(e){}
             form.reset();
             msg.className='form-msg ok';

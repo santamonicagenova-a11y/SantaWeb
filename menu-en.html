@@ -120,6 +120,7 @@
     .degu {
       text-align: center;
       flex: 1;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -166,6 +167,7 @@
     /* ── sezioni carta ── */
     .pg-content {
       flex: 1;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -228,6 +230,7 @@
     /* ── note ospite carta ── */
     .note-ospite {
       margin-top: auto;
+      flex-shrink: 0;
       font-style: italic;
       font-size: .73rem;
       color: var(--stone);
@@ -467,7 +470,7 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Black lemon, lovage and lime ice cream with milk biscuits"
+          "nome": "Black lemon, lovage and lime ice cream with milk crackers"
         }
       ],
       "Sette": "Chef's free interpretation menu"
@@ -591,7 +594,7 @@ const MENU = {
           "prezzo": 18
         },
         {
-          "nome": "Locally caught croaker, caught on a hook, with vine-leaf sauce and a pea purée",
+          "nome": "Locally caught croaker, caught on a hook, with vine-leaf sauce and pea purée",
           "prezzo": 34,
           "sostenibile": true
         },
@@ -613,7 +616,7 @@ const MENU = {
       "titolo": "Golosità",
       "piatti": [
         {
-          "nome": "Black lemon, lovage and lime ice cream with milk biscuits",
+          "nome": "Black lemon, lovage and lime ice cream with milk crackers",
           "prezzo": 14
         },
         {
@@ -790,10 +793,11 @@ const MENU = {
         "titolo_display": "Not Only Sea",
         "piatti": [
           {
-            "nome": "Locally caught yellowtail caught on a hook, pepper cream, BBQ aubergine purée, tahini",
+            "nome": "Locally caught yellowtail caught on a hook, cherry tomatoes, tahini, lovage",
             "allergeni": [
               "fish",
-              "sesame"
+              "sesame",
+              "sulphites"
             ]
           },
           {
@@ -803,7 +807,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "Locally caught croaker, caught on a hook, with vine-leaf sauce and a pea purée",
+            "nome": "Locally caught croaker, caught on a hook, with vine-leaf sauce and pea purée",
             "allergeni": [
               "fish",
               "celery",
@@ -819,6 +823,14 @@ const MENU = {
               "celery",
               "sulphites",
               "molluscs"
+            ]
+          },
+          {
+            "nome": "Blue lobster, medlars, apricots, hollandaise sauce, bisque",
+            "allergeni": [
+              "crustaceans",
+              "eggs",
+              "milk"
             ]
           }
         ]

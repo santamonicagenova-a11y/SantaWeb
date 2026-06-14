@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.06.14.02 — _szApply aggiorna anche i riquadri valore della barra preview (#szv-fs/#szv-lh/#szv-gap/#szv-shift) → valori visibili in tempo reale mentre si regola. Span definiti in _SIZE_BTNS (admin-core.js). -->
 <!-- v 2026.06.14.01 — Aggiunta funzione live _szSave(): il pulsante "Fissa come default" della barra preview (iniettata da _dolciCtrlBar in admin-core.js) la chiama per passare i valori correnti _sz (fs/lh/gap/shift) all'admin via window.opener.salvaImpostazioniStampa(). Speculare alla carta. -->
 <!-- v 2026.06.10.06 — Funzioni live _sz* nello <script>: i pulsanti della barra (iniettata in preview da apriPreview) regolano caratteri/interlinea/spazio/posizione in tempo reale (--fs/--lh/--gap/--shift). _szApply all'init. -->
 <!-- v 2026.06.10.05 — Aggiunti interlinea (--lh), spazio tra i piatti (--gap) e posizione sul foglio (--shift, translateY su .degu/.pg-content) regolabili dai cursori in menu-admin; renderCarta legge lineScale/gapScale/shift. .note-ospite sempre escluso. -->
@@ -428,8 +429,7 @@ const MENU = {
           "nome": "Erborinato ligure e Picolit Zorzettig",
           "prezzo": 12
         }
-      ],
-      "titolo_display": "Golosità"
+      ]
     }
   ],
   "allergeni": [
@@ -678,7 +678,7 @@ function showLayout(which) {
 
 /* ── init ── */
 var _sz={fs:(MENU.fontScale!=null?MENU.fontScale:1.12),lh:(MENU.lineScale!=null?MENU.lineScale:1),gap:(MENU.gapScale!=null?MENU.gapScale:1),shift:(MENU.shift!=null?MENU.shift:0)};
-function _szApply(){var r=document.getElementById('layout-carta');if(!r)return;r.style.setProperty('--fs',_sz.fs);r.style.setProperty('--lh',_sz.lh);r.style.setProperty('--gap',_sz.gap);r.style.setProperty('--shift',_sz.shift+'mm');}
+function _szApply(){var r=document.getElementById('layout-carta');if(r){r.style.setProperty('--fs',_sz.fs);r.style.setProperty('--lh',_sz.lh);r.style.setProperty('--gap',_sz.gap);r.style.setProperty('--shift',_sz.shift+'mm');}var _sv=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};_sv('szv-fs',Math.round(_sz.fs*100)+'%');_sv('szv-lh',Math.round(_sz.lh*100)+'%');_sv('szv-gap',Math.round(_sz.gap*100)+'%');_sv('szv-shift',(_sz.shift>0?'+':'')+_sz.shift+'mm');}
 function _szF(d){_sz.fs=Math.max(0.85,Math.min(1.4,Math.round((_sz.fs+d)*100)/100));_szApply();}
 function _szL(d){_sz.lh=Math.max(0.8,Math.min(1.5,Math.round((_sz.lh+d)*100)/100));_szApply();}
 function _szG(d){_sz.gap=Math.max(0.6,Math.min(1.7,Math.round((_sz.gap+d)*100)/100));_szApply();}

@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.06.14.06 — Barra preview (carta + dolci): accanto a ogni controllo dimensione/spaziatura ora c'è il VALORE corrente (caratteri %, interlinea %, spazio %, posizione mm). Aggiunti span #szv-fs/#szv-lh/#szv-gap/#szv-shift in _SIZE_BTNS; aggiornati live da _szApply (in CARTA_TPL_A v 2026.06.14.03 e menu-dolci.html v 2026.06.14.02).
 // v 2026.06.14.05 — FIX traduzioni pagina ALLERGENI EN/FR (costruisciAllergeniPerCarta): (1) titoli sezione — la pagina allergeni salva il titolo VISIBILE (titolo_display, es. "Antipasti") ma il dizionario .sezioni è per titolo CANONICO (es. "Sfiziosi"→Starters): aggiunta mappa display→canonico da dati.sezioni + trSez ora prova canonico, display, poi .piatti. (2) nomi DOLCI — i nomi brevi (es. "Gelato porcino") stanno solo in TRADUZIONI_DOLCI, non in .piatti: nuova trNomeDolci con fallback su TRADUZIONI_DOLCI[lang].piatti. Si vede dopo Traduci e Pubblica della carta.
 // v 2026.06.14.04 — FIX preview lingue dolci: la preview EN/FR dei dolci apriva menu-dolci-en/fr.html (non più esistenti dal 22/5: i dolci sono accorpati nella carta EN/FR) → 404 → fallback alla home. Ora la preview lingua punta sempre a menu-<lang>.html (carta tradotta, coi dolci in fondo), sia da modalità carta sia da modalità dolci.
 // v 2026.06.14.03 — "✔ Fissa come default" ESTESO ai DOLCI: pulsante aggiunto anche a _dolciCtrlBar() (barra preview dolci + menu-dolci-it.html); _szSave() definita in menu-dolci.html v 2026.06.14.01. salvaImpostazioniStampa() è già generica (scrive dati.fontScale/lineScale/gapScale/shift, vale sia per carta sia per dolci).
@@ -465,15 +466,21 @@ var _qrBase64 = null;   // base64 del nuovo QR selezionato (separato dal MENU)
 
 // Pulsanti dimensione/spaziatura per la barra della preview (carta + dolci).
 // Chiamano le funzioni _sz* definite nello <script> della pagina (CARTA_TPL_A / menu-dolci.html).
+// Stile dei riquadri che mostrano il valore corrente di ogni controllo (aggiornati da _szApply).
+var _SZV = ' style="font-family:Jost,sans-serif;font-size:.62rem;color:var(--stone);min-width:3.1em;display:inline-block;text-align:center;letter-spacing:.03em"';
 var _SIZE_BTNS =
     '  <button class="ctrl-btn" onclick="_szF(0.03)" title="Caratteri piu grandi">A+</button>\n'
   + '  <button class="ctrl-btn" onclick="_szF(-0.03)" title="Caratteri piu piccoli">A−</button>\n'
+  + '  <span id="szv-fs"'+_SZV+' title="Dimensione caratteri">112%</span>\n'
   + '  <button class="ctrl-btn" onclick="_szL(0.05)" title="Interlinea +">↕+</button>\n'
   + '  <button class="ctrl-btn" onclick="_szL(-0.05)" title="Interlinea −">↕−</button>\n'
+  + '  <span id="szv-lh"'+_SZV+' title="Interlinea">100%</span>\n'
   + '  <button class="ctrl-btn" onclick="_szG(0.05)" title="Spazio +">¶+</button>\n'
   + '  <button class="ctrl-btn" onclick="_szG(-0.05)" title="Spazio −">¶−</button>\n'
+  + '  <span id="szv-gap"'+_SZV+' title="Spazio tra i piatti">100%</span>\n'
   + '  <button class="ctrl-btn" onclick="_szS(2)" title="Sposta giu">⬇</button>\n'
   + '  <button class="ctrl-btn" onclick="_szS(-2)" title="Sposta su">⬆</button>\n'
+  + '  <span id="szv-shift"'+_SZV+' title="Posizione sul foglio">0mm</span>\n'
   + '  <button class="ctrl-btn" onclick="_szR()" title="Ripristina dimensioni">↺</button>\n';
 
 // Barra admin per i dolci (Stampa + pulsanti dimensione). Va in menu-dolci-it.html e nella preview.

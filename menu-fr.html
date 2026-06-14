@@ -120,6 +120,7 @@
     .degu {
       text-align: center;
       flex: 1;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -166,6 +167,7 @@
     /* ── sezioni carta ── */
     .pg-content {
       flex: 1;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -228,6 +230,7 @@
     /* ── note ospite carta ── */
     .note-ospite {
       margin-top: auto;
+      flex-shrink: 0;
       font-style: italic;
       font-size: .73rem;
       color: var(--stone);
@@ -467,7 +470,7 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Glace au citron noir, au livèche et au citron vert, accompagnée de biscuits au lait"
+          "nome": "Glace au citron noir, au livèche et au citron vert, accompagnée de crackers au lait"
         }
       ],
       "Sette": "Menu carte blanche du Chef"
@@ -613,7 +616,7 @@ const MENU = {
       "titolo": "Golosità",
       "piatti": [
         {
-          "nome": "Glace au citron noir, au livèche et au citron vert, accompagnée de biscuits au lait",
+          "nome": "Glace au citron noir, au livèche et au citron vert, accompagnée de crackers au lait",
           "prezzo": 14
         },
         {
@@ -790,10 +793,11 @@ const MENU = {
         "titolo_display": "Pas Seulement la Mer",
         "piatti": [
           {
-            "nome": "Sériole locale pêchée à la ligne, crème de poivrons, purée d&#x27;aubergines au barbecue, tahini",
+            "nome": "Sériole locale pêchée à la ligne, cerises, tahini, livèche",
             "allergeni": [
               "poisson",
-              "sésame"
+              "sésame",
+              "sulfites"
             ]
           },
           {
@@ -819,6 +823,14 @@ const MENU = {
               "céleri",
               "sulfites",
               "mollusques"
+            ]
+          },
+          {
+            "nome": "Homard bleu, nèfles, abricots, sauce hollandaise, bisque",
+            "allergeni": [
+              "crustacés",
+              "œufs",
+              "lait"
             ]
           }
         ]

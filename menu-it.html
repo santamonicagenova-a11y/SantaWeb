@@ -418,12 +418,16 @@
   <div class="ctrl-sep"></div>
   <button class="ctrl-btn" onclick="_szF(0.03)" title="Caratteri piu grandi">A+</button>
   <button class="ctrl-btn" onclick="_szF(-0.03)" title="Caratteri piu piccoli">A−</button>
+  <span id="szv-fs" style="font-family:Jost,sans-serif;font-size:.62rem;color:var(--stone);min-width:3.1em;display:inline-block;text-align:center;letter-spacing:.03em" title="Dimensione caratteri">112%</span>
   <button class="ctrl-btn" onclick="_szL(0.05)" title="Interlinea +">↕+</button>
   <button class="ctrl-btn" onclick="_szL(-0.05)" title="Interlinea −">↕−</button>
+  <span id="szv-lh" style="font-family:Jost,sans-serif;font-size:.62rem;color:var(--stone);min-width:3.1em;display:inline-block;text-align:center;letter-spacing:.03em" title="Interlinea">100%</span>
   <button class="ctrl-btn" onclick="_szG(0.05)" title="Spazio +">¶+</button>
   <button class="ctrl-btn" onclick="_szG(-0.05)" title="Spazio −">¶−</button>
+  <span id="szv-gap" style="font-family:Jost,sans-serif;font-size:.62rem;color:var(--stone);min-width:3.1em;display:inline-block;text-align:center;letter-spacing:.03em" title="Spazio tra i piatti">100%</span>
   <button class="ctrl-btn" onclick="_szS(2)" title="Sposta giu">⬇</button>
   <button class="ctrl-btn" onclick="_szS(-2)" title="Sposta su">⬆</button>
+  <span id="szv-shift" style="font-family:Jost,sans-serif;font-size:.62rem;color:var(--stone);min-width:3.1em;display:inline-block;text-align:center;letter-spacing:.03em" title="Posizione sul foglio">0mm</span>
   <button class="ctrl-btn" onclick="_szR()" title="Ripristina dimensioni">↺</button>
   <div class="ctrl-sep"></div>
   <button class="ctrl-btn" onclick="_szSave()" title="Fissa le dimensioni e spaziature correnti come default del menù">✔ Fissa come default</button>
@@ -659,7 +663,7 @@ const MENU = {
       }
     ]
   },
-  "fontScale": 1.28,
+  "fontScale": 1.22,
   "lineScale": 1,
   "gapScale": 1,
   "shift": 0
@@ -865,7 +869,7 @@ function showLayout(which) {
 
 /* ── init ── */
 var _sz={fs:(MENU.fontScale!=null?MENU.fontScale:1.12),lh:(MENU.lineScale!=null?MENU.lineScale:1),gap:(MENU.gapScale!=null?MENU.gapScale:1),shift:(MENU.shift!=null?MENU.shift:0)};
-function _szApply(){var r=document.getElementById('layout-carta');if(!r)return;r.style.setProperty('--fs',_sz.fs);r.style.setProperty('--lh',_sz.lh);r.style.setProperty('--gap',_sz.gap);r.style.setProperty('--shift',_sz.shift+'mm');}
+function _szApply(){var r=document.getElementById('layout-carta');if(r){r.style.setProperty('--fs',_sz.fs);r.style.setProperty('--lh',_sz.lh);r.style.setProperty('--gap',_sz.gap);r.style.setProperty('--shift',_sz.shift+'mm');}var _sv=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};_sv('szv-fs',Math.round(_sz.fs*100)+'%');_sv('szv-lh',Math.round(_sz.lh*100)+'%');_sv('szv-gap',Math.round(_sz.gap*100)+'%');_sv('szv-shift',(_sz.shift>0?'+':'')+_sz.shift+'mm');}
 function _szF(d){_sz.fs=Math.max(0.85,Math.min(1.4,Math.round((_sz.fs+d)*100)/100));_szApply();}
 function _szL(d){_sz.lh=Math.max(0.8,Math.min(1.5,Math.round((_sz.lh+d)*100)/100));_szApply();}
 function _szG(d){_sz.gap=Math.max(0.6,Math.min(1.7,Math.round((_sz.gap+d)*100)/100));_szApply();}

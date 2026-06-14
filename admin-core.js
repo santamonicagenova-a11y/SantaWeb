@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.06.14.05 — FIX traduzioni pagina ALLERGENI EN/FR (costruisciAllergeniPerCarta): (1) titoli sezione — la pagina allergeni salva il titolo VISIBILE (titolo_display, es. "Antipasti") ma il dizionario .sezioni è per titolo CANONICO (es. "Sfiziosi"→Starters): aggiunta mappa display→canonico da dati.sezioni + trSez ora prova canonico, display, poi .piatti. (2) nomi DOLCI — i nomi brevi (es. "Gelato porcino") stanno solo in TRADUZIONI_DOLCI, non in .piatti: nuova trNomeDolci con fallback su TRADUZIONI_DOLCI[lang].piatti. Si vede dopo Traduci e Pubblica della carta.
 // v 2026.06.14.04 — FIX preview lingue dolci: la preview EN/FR dei dolci apriva menu-dolci-en/fr.html (non più esistenti dal 22/5: i dolci sono accorpati nella carta EN/FR) → 404 → fallback alla home. Ora la preview lingua punta sempre a menu-<lang>.html (carta tradotta, coi dolci in fondo), sia da modalità carta sia da modalità dolci.
 // v 2026.06.14.03 — "✔ Fissa come default" ESTESO ai DOLCI: pulsante aggiunto anche a _dolciCtrlBar() (barra preview dolci + menu-dolci-it.html); _szSave() definita in menu-dolci.html v 2026.06.14.01. salvaImpostazioniStampa() è già generica (scrive dati.fontScale/lineScale/gapScale/shift, vale sia per carta sia per dolci).
 // v 2026.06.14.02 — Carta: pulsante "✔ Fissa come default" nella barra della PREVIEW. Dopo aver regolato caratteri/interlinea/spazio/posizione con i pulsanti, lo si preme per salvare i valori correnti come default: la preview chiama window.opener.salvaImpostazioniStampa(fs,lh,gap,shift) (nuova funzione qui) che scrive dati.fontScale/lineScale/gapScale/shift; round-trippano in leggi() → JSON pubblicato → renderCarta. Diventano permanenti dopo Pubblica. Pulsante aggiunto alla CTRL_BAR carta (costruisciOutput); _szSave() definita in CARTA_TPL_A (admin-templates-shared.js v 2026.06.14.02).
@@ -1048,8 +1049,17 @@ function costruisciAllergeniPerCarta(lang) {
   if (!T) return null;
   var dynPiatti = (TRANSLATIONS[lang] && TRANSLATIONS[lang].piatti) || {};
   var dynSez    = (TRANSLATIONS[lang] && TRANSLATIONS[lang].sezioni) || {};
+  var statDolci = (typeof TRADUZIONI_DOLCI !== 'undefined' && TRADUZIONI_DOLCI[lang] && TRADUZIONI_DOLCI[lang].piatti) || {};
+  // La pagina allergeni salva il titolo VISIBILE della sezione (titolo_display, es. "Antipasti"),
+  // ma il dizionario è per titolo CANONICO (es. "Sfiziosi"→"Starters"). Mappo display→canonico
+  // dalle sezioni della carta caricata, così la sezione si traduce come nella carta principale.
+  var dispToCanon = {};
+  if (dati && dati.sezioni) dati.sezioni.forEach(function(s){ if (s) dispToCanon[(s.titolo_display || s.titolo)] = s.titolo; });
   function trNome(n) { var c = String(n).replace(/<[^>]+>/g, ''); return dynPiatti[c] || dynPiatti[n] || c; }
-  function trSez(t)  { return dynSez[t] || t; }
+  // Nomi DOLCI nella pagina allergeni: i nomi brevi (es. "Gelato porcino") stanno nel dizionario
+  // statico dei dolci (TRADUZIONI_DOLCI), non in .piatti → aggiungo quel fallback.
+  function trNomeDolci(n) { var c = String(n).replace(/<[^>]+>/g, ''); return dynPiatti[c] || dynPiatti[n] || statDolci[c] || statDolci[n] || c; }
+  function trSez(t)  { var k = dispToCanon[t] || t; return dynSez[k] || dynSez[t] || dynPiatti[k] || dynPiatti[t] || t; }
   var sezioni = [];
   // 1) CARTA (da menu-allergeni.html)
   if (_allergeniCartaLive && _allergeniCartaLive.sezioni) {
@@ -1069,7 +1079,7 @@ function costruisciAllergeniPerCarta(lang) {
     sezioni.push({
       titolo_display: (typeof TRADUZIONI_DOLCI !== 'undefined' && TRADUZIONI_DOLCI[lang] && TRADUZIONI_DOLCI[lang].sezione) || T.dolciTitolo,
       piatti: dolciAll.map(function(p) {
-        return { nome: trNome(p.nome), allergeni: _normAllergeni(p.allergeni).map(function(a){ return _trAllergene(a, lang); }) };
+        return { nome: trNomeDolci(p.nome), allergeni: _normAllergeni(p.allergeni).map(function(a){ return _trAllergene(a, lang); }) };
       })
     });
   }

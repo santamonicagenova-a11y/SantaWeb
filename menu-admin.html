@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.06.14.08 — aggiunto pannello "📖 Procedure di aggiornamento e traduzione" (details collassabile sotto la top-bar): sequenze giuste per carta/dolci/allergeni/vini/foto/buoni/prenotazioni + regola d'oro (dolci e allergeni vanno pubblicati PRIMA della carta, perché la carta in lingua li pesca dal sito già pubblicato). Solo HTML. -->
 <!-- v 2026.06.14.07 — barra preview: valori correnti accanto ai controlli dimensione/spaziatura (carta + dolci): bump ?v= admin-core.js a 2026.06.14.06 e admin-templates-shared.js a 2026.06.14.03. -->
 <!-- v 2026.06.14.06 — fix traduzioni pagina allergeni EN/FR (titolo sezione "Antipasti" via mappa display→canonico + nomi dolci via TRADUZIONI_DOLCI): bump ?v= admin-core.js a 2026.06.14.05. -->
 <!-- v 2026.06.14.05 — fix preview lingue dolci (puntava a menu-dolci-en/fr.html inesistenti → home; ora menu-<lang>.html): bump ?v= admin-core.js a 2026.06.14.04. -->
@@ -127,6 +128,71 @@
     <button class="btn btn-load" onclick="resetToken()" title="Cambia token GitHub" style="font-size:.6rem;padding:.45rem .7rem;opacity:.7">🔑</button>
   </div>
 </div>
+
+<details id="procedure" style="max-width:1000px;margin:1.1rem auto 0;background:var(--sand);border:1px solid var(--rule);border-radius:6px;font-size:.82rem;line-height:1.55;color:var(--ink)">
+  <summary style="cursor:pointer;padding:.75rem 1.1rem;font-weight:600;letter-spacing:.03em;list-style:none">📖 Procedure di aggiornamento e traduzione — leggimi</summary>
+  <div style="padding:0 1.2rem 1.2rem">
+
+    <p style="background:#fff;border-left:3px solid var(--rust);padding:.55rem .85rem;margin:.3rem 0 1rem">
+      <strong>Regola d'oro.</strong> La carta in lingua (EN/FR) pesca <strong>dolci</strong> e <strong>allergeni</strong> dal sito <em>già pubblicato</em>.
+      Quindi se cambi dolci o allergeni: <strong>pubblicali prima</strong>, aspetta ~1–2 minuti che il sito si aggiorni, e <strong>solo dopo</strong> fai “Traduci e Pubblica” della carta.
+    </p>
+
+    <p style="margin:.2rem 0 1rem">Il pulsante <strong>“✦ Traduci e Pubblica”</strong> pubblica sempre il menù che hai <em>caricato</em> in quel momento. Per la <strong>carta</strong> produce IT + EN + FR (con dolci e allergeni accorpati in lingua); per <strong>dolci</strong> e <strong>allergeni</strong> produce l'italiano (le loro versioni EN/FR vivono dentro la carta tradotta).</p>
+
+    <h3 style="margin:1rem 0 .25rem;font-size:.86rem">🍽️ Carta — piatti, prezzi, sezioni</h3>
+    <ol style="margin:.2rem 0 .2rem 1.2rem;padding:0">
+      <li><strong>Carica dal sito → Menù alla carta</strong></li>
+      <li>Modifica i piatti (usa <strong>“+ Aggiungi piatto”</strong> per una riga nuova; le righe lasciate vuote non vengono pubblicate)</li>
+      <li><strong>Preview 🇮🇹</strong> per controllare; se vuoi, regola caratteri/interlinea/spazio/posizione coi pulsanti (vedi i valori accanto) e premi <strong>“✔ Fissa come default”</strong></li>
+      <li><strong>✦ Traduci e Pubblica</strong> → pubblica IT + EN + FR</li>
+    </ol>
+
+    <h3 style="margin:1rem 0 .25rem;font-size:.86rem">🍰 Dolci</h3>
+    <ol style="margin:.2rem 0 .2rem 1.2rem;padding:0">
+      <li><strong>Carica dal sito → Menù dolci</strong></li>
+      <li>Modifica</li>
+      <li><strong>Preview 🇮🇹</strong> (in EN/FR i dolci si vedono dentro la carta tradotta)</li>
+      <li><strong>✦ Traduci e Pubblica</strong> → pubblica i dolci in italiano</li>
+      <li>⚠️ <strong>Per aggiornarli anche in EN/FR</strong>: aspetta ~1–2 min, poi <strong>Carica la carta → Traduci e Pubblica</strong> (la carta in lingua ripesca i dolci appena pubblicati)</li>
+    </ol>
+
+    <h3 style="margin:1rem 0 .25rem;font-size:.86rem">⚠️ Allergeni</h3>
+    <ol style="margin:.2rem 0 .2rem 1.2rem;padding:0">
+      <li><strong>Carica dal sito → Allergeni carta</strong> (si sincronizza dai piatti della carta <em>già pubblicata</em>)</li>
+      <li>Spunta gli allergeni di ogni piatto</li>
+      <li><strong>✦ Traduci e Pubblica</strong> → pubblica la pagina allergeni in italiano</li>
+      <li>⚠️ <strong>Per aggiornarla in EN/FR</strong>: aspetta ~1–2 min, poi <strong>Carica la carta → Traduci e Pubblica</strong> (la pagina allergeni tradotta è in coda alla carta EN/FR)</li>
+    </ol>
+
+    <h3 style="margin:1rem 0 .25rem;font-size:.86rem">🔁 Ho cambiato i piatti (e magari i loro allergeni)</h3>
+    <p style="margin:.2rem 0">Sequenza completa, con la carta pubblicata <strong>due volte</strong> (la prima porta i piatti nuovi, l'ultima aggiorna allergeni/dolci in lingua):</p>
+    <ol style="margin:.2rem 0 .2rem 1.2rem;padding:0">
+      <li><strong>Carta</strong>: Carica → modifica i piatti → <strong>Traduci e Pubblica</strong></li>
+      <li>aspetta ~1–2 min</li>
+      <li><strong>Allergeni</strong>: Carica (riprende i piatti nuovi) → spunta → <strong>Traduci e Pubblica</strong></li>
+      <li>(se hai toccato i dolci) <strong>Dolci</strong>: Carica → modifica → <strong>Traduci e Pubblica</strong></li>
+      <li>aspetta ~1–2 min</li>
+      <li><strong>Carta</strong>: Carica → <strong>Traduci e Pubblica</strong> un'ultima volta → ora EN/FR ha piatti, allergeni e dolci aggiornati</li>
+    </ol>
+    <p style="margin:.2rem 0;color:var(--stone)">Se hai cambiato solo prezzi/nomi e <em>non</em> gli allergeni: basta la sola Carta (passi 1–2), salta allergeni e la seconda pubblicazione.</p>
+
+    <h3 style="margin:1rem 0 .25rem;font-size:.86rem">🍷 Vini · 📷 Foto · 🎁 Buoni · 🔒 Prenotazioni</h3>
+    <ul style="margin:.2rem 0 .2rem 1.2rem;padding:0">
+      <li><strong>Carta vini</strong>: Menù Vini → scegli il PDF → <strong>Converti e Pubblica</strong> (si apre prima un'anteprima; ogni pagina del PDF diventa un'immagine fedele)</li>
+      <li><strong>Foto cucina / Foto sito</strong>: scegli le immagini → <strong>Pubblica foto</strong></li>
+      <li><strong>Buoni regalo</strong>: imposta i valori → <strong>Pubblica valori</strong></li>
+      <li><strong>Prenotazioni online</strong>: chiusure/aperture (giorno, servizio o singolo orario) → si applicano subito</li>
+    </ul>
+
+    <h3 style="margin:1rem 0 .25rem;font-size:.86rem">ℹ️ Note utili</h3>
+    <ul style="margin:.2rem 0 0 1.2rem;padding:0">
+      <li>Alla prima pubblicazione serve il <strong>token GitHub</strong> (lo stesso per tutto; il 🔑 lo cambia)</li>
+      <li>Dopo “Pubblica”, il sito si aggiorna in <strong>~90 secondi</strong> (se non vedi i cambiamenti, ricarica con hard refresh)</li>
+      <li><strong>Carica dal sito</strong> prende sempre la versione <em>attualmente pubblicata</em>: parti sempre da lì, così non sovrascrivi con dati vecchi</li>
+    </ul>
+  </div>
+</details>
 
 <div class="intro" id="intro">
   <h2>Come si usa</h2>
@@ -1087,7 +1153,7 @@ async function _eseguiPubblicaFotoSito(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.06.14.07</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.06.14.08</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

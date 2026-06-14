@@ -425,6 +425,8 @@
   <button class="ctrl-btn" onclick="_szS(2)" title="Sposta giu">⬇</button>
   <button class="ctrl-btn" onclick="_szS(-2)" title="Sposta su">⬆</button>
   <button class="ctrl-btn" onclick="_szR()" title="Ripristina dimensioni">↺</button>
+  <div class="ctrl-sep"></div>
+  <button class="ctrl-btn" onclick="_szSave()" title="Fissa le dimensioni e spaziature correnti come default del menù">✔ Fissa come default</button>
 </div>
 
 
@@ -657,7 +659,10 @@ const MENU = {
       }
     ]
   },
-  "fontScale": 1.34
+  "fontScale": 1.28,
+  "lineScale": 1,
+  "gapScale": 1,
+  "shift": 0
 };
 /* ═════════════════════════════════════════════════════════ */
 
@@ -866,6 +871,7 @@ function _szL(d){_sz.lh=Math.max(0.8,Math.min(1.5,Math.round((_sz.lh+d)*100)/100
 function _szG(d){_sz.gap=Math.max(0.6,Math.min(1.7,Math.round((_sz.gap+d)*100)/100));_szApply();}
 function _szS(d){_sz.shift=Math.max(-25,Math.min(25,_sz.shift+d));_szApply();}
 function _szR(){_sz={fs:1.12,lh:1,gap:1,shift:0};_szApply();}
+function _szSave(){try{if(window.opener&&window.opener.salvaImpostazioniStampa){window.opener.salvaImpostazioniStampa(_sz.fs,_sz.lh,_sz.gap,_sz.shift);alert('Impostazioni fissate come default. Torna nel pannello e premi Pubblica per renderle permanenti.');}else{alert('Per salvare, apri questa anteprima dal pulsante Anteprima del pannello.');}}catch(e){alert('Impossibile salvare: '+e.message);}}
 renderCarta();
 renderOrario();
 showLayout('carta');

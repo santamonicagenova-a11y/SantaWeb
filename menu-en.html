@@ -594,7 +594,7 @@ const MENU = {
           "prezzo": 18
         },
         {
-          "nome": "Locally caught croaker, caught on a hook, with vine-leaf sauce and a pea purée",
+          "nome": "Locally caught croaker, caught with a hook and line, with vine leaves and a pea purée",
           "prezzo": 34,
           "sostenibile": true
         },
@@ -684,7 +684,7 @@ const MENU = {
       }
     ]
   },
-  "fontScale": 1.28,
+  "fontScale": 1.22,
   "lineScale": 1,
   "gapScale": 1,
   "shift": 0,
@@ -810,7 +810,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "Locally caught croaker, caught on a hook, with vine-leaf sauce and a pea purée",
+            "nome": "Locally caught croaker, caught with a hook and line, with vine leaves and a pea purée",
             "allergeni": [
               "fish",
               "celery",
@@ -1081,7 +1081,7 @@ function showLayout(which) {
 
 /* ── init ── */
 var _sz={fs:(MENU.fontScale!=null?MENU.fontScale:1.12),lh:(MENU.lineScale!=null?MENU.lineScale:1),gap:(MENU.gapScale!=null?MENU.gapScale:1),shift:(MENU.shift!=null?MENU.shift:0)};
-function _szApply(){var r=document.getElementById('layout-carta');if(!r)return;r.style.setProperty('--fs',_sz.fs);r.style.setProperty('--lh',_sz.lh);r.style.setProperty('--gap',_sz.gap);r.style.setProperty('--shift',_sz.shift+'mm');}
+function _szApply(){var r=document.getElementById('layout-carta');if(r){r.style.setProperty('--fs',_sz.fs);r.style.setProperty('--lh',_sz.lh);r.style.setProperty('--gap',_sz.gap);r.style.setProperty('--shift',_sz.shift+'mm');}var _sv=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};_sv('szv-fs',Math.round(_sz.fs*100)+'%');_sv('szv-lh',Math.round(_sz.lh*100)+'%');_sv('szv-gap',Math.round(_sz.gap*100)+'%');_sv('szv-shift',(_sz.shift>0?'+':'')+_sz.shift+'mm');}
 function _szF(d){_sz.fs=Math.max(0.85,Math.min(1.4,Math.round((_sz.fs+d)*100)/100));_szApply();}
 function _szL(d){_sz.lh=Math.max(0.8,Math.min(1.5,Math.round((_sz.lh+d)*100)/100));_szApply();}
 function _szG(d){_sz.gap=Math.max(0.6,Math.min(1.7,Math.round((_sz.gap+d)*100)/100));_szApply();}

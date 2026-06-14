@@ -1,17 +1,14 @@
 <!DOCTYPE html>
+<!-- v 2026.06.14.01 — Intestazione pagina stampabile: rimossi sottotitolo indirizzo "Santamonica — Lungomare Lombardo 27, Genova" + separatore sotto l'header (border-bottom .pg-header) e il blocco .nota-legale "Informativa ai sensi del Reg. UE 1169/2011…"; quel testo dell'informativa è ora il titolo della legenda in fondo (sostituisce "Allergeni regolamentati (Reg. UE 1169/2011):"). Solo testo IT spostato/rimosso, nessun contenuto legale nuovo. -->
 <!-- v 2026.05.22.01 — F0.21-e: allineamento vocabolario allergeni: "latte" -> "latticini" (coerenza con menu-dolci e output EN/FR). -->
 <html lang="it">
-  <style>
-@media (max-width:640px){.pg{width:auto!important;max-width:100%!important;min-height:0!important;margin:0!important;padding:26px 16px!important;box-shadow:none!important;}.logo{font-size:1.9rem!important;letter-spacing:.1em!important;}.logo-sub{font-size:.6rem!important;}.lista-titolo{font-size:1.05rem!important;letter-spacing:.12em!important;}.sez-titolo{font-size:1.3rem!important;letter-spacing:.08em!important;}.sommelier{font-size:.62rem!important;}html,body{overflow-x:hidden!important;}}
-</style>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>Tabella Allergeni | Ristorante Santamonica Genova</title>
-<meta name="description" content="Tabella allergeni del ristorante Santamonica a Genova: informazioni chiare su allergie e intolleranze alimentari per ogni piatto del menù."/>
+  <title>Allergeni — Santamonica</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
@@ -80,8 +77,6 @@
     .pg-header {
       text-align: center;
       margin-bottom: 8mm;
-      padding-bottom: 4mm;
-      border-bottom: 1.5px solid var(--ink);
     }
     .pg-header-title {
       font-size: 1.9rem;
@@ -205,44 +200,27 @@
 const ALLERGENI_DATA = {
   "sezioni": [
     {
-      "titolo": "Antipasti",
+      "titolo": "Sfiziosi",
       "piatti": [
         {
-          "nome": "Calamaro nostrano, piselli freschi, bagna cauda, kefir",
-          "allergeni": [
-            "pesce",
-            "latte",
-            "solfiti",
-            "molluschi"
-          ]
+          "nome": "Calamaro nostrano, piselli freschi, bagna cauda leggera, kefir",
+          "allergeni": ["latticini", "pesce", "solfiti", "molluschi"]
         },
         {
-          "nome": "Gamberi viola crudi alla puttanesca",
-          "allergeni": [
-            "crostacei"
-          ]
+          "nome": "Cavolo cappuccio, miso, lamponi, anacardi",
+          "allergeni": ["soia", "frutta a guscio"]
         },
         {
           "nome": "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce",
-          "allergeni": [
-            "pesce",
-            "frutta a guscio",
-            "solfiti"
-          ]
+          "allergeni": ["latticini", "frutta a guscio", "solfiti", "pesce"]
         },
         {
-          "nome": "Dentice reale nostrano crudo, ricci di mare, limone, mandorle",
-          "allergeni": [
-            "glutine",
-            "pesce",
-            "frutta a guscio"
-          ]
+          "nome": "Ali di razza, fave nostrane, mela verde, mandorle",
+          "allergeni": ["latticini", "pesce", "frutta a guscio", "lupini"]
         },
         {
-          "nome": "“Non formaggi”",
-          "allergeni": [
-            "frutta a guscio"
-          ]
+          "nome": "\u201cNon formaggi\u201d",
+          "allergeni": ["frutta a guscio"]
         }
       ]
     },
@@ -250,39 +228,20 @@ const ALLERGENI_DATA = {
       "titolo": "Amidi e Carboidrati",
       "piatti": [
         {
-          "nome": "Spaghettoni quadrati Mancini, anemoni di mare, nduja, maggiorana",
-          "allergeni": [
-            "glutine",
-            "latte"
-          ]
+          "nome": "Riso \u201cRiserva San Massimo\u201d, rag\u00f9 di lepre, cime di rapa, Parmigiano Reggiano",
+          "allergeni": ["sedano", "latticini", "solfiti"]
         },
         {
-          "nome": "Cappellacci di cinghiale, cardoncelli, ortica, mirtilli",
-          "allergeni": [
-            "glutine",
-            "uova",
-            "pesce",
-            "soia",
-            "latte",
-            "sedano",
-            "solfiti"
-          ]
+          "nome": "Tortelli di cinghiale, dashi di orata, cipollina, shiso",
+          "allergeni": ["latticini", "glutine", "pesce", "sedano", "solfiti"]
         },
         {
-          "nome": "Tubetti Mancini, baccalà, preboggion, kosho di agrumi",
-          "allergeni": [
-            "glutine",
-            "pesce",
-            "soia",
-            "latte"
-          ]
+          "nome": "Tubetti \u201cMancini\u201d, baccal\u00e0, il nostro kosho di agrumi fermentato, borlotti",
+          "allergeni": ["glutine", "pesce", "soia", "latticini"]
         },
         {
-          "nome": "Riso Riserva San Massimo, ostriche, asparago bianco, vaniglia",
-          "allergeni": [
-            "latte",
-            "molluschi"
-          ]
+          "nome": "Spaghettoni quadrati \u201cMancini\u201d, anemoni di mare, nduja, maggiorana",
+          "allergeni": ["glutine", "latticini"]
         }
       ]
     },
@@ -290,45 +249,20 @@ const ALLERGENI_DATA = {
       "titolo": "Non Solo Mare",
       "piatti": [
         {
-          "nome": "Ricciola nostrana pescata ad amo, ciliege, tahina, levistico",
-          "allergeni": [
-            "pesce",
-            "sesamo",
-            "solfiti"
-          ]
+          "nome": "Ombrina nostrana pescata ad amo, salicornia, indivia belga",
+          "allergeni": ["pesce", "sedano", "latticini"]
+        },
+        {
+          "nome": "Polpo nostrano, rabarbaro, piselli",
+          "allergeni": ["molluschi"]
+        },
+        {
+          "nome": "Picanha, cardoncelli, fondo di manzo",
+          "allergeni": ["soia", "latticini", "sedano"]
         },
         {
           "nome": "Zucchina alla scapece, menta, yogurt, pepe Timut",
-          "allergeni": [
-            "latte"
-          ]
-        },
-        {
-          "nome": "Ombrina nostrana pescata ad amo, vignarola, crema di piselli",
-          "allergeni": [
-            "pesce",
-            "sedano",
-            "solfiti"
-          ]
-        },
-        {
-          "nome": "\"Tournedos alla Rossini\"?",
-          "allergeni": [
-            "crostacei",
-            "pesce",
-            "latte",
-            "sedano",
-            "solfiti",
-            "molluschi"
-          ]
-        },
-        {
-          "nome": "Astice blu, nespole, albicocche, salsa olandese, bisque",
-          "allergeni": [
-            "crostacei",
-            "uova",
-            "latte"
-          ]
+          "allergeni": ["latticini"]
         }
       ]
     }
@@ -352,11 +286,6 @@ function render() {
   // Intestazione
   pg.innerHTML = '<div class="pg-header">' +
     '<div class="pg-header-title">Allergeni</div>' +
-    '<div class="pg-header-sub">Santamonica &mdash; Lungomare Lombardo 27, Genova</div>' +
-    '</div>' +
-    '<div class="nota-legale">' +
-    'Informativa ai sensi del Reg. UE 1169/2011. Per ulteriori informazioni sugli allergeni ' +
-    'presenti nei nostri piatti si prega di rivolgersi al personale di sala.' +
     '</div>';
 
   // Sezioni
@@ -397,7 +326,7 @@ function render() {
   // Legenda allergeni
   var legenda = document.createElement('div');
   legenda.className = 'legenda';
-  legenda.innerHTML = '<strong>Allergeni regolamentati (Reg. UE 1169/2011):</strong><br>' +
+  legenda.innerHTML = '<strong>Informativa ai sensi del Reg. UE 1169/2011. Per ulteriori informazioni sugli allergeni presenti nei nostri piatti si prega di rivolgersi al personale di sala.</strong><br>' +
     TUTTI_ALLERGENI.join(' &bull; ');
   pg.appendChild(legenda);
 

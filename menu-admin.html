@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.06.14.03 — carta preview: pulsante "Fissa come default" (salva caratteri/interlinea/spazio/posizione correnti come default): bump ?v= admin-core.js e admin-templates-shared.js a 2026.06.14.02. -->
 <!-- v 2026.06.14.02 — footer carta blindato in fondo (admin-templates-shared.js: min-height:0 su .pg-content/.degu + flex-shrink:0 su .note-ospite): bump ?v= admin-templates-shared.js a 2026.06.14.01. -->
 <!-- v 2026.06.14.01 — carta: pulsante "+ Aggiungi piatto" in ogni sezione (admin-core.js): bump ?v= admin-core.js a 2026.06.14.01. -->
 <!-- v 2026.06.10.14 — pannello "Buoni regalo" (3 campi valori buoni liberi → pubblica voucher-config.json): nuova voce nav + sezione #buoni-section + bump ?v= admin-core.js a 2026.06.10.13. -->
@@ -353,8 +354,8 @@
 <div class="toast" id="toast">✓ Scaricato!</div>
 
 <script src="admin-translations.js"></script>
-<script src="admin-templates-shared.js?v=2026.06.14.01"></script>
-<script src="admin-core.js?v=2026.06.14.01"></script>
+<script src="admin-templates-shared.js?v=2026.06.14.02"></script>
+<script src="admin-core.js?v=2026.06.14.02"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -1082,7 +1083,7 @@ async function _eseguiPubblicaFotoSito(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.06.14.02</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.06.14.03</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

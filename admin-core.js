@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.06.14.02 — Carta: pulsante "✔ Fissa come default" nella barra della PREVIEW. Dopo aver regolato caratteri/interlinea/spazio/posizione con i pulsanti, lo si preme per salvare i valori correnti come default: la preview chiama window.opener.salvaImpostazioniStampa(fs,lh,gap,shift) (nuova funzione qui) che scrive dati.fontScale/lineScale/gapScale/shift; round-trippano in leggi() → JSON pubblicato → renderCarta. Diventano permanenti dopo Pubblica. Pulsante aggiunto alla CTRL_BAR carta (costruisciOutput); _szSave() definita in CARTA_TPL_A (admin-templates-shared.js v 2026.06.14.02).
 // v 2026.06.14.01 — Carta: pulsante "+ Aggiungi piatto" in fondo a OGNI sezione (costruisci()) → funzione aggiungiPiatto(si) che cattura il form (leggi(true)), accoda un piatto vuoto a dati.sezioni[si].piatti, ri-renderizza e mette il focus sul nuovo nome. leggi() ora accetta un flag keepEmpty: di default scarta i piatti senza nome (le righe vuote aggiunte e non valorizzate NON finiscono nel menu pubblicato/IT/EN/FR/allergeni, tutti passano da leggi()); aggiungiPiatto usa leggi(true) per non perdere le righe vuote durante l'editing.
 // v 2026.06.10.13 — Pannello "Buoni regalo": 3 campi per i valori dei buoni liberi → pubblica voucher-config.json su GitHub (riusa pubblicaFile + flusso token). Funzioni caricaVoucherBuoni / pubblicaVoucherBuoni / _pubblicaVoucherConfig + hook _pendingVoucherPublish in confermaPubblica. regala.html v2026.06.10.04 legge questi valori a runtime.
 // v 2026.06.10.12 — Documento generico, "Scarica HTML": il file salvato ora NON contiene più la toolbar (pulsanti Stampa/Scarica/allineamento/dimensione) né gli script di controllo — si clona il DOM, si rimuovono .doc-toolbar e tutti gli <script>, restano documento + stile + stato corrente (classi/inline). Come il file pubblico dei dolci.
@@ -420,11 +421,27 @@ function costruisciOutput() {
       + '  <button class="ctrl-btn" onclick="window.print()">\u26a1 Stampa</button>\n'
       + '  <div class="ctrl-sep"></div>\n'
       + _SIZE_BTNS
+      + '  <div class="ctrl-sep"></div>\n'
+      + '  <button class="ctrl-btn" onclick="_szSave()" title="Fissa le dimensioni e spaziature correnti come default del menù">✔ Fissa come default</button>\n'
       + '</div>\n';
     html = html.replace('<body>\n', '<body>\n' + CTRL_BAR);
     return html;
   }
   return tplBefore + blocco + tplAfter;
+}
+
+// Fissa come default le impostazioni di stampa correnti (caratteri/interlinea/spazio/posizione).
+// Chiamata DALLA PREVIEW (pulsante "Fissa come default") via window.opener: i valori live _sz
+// della preview vengono scritti in dati.* → round-trippano in leggi() → finiscono nel JSON
+// pubblicato (MENU.fontScale/lineScale/gapScale/shift), che renderCarta legge come default.
+// NB: diventano permanenti solo dopo Pubblica (altrimenti restano nei dati di sessione).
+function salvaImpostazioniStampa(fs, lh, gap, shift) {
+  if (!dati) { alert('Nessun menù caricato nel pannello.'); return; }
+  if (fs    != null) dati.fontScale = +fs;
+  if (lh    != null) dati.lineScale = +lh;
+  if (gap   != null) dati.gapScale  = +gap;
+  if (shift != null) dati.shift     = +shift;
+  toast('✓ Impostazioni fissate come default — ora premi Pubblica per renderle permanenti.');
 }
 
 function salva() { apriPreview(); }

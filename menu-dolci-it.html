@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.06.14.01 — Aggiunta funzione live _szSave(): il pulsante "Fissa come default" della barra preview (iniettata da _dolciCtrlBar in admin-core.js) la chiama per passare i valori correnti _sz (fs/lh/gap/shift) all'admin via window.opener.salvaImpostazioniStampa(). Speculare alla carta. -->
 <!-- v 2026.06.10.06 — Funzioni live _sz* nello <script>: i pulsanti della barra (iniettata in preview da apriPreview) regolano caratteri/interlinea/spazio/posizione in tempo reale (--fs/--lh/--gap/--shift). _szApply all'init. -->
 <!-- v 2026.06.10.05 — Aggiunti interlinea (--lh), spazio tra i piatti (--gap) e posizione sul foglio (--shift, translateY su .degu/.pg-content) regolabili dai cursori in menu-admin; renderCarta legge lineScale/gapScale/shift. .note-ospite sempre escluso. -->
 <!-- v 2026.06.10.04 — Dimensione caratteri regolabile (come la carta): font-size del testo leggibile ora calc(<orig>rem * var(--fs,1.12)); renderCarta() imposta --fs da MENU.fontScale (round-trippa via leggi(), pilotato dal cursore in menu-admin). .note-ospite ESCLUSO. + Stampa entro area stampabile: @page margin 8mm + #layout-carta .pg width auto/height 281mm/padding 9-14-8; foglio orario isolato e invariato via @page nominata "orarioPage" (margin 0). -->
@@ -697,6 +698,7 @@ function _szL(d){_sz.lh=Math.max(0.8,Math.min(1.5,Math.round((_sz.lh+d)*100)/100
 function _szG(d){_sz.gap=Math.max(0.6,Math.min(1.7,Math.round((_sz.gap+d)*100)/100));_szApply();}
 function _szS(d){_sz.shift=Math.max(-25,Math.min(25,_sz.shift+d));_szApply();}
 function _szR(){_sz={fs:1.12,lh:1,gap:1,shift:0};_szApply();}
+function _szSave(){try{if(window.opener&&window.opener.salvaImpostazioniStampa){window.opener.salvaImpostazioniStampa(_sz.fs,_sz.lh,_sz.gap,_sz.shift);alert('Impostazioni fissate come default. Torna nel pannello e premi Pubblica per renderle permanenti.');}else{alert('Per salvare, apri questa anteprima dal pulsante Anteprima del pannello.');}}catch(e){alert('Impossibile salvare: '+e.message);}}
 renderCarta();
 renderOrario();
 showLayout('carta');

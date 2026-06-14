@@ -1,4 +1,6 @@
 // Core functions per menu-admin Santamonica
+// v 2026.06.14.01 — Carta: pulsante "+ Aggiungi piatto" in fondo a OGNI sezione (costruisci()) → funzione aggiungiPiatto(si) che cattura il form (leggi(true)), accoda un piatto vuoto a dati.sezioni[si].piatti, ri-renderizza e mette il focus sul nuovo nome. leggi() ora accetta un flag keepEmpty: di default scarta i piatti senza nome (le righe vuote aggiunte e non valorizzate NON finiscono nel menu pubblicato/IT/EN/FR/allergeni, tutti passano da leggi()); aggiungiPiatto usa leggi(true) per non perdere le righe vuote durante l'editing.
+// v 2026.06.10.13 — Pannello "Buoni regalo": 3 campi per i valori dei buoni liberi → pubblica voucher-config.json su GitHub (riusa pubblicaFile + flusso token). Funzioni caricaVoucherBuoni / pubblicaVoucherBuoni / _pubblicaVoucherConfig + hook _pendingVoucherPublish in confermaPubblica. regala.html v2026.06.10.04 legge questi valori a runtime.
 // v 2026.06.10.12 — Documento generico, "Scarica HTML": il file salvato ora NON contiene più la toolbar (pulsanti Stampa/Scarica/allineamento/dimensione) né gli script di controllo — si clona il DOM, si rimuovono .doc-toolbar e tutti gli <script>, restano documento + stile + stato corrente (classi/inline). Come il file pubblico dei dolci.
 // v 2026.06.10.11 — Dolci allineato alla carta: filesDolci() pubblica DUE file → menu-dolci.html (pubblico, senza barra) + menu-dolci-it.html (admin/preview, con barra Stampa + pulsanti dimensione, noindex). La preview dolci (apriPreview) usa _dolciCtrlBar() (stessa barra). Così la preview dolci ha i pulsanti come la carta.
 // v 2026.06.10.10 — Impostazioni stampa carta/dolci spostate da CURSORI (admin) a PULSANTI nella barra della PREVIEW (come il documento generico). Rimosso il pannello cursori da costruisci(). Nuova costante _SIZE_BTNS (A+/A−, interlinea, spazio, sposta su/giù, reset) aggiunta alla CTRL_BAR della carta; per i dolci (senza barra nel file) la barra è iniettata SOLO nella preview da apriPreview (non finisce nel file pubblicato). Le funzioni live _sz* stanno in CARTA_TPL_A e menu-dolci.html. Aggiornata la regex di strip della ctrl-bar in costruisciMenuItPub (ora taglia l'intera barra fino a <div id="layout-carta">, non più "fino a Stampa").
@@ -154,7 +156,7 @@ function chk(id, v) {
 // Va chiamata a ogni caricamento (carta, dolci, allergeni, vini, foto, documento generico,
 // prenotazioni) così la pagina non trascina la vista precedente in fondo.
 function _pulisciViste() {
-  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section'].forEach(function(id){
+  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section','buoni-section'].forEach(function(id){
     var e = document.getElementById(id); if (e) e.style.display = 'none';
   });
   var w = document.getElementById('wrap');
@@ -247,6 +249,15 @@ function costruisci() {
       body.appendChild(row);
     });
 
+    // Pulsante "+" per accodare un piatto vuoto a questa sezione
+    var addWrap = el('div'); addWrap.style.cssText = 'padding-top:.6rem';
+    var addBtn = el('button','','+ Aggiungi piatto');
+    addBtn.type = 'button';
+    addBtn.style.cssText = 'font-family:Jost,sans-serif;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:1px dashed var(--rule);padding:.4rem .9rem;cursor:pointer;color:var(--stone)';
+    addBtn.onclick = (function(idx){ return function(e){ e.preventDefault(); aggiungiPiatto(idx); }; })(si);
+    addWrap.appendChild(addBtn);
+    body.appendChild(addWrap);
+
     fs.appendChild(body); wrap.appendChild(fs);
   });
   if (m.orario) {
@@ -284,7 +295,24 @@ function costruisci() {
   }
 }
 
-function leggi() {
+// Accoda un piatto vuoto alla sezione indicata e ri-renderizza il form.
+// Cattura prima lo stato corrente (leggi(true) = senza scartare le righe vuote
+// già aggiunte) per non perdere eventuali modifiche non ancora salvate.
+function aggiungiPiatto(si) {
+  if (!dati || !dati.sezioni || !dati.sezioni[si]) return;
+  dati = leggi(true);
+  if (!Array.isArray(dati.sezioni[si].piatti)) dati.sezioni[si].piatti = [];
+  dati.sezioni[si].piatti.push({ nome: '', prezzo: null });
+  costruisci();
+  var idx = dati.sezioni[si].piatti.length - 1;
+  var f = document.getElementById('s' + si + 'p' + idx + '-nome');
+  if (f) f.focus();
+}
+
+// keepEmpty=true → mantiene i piatti senza nome (serve durante l'editing, es. aggiungiPiatto).
+// Di default i piatti con nome vuoto vengono scartati: una riga aggiunta col "+" e non
+// valorizzata NON finisce nel menu pubblicato (IT/EN/FR/allergeni passano tutti da leggi()).
+function leggi(keepEmpty) {
   var m = JSON.parse(JSON.stringify(dati));
 
   if (m.degustazione) {
@@ -347,6 +375,17 @@ function leggi() {
       var al = document.getElementById('all-'+ai+'-all');
       if (n) a.nome = n.value;
       if (al) a.allergeni = al.value;
+    });
+  }
+  // Scarta i piatti senza nome (righe aggiunte col "+" e non valorizzate),
+  // tranne durante l'editing (keepEmpty). Così non escono righe vuote nel menu.
+  if (!keepEmpty && Array.isArray(m.sezioni)) {
+    m.sezioni.forEach(function(sez) {
+      if (Array.isArray(sez.piatti)) {
+        sez.piatti = sez.piatti.filter(function(p) {
+          return p && String(p.nome || '').trim() !== '';
+        });
+      }
     });
   }
   return m;
@@ -508,6 +547,7 @@ function confermaPubblica() {
   localStorage.setItem('gh_token', token);
   chiudiModal();
   if (window._pendingAllergeniPublish) { window._pendingAllergeniPublish = false; pubblicaAllergeni(token); return; }
+  if (window._pendingVoucherPublish) { window._pendingVoucherPublish = false; _pubblicaVoucherConfig(token); return; }
   eseguiPubblicazione(token);
   var btn = document.getElementById('btn-pubblica');
   if (btn) { btn.textContent = '✦ Traduci e Pubblica'; btn.disabled = false; }
@@ -515,6 +555,82 @@ function confermaPubblica() {
 
 function chiudiModal() {
   document.getElementById('modal-token').classList.remove('on');
+}
+
+// ── Buoni regalo: i 3 valori dei "buoni liberi" (voucher-config.json) ──────────
+// Legge i valori attuali e li mette nei 3 campi del pannello "Buoni regalo".
+function caricaVoucherBuoni() {
+  var st = document.getElementById('vb-status');
+  fetch('/voucher-config.json', { cache: 'no-store' })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(cfg){
+      if (cfg && Array.isArray(cfg.liberi)) {
+        if (cfg.liberi[0] != null) document.getElementById('vb-1').value = cfg.liberi[0];
+        if (cfg.liberi[1] != null) document.getElementById('vb-2').value = cfg.liberi[1];
+        if (cfg.liberi[2] != null) document.getElementById('vb-3').value = cfg.liberi[2];
+        if (st) st.textContent = 'Valori attuali caricati.';
+      } else if (st) { st.textContent = 'Nessun config trovato: inserisci i valori e pubblica.'; }
+    })
+    .catch(function(){ if (st) st.textContent = 'Config non raggiungibile (offline?).'; });
+}
+
+// Apre il pannello "Buoni regalo" (stesso pattern delle altre sezioni).
+function apriSezioneBuoni() {
+  var cm = document.getElementById('carica-menu'); if (cm) cm.classList.remove('open');
+  var intro = document.getElementById('intro'); if (intro) intro.style.display = 'none';
+  _pulisciViste();
+  var bs = document.getElementById('buoni-section');
+  if (bs) bs.style.display = 'block';
+  caricaVoucherBuoni();
+}
+
+// Avvia la pubblicazione dei 3 valori (gestisce il token come gli altri publish).
+function pubblicaVoucherBuoni() {
+  var v1 = parseInt(document.getElementById('vb-1').value, 10);
+  var v2 = parseInt(document.getElementById('vb-2').value, 10);
+  var v3 = parseInt(document.getElementById('vb-3').value, 10);
+  if (!(v1 > 0) || !(v2 > 0) || !(v3 > 0)) { alert('Inserisci tre importi validi (numeri interi positivi).'); return; }
+  var token = localStorage.getItem('gh_token') || '';
+  if (token) {
+    _pubblicaVoucherConfig(token);
+  } else {
+    window._pendingVoucherPublish = true;
+    document.getElementById('token-input').value = '';
+    document.getElementById('modal-token').classList.add('on');
+  }
+}
+
+// Costruisce voucher-config.json (preservando la parte degustazione) e lo pubblica.
+function _pubblicaVoucherConfig(token) {
+  var st = document.getElementById('vb-status');
+  var v1 = parseInt(document.getElementById('vb-1').value, 10);
+  var v2 = parseInt(document.getElementById('vb-2').value, 10);
+  var v3 = parseInt(document.getElementById('vb-3').value, 10);
+  if (st) st.textContent = 'Pubblicazione in corso…';
+  var headers = {
+    'Authorization': 'token ' + token,
+    'Accept': 'application/vnd.github.v3+json',
+    'Content-Type': 'application/json'
+  };
+  // recupera il config attuale per non perdere la parte "degustazione"
+  fetch('/voucher-config.json', { cache: 'no-store' })
+    .then(function(r){ return r.ok ? r.json() : {}; })
+    .catch(function(){ return {}; })
+    .then(function(cur){
+      cur = cur || {};
+      cur.liberi = [v1, v2, v3];
+      if (!cur.degustazione) {
+        cur.degustazione = { sei: { base: 180, vini: 300 }, sette: { base: 220, vini: 360 } };
+      }
+      cur.versione = 'v ' + new Date().toISOString().slice(0,10).replace(/-/g, '.') + '.01';
+      cur._nota = 'Fonte unica dei valori dei voucher. Modificabile da menu-admin (pannello Buoni regalo) o a mano.';
+      var json = JSON.stringify(cur, null, 2) + '\n';
+      return pubblicaFile(token, headers, 'voucher-config.json', json);
+    })
+    .then(function(r){
+      if (st) st.textContent = (r && r.ok) ? '✓ Valori pubblicati. Online entro 1-2 minuti.' : 'Errore in pubblicazione (verifica il token).';
+    })
+    .catch(function(){ if (st) st.textContent = 'Errore di rete in pubblicazione.'; });
 }
 
 

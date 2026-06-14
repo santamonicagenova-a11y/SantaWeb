@@ -1,4 +1,6 @@
 // Core functions per menu-admin Santamonica
+// v 2026.06.14.04 — FIX preview lingue dolci: la preview EN/FR dei dolci apriva menu-dolci-en/fr.html (non più esistenti dal 22/5: i dolci sono accorpati nella carta EN/FR) → 404 → fallback alla home. Ora la preview lingua punta sempre a menu-<lang>.html (carta tradotta, coi dolci in fondo), sia da modalità carta sia da modalità dolci.
+// v 2026.06.14.03 — "✔ Fissa come default" ESTESO ai DOLCI: pulsante aggiunto anche a _dolciCtrlBar() (barra preview dolci + menu-dolci-it.html); _szSave() definita in menu-dolci.html v 2026.06.14.01. salvaImpostazioniStampa() è già generica (scrive dati.fontScale/lineScale/gapScale/shift, vale sia per carta sia per dolci).
 // v 2026.06.14.02 — Carta: pulsante "✔ Fissa come default" nella barra della PREVIEW. Dopo aver regolato caratteri/interlinea/spazio/posizione con i pulsanti, lo si preme per salvare i valori correnti come default: la preview chiama window.opener.salvaImpostazioniStampa(fs,lh,gap,shift) (nuova funzione qui) che scrive dati.fontScale/lineScale/gapScale/shift; round-trippano in leggi() → JSON pubblicato → renderCarta. Diventano permanenti dopo Pubblica. Pulsante aggiunto alla CTRL_BAR carta (costruisciOutput); _szSave() definita in CARTA_TPL_A (admin-templates-shared.js v 2026.06.14.02).
 // v 2026.06.14.01 — Carta: pulsante "+ Aggiungi piatto" in fondo a OGNI sezione (costruisci()) → funzione aggiungiPiatto(si) che cattura il form (leggi(true)), accoda un piatto vuoto a dati.sezioni[si].piatti, ri-renderizza e mette il focus sul nuovo nome. leggi() ora accetta un flag keepEmpty: di default scarta i piatti senza nome (le righe vuote aggiunte e non valorizzate NON finiscono nel menu pubblicato/IT/EN/FR/allergeni, tutti passano da leggi()); aggiungiPiatto usa leggi(true) per non perdere le righe vuote durante l'editing.
 // v 2026.06.10.13 — Pannello "Buoni regalo": 3 campi per i valori dei buoni liberi → pubblica voucher-config.json su GitHub (riusa pubblicaFile + flusso token). Funzioni caricaVoucherBuoni / pubblicaVoucherBuoni / _pubblicaVoucherConfig + hook _pendingVoucherPublish in confermaPubblica. regala.html v2026.06.10.04 legge questi valori a runtime.
@@ -479,6 +481,8 @@ function _dolciCtrlBar() {
     + '  <button class="ctrl-btn" onclick="window.print()">⚡ Stampa</button>\n'
     + '  <div class="ctrl-sep"></div>\n'
     + _SIZE_BTNS
+    + '  <div class="ctrl-sep"></div>\n'
+    + '  <button class="ctrl-btn" onclick="_szSave()" title="Fissa le dimensioni e spaziature correnti come default del menù">✔ Fissa come default</button>\n'
     + '</div>\n';
 }
 
@@ -497,9 +501,13 @@ function apriPreview(lang) {
     var blob = new Blob([previewHtml], { type: 'text/html;charset=utf-8' });
     window.open(URL.createObjectURL(blob), '_blank').focus();
   } else {
-    // Lingue: apri direttamente da GitHub Pages
-    var prefix = tipoMenuCorrente === 'dolci' ? 'menu-dolci-' : 'menu-';
-    var base = BASE_FETCH_URL + '/' + prefix + lang + '.html';
+    // Lingue: apri direttamente da GitHub Pages.
+    // I dolci EN/FR NON hanno un file proprio: dal 22/5 sono accorpati nella CARTA tradotta
+    // (menu-en.html / menu-fr.html), e filesDolci non genera più menu-dolci-en/fr.html.
+    // Quindi sia per la carta sia per i dolci la preview lingua punta a menu-<lang>.html
+    // (i dolci tradotti sono in fondo alla pagina). Prima si apriva menu-dolci-<lang>.html
+    // → 404 → fallback Cloudflare alla home.
+    var base = BASE_FETCH_URL + '/menu-' + lang + '.html';
     window.open(base + '?v=' + Date.now(), '_blank').focus();
   }
 }

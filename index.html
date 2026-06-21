@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v 2026.06.19.01 — Modifica indirizzo IG sbagliato fatta a mano da Andrea -->
+<!-- v 2026.06.21.01 — ORARIO ESTIVO TEMPORANEO (21 giu → 31 ago 2026): chiuso a pranzo tutti i giorni; cena 20:00-22:30 da martedì a domenica (lun chiuso). Aggiornati: openingHoursSpecification statico nel JSON-LD, slot del form #p-orario (rimosso optgroup Pranzo + slot 19:30, aggiunto 22:30). Fonte runtime = orari.js v 2026.06.21.01. ⏳ Ripristino 31/8 allo schema 7/6. Speculare lato server: VALID_SLOTS in submit-reservation. -->
 <!-- v 2026.06.12.01 — GEO chef reinforcement (sessione 26 SEO): aggiunto nome chef/sommelier nel campo `description` del JSON-LD Restaurant (prima assente, fonte principale per i motori IA). Trova critica del GEO giro 3: Grok citava "Tomaso Giachino" invece di Nicolò Lazzaroni. -->
 <!-- v 2026.06.11.01 — FAQ + schema FAQPage (sessione 25 SEO): aggiunta sezione #faq (6 Q&A già gated, sign-off 11/6) tra #info e #newsletter + JSON-LD FAQPage nell'<head> (allineato 1:1 col visibile) + CSS accordion .faq-*. Repurpose dei testi dalla funzione GBP "Domande e risposte" dismessa da Google → FAQ sul sito che alimenta SEO + AI di Google + GEO. IT-only (EN/FR = debito separato; le stringhe FAQ non usano data-i18n). -->
 <!-- v 2026.06.10.01 — Schema (recon report GEO): aggiunto WebSite JSON-LD (publisher→#restaurant) + esteso sameAs del Restaurant con Michelin guide + TheFork + TripAdvisor. NB: i commenti changelog NON sono deployati live (la home live ne ha solo 8 funzionali) → nessuna pulizia commenti necessaria. -->
@@ -86,8 +86,7 @@
   "menu": "https://santamonicagenova.it/menu.html",
   "acceptsReservations": "True",
   "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Friday", "Saturday", "Sunday"], "opens": "12:30", "closes": "14:30" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "19:30", "closes": "22:30" }
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "20:00", "closes": "22:30" }
   ],
   "award": "Guida Michelin - Good Cooking",
   "address": {
@@ -153,7 +152,7 @@
     {
       "@type": "Question",
       "name": "Quali sono gli orari?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Lunedì chiusi; da martedì a giovedì solo cena; venerdì, sabato e domenica pranzo e cena. Gli orari aggiornati sono sempre sul sito." }
+      "acceptedAnswer": { "@type": "Answer", "text": "In estate, fino a fine agosto, siamo aperti solo a cena dalle 20:00 alle 22:30, da martedì a domenica; lunedì chiusi. Gli orari aggiornati sono sempre sul sito." }
     },
     {
       "@type": "Question",
@@ -575,19 +574,16 @@
                 <label for="p-orario" data-i18n="prenota_f_orario">Orario</label>
                 <select id="p-orario" name="orario" required>
                   <option value="" disabled selected data-i18n="prenota_f_orario_sel">Seleziona</option>
-                  <optgroup label="Pranzo" data-i18n-label="prenota_f_orario_pranzo">
-                    <option value="12:30">12:30</option>
-                    <option value="13:00">13:00</option>
-                    <option value="13:30">13:30</option>
-                    <option value="14:00">14:00</option>
-                  </optgroup>
+                  <!-- ORARIO ESTIVO 21/6→31/8: pranzo chiuso tutti i giorni; cena 20:00-22:30 mar→dom.
+                       Ripristino 31/8: ripristinare l'optgroup Pranzo (12:30/13:00/13:30/14:00)
+                       e riaggiungere lo slot 19:30 in Cena. -->
                   <optgroup label="Cena" data-i18n-label="prenota_f_orario_cena">
-                    <option value="19:30">19:30</option>
                     <option value="20:00">20:00</option>
                     <option value="20:30">20:30</option>
                     <option value="21:00">21:00</option>
                     <option value="21:30">21:30</option>
                     <option value="22:00">22:00</option>
+                    <option value="22:30">22:30</option>
                   </optgroup>
                 </select>
               </div>
@@ -712,7 +708,7 @@
       </details>
       <details class="faq-item">
         <summary>Quali sono gli orari?</summary>
-        <div class="faq-answer"><p>Luned&igrave; chiusi; da marted&igrave; a gioved&igrave; solo cena; venerd&igrave;, sabato e domenica pranzo e cena. Gli orari aggiornati sono sempre sul sito.</p></div>
+        <div class="faq-answer"><p>In estate, fino a fine agosto, siamo aperti solo a cena dalle 20:00 alle 22:30, da marted&igrave; a domenica; luned&igrave; chiusi. Gli orari aggiornati sono sempre sul sito.</p></div>
       </details>
       <details class="faq-item">
         <summary>C&rsquo;&egrave; un men&ugrave; degustazione?</summary>
@@ -769,10 +765,10 @@
   <div class="footer-inner">
     <span class="footer-brand">Santamonica</span>
     <div class="footer-social">
-      <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
+      <a href="https://www.instagram.com/santamonicaristorante/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.06.12.01</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.06.21.01</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>

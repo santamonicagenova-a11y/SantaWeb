@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════
    orari.js — FONTE UNICA orari di apertura · Santamonica Web
-   v 2026.06.11.01
+   v 2026.06.21.01
    ───────────────────────────────────────────────────────────────────────
    PER CAMBIARE GLI ORARI: modifica SOLO gli oggetti SERVIZI e SETTIMANA.
    Tutto il resto (display #info, tabella dove-siamo, Schema.org JSON-LD su
@@ -22,6 +22,15 @@
    ═══════════════════════════════════════════════════════════════════════
 
    STORICO
+   - v 2026.06.21.01 (ORARIO ESTIVO TEMPORANEO · 21 giu → 31 ago 2026):
+     chiusura a PRANZO tutti i giorni; CENA solo dalle 20:00 (prima 19:30) alle
+     22:30, da MARTEDÌ a DOMENICA (lun resta chiuso). SERVIZI.cena.opens 19:30→20:00;
+     SETTIMANA: tutti i giorni tranne lun = ['cena'], pranzo rimosso ovunque.
+     ⏳ RIPRISTINO il 31/8: rimettere SERVIZI.cena.opens '19:30' e SETTIMANA allo
+     schema 7/6 → lun [] · mar/mer/gio ['cena'] · ven/sab/dom ['pranzo','cena'].
+     Speculare lato server: VALID_SLOTS in submit-reservation. Aggiornati anche i
+     blocchi statici openingHoursSpecification in index.html + dove-siamo.html e gli
+     slot del form #p-orario in index.html.
    - v 2026.06.11.01 (GEO giro 2): re-introdotto openingHoursSpecification
      STATICO crawler-safe in index.html + dove-siamo.html (i crawler IA non
      eseguono JS). Nessun cambio di codice qui: solo commento + nota desync.
@@ -50,18 +59,19 @@
 
   // ════════════ FONTE UNICA — MODIFICA QUI ════════════
   var SERVIZI = {
-    pranzo: { opens: '12:30', closes: '14:30' },
-    cena:   { opens: '19:30', closes: '22:30' }
+    pranzo: { opens: '12:30', closes: '14:30' }, // estate 2026: non usato (pranzo chiuso); definizione tenuta per il ripristino del 31/8
+    cena:   { opens: '20:00', closes: '22:30' }
   };
   // Settimana lun→dom. services = servizi attivi quel giorno (vuoto = chiuso).
+  // ORARIO ESTIVO 21/6→31/8: chiuso a pranzo tutti i giorni; cena mar→dom (lun chiuso).
   var SETTIMANA = [
     { day: 'lun', services: [] },
     { day: 'mar', services: ['cena'] },
     { day: 'mer', services: ['cena'] },
     { day: 'gio', services: ['cena'] },
-    { day: 'ven', services: ['pranzo', 'cena'] },
-    { day: 'sab', services: ['pranzo', 'cena'] },
-    { day: 'dom', services: ['pranzo', 'cena'] }
+    { day: 'ven', services: ['cena'] },
+    { day: 'sab', services: ['cena'] },
+    { day: 'dom', services: ['cena'] }
   ];
   // ═════════════════════════════════════════════════════
 

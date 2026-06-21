@@ -2,10 +2,16 @@
   ─────────────────────────────────────────────────────────────────────────
   dove-siamo.html — Dove siamo / Contatti
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.05.31.01
-  Ultimo aggiornamento: 2026-05-31
+  Versione: v 2026.06.21.01
+  Ultimo aggiornamento: 2026-06-21
   Lingua: IT (versione ufficiale)
   Stato: BOZZA INFORMATIVA · F0.12 chiusa (hotfix layout)
+
+  Modifiche v 2026.06.21.01 (ORARIO ESTIVO TEMPORANEO 21/6→31/8):
+  - openingHoursSpecification statico aggiornato: chiuso a pranzo tutti i giorni;
+    cena 20:00-22:30 da martedì a domenica (lun chiuso). Speculare a orari.js
+    v 2026.06.21.01 (che genera la tabella #orari-tbody). Ripristino il 31/8 allo
+    schedule 7/6. meta description "Aperto da martedì a domenica" invariata (corretta).
 
   Modifiche v 2026.05.31.01 (sessione 15 SEO):
   - Fix Schema.org @type da "ItalianRestaurant" a "Restaurant" (tipo non
@@ -133,16 +139,15 @@
     },
     "hasMap": "https://www.google.com/maps/place/?q=place_id:ChIJGzMzZqlD0xIRKRomfkk1F2c",
     "openingHoursSpecification": [
-      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Friday", "Saturday", "Sunday"], "opens": "12:30", "closes": "14:30" },
-      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "19:30", "closes": "22:30" }
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "20:00", "closes": "22:30" }
     ],
-    "_comment_orari": "openingHoursSpecification STATICO crawler-safe (schedule 7/6); /orari.js lo ri-inietta identico a runtime. Se cambi orari: aggiorna orari.js E questo blocco statico (index.html + dove-siamo.html).",
+    "_comment_orari": "openingHoursSpecification STATICO crawler-safe (ORARIO ESTIVO 21/6→31/8: chiuso a pranzo, cena 20:00-22:30 mar→dom, lun chiuso); /orari.js lo ri-inietta identico a runtime. Ripristino 31/8 allo schedule 7/6. Se cambi orari: aggiorna orari.js E questo blocco statico (index.html + dove-siamo.html).",
     "sameAs": [
-    "https://www.instagram.com/ristorantesantamonica/",
-    "https://www.facebook.com/santamonicage",
-    "https://guide.michelin.com/en/liguria/genova/restaurant/santamonica",
-    "https://www.thefork.it/ristorante/santamonica-r561215",
-    "https://www.tripadvisor.com/Restaurant_Review-g187823-d10480613-Reviews-Santamonica-Genoa_Italian_Riviera_Liguria.html"
+      "https://www.instagram.com/ristorantesantamonica/",
+      "https://www.facebook.com/santamonicage",
+      "https://guide.michelin.com/en/liguria/genova/restaurant/santamonica",
+      "https://www.thefork.it/ristorante/santamonica-r561215",
+      "https://www.tripadvisor.com/Restaurant_Review-g187823-d10480613-Reviews-Santamonica-Genoa_Italian_Riviera_Liguria.html"
     ],
     "award": "Guida Michelin - Good Cooking",
     "employee": [
@@ -157,7 +162,8 @@
         "jobTitle": "Sommelier"
       }
     ]
-  }  </script>
+  }
+  </script>
 
   <!-- FONTE UNICA orari · /orari.js -->
   <script src="/orari.js"></script>
@@ -284,7 +290,7 @@
     }
     .hours td.day { font-weight: 500; width: 38%; }
     .hours td.time { color: var(--text-soft); }
-    .hours tr.closed td.time { color: #6c6c6c; font-style: italic; }
+    .hours tr.closed td.time { color: #aaa; font-style: italic; }
     .hours tr.today td.day { color: var(--accent); }
     .hours tr.today td.day::after {
       content: "  oggi";

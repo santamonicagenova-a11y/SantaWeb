@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "version": "v 2026.06.04.01",
+    "version": "v 2026.06.24.01",
     "languages": [
       "it",
       "en",
@@ -11,7 +11,7 @@
   },
   "it": {
     "page_title": "Ristorante Pesce e Vista Mare a Genova | Santamonica",
-    "page_description": "Ristorante di pesce sul mare a Genova, sul Lungomare Lombardo vicino a Corso Italia. Cucina ligure di territorio e cantina curata.",
+    "page_description": "Ristorante di pesce sul Lungomare Lombardo di Genova, sala vista mare aperto vicino a Corso Italia. Cucina ligure sul pescato del giorno, cantina curata.",
     "nav_cucina": "Cucina",
     "nav_cantina": "Cantina",
     "nav_galleria": "Galleria",
@@ -21,7 +21,7 @@
     "nav_prenota": "Prenota",
     "hero_eyebrow": "Ristorante &middot; Genova",
     "hero_title": "Cucina <em>viva</em><br>sul mare",
-    "hero_desc": "Un progetto in costante divenire, basato sull&rsquo;attenzione al gusto e sulla qualit&agrave; della materia prima. Pesce di Camogli, verdure dell&rsquo;orto genovese, pasta e pane di nostra produzione.",
+    "hero_desc": "Santamonica &egrave; un ristorante gourmet di pesce sul Lungomare Lombardo di Genova, con la sala affacciata sul mare aperto. Un progetto in costante divenire, basato sull&rsquo;attenzione al gusto e sulla qualit&agrave; della materia prima. Pesce di Camogli, verdure dell&rsquo;orto genovese, pasta e pane di nostra produzione.",
     "hero_btn_prenota": "Prenota un tavolo",
     "hero_btn_menu": "Scopri il menu",
     "hero_scorri": "Scorri",

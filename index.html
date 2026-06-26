@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.06.24.02 — AEO quick win #2+#3 (audit seo-geo-aeo): FAQ — (2) liste estraibili: "Come si prenota?" e parcheggio passano a <ul>; (3) risposta parcheggio riscritta answer-first ("No, non ci sono parcheggi privati…"). JSON-LD FAQPage allineato 1:1 (testo parcheggio aggiornato). +CSS .faq-answer ul/li. Gate: P1+P2; P3 = debito (Zapier task esauriti). -->
 <!-- v 2026.06.24.01 — AEO quick win (audit skill seo-geo-aeo): (1) frase di definizione in apertura di hero_desc IT ("Santamonica è il ristorante di pesce sul Lungomare Lombardo di Genova, con la sala affacciata sul mare aperto.") = definition pattern per snippet/entità/IA; (2) meta description IT riscritta (130→~152 char) sui 3 cluster pesce/mare/Corso Italia, allineata anche su og:description e twitter:description; (3) H1 "Cucina viva sul mare" → "...sul mare di Genova" (rinforzo segnale locale, coerente col siloing: la home resta sul silo MARE, "pesce" → pillar /cucina-di-pesce). Sorgente valori = translations.json (page_description/hero_desc IT); HTML statico allineato per scraper/crawler. Gate: P1+P2 (Claude); P3 = DEBITO dichiarato (Zapier task esauriti, decisione Andrea "fai p3 se funziona altrimenti lascia stare"). -->
 <!-- v 2026.06.21.01 — ORARIO ESTIVO TEMPORANEO (21 giu → 31 ago 2026): chiuso a pranzo tutti i giorni; cena 20:00-22:30 da martedì a domenica (lun chiuso). Aggiornati: openingHoursSpecification statico nel JSON-LD, slot del form #p-orario (rimosso optgroup Pranzo + slot 19:30, aggiunto 22:30). Fonte runtime = orari.js v 2026.06.21.01. ⏳ Ripristino 31/8 allo schema 7/6. Speculare lato server: VALID_SLOTS in submit-reservation. -->
 <!-- v 2026.06.12.01 — GEO chef reinforcement (sessione 26 SEO): aggiunto nome chef/sommelier nel campo `description` del JSON-LD Restaurant (prima assente, fonte principale per i motori IA). Trova critica del GEO giro 3: Grok citava "Tomaso Giachino" invece di Nicolò Lazzaroni. -->
@@ -173,7 +174,7 @@
     {
       "@type": "Question",
       "name": "C’è parcheggio nelle vicinanze?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Non ci sono parcheggi privati in zona (il Lungomare Lombardo è pedonale). Nelle vie vicine si parcheggia in strada: righe blu a pagamento, righe bianche gratuite, e righe bianche e blu a pagamento solo in estate." }
+      "acceptedAnswer": { "@type": "Answer", "text": "No, non ci sono parcheggi privati: il Lungomare Lombardo è pedonale. Nelle vie vicine si parcheggia in strada: righe blu a pagamento, righe bianche gratuite, righe bianche e blu a pagamento solo in estate." }
     }
   ]
 }
@@ -349,6 +350,8 @@
   .faq-item[open] summary::after { content: '\2013'; }
   .faq-answer { padding: 0 0 1.5rem; font-size: 0.9rem; line-height: 1.8; color: var(--ink-soft); }
   .faq-answer p { margin: 0; }
+  .faq-answer ul { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+  .faq-answer li { margin: 0.15rem 0; }
   @media (max-width: 900px) { .faq-item summary { font-size: 1.2rem; } .faq-list { text-align: left; } }
 
   footer { background: var(--ink); color: var(--sand); padding: 3rem 2rem; }
@@ -721,11 +724,11 @@
       </details>
       <details class="faq-item">
         <summary>Come si prenota?</summary>
-        <div class="faq-answer"><p>Dal modulo sul sito santamonicagenova.it, o per telefono allo <a href="tel:+390105533155">010 5533155</a>.</p></div>
+        <div class="faq-answer"><p>In due modi:</p><ul><li>dal modulo sul sito santamonicagenova.it</li><li>per telefono allo <a href="tel:+390105533155">010 5533155</a></li></ul></div>
       </details>
       <details class="faq-item">
         <summary>C&rsquo;&egrave; parcheggio nelle vicinanze?</summary>
-        <div class="faq-answer"><p>Non ci sono parcheggi privati in zona (il Lungomare Lombardo &egrave; pedonale). Nelle vie vicine si parcheggia in strada: righe blu a pagamento, righe bianche gratuite, e righe bianche e blu a pagamento solo in estate.</p></div>
+        <div class="faq-answer"><p>No, non ci sono parcheggi privati: il Lungomare Lombardo &egrave; pedonale. Nelle vie vicine si parcheggia in strada:</p><ul><li>righe blu: a pagamento</li><li>righe bianche: gratuite</li><li>righe bianche e blu: a pagamento solo in estate</li></ul></div>
       </details>
     </div>
   </div>
@@ -769,7 +772,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.06.24.01</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.06.24.02</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>

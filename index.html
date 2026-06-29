@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.06.29.01 — P3 AEO bucket A: rimosso "gourmet" (filler) da meta/og/twitter + page_description + JSON-LD + hero; meta accorciata ~140c; H1 con entità "Ristorante sul mare"; definizione hero front-load "a Genova". TITLE/og:title invariati (rinvio go-live pillar /cucina-di-pesce). Gate: P1+P2 + P3 a 3 vendor (Gemini+Grok+DeepSeek), raw conservato. -->
 <!-- v 2026.06.24.03 — AEO quick win #1 (audit seo-geo-aeo): le 6 domande FAQ ora avvolte in <h3 class="faq-q"> dentro <summary> = heading formulati come domanda (segnale AEO). Aspetto invariato via CSS (.faq-item summary h3 { font:inherit; display:inline }). Testo domande INVARIATO → JSON-LD FAQPage non toccato. Gate: solo markup (nessun testo pubblico nuovo) → P1+P2, P3 non dovuta. -->
 <!-- v 2026.06.24.02 — AEO quick win #2+#3 (audit seo-geo-aeo): FAQ — (2) liste estraibili: "Come si prenota?" e parcheggio passano a <ul>; (3) risposta parcheggio riscritta answer-first ("No, non ci sono parcheggi privati…"). JSON-LD FAQPage allineato 1:1 (testo parcheggio aggiornato). +CSS .faq-answer ul/li. Gate: P1+P2; P3 = debito (Zapier task esauriti). -->
 <!-- v 2026.06.24.01 — AEO quick win (audit skill seo-geo-aeo): (1) frase di definizione in apertura di hero_desc IT ("Santamonica è il ristorante di pesce sul Lungomare Lombardo di Genova, con la sala affacciata sul mare aperto.") = definition pattern per snippet/entità/IA; (2) meta description IT riscritta (130→~152 char) sui 3 cluster pesce/mare/Corso Italia, allineata anche su og:description e twitter:description; (3) H1 "Cucina viva sul mare" → "...sul mare di Genova" (rinforzo segnale locale, coerente col siloing: la home resta sul silo MARE, "pesce" → pillar /cucina-di-pesce). Sorgente valori = translations.json (page_description/hero_desc IT); HTML statico allineato per scraper/crawler. Gate: P1+P2 (Claude); P3 = DEBITO dichiarato (Zapier task esauriti, decisione Andrea "fai p3 se funziona altrimenti lascia stare"). -->
@@ -36,7 +37,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ristorante Pesce e Vista Mare a Genova | Santamonica</title>
-<meta name="description" content="Ristorante gourmet di pesce sul Lungomare Lombardo di Genova, sala vista mare aperto vicino a Corso Italia. Cucina ligure sul pescato del giorno, cantina curata.">
+<meta name="description" content="Ristorante di pesce sul Lungomare Lombardo di Genova, sala affacciata sul mare aperto. Cucina ligure sul pescato del giorno, cantina curata.">
 <meta name="robots" content="index, follow">
 
 <!-- Canonical -->
@@ -51,7 +52,7 @@
 <!-- Open Graph -->
 <meta property="og:type" content="restaurant">
 <meta property="og:title" content="Ristorante Pesce e Vista Mare a Genova | Santamonica">
-<meta property="og:description" content="Ristorante gourmet di pesce sul Lungomare Lombardo di Genova, sala vista mare aperto vicino a Corso Italia. Cucina ligure sul pescato del giorno, cantina curata.">
+<meta property="og:description" content="Ristorante di pesce sul Lungomare Lombardo di Genova, sala affacciata sul mare aperto. Cucina ligure sul pescato del giorno, cantina curata.">
 <meta property="og:url" content="https://santamonicagenova.it/">
 <meta property="og:image" content="https://santamonicagenova.it/img/hero.jpg">
 <meta property="og:locale" content="it_IT">
@@ -60,7 +61,7 @@
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Ristorante Pesce e Vista Mare a Genova | Santamonica">
-<meta name="twitter:description" content="Ristorante gourmet di pesce sul Lungomare Lombardo di Genova, sala vista mare aperto vicino a Corso Italia. Cucina ligure sul pescato del giorno, cantina curata.">
+<meta name="twitter:description" content="Ristorante di pesce sul Lungomare Lombardo di Genova, sala affacciata sul mare aperto. Cucina ligure sul pescato del giorno, cantina curata.">
 <meta name="twitter:image" content="https://santamonicagenova.it/img/hero.jpg">
 
 <!-- Favicon (v 2026.06.08.01) — file in radice del sito -->
@@ -76,7 +77,7 @@
   "@id": "https://santamonicagenova.it/#restaurant",
   "name": "Ristorante Santamonica",
   "alternateName": "Santamonica",
-  "description": "Ristorante gourmet di pesce fresco sul Lungomare Lombardo di Genova. Chef Nicolò Lazzaroni, Sommelier Monica Capurro. Segnalato dalla Guida Michelin. Cucina del territorio ligure, cantina curata, vista mare.",
+  "description": "Ristorante di pesce fresco sul Lungomare Lombardo di Genova. Chef Nicolò Lazzaroni, Sommelier Monica Capurro. Segnalato dalla Guida Michelin. Cucina del territorio ligure, cantina curata, vista mare.",
   "url": "https://santamonicagenova.it/",
   "logo": "https://santamonicagenova.it/img/logo-santamonica.png",
   "image": "https://santamonicagenova.it/img/hero.jpg",
@@ -455,8 +456,8 @@
 <section class="hero" style="padding:0;position:relative;">
   <div class="hero-text-panel">
     <p class="hero-eyebrow" data-i18n="hero_eyebrow">Ristorante &middot; Genova</p>
-    <h1 class="hero-title" data-i18n="hero_title">Cucina <em>viva</em><br>sul mare di Genova</h1>
-    <p class="hero-desc" data-i18n="hero_desc">Santamonica &egrave; un ristorante gourmet di pesce sul Lungomare Lombardo di Genova, con la sala affacciata sul mare aperto. Un progetto in costante divenire, basato sull&rsquo;attenzione al gusto e sulla qualit&agrave; della materia prima. Pesce di Camogli, verdure dell&rsquo;orto genovese, pasta e pane di nostra produzione.</p>
+    <h1 class="hero-title" data-i18n="hero_title">Ristorante sul mare:<br>Cucina <em>viva</em> a Genova</h1>
+    <p class="hero-desc" data-i18n="hero_desc">Santamonica &egrave; un ristorante di pesce a Genova, sul Lungomare Lombardo, con la sala affacciata sul mare aperto. Un progetto in costante divenire, basato sull&rsquo;attenzione al gusto e sulla qualit&agrave; della materia prima. Pesce di Camogli, verdure dell&rsquo;orto genovese, pasta e pane di nostra produzione.</p>
     <div class="hero-actions">
       <a href="#prenota" class="btn-primary" data-i18n="hero_btn_prenota">Prenota un tavolo</a>
       <a href="#cucina" class="btn-secondary" data-i18n="hero_btn_menu">Scopri il menu</a>
@@ -774,7 +775,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.06.24.03</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.06.29.01</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>

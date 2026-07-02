@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<!-- 404.html — pagina "non trovata" · Santamonica · v 2026.07.02.01
+     Scopo: Cloudflare Pages la serve AUTOMATICAMENTE (status 404 vero) per ogni URL
+     inesistente, eliminando il soft-404 (prima: qualunque URL fantasma rispondeva 200
+     col contenuto della home — vedi REVISIONE_CRITICA_SEO-GEO-AEO_v2026.07.02.01 §A1).
+     Basta committarla nella root del repo SantaWeb. Nessun JS, nessun tracking. -->
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>Pagina non trovata — Ristorante Santamonica, Genova</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap"></noscript>
+  <style>
+    :root { --sabbia:#f4efe7; --ink:#1e1e1c; --stone:#7d7062; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      min-height:100vh; display:flex; align-items:center; justify-content:center;
+      background:var(--sabbia); color:var(--ink);
+      font-family:'Cormorant Garamond', Georgia, serif;
+      text-align:center; padding:2rem;
+    }
+    .box { max-width:34rem; }
+    .brand { font-size:.95rem; letter-spacing:.28em; text-transform:uppercase; color:var(--stone); margin-bottom:2.2rem; }
+    h1 { font-size:2.1rem; font-weight:500; line-height:1.25; margin-bottom:1rem; }
+    h1 em { font-style:italic; }
+    p { font-size:1.15rem; line-height:1.55; color:var(--stone); margin-bottom:2rem; }
+    .actions a {
+      display:inline-block; margin:.3rem .5rem; padding:.7rem 1.5rem;
+      border:1px solid var(--ink); color:var(--ink); text-decoration:none;
+      font-size:1rem; letter-spacing:.06em;
+    }
+    .actions a:hover { background:var(--ink); color:var(--sabbia); }
+    .tel { margin-top:2rem; font-size:1rem; }
+    .tel a { color:var(--ink); }
+    footer { margin-top:3rem; font-size:.8rem; color:var(--stone); }
+  </style>
+</head>
+<body>
+  <main class="box">
+    <div class="brand">Santamonica · Genova</div>
+    <h1>Questa pagina non c'è, <em>il mare sì</em>.</h1>
+    <p>L'indirizzo che hai seguito non esiste o è stato spostato. Ti riportiamo dove il sito vive davvero.</p>
+    <nav class="actions">
+      <a href="/">Torna alla home</a>
+      <a href="/menu.html">Il menù</a>
+      <a href="/dove-siamo.html">Dove siamo</a>
+    </nav>
+    <p class="tel">Per prenotare: <a href="tel:+390105533155">010&nbsp;5533155</a></p>
+    <footer>Ristorante Santamonica — Lungomare Lombardo 27, 16145 Genova · v 2026.07.02.01</footer>
+  </main>
+</body>
+</html>

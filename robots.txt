@@ -1,16 +1,18 @@
-# robots.txt · santamonicagenova.it · v 2026.06.10.01
+# robots.txt · santamonicagenova.it · v 2026.07.03.01
 # Policy crawler AI (POLICY_CRAWLER_AI): retrieval/risposta CONSENTITI, training BLOCCATO.
 # Content signals: search consentito, uso per risposte AI (ai-input) consentito, training (ai-train) NO.
 # Sostituisce il "Robots.txt gestito" di Cloudflare (da disattivare in AI Crawl Control > Segnali).
+# v 2026.07.03.01: Disallow senza estensione — Cloudflare Pages serve le pagine su URL
+# pulite (/menu-it) con redirect da /menu-it.html; il prefisso copre entrambe le varianti.
 
 User-agent: *
 Content-Signal: search=yes, ai-input=yes, ai-train=no
 Allow: /
 # Pagine private (stampa menu) — non indicizzare
-Disallow: /menu-it.html
-Disallow: /menu-dolci-it.html
+Disallow: /menu-it
+Disallow: /menu-dolci-it
 # Admin e login — non indicizzare
-Disallow: /login.html
+Disallow: /login
 
 # --- Crawler di TRAINING AI: bloccati (no addestramento sui nostri contenuti) ---
 User-agent: GPTBot

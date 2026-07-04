@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.07.05.03 — pannello Reminder: aggiornato il testo (il reminder è automatico per tutte le prenotazioni future dal 7/7, non serve più confermare) + liste "da confermare"/"confermate" unite in una sola "Prossime prenotazioni" senza pulsanti conferma/rifiuta (rimosse confirmReminderRow/rejectReminderRow, ora inutilizzate). -->
 <!-- v 2026.07.05.02 — nuova voce nav "📅 Gestionale (Calendario/Servizio)" → link diretto a gestionale.html (pagina standalone, vista mese/giorno prenotazioni ispirata a TheFork Manager). -->
 <!-- v 2026.07.04.01 — Reminder prenotazioni: nuova voce nav "✉ Reminder prenotazioni" → sezione #reminder-section (setup messaggio+tempistiche del promemoria automatico al cliente + lista prenotazioni da confermare/confermate). Backend nuovo: reservation-confirm (link conferma/rifiuta da mail M1bis), send-reservation-reminders (motore, pg_cron ogni 15 min), reminder-settings-status (GET) + set-reminder-settings (POST, auth gh_token). Bump ?v= admin-core.js a 2026.07.04.01 (aggiunto 'reminder-section' a _pulisciViste). -->
 <!-- v 2026.06.14.01 — carta: pulsante "+ Aggiungi piatto" in ogni sezione (admin-core.js): bump ?v= admin-core.js a 2026.06.14.01. -->
@@ -358,7 +359,7 @@
     <div class="fs-head">Reminder prenotazioni — Setup messaggio &amp; tempistiche</div>
     <div class="fs-body">
       <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">
-        Il promemoria parte in automatico <strong>solo per le prenotazioni che confermi</strong> (bottone "✓ Conferma" nella mail che ricevi per ogni richiesta, oppure dalla lista qui sotto). Arriva al cliente via email, con l'anticipo e l'orario che imposti qui.
+        Il promemoria parte <strong>in automatico per tutte le prenotazioni future</strong> (dal 7 luglio 2026 in poi), non serve più confermarle a mano. Arriva al cliente via email, con l'anticipo e l'orario che imposti qui.
       </p>
 
       <div style="display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-bottom:1.2rem;padding-bottom:1.2rem;border-bottom:1px solid var(--rule);">
@@ -399,11 +400,8 @@
         <span id="rem-settings-status" style="font-size:.75rem;color:var(--stone);"></span>
       </div>
 
-      <div class="sub" style="margin-top:0;">Da confermare (prenotazioni future non ancora confermate né rifiutate)</div>
-      <div id="rem-pending-list" style="font-size:.85rem;margin-bottom:1.4rem;">&hellip;</div>
-
-      <div class="sub">Confermate (reminder programmato)</div>
-      <div id="rem-confirmed-list" style="font-size:.85rem;">&hellip;</div>
+      <div class="sub" style="margin-top:0;">Prossime prenotazioni (reminder automatico)</div>
+      <div id="rem-upcoming-list" style="font-size:.85rem;">&hellip;</div>
 
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
         <button class="btn btn-load" onclick="chiudiSezioneReminder()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
@@ -764,33 +762,16 @@ function _remFillForm(s) {
   document.getElementById('rem-digest-email').value = s.digest_email || '';
 }
 
-function _remRenderPending(items) {
-  var list = document.getElementById('rem-pending-list');
+function _remRenderUpcoming(pending, confirmed) {
+  // v2 (5/7): reminder automatico per tutte le prenotazioni future -> le due
+  // liste pending/confirmed (che venivano da confermata_at, ora vestigiale)
+  // si mostrano unite in una sola vista, senza pulsanti conferma/rifiuta.
+  var list = document.getElementById('rem-upcoming-list');
   if (!list) return;
-  if (!items.length) { list.innerHTML = '<span style="color:var(--stone);">Nessuna prenotazione futura in attesa.</span>'; return; }
-  list.innerHTML = '';
-  items.forEach(function (r) {
-    var row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:.4rem 0;border-bottom:1px dotted var(--rule);';
-    var txt = document.createElement('span');
-    txt.innerHTML = _prenFormatDate(r.data) + ' ore ' + r.orario + ' — <strong>' + r.nome + '</strong> (' + r.persone + 'p)';
-    var ok = document.createElement('button');
-    ok.className = 'btn btn-publish'; ok.style.cssText = 'padding:.25rem .8rem;font-size:.62rem;margin-left:auto;';
-    ok.textContent = '✓ Conferma';
-    ok.onclick = function () { confirmReminderRow(r.id); };
-    var no = document.createElement('button');
-    no.className = 'btn btn-load'; no.style.cssText = 'border:1px solid var(--rust);color:var(--rust);padding:.25rem .8rem;font-size:.62rem;';
-    no.textContent = '✕ Rifiuta';
-    no.onclick = function () { rejectReminderRow(r.id); };
-    row.appendChild(txt); row.appendChild(ok); row.appendChild(no);
-    list.appendChild(row);
+  var items = (pending || []).concat(confirmed || []).sort(function (a, b) {
+    return (a.data + a.orario).localeCompare(b.data + b.orario);
   });
-}
-
-function _remRenderConfirmed(items) {
-  var list = document.getElementById('rem-confirmed-list');
-  if (!list) return;
-  if (!items.length) { list.innerHTML = '<span style="color:var(--stone);">Nessuna prenotazione confermata nei prossimi giorni.</span>'; return; }
+  if (!items.length) { list.innerHTML = '<span style="color:var(--stone);">Nessuna prenotazione futura.</span>'; return; }
   list.innerHTML = '';
   items.forEach(function (r) {
     var row = document.createElement('div');
@@ -807,8 +788,7 @@ function _remRenderConfirmed(items) {
 
 function renderReminderUI() {
   _remFillForm(remState.settings || {});
-  _remRenderPending(remState.pending || []);
-  _remRenderConfirmed(remState.confirmed || []);
+  _remRenderUpcoming(remState.pending || [], remState.confirmed || []);
 }
 
 function loadReminderStatus() {
@@ -860,35 +840,6 @@ function saveReminderSettings() {
     .catch(function (e) {
       if (e && e.message === 'no-token') _remSetSettingsStatus('Operazione annullata: serve il token GitHub.', true);
       else _remSetSettingsStatus('Errore di connessione.', true);
-    });
-}
-
-function confirmReminderRow(id) {
-  _remSetStatus('Salvataggio…');
-  _remFetch({ action: 'confirm_reservation', id: id })
-    .then(function (res) {
-      if (res.status === 200 && res.body && res.body.ok) { _remSetStatus('Prenotazione confermata.'); loadReminderStatus(); }
-      else if (res.status === 401) _remSetStatus('Token GitHub non valido o senza permessi.', true);
-      else _remSetStatus((res.body && res.body.error) || 'Errore.', true);
-    })
-    .catch(function (e) {
-      if (e && e.message === 'no-token') _remSetStatus('Operazione annullata: serve il token GitHub.', true);
-      else _remSetStatus('Errore di connessione.', true);
-    });
-}
-
-function rejectReminderRow(id) {
-  if (!window.confirm('Segnare questa prenotazione come rifiutata/annullata? Niente promemoria per lei.')) return;
-  _remSetStatus('Salvataggio…');
-  _remFetch({ action: 'reject_reservation', id: id })
-    .then(function (res) {
-      if (res.status === 200 && res.body && res.body.ok) { _remSetStatus('Prenotazione segnata come rifiutata.'); loadReminderStatus(); }
-      else if (res.status === 401) _remSetStatus('Token GitHub non valido o senza permessi.', true);
-      else _remSetStatus((res.body && res.body.error) || 'Errore.', true);
-    })
-    .catch(function (e) {
-      if (e && e.message === 'no-token') _remSetStatus('Operazione annullata: serve il token GitHub.', true);
-      else _remSetStatus('Errore di connessione.', true);
     });
 }
 
@@ -1321,7 +1272,7 @@ async function _eseguiPubblicaFotoSito(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.07.05.02</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.07.05.03</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

@@ -1,8 +1,12 @@
 <!DOCTYPE html>
-<!-- v 2026.07.05.01 — Fase 1 (Calendario/Servizio), ispirata a TheFork Manager su richiesta Andrea 4/7/2026.
+<!-- v 2026.07.05.02 — Fase 1 (Calendario/Servizio), ispirata a TheFork Manager su richiesta Andrea 4/7/2026.
      Pagina admin standalone (separata da menu-admin.html, che resta per il contenuto del menù).
      Legge da gestionale-calendar-status (vista mese) + gestionale-day (vista giorno).
-     Azioni conferma/rifiuta riusano set-reminder-settings (stesso gh_token delle altre sezioni admin).
+     v.02 (5/7): il reminder è ora automatico per tutte le prenotazioni future (non serve più
+     confermare) → tolti i pulsanti verde/rosso di conferma/rifiuto. Al loro posto: stato ARRIVO
+     manuale (in attesa/arrivato/no-show, azione set_arrivo_status) + stato GARANZIA in sola
+     lettura (richiesta/effettuata, calcolato dal gestionale-day joinando SafeTable/cauzioni).
+     Azioni riusano set-reminder-settings (stesso gh_token delle altre sezioni admin).
      noindex: pagina interna, non deve finire in ricerca. -->
 <html lang="it">
 <head>
@@ -110,7 +114,7 @@
   <div class="status-line" id="day-status"></div>
 </div>
 
-<footer class="ver">v 2026.07.05.01</footer>
+<footer class="ver">v 2026.07.05.02</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';
@@ -246,10 +250,23 @@ function loadDay() {
 }
 
 function statusBadge(r) {
+  // status (rejected/cancelled) prevale su tutto: se scartata, arrivo/garanzia non hanno senso.
   if (r.status === 'rejected') return '<span class="badge badge-no">✕ Rifiutata</span>';
   if (r.status === 'cancelled') return '<span class="badge badge-no">Annullata</span>';
-  if (r.confermata_at) return '<span class="badge badge-ok">✓ Confermata</span>';
-  return '<span class="badge badge-wait">Da confermare</span>';
+  return '';
+}
+
+function arrivoBadge(r) {
+  if (r.arrivo_status === 'arrivato') return '<span class="badge badge-ok">✓ Arrivato</span>';
+  if (r.arrivo_status === 'no_show') return '<span class="badge badge-no">✕ No-show</span>';
+  return ''; // in_attesa: nessun badge, e' lo stato di default prima del servizio
+}
+
+function garanziaBadge(r) {
+  if (r.garanzia_status === 'effettuata') return '<span class="badge badge-ok">✓ Garanzia</span>';
+  if (r.garanzia_status === 'richiesta') return '<span class="badge badge-cauzione">Garanzia richiesta</span>';
+  if (r.garanzia_status === 'annullata') return '<span class="badge badge-no">Garanzia annullata</span>';
+  return '';
 }
 
 function renderDay(rows) {
@@ -268,15 +285,21 @@ function renderDay(rows) {
           (r.occasione ? ' · ' + escapeHtml(r.occasione) : '') +
           (r.intolleranze ? ' · ' + escapeHtml(r.intolleranze) : '') + '</div>' +
       '</div>' +
-      '<div>' + statusBadge(r) + (r.cauzione_short_id ? ' <span class="badge badge-cauzione">Garanzia</span>' : '') + '</div>';
+      '<div>' + statusBadge(r) + ' ' + arrivoBadge(r) + ' ' + garanziaBadge(r) + '</div>';
 
     if (canAct) {
       var actions = document.createElement('div'); actions.className = 'res-actions';
-      var ok = document.createElement('button'); ok.className = 'btn btn-ok'; ok.textContent = '✓';
-      ok.onclick = function () { actOnReservation(r.id, 'confirm_reservation'); };
-      var no = document.createElement('button'); no.className = 'btn btn-rust'; no.textContent = '✕';
-      no.onclick = function () { actOnReservation(r.id, 'reject_reservation'); };
+      var ok = document.createElement('button'); ok.className = 'btn btn-ok'; ok.textContent = 'Arrivato';
+      ok.onclick = function () { setArrivoStatus(r.id, 'arrivato'); };
+      var no = document.createElement('button'); no.className = 'btn btn-rust'; no.textContent = 'No-show';
+      no.onclick = function () { setArrivoStatus(r.id, 'no_show'); };
       actions.appendChild(ok); actions.appendChild(no);
+      if (r.arrivo_status && r.arrivo_status !== 'in_attesa') {
+        var reset = document.createElement('button'); reset.className = 'btn'; reset.textContent = '↺';
+        reset.title = 'Riporta a "in attesa"';
+        reset.onclick = function () { setArrivoStatus(r.id, 'in_attesa'); };
+        actions.appendChild(reset);
+      }
       row.appendChild(actions);
     }
     list.appendChild(row);
@@ -296,14 +319,14 @@ function _ghToken() {
   return t;
 }
 
-function actOnReservation(id, action) {
-  if (action === 'reject_reservation' && !window.confirm('Segnare questa prenotazione come rifiutata/annullata?')) return;
+function setArrivoStatus(id, value) {
+  if (value === 'no_show' && !window.confirm('Segnare questa prenotazione come no-show?')) return;
   var token = _ghToken();
   if (!token) { _daySetStatus('Operazione annullata: serve il token GitHub.', true); return; }
   _daySetStatus('Salvataggio…');
   fetch(ACTION_URL, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: action, id: id, github_token: token }),
+    body: JSON.stringify({ action: 'set_arrivo_status', id: id, value: value, github_token: token }),
   })
     .then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); })
     .then(function (res) {

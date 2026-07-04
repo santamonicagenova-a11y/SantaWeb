@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.07.05.05 — fix bug: le prenotazioni passate (checkbox "mostra anche le vecchie") mostravano ancora "in coda" a destra invece di "passata" (l'etichetta "(passata)" era solo accanto al nome, poco visibile). Ora lo stato a destra dice direttamente "passata". -->
 <!-- v 2026.07.05.04 — pannello Reminder: "Prossime prenotazioni" ora mostra di default SOLO da domani in poi (prima includeva anche oggi); aggiunto checkbox "mostra anche le vecchie" (query ?show_past=1 su reminder-settings-status v2) che le fa comparire in coda, in grigio, con etichetta "(passata)". -->
 <!-- v 2026.07.05.03 — pannello Reminder: aggiornato il testo (il reminder è automatico per tutte le prenotazioni future dal 7/7, non serve più confermare) + liste "da confermare"/"confermate" unite in una sola "Prossime prenotazioni" senza pulsanti conferma/rifiuta (rimosse confirmReminderRow/rejectReminderRow, ora inutilizzate). -->
 <!-- v 2026.07.05.02 — nuova voce nav "📅 Gestionale (Calendario/Servizio)" → link diretto a gestionale.html (pagina standalone, vista mese/giorno prenotazioni ispirata a TheFork Manager). -->
@@ -788,10 +789,10 @@ function _remRenderUpcoming(pending, confirmed) {
     var row = document.createElement('div');
     row.style.cssText = 'display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:.4rem 0;border-bottom:1px dotted var(--rule);' + (isPast ? 'opacity:.5;' : '');
     var txt = document.createElement('span');
-    txt.innerHTML = _prenFormatDate(r.data) + ' ore ' + r.orario + ' — <strong>' + r.nome + '</strong> (' + r.persone + 'p)' + (isPast ? ' <span style="font-size:.62rem;">(passata)</span>' : '');
+    txt.innerHTML = _prenFormatDate(r.data) + ' ore ' + r.orario + ' — <strong>' + r.nome + '</strong> (' + r.persone + 'p)';
     var st = document.createElement('span');
     st.style.cssText = 'font-size:.68rem;color:' + (r.reminder_sent_at ? '#2d6a4f' : 'var(--stone)') + ';margin-left:auto;';
-    st.textContent = r.reminder_sent_at ? '✓ promemoria inviato' : 'in coda';
+    st.textContent = isPast ? 'passata' : (r.reminder_sent_at ? '✓ promemoria inviato' : 'in coda');
     row.appendChild(txt); row.appendChild(st);
     list.appendChild(row);
   });
@@ -1286,7 +1287,7 @@ async function _eseguiPubblicaFotoSito(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.07.05.04</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.07.05.05</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

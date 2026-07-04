@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<!-- v 2026.07.05.02 — Fase 1 (Calendario/Servizio), ispirata a TheFork Manager su richiesta Andrea 4/7/2026.
+<!-- v 2026.07.05.03 — Fase 1 (Calendario/Servizio), ispirata a TheFork Manager su richiesta Andrea 4/7/2026.
      Pagina admin standalone (separata da menu-admin.html, che resta per il contenuto del menù).
      Legge da gestionale-calendar-status (vista mese) + gestionale-day (vista giorno).
      v.02 (5/7): il reminder è ora automatico per tutte le prenotazioni future (non serve più
      confermare) → tolti i pulsanti verde/rosso di conferma/rifiuto. Al loro posto: stato ARRIVO
      manuale (in attesa/arrivato/no-show, azione set_arrivo_status) + stato GARANZIA in sola
      lettura (richiesta/effettuata, calcolato dal gestionale-day joinando SafeTable/cauzioni).
+     v.03 (5/7): appena si imposta Arrivato/No-show, i 2 pulsanti spariscono e resta solo il
+     badge di stato (niente più pulsante di reset "↺" — se serve correggere, richiesta futura).
      Azioni riusano set-reminder-settings (stesso gh_token delle altre sezioni admin).
      noindex: pagina interna, non deve finire in ricerca. -->
 <html lang="it">
@@ -114,7 +116,7 @@
   <div class="status-line" id="day-status"></div>
 </div>
 
-<footer class="ver">v 2026.07.05.02</footer>
+<footer class="ver">v 2026.07.05.03</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';
@@ -276,7 +278,7 @@ function renderDay(rows) {
   list.innerHTML = '';
   rows.forEach(function (r) {
     var row = document.createElement('div'); row.className = 'res-row';
-    var canAct = r.status !== 'rejected' && r.status !== 'cancelled';
+    var canAct = r.status !== 'rejected' && r.status !== 'cancelled' && r.arrivo_status === 'in_attesa';
     row.innerHTML =
       '<div class="res-orario">' + r.orario + '</div>' +
       '<div class="res-info">' +
@@ -294,12 +296,6 @@ function renderDay(rows) {
       var no = document.createElement('button'); no.className = 'btn btn-rust'; no.textContent = 'No-show';
       no.onclick = function () { setArrivoStatus(r.id, 'no_show'); };
       actions.appendChild(ok); actions.appendChild(no);
-      if (r.arrivo_status && r.arrivo_status !== 'in_attesa') {
-        var reset = document.createElement('button'); reset.className = 'btn'; reset.textContent = '↺';
-        reset.title = 'Riporta a "in attesa"';
-        reset.onclick = function () { setArrivoStatus(r.id, 'in_attesa'); };
-        actions.appendChild(reset);
-      }
       row.appendChild(actions);
     }
     list.appendChild(row);

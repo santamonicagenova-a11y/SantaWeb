@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.07.05.06 — tolto il menu a tendina "Carica dal sito ▾": le 11 azioni sono ora pulsanti diretti sempre visibili in una barra sotto il top-bar (id="carica-menu" mantenuto per compatibilità coi vecchi classList.remove('open') sparsi nel JS, ora no-op innocuo). Rimossa la sezione testuale "Come si usa" (restano solo #file-input e #err, necessari a "Carica da file"). -->
 <!-- v 2026.07.05.05 — fix bug: le prenotazioni passate (checkbox "mostra anche le vecchie") mostravano ancora "in coda" a destra invece di "passata" (l'etichetta "(passata)" era solo accanto al nome, poco visibile). Ora lo stato a destra dice direttamente "passata". -->
 <!-- v 2026.07.05.04 — pannello Reminder: "Prossime prenotazioni" ora mostra di default SOLO da domani in poi (prima includeva anche oggi); aggiunto checkbox "mostra anche le vecchie" (query ?show_past=1 su reminder-settings-status v2) che le fa comparire in coda, in grigio, con etichetta "(passata)". -->
 <!-- v 2026.07.05.03 — pannello Reminder: aggiornato il testo (il reminder è automatico per tutte le prenotazioni future dal 7/7, non serve più confermare) + liste "da confermare"/"confermate" unite in una sola "Prossime prenotazioni" senza pulsanti conferma/rifiuta (rimosse confirmReminderRow/rejectReminderRow, ora inutilizzate). -->
@@ -48,6 +49,9 @@
     .preview-menu a:hover { background:var(--rust); }
     .preview-menu.open { display:block; }
     .btn-publish:hover { opacity:.85; }
+    .quick-actions { max-width:900px; margin:1.2rem auto 0; padding:0 1rem; display:flex; flex-wrap:wrap; gap:.5rem; }
+    .qa-btn { padding:.45rem 1rem; border:1px solid var(--rule); background:#fff; font-family:'Jost',sans-serif; font-size:.72rem; letter-spacing:.06em; color:var(--ink); cursor:pointer; }
+    .qa-btn:hover { background:var(--sand); border-color:var(--stone); }
     .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; align-items:center; justify-content:center; }
     .modal-overlay.on { display:flex; }
     .modal { background:#fff; padding:2rem; max-width:440px; width:90%; border:1px solid var(--rule); }
@@ -56,7 +60,7 @@
     .modal input { width:100%; padding:.4rem .6rem; border:1px solid var(--rule); font-family:'Jost',sans-serif; font-size:.82rem; margin-bottom:.8rem; }
     .modal-btns { display:flex; gap:.5rem; justify-content:flex-end; }
 
-    .intro { max-width:700px; margin:2rem auto; padding:1.5rem 2rem; background:#fff; border:1px solid var(--rule); }
+    .intro { max-width:700px; margin:0 auto; padding:0 1rem; }
     .intro h2 { font-size:.8rem; font-weight:500; letter-spacing:.14em; text-transform:uppercase; margin-bottom:.8rem; color:var(--stone); }
     .intro p { font-size:.85rem; line-height:1.6; margin-bottom:.8rem; }
     .intro label { display:inline-block; padding:.45rem 1.3rem; background:var(--ink); color:#fff; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; cursor:pointer; }
@@ -99,22 +103,6 @@
     <h1>Admin Menù</h1>
   </div>
   <div class="top-btns">
-    <div class="preview-wrap" id="carica-wrap">
-      <button class="btn btn-load" onclick="toggleCaricaMenu(event)">↓ Carica dal sito ▾</button>
-      <div class="preview-menu" id="carica-menu">
-        <a onclick="caricaDalSito('carta')">☞ Menù alla carta</a>
-        <a onclick="caricaDalSito('dolci')">☞ Menù dolci</a>
-        <a onclick="caricaDalSito('allergeni')">☞ Allergeni carta</a>
-        <a onclick="apriGestoreFoto()">📷 Foto cucina</a>
-        <a onclick="apriGestoreFotoSito()">🏛️ Foto sito</a>
-        <a onclick="apriSezioneVini()">🍷 Menù Vini</a>
-        <a onclick="apriSezioneDocGenerico()">📄 Documento generico</a>
-        <a onclick="apriSezionePrenotazioni()">🔒 Prenotazioni online</a>
-        <a onclick="apriSezioneBuoni()">🎁 Buoni regalo</a>
-        <a onclick="apriSezioneReminder()">✉ Reminder prenotazioni</a>
-        <a href="gestionale.html">📅 Gestionale (Calendario/Servizio)</a>
-      </div>
-    </div>
     <button class="btn btn-load" onclick="document.getElementById('file-input').click()">↑ Carica da file</button>
     <div class="preview-wrap">
       <button class="btn btn-save" onclick="togglePreviewMenu(event)">⧉ Preview ▾</button>
@@ -129,11 +117,21 @@
   </div>
 </div>
 
+<div class="quick-actions" id="carica-menu">
+  <button class="qa-btn" onclick="caricaDalSito('carta')">☞ Menù alla carta</button>
+  <button class="qa-btn" onclick="caricaDalSito('dolci')">☞ Menù dolci</button>
+  <button class="qa-btn" onclick="caricaDalSito('allergeni')">☞ Allergeni carta</button>
+  <button class="qa-btn" onclick="apriGestoreFoto()">📷 Foto cucina</button>
+  <button class="qa-btn" onclick="apriGestoreFotoSito()">🏛️ Foto sito</button>
+  <button class="qa-btn" onclick="apriSezioneVini()">🍷 Menù Vini</button>
+  <button class="qa-btn" onclick="apriSezioneDocGenerico()">📄 Documento generico</button>
+  <button class="qa-btn" onclick="apriSezionePrenotazioni()">🔒 Prenotazioni online</button>
+  <button class="qa-btn" onclick="apriSezioneBuoni()">🎁 Buoni regalo</button>
+  <button class="qa-btn" onclick="apriSezioneReminder()">✉ Reminder prenotazioni</button>
+  <button class="qa-btn" onclick="location.href='gestionale.html'">📅 Gestionale (Calendario/Servizio)</button>
+</div>
+
 <div class="intro" id="intro">
-  <h2>Come si usa</h2>
-  <p><strong>1.</strong> Clicca <strong>Carica dal sito</strong> per caricare automaticamente il menù attivo, oppure <strong>Carica da file</strong> per selezionarlo dal computer.</p>
-  <p><strong>2.</strong> Modifica prezzi, nomi, asterischi.</p>
-  <p><strong>3.</strong> Clicca <strong>Preview</strong> per vedere il risultato, poi <strong>Pubblica su GitHub</strong> per aggiornare il sito.</p>
   <input type="file" id="file-input" accept=".html" onchange="carica(this)" />
   <div class="err" id="err"></div>
 </div>

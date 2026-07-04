@@ -1,0 +1,19 @@
+{
+  "liberi": [
+    100,
+    150,
+    200
+  ],
+  "degustazione": {
+    "sei": {
+      "base": 180,
+      "vini": 300
+    },
+    "sette": {
+      "base": 220,
+      "vini": 360
+    }
+  },
+  "versione": "v 2026.07.04.01",
+  "_nota": "Fonte unica dei valori dei voucher. Modificabile da menu-admin (pannello Buoni regalo) o a mano."
+}

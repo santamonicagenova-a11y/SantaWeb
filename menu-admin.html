@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.07.05.02 — nuova voce nav "📅 Gestionale (Calendario/Servizio)" → link diretto a gestionale.html (pagina standalone, vista mese/giorno prenotazioni ispirata a TheFork Manager). -->
 <!-- v 2026.07.04.01 — Reminder prenotazioni: nuova voce nav "✉ Reminder prenotazioni" → sezione #reminder-section (setup messaggio+tempistiche del promemoria automatico al cliente + lista prenotazioni da confermare/confermate). Backend nuovo: reservation-confirm (link conferma/rifiuta da mail M1bis), send-reservation-reminders (motore, pg_cron ogni 15 min), reminder-settings-status (GET) + set-reminder-settings (POST, auth gh_token). Bump ?v= admin-core.js a 2026.07.04.01 (aggiunto 'reminder-section' a _pulisciViste). -->
 <!-- v 2026.06.14.01 — carta: pulsante "+ Aggiungi piatto" in ogni sezione (admin-core.js): bump ?v= admin-core.js a 2026.06.14.01. -->
 <!-- v 2026.06.10.14 — pannello "Buoni regalo" (3 campi valori buoni liberi → pubblica voucher-config.json): nuova voce nav + sezione #buoni-section + bump ?v= admin-core.js a 2026.06.10.13. -->
@@ -108,6 +109,7 @@
         <a onclick="apriSezionePrenotazioni()">🔒 Prenotazioni online</a>
         <a onclick="apriSezioneBuoni()">🎁 Buoni regalo</a>
         <a onclick="apriSezioneReminder()">✉ Reminder prenotazioni</a>
+        <a href="gestionale.html">📅 Gestionale (Calendario/Servizio)</a>
       </div>
     </div>
     <button class="btn btn-load" onclick="document.getElementById('file-input').click()">↑ Carica da file</button>
@@ -1319,7 +1321,7 @@ async function _eseguiPubblicaFotoSito(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.07.04.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.07.05.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

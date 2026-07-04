@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.07.05.04 — pannello Reminder: "Prossime prenotazioni" ora mostra di default SOLO da domani in poi (prima includeva anche oggi); aggiunto checkbox "mostra anche le vecchie" (query ?show_past=1 su reminder-settings-status v2) che le fa comparire in coda, in grigio, con etichetta "(passata)". -->
 <!-- v 2026.07.05.03 — pannello Reminder: aggiornato il testo (il reminder è automatico per tutte le prenotazioni future dal 7/7, non serve più confermare) + liste "da confermare"/"confermate" unite in una sola "Prossime prenotazioni" senza pulsanti conferma/rifiuta (rimosse confirmReminderRow/rejectReminderRow, ora inutilizzate). -->
 <!-- v 2026.07.05.02 — nuova voce nav "📅 Gestionale (Calendario/Servizio)" → link diretto a gestionale.html (pagina standalone, vista mese/giorno prenotazioni ispirata a TheFork Manager). -->
 <!-- v 2026.07.04.01 — Reminder prenotazioni: nuova voce nav "✉ Reminder prenotazioni" → sezione #reminder-section (setup messaggio+tempistiche del promemoria automatico al cliente + lista prenotazioni da confermare/confermate). Backend nuovo: reservation-confirm (link conferma/rifiuta da mail M1bis), send-reservation-reminders (motore, pg_cron ogni 15 min), reminder-settings-status (GET) + set-reminder-settings (POST, auth gh_token). Bump ?v= admin-core.js a 2026.07.04.01 (aggiunto 'reminder-section' a _pulisciViste). -->
@@ -400,7 +401,12 @@
         <span id="rem-settings-status" style="font-size:.75rem;color:var(--stone);"></span>
       </div>
 
-      <div class="sub" style="margin-top:0;">Prossime prenotazioni (reminder automatico)</div>
+      <div class="sub" style="margin-top:0;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;">
+        <span>Prossime prenotazioni (reminder automatico, da domani)</span>
+        <label style="display:flex;align-items:center;gap:.35rem;font-size:.7rem;font-weight:400;text-transform:none;letter-spacing:0;color:var(--stone);margin-left:auto;">
+          <input type="checkbox" id="rem-show-past" style="width:14px;height:14px;" onchange="loadReminderStatus()" /> mostra anche le vecchie
+        </label>
+      </div>
       <div id="rem-upcoming-list" style="font-size:.85rem;">&hellip;</div>
 
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
@@ -766,18 +772,23 @@ function _remRenderUpcoming(pending, confirmed) {
   // v2 (5/7): reminder automatico per tutte le prenotazioni future -> le due
   // liste pending/confirmed (che venivano da confermata_at, ora vestigiale)
   // si mostrano unite in una sola vista, senza pulsanti conferma/rifiuta.
+  // v3 (5/7): default = solo da domani in poi (cutoffDate dal backend); il
+  // checkbox "mostra anche le vecchie" richiama show_past=1 e qui le passate
+  // vengono solo evidenziate in grigio più chiaro (nessuna azione su di loro).
   var list = document.getElementById('rem-upcoming-list');
   if (!list) return;
+  var cutoff = remState.cutoffDate || null;
   var items = (pending || []).concat(confirmed || []).sort(function (a, b) {
     return (a.data + a.orario).localeCompare(b.data + b.orario);
   });
   if (!items.length) { list.innerHTML = '<span style="color:var(--stone);">Nessuna prenotazione futura.</span>'; return; }
   list.innerHTML = '';
   items.forEach(function (r) {
+    var isPast = cutoff && r.data < cutoff;
     var row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:.4rem 0;border-bottom:1px dotted var(--rule);';
+    row.style.cssText = 'display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:.4rem 0;border-bottom:1px dotted var(--rule);' + (isPast ? 'opacity:.5;' : '');
     var txt = document.createElement('span');
-    txt.innerHTML = _prenFormatDate(r.data) + ' ore ' + r.orario + ' — <strong>' + r.nome + '</strong> (' + r.persone + 'p)';
+    txt.innerHTML = _prenFormatDate(r.data) + ' ore ' + r.orario + ' — <strong>' + r.nome + '</strong> (' + r.persone + 'p)' + (isPast ? ' <span style="font-size:.62rem;">(passata)</span>' : '');
     var st = document.createElement('span');
     st.style.cssText = 'font-size:.68rem;color:' + (r.reminder_sent_at ? '#2d6a4f' : 'var(--stone)') + ';margin-left:auto;';
     st.textContent = r.reminder_sent_at ? '✓ promemoria inviato' : 'in coda';
@@ -793,12 +804,15 @@ function renderReminderUI() {
 
 function loadReminderStatus() {
   _remSetStatus('Caricamento…');
-  fetch(REM_STATUS_URL, { cache: 'no-store' })
+  var showPast = document.getElementById('rem-show-past') && document.getElementById('rem-show-past').checked;
+  var url = REM_STATUS_URL + (showPast ? '?show_past=1' : '');
+  fetch(url, { cache: 'no-store' })
     .then(function (r) { return r.json(); })
     .then(function (d) {
       remState.settings = (d && d.settings) || {};
       remState.pending = (d && d.pending) || [];
       remState.confirmed = (d && d.confirmed) || [];
+      remState.cutoffDate = (d && d.cutoff_date) || null;
       renderReminderUI();
       _remSetStatus('');
     })
@@ -1272,7 +1286,7 @@ async function _eseguiPubblicaFotoSito(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.07.05.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.07.05.04</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

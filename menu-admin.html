@@ -1,11 +1,5 @@
 <!DOCTYPE html>
-<!-- v 2026.06.14.08 — aggiunto pannello "📖 Procedure di aggiornamento e traduzione" (details collassabile sotto la top-bar): sequenze giuste per carta/dolci/allergeni/vini/foto/buoni/prenotazioni + regola d'oro (dolci e allergeni vanno pubblicati PRIMA della carta, perché la carta in lingua li pesca dal sito già pubblicato). Solo HTML. -->
-<!-- v 2026.06.14.07 — barra preview: valori correnti accanto ai controlli dimensione/spaziatura (carta + dolci): bump ?v= admin-core.js a 2026.06.14.06 e admin-templates-shared.js a 2026.06.14.03. -->
-<!-- v 2026.06.14.06 — fix traduzioni pagina allergeni EN/FR (titolo sezione "Antipasti" via mappa display→canonico + nomi dolci via TRADUZIONI_DOLCI): bump ?v= admin-core.js a 2026.06.14.05. -->
-<!-- v 2026.06.14.05 — fix preview lingue dolci (puntava a menu-dolci-en/fr.html inesistenti → home; ora menu-<lang>.html): bump ?v= admin-core.js a 2026.06.14.04. -->
-<!-- v 2026.06.14.04 — "Fissa come default" esteso ai DOLCI (_dolciCtrlBar + menu-dolci.html _szSave): bump ?v= admin-core.js a 2026.06.14.03. -->
-<!-- v 2026.06.14.03 — carta preview: pulsante "Fissa come default" (salva caratteri/interlinea/spazio/posizione correnti come default): bump ?v= admin-core.js e admin-templates-shared.js a 2026.06.14.02. -->
-<!-- v 2026.06.14.02 — footer carta blindato in fondo (admin-templates-shared.js: min-height:0 su .pg-content/.degu + flex-shrink:0 su .note-ospite): bump ?v= admin-templates-shared.js a 2026.06.14.01. -->
+<!-- v 2026.07.04.01 — Reminder prenotazioni: nuova voce nav "✉ Reminder prenotazioni" → sezione #reminder-section (setup messaggio+tempistiche del promemoria automatico al cliente + lista prenotazioni da confermare/confermate). Backend nuovo: reservation-confirm (link conferma/rifiuta da mail M1bis), send-reservation-reminders (motore, pg_cron ogni 15 min), reminder-settings-status (GET) + set-reminder-settings (POST, auth gh_token). Bump ?v= admin-core.js a 2026.07.04.01 (aggiunto 'reminder-section' a _pulisciViste). -->
 <!-- v 2026.06.14.01 — carta: pulsante "+ Aggiungi piatto" in ogni sezione (admin-core.js): bump ?v= admin-core.js a 2026.06.14.01. -->
 <!-- v 2026.06.10.14 — pannello "Buoni regalo" (3 campi valori buoni liberi → pubblica voucher-config.json): nuova voce nav + sezione #buoni-section + bump ?v= admin-core.js a 2026.06.10.13. -->
 <!-- v 2026.06.10.11 — impostazioni stampa carta/dolci da cursori a PULSANTI nella barra della preview: bump ?v= admin-core.js a 2026.06.10.10 e admin-templates-shared.js a 2026.06.10.06 + footer. -->
@@ -113,6 +107,7 @@
         <a onclick="apriSezioneDocGenerico()">📄 Documento generico</a>
         <a onclick="apriSezionePrenotazioni()">🔒 Prenotazioni online</a>
         <a onclick="apriSezioneBuoni()">🎁 Buoni regalo</a>
+        <a onclick="apriSezioneReminder()">✉ Reminder prenotazioni</a>
       </div>
     </div>
     <button class="btn btn-load" onclick="document.getElementById('file-input').click()">↑ Carica da file</button>
@@ -128,71 +123,6 @@
     <button class="btn btn-load" onclick="resetToken()" title="Cambia token GitHub" style="font-size:.6rem;padding:.45rem .7rem;opacity:.7">🔑</button>
   </div>
 </div>
-
-<details id="procedure" style="max-width:1000px;margin:1.1rem auto 0;background:var(--sand);border:1px solid var(--rule);border-radius:6px;font-size:.82rem;line-height:1.55;color:var(--ink)">
-  <summary style="cursor:pointer;padding:.75rem 1.1rem;font-weight:600;letter-spacing:.03em;list-style:none">📖 Procedure di aggiornamento e traduzione — leggimi</summary>
-  <div style="padding:0 1.2rem 1.2rem">
-
-    <p style="background:#fff;border-left:3px solid var(--rust);padding:.55rem .85rem;margin:.3rem 0 1rem">
-      <strong>Regola d'oro.</strong> La carta in lingua (EN/FR) pesca <strong>dolci</strong> e <strong>allergeni</strong> dal sito <em>già pubblicato</em>.
-      Quindi se cambi dolci o allergeni: <strong>pubblicali prima</strong>, aspetta ~1–2 minuti che il sito si aggiorni, e <strong>solo dopo</strong> fai “Traduci e Pubblica” della carta.
-    </p>
-
-    <p style="margin:.2rem 0 1rem">Il pulsante <strong>“✦ Traduci e Pubblica”</strong> pubblica sempre il menù che hai <em>caricato</em> in quel momento. Per la <strong>carta</strong> produce IT + EN + FR (con dolci e allergeni accorpati in lingua); per <strong>dolci</strong> e <strong>allergeni</strong> produce l'italiano (le loro versioni EN/FR vivono dentro la carta tradotta).</p>
-
-    <h3 style="margin:1rem 0 .25rem;font-size:.86rem">🍽️ Carta — piatti, prezzi, sezioni</h3>
-    <ol style="margin:.2rem 0 .2rem 1.2rem;padding:0">
-      <li><strong>Carica dal sito → Menù alla carta</strong></li>
-      <li>Modifica i piatti (usa <strong>“+ Aggiungi piatto”</strong> per una riga nuova; le righe lasciate vuote non vengono pubblicate)</li>
-      <li><strong>Preview 🇮🇹</strong> per controllare; se vuoi, regola caratteri/interlinea/spazio/posizione coi pulsanti (vedi i valori accanto) e premi <strong>“✔ Fissa come default”</strong></li>
-      <li><strong>✦ Traduci e Pubblica</strong> → pubblica IT + EN + FR</li>
-    </ol>
-
-    <h3 style="margin:1rem 0 .25rem;font-size:.86rem">🍰 Dolci</h3>
-    <ol style="margin:.2rem 0 .2rem 1.2rem;padding:0">
-      <li><strong>Carica dal sito → Menù dolci</strong></li>
-      <li>Modifica</li>
-      <li><strong>Preview 🇮🇹</strong> (in EN/FR i dolci si vedono dentro la carta tradotta)</li>
-      <li><strong>✦ Traduci e Pubblica</strong> → pubblica i dolci in italiano</li>
-      <li>⚠️ <strong>Per aggiornarli anche in EN/FR</strong>: aspetta ~1–2 min, poi <strong>Carica la carta → Traduci e Pubblica</strong> (la carta in lingua ripesca i dolci appena pubblicati)</li>
-    </ol>
-
-    <h3 style="margin:1rem 0 .25rem;font-size:.86rem">⚠️ Allergeni</h3>
-    <ol style="margin:.2rem 0 .2rem 1.2rem;padding:0">
-      <li><strong>Carica dal sito → Allergeni carta</strong> (si sincronizza dai piatti della carta <em>già pubblicata</em>)</li>
-      <li>Spunta gli allergeni di ogni piatto</li>
-      <li><strong>✦ Traduci e Pubblica</strong> → pubblica la pagina allergeni in italiano</li>
-      <li>⚠️ <strong>Per aggiornarla in EN/FR</strong>: aspetta ~1–2 min, poi <strong>Carica la carta → Traduci e Pubblica</strong> (la pagina allergeni tradotta è in coda alla carta EN/FR)</li>
-    </ol>
-
-    <h3 style="margin:1rem 0 .25rem;font-size:.86rem">🔁 Ho cambiato i piatti (e magari i loro allergeni)</h3>
-    <p style="margin:.2rem 0">Sequenza completa, con la carta pubblicata <strong>due volte</strong> (la prima porta i piatti nuovi, l'ultima aggiorna allergeni/dolci in lingua):</p>
-    <ol style="margin:.2rem 0 .2rem 1.2rem;padding:0">
-      <li><strong>Carta</strong>: Carica → modifica i piatti → <strong>Traduci e Pubblica</strong></li>
-      <li>aspetta ~1–2 min</li>
-      <li><strong>Allergeni</strong>: Carica (riprende i piatti nuovi) → spunta → <strong>Traduci e Pubblica</strong></li>
-      <li>(se hai toccato i dolci) <strong>Dolci</strong>: Carica → modifica → <strong>Traduci e Pubblica</strong></li>
-      <li>aspetta ~1–2 min</li>
-      <li><strong>Carta</strong>: Carica → <strong>Traduci e Pubblica</strong> un'ultima volta → ora EN/FR ha piatti, allergeni e dolci aggiornati</li>
-    </ol>
-    <p style="margin:.2rem 0;color:var(--stone)">Se hai cambiato solo prezzi/nomi e <em>non</em> gli allergeni: basta la sola Carta (passi 1–2), salta allergeni e la seconda pubblicazione.</p>
-
-    <h3 style="margin:1rem 0 .25rem;font-size:.86rem">🍷 Vini · 📷 Foto · 🎁 Buoni · 🔒 Prenotazioni</h3>
-    <ul style="margin:.2rem 0 .2rem 1.2rem;padding:0">
-      <li><strong>Carta vini</strong>: Menù Vini → scegli il PDF → <strong>Converti e Pubblica</strong> (si apre prima un'anteprima; ogni pagina del PDF diventa un'immagine fedele)</li>
-      <li><strong>Foto cucina / Foto sito</strong>: scegli le immagini → <strong>Pubblica foto</strong></li>
-      <li><strong>Buoni regalo</strong>: imposta i valori → <strong>Pubblica valori</strong></li>
-      <li><strong>Prenotazioni online</strong>: chiusure/aperture (giorno, servizio o singolo orario) → si applicano subito</li>
-    </ul>
-
-    <h3 style="margin:1rem 0 .25rem;font-size:.86rem">ℹ️ Note utili</h3>
-    <ul style="margin:.2rem 0 0 1.2rem;padding:0">
-      <li>Alla prima pubblicazione serve il <strong>token GitHub</strong> (lo stesso per tutto; il 🔑 lo cambia)</li>
-      <li>Dopo “Pubblica”, il sito si aggiorna in <strong>~90 secondi</strong> (se non vedi i cambiamenti, ricarica con hard refresh)</li>
-      <li><strong>Carica dal sito</strong> prende sempre la versione <em>attualmente pubblicata</em>: parti sempre da lì, così non sovrascrivi con dati vecchi</li>
-    </ul>
-  </div>
-</details>
 
 <div class="intro" id="intro">
   <h2>Come si usa</h2>
@@ -421,11 +351,71 @@
   </div>
 </div>
 
+<div id="reminder-section" style="max-width:700px;margin:1.5rem auto;padding:0 1rem;display:none;">
+  <div class="fs">
+    <div class="fs-head">Reminder prenotazioni — Setup messaggio &amp; tempistiche</div>
+    <div class="fs-body">
+      <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">
+        Il promemoria parte in automatico <strong>solo per le prenotazioni che confermi</strong> (bottone "✓ Conferma" nella mail che ricevi per ogni richiesta, oppure dalla lista qui sotto). Arriva al cliente via email, con l'anticipo e l'orario che imposti qui.
+      </p>
+
+      <div style="display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-bottom:1.2rem;padding-bottom:1.2rem;border-bottom:1px solid var(--rule);">
+        <span class="opt-lbl" style="margin:0;">Reminder attivo</span>
+        <input type="checkbox" id="rem-enabled" style="width:18px;height:18px;" />
+      </div>
+
+      <div style="display:flex;gap:1.4rem;flex-wrap:wrap;margin-bottom:1.2rem;">
+        <div>
+          <span class="opt-lbl">Giorni prima</span>
+          <input type="number" id="rem-days-before" min="1" max="14" style="width:80px;" />
+        </div>
+        <div>
+          <span class="opt-lbl">Ora di invio</span>
+          <input type="time" id="rem-send-time" style="width:auto;" />
+        </div>
+      </div>
+
+      <div style="margin-bottom:1rem;">
+        <span class="opt-lbl">Oggetto mail</span>
+        <input type="text" id="rem-subject" style="width:100%;" />
+      </div>
+
+      <div style="margin-bottom:.4rem;">
+        <span class="opt-lbl">Testo del messaggio</span>
+      </div>
+      <textarea id="rem-message" rows="8" style="width:100%;padding:.5rem;border:1px solid var(--rule);background:var(--cream);font-family:'Jost',sans-serif;font-size:.82rem;color:var(--ink);line-height:1.5;"></textarea>
+      <p style="font-size:.68rem;color:var(--stone);margin:.4rem 0 1.2rem;">Segnaposto disponibili: <code>{nome}</code> <code>{data}</code> <code>{orario}</code> <code>{persone}</code> — vengono sostituiti automaticamente per ogni cliente.</p>
+
+      <div style="display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;margin:0 0 1.4rem;padding:1rem 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);">
+        <span class="opt-lbl" style="margin:0;">Riepilogo giornaliero per te</span>
+        <input type="checkbox" id="rem-digest-enabled" style="width:18px;height:18px;" />
+        <input type="text" id="rem-digest-email" placeholder="email destinatario" style="width:auto;flex:1;min-width:220px;" />
+      </div>
+
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:1.6rem;">
+        <button class="btn btn-publish" onclick="saveReminderSettings()">💾 Salva impostazioni</button>
+        <span id="rem-settings-status" style="font-size:.75rem;color:var(--stone);"></span>
+      </div>
+
+      <div class="sub" style="margin-top:0;">Da confermare (prenotazioni future non ancora confermate né rifiutate)</div>
+      <div id="rem-pending-list" style="font-size:.85rem;margin-bottom:1.4rem;">&hellip;</div>
+
+      <div class="sub">Confermate (reminder programmato)</div>
+      <div id="rem-confirmed-list" style="font-size:.85rem;">&hellip;</div>
+
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
+        <button class="btn btn-load" onclick="chiudiSezioneReminder()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
+        <span id="rem-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast">✓ Scaricato!</div>
 
 <script src="admin-translations.js"></script>
-<script src="admin-templates-shared.js?v=2026.06.14.03"></script>
-<script src="admin-core.js?v=2026.06.14.06"></script>
+<script src="admin-templates-shared.js?v=2026.06.10.06"></script>
+<script src="admin-core.js?v=2026.07.04.01"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -722,6 +712,182 @@ function addPrenSlotOpening() {
 
 function removePrenSlotOpening(date, time) {
   _prenConfig({ action: 'remove_slot_opening', date: date, time: time }, 'Apertura orario rimossa.');
+}
+
+// ══ REMINDER PRENOTAZIONI (setup messaggio + tempistiche) ════
+// Stato letto da reminder-settings-status (GET pubblico); scrittura via
+// set-reminder-settings (POST, auth col token GitHub gh_token, stesso
+// meccanismo delle prenotazioni online). Il promemoria vero e proprio parte
+// da send-reservation-reminders, chiamata da un job pg_cron ogni 15 min
+// (vedi progetto-sito CLAUDE.md — ramo "reminder prenotazioni").
+var REM_STATUS_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/reminder-settings-status';
+var REM_CONFIG_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/set-reminder-settings';
+var remState = { settings: {}, pending: [], confirmed: [] };
+
+function apriSezioneReminder() {
+  document.getElementById('carica-menu').classList.remove('open');
+  document.getElementById('intro').style.display = 'none';
+  _pulisciViste();
+  document.getElementById('reminder-section').style.display = 'block';
+  loadReminderStatus();
+}
+
+function chiudiSezioneReminder() {
+  document.getElementById('reminder-section').style.display = 'none';
+  if (!document.getElementById('wrap').classList.contains('on'))
+    document.getElementById('intro').style.display = '';
+}
+
+function _remSetStatus(msg, isErr) {
+  var el = document.getElementById('rem-status');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
+}
+
+function _remSetSettingsStatus(msg, isErr) {
+  var el = document.getElementById('rem-settings-status');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
+}
+
+function _remFillForm(s) {
+  document.getElementById('rem-enabled').checked = s.enabled !== false;
+  document.getElementById('rem-days-before').value = s.days_before || 1;
+  document.getElementById('rem-send-time').value = s.send_time || '11:00';
+  document.getElementById('rem-subject').value = s.subject_template || '';
+  document.getElementById('rem-message').value = s.message_template || '';
+  document.getElementById('rem-digest-enabled').checked = s.digest_enabled !== false;
+  document.getElementById('rem-digest-email').value = s.digest_email || '';
+}
+
+function _remRenderPending(items) {
+  var list = document.getElementById('rem-pending-list');
+  if (!list) return;
+  if (!items.length) { list.innerHTML = '<span style="color:var(--stone);">Nessuna prenotazione futura in attesa.</span>'; return; }
+  list.innerHTML = '';
+  items.forEach(function (r) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:.4rem 0;border-bottom:1px dotted var(--rule);';
+    var txt = document.createElement('span');
+    txt.innerHTML = _prenFormatDate(r.data) + ' ore ' + r.orario + ' — <strong>' + r.nome + '</strong> (' + r.persone + 'p)';
+    var ok = document.createElement('button');
+    ok.className = 'btn btn-publish'; ok.style.cssText = 'padding:.25rem .8rem;font-size:.62rem;margin-left:auto;';
+    ok.textContent = '✓ Conferma';
+    ok.onclick = function () { confirmReminderRow(r.id); };
+    var no = document.createElement('button');
+    no.className = 'btn btn-load'; no.style.cssText = 'border:1px solid var(--rust);color:var(--rust);padding:.25rem .8rem;font-size:.62rem;';
+    no.textContent = '✕ Rifiuta';
+    no.onclick = function () { rejectReminderRow(r.id); };
+    row.appendChild(txt); row.appendChild(ok); row.appendChild(no);
+    list.appendChild(row);
+  });
+}
+
+function _remRenderConfirmed(items) {
+  var list = document.getElementById('rem-confirmed-list');
+  if (!list) return;
+  if (!items.length) { list.innerHTML = '<span style="color:var(--stone);">Nessuna prenotazione confermata nei prossimi giorni.</span>'; return; }
+  list.innerHTML = '';
+  items.forEach(function (r) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:.4rem 0;border-bottom:1px dotted var(--rule);';
+    var txt = document.createElement('span');
+    txt.innerHTML = _prenFormatDate(r.data) + ' ore ' + r.orario + ' — <strong>' + r.nome + '</strong> (' + r.persone + 'p)';
+    var st = document.createElement('span');
+    st.style.cssText = 'font-size:.68rem;color:' + (r.reminder_sent_at ? '#2d6a4f' : 'var(--stone)') + ';margin-left:auto;';
+    st.textContent = r.reminder_sent_at ? '✓ promemoria inviato' : 'in coda';
+    row.appendChild(txt); row.appendChild(st);
+    list.appendChild(row);
+  });
+}
+
+function renderReminderUI() {
+  _remFillForm(remState.settings || {});
+  _remRenderPending(remState.pending || []);
+  _remRenderConfirmed(remState.confirmed || []);
+}
+
+function loadReminderStatus() {
+  _remSetStatus('Caricamento…');
+  fetch(REM_STATUS_URL, { cache: 'no-store' })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      remState.settings = (d && d.settings) || {};
+      remState.pending = (d && d.pending) || [];
+      remState.confirmed = (d && d.confirmed) || [];
+      renderReminderUI();
+      _remSetStatus('');
+    })
+    .catch(function () { _remSetStatus('Errore nel caricamento dello stato.', true); });
+}
+
+function _remFetch(payload) {
+  var token = _prenGhToken();
+  if (!token) return Promise.reject(new Error('no-token'));
+  payload.github_token = token;
+  return fetch(REM_CONFIG_URL, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+  }).then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); });
+}
+
+function saveReminderSettings() {
+  var payload = {
+    action: 'update_settings',
+    enabled: document.getElementById('rem-enabled').checked,
+    days_before: parseInt(document.getElementById('rem-days-before').value, 10) || 1,
+    send_time: document.getElementById('rem-send-time').value || '11:00',
+    subject_template: document.getElementById('rem-subject').value,
+    message_template: document.getElementById('rem-message').value,
+    digest_enabled: document.getElementById('rem-digest-enabled').checked,
+    digest_email: document.getElementById('rem-digest-email').value,
+  };
+  _remSetSettingsStatus('Salvataggio…');
+  _remFetch(payload)
+    .then(function (res) {
+      if (res.status === 200 && res.body && res.body.ok) {
+        remState.settings = payload;
+        _remSetSettingsStatus('Impostazioni salvate.');
+      } else if (res.status === 401) {
+        _remSetSettingsStatus('Token GitHub non valido o senza permessi.', true);
+      } else {
+        _remSetSettingsStatus((res.body && res.body.error) || 'Errore.', true);
+      }
+    })
+    .catch(function (e) {
+      if (e && e.message === 'no-token') _remSetSettingsStatus('Operazione annullata: serve il token GitHub.', true);
+      else _remSetSettingsStatus('Errore di connessione.', true);
+    });
+}
+
+function confirmReminderRow(id) {
+  _remSetStatus('Salvataggio…');
+  _remFetch({ action: 'confirm_reservation', id: id })
+    .then(function (res) {
+      if (res.status === 200 && res.body && res.body.ok) { _remSetStatus('Prenotazione confermata.'); loadReminderStatus(); }
+      else if (res.status === 401) _remSetStatus('Token GitHub non valido o senza permessi.', true);
+      else _remSetStatus((res.body && res.body.error) || 'Errore.', true);
+    })
+    .catch(function (e) {
+      if (e && e.message === 'no-token') _remSetStatus('Operazione annullata: serve il token GitHub.', true);
+      else _remSetStatus('Errore di connessione.', true);
+    });
+}
+
+function rejectReminderRow(id) {
+  if (!window.confirm('Segnare questa prenotazione come rifiutata/annullata? Niente promemoria per lei.')) return;
+  _remSetStatus('Salvataggio…');
+  _remFetch({ action: 'reject_reservation', id: id })
+    .then(function (res) {
+      if (res.status === 200 && res.body && res.body.ok) { _remSetStatus('Prenotazione segnata come rifiutata.'); loadReminderStatus(); }
+      else if (res.status === 401) _remSetStatus('Token GitHub non valido o senza permessi.', true);
+      else _remSetStatus((res.body && res.body.error) || 'Errore.', true);
+    })
+    .catch(function (e) {
+      if (e && e.message === 'no-token') _remSetStatus('Operazione annullata: serve il token GitHub.', true);
+      else _remSetStatus('Errore di connessione.', true);
+    });
 }
 
 // ══ FOTO CUCINA ══════════════════════════════════════════
@@ -1153,7 +1319,7 @@ async function _eseguiPubblicaFotoSito(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.06.14.08</div>
+<div style="text-align:center;padding:6px 0;font-family:'Jost',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;">v 2026.06.14.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

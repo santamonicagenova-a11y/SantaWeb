@@ -1,9 +1,5 @@
 // Core functions per menu-admin Santamonica
-// v 2026.06.14.06 — Barra preview (carta + dolci): accanto a ogni controllo dimensione/spaziatura ora c'è il VALORE corrente (caratteri %, interlinea %, spazio %, posizione mm). Aggiunti span #szv-fs/#szv-lh/#szv-gap/#szv-shift in _SIZE_BTNS; aggiornati live da _szApply (in CARTA_TPL_A v 2026.06.14.03 e menu-dolci.html v 2026.06.14.02).
-// v 2026.06.14.05 — FIX traduzioni pagina ALLERGENI EN/FR (costruisciAllergeniPerCarta): (1) titoli sezione — la pagina allergeni salva il titolo VISIBILE (titolo_display, es. "Antipasti") ma il dizionario .sezioni è per titolo CANONICO (es. "Sfiziosi"→Starters): aggiunta mappa display→canonico da dati.sezioni + trSez ora prova canonico, display, poi .piatti. (2) nomi DOLCI — i nomi brevi (es. "Gelato porcino") stanno solo in TRADUZIONI_DOLCI, non in .piatti: nuova trNomeDolci con fallback su TRADUZIONI_DOLCI[lang].piatti. Si vede dopo Traduci e Pubblica della carta.
-// v 2026.06.14.04 — FIX preview lingue dolci: la preview EN/FR dei dolci apriva menu-dolci-en/fr.html (non più esistenti dal 22/5: i dolci sono accorpati nella carta EN/FR) → 404 → fallback alla home. Ora la preview lingua punta sempre a menu-<lang>.html (carta tradotta, coi dolci in fondo), sia da modalità carta sia da modalità dolci.
-// v 2026.06.14.03 — "✔ Fissa come default" ESTESO ai DOLCI: pulsante aggiunto anche a _dolciCtrlBar() (barra preview dolci + menu-dolci-it.html); _szSave() definita in menu-dolci.html v 2026.06.14.01. salvaImpostazioniStampa() è già generica (scrive dati.fontScale/lineScale/gapScale/shift, vale sia per carta sia per dolci).
-// v 2026.06.14.02 — Carta: pulsante "✔ Fissa come default" nella barra della PREVIEW. Dopo aver regolato caratteri/interlinea/spazio/posizione con i pulsanti, lo si preme per salvare i valori correnti come default: la preview chiama window.opener.salvaImpostazioniStampa(fs,lh,gap,shift) (nuova funzione qui) che scrive dati.fontScale/lineScale/gapScale/shift; round-trippano in leggi() → JSON pubblicato → renderCarta. Diventano permanenti dopo Pubblica. Pulsante aggiunto alla CTRL_BAR carta (costruisciOutput); _szSave() definita in CARTA_TPL_A (admin-templates-shared.js v 2026.06.14.02).
+// v 2026.07.04.01 — Aggiunta 'reminder-section' a _pulisciViste() (nuovo pannello "Reminder prenotazioni" in menu-admin.html: setup messaggio+tempistiche del promemoria automatico ai clienti + lista prenotazioni da confermare/confermate). Nessun'altra modifica a questo file: la logica del pannello è tutta inline in menu-admin.html, come il pannello "Prenotazioni online".
 // v 2026.06.14.01 — Carta: pulsante "+ Aggiungi piatto" in fondo a OGNI sezione (costruisci()) → funzione aggiungiPiatto(si) che cattura il form (leggi(true)), accoda un piatto vuoto a dati.sezioni[si].piatti, ri-renderizza e mette il focus sul nuovo nome. leggi() ora accetta un flag keepEmpty: di default scarta i piatti senza nome (le righe vuote aggiunte e non valorizzate NON finiscono nel menu pubblicato/IT/EN/FR/allergeni, tutti passano da leggi()); aggiungiPiatto usa leggi(true) per non perdere le righe vuote durante l'editing.
 // v 2026.06.10.13 — Pannello "Buoni regalo": 3 campi per i valori dei buoni liberi → pubblica voucher-config.json su GitHub (riusa pubblicaFile + flusso token). Funzioni caricaVoucherBuoni / pubblicaVoucherBuoni / _pubblicaVoucherConfig + hook _pendingVoucherPublish in confermaPubblica. regala.html v2026.06.10.04 legge questi valori a runtime.
 // v 2026.06.10.12 — Documento generico, "Scarica HTML": il file salvato ora NON contiene più la toolbar (pulsanti Stampa/Scarica/allineamento/dimensione) né gli script di controllo — si clona il DOM, si rimuovono .doc-toolbar e tutti gli <script>, restano documento + stile + stato corrente (classi/inline). Come il file pubblico dei dolci.
@@ -161,7 +157,7 @@ function chk(id, v) {
 // Va chiamata a ogni caricamento (carta, dolci, allergeni, vini, foto, documento generico,
 // prenotazioni) così la pagina non trascina la vista precedente in fondo.
 function _pulisciViste() {
-  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section','buoni-section'].forEach(function(id){
+  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section','buoni-section','reminder-section'].forEach(function(id){
     var e = document.getElementById(id); if (e) e.style.display = 'none';
   });
   var w = document.getElementById('wrap');
@@ -425,27 +421,11 @@ function costruisciOutput() {
       + '  <button class="ctrl-btn" onclick="window.print()">\u26a1 Stampa</button>\n'
       + '  <div class="ctrl-sep"></div>\n'
       + _SIZE_BTNS
-      + '  <div class="ctrl-sep"></div>\n'
-      + '  <button class="ctrl-btn" onclick="_szSave()" title="Fissa le dimensioni e spaziature correnti come default del menù">✔ Fissa come default</button>\n'
       + '</div>\n';
     html = html.replace('<body>\n', '<body>\n' + CTRL_BAR);
     return html;
   }
   return tplBefore + blocco + tplAfter;
-}
-
-// Fissa come default le impostazioni di stampa correnti (caratteri/interlinea/spazio/posizione).
-// Chiamata DALLA PREVIEW (pulsante "Fissa come default") via window.opener: i valori live _sz
-// della preview vengono scritti in dati.* → round-trippano in leggi() → finiscono nel JSON
-// pubblicato (MENU.fontScale/lineScale/gapScale/shift), che renderCarta legge come default.
-// NB: diventano permanenti solo dopo Pubblica (altrimenti restano nei dati di sessione).
-function salvaImpostazioniStampa(fs, lh, gap, shift) {
-  if (!dati) { alert('Nessun menù caricato nel pannello.'); return; }
-  if (fs    != null) dati.fontScale = +fs;
-  if (lh    != null) dati.lineScale = +lh;
-  if (gap   != null) dati.gapScale  = +gap;
-  if (shift != null) dati.shift     = +shift;
-  toast('✓ Impostazioni fissate come default — ora premi Pubblica per renderle permanenti.');
 }
 
 function salva() { apriPreview(); }
@@ -466,21 +446,15 @@ var _qrBase64 = null;   // base64 del nuovo QR selezionato (separato dal MENU)
 
 // Pulsanti dimensione/spaziatura per la barra della preview (carta + dolci).
 // Chiamano le funzioni _sz* definite nello <script> della pagina (CARTA_TPL_A / menu-dolci.html).
-// Stile dei riquadri che mostrano il valore corrente di ogni controllo (aggiornati da _szApply).
-var _SZV = ' style="font-family:Jost,sans-serif;font-size:.62rem;color:var(--stone);min-width:3.1em;display:inline-block;text-align:center;letter-spacing:.03em"';
 var _SIZE_BTNS =
     '  <button class="ctrl-btn" onclick="_szF(0.03)" title="Caratteri piu grandi">A+</button>\n'
   + '  <button class="ctrl-btn" onclick="_szF(-0.03)" title="Caratteri piu piccoli">A−</button>\n'
-  + '  <span id="szv-fs"'+_SZV+' title="Dimensione caratteri">112%</span>\n'
   + '  <button class="ctrl-btn" onclick="_szL(0.05)" title="Interlinea +">↕+</button>\n'
   + '  <button class="ctrl-btn" onclick="_szL(-0.05)" title="Interlinea −">↕−</button>\n'
-  + '  <span id="szv-lh"'+_SZV+' title="Interlinea">100%</span>\n'
   + '  <button class="ctrl-btn" onclick="_szG(0.05)" title="Spazio +">¶+</button>\n'
   + '  <button class="ctrl-btn" onclick="_szG(-0.05)" title="Spazio −">¶−</button>\n'
-  + '  <span id="szv-gap"'+_SZV+' title="Spazio tra i piatti">100%</span>\n'
   + '  <button class="ctrl-btn" onclick="_szS(2)" title="Sposta giu">⬇</button>\n'
   + '  <button class="ctrl-btn" onclick="_szS(-2)" title="Sposta su">⬆</button>\n'
-  + '  <span id="szv-shift"'+_SZV+' title="Posizione sul foglio">0mm</span>\n'
   + '  <button class="ctrl-btn" onclick="_szR()" title="Ripristina dimensioni">↺</button>\n';
 
 // Barra admin per i dolci (Stampa + pulsanti dimensione). Va in menu-dolci-it.html e nella preview.
@@ -489,8 +463,6 @@ function _dolciCtrlBar() {
     + '  <button class="ctrl-btn" onclick="window.print()">⚡ Stampa</button>\n'
     + '  <div class="ctrl-sep"></div>\n'
     + _SIZE_BTNS
-    + '  <div class="ctrl-sep"></div>\n'
-    + '  <button class="ctrl-btn" onclick="_szSave()" title="Fissa le dimensioni e spaziature correnti come default del menù">✔ Fissa come default</button>\n'
     + '</div>\n';
 }
 
@@ -509,13 +481,9 @@ function apriPreview(lang) {
     var blob = new Blob([previewHtml], { type: 'text/html;charset=utf-8' });
     window.open(URL.createObjectURL(blob), '_blank').focus();
   } else {
-    // Lingue: apri direttamente da GitHub Pages.
-    // I dolci EN/FR NON hanno un file proprio: dal 22/5 sono accorpati nella CARTA tradotta
-    // (menu-en.html / menu-fr.html), e filesDolci non genera più menu-dolci-en/fr.html.
-    // Quindi sia per la carta sia per i dolci la preview lingua punta a menu-<lang>.html
-    // (i dolci tradotti sono in fondo alla pagina). Prima si apriva menu-dolci-<lang>.html
-    // → 404 → fallback Cloudflare alla home.
-    var base = BASE_FETCH_URL + '/menu-' + lang + '.html';
+    // Lingue: apri direttamente da GitHub Pages
+    var prefix = tipoMenuCorrente === 'dolci' ? 'menu-dolci-' : 'menu-';
+    var base = BASE_FETCH_URL + '/' + prefix + lang + '.html';
     window.open(base + '?v=' + Date.now(), '_blank').focus();
   }
 }
@@ -1056,17 +1024,8 @@ function costruisciAllergeniPerCarta(lang) {
   if (!T) return null;
   var dynPiatti = (TRANSLATIONS[lang] && TRANSLATIONS[lang].piatti) || {};
   var dynSez    = (TRANSLATIONS[lang] && TRANSLATIONS[lang].sezioni) || {};
-  var statDolci = (typeof TRADUZIONI_DOLCI !== 'undefined' && TRADUZIONI_DOLCI[lang] && TRADUZIONI_DOLCI[lang].piatti) || {};
-  // La pagina allergeni salva il titolo VISIBILE della sezione (titolo_display, es. "Antipasti"),
-  // ma il dizionario è per titolo CANONICO (es. "Sfiziosi"→"Starters"). Mappo display→canonico
-  // dalle sezioni della carta caricata, così la sezione si traduce come nella carta principale.
-  var dispToCanon = {};
-  if (dati && dati.sezioni) dati.sezioni.forEach(function(s){ if (s) dispToCanon[(s.titolo_display || s.titolo)] = s.titolo; });
   function trNome(n) { var c = String(n).replace(/<[^>]+>/g, ''); return dynPiatti[c] || dynPiatti[n] || c; }
-  // Nomi DOLCI nella pagina allergeni: i nomi brevi (es. "Gelato porcino") stanno nel dizionario
-  // statico dei dolci (TRADUZIONI_DOLCI), non in .piatti → aggiungo quel fallback.
-  function trNomeDolci(n) { var c = String(n).replace(/<[^>]+>/g, ''); return dynPiatti[c] || dynPiatti[n] || statDolci[c] || statDolci[n] || c; }
-  function trSez(t)  { var k = dispToCanon[t] || t; return dynSez[k] || dynSez[t] || dynPiatti[k] || dynPiatti[t] || t; }
+  function trSez(t)  { return dynSez[t] || t; }
   var sezioni = [];
   // 1) CARTA (da menu-allergeni.html)
   if (_allergeniCartaLive && _allergeniCartaLive.sezioni) {
@@ -1086,7 +1045,7 @@ function costruisciAllergeniPerCarta(lang) {
     sezioni.push({
       titolo_display: (typeof TRADUZIONI_DOLCI !== 'undefined' && TRADUZIONI_DOLCI[lang] && TRADUZIONI_DOLCI[lang].sezione) || T.dolciTitolo,
       piatti: dolciAll.map(function(p) {
-        return { nome: trNomeDolci(p.nome), allergeni: _normAllergeni(p.allergeni).map(function(a){ return _trAllergene(a, lang); }) };
+        return { nome: trNome(p.nome), allergeni: _normAllergeni(p.allergeni).map(function(a){ return _trAllergene(a, lang); }) };
       })
     });
   }

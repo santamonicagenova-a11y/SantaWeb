@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<!-- v 2026.07.05.04 — nella vista giorno, nuovo badge "✓ Confermata" / "Da confermare" basato su confermata_at
+     (si valorizza quando clicchi "Conferma" nella mail M1bis) — il campo era già restituito da gestionale-day,
+     solo aggiunto il badge in renderDay. Non mostrato se la prenotazione è rifiutata/annullata (statusBadge prevale). -->
 <!-- v 2026.07.05.03 — Fase 1 (Calendario/Servizio), ispirata a TheFork Manager su richiesta Andrea 4/7/2026.
      Pagina admin standalone (separata da menu-admin.html, che resta per il contenuto del menù).
      Legge da gestionale-calendar-status (vista mese) + gestionale-day (vista giorno).
@@ -116,7 +119,7 @@
   <div class="status-line" id="day-status"></div>
 </div>
 
-<footer class="ver">v 2026.07.05.03</footer>
+<footer class="ver">v 2026.07.05.04</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';
@@ -258,6 +261,12 @@ function statusBadge(r) {
   return '';
 }
 
+function confermaBadge(r) {
+  if (r.status === 'rejected' || r.status === 'cancelled') return '';
+  if (r.confermata_at) return '<span class="badge badge-ok">✓ Confermata</span>';
+  return '<span class="badge badge-wait">Da confermare</span>';
+}
+
 function arrivoBadge(r) {
   if (r.arrivo_status === 'arrivato') return '<span class="badge badge-ok">✓ Arrivato</span>';
   if (r.arrivo_status === 'no_show') return '<span class="badge badge-no">✕ No-show</span>';
@@ -287,7 +296,7 @@ function renderDay(rows) {
           (r.occasione ? ' · ' + escapeHtml(r.occasione) : '') +
           (r.intolleranze ? ' · ' + escapeHtml(r.intolleranze) : '') + '</div>' +
       '</div>' +
-      '<div>' + statusBadge(r) + ' ' + arrivoBadge(r) + ' ' + garanziaBadge(r) + '</div>';
+      '<div>' + statusBadge(r) + ' ' + confermaBadge(r) + ' ' + arrivoBadge(r) + ' ' + garanziaBadge(r) + '</div>';
 
     if (canAct) {
       var actions = document.createElement('div'); actions.className = 'res-actions';

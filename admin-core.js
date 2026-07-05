@@ -157,7 +157,7 @@ function chk(id, v) {
 // Va chiamata a ogni caricamento (carta, dolci, allergeni, vini, foto, documento generico,
 // prenotazioni) così la pagina non trascina la vista precedente in fondo.
 function _pulisciViste() {
-  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section','buoni-section','reminder-section'].forEach(function(id){
+  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section','buoni-section','reminder-section','cauzioni-section'].forEach(function(id){
     var e = document.getElementById(id); if (e) e.style.display = 'none';
   });
   var w = document.getElementById('wrap');

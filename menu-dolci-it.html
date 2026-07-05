@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.07.05.01 — Ripristinata la barra preview: aggiunti CSS .ctrl-val (riquadri valore %/mm) + spans #szv-fs/#szv-lh/#szv-gap/#szv-shift + pulsante "✔ Fissa come default" nel ctrl-bar (mancavano, pur avendo gia' _szApply/_szSave funzionanti nello script). Vedi anche admin-core.js v 2026.07.05.03 (stessa aggiunta nel generatore _SIZE_BTNS, cosi' sopravvive alle prossime pubblicazioni). -->
 <!-- v 2026.06.14.01 — Aggiunta funzione live _szSave(): il pulsante "Fissa come default" della barra preview (iniettata da _dolciCtrlBar in admin-core.js) la chiama per passare i valori correnti _sz (fs/lh/gap/shift) all'admin via window.opener.salvaImpostazioniStampa(). Speculare alla carta. -->
 <!-- v 2026.06.10.06 — Funzioni live _sz* nello <script>: i pulsanti della barra (iniettata in preview da apriPreview) regolano caratteri/interlinea/spazio/posizione in tempo reale (--fs/--lh/--gap/--shift). _szApply all'init. -->
 <!-- v 2026.06.10.05 — Aggiunti interlinea (--lh), spazio tra i piatti (--gap) e posizione sul foglio (--shift, translateY su .degu/.pg-content) regolabili dai cursori in menu-admin; renderCarta legge lineScale/gapScale/shift. .note-ospite sempre escluso. -->
@@ -79,6 +80,13 @@
       width: 1px;
       height: 1.4rem;
       background: var(--rule);
+    }
+    .ctrl-val {
+      font-family: 'Jost', sans-serif;
+      font-size: .62rem;
+      color: var(--stone);
+      min-width: 2.6em;
+      text-align: center;
     }
 
     /* ══════════════════════════════════════
@@ -398,13 +406,19 @@
   <div class="ctrl-sep"></div>
   <button class="ctrl-btn" onclick="_szF(0.03)" title="Caratteri piu grandi">A+</button>
   <button class="ctrl-btn" onclick="_szF(-0.03)" title="Caratteri piu piccoli">A−</button>
+  <span class="ctrl-val" id="szv-fs">112%</span>
   <button class="ctrl-btn" onclick="_szL(0.05)" title="Interlinea +">↕+</button>
   <button class="ctrl-btn" onclick="_szL(-0.05)" title="Interlinea −">↕−</button>
+  <span class="ctrl-val" id="szv-lh">100%</span>
   <button class="ctrl-btn" onclick="_szG(0.05)" title="Spazio +">¶+</button>
   <button class="ctrl-btn" onclick="_szG(-0.05)" title="Spazio −">¶−</button>
+  <span class="ctrl-val" id="szv-gap">100%</span>
   <button class="ctrl-btn" onclick="_szS(2)" title="Sposta giu">⬇</button>
   <button class="ctrl-btn" onclick="_szS(-2)" title="Sposta su">⬆</button>
+  <span class="ctrl-val" id="szv-shift">0mm</span>
   <button class="ctrl-btn" onclick="_szR()" title="Ripristina dimensioni">↺</button>
+  <div class="ctrl-sep"></div>
+  <button class="ctrl-btn" onclick="_szSave()" title="Fissa i valori attuali come default">✔ Fissa come default</button>
 </div>
 
 

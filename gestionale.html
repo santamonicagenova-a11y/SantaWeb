@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!-- v 2026.07.05.06 — nuova barra di ricerca clienti (sotto il top-bar, sempre visibile): cerca per
+     nome, telefono o email tra TUTTE le prenotazioni (non solo il giorno), via nuova Edge Function
+     gestionale-search (GET pubblico, stesso pattern di gestionale-day). Risultati con stessi badge
+     della vista giorno + bottone "Vai al giorno" per aprire quella data. Nessuna modifica alle
+     viste mese/giorno esistenti. -->
 <!-- v 2026.07.05.05 — confermaBadge non dipende più da confermata_at: il bottone verde "Conferma" è stato
      tolto dalla mail M1bis (submit-reservation v25/v26 — send-reservation-reminders v2 manda il reminder
      automatico a tutte le prenotazioni non rifiutate/annullate, senza bisogno di conferma). Il badge
@@ -84,6 +89,12 @@
     .status-line { font-size:.75rem; color:var(--stone); margin-top:.5rem; }
     .status-line.err { color:var(--rust); }
     footer.ver { text-align:center; padding:6px 0; font-family:'Jost',sans-serif; font-size:.55rem; color:#888; letter-spacing:.1em; }
+
+    .search-bar { max-width:1100px; margin:1.2rem auto 0; padding:0 1rem; display:flex; gap:.6rem; flex-wrap:wrap; }
+    .search-bar input[type=text] { flex:1; min-width:220px; padding:.55rem .8rem; border:1px solid var(--rule); font-family:'Jost',sans-serif; font-size:.85rem; background:#fff; color:var(--ink); }
+    .search-bar input[type=text]:focus { outline:1px solid var(--rust); }
+    .res-date { min-width:96px; font-size:.85rem; }
+    .res-date .res-time { display:block; font-size:.68rem; color:var(--stone); margin-top:.1rem; }
   </style>
 </head>
 <body>
@@ -94,6 +105,12 @@
     <h1>Gestionale Prenotazioni</h1>
   </div>
   <a class="back" href="menu-admin.html">← Admin Menù</a>
+</div>
+
+<div class="search-bar">
+  <input type="text" id="search-input" placeholder="Cerca cliente per nome, telefono o email…" onkeydown="if(event.key==='Enter'){event.preventDefault();doSearch();}" />
+  <button class="btn" onclick="doSearch()">Cerca</button>
+  <button class="btn" id="search-clear-btn" onclick="clearSearch()" style="display:none;">✕ Chiudi ricerca</button>
 </div>
 
 <div class="toolbar">
@@ -123,12 +140,25 @@
   <div class="status-line" id="day-status"></div>
 </div>
 
-<footer class="ver">v 2026.07.05.05</footer>
+<div class="day-wrap" id="search-wrap">
+  <div class="day-hdr">
+    <button class="btn" onclick="clearSearch()">‹ Torna al mese</button>
+    <div>
+      <h2 id="search-title">Risultati ricerca</h2>
+      <div class="sub" id="search-sub"></div>
+    </div>
+  </div>
+  <div id="search-list"></div>
+  <div class="status-line" id="search-status"></div>
+</div>
+
+<footer class="ver">v 2026.07.05.06</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';
 var DAY_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-day';
 var ACTION_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/set-reminder-settings';
+var SEARCH_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-search';
 
 var today = new Date();
 var curYear = today.getFullYear();
@@ -321,6 +351,76 @@ function renderDay(rows) {
 
 function escapeHtml(s) {
   var d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML;
+}
+
+function fmtItDateShort(dateStr) {
+  var p = dateStr.split('-');
+  return parseInt(p[2], 10) + ' ' + MESI[parseInt(p[1], 10) - 1].slice(0, 3) + ' ' + p[0];
+}
+
+function _searchSetStatus(msg, isErr) {
+  var el = document.getElementById('search-status');
+  el.textContent = msg || '';
+  el.className = 'status-line' + (isErr ? ' err' : '');
+}
+
+function doSearch() {
+  var q = (document.getElementById('search-input').value || '').trim();
+  if (q.length < 2) { _searchSetStatus('Scrivi almeno 2 caratteri.', true); return; }
+
+  document.getElementById('cal-wrap').style.display = 'none';
+  document.getElementById('day-wrap').classList.remove('on');
+  document.querySelector('.toolbar').style.display = 'none';
+  document.getElementById('search-wrap').classList.add('on');
+  document.getElementById('search-clear-btn').style.display = '';
+  document.getElementById('search-title').textContent = 'Risultati per «' + q + '»';
+  _searchSetStatus('Ricerca…');
+
+  fetch(SEARCH_URL + '?q=' + encodeURIComponent(q), { cache: 'no-store' })
+    .then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); })
+    .then(function (res) {
+      if (res.status === 200) { renderSearch(res.body.reservations || []); _searchSetStatus(''); }
+      else _searchSetStatus((res.body && res.body.error) || 'Errore nella ricerca.', true);
+    })
+    .catch(function () { _searchSetStatus('Errore di connessione.', true); });
+}
+
+function clearSearch() {
+  document.getElementById('search-wrap').classList.remove('on');
+  document.getElementById('search-clear-btn').style.display = 'none';
+  document.getElementById('cal-wrap').style.display = '';
+  document.querySelector('.toolbar').style.display = '';
+  loadMonth();
+}
+
+function renderSearch(rows) {
+  var list = document.getElementById('search-list');
+  document.getElementById('search-sub').textContent = rows.length ? (rows.length + ' prenotazion' + (rows.length === 1 ? 'e' : 'i')) : '';
+  if (!rows.length) { list.innerHTML = '<div class="empty-msg">Nessun cliente trovato.</div>'; return; }
+  list.innerHTML = '';
+  rows.forEach(function (r) {
+    var row = document.createElement('div'); row.className = 'res-row';
+    row.innerHTML =
+      '<div class="res-date">' + fmtItDateShort(r.data) + '<span class="res-time">' + r.orario + '</span></div>' +
+      '<div class="res-info">' +
+        '<div class="nome">' + escapeHtml(r.nome) + ' · ' + r.persone + 'p</div>' +
+        '<div class="meta">' + (r.telefono ? '<a href="tel:' + escapeHtml(r.telefono) + '">' + escapeHtml(r.telefono) + '</a>' : '') +
+          (r.email ? ' · ' + escapeHtml(r.email) : '') +
+          (r.occasione ? ' · ' + escapeHtml(r.occasione) : '') + '</div>' +
+      '</div>' +
+      '<div>' + statusBadge(r) + ' ' + confermaBadge(r) + ' ' + arrivoBadge(r) + ' ' + garanziaBadge(r) + '</div>';
+    var goBtn = document.createElement('button');
+    goBtn.className = 'btn'; goBtn.textContent = 'Vai al giorno →'; goBtn.style.marginLeft = '.5rem';
+    goBtn.onclick = function () { goToSearchResultDay(r.data); };
+    row.appendChild(goBtn);
+    list.appendChild(row);
+  });
+}
+
+function goToSearchResultDay(dateStr) {
+  document.getElementById('search-wrap').classList.remove('on');
+  document.getElementById('search-clear-btn').style.display = 'none';
+  openDay(dateStr);
 }
 
 function _ghToken() {

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.07.05.11 — integrazione SafeTable, punto 2: nel pannello Cauzioni aggiunto "+ Genera nuovo link garanzia" (details collassato), chiama create-setup-intent (stessa Edge Function di SafeTable, header x-admin-secret) con short_id generato lato client, ristorante_nome/phone fissi (Ristorante Santamonica / 010 5533155). Risultato = link Stripe con Copia/Apri, poi ricarica lo storico. -->
 <!-- v 2026.07.05.10 — integrazione SafeTable, punto 1 (sola lettura): nuovo pannello "Cauzioni (storico)" (#cauzioni-section) che riusa la Edge Function cauzioni-admin (azione "list", header x-admin-secret = CAUZIONI_ADMIN_SECRET, stessa gia' in produzione per SafeTable). Chiave chiesta una tantum, salvata in localStorage con chiave propria (origine diversa da SafeTable, non condivisa). Nessuna azione di scrittura in questo primo passo (genera link/incassa penale rimandati). -->
 <!-- v 2026.07.05.09 — aggiunta favicon (mancava sempre stata: favicon.ico + favicon.svg + apple-touch-icon.png), stessi file già live sul sito pubblico. -->
 <!-- v 2026.07.05.08 — top-bar a griglia 3 colonne (1fr auto 1fr): i pulsanti Preview/Traduci e Pubblica/🔑 ora centrati nella barra, logo resta a sinistra (colonna vuota simmetrica a destra). -->
@@ -428,8 +429,50 @@
     <div class="fs-head">Cauzioni — Storico (SafeTable)</div>
     <div class="fs-body">
       <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">
-        Storico delle richieste di carta a garanzia, in sola lettura (stessi dati di SafeTable). La prima volta chiede la chiave amministratore — la stessa che usi in SafeTable.
+        Storico delle richieste di carta a garanzia (stessi dati di SafeTable). La prima volta chiede la chiave amministratore — la stessa che usi in SafeTable.
       </p>
+
+      <details id="cz-gen-details" style="margin-bottom:1.4rem;border:1px solid var(--rule);padding:.8rem 1rem;">
+        <summary style="cursor:pointer;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);">+ Genera nuovo link garanzia</summary>
+        <div style="margin-top:1rem;display:flex;flex-direction:column;gap:.7rem;">
+          <div>
+            <span class="opt-lbl">Nome cliente</span>
+            <input type="text" id="cz-gen-nome" style="width:100%;" />
+          </div>
+          <div style="display:flex;gap:1.2rem;flex-wrap:wrap;">
+            <label style="display:flex;align-items:center;gap:.3rem;font-size:.78rem;"><input type="radio" name="cz-gen-channel" value="phone" checked onchange="_czToggleChannel()" /> Telefono</label>
+            <label style="display:flex;align-items:center;gap:.3rem;font-size:.78rem;"><input type="radio" name="cz-gen-channel" value="email" onchange="_czToggleChannel()" /> Email</label>
+          </div>
+          <div id="cz-gen-phone-row" style="display:flex;gap:.5rem;">
+            <input type="text" id="cz-gen-cc" value="+39" style="width:60px;" />
+            <input type="text" id="cz-gen-phone" placeholder="numero cliente" style="flex:1;" />
+          </div>
+          <div id="cz-gen-email-row" style="display:none;">
+            <input type="text" id="cz-gen-email" placeholder="email cliente" style="width:100%;" />
+          </div>
+          <div>
+            <span class="opt-lbl">Data e ora prenotazione</span>
+            <input type="datetime-local" id="cz-gen-date" style="width:100%;" />
+          </div>
+          <div class="opt-row">
+            <div><span class="opt-lbl">Persone</span><input type="number" id="cz-gen-persone" min="1" value="2" /></div>
+            <div><span class="opt-lbl">Penale €/p</span><input type="number" id="cz-gen-penale" min="1" value="25" /></div>
+            <div><span class="opt-lbl">Ore disdetta</span><input type="number" id="cz-gen-ore" min="1" value="24" /></div>
+          </div>
+          <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
+            <button class="btn btn-publish" onclick="generaCauzioneLink()">✦ Genera link garanzia</button>
+            <span id="cz-gen-status" style="font-size:.75rem;color:var(--stone);"></span>
+          </div>
+          <div id="cz-gen-result" style="display:none;font-size:.82rem;background:var(--sand);padding:.7rem;word-break:break-all;">
+            <div id="cz-gen-link"></div>
+            <div style="display:flex;gap:.5rem;margin-top:.5rem;">
+              <button class="btn btn-load" style="border:1px solid var(--ink);color:var(--ink);" onclick="_czCopyLink()">⧉ Copia link</button>
+              <button class="btn btn-load" style="border:1px solid var(--ink);color:var(--ink);" onclick="_czOpenLink()">↗ Apri</button>
+            </div>
+          </div>
+        </div>
+      </details>
+
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
         <button class="btn btn-load" onclick="caricaCauzioni()" style="border:1px solid var(--ink);color:var(--ink)">↻ Aggiorna</button>
         <span id="cz-status" style="font-size:.75rem;color:var(--stone);"></span>
@@ -891,7 +934,11 @@ function saveReminderSettings() {
 // non e' condiviso tra i due domini). Solo lettura in questo primo passo:
 // nessuna azione (genera link / incassa penale) esposta da qui.
 var CAUZIONI_ADMIN_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/cauzioni-admin';
+var CAUZIONI_SETUP_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/create-setup-intent';
 var CZ_SECRET_KEY = 'menuadmin.cauzioni.secret.v1';
+var RISTORANTE_NOME = 'Ristorante Santamonica';
+var RISTORANTE_PHONE = '0105533155';
+var _czLastLink = '';
 
 function _czGetSecret() {
   var s = localStorage.getItem(CZ_SECRET_KEY);
@@ -1006,6 +1053,100 @@ function caricaCauzioni() {
     .catch(function (ex) {
       _czSetStatus('Impossibile caricare: ' + ex.message, true);
     });
+}
+
+function _czToggleChannel() {
+  var checked = document.querySelector('input[name="cz-gen-channel"]:checked');
+  var isPhone = !checked || checked.value === 'phone';
+  document.getElementById('cz-gen-phone-row').style.display = isPhone ? 'flex' : 'none';
+  document.getElementById('cz-gen-email-row').style.display = isPhone ? 'none' : 'block';
+}
+
+function _czShortId() {
+  var s = 'abcdefghjkmnpqrstuvwxyz23456789';
+  var out = '';
+  for (var i = 0; i < 8; i++) out += s[Math.floor(Math.random() * s.length)];
+  return out;
+}
+
+function _czGenSetStatus(msg, isErr) {
+  var el = document.getElementById('cz-gen-status');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
+}
+
+function generaCauzioneLink() {
+  var secret = _czGetSecret();
+  if (!secret) { _czGenSetStatus('Operazione annullata: serve la chiave amministratore.', true); return; }
+
+  var nome = document.getElementById('cz-gen-nome').value.trim();
+  var checked = document.querySelector('input[name="cz-gen-channel"]:checked');
+  var isPhone = !checked || checked.value === 'phone';
+  var telefono = '', email = '';
+  if (isPhone) {
+    var cc = document.getElementById('cz-gen-cc').value.trim().replace(/\s/g, '') || '+39';
+    var raw = document.getElementById('cz-gen-phone').value.trim().replace(/\s/g, '');
+    if (!raw) { _czGenSetStatus('Inserisci il numero del cliente.', true); return; }
+    telefono = (cc + raw).replace(/\D/g, '');
+  } else {
+    email = document.getElementById('cz-gen-email').value.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { _czGenSetStatus("Inserisci un'email valida.", true); return; }
+  }
+  var dateVal = document.getElementById('cz-gen-date').value;
+  if (!dateVal) { _czGenSetStatus('Inserisci data e ora della prenotazione.', true); return; }
+  var persone = +document.getElementById('cz-gen-persone').value || 2;
+  var penale = +document.getElementById('cz-gen-penale').value || 25;
+  var ore = +document.getElementById('cz-gen-ore').value || 24;
+
+  document.getElementById('cz-gen-result').style.display = 'none';
+  _czGenSetStatus('Creazione link…');
+  fetch(CAUZIONI_SETUP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-secret': secret },
+    body: JSON.stringify({
+      short_id: _czShortId(),
+      telefono: telefono || null,
+      email: email || null,
+      nome_cliente: nome || null,
+      data_prenotazione: dateVal,
+      persone: persone, penale: penale, ore_disdetta: ore,
+      ristorante_nome: RISTORANTE_NOME,
+      ristorante_phone: RISTORANTE_PHONE,
+    })
+  })
+    .then(function (r) {
+      if (r.status === 401) { localStorage.removeItem(CZ_SECRET_KEY); throw new Error('Chiave errata — riprova.'); }
+      return r.json().then(function (j) { return { status: r.status, body: j }; });
+    })
+    .then(function (res) {
+      if (!res.body || !res.body.url) throw new Error((res.body && res.body.error) || 'Errore sconosciuto');
+      _czLastLink = res.body.url;
+      document.getElementById('cz-gen-link').textContent = _czLastLink;
+      document.getElementById('cz-gen-result').style.display = 'block';
+      _czGenSetStatus(res.body.already_confirmed ? 'Già confermata: link esistente.' : 'Link generato.');
+      caricaCauzioni();
+    })
+    .catch(function (ex) {
+      _czGenSetStatus('Impossibile generare: ' + ex.message, true);
+    });
+}
+
+function _czCopyLink() {
+  if (!_czLastLink) return;
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(_czLastLink).then(function () { _czGenSetStatus('Link copiato.'); });
+    return;
+  }
+  var ta = document.createElement('textarea');
+  ta.value = _czLastLink; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); _czGenSetStatus('Link copiato.'); } catch (e) { _czGenSetStatus('Copia manuale: seleziona il testo sopra.', true); }
+  document.body.removeChild(ta);
+}
+
+function _czOpenLink() {
+  if (_czLastLink) window.open(_czLastLink, '_blank');
 }
 
 // ══ FOTO CUCINA ══════════════════════════════════════════

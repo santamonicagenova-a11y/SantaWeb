@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.07.05.13 — pulsanti quick-actions: tolte le iconcine emoji dalle 12 etichette, testo più grande e in stile header (.qa-btn ora font-weight 600, .72rem, uppercase, letter-spacing .06em — come .btn di Preview/Traduci e Pubblica). "Gestionale (Calendario/Servizio)" abbreviato a "Gestionale" (il testo esteso resta nel title-tag implicito del link gestionale.html). Nessuna modifica di funzione, solo etichetta+stile. -->
 <!-- v 2026.07.05.12 — reskin completo di menu-admin sul tema di SafeTable: sfondo scuro, font Inter, accento ambra, card arrotondate con ombre, verde per le azioni "pubblica". Riguarda SOLO la chrome dell'admin (top-bar, pulsanti, pannelli .fs, form, modal, toast). NON toccati i template pubblicati (admin-templates-shared.js, _VINI_TPL e il documento generico dentro admin-core.js), che restano nello stile Cormorant/crema del sito pubblico — sono pagine diverse, non l'interfaccia di menu-admin. Nuove variabili --surface (sfondo card/barra), --field (sfondo input, più chiaro della card), --green (azioni pubblica/salva), --radius/--radius-lg. Font Jost→Inter solo nella chrome (14 punti in questo file + 5 in admin-core.js, verificati uno a uno per non toccare i template). Colore verde hardcoded var(--green)→var(--green) in tutto il file (15 occorrenze, stesso ruolo semantico ovunque: successo/pubblicato). -->
 <!-- v 2026.07.05.11 — integrazione SafeTable, punto 2: nel pannello Cauzioni aggiunto "+ Genera nuovo link garanzia" (details collassato), chiama create-setup-intent (stessa Edge Function di SafeTable, header x-admin-secret) con short_id generato lato client, ristorante_nome/phone fissi (Ristorante Santamonica / 010 5533155). Risultato = link Stripe con Copia/Apri, poi ricarica lo storico. -->
 <!-- v 2026.07.05.10 — integrazione SafeTable, punto 1 (sola lettura): nuovo pannello "Cauzioni (storico)" (#cauzioni-section) che riusa la Edge Function cauzioni-admin (azione "list", header x-admin-secret = CAUZIONI_ADMIN_SECRET, stessa gia' in produzione per SafeTable). Chiave chiesta una tantum, salvata in localStorage con chiave propria (origine diversa da SafeTable, non condivisa). Nessuna azione di scrittura in questo primo passo (genera link/incassa penale rimandati). -->
@@ -72,7 +73,7 @@
     .preview-menu.open { display:block; }
     .btn-publish:hover { opacity:.9; }
     .quick-actions { max-width:900px; margin:1.2rem auto 0; padding:0 1rem; display:flex; flex-wrap:wrap; gap:.6rem; justify-content:center; }
-    .qa-btn { width:104px; height:104px; flex-shrink:0; border:1px solid var(--rule); border-radius:var(--radius-lg); background:var(--surface); font-family:'Inter',sans-serif; font-weight:500; font-size:.66rem; line-height:1.3; letter-spacing:.01em; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; text-align:center; padding:.5rem; box-shadow:0 1px 0 rgba(255,255,255,.03) inset; transition:background .15s,border-color .15s; }
+    .qa-btn { width:104px; height:104px; flex-shrink:0; border:1px solid var(--rule); border-radius:var(--radius-lg); background:var(--surface); font-family:'Inter',sans-serif; font-weight:600; font-size:.7rem; line-height:1.25; letter-spacing:.03em; text-transform:uppercase; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; text-align:center; padding:.45rem; overflow-wrap:break-word; box-shadow:0 1px 0 rgba(255,255,255,.03) inset; transition:background .15s,border-color .15s; }
     .qa-btn:hover { background:var(--sand); border-color:var(--rust); }
     .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:200; align-items:center; justify-content:center; }
     .modal-overlay.on { display:flex; }
@@ -139,18 +140,18 @@
 </div>
 
 <div class="quick-actions" id="carica-menu">
-  <button class="qa-btn" onclick="caricaDalSito('carta')">☞ Menù alla carta</button>
-  <button class="qa-btn" onclick="caricaDalSito('dolci')">☞ Menù dolci</button>
-  <button class="qa-btn" onclick="caricaDalSito('allergeni')">☞ Allergeni carta</button>
-  <button class="qa-btn" onclick="apriGestoreFoto()">📷 Foto cucina</button>
-  <button class="qa-btn" onclick="apriGestoreFotoSito()">🏛️ Foto sito</button>
-  <button class="qa-btn" onclick="apriSezioneVini()">🍷 Menù Vini</button>
-  <button class="qa-btn" onclick="apriSezioneDocGenerico()">📄 Documento generico</button>
-  <button class="qa-btn" onclick="apriSezionePrenotazioni()">🔒 Prenotazioni online</button>
-  <button class="qa-btn" onclick="apriSezioneBuoni()">🎁 Buoni regalo</button>
-  <button class="qa-btn" onclick="apriSezioneReminder()">✉ Reminder prenotazioni</button>
-  <button class="qa-btn" onclick="location.href='gestionale.html'">📅 Gestionale (Calendario/Servizio)</button>
-  <button class="qa-btn" onclick="apriSezioneCauzioni()">🔐 Cauzioni (storico)</button>
+  <button class="qa-btn" onclick="caricaDalSito('carta')">Menù alla carta</button>
+  <button class="qa-btn" onclick="caricaDalSito('dolci')">Menù dolci</button>
+  <button class="qa-btn" onclick="caricaDalSito('allergeni')">Allergeni carta</button>
+  <button class="qa-btn" onclick="apriGestoreFoto()">Foto cucina</button>
+  <button class="qa-btn" onclick="apriGestoreFotoSito()">Foto sito</button>
+  <button class="qa-btn" onclick="apriSezioneVini()">Menù Vini</button>
+  <button class="qa-btn" onclick="apriSezioneDocGenerico()">Documento generico</button>
+  <button class="qa-btn" onclick="apriSezionePrenotazioni()">Prenotazioni online</button>
+  <button class="qa-btn" onclick="apriSezioneBuoni()">Buoni regalo</button>
+  <button class="qa-btn" onclick="apriSezioneReminder()">Reminder prenotazioni</button>
+  <button class="qa-btn" onclick="location.href='gestionale.html'">Gestionale</button>
+  <button class="qa-btn" onclick="apriSezioneCauzioni()">Cauzioni (storico)</button>
 </div>
 
 <div class="intro" id="intro">
@@ -504,7 +505,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.06.10.06"></script>
-<script src="admin-core.js?v=2026.07.05.01"></script>
+<script src="admin-core.js?v=2026.07.05.02"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -1592,7 +1593,7 @@ async function _eseguiPubblicaFotoSito(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.05.05</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.05.13</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

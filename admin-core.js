@@ -1,4 +1,15 @@
 // Core functions per menu-admin Santamonica
+// v 2026.07.05.02 — Fix caricaAllergeniDalSito(): il ramo di fallback (menu carta non ancora
+//   caricato in sessione) rifetchava menu-it.html e chiamava analizza() dentro un try/catch
+//   VUOTO — se il fetch/parse falliva (rete, HTML cambiato, ecc.) l'errore spariva nel nulla e
+//   veniva comunque mostrato il toast "✓ Allergeni caricati", nascondendo che la sincronizzazione
+//   coi piatti della carta NON era avvenuta (il pannello si popolava solo con l'ALLERGENI_DATA
+//   già salvato in precedenza, potenzialmente vuoto/stantio se il file live non aveva ancora dati).
+//   Ora fetch fallito (HTTP non-ok) e parse fallito mostrano un toast di avviso esplicito
+//   ("⚠ ... non si è sincronizzato" / "menù non aggiornato") invece di un falso successo.
+//   Verificato dal vivo (santamonicagenova.it/menu-admin): con ALLERGENI_DATA popolato il
+//   pannello si è sempre renderizzato correttamente in entrambi i rami; questo fix indurisce
+//   il caso di errore silenzioso che poteva far apparire il pannello "vuoto" senza spiegazione.
 // v 2026.07.04.01 — Aggiunta 'reminder-section' a _pulisciViste() (nuovo pannello "Reminder prenotazioni" in menu-admin.html: setup messaggio+tempistiche del promemoria automatico ai clienti + lista prenotazioni da confermare/confermate). Nessun'altra modifica a questo file: la logica del pannello è tutta inline in menu-admin.html, come il pannello "Prenotazioni online".
 // v 2026.06.14.01 — Carta: pulsante "+ Aggiungi piatto" in fondo a OGNI sezione (costruisci()) → funzione aggiungiPiatto(si) che cattura il form (leggi(true)), accoda un piatto vuoto a dati.sezioni[si].piatti, ri-renderizza e mette il focus sul nuovo nome. leggi() ora accetta un flag keepEmpty: di default scarta i piatti senza nome (le righe vuote aggiunte e non valorizzate NON finiscono nel menu pubblicato/IT/EN/FR/allergeni, tutti passano da leggi()); aggiungiPiatto usa leggi(true) per non perdere le righe vuote durante l'editing.
 // v 2026.06.10.13 — Pannello "Buoni regalo": 3 campi per i valori dei buoni liberi → pubblica voucher-config.json su GitHub (riusa pubblicaFile + flusso token). Funzioni caricaVoucherBuoni / pubblicaVoucherBuoni / _pubblicaVoucherConfig + hook _pendingVoucherPublish in confermaPubblica. regala.html v2026.06.10.04 legge questi valori a runtime.
@@ -1309,19 +1320,28 @@ function caricaAllergeniDalSito() {
         toast('\u2713 Allergeni caricati');
       } else {
         fetch(MENU_URL + '?nocache=' + Date.now(), { cache: 'no-store' })
-          .then(function(r2) { return r2.text(); })
+          .then(function(r2) {
+            if (!r2.ok) throw new Error('HTTP ' + r2.status);
+            return r2.text();
+          })
           .then(function(src2) {
             try {
               analizza(src2);
               datiMenuPerAllergeni = dati;
-            } catch(e) {}
-            costruisciFormAllergeni();
-            toast('\u2713 Allergeni caricati');
+              costruisciFormAllergeni();
+              toast('\u2713 Allergeni caricati');
+            } catch(e) {
+              // Sync dal menu fallita (parse KO): mostra comunque il form ma
+              // avvisa chiaramente \u2014 prima veniva nascosto da un catch silenzioso
+              // e appariva un falso "successo" anche a sincronizzazione mancata.
+              costruisciFormAllergeni();
+              toast('\u26a0 Allergeni caricati, ma il men\u00f9 carta non si \u00e8 sincronizzato (' + e.message + ')');
+            }
           })
-          .catch(function() {
+          .catch(function(e) {
             // fallback: usa solo datiAllergeni senza aggiornare i piatti
             costruisciFormAllergeni();
-            toast('\u2713 Allergeni caricati (menu non aggiornato)');
+            toast('\u26a0 Allergeni caricati (men\u00f9 non aggiornato: ' + e.message + ')');
           });
       }
     })

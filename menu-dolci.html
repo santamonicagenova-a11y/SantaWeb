@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.07.05.01 — Aggiunto CSS .ctrl-val (riquadri valore %/mm nella barra preview), mancante da questo file: senza, i riquadri iniettati da _szApply (gia' presente) restavano senza stile. Vedi anche admin-core.js v 2026.07.05.03 (bottone Fissa come default + spans in _SIZE_BTNS) e admin-templates-shared.js v 2026.07.05.01 (stessa CSS per la carta). -->
 <!-- v 2026.06.14.02 — _szApply aggiorna anche i riquadri valore della barra preview (#szv-fs/#szv-lh/#szv-gap/#szv-shift) → valori visibili in tempo reale mentre si regola. Span definiti in _SIZE_BTNS (admin-core.js). -->
 <!-- v 2026.06.14.01 — Aggiunta funzione live _szSave(): il pulsante "Fissa come default" della barra preview (iniettata da _dolciCtrlBar in admin-core.js) la chiama per passare i valori correnti _sz (fs/lh/gap/shift) all'admin via window.opener.salvaImpostazioniStampa(). Speculare alla carta. -->
 <!-- v 2026.06.10.06 — Funzioni live _sz* nello <script>: i pulsanti della barra (iniettata in preview da apriPreview) regolano caratteri/interlinea/spazio/posizione in tempo reale (--fs/--lh/--gap/--shift). _szApply all'init. -->
@@ -80,6 +81,13 @@
       width: 1px;
       height: 1.4rem;
       background: var(--rule);
+    }
+    .ctrl-val {
+      font-family: 'Jost', sans-serif;
+      font-size: .62rem;
+      color: var(--stone);
+      min-width: 2.6em;
+      text-align: center;
     }
 
     /* ══════════════════════════════════════

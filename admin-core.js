@@ -231,7 +231,7 @@ function costruisci() {
     var headLabel = el('span','', 'Sezione: ');
     headLabel.style.cssText = 'font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);margin-right:.5rem';
     var headInp = inp('text','sez-display-'+si, sez.titolo_display || sez.titolo);
-    headInp.style.cssText = 'width:220px;display:inline-block;font-size:.75rem;padding:.2rem .4rem;background:#fff';
+    headInp.style.cssText = 'width:220px;display:inline-block;font-size:.75rem;padding:.2rem .4rem;border:1px solid var(--rule);border-radius:var(--radius);background:var(--field);color:var(--ink)';
     head.appendChild(headLabel); head.appendChild(headInp);
     fs.appendChild(head);
     var body = el('div','fs-body');
@@ -254,7 +254,7 @@ function costruisci() {
     var addWrap = el('div'); addWrap.style.cssText = 'padding-top:.6rem';
     var addBtn = el('button','','+ Aggiungi piatto');
     addBtn.type = 'button';
-    addBtn.style.cssText = 'font-family:Jost,sans-serif;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:1px dashed var(--rule);padding:.4rem .9rem;cursor:pointer;color:var(--stone)';
+    addBtn.style.cssText = 'font-family:Inter,sans-serif;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:1px dashed var(--rule);border-radius:var(--radius);padding:.4rem .9rem;cursor:pointer;color:var(--stone)';
     addBtn.onclick = (function(idx){ return function(e){ e.preventDefault(); aggiungiPiatto(idx); }; })(si);
     addWrap.appendChild(addBtn);
     body.appendChild(addWrap);
@@ -275,7 +275,7 @@ function costruisci() {
     qrRow.appendChild(qrPrev);
     // Input file
     var qrFile = document.createElement('input'); qrFile.type='file'; qrFile.id='orario-qr-file'; qrFile.accept='image/*';
-    qrFile.style.cssText='font-family:Jost,sans-serif;font-size:.78rem;cursor:pointer';
+    qrFile.style.cssText='font-family:Inter,sans-serif;font-size:.78rem;cursor:pointer';
     qrFile.onchange = function() {
       var file = this.files[0]; if (!file) return;
       var reader = new FileReader();
@@ -289,7 +289,7 @@ function costruisci() {
     qrRow.appendChild(qrFile);
     // Pulsante reset
     var qrReset = document.createElement('button'); qrReset.textContent='✕ Ripristina QR predefinito';
-    qrReset.style.cssText='margin-top:.4rem;display:block;font-family:Jost,sans-serif;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:1px solid var(--rule);padding:.3rem .7rem;cursor:pointer;color:var(--stone)';
+    qrReset.style.cssText='margin-top:.4rem;display:block;font-family:Inter,sans-serif;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;background:transparent;border:1px solid var(--rule);border-radius:var(--radius);padding:.3rem .7rem;cursor:pointer;color:var(--stone)';
     qrReset.onclick = function(e) { e.preventDefault(); var f=document.getElementById('orario-qr-file'); if(f) f.value=''; _qrBase64=null; var p=document.getElementById('qr-preview'); if(p){p.src=BASE_FETCH_URL+'/orario-qr.png?t='+Date.now();p.style.display='block';} };
     qrRow.appendChild(qrReset);
     bdo.appendChild(qrRow); fso.appendChild(bdo); wrap.appendChild(fso);
@@ -1427,7 +1427,7 @@ function costruisciFormAllergeni() {
       TUTTI_ALLERGENI.forEach(function(all) {
         var id = 'all_' + si + '_' + pi + '_' + all.replace(/\s+/g, '_');
         var label = document.createElement('label');
-        label.style.cssText = 'display:flex;align-items:center;gap:.25rem;font-family:Jost,sans-serif;font-size:.68rem;letter-spacing:.04em;cursor:pointer;padding:.2rem .4rem;border:1px solid var(--rule);border-radius:2px;transition:background .15s';
+        label.style.cssText = 'display:flex;align-items:center;gap:.25rem;font-family:Inter,sans-serif;font-size:.68rem;letter-spacing:.04em;cursor:pointer;padding:.2rem .4rem;border:1px solid var(--rule);border-radius:var(--radius);transition:background .15s';
         var chkEl = document.createElement('input');
         chkEl.type = 'checkbox';
         chkEl.id = id;
@@ -1574,7 +1574,7 @@ function _viniMontaPannello() {
   slider('Interlinea (spazio tra le righe)', 'lh', '0.8', '1.5', '0.05');
   slider('Spazio tra le voci', 'gap', '0.6', '1.6', '0.05');
   var rb = document.createElement('button'); rb.type='button'; rb.textContent = '↺ Ripristina valori predefiniti';
-  rb.style.cssText = "margin:.2rem 0 .6rem;padding:.4rem 1rem;background:transparent;border:1px solid var(--ink);font-family:'Jost',sans-serif;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;color:var(--ink)";
+  rb.style.cssText = "margin:.2rem 0 .6rem;padding:.4rem 1rem;background:transparent;border:1px solid var(--rule);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;color:var(--ink)";
   rb.addEventListener('click', function(){ ctrls.forEach(function(c){ _viniPrint[c.key]=1; c.rng.value=1; c.out.textContent='100%'; }); });
   body.appendChild(rb);
   var hint = el('div','', 'Valgono per la carta vini stampata (100% = base). Si applicano alla prossima Converti e Pubblica.');
@@ -1775,7 +1775,7 @@ function _pubblicaMenuVini(token, html, statusEl) {
   pubblicaFile(token, headers, VINI_PATH, html)
     .then(function(r) {
       if (!r.ok) return r.json().then(function(e){ throw new Error(e.message); });
-      statusEl.style.color = '#2d6a4f';
+      statusEl.style.color = 'var(--green)';
       statusEl.textContent = '✓ Menù vini pubblicato! Attendi ~90 secondi.';
       toast('\u2713 Men\u00f9 vini pubblicato!');
       window._pendingViniHtml = null;
@@ -2041,6 +2041,6 @@ function _docGen_apriPreview(titolo, corpoHtml, statusEl) {
   w.document.open();
   w.document.write(html);
   w.document.close();
-  statusEl.style.color = '#2d6a4f';
+  statusEl.style.color = 'var(--green)';
   statusEl.textContent = '✓ Preview aperta in nuova finestra.';
 }

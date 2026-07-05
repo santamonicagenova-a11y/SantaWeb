@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!-- v 2026.07.05.05 — confermaBadge non dipende più da confermata_at: il bottone verde "Conferma" è stato
+     tolto dalla mail M1bis (submit-reservation v25/v26 — send-reservation-reminders v2 manda il reminder
+     automatico a tutte le prenotazioni non rifiutate/annullate, senza bisogno di conferma). Il badge
+     "✓ Confermata" ora compare per qualunque prenotazione attiva, sempre, anche senza click. -->
 <!-- v 2026.07.05.04 — nella vista giorno, nuovo badge "✓ Confermata" / "Da confermare" basato su confermata_at
      (si valorizza quando clicchi "Conferma" nella mail M1bis) — il campo era già restituito da gestionale-day,
      solo aggiunto il badge in renderDay. Non mostrato se la prenotazione è rifiutata/annullata (statusBadge prevale). -->
@@ -119,7 +123,7 @@
   <div class="status-line" id="day-status"></div>
 </div>
 
-<footer class="ver">v 2026.07.05.04</footer>
+<footer class="ver">v 2026.07.05.05</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';
@@ -262,9 +266,13 @@ function statusBadge(r) {
 }
 
 function confermaBadge(r) {
+  // v 2026.07.05.05: il reminder automatico (send-reservation-reminders v2) parte
+  // per TUTTE le prenotazioni non rifiutate/annullate, senza bisogno del click sul
+  // link "Conferma" (rimosso dalla mail M1bis — restava solo "Rifiuta", l'unica
+  // azione con effetto reale). Quindi il badge non dipende più da confermata_at:
+  // qualunque prenotazione attiva è "confermata" a tutti gli effetti pratici.
   if (r.status === 'rejected' || r.status === 'cancelled') return '';
-  if (r.confermata_at) return '<span class="badge badge-ok">✓ Confermata</span>';
-  return '<span class="badge badge-wait">Da confermare</span>';
+  return '<span class="badge badge-ok">✓ Confermata</span>';
 }
 
 function arrivoBadge(r) {

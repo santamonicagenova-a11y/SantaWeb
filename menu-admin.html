@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!-- v 2026.07.05.14 — ripristinato il blocco "Come si usa" (h2 + 3 passi) in #intro, tolto per errore
+     nella v.06 di questa stessa sessione (rimozione non richiesta da Andrea, chiarito a posteriori).
+     Testo adattato all'interfaccia attuale a pulsanti diretti (non più "Carica dal sito ▾"): passo 1
+     ora dice di cliccare uno dei pulsanti quick-actions; passo 3 cita Preview/Traduci e Pubblica coi
+     nomi attuali. CSS .intro h2/.intro p già esistente e mai toccato, solo l'HTML era stato svuotato. -->
 <!-- v 2026.07.05.13 — pulsanti quick-actions: tolte le iconcine emoji dalle 12 etichette, testo più grande e in stile header (.qa-btn ora font-weight 600, .72rem, uppercase, letter-spacing .06em — come .btn di Preview/Traduci e Pubblica). "Gestionale (Calendario/Servizio)" abbreviato a "Gestionale" (il testo esteso resta nel title-tag implicito del link gestionale.html). Nessuna modifica di funzione, solo etichetta+stile. -->
 <!-- v 2026.07.05.12 — reskin completo di menu-admin sul tema di SafeTable: sfondo scuro, font Inter, accento ambra, card arrotondate con ombre, verde per le azioni "pubblica". Riguarda SOLO la chrome dell'admin (top-bar, pulsanti, pannelli .fs, form, modal, toast). NON toccati i template pubblicati (admin-templates-shared.js, _VINI_TPL e il documento generico dentro admin-core.js), che restano nello stile Cormorant/crema del sito pubblico — sono pagine diverse, non l'interfaccia di menu-admin. Nuove variabili --surface (sfondo card/barra), --field (sfondo input, più chiaro della card), --green (azioni pubblica/salva), --radius/--radius-lg. Font Jost→Inter solo nella chrome (14 punti in questo file + 5 in admin-core.js, verificati uno a uno per non toccare i template). Colore verde hardcoded var(--green)→var(--green) in tutto il file (15 occorrenze, stesso ruolo semantico ovunque: successo/pubblicato). -->
 <!-- v 2026.07.05.11 — integrazione SafeTable, punto 2: nel pannello Cauzioni aggiunto "+ Genera nuovo link garanzia" (details collassato), chiama create-setup-intent (stessa Edge Function di SafeTable, header x-admin-secret) con short_id generato lato client, ristorante_nome/phone fissi (Ristorante Santamonica / 010 5533155). Risultato = link Stripe con Copia/Apri, poi ricarica lo storico. -->
@@ -155,6 +160,10 @@
 </div>
 
 <div class="intro" id="intro">
+  <h2>Come si usa</h2>
+  <p><strong>1.</strong> Clicca uno dei pulsanti qui sopra per caricare la sezione che vuoi modificare (Menù alla carta, Allergeni, Foto, Prenotazioni…).</p>
+  <p><strong>2.</strong> Modifica prezzi, nomi, testi, foto.</p>
+  <p><strong>3.</strong> Clicca <strong>Preview</strong> per vedere il risultato, poi <strong>Traduci e Pubblica</strong> per aggiornare il sito.</p>
   <input type="file" id="file-input" accept=".html" onchange="carica(this)" />
   <div class="err" id="err"></div>
 </div>
@@ -1593,7 +1602,7 @@ async function _eseguiPubblicaFotoSito(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.05.13</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.05.14</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

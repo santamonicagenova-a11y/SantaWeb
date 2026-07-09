@@ -1,4 +1,17 @@
 <!DOCTYPE html>
+<!-- v 2026.07.09.01 — 3 nuove capacità sulle prenotazioni (richiesta Andrea): AGGIUNGI — bottone
+     "+ Nuova prenotazione" nella vista giorno, apre un form (nome/telefono richiesti, email/persone/
+     data/orario/occasione/intolleranze/note) → nuova azione create_reservation su set-reminder-
+     settings v5 (source='gestionale_manuale', arrivo_status di default 'in_attesa', status di default
+     'pending_review' come le prenotazioni dal sito: stesso badge "Confermata" e stesso reminder
+     automatico, nessuna azione speciale). ELIMINA — bottone "✕ Elimina" su ogni riga (vista giorno E
+     ricerca), con conferma; nuova azione delete_reservation (DELETE definitivo by id; non tocca righe
+     collegate su SafeTable/cauzioni, restano lì e vanno gestite a parte se presenti). MODIFICA STATO
+     ARRIVO — sostituiti i 2 bottoni "Arrivato"/"No-show" (visibili solo quando in_attesa, mai più
+     modificabili dopo) con 3 bottoni sempre visibili "In attesa"/"Arrivato"/"No-show" (buildArrivoControls),
+     quello attivo evidenziato; permette di correggere un arrivo/no-show impostato per errore. Il
+     backend (set_arrivo_status v4, già in produzione) supportava già tutte le transizioni — mancava
+     solo la UI per farle. arrivoBadge() rimossa (ridondante coi bottoni sempre visibili). -->
 <!-- v 2026.07.05.06 — nuova barra di ricerca clienti (sotto il top-bar, sempre visibile): cerca per
      nome, telefono o email tra TUTTE le prenotazioni (non solo il giorno), via nuova Edge Function
      gestionale-search (GET pubblico, stesso pattern di gestionale-day). Risultati con stessi badge
@@ -82,8 +95,25 @@
     .badge-ok { background:#e6f0ea; color:var(--ok); border:1px solid #bcd9c9; }
     .badge-no { background:#f6e7e2; color:var(--rust); border:1px solid #e3bcac; }
     .badge-cauzione { background:#f0ebe0; color:#7d6a3a; border:1px solid var(--rule); }
-    .res-actions { display:flex; gap:.4rem; }
+    .res-actions { display:flex; gap:.4rem; flex-wrap:wrap; align-items:center; }
     .res-actions button { padding:.35rem .8rem; font-size:.62rem; }
+    .seg-btn { padding:.3rem .65rem; font-size:.6rem; letter-spacing:.04em; text-transform:uppercase; border:1px solid var(--rule); background:#fff; color:var(--stone); cursor:pointer; }
+    .seg-btn:hover { background:var(--sand); }
+    .seg-btn.on-wait { background:var(--sand); color:var(--ink); border-color:var(--stone); font-weight:400; }
+    .seg-btn.on-ok { background:var(--ok); color:#fff; border-color:var(--ok); }
+    .seg-btn.on-no { background:var(--rust); color:#fff; border-color:var(--rust); }
+    .btn-del { border-color:var(--rule); color:var(--stone); background:#fff; }
+    .btn-del:hover { background:#f6e7e2; color:var(--rust); border-color:#e3bcac; }
+
+    .new-res-wrap { max-width:800px; margin:0 auto 1.2rem; padding:0 1rem; display:none; }
+    .new-res-wrap.on { display:block; }
+    .new-res-box { background:#fff; border:1px solid var(--rule); padding:1rem 1.2rem; }
+    .new-res-box h3 { font-size:.78rem; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--stone); margin-bottom:.8rem; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem .8rem; margin-bottom:.6rem; }
+    .form-grid label { display:block; font-size:.62rem; color:var(--stone); letter-spacing:.06em; text-transform:uppercase; margin-bottom:.2rem; }
+    .form-grid input, .form-grid textarea { width:100%; padding:.4rem .55rem; border:1px solid var(--rule); font-family:'Jost',sans-serif; font-size:.82rem; color:var(--ink); background:var(--cream); }
+    .form-grid .full { grid-column:1 / -1; }
+    .new-res-actions { display:flex; gap:.5rem; align-items:center; margin-top:.4rem; }
 
     .empty-msg { color:var(--stone); font-size:.85rem; padding:2rem 0; text-align:center; }
     .status-line { font-size:.75rem; color:var(--stone); margin-top:.5rem; }
@@ -135,7 +165,31 @@
       <h2 id="day-title">…</h2>
       <div class="sub" id="day-sub"></div>
     </div>
+    <button class="btn btn-ok" id="new-res-toggle-btn" onclick="toggleNewResForm()" style="margin-left:auto;">+ Nuova prenotazione</button>
   </div>
+
+  <div class="new-res-wrap" id="new-res-wrap">
+    <div class="new-res-box">
+      <h3>Nuova prenotazione manuale</h3>
+      <div class="form-grid">
+        <div><label>Nome *</label><input type="text" id="nr-nome" /></div>
+        <div><label>Telefono *</label><input type="text" id="nr-telefono" /></div>
+        <div><label>Email</label><input type="text" id="nr-email" /></div>
+        <div><label>Persone *</label><input type="text" id="nr-persone" placeholder="es. 2" /></div>
+        <div><label>Data *</label><input type="date" id="nr-data" /></div>
+        <div><label>Orario *</label><input type="text" id="nr-orario" placeholder="es. 20:00" /></div>
+        <div><label>Occasione</label><input type="text" id="nr-occasione" /></div>
+        <div><label>Intolleranze</label><input type="text" id="nr-intolleranze" /></div>
+        <div class="full"><label>Note</label><input type="text" id="nr-note" /></div>
+      </div>
+      <div class="new-res-actions">
+        <button class="btn btn-ok" onclick="submitNewRes()">✦ Crea prenotazione</button>
+        <button class="btn" onclick="toggleNewResForm()">Annulla</button>
+        <span class="status-line" id="new-res-status" style="margin:0;"></span>
+      </div>
+    </div>
+  </div>
+
   <div id="day-list"></div>
   <div class="status-line" id="day-status"></div>
 </div>
@@ -152,7 +206,7 @@
   <div class="status-line" id="search-status"></div>
 </div>
 
-<footer class="ver">v 2026.07.05.06</footer>
+<footer class="ver">v 2026.07.09.01</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';
@@ -261,6 +315,7 @@ function openDay(dateStr) {
   document.getElementById('day-wrap').classList.add('on');
   document.querySelector('.toolbar').style.display = 'none';
   document.getElementById('day-title').textContent = fmtItDate(dateStr);
+  document.getElementById('new-res-wrap').classList.remove('on');
   loadDay();
 }
 
@@ -305,17 +360,32 @@ function confermaBadge(r) {
   return '<span class="badge badge-ok">✓ Confermata</span>';
 }
 
-function arrivoBadge(r) {
-  if (r.arrivo_status === 'arrivato') return '<span class="badge badge-ok">✓ Arrivato</span>';
-  if (r.arrivo_status === 'no_show') return '<span class="badge badge-no">✕ No-show</span>';
-  return ''; // in_attesa: nessun badge, e' lo stato di default prima del servizio
-}
-
 function garanziaBadge(r) {
   if (r.garanzia_status === 'effettuata') return '<span class="badge badge-ok">✓ Garanzia</span>';
   if (r.garanzia_status === 'richiesta') return '<span class="badge badge-cauzione">Garanzia richiesta</span>';
   if (r.garanzia_status === 'annullata') return '<span class="badge badge-no">Garanzia annullata</span>';
   return '';
+}
+
+function buildArrivoControls(r, onChanged) {
+  var wrap = document.createElement('div'); wrap.className = 'res-actions';
+  var opts = [
+    { value: 'in_attesa', label: 'In attesa', cls: 'on-wait' },
+    { value: 'arrivato', label: 'Arrivato', cls: 'on-ok' },
+    { value: 'no_show', label: 'No-show', cls: 'on-no' }
+  ];
+  opts.forEach(function (o) {
+    var b = document.createElement('button');
+    b.className = 'seg-btn' + (r.arrivo_status === o.value ? ' ' + o.cls : '');
+    b.textContent = o.label;
+    b.onclick = function () { setArrivoStatus(r.id, o.value, onChanged); };
+    wrap.appendChild(b);
+  });
+  var del = document.createElement('button');
+  del.className = 'btn btn-del'; del.textContent = '✕ Elimina';
+  del.onclick = function () { deleteReservation(r.id, r.nome, onChanged); };
+  wrap.appendChild(del);
+  return wrap;
 }
 
 function renderDay(rows) {
@@ -325,7 +395,6 @@ function renderDay(rows) {
   list.innerHTML = '';
   rows.forEach(function (r) {
     var row = document.createElement('div'); row.className = 'res-row';
-    var canAct = r.status !== 'rejected' && r.status !== 'cancelled' && r.arrivo_status === 'in_attesa';
     row.innerHTML =
       '<div class="res-orario">' + r.orario + '</div>' +
       '<div class="res-info">' +
@@ -334,17 +403,8 @@ function renderDay(rows) {
           (r.occasione ? ' · ' + escapeHtml(r.occasione) : '') +
           (r.intolleranze ? ' · ' + escapeHtml(r.intolleranze) : '') + '</div>' +
       '</div>' +
-      '<div>' + statusBadge(r) + ' ' + confermaBadge(r) + ' ' + arrivoBadge(r) + ' ' + garanziaBadge(r) + '</div>';
-
-    if (canAct) {
-      var actions = document.createElement('div'); actions.className = 'res-actions';
-      var ok = document.createElement('button'); ok.className = 'btn btn-ok'; ok.textContent = 'Arrivato';
-      ok.onclick = function () { setArrivoStatus(r.id, 'arrivato'); };
-      var no = document.createElement('button'); no.className = 'btn btn-rust'; no.textContent = 'No-show';
-      no.onclick = function () { setArrivoStatus(r.id, 'no_show'); };
-      actions.appendChild(ok); actions.appendChild(no);
-      row.appendChild(actions);
-    }
+      '<div>' + statusBadge(r) + ' ' + confermaBadge(r) + ' ' + garanziaBadge(r) + '</div>';
+    row.appendChild(buildArrivoControls(r, loadDay));
     list.appendChild(row);
   });
 }
@@ -408,11 +468,12 @@ function renderSearch(rows) {
           (r.email ? ' · ' + escapeHtml(r.email) : '') +
           (r.occasione ? ' · ' + escapeHtml(r.occasione) : '') + '</div>' +
       '</div>' +
-      '<div>' + statusBadge(r) + ' ' + confermaBadge(r) + ' ' + arrivoBadge(r) + ' ' + garanziaBadge(r) + '</div>';
+      '<div>' + statusBadge(r) + ' ' + confermaBadge(r) + ' ' + garanziaBadge(r) + '</div>';
     var goBtn = document.createElement('button');
     goBtn.className = 'btn'; goBtn.textContent = 'Vai al giorno →'; goBtn.style.marginLeft = '.5rem';
     goBtn.onclick = function () { goToSearchResultDay(r.data); };
     row.appendChild(goBtn);
+    row.appendChild(buildArrivoControls(r, function () { doSearch(); }));
     list.appendChild(row);
   });
 }
@@ -432,7 +493,7 @@ function _ghToken() {
   return t;
 }
 
-function setArrivoStatus(id, value) {
+function setArrivoStatus(id, value, onDone) {
   if (value === 'no_show' && !window.confirm('Segnare questa prenotazione come no-show?')) return;
   var token = _ghToken();
   if (!token) { _daySetStatus('Operazione annullata: serve il token GitHub.', true); return; }
@@ -443,11 +504,88 @@ function setArrivoStatus(id, value) {
   })
     .then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); })
     .then(function (res) {
-      if (res.status === 200 && res.body && res.body.ok) { _daySetStatus('Fatto.'); loadDay(); }
+      if (res.status === 200 && res.body && res.body.ok) { _daySetStatus('Fatto.'); (onDone || loadDay)(); }
       else if (res.status === 401) _daySetStatus('Token GitHub non valido o senza permessi.', true);
       else _daySetStatus((res.body && res.body.error) || 'Errore.', true);
     })
     .catch(function () { _daySetStatus('Errore di connessione.', true); });
+}
+
+function deleteReservation(id, nome, onDone) {
+  if (!window.confirm('Eliminare definitivamente la prenotazione di ' + nome + '? L\'operazione non si può annullare. Se è collegata a una garanzia SafeTable, quella resta a parte e va gestita separatamente.')) return;
+  var token = _ghToken();
+  if (!token) { _daySetStatus('Operazione annullata: serve il token GitHub.', true); return; }
+  _daySetStatus('Eliminazione…');
+  fetch(ACTION_URL, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'delete_reservation', id: id, github_token: token }),
+  })
+    .then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); })
+    .then(function (res) {
+      if (res.status === 200 && res.body && res.body.ok) { _daySetStatus('Prenotazione eliminata.'); (onDone || loadDay)(); }
+      else if (res.status === 401) _daySetStatus('Token GitHub non valido o senza permessi.', true);
+      else _daySetStatus((res.body && res.body.error) || 'Errore.', true);
+    })
+    .catch(function () { _daySetStatus('Errore di connessione.', true); });
+}
+
+function toggleNewResForm() {
+  var wrap = document.getElementById('new-res-wrap');
+  var opening = !wrap.classList.contains('on');
+  wrap.classList.toggle('on');
+  document.getElementById('new-res-status').textContent = '';
+  if (opening) {
+    ['nr-nome','nr-telefono','nr-email','nr-persone','nr-orario','nr-occasione','nr-intolleranze','nr-note'].forEach(function (id) {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('nr-data').value = curDate || todayStr();
+  }
+}
+
+function submitNewRes() {
+  var nome = document.getElementById('nr-nome').value.trim();
+  var telefono = document.getElementById('nr-telefono').value.trim();
+  var email = document.getElementById('nr-email').value.trim();
+  var persone = parseInt(document.getElementById('nr-persone').value, 10);
+  var data = document.getElementById('nr-data').value;
+  var orario = document.getElementById('nr-orario').value.trim();
+  var occasione = document.getElementById('nr-occasione').value.trim();
+  var intolleranze = document.getElementById('nr-intolleranze').value.trim();
+  var note = document.getElementById('nr-note').value.trim();
+  var statusEl = document.getElementById('new-res-status');
+
+  if (!nome || !telefono || !data || !orario || !persone) {
+    statusEl.className = 'status-line err';
+    statusEl.textContent = 'Compila almeno nome, telefono, persone, data e orario.';
+    return;
+  }
+
+  var token = _ghToken();
+  if (!token) { statusEl.className = 'status-line err'; statusEl.textContent = 'Operazione annullata: serve il token GitHub.'; return; }
+
+  statusEl.className = 'status-line'; statusEl.textContent = 'Salvataggio…';
+  fetch(ACTION_URL, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'create_reservation', nome: nome, telefono: telefono, email: email,
+      persone: persone, data: data, orario: orario, occasione: occasione,
+      intolleranze: intolleranze, note: note, github_token: token,
+    }),
+  })
+    .then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); })
+    .then(function (res) {
+      if (res.status === 200 && res.body && res.body.ok) {
+        statusEl.textContent = 'Prenotazione creata.';
+        toggleNewResForm();
+        if (data === curDate) { loadDay(); }
+        else { openDay(data); }
+      } else if (res.status === 401) {
+        statusEl.className = 'status-line err'; statusEl.textContent = 'Token GitHub non valido o senza permessi.';
+      } else {
+        statusEl.className = 'status-line err'; statusEl.textContent = (res.body && res.body.error) || 'Errore.';
+      }
+    })
+    .catch(function () { statusEl.className = 'status-line err'; statusEl.textContent = 'Errore di connessione.'; });
 }
 
 loadMonth();

@@ -1,4 +1,21 @@
 <!DOCTYPE html>
+<!-- v 2026.07.09.02 — reminder via WhatsApp/SMS, stesso pattern già in produzione su SafeTable
+     (inviaWhatsApp()/inviaSMS(): link wa.me/sms: con messaggio precompilato, nessun provider/account
+     nuovo — Andrea legge/rivede e invia lui dal cellulare). Bottoni "📱 WhatsApp"/"💬 SMS" aggiunti
+     (a) su ogni riga prenotazione (vista giorno E ricerca, buildReminderButtons, saltati se manca il
+     telefono), (b) nella conferma dopo "+ Nuova prenotazione" (usa i dati appena inseriti, prima
+     ancora di ricaricare la lista). Il testo del messaggio riusa lo stesso message_template del
+     reminder automatico via email (reservation_reminder_settings, letto da reminder-settings-status,
+     già pubblico) con gli stessi segnaposto {nome}/{data}/{orario}/{persone} — fallback DEFAULT_
+     REMINDER_TPL hardcoded se il fetch fallisce. Numero normalizzato assumendo +39 se non ha già un
+     prefisso internazionale esplicito (stessa euristica del selettore prefisso di SafeTable, default
+     +39). Invio non automatico: NON tocca reminder_sent_at, resta indipendente dal motore email
+     automatico (send-reservation-reminders) che gira comunque alla sua scadenza. Popup: la finestra
+     si apre SUBITO nel click sincrono (window.open('about:blank') senza noopener, per poterne
+     impostare .location dopo) e solo poi ci si scrive l'URL wa.me/sms: una volta pronto il template —
+     altrimenti Safari/iOS blocca il popup perché arriverebbe dopo un fetch asincrono; il template è
+     anche precaricato a inizio pagina (ensureReminderTpl() dopo loadMonth()) così di norma è già
+     pronto al primo click. -->
 <!-- v 2026.07.09.01 — 3 nuove capacità sulle prenotazioni (richiesta Andrea): AGGIUNGI — bottone
      "+ Nuova prenotazione" nella vista giorno, apre un form (nome/telefono richiesti, email/persone/
      data/orario/occasione/intolleranze/note) → nuova azione create_reservation su set-reminder-
@@ -185,7 +202,7 @@
       <div class="new-res-actions">
         <button class="btn btn-ok" onclick="submitNewRes()">✦ Crea prenotazione</button>
         <button class="btn" onclick="toggleNewResForm()">Annulla</button>
-        <span class="status-line" id="new-res-status" style="margin:0;"></span>
+        <div class="status-line" id="new-res-status" style="margin:0;"></div>
       </div>
     </div>
   </div>
@@ -206,13 +223,14 @@
   <div class="status-line" id="search-status"></div>
 </div>
 
-<footer class="ver">v 2026.07.09.01</footer>
+<footer class="ver">v 2026.07.09.02</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';
 var DAY_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-day';
 var ACTION_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/set-reminder-settings';
 var SEARCH_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-search';
+var REMINDER_STATUS_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/reminder-settings-status';
 
 var today = new Date();
 var curYear = today.getFullYear();
@@ -229,6 +247,76 @@ function fmtItDate(dateStr) {
   var giorni = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
   var d = new Date(dateStr + 'T00:00:00');
   return giorni[d.getDay()] + ' ' + parseInt(p[2],10) + ' ' + MESI[parseInt(p[1],10)-1] + ' ' + p[0];
+}
+
+// ══ REMINDER via WhatsApp/SMS (link wa.me / sms:, stesso pattern di SafeTable
+// inviaWhatsApp()/inviaSMS()): niente provider/account da attivare, si apre
+// l'app col messaggio già scritto e lo mandi tu dal cellulare. Il testo usa
+// lo stesso modello del reminder automatico via email (reservation_reminder_
+// settings.message_template), letto al volo da reminder-settings-status
+// (GET pubblico, già usato altrove nel gestionale/admin). ═══════════════════
+var DEFAULT_REMINDER_TPL = 'Buongiorno {nome},\n\nle ricordiamo con piacere la sua prenotazione:\n\nData: {data}\nOrario: {orario}\nPersone: {persone}\n\nPer qualsiasi variazione può contattarci al 010 5533155.\n\nA presto,\nRistorante Santamonica';
+var GIORNI_LUNGHI = ['domenica','lunedì','martedì','mercoledì','giovedì','venerdì','sabato'];
+var MESI_LUNGHI = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+var _reminderTplPromise = null;
+
+function formatDateLongIt(dateStr) {
+  var d = new Date(dateStr + 'T00:00:00');
+  return GIORNI_LUNGHI[d.getDay()] + ' ' + d.getDate() + ' ' + MESI_LUNGHI[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+function ensureReminderTpl() {
+  if (_reminderTplPromise) return _reminderTplPromise;
+  _reminderTplPromise = fetch(REMINDER_STATUS_URL, { cache: 'no-store' })
+    .then(function (r) { return r.json(); })
+    .then(function (d) { return (d.settings && d.settings.message_template) || DEFAULT_REMINDER_TPL; })
+    .catch(function () { return DEFAULT_REMINDER_TPL; });
+  return _reminderTplPromise;
+}
+
+function renderReminderMsg(tpl, r) {
+  var vars = { nome: r.nome, data: formatDateLongIt(r.data), orario: r.orario, persone: String(r.persone) };
+  return tpl.replace(/\{(\w+)\}/g, function (_m, k) { return (k in vars) ? vars[k] : '{' + k + '}'; });
+}
+
+// Digits-only con prefisso internazionale: se il numero salvato ha già un "+"
+// lo teniamo (es. svizzeri/esteri salvati con prefisso), altrimenti assumiamo
+// Italia (+39) come fa SafeTable col suo selettore prefisso di default.
+function waPhoneDigits(raw) {
+  var s = (raw || '').trim();
+  var digits = s.replace(/\D/g, '');
+  if (!digits) return '';
+  if (s.charAt(0) === '+') return digits;
+  if (digits.length <= 10) return '39' + digits;
+  return digits;
+}
+
+function waLink(phone, msg) { return 'https://wa.me/' + waPhoneDigits(phone) + '?text=' + encodeURIComponent(msg); }
+function smsLink(phone, msg) { return 'sms:+' + waPhoneDigits(phone) + '?body=' + encodeURIComponent(msg); }
+
+function openReminderChannel(kind, r) {
+  // La finestra va aperta SUBITO, dentro il click sincrono (senza 'noopener',
+  // altrimenti non si ottiene il riferimento) — altrimenti Safari/iOS blocca
+  // il popup perché l'apertura arriverebbe dopo il fetch del template (async).
+  var win = window.open('about:blank', '_blank');
+  ensureReminderTpl().then(function (tpl) {
+    var msg = renderReminderMsg(tpl, r);
+    var url = kind === 'wa' ? waLink(r.telefono, msg) : smsLink(r.telefono, msg);
+    if (win && !win.closed) { win.location.href = url; }
+    else { window.open(url, '_blank'); } // fallback se il pre-open è stato comunque bloccato
+  });
+}
+
+function buildReminderButtons(r, dateStr) {
+  if (!r.telefono) return null;
+  var rowData = { nome: r.nome, telefono: r.telefono, data: dateStr, orario: r.orario, persone: r.persone };
+  var wrap = document.createElement('div'); wrap.className = 'res-actions';
+  var wa = document.createElement('button'); wa.className = 'btn'; wa.textContent = '📱 WhatsApp';
+  wa.onclick = function () { openReminderChannel('wa', rowData); };
+  var sm = document.createElement('button'); sm.className = 'btn'; sm.textContent = '💬 SMS';
+  sm.onclick = function () { openReminderChannel('sms', rowData); };
+  wrap.appendChild(wa); wrap.appendChild(sm);
+  return wrap;
 }
 
 function changeMonth(delta) {
@@ -404,6 +492,8 @@ function renderDay(rows) {
           (r.intolleranze ? ' · ' + escapeHtml(r.intolleranze) : '') + '</div>' +
       '</div>' +
       '<div>' + statusBadge(r) + ' ' + confermaBadge(r) + ' ' + garanziaBadge(r) + '</div>';
+    var remBtns = buildReminderButtons(r, curDate);
+    if (remBtns) row.appendChild(remBtns);
     row.appendChild(buildArrivoControls(r, loadDay));
     list.appendChild(row);
   });
@@ -473,6 +563,8 @@ function renderSearch(rows) {
     goBtn.className = 'btn'; goBtn.textContent = 'Vai al giorno →'; goBtn.style.marginLeft = '.5rem';
     goBtn.onclick = function () { goToSearchResultDay(r.data); };
     row.appendChild(goBtn);
+    var remBtns = buildReminderButtons(r, r.data);
+    if (remBtns) row.appendChild(remBtns);
     row.appendChild(buildArrivoControls(r, function () { doSearch(); }));
     list.appendChild(row);
   });
@@ -575,10 +667,21 @@ function submitNewRes() {
     .then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); })
     .then(function (res) {
       if (res.status === 200 && res.body && res.body.ok) {
-        statusEl.textContent = 'Prenotazione creata.';
-        toggleNewResForm();
-        if (data === curDate) { loadDay(); }
-        else { openDay(data); }
+        var createdDate = data;
+        statusEl.className = 'status-line';
+        statusEl.innerHTML = '';
+        var okMsg = document.createElement('div');
+        okMsg.textContent = '✓ Prenotazione creata' + (createdDate !== curDate ? ' (per il ' + fmtItDateShort(createdDate) + ')' : '') + '. Invia il promemoria:';
+        statusEl.appendChild(okMsg);
+        var remBtns = buildReminderButtons({ nome: nome, telefono: telefono, orario: orario, persone: persone }, createdDate);
+        if (remBtns) { remBtns.style.marginTop = '.4rem'; statusEl.appendChild(remBtns); }
+        var closeBtn = document.createElement('button');
+        closeBtn.className = 'btn'; closeBtn.style.marginTop = '.4rem'; closeBtn.textContent = 'Chiudi e aggiorna';
+        closeBtn.onclick = function () {
+          if (createdDate === curDate) { toggleNewResForm(); loadDay(); }
+          else { openDay(createdDate); }
+        };
+        statusEl.appendChild(closeBtn);
       } else if (res.status === 401) {
         statusEl.className = 'status-line err'; statusEl.textContent = 'Token GitHub non valido o senza permessi.';
       } else {
@@ -589,6 +692,7 @@ function submitNewRes() {
 }
 
 loadMonth();
+ensureReminderTpl(); // precarica il template reminder, così i bottoni WhatsApp/SMS sono pronti subito
 </script>
 </body>
 </html>

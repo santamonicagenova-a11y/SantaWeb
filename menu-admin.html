@@ -1,9 +1,15 @@
 <!DOCTYPE html>
-<!-- v 2026.07.05.14 — ripristinato il blocco "Come si usa" (h2 + 3 passi) in #intro, tolto per errore
-     nella v.06 di questa stessa sessione (rimozione non richiesta da Andrea, chiarito a posteriori).
-     Testo adattato all'interfaccia attuale a pulsanti diretti (non più "Carica dal sito ▾"): passo 1
-     ora dice di cliccare uno dei pulsanti quick-actions; passo 3 cita Preview/Traduci e Pubblica coi
-     nomi attuali. CSS .intro h2/.intro p già esistente e mai toccato, solo l'HTML era stato svuotato. -->
+<!-- v 2026.07.05.15 — CORREZIONE della v.14: non era il blocco "Come si usa" a mancare, ma il pannello
+     collassabile "📖 Procedure di aggiornamento e traduzione — leggimi" (details#procedure) aggiunto
+     in origine il 14/6 (v 2026.06.14.08) e perso in qualche pubblicazione successiva (già assente al
+     5/7 prima di questa sessione). Ripristinato in #intro al posto del testo "Come si usa" inventato
+     nella v.14 (rimossa); contenuto storico recuperato da GitHub (commit b5b32e1, 14/6) e adattato
+     all'interfaccia attuale a pulsanti diretti ("Clicca «Menù alla carta»" invece di "Carica dal sito
+     → Menù alla carta"); colore di sfondo dei box interni portato da #fff hardcoded a var(--field)
+     per restare leggibile nel tema scuro attuale (il pannello originale era su sfondo chiaro). #file-
+     input reso invisibile via style (non più tramite .intro label, rimossa col vecchio blocco). -->
+<!-- v 2026.07.05.14 — ripristinato il blocco "Come si usa" (h2 + 3 passi) in #intro (SUPERATA dalla
+     v.15 sopra: non era quello il pannello richiesto). -->
 <!-- v 2026.07.05.13 — pulsanti quick-actions: tolte le iconcine emoji dalle 12 etichette, testo più grande e in stile header (.qa-btn ora font-weight 600, .72rem, uppercase, letter-spacing .06em — come .btn di Preview/Traduci e Pubblica). "Gestionale (Calendario/Servizio)" abbreviato a "Gestionale" (il testo esteso resta nel title-tag implicito del link gestionale.html). Nessuna modifica di funzione, solo etichetta+stile. -->
 <!-- v 2026.07.05.12 — reskin completo di menu-admin sul tema di SafeTable: sfondo scuro, font Inter, accento ambra, card arrotondate con ombre, verde per le azioni "pubblica". Riguarda SOLO la chrome dell'admin (top-bar, pulsanti, pannelli .fs, form, modal, toast). NON toccati i template pubblicati (admin-templates-shared.js, _VINI_TPL e il documento generico dentro admin-core.js), che restano nello stile Cormorant/crema del sito pubblico — sono pagine diverse, non l'interfaccia di menu-admin. Nuove variabili --surface (sfondo card/barra), --field (sfondo input, più chiaro della card), --green (azioni pubblica/salva), --radius/--radius-lg. Font Jost→Inter solo nella chrome (14 punti in questo file + 5 in admin-core.js, verificati uno a uno per non toccare i template). Colore verde hardcoded var(--green)→var(--green) in tutto il file (15 occorrenze, stesso ruolo semantico ovunque: successo/pubblicato). -->
 <!-- v 2026.07.05.11 — integrazione SafeTable, punto 2: nel pannello Cauzioni aggiunto "+ Genera nuovo link garanzia" (details collassato), chiama create-setup-intent (stessa Edge Function di SafeTable, header x-admin-secret) con short_id generato lato client, ristorante_nome/phone fissi (Ristorante Santamonica / 010 5533155). Risultato = link Stripe con Copia/Apri, poi ricarica lo storico. -->
@@ -159,12 +165,72 @@
   <button class="qa-btn" onclick="apriSezioneCauzioni()">Cauzioni (storico)</button>
 </div>
 
-<div class="intro" id="intro">
-  <h2>Come si usa</h2>
-  <p><strong>1.</strong> Clicca uno dei pulsanti qui sopra per caricare la sezione che vuoi modificare (Menù alla carta, Allergeni, Foto, Prenotazioni…).</p>
-  <p><strong>2.</strong> Modifica prezzi, nomi, testi, foto.</p>
-  <p><strong>3.</strong> Clicca <strong>Preview</strong> per vedere il risultato, poi <strong>Traduci e Pubblica</strong> per aggiornare il sito.</p>
-  <input type="file" id="file-input" accept=".html" onchange="carica(this)" />
+<div id="intro">
+  <details id="procedure" style="max-width:1000px;margin:1.1rem auto 0;background:var(--sand);border:1px solid var(--rule);border-radius:var(--radius-lg);font-size:.82rem;line-height:1.55;color:var(--ink)">
+    <summary style="cursor:pointer;padding:.75rem 1.1rem;font-weight:600;letter-spacing:.03em;list-style:none">📖 Procedure di aggiornamento e traduzione — leggimi</summary>
+    <div style="padding:0 1.2rem 1.2rem">
+
+      <p style="background:var(--field);border-left:3px solid var(--rust);padding:.55rem .85rem;margin:.3rem 0 1rem">
+        <strong>Regola d'oro.</strong> La carta in lingua (EN/FR) pesca <strong>dolci</strong> e <strong>allergeni</strong> dal sito <em>già pubblicato</em>.
+        Quindi se cambi dolci o allergeni: <strong>pubblicali prima</strong>, aspetta ~1–2 minuti che il sito si aggiorni, e <strong>solo dopo</strong> fai "Traduci e Pubblica" della carta.
+      </p>
+
+      <p style="margin:.2rem 0 1rem">Il pulsante <strong>"✦ Traduci e Pubblica"</strong> pubblica sempre il menù che hai <em>caricato</em> in quel momento. Per la <strong>carta</strong> produce IT + EN + FR (con dolci e allergeni accorpati in lingua); per <strong>dolci</strong> e <strong>allergeni</strong> produce l'italiano (le loro versioni EN/FR vivono dentro la carta tradotta).</p>
+
+      <h3 style="margin:1rem 0 .25rem;font-size:.86rem">🍽️ Carta — piatti, prezzi, sezioni</h3>
+      <ol style="margin:.2rem 0 .2rem 1.2rem;padding:0">
+        <li>Clicca <strong>«Menù alla carta»</strong></li>
+        <li>Modifica i piatti (usa <strong>"+ Aggiungi piatto"</strong> per una riga nuova; le righe lasciate vuote non vengono pubblicate)</li>
+        <li><strong>Preview 🇮🇹</strong> per controllare; se vuoi, regola caratteri/interlinea/spazio/posizione coi pulsanti (vedi i valori accanto) e premi <strong>"✔ Fissa come default"</strong></li>
+        <li><strong>✦ Traduci e Pubblica</strong> → pubblica IT + EN + FR</li>
+      </ol>
+
+      <h3 style="margin:1rem 0 .25rem;font-size:.86rem">🍰 Dolci</h3>
+      <ol style="margin:.2rem 0 .2rem 1.2rem;padding:0">
+        <li>Clicca <strong>«Menù dolci»</strong></li>
+        <li>Modifica</li>
+        <li><strong>Preview 🇮🇹</strong> (in EN/FR i dolci si vedono dentro la carta tradotta)</li>
+        <li><strong>✦ Traduci e Pubblica</strong> → pubblica i dolci in italiano</li>
+        <li>⚠️ <strong>Per aggiornarli anche in EN/FR</strong>: aspetta ~1–2 min, poi <strong>Carica la carta → Traduci e Pubblica</strong> (la carta in lingua ripesca i dolci appena pubblicati)</li>
+      </ol>
+
+      <h3 style="margin:1rem 0 .25rem;font-size:.86rem">⚠️ Allergeni</h3>
+      <ol style="margin:.2rem 0 .2rem 1.2rem;padding:0">
+        <li>Clicca <strong>«Allergeni carta»</strong> (si sincronizza dai piatti della carta <em>già pubblicata</em>)</li>
+        <li>Spunta gli allergeni di ogni piatto</li>
+        <li><strong>✦ Traduci e Pubblica</strong> → pubblica la pagina allergeni in italiano</li>
+        <li>⚠️ <strong>Per aggiornarla in EN/FR</strong>: aspetta ~1–2 min, poi <strong>Carica la carta → Traduci e Pubblica</strong> (la pagina allergeni tradotta è in coda alla carta EN/FR)</li>
+      </ol>
+
+      <h3 style="margin:1rem 0 .25rem;font-size:.86rem">🔁 Ho cambiato i piatti (e magari i loro allergeni)</h3>
+      <p style="margin:.2rem 0">Sequenza completa, con la carta pubblicata <strong>due volte</strong> (la prima porta i piatti nuovi, l'ultima aggiorna allergeni/dolci in lingua):</p>
+      <ol style="margin:.2rem 0 .2rem 1.2rem;padding:0">
+        <li><strong>Carta</strong>: clicca «Menù alla carta» → modifica i piatti → <strong>Traduci e Pubblica</strong></li>
+        <li>aspetta ~1–2 min</li>
+        <li><strong>Allergeni</strong>: clicca «Allergeni carta» (riprende i piatti nuovi) → spunta → <strong>Traduci e Pubblica</strong></li>
+        <li>(se hai toccato i dolci) <strong>Dolci</strong>: clicca «Menù dolci» → modifica → <strong>Traduci e Pubblica</strong></li>
+        <li>aspetta ~1–2 min</li>
+        <li><strong>Carta</strong>: clicca «Menù alla carta» → <strong>Traduci e Pubblica</strong> un'ultima volta → ora EN/FR ha piatti, allergeni e dolci aggiornati</li>
+      </ol>
+      <p style="margin:.2rem 0;color:var(--stone)">Se hai cambiato solo prezzi/nomi e <em>non</em> gli allergeni: basta la sola Carta (passi 1–2), salta allergeni e la seconda pubblicazione.</p>
+
+      <h3 style="margin:1rem 0 .25rem;font-size:.86rem">🍷 Vini · 📷 Foto · 🎁 Buoni · 🔒 Prenotazioni</h3>
+      <ul style="margin:.2rem 0 .2rem 1.2rem;padding:0">
+        <li><strong>Carta vini</strong>: «Menù Vini» → scegli il PDF → <strong>Converti e Pubblica</strong> (si apre prima un'anteprima; ogni pagina del PDF diventa un'immagine fedele)</li>
+        <li><strong>Foto cucina / Foto sito</strong>: scegli le immagini → <strong>Pubblica foto</strong></li>
+        <li><strong>Buoni regalo</strong>: imposta i valori → <strong>Pubblica valori</strong></li>
+        <li><strong>Prenotazioni online</strong>: chiusure/aperture (giorno, servizio o singolo orario) → si applicano subito</li>
+      </ul>
+
+      <h3 style="margin:1rem 0 .25rem;font-size:.86rem">ℹ️ Note utili</h3>
+      <ul style="margin:.2rem 0 0 1.2rem;padding:0">
+        <li>Alla prima pubblicazione serve il <strong>token GitHub</strong> (lo stesso per tutto; il 🔑 lo cambia)</li>
+        <li>Dopo "Pubblica", il sito si aggiorna in <strong>~90 secondi</strong> (se non vedi i cambiamenti, ricarica con hard refresh)</li>
+        <li>Ogni pulsante qui sopra carica sempre la versione <em>attualmente pubblicata</em>: parti sempre da lì, così non sovrascrivi con dati vecchi</li>
+      </ul>
+    </div>
+  </details>
+  <input type="file" id="file-input" accept=".html" onchange="carica(this)" style="display:none" />
   <div class="err" id="err"></div>
 </div>
 
@@ -1602,7 +1668,7 @@ async function _eseguiPubblicaFotoSito(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.05.14</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.05.15</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

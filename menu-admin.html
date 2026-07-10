@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- v 2026.07.10.01 — Prenotazioni online: nuovo blocco "Limita i posti su un orario già aperto"
+     (data + tendina orari + max posti + lista limiti attivi con coperti occupati/max e rimozione).
+     Tabella reservation_slot_caps (slot_date, slot_time, max_covers) + azioni set_slot_cap/
+     remove_slot_cap in set-reservations-config v4 + campo slot_caps (con current_covers) in
+     reservations-status v4 e nella risposta di set-reservations-config. Il rifiuto vero e proprio
+     (quando il limite verrebbe superato) è lato server in submit-reservation v27 — qui solo la
+     UI di gestione. NON applicato al form "+ Nuova prenotazione" del gestionale (solo al form
+     pubblico del sito) — gap noto, annotato nel changelog Edge Function. -->
 <!-- v 2026.07.05.15 — CORREZIONE della v.14: non era il blocco "Come si usa" a mancare, ma il pannello
      collassabile "📖 Procedure di aggiornamento e traduzione — leggimi" (details#procedure) aggiunto
      in origine il 14/6 (v 2026.06.14.08) e perso in qualche pubblicazione successiva (già assente al
@@ -444,6 +452,36 @@
       <div class="sub">Orari aperti extra (da oggi in poi)</div>
       <div id="pren-slot-openings-list" style="font-size:.85rem;">&hellip;</div>
 
+      <div class="sub" style="margin-top:1.4rem;">Limita i posti su un orario già aperto</div>
+      <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
+        Imposta un numero massimo di coperti (somma persone) per una data+orario specifici.
+        Quando viene raggiunto, il form del sito rifiuta nuove richieste per quello slot — gli altri orari restano regolari.
+      </p>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
+        <div>
+          <span class="opt-lbl">Data</span>
+          <input type="date" id="pren-slot-cap-date" style="width:auto;" />
+        </div>
+        <div>
+          <span class="opt-lbl">Orario</span>
+          <select id="pren-slot-cap-time" style="padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);">
+            <optgroup label="Pranzo">
+              <option value="12:30">12:30</option><option value="13:00">13:00</option><option value="13:30">13:30</option><option value="14:00">14:00</option>
+            </optgroup>
+            <optgroup label="Cena">
+              <option value="19:30">19:30</option><option value="20:00">20:00</option><option value="20:30">20:30</option><option value="21:00">21:00</option><option value="21:30">21:30</option><option value="22:00">22:00</option>
+            </optgroup>
+          </select>
+        </div>
+        <div>
+          <span class="opt-lbl">Max posti</span>
+          <input type="number" id="pren-slot-cap-max" min="1" max="500" step="1" placeholder="es. 20" style="width:6rem;" />
+        </div>
+        <button class="btn btn-publish" onclick="addPrenSlotCap()">+ Imposta limite</button>
+      </div>
+      <div class="sub">Limiti attivi (da oggi in poi)</div>
+      <div id="pren-slot-caps-list" style="font-size:.85rem;">&hellip;</div>
+
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
         <button class="btn btn-load" onclick="chiudiSezionePrenotazioni()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
         <span id="pren-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
@@ -588,7 +626,7 @@
 // usato per la pubblicazione. Vedi progetto-sito CLAUDE.md sessione 13.
 var PREN_STATUS_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/reservations-status';
 var PREN_CONFIG_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/set-reservations-config';
-var prenState = { online_open: true, closures: [], openings: [], slot_closures: [], slot_openings: [] };
+var prenState = { online_open: true, closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [] };
 
 function apriSezionePrenotazioni() {
   document.getElementById('carica-menu').classList.remove('open');
@@ -600,10 +638,12 @@ function apriSezionePrenotazioni() {
   var doo = document.getElementById('pren-opening-date');
   var dsc = document.getElementById('pren-slot-closure-date');
   var dso = document.getElementById('pren-slot-opening-date');
+  var dscap = document.getElementById('pren-slot-cap-date');
   if (dc) dc.min = today;
   if (doo) doo.min = today;
   if (dsc) dsc.min = today;
   if (dso) dso.min = today;
+  if (dscap) dscap.min = today;
   loadPrenStatus();
 }
 
@@ -678,6 +718,33 @@ function _prenRenderSlotList(elId, items, emptyMsg, borderColor, removeFn) {
   });
 }
 
+// Renderer per la lista dei limiti posti per singolo orario (items {date, time, max_covers, current_covers}).
+function _prenRenderCapsList(elId, items, emptyMsg, removeFn) {
+  var list = document.getElementById(elId);
+  if (!list) return;
+  if (!items.length) {
+    list.innerHTML = '<span style="color:var(--stone);">' + emptyMsg + '</span>';
+    return;
+  }
+  list.innerHTML = '';
+  items.forEach(function (it) {
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:.6rem;padding:.35rem 0;border-bottom:1px dotted var(--rule);';
+    var txt = document.createElement('span');
+    var full = (it.current_covers || 0) >= it.max_covers;
+    txt.textContent = _prenFormatDate(it.date) + ' — ore ' + it.time + ' — ' + (it.current_covers || 0) + '/' + it.max_covers + ' posti';
+    if (full) txt.style.color = 'var(--rust)';
+    var rm = document.createElement('button');
+    rm.className = 'btn btn-load';
+    rm.style.cssText = 'border:1px solid var(--rust);color:var(--rust);padding:.25rem .8rem;font-size:.62rem;margin-left:auto;';
+    rm.textContent = '✕ Rimuovi';
+    rm.onclick = function () { removeFn(it.date, it.time); };
+    row.appendChild(txt);
+    row.appendChild(rm);
+    list.appendChild(row);
+  });
+}
+
 function renderPrenUI() {
   var lbl = document.getElementById('pren-stato-label');
   var btn = document.getElementById('pren-toggle-btn');
@@ -690,6 +757,7 @@ function renderPrenUI() {
   _prenRenderList('pren-openings-list', prenState.openings || [], 'Nessuna apertura straordinaria attiva.', 'var(--green)', removePrenOpening);
   _prenRenderSlotList('pren-slot-closures-list', prenState.slot_closures || [], 'Nessun orario chiuso singolarmente.', 'var(--rust)', removePrenSlotClosure);
   _prenRenderSlotList('pren-slot-openings-list', prenState.slot_openings || [], 'Nessun orario aperto extra.', 'var(--green)', removePrenSlotOpening);
+  _prenRenderCapsList('pren-slot-caps-list', prenState.slot_caps || [], 'Nessun limite posti attivo.', removePrenSlotCap);
 }
 
 // Conflitto: stessa data, servizio che si sovrappone (uguale, oppure uno dei
@@ -715,6 +783,7 @@ function loadPrenStatus() {
       prenState.openings = (d && d.openings) || [];
       prenState.slot_closures = (d && d.slot_closures) || [];
       prenState.slot_openings = (d && d.slot_openings) || [];
+      prenState.slot_caps = (d && d.slot_caps) || [];
       renderPrenUI();
       _prenSetStatus('');
     })
@@ -746,6 +815,7 @@ function _prenApply(res, okMsg) {
     prenState.openings = res.body.openings || [];
     prenState.slot_closures = res.body.slot_closures || [];
     prenState.slot_openings = res.body.slot_openings || [];
+    prenState.slot_caps = res.body.slot_caps || [];
     renderPrenUI();
     _prenSetStatus(okMsg || 'Fatto.');
   } else if (res.status === 401) {
@@ -877,6 +947,22 @@ function addPrenSlotOpening() {
 
 function removePrenSlotOpening(date, time) {
   _prenConfig({ action: 'remove_slot_opening', date: date, time: time }, 'Apertura orario rimossa.');
+}
+
+// ── Limite posti (coperti) per SINGOLO orario ──
+function addPrenSlotCap() {
+  var date = document.getElementById('pren-slot-cap-date').value;
+  var time = document.getElementById('pren-slot-cap-time').value;
+  var maxRaw = document.getElementById('pren-slot-cap-max').value;
+  var max = parseInt(maxRaw, 10);
+  if (!date) { _prenSetStatus('Scegli una data.', true); return; }
+  if (!maxRaw || isNaN(max) || max < 1 || max > 500) { _prenSetStatus('Inserisci un numero massimo di posti valido (1-500).', true); return; }
+  var existing = (prenState.slot_caps || []).some(function (c) { return c.date === date && c.time === time; });
+  _prenConfig({ action: 'set_slot_cap', date: date, time: time, max_covers: max }, existing ? 'Limite aggiornato.' : 'Limite impostato.');
+}
+
+function removePrenSlotCap(date, time) {
+  _prenConfig({ action: 'remove_slot_cap', date: date, time: time }, 'Limite rimosso.');
 }
 
 // ══ REMINDER PRENOTAZIONI (setup messaggio + tempistiche) ════
@@ -1668,7 +1754,7 @@ async function _eseguiPubblicaFotoSito(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.05.15</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.10.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

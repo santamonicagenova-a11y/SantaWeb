@@ -1,28 +1,48 @@
 <!DOCTYPE html>
 <!--
   regala.html
-  Versione: v 2026.05.20.01
-  Pagina: Voucher regalo Santamonica — acquisto online via Stripe Payment Links
-  Fase progetto: F0.13 (sessione 2026-05-20)
+  Versione: v 2026.07.14.01
+  Pagina: Voucher regalo Santamonica — acquisto su RICHIESTA (email), in attesa dello sblocco Stripe (dec.#28)
+  Fase progetto: Sito — chiusura gate voucher (2026-07-14)
   Lingua: it (IT only, dec. F0.10 C1)
-  Cambi v.05.19.03 → v.05.20.01:
-    - Rimosso form Formspree (dipendenza inversa F0.10 → F0.13)
-    - Aggiunti 3 bottoni Stripe Payment Links (URL da sostituire post-creazione Live mode)
-    - T5 opt-in marketing rimosso dalla pagina (ora gestito Stripe consent_collection nativo)
-    - Link a /voucher-termini.html ora attivo (F0.14 ✅)
-    - Sezione "Come funziona" aggiornata (workflow semi-auto A3)
+  Cambi v.06.10.04 → v.07.14.01:
+    - Lead riscritto su richiesta Andrea (micro-fix di copy, tono invariato): tolto "sederlo... sul Lungomare"
+      e "cucina di pesce" → "invitarlo alla nostra tavola" e "la nostra cucina sul mare".
+    - Descrizioni dei due Voucher Esperienza differenziate su richiesta Andrea: sei portate = menù fisso,
+      link a /menu.html; sette portate = "a mano libera", composto dallo chef sul pescato del giorno.
+      Coordinato con voucher-termini.html §3 (stessa versione).
+    - Rimosso il blocco ".request-note" (icona + testo dopo i buoni liberi): su segnalazione Andrea era
+      ridondante coi punti 2-3 di "Come funziona" subito sotto, e il layout flex spezzava male il testo.
+      Il numero di assistenza 010 5533155 spostato in fondo a "Come funziona". CSS .request-note rimosso.
+    - "Condizioni d'uso" (ex .terms-link-block, box separato sotto la griglia) spostato DENTRO la griglia
+      "Informazioni essenziali", subito dopo "Prenotazione", stessa tipografia delle altre card ma con
+      sfondo sabbia + bordo oro (.info-item-terms) per segnalare che è diverso dalle altre voci.
+  Cambi v.05.20.01 → v.06.10.01 → v.06.10.02:
+    - Offerta ristrutturata: 2 Voucher Esperienza sui due menù degustazione (6/7 portate, per DUE,
+      bevande escluse) con checkbox opzionale "abbinamento vini" + 3 tagli "buono libero" (100/150/200 €).
+    - Validità 6 → 12 mesi.
+    - .02: CTA cambiate da Stripe Payment Links (placeholder, non operativi) a "Richiedi questo buono"
+      via email precompilata a info@ → flusso manuale assistito (richiesta → modalità di pagamento → PDF).
+      Rimosso il noindex di pagina (decisione Andrea: pagina indicizzabile). Stripe si riaggancia poi.
+    - .03: due modalità di consegna — (a) pagamento in loco + ritiro voucher FISICO stampato in confezione;
+      (b) pagamento elettronico + PDF via email all'ACQUIRENTE (mai al destinatario), che lo dona.
+    - .04: Cumulabilità → +"non utilizzabile nei fine settimana e nelle festività"; i 3 valori dei buoni liberi
+      sono letti a runtime da /voucher-config.json (fallback ai valori in pagina). Coordinato con menu-admin.
+  GATE: contenuto pubblico → P1+P2 + P3 (3 vendor, 10/6) eseguite sui testi/Termini. IVA (ultimo bloccante)
+        confermata dal commercialista il 14/7, recepita in voucher-termini.html v 2026.07.14.01. Lead
+        riscritto il 14/7 = micro-fix di copy (P1+P2, no P3: tono/contenuto invariati). Pronto per sign-off
+        finale Andrea e go-live.
 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Regala un'esperienza al ristorante Santamonica di Genova · buoni regalo 100€ / 150€ / 200€ · pagamento sicuro Stripe · validità 6 mesi.">
-  <meta name="robots" content="noindex,nofollow"><!-- staging CF Pages, rimozione globale F0.21 -->
-  <title>Regala un'esperienza · Santamonica Genova</title>
+  <meta name="description" content="Regala un'esperienza al ristorante Santamonica di Genova: i menù degustazione per due o un buono di valore libero. Validità 12 mesi.">
+  <title>Buoni regalo · Ristorante Santamonica Genova</title>
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Regala un'esperienza · Santamonica Genova">
-  <meta property="og:description" content="Buoni regalo Santamonica · 100€ / 150€ / 200€ · validità 6 mesi · acquisto online sicuro.">
+  <meta property="og:title" content="Buoni regalo · Ristorante Santamonica Genova">
+  <meta property="og:description" content="Buoni regalo Santamonica · i due menù degustazione per due o un buono di valore libero · validità 12 mesi.">
   <meta property="og:locale" content="it_IT">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -56,7 +76,7 @@
     }
 
     .container {
-      max-width: 880px;
+      max-width: 920px;
       margin: 0 auto;
       padding: 48px 24px 80px;
     }
@@ -64,14 +84,14 @@
     /* ===== Header ===== */
     header.page-header {
       text-align: center;
-      margin-bottom: 56px;
+      margin-bottom: 48px;
     }
 
     .eyebrow {
       font-size: 12px;
       letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: #9f5d3c;
+      color: var(--terracotta);
       font-weight: 600;
       margin-bottom: 16px;
     }
@@ -93,24 +113,49 @@
     .lead {
       font-size: 18px;
       color: var(--muted);
-      max-width: 620px;
+      max-width: 640px;
       margin: 0 auto;
-      line-height: 1.55;
+      line-height: 1.6;
+    }
+
+    /* ===== Section heading (categoria voucher) ===== */
+    .cat-head {
+      text-align: center;
+      margin: 8px 0 28px;
+    }
+
+    .cat-head h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 32px;
+      font-weight: 600;
+      margin: 0 0 8px;
+      color: var(--ink);
+    }
+
+    .cat-head p {
+      margin: 0 auto;
+      max-width: 560px;
+      font-size: 15px;
+      color: var(--muted);
     }
 
     /* ===== Voucher cards ===== */
     .voucher-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 24px;
-      margin-bottom: 64px;
+      margin-bottom: 28px;
+    }
+
+    .voucher-grid.libero {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     }
 
     .voucher-card {
       background: white;
       border: 1px solid var(--rule);
       border-radius: 8px;
-      padding: 36px 28px;
+      padding: 32px 28px;
       text-align: center;
       transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
       display: flex;
@@ -130,13 +175,31 @@
       background: linear-gradient(180deg, #fff 0%, #fdf9f1 100%);
     }
 
+    .deg-portate {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .deg-sub {
+      font-size: 12.5px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
     .voucher-amount {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 56px;
+      font-size: 52px;
       font-weight: 700;
       color: var(--ink);
       line-height: 1;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       letter-spacing: -0.02em;
     }
 
@@ -148,11 +211,51 @@
       font-weight: 500;
     }
 
+    .price-note {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-bottom: 18px;
+      letter-spacing: 0.02em;
+    }
+
     .voucher-desc {
       font-size: 14px;
       color: var(--muted);
-      margin-bottom: 28px;
-      min-height: 42px;
+      margin-bottom: 20px;
+      line-height: 1.55;
+      flex-grow: 1;
+    }
+
+    /* ===== Checkbox abbinamento vini ===== */
+    .vini-toggle {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      text-align: left;
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+      background: var(--sand);
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--ink);
+      cursor: pointer;
+      line-height: 1.4;
+    }
+
+    .vini-toggle input {
+      margin-top: 2px;
+      width: 16px;
+      height: 16px;
+      accent-color: var(--terracotta-dark);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .vini-toggle .vini-supp {
+      color: var(--terracotta-dark);
+      font-weight: 600;
+      white-space: nowrap;
     }
 
     .btn-buy {
@@ -174,21 +277,17 @@
       transition: background 0.2s ease;
     }
 
-    .btn-buy:hover {
-      background: var(--terracotta-dark);
-    }
+    .btn-buy:hover { background: var(--terracotta-dark); }
+    .btn-buy.featured { background: var(--terracotta-dark); }
+    .btn-buy.featured:hover { background: var(--terracotta); }
 
-    .btn-buy.featured {
-      background: var(--terracotta-dark);
-    }
+    .btn-buy svg { width: 14px; height: 14px; }
 
-    .btn-buy.featured:hover {
-      background: var(--terracotta);
-    }
-
-    .btn-buy svg {
-      width: 14px;
-      height: 14px;
+    .cat-divider {
+      border: 0;
+      border-top: 1px solid var(--rule);
+      max-width: 120px;
+      margin: 56px auto 48px;
     }
 
     /* ===== How it works ===== */
@@ -196,7 +295,7 @@
       background: var(--sand);
       border-radius: 8px;
       padding: 40px 32px;
-      margin-bottom: 56px;
+      margin: 56px 0;
     }
 
     section.how-it-works h2 {
@@ -291,16 +390,14 @@
       line-height: 1.55;
     }
 
-    .terms-link-block {
-      margin-top: 24px;
-      padding: 20px 24px;
-      background: white;
+    .info-item-terms {
+      background: var(--sand);
       border-left: 3px solid var(--gold);
       border-radius: 0 4px 4px 0;
-      font-size: 14px;
+      padding: 14px 18px;
     }
 
-    .terms-link-block a {
+    .info-item-terms a {
       color: var(--terracotta-dark);
       font-weight: 600;
       text-decoration: underline;
@@ -342,7 +439,7 @@
       font-family: 'Inter', monospace;
       font-size: 11px;
       letter-spacing: 0.05em;
-      color: #7d6b48;
+      color: var(--gold);
       font-variant-numeric: tabular-nums;
     }
 
@@ -366,21 +463,6 @@
       border-color: var(--terracotta);
     }
 
-    /* Stripe trust micro-icon */
-    .stripe-trust {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 32px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .stripe-trust svg {
-      width: 14px;
-      height: 14px;
-    }
   </style>
 </head>
 <body>
@@ -392,75 +474,131 @@
       <div class="eyebrow">Buoni regalo</div>
       <h1>Regala <em>un'esperienza</em><br>al ristorante Santamonica</h1>
       <p class="lead">
-        [TESTO DA COMPLETARE] Un buono regalo Santamonica è un'occasione per condividere la nostra cucina con chi ami. Tre tagli, validità sei mesi, riscatto al ristorante a Genova sul Lungomare Lombardo.
+        C'è un modo per dire a qualcuno che gli vuoi bene: invitarlo alla nostra tavola e lasciare che sia il mare a raccontare. Un buono regalo Santamonica è questo — la nostra cucina sul mare, da vivere con calma, quando preferisce. Scegli uno dei due menù degustazione per due persone, oppure un buono di valore libero da spendere come desidera.
       </p>
     </header>
-<main>
 
-    <!-- ===== VOUCHER CARDS ===== -->
-    <section class="voucher-grid" aria-label="Tagli voucher disponibili">
+    <!-- ===== CATEGORIA 1 · MENU DEGUSTAZIONE ===== -->
+    <div class="cat-head">
+      <h2>I nostri menù degustazione, in regalo</h2>
+      <p>Il percorso che lo chef Nicolò Lazzaroni costruisce con il pescato del giorno. Per due persone, allo stesso tavolo.</p>
+    </div>
 
-      <!-- 100€ -->
-      <article class="voucher-card">
-        <div class="voucher-amount">100<span class="currency">€</span></div>
-        <p class="voucher-desc">[TESTO DA COMPLETARE] Una cena per due, antipasto e secondo con calice di vino in abbinamento.</p>
-        <!-- TODO F0.13 LIVE: sostituire STRIPE_PAYMENT_LINK_100 con URL reale da Stripe Dashboard Live -->
-        <a href="STRIPE_PAYMENT_LINK_100" class="btn-buy" target="_blank" rel="noopener noreferrer" aria-label="Acquista buono regalo da 100 euro">
-          Acquista
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    <section class="voucher-grid" aria-label="Voucher menù degustazione">
+
+      <!-- DEGUSTAZIONE 6 PORTATE -->
+      <article class="voucher-card" data-card="deg6">
+        <div class="deg-portate">Menù Degustazione</div>
+        <div class="deg-sub">Sei portate · per due</div>
+        <div class="voucher-amount"><span class="eur-num" data-base="180" data-vini="300">180</span><span class="currency">€</span></div>
+        <p class="price-note">per due persone · bevande escluse</p>
+        <p class="voucher-desc">Il menù degustazione fisso del ristorante, identico per i due ospiti: puoi vederne la composizione nella <a href="/menu.html" style="color:var(--terracotta-dark);">carta sul sito</a>. Le bevande si scelgono e si pagano al tavolo.</p>
+        <label class="vini-toggle">
+          <input type="checkbox" class="vini-check" data-target="deg6" aria-label="Aggiungi l'abbinamento vini al voucher sei portate">
+          <span>Aggiungi l'abbinamento vini scelto da Monica per le sei portate <span class="vini-supp">+120 €</span></span>
+        </label>
+        <a href="#" class="btn-buy"
+           data-label-base="Menù Degustazione Sei portate, per due persone — 180 € (bevande escluse)"
+           data-label-vini="Menù Degustazione Sei portate, per due persone, con abbinamento vini — 300 €"
+           aria-label="Richiedi il voucher menù degustazione sei portate">
+          Richiedi questo buono
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
         </a>
       </article>
 
-      <!-- 150€ -->
-      <article class="voucher-card featured">
-        <div class="voucher-amount">150<span class="currency">€</span></div>
-        <p class="voucher-desc">[TESTO DA COMPLETARE] Una cena completa per due con tre portate e abbinamento vino del sommelier.</p>
-        <!-- TODO F0.13 LIVE: sostituire STRIPE_PAYMENT_LINK_150 con URL reale da Stripe Dashboard Live -->
-        <a href="STRIPE_PAYMENT_LINK_150" class="btn-buy featured" target="_blank" rel="noopener noreferrer" aria-label="Acquista buono regalo da 150 euro">
-          Acquista
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
-      </article>
-
-      <!-- 200€ -->
-      <article class="voucher-card">
-        <div class="voucher-amount">200<span class="currency">€</span></div>
-        <p class="voucher-desc">[TESTO DA COMPLETARE] Un'esperienza completa per due: menu degustazione e percorso enologico curato.</p>
-        <!-- TODO F0.13 LIVE: sostituire STRIPE_PAYMENT_LINK_200 con URL reale da Stripe Dashboard Live -->
-        <a href="STRIPE_PAYMENT_LINK_200" class="btn-buy" target="_blank" rel="noopener noreferrer" aria-label="Acquista buono regalo da 200 euro">
-          Acquista
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      <!-- DEGUSTAZIONE 7 PORTATE -->
+      <article class="voucher-card featured" data-card="deg7">
+        <div class="deg-portate">Menù Degustazione</div>
+        <div class="deg-sub">Sette portate · per due</div>
+        <div class="voucher-amount"><span class="eur-num" data-base="220" data-vini="360">220</span><span class="currency">€</span></div>
+        <p class="price-note">per due persone · bevande escluse</p>
+        <p class="voucher-desc">Il percorso più ampio, a mano libera: sette portate che lo chef costruisce sul pescato del giorno, non fisse in carta. Le bevande si scelgono e si pagano al tavolo.</p>
+        <label class="vini-toggle">
+          <input type="checkbox" class="vini-check" data-target="deg7" aria-label="Aggiungi l'abbinamento vini al voucher sette portate">
+          <span>Aggiungi l'abbinamento vini scelto da Monica per le sette portate <span class="vini-supp">+140 €</span></span>
+        </label>
+        <a href="#" class="btn-buy featured"
+           data-label-base="Menù Degustazione Sette portate, per due persone — 220 € (bevande escluse)"
+           data-label-vini="Menù Degustazione Sette portate, per due persone, con abbinamento vini — 360 €"
+           aria-label="Richiedi il voucher menù degustazione sette portate">
+          Richiedi questo buono
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
         </a>
       </article>
 
     </section>
 
-    <div class="stripe-trust">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      Pagamento sicuro gestito da Stripe Payments Europe Ltd.
+    <p class="price-note" style="text-align:center;max-width:620px;margin:0 auto;">
+      L'abbinamento vini è il percorso di calici che la sommelier Monica Capurro accosta a ciascuna portata. Se non lo aggiungi, il destinatario potrà comunque scegliere vini e bevande al tavolo.
+    </p>
+
+    <hr class="cat-divider">
+
+    <!-- ===== CATEGORIA 2 · BUONO LIBERO ===== -->
+    <div class="cat-head">
+      <h2>Il buono di valore libero</h2>
+      <p>Un credito da spendere come si preferisce su tutto il menù — pesce, carta dei vini, dolci, caffetteria. Bevande comprese.</p>
     </div>
+
+    <section class="voucher-grid libero" aria-label="Buoni regalo di valore libero">
+
+      <!-- 100 -->
+      <article class="voucher-card" data-libero-index="0">
+        <div class="voucher-amount"><span class="eur-num">100</span><span class="currency">€</span></div>
+        <p class="price-note">valore da spendere su tutto il menù</p>
+        <p class="voucher-desc">Un assaggio della nostra cucina, da comporre liberamente al tavolo.</p>
+        <a href="#" class="btn-buy" data-label-base="Buono libero — 100 €" aria-label="Richiedi buono regalo libero da 100 euro">
+          Richiedi questo buono
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+        </a>
+      </article>
+
+      <!-- 150 -->
+      <article class="voucher-card featured" data-libero-index="1">
+        <div class="voucher-amount"><span class="eur-num">150</span><span class="currency">€</span></div>
+        <p class="price-note">valore da spendere su tutto il menù</p>
+        <p class="voucher-desc">Spazio per una cena intera in due, dall'antipasto al dolce.</p>
+        <a href="#" class="btn-buy featured" data-label-base="Buono libero — 150 €" aria-label="Richiedi buono regalo libero da 150 euro">
+          Richiedi questo buono
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+        </a>
+      </article>
+
+      <!-- 200 -->
+      <article class="voucher-card" data-libero-index="2">
+        <div class="voucher-amount"><span class="eur-num">200</span><span class="currency">€</span></div>
+        <p class="price-note">valore da spendere su tutto il menù</p>
+        <p class="voucher-desc">Un'occasione senza pensieri, vini della carta inclusi.</p>
+        <a href="#" class="btn-buy" data-label-base="Buono libero — 200 €" aria-label="Richiedi buono regalo libero da 200 euro">
+          Richiedi questo buono
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+        </a>
+      </article>
+
+    </section>
 
     <!-- ===== HOW IT WORKS ===== -->
     <section class="how-it-works">
       <h2>Come funziona</h2>
       <ol class="steps">
         <li>
-          <h3>Scegli il taglio</h3>
-          <p>100 €, 150 € o 200 €. Premi "Acquista" sul taglio desiderato.</p>
+          <h3>Scegli il regalo</h3>
+          <p>Un menù degustazione per due (con o senza abbinamento vini) oppure un buono di valore libero.</p>
         </li>
         <li>
-          <h3>Paga su Stripe</h3>
-          <p>Checkout sicuro in italiano. Puoi indicare nome e email del destinatario e un messaggio personale che apparirà sul voucher.</p>
+          <h3>Inviaci la richiesta</h3>
+          <p>Premi "Richiedi questo buono": si apre un'email già compilata. Indica se preferisci ritirarlo in ristorante o riceverlo via email. Ti rispondiamo entro 24 ore con le modalità di pagamento.</p>
         </li>
         <li>
-          <h3>Ricevi il PDF</h3>
-          <p>Da Stripe ricevi subito una ricevuta automatica del pagamento. Il PDF del voucher (con codice univoco e scadenza) ti arriverà via email entro 24 ore.</p>
+          <h3>Ritira o ricevi il buono</h3>
+          <p>Pagando in ristorante ritiri il voucher stampato in una confezione. Pagando elettronicamente ricevi il PDF via email a te, pronto da donare. In entrambi i casi con codice univoco e scadenza.</p>
         </li>
         <li>
           <h3>Prenota e riscatta</h3>
-          <p>Il destinatario prenota al ristorante menzionando il voucher e presenta il codice al tavolo.</p>
+          <p>Il destinatario prenota segnalando il voucher e presenta il codice al tavolo.</p>
         </li>
       </ol>
+      <p style="text-align:center;font-size:13px;color:var(--muted);margin:24px 0 0;">Per assistenza: <a href="tel:+390105533155" style="color:var(--terracotta-dark);">010 5533155</a></p>
     </section>
 
     <!-- ===== INFO ===== -->
@@ -469,7 +607,15 @@
       <div class="info-grid">
         <div class="info-item">
           <h3>Validità</h3>
-          <p>6 mesi dalla data di emissione, indicata sul PDF.</p>
+          <p>12 mesi dalla data di emissione, indicata sul PDF.</p>
+        </div>
+        <div class="info-item">
+          <h3>Bevande</h3>
+          <p>Nei voucher degustazione le bevande sono escluse, salvo l'abbinamento vini se aggiunto. Il buono libero invece copre anche le bevande.</p>
+        </div>
+        <div class="info-item">
+          <h3>Come lo ricevi</h3>
+          <p>Due modi: ritiro in ristorante del voucher stampato in confezione (pagamento in loco), oppure PDF via email all'acquirente, che lo dona al destinatario.</p>
         </div>
         <div class="info-item">
           <h3>Trasferibilità</h3>
@@ -477,30 +623,29 @@
         </div>
         <div class="info-item">
           <h3>Uso parziale</h3>
-          <p>Eventuale residuo utilizzabile come credito in visite successive entro la scadenza originale.</p>
+          <p>Per il buono libero, l'eventuale residuo resta come credito per visite successive entro la scadenza. I voucher degustazione valgono per l'esperienza indicata.</p>
         </div>
         <div class="info-item">
-          <h3>Cumulabilità</h3>
-          <p>Non cumulabile con promozioni, sconti, menu fissi o convenzioni in essere.</p>
+          <h3>Cumulabilità e periodi</h3>
+          <p>Non cumulabile con promozioni, sconti, menu fissi o convenzioni in essere. Non utilizzabile nei fine settimana e nelle festività.</p>
         </div>
         <div class="info-item">
           <h3>Recesso</h3>
-          <p>14 giorni dalla data di acquisto, solo se il voucher non è ancora stato riscattato (Art. 52 D.Lgs. 206/2005).</p>
+          <p>14 giorni dall'acquisto, solo se il voucher non è ancora stato riscattato (Art. 52 D.Lgs. 206/2005).</p>
         </div>
         <div class="info-item">
           <h3>Prenotazione</h3>
           <p>Obbligatoria: contatta il ristorante segnalando l'utilizzo del voucher al momento della prenotazione.</p>
         </div>
-      </div>
-
-      <div class="terms-link-block">
-        Le condizioni complete d'uso, esercizio del diritto di recesso, smarrimento, modalità di rimborso e foro competente sono dettagliate nei <a href="/voucher-termini.html">Termini e condizioni d'uso dei buoni regalo</a>. La conclusione dell'acquisto su Stripe comporta accettazione integrale di tali termini.
+        <div class="info-item info-item-terms">
+          <h3>Condizioni d'uso</h3>
+          <p>Recesso, smarrimento, rimborsi e foro competente sono nei <a href="/voucher-termini.html">Termini e condizioni d'uso dei buoni regalo</a>. L'acquisto comporta accettazione integrale.</p>
+        </div>
       </div>
     </section>
 
     <!-- ===== FOOTER ===== -->
-    </main>
-<footer class="page-footer">
+    <footer class="page-footer">
       <div class="footer-grid">
         <div class="cross-links">
           <a href="/">Home</a>
@@ -516,7 +661,7 @@
 
       <p style="margin: 0; font-size: 12px;">
         © 2026 Santamonica · Genova · Lungomare Lombardo 27, 16145 Genova<br>
-        <span class="version-tag">regala.html · v 2026.05.20.01</span>
+        <span class="version-tag">regala.html · v 2026.07.14.01</span>
       </p>
     </footer>
 
@@ -527,20 +672,61 @@
   <script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
   <script defer src="/cookieconsent-config.js"></script>
 
-  <!-- Protezione operativa F0.13: warning console se i placeholder Stripe non sono stati sostituiti -->
+  <!-- Costruzione dei mailto "Richiedi questo buono" + checkbox abbinamento vini -->
   <script>
     (function() {
-      var unresolved = Array.from(document.querySelectorAll('a.btn-buy[href^="STRIPE_PAYMENT_LINK_"]'));
-      if (unresolved.length > 0) {
-        console.warn('[regala.html] ATTENZIONE: ' + unresolved.length + ' placeholder Stripe Payment Link non sostituiti. ' +
-          'Sostituire STRIPE_PAYMENT_LINK_100/150/200 con gli URL reali generati nel Dashboard Stripe (Live mode) prima del go-live.');
-        unresolved.forEach(function(a) {
-          a.addEventListener('click', function(e) {
-            e.preventDefault();
-            alert('Configurazione non completata: il link di acquisto non è ancora attivo. Contatta info@santamonicagenova.it');
-          });
-        });
+      var MAIL = 'info@santamonicagenova.it';
+      var SUBJECT = 'Richiesta buono regalo Santamonica';
+
+      function buildHref(label) {
+        var body = 'Buongiorno,\n\nvorrei acquistare il seguente buono regalo Santamonica:\n\n• ' + label +
+          '\n\nModalità preferita (ritiro in ristorante con voucher stampato in confezione / invio elettronico via email): ' +
+          '\n\nResto in attesa delle modalità di pagamento. Grazie.\n\n' +
+          '(Se è un regalo, può indicare qui nome del destinatario ed eventuale dedica: )';
+        return 'mailto:' + MAIL + '?subject=' + encodeURIComponent(SUBJECT) + '&body=' + encodeURIComponent(body);
       }
+
+      // imposta href iniziale su tutti i bottoni
+      document.querySelectorAll('a.btn-buy').forEach(function(btn) {
+        var label = btn.getAttribute('data-label-base');
+        if (label) btn.setAttribute('href', buildHref(label));
+      });
+
+      // checkbox abbinamento vini: aggiorna prezzo mostrato + label del mailto
+      document.querySelectorAll('.vini-check').forEach(function(chk) {
+        chk.addEventListener('change', function() {
+          var card = chk.closest('.voucher-card');
+          if (!card) return;
+          var num = card.querySelector('.eur-num');
+          var btn = card.querySelector('.btn-buy');
+          if (!num || !btn) return;
+          var on = chk.checked;
+          num.textContent = on ? (num.getAttribute('data-vini') || num.textContent)
+                               : (num.getAttribute('data-base') || num.textContent);
+          var label = on ? btn.getAttribute('data-label-vini') : btn.getAttribute('data-label-base');
+          if (label) btn.setAttribute('href', buildHref(label));
+        });
+      });
+
+      // valori dei 3 buoni liberi da voucher-config.json (fallback: valori già in pagina)
+      fetch('/voucher-config.json', { cache: 'no-store' }).then(function(r) {
+        return r.ok ? r.json() : null;
+      }).then(function(cfg) {
+        if (!cfg || !Array.isArray(cfg.liberi)) return;
+        document.querySelectorAll('[data-libero-index]').forEach(function(card) {
+          var i = parseInt(card.getAttribute('data-libero-index'), 10);
+          var val = cfg.liberi[i];
+          if (val == null) return;
+          var num = card.querySelector('.eur-num');
+          var btn = card.querySelector('.btn-buy');
+          if (num) num.textContent = val;
+          if (btn) {
+            var label = 'Buono libero — ' + val + ' €';
+            btn.setAttribute('data-label-base', label);
+            btn.setAttribute('href', buildHref(label));
+          }
+        });
+      }).catch(function(){ /* offline o file assente: restano i valori in pagina */ });
     })();
   </script>
 

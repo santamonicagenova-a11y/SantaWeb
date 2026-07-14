@@ -1,20 +1,45 @@
 <!DOCTYPE html>
 <!--
   voucher-termini.html
-  Versione: v 2026.05.20.01
+  Versione: v 2026.07.14.01
   Pagina: Termini e condizioni d'uso buoni regalo (voucher) Santamonica
-  Fase progetto: F0.14 (sessione 2026-05-20)
+  Fase progetto: Sito — chiusura gate voucher (2026-07-14)
   Lingua: it (IT only, dec. F0.10 C1)
+  Cambi v.06.10.04 → v.07.14.01:
+    - §3 IVA: sciolto il rinvio "aliquota applicabile" — confermato dal commercialista (Andrea, 14/7) che
+      SIA il Voucher Esperienza SIA il Voucher di Valore sono buoni-corrispettivo MONOUSO ai sensi
+      dell'art. 6-bis DPR 633/1972 (Dir. UE 2016/1065): IVA dovuta ed esposta per intero all'emissione.
+      Chiude il debito "conferma commercialista" aperto il 10/6 (P3 3 vendor, punto BLOCCANTE IVA).
+    - §3 menù: differenziati su richiesta Andrea — sei portate = menù fisso pubblicato in carta (sito e
+      locale); sette portate = "a mano libera", composto dallo chef sul pescato del giorno. Coordinato
+      con regala.html (stessa versione).
+  Cambi v.05.20.01 → v.06.10.01:
+    - §3 rielaborato: due tipologie di voucher (A = esperienza "menù degustazione" per due,
+      bevande escluse salvo abbinamento vini opzionale; B = valore monetario "buono libero").
+    - Validità portata da 6 a 12 mesi ovunque (§7 + indice + lead, decisione Andrea 2026-06-10).
+    - §4 acquisto: aggiunta l'opzione abbinamento vini in fase di checkout.
+    - §9 ambito: chiarito il regime bevande per tipologia.
+    - §10 uso parziale/residuo: precisato che il credito residuo riguarda i soli voucher di valore (B).
+    - Correzioni da Revisione Oppositiva (P3, 3 vendor): §3 "IVA inclusa ove dovuta" (no "ogni eventuale imposta");
+      §13 smarrimento → blocco + sostituzione se non riscattato; §14 recesso decorre dalla conclusione del contratto (pagamento).
+    - .02: rimosso il noindex di pagina (indicizzabile); §4 riallineato al flusso "acquisto su richiesta" (CTA email),
+      con Stripe come modalità futura. Coordinato con regala.html v 2026.06.10.02.
+    - .03: §4 pagamento in loco o elettronico; §5 due modalità di consegna (ritiro fisico in confezione /
+      PDF inviato all'ACQUIRENTE, non al Beneficiario). Coordinato con regala.html v 2026.06.10.03.
+    - .04: §11 aggiunto "non utilizzabile nei fine settimana e nelle festività"; §10 eccedenza del buono libero
+      a carico di Acquirente o Beneficiario secondo quanto indicato sul Voucher.
   Note: pagina legale sobria, coerente con privacy.html / cookies.html (palette legal pages).
         Banner cookieconsent integrato (autoShow attivo, non è policy page).
         Bottone .cc-manage in footer per coerenza UX cross-page.
+  GATE: documento legale → P1+P2 + P3 (3 vendor, 10/6) eseguite. Ultimo punto BLOCCANTE (classificazione IVA
+        monouso/multiuso) confermato dal commercialista il 14/7 → recepito in questa versione. Gate pronto
+        per sign-off finale Andrea prima del go-live pubblico.
 -->
 <html lang="it">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Termini e condizioni d'uso dei buoni regalo (voucher) Santamonica · ristorante a Genova · validità 6 mesi.">
-  <meta name="robots" content="noindex,nofollow"><!-- staging CF Pages, rimozione globale F0.21 -->
+  <meta name="description" content="Termini e condizioni d'uso dei buoni regalo (voucher) Santamonica · ristorante a Genova · validità 12 mesi.">
   <title>Termini d'uso buoni regalo · Santamonica Genova</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -306,8 +331,8 @@
       <h1>Buoni regalo Santamonica<br><small style="color:var(--muted);font-weight:500;font-size:0.55em;">Condizioni d'uso e informazioni al consumatore</small></h1>
 
       <div class="legal-meta">
-        <span><strong>Versione:</strong> v 2026.05.20.01</span>
-        <span><strong>Ultimo aggiornamento:</strong> 20 maggio 2026</span>
+        <span><strong>Versione:</strong> v 2026.07.14.01</span>
+        <span><strong>Ultimo aggiornamento:</strong> 14 luglio 2026</span>
         <span><strong>Titolare:</strong> Santamonica · Genova</span>
         <span><strong>Lingua:</strong> Italiano</span>
       </div>
@@ -319,7 +344,7 @@
       <ol>
         <li><a href="#s1">Titolare e finalità</a></li>
         <li><a href="#s2">Definizioni</a></li>
-        <li><a href="#s3">Tagli disponibili e prezzo</a></li>
+        <li><a href="#s3">Tipologie disponibili e prezzo</a></li>
         <li><a href="#s4">Acquisto e pagamento</a></li>
         <li><a href="#s5">Consegna del voucher</a></li>
         <li><a href="#s6">Codice voucher</a></li>
@@ -354,7 +379,13 @@
       <h2 class="section-title"><span class="num">2.</span> Definizioni</h2>
       <dl class="definitions">
         <dt>Voucher</dt>
-        <dd>Buono regalo nominale o al portatore emesso da Santamonica, di valore predeterminato (vedi §3), utilizzabile presso il Ristorante secondo le presenti condizioni.</dd>
+        <dd>Buono regalo emesso da Santamonica, utilizzabile presso il Ristorante secondo le presenti condizioni. Si distinguono due tipologie (vedi §3): il <strong>Voucher Esperienza</strong> e il <strong>Voucher di Valore</strong>.</dd>
+
+        <dt>Voucher Esperienza</dt>
+        <dd>Voucher che dà diritto a una specifica esperienza gastronomica predeterminata: uno dei due menù degustazione del Ristorante, per due persone. Le bevande sono escluse, salvo l'eventuale abbinamento vini aggiunto in fase di acquisto (vedi §3 e §9).</dd>
+
+        <dt>Voucher di Valore</dt>
+        <dd>Voucher "libero" di importo predeterminato (100 €, 150 € o 200 €), pari a un credito spendibile liberamente su tutto il menù, bevande comprese (vedi §3 e §9).</dd>
 
         <dt>Acquirente</dt>
         <dd>La persona fisica (consumatore) che acquista il Voucher tramite il sito santamonicagenova.it.</dd>
@@ -375,37 +406,54 @@
 
     <!-- ===== §3 ===== -->
     <section class="legal-section" id="s3">
-      <h2 class="section-title"><span class="num">3.</span> Tagli disponibili e prezzo</h2>
-      <p>I Voucher sono disponibili nei seguenti tre tagli di valore nominale:</p>
+      <h2 class="section-title"><span class="num">3.</span> Tipologie disponibili e prezzo</h2>
+
+      <h3>A. Voucher Esperienza — menù degustazione per due</h3>
+      <p>Danno diritto, per <strong>due persone</strong> allo stesso tavolo, a uno dei due menù degustazione del Ristorante. <strong>Le bevande sono escluse</strong> e si pagano separatamente al tavolo, salvo l'eventuale abbinamento vini aggiunto in fase di acquisto.</p>
+      <ul>
+        <li><strong>Degustazione sei portate · due persone</strong> — 180 € (bevande escluse) · 300 € con abbinamento vini per due. È il menù degustazione fisso, pubblicato nella carta del Ristorante (sito e locale).</li>
+        <li><strong>Degustazione sette portate · due persone</strong> — 220 € (bevande escluse) · 360 € con abbinamento vini per due. È un percorso <strong>a mano libera</strong>: lo chef lo compone sul pescato del giorno, non è fisso in carta.</li>
+      </ul>
+      <p>L'<strong>abbinamento vini</strong> è il percorso di calici accostato dalla sommelier a ciascuna portata; è facoltativo e, se non incluso nel Voucher, può comunque essere scelto e pagato al tavolo. Il menù degustazione è inteso per l'intero tavolo: i due ospiti consumano il medesimo percorso.</p>
+
+      <h3>B. Voucher di Valore — buono libero</h3>
+      <p>Credito di importo predeterminato spendibile liberamente su tutto il menù, <strong>bevande comprese</strong>, nei seguenti tre tagli:</p>
       <ul>
         <li><strong>100 €</strong> — Buono Regalo Santamonica 100</li>
         <li><strong>150 €</strong> — Buono Regalo Santamonica 150</li>
         <li><strong>200 €</strong> — Buono Regalo Santamonica 200</li>
       </ul>
-      <p>Il prezzo di acquisto coincide con il valore nominale del Voucher: non sono previste maggiorazioni, commissioni o spese di emissione/consegna a carico dell'Acquirente. Tutti i prezzi sono espressi in Euro (€) e si intendono comprensivi di ogni eventuale imposta dovuta secondo la normativa fiscale applicabile.</p>
+
+      <p>Il prezzo di acquisto coincide con il valore indicato per ciascuna tipologia: non sono previste maggiorazioni, commissioni o spese di emissione/consegna a carico dell'Acquirente. Tutti i prezzi sono espressi in Euro (€) e si intendono <strong>IVA inclusa</strong>.</p>
+      <p>Ai fini IVA, sia il Voucher Esperienza sia il Voucher di Valore sono qualificati come <strong>buoni-corrispettivo monouso</strong> ai sensi dell'art. 6-bis del D.P.R. 633/1972 (che recepisce la Direttiva UE 2016/1065): l'imposta è determinabile fin dall'emissione ed è quindi dovuta ed esposta interamente al momento dell'acquisto, con l'aliquota propria della somministrazione di alimenti e bevande.</p>
     </section>
 
     <!-- ===== §4 ===== -->
     <section class="legal-section" id="s4">
       <h2 class="section-title"><span class="num">4.</span> Acquisto e pagamento</h2>
-      <p>L'acquisto avviene <strong>online</strong> tramite la pagina <a href="/regala.html">santamonicagenova.it/regala.html</a>, selezionando il taglio desiderato e completando la procedura di pagamento sulla piattaforma sicura <strong>Stripe Payments Europe Ltd</strong> (Irlanda).</p>
-      <p>Sono accettati i principali circuiti di carte di credito e debito; potrebbero essere disponibili ulteriori metodi di pagamento a discrezione di Stripe. Il contratto si perfeziona al buon esito del pagamento, momento in cui l'Acquirente riceverà una ricevuta automatica da Stripe all'indirizzo email indicato in fase di checkout.</p>
-      <p>Durante il checkout l'Acquirente può facoltativamente fornire: nome del Beneficiario, email del Beneficiario (se diversa dalla propria), un messaggio personale che verrà riportato sul PDF del Voucher. Tali informazioni sono utilizzate esclusivamente per la personalizzazione del Voucher e non vengono utilizzate per finalità ulteriori se non previo specifico consenso.</p>
+      <p>L'acquisto si avvia inviando una <strong>richiesta</strong> dalla pagina <a href="/regala.html">santamonicagenova.it/regala.html</a>, indicando la tipologia di Voucher desiderata (ed eventualmente l'<strong>abbinamento vini</strong> per i Voucher Esperienza). Il Ristorante conferma la disponibilità e comunica all'Acquirente le <strong>modalità di pagamento</strong>. Il pagamento può avvenire <strong>presso il Ristorante</strong> (di persona) oppure con <strong>strumenti elettronici</strong> secondo le indicazioni fornite. Il contratto si perfeziona al <strong>ricevimento del pagamento</strong>, dopodiché il Ristorante emette e consegna il Voucher (vedi §5).</p>
+      <p>Nella richiesta o nella successiva corrispondenza l'Acquirente può facoltativamente fornire: nome del Beneficiario, email del Beneficiario (se diversa dalla propria), un messaggio personale che verrà riportato sul PDF del Voucher. Tali informazioni sono utilizzate esclusivamente per la personalizzazione e la consegna del Voucher.</p>
+      <p>Quando sarà attivo il pagamento online tramite <strong>Stripe Payments Europe Ltd</strong> (Irlanda), l'acquisto potrà essere completato direttamente sulla piattaforma sicura del fornitore; le presenti condizioni si applicheranno in modo equivalente.</p>
     </section>
 
     <!-- ===== §5 ===== -->
     <section class="legal-section" id="s5">
       <h2 class="section-title"><span class="num">5.</span> Consegna del voucher</h2>
-      <p>Entro <strong>24 ore lavorative</strong> dall'avvenuto pagamento, il Ristorante invia all'indirizzo email dell'Acquirente (o del Beneficiario, se diverso e indicato in fase di checkout) un <strong>PDF nominativo</strong> contenente:</p>
+      <p>Il Voucher è consegnato secondo la modalità concordata:</p>
+      <ul>
+        <li><strong>Ritiro in ristorante:</strong> in caso di pagamento di persona, il Voucher è consegnato <strong>stampato</strong> (in confezione regalo) direttamente all'Acquirente presso il Ristorante.</li>
+        <li><strong>Invio elettronico:</strong> in caso di pagamento elettronico, entro <strong>24 ore lavorative</strong> il Ristorante invia il <strong>PDF del Voucher all'indirizzo email dell'Acquirente</strong> — e non del Beneficiario — affinché sia l'Acquirente a consegnarlo personalmente al destinatario.</li>
+      </ul>
+      <p>Il Voucher (stampato o in PDF) contiene:</p>
       <ul>
         <li>Codice voucher univoco (formato <code>SM-YYYY-NNN</code>)</li>
-        <li>Valore nominale</li>
-        <li>Data di emissione e data di scadenza (6 mesi dopo, vedi §7)</li>
+        <li>Tipologia e contenuto del Voucher (esperienza degustazione o valore, eventuale abbinamento vini)</li>
+        <li>Data di emissione e data di scadenza (12 mesi dopo, vedi §7)</li>
         <li>Nome del Beneficiario, se fornito</li>
         <li>Messaggio personale, se fornito</li>
         <li>Sintesi delle condizioni di utilizzo</li>
       </ul>
-      <p>In caso di mancata ricezione entro 48 ore dall'acquisto (verifica anche la cartella spam/promozioni), contattare <a href="mailto:info@santamonicagenova.it">info@santamonicagenova.it</a> indicando i dati di pagamento.</p>
+      <p>In caso di invio elettronico, se il PDF non perviene entro 48 ore dal pagamento (verifica anche la cartella spam/promozioni), contattare <a href="mailto:info@santamonicagenova.it">info@santamonicagenova.it</a> indicando i dati di pagamento.</p>
     </section>
 
     <!-- ===== §6 ===== -->
@@ -418,7 +466,7 @@
     <!-- ===== §7 ===== -->
     <section class="legal-section" id="s7">
       <h2 class="section-title"><span class="num">7.</span> Validità</h2>
-      <p>Il Voucher è valido per <strong>6 mesi (sei) a decorrere dalla data di emissione</strong> indicata sul PDF. La data di scadenza è riportata in chiaro sul Voucher stesso.</p>
+      <p>Il Voucher è valido per <strong>12 mesi (dodici) a decorrere dalla data di emissione</strong> indicata sul PDF. La data di scadenza è riportata in chiaro sul Voucher stesso.</p>
       <div class="highlight">
         <strong>Importante:</strong> il Voucher non riscattato entro la data di scadenza perde efficacia e non è più utilizzabile né rimborsabile. Non sono previste proroghe, salvo casi eccezionali a discrezione del Ristorante.
       </div>
@@ -438,7 +486,12 @@
     <!-- ===== §9 ===== -->
     <section class="legal-section" id="s9">
       <h2 class="section-title"><span class="num">9.</span> Ambito di utilizzo</h2>
-      <p>Il Voucher è utilizzabile <strong>esclusivamente presso il ristorante Santamonica</strong> per la consumazione in loco di qualsiasi voce del menù comunemente disponibile, <strong>incluse le bevande</strong> (analcoliche, vini da carta, distillati, caffetteria). Il Voucher non è utilizzabile per:</p>
+      <p>Il Voucher è utilizzabile <strong>esclusivamente presso il ristorante Santamonica</strong> per la consumazione in loco, secondo la propria tipologia:</p>
+      <ul>
+        <li><strong>Voucher Esperienza (A):</strong> dà diritto al menù degustazione indicato, per due persone. <strong>Le bevande sono escluse</strong> e si pagano a parte al tavolo, salvo l'abbinamento vini se incluso al momento dell'acquisto.</li>
+        <li><strong>Voucher di Valore (B):</strong> credito spendibile su qualsiasi voce del menù comunemente disponibile, <strong>bevande comprese</strong> (analcoliche, vini da carta, distillati, caffetteria).</li>
+      </ul>
+      <p>In nessun caso il Voucher è utilizzabile per:</p>
       <ul>
         <li>acquisti per asporto, delivery o vendita di prodotti enogastronomici da consumare fuori dal locale;</li>
         <li>eventi privatizzati, banchetti dedicati o servizi di catering esterni;</li>
@@ -449,15 +502,17 @@
     <!-- ===== §10 ===== -->
     <section class="legal-section" id="s10">
       <h2 class="section-title"><span class="num">10.</span> Uso parziale e residuo</h2>
-      <p>Se l'importo del conto è <strong>inferiore</strong> al valore nominale del Voucher, l'eventuale differenza (residuo) non è rimborsabile in contanti né monetizzabile.</p>
+      <p>Le previsioni del presente articolo si applicano ai soli <strong>Voucher di Valore (B)</strong>. Il <strong>Voucher Esperienza (A)</strong> dà diritto all'esperienza indicata (menù degustazione per due, con eventuale abbinamento) e si considera interamente riscattato con la fruizione di tale esperienza, senza generare residui di credito; eventuali consumazioni ulteriori (bevande non incluse, coperti aggiuntivi, voci extra) sono a carico del Beneficiario.</p>
+      <p>Per il Voucher di Valore, se l'importo del conto è <strong>inferiore</strong> al valore del Voucher, l'eventuale differenza (residuo) non è rimborsabile in contanti né monetizzabile.</p>
       <p>Il residuo rimane tuttavia <strong>utilizzabile come credito</strong> presso il Ristorante in una o più visite successive, <strong>entro la data di scadenza originale</strong> del Voucher (vedi §7). Il Ristorante annoterà il residuo nel registro interno dei voucher abbinato al Codice e ne darà conferma al Beneficiario al momento del conto.</p>
-      <p>Se l'importo del conto è <strong>superiore</strong> al valore del Voucher, la differenza è dovuta dal Beneficiario con i normali mezzi di pagamento accettati dal Ristorante.</p>
+      <p>Se l'importo del conto è <strong>superiore</strong> al valore del Voucher, la differenza è dovuta da chi <strong>indicato sul Voucher</strong> (l'Acquirente oppure il Beneficiario, secondo la scelta effettuata all'acquisto); in mancanza di indicazione, è a carico del Beneficiario. Il pagamento avviene con i normali mezzi accettati dal Ristorante.</p>
     </section>
 
     <!-- ===== §11 ===== -->
     <section class="legal-section" id="s11">
       <h2 class="section-title"><span class="num">11.</span> Cumulabilità</h2>
       <p>Il Voucher <strong>non è cumulabile</strong> con altre promozioni, sconti, menu fissi a tema, convenzioni o accordi commerciali eventualmente in essere presso il Ristorante. Non è cumulabile con altri voucher Santamonica nella stessa transazione.</p>
+      <p>Il Voucher <strong>non è inoltre utilizzabile nei fine settimana e nelle festività</strong>. Eventuali periodi di chiusura del Ristorante sono consultabili contattando il ristorante al momento della prenotazione.</p>
     </section>
 
     <!-- ===== §12 ===== -->
@@ -470,13 +525,13 @@
     <!-- ===== §13 ===== -->
     <section class="legal-section" id="s13">
       <h2 class="section-title"><span class="num">13.</span> Smarrimento del codice</h2>
-      <p>Il Codice voucher equivale a uno strumento di pagamento al portatore: in caso di <strong>smarrimento, furto, distruzione o appropriazione indebita</strong> del PDF o del Codice, il Voucher <strong>non è sostituibile né rimborsabile</strong>. Si raccomanda di conservare il PDF in luogo sicuro e di non condividerlo con soggetti diversi dal Beneficiario.</p>
+      <p>Il Codice voucher equivale a uno strumento di pagamento al portatore: va conservato con cura e non condiviso con soggetti diversi dal Beneficiario. In caso di <strong>smarrimento, furto o distruzione</strong> del PDF o del Codice, se il Voucher <strong>non è ancora stato riscattato</strong>, l'Acquirente o il Beneficiario può richiedere a <a href="mailto:info@santamonicagenova.it">info@santamonicagenova.it</a> il <strong>blocco del Codice smarrito e l'emissione di un Codice sostitutivo di pari valore e pari scadenza</strong>, previa verifica dell'avvenuto acquisto e dell'identità del richiedente. Il Voucher già riscattato, o utilizzato da un terzo prima della richiesta di blocco, non è sostituibile né rimborsabile.</p>
     </section>
 
     <!-- ===== §14 ===== -->
     <section class="legal-section" id="s14">
       <h2 class="section-title"><span class="num">14.</span> Diritto di recesso</h2>
-      <p>Ai sensi degli artt. 52 e seguenti del Codice del Consumo (D.Lgs. 206/2005), l'Acquirente in qualità di consumatore ha diritto di recedere dal contratto di acquisto del Voucher senza dover fornire alcuna motivazione, <strong>entro 14 (quattordici) giorni</strong> dalla data di emissione del Voucher.</p>
+      <p>Ai sensi degli artt. 52 e seguenti del Codice del Consumo (D.Lgs. 206/2005), l'Acquirente in qualità di consumatore ha diritto di recedere dal contratto di acquisto del Voucher senza dover fornire alcuna motivazione, <strong>entro 14 (quattordici) giorni</strong> dalla data di conclusione del contratto (buon esito del pagamento).</p>
       <div class="highlight">
         <strong>Condizione essenziale:</strong> il diritto di recesso è esercitabile <strong>esclusivamente se il Voucher non è ancora stato utilizzato</strong> (riscattato in tutto o in parte) presso il Ristorante. Una volta avvenuto il riscatto, anche parziale, il diritto di recesso decade.
       </div>
@@ -562,7 +617,7 @@
 
       <p style="margin: 0; font-size: 12px;">
         © 2026 Santamonica · Genova · Tutti i diritti riservati.<br>
-        <span class="version-tag">voucher-termini.html · v 2026.05.20.01</span>
+        <span class="version-tag">voucher-termini.html · v 2026.07.14.01</span>
       </p>
     </footer>
 

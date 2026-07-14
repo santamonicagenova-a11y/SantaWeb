@@ -1,10 +1,22 @@
 <!DOCTYPE html>
 <!--
   regala.html
-  Versione: v 2026.07.14.01
+  Versione: v 2026.07.14.02
   Pagina: Voucher regalo Santamonica — acquisto su RICHIESTA (email), in attesa dello sblocco Stripe (dec.#28)
   Fase progetto: Sito — chiusura gate voucher (2026-07-14)
   Lingua: it (IT only, dec. F0.10 C1)
+  Cambi v.07.14.01 → v.07.14.02 (su richiesta Andrea):
+    - La modalità di consegna (ritiro in ristorante / via email) era finora un'istruzione a testo libero
+      dentro la mail precompilata ("Indica se preferisci..."). Ora è una scelta esplicita OBBLIGATORIA
+      dentro ogni scheda voucher (nuovo blocco radio ".consegna-toggle", 2 opzioni: fisico/elettronico,
+      stessi termini di voucher-termini.html §4 e voucher-config).
+    - Il pulsante "Richiedi questo buono" resta cliccabile ma un click SENZA selezione non apre la mail:
+      compare un avviso inline ("Scegli come vuoi ricevere il buono...") e il focus va al blocco scelta.
+      Una volta scelta la modalità, il corpo della mail la riporta già scritta (non più da compilare).
+    - "Come funziona" step 2 riformulato di conseguenza. Applicato a tutte e 5 le schede (2 degustazione
+      + 3 buono libero). Gate: micro-fix funzionale che rende esplicito un passaggio già previsto/deciso
+      (dec. .06.10.03 "due modalità di consegna") — P1+P2, nessuna nuova P3 (nessun contenuto legale/fattuale
+      nuovo, stessa dicotomia fisico/elettronico già in voucher-termini.html).
   Cambi v.06.10.04 → v.07.14.01:
     - Lead riscritto su richiesta Andrea (micro-fix di copy, tono invariato): tolto "sederlo... sul Lungomare"
       e "cucina di pesce" → "invitarlo alla nostra tavola" e "la nostra cucina sul mare".
@@ -258,6 +270,59 @@
       white-space: nowrap;
     }
 
+    /* ===== Scelta consegna (obbligatoria) ===== */
+    .consegna-toggle {
+      width: 100%;
+      text-align: left;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      background: var(--sand);
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    .consegna-toggle .consegna-title {
+      display: block;
+      font-weight: 600;
+      font-size: 12.5px;
+      margin-bottom: 8px;
+    }
+
+    .consegna-toggle .req-star {
+      color: var(--terracotta-dark);
+    }
+
+    .consegna-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      cursor: pointer;
+      line-height: 1.4;
+      margin-bottom: 6px;
+    }
+
+    .consegna-option:last-child { margin-bottom: 0; }
+
+    .consegna-option input {
+      margin-top: 2px;
+      width: 15px;
+      height: 15px;
+      accent-color: var(--terracotta-dark);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .consegna-error {
+      display: none;
+      color: var(--terracotta-dark);
+      font-size: 12px;
+      font-weight: 600;
+      margin: -6px 0 14px;
+      text-align: left;
+      width: 100%;
+    }
+
     .btn-buy {
       display: inline-flex;
       align-items: center;
@@ -497,6 +562,18 @@
           <input type="checkbox" class="vini-check" data-target="deg6" aria-label="Aggiungi l'abbinamento vini al voucher sei portate">
           <span>Aggiungi l'abbinamento vini scelto da Monica per le sei portate <span class="vini-supp">+120 €</span></span>
         </label>
+        <div class="consegna-toggle" role="radiogroup" aria-label="Modalità di consegna — Menù degustazione sei portate">
+          <span class="consegna-title">Come lo ricevi? <span class="req-star">*</span></span>
+          <label class="consegna-option">
+            <input type="radio" name="consegna-deg6" class="consegna-radio" value="fisico">
+            <span>Ritiro in ristorante — pagamento in loco, voucher stampato in confezione</span>
+          </label>
+          <label class="consegna-option">
+            <input type="radio" name="consegna-deg6" class="consegna-radio" value="elettronico">
+            <span>Via email — pagamento elettronico, PDF a te che lo doni</span>
+          </label>
+        </div>
+        <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
         <a href="#" class="btn-buy"
            data-label-base="Menù Degustazione Sei portate, per due persone — 180 € (bevande escluse)"
            data-label-vini="Menù Degustazione Sei portate, per due persone, con abbinamento vini — 300 €"
@@ -517,6 +594,18 @@
           <input type="checkbox" class="vini-check" data-target="deg7" aria-label="Aggiungi l'abbinamento vini al voucher sette portate">
           <span>Aggiungi l'abbinamento vini scelto da Monica per le sette portate <span class="vini-supp">+140 €</span></span>
         </label>
+        <div class="consegna-toggle" role="radiogroup" aria-label="Modalità di consegna — Menù degustazione sette portate">
+          <span class="consegna-title">Come lo ricevi? <span class="req-star">*</span></span>
+          <label class="consegna-option">
+            <input type="radio" name="consegna-deg7" class="consegna-radio" value="fisico">
+            <span>Ritiro in ristorante — pagamento in loco, voucher stampato in confezione</span>
+          </label>
+          <label class="consegna-option">
+            <input type="radio" name="consegna-deg7" class="consegna-radio" value="elettronico">
+            <span>Via email — pagamento elettronico, PDF a te che lo doni</span>
+          </label>
+        </div>
+        <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
         <a href="#" class="btn-buy featured"
            data-label-base="Menù Degustazione Sette portate, per due persone — 220 € (bevande escluse)"
            data-label-vini="Menù Degustazione Sette portate, per due persone, con abbinamento vini — 360 €"
@@ -547,6 +636,18 @@
         <div class="voucher-amount"><span class="eur-num">100</span><span class="currency">€</span></div>
         <p class="price-note">valore da spendere su tutto il menù</p>
         <p class="voucher-desc">Un assaggio della nostra cucina, da comporre liberamente al tavolo.</p>
+        <div class="consegna-toggle" role="radiogroup" aria-label="Modalità di consegna — buono libero 100 euro">
+          <span class="consegna-title">Come lo ricevi? <span class="req-star">*</span></span>
+          <label class="consegna-option">
+            <input type="radio" name="consegna-libero-0" class="consegna-radio" value="fisico">
+            <span>Ritiro in ristorante — pagamento in loco, voucher stampato in confezione</span>
+          </label>
+          <label class="consegna-option">
+            <input type="radio" name="consegna-libero-0" class="consegna-radio" value="elettronico">
+            <span>Via email — pagamento elettronico, PDF a te che lo doni</span>
+          </label>
+        </div>
+        <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
         <a href="#" class="btn-buy" data-label-base="Buono libero — 100 €" aria-label="Richiedi buono regalo libero da 100 euro">
           Richiedi questo buono
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
@@ -558,6 +659,18 @@
         <div class="voucher-amount"><span class="eur-num">150</span><span class="currency">€</span></div>
         <p class="price-note">valore da spendere su tutto il menù</p>
         <p class="voucher-desc">Spazio per una cena intera in due, dall'antipasto al dolce.</p>
+        <div class="consegna-toggle" role="radiogroup" aria-label="Modalità di consegna — buono libero 150 euro">
+          <span class="consegna-title">Come lo ricevi? <span class="req-star">*</span></span>
+          <label class="consegna-option">
+            <input type="radio" name="consegna-libero-1" class="consegna-radio" value="fisico">
+            <span>Ritiro in ristorante — pagamento in loco, voucher stampato in confezione</span>
+          </label>
+          <label class="consegna-option">
+            <input type="radio" name="consegna-libero-1" class="consegna-radio" value="elettronico">
+            <span>Via email — pagamento elettronico, PDF a te che lo doni</span>
+          </label>
+        </div>
+        <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
         <a href="#" class="btn-buy featured" data-label-base="Buono libero — 150 €" aria-label="Richiedi buono regalo libero da 150 euro">
           Richiedi questo buono
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
@@ -569,6 +682,18 @@
         <div class="voucher-amount"><span class="eur-num">200</span><span class="currency">€</span></div>
         <p class="price-note">valore da spendere su tutto il menù</p>
         <p class="voucher-desc">Un'occasione senza pensieri, vini della carta inclusi.</p>
+        <div class="consegna-toggle" role="radiogroup" aria-label="Modalità di consegna — buono libero 200 euro">
+          <span class="consegna-title">Come lo ricevi? <span class="req-star">*</span></span>
+          <label class="consegna-option">
+            <input type="radio" name="consegna-libero-2" class="consegna-radio" value="fisico">
+            <span>Ritiro in ristorante — pagamento in loco, voucher stampato in confezione</span>
+          </label>
+          <label class="consegna-option">
+            <input type="radio" name="consegna-libero-2" class="consegna-radio" value="elettronico">
+            <span>Via email — pagamento elettronico, PDF a te che lo doni</span>
+          </label>
+        </div>
+        <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
         <a href="#" class="btn-buy" data-label-base="Buono libero — 200 €" aria-label="Richiedi buono regalo libero da 200 euro">
           Richiedi questo buono
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
@@ -583,11 +708,11 @@
       <ol class="steps">
         <li>
           <h3>Scegli il regalo</h3>
-          <p>Un menù degustazione per due (con o senza abbinamento vini) oppure un buono di valore libero.</p>
+          <p>Un menù degustazione per due (con o senza abbinamento vini) oppure un buono di valore libero. Indica anche come preferisci riceverlo: ritiro in ristorante o via email.</p>
         </li>
         <li>
           <h3>Inviaci la richiesta</h3>
-          <p>Premi "Richiedi questo buono": si apre un'email già compilata. Indica se preferisci ritirarlo in ristorante o riceverlo via email. Ti rispondiamo entro 24 ore con le modalità di pagamento.</p>
+          <p>Premi "Richiedi questo buono": si apre un'email già compilata con la tua scelta. Ti rispondiamo entro 24 ore con le modalità di pagamento.</p>
         </li>
         <li>
           <h3>Ritira o ricevi il buono</h3>
@@ -607,7 +732,7 @@
       <div class="info-grid">
         <div class="info-item">
           <h3>Validità</h3>
-          <p>12 mesi dalla data di emissione, indicata sul PDF.</p>
+          <p>12 mesi dalla data di emissione, indicata sul Buono Regalo.</p>
         </div>
         <div class="info-item">
           <h3>Bevande</h3>
@@ -661,7 +786,7 @@
 
       <p style="margin: 0; font-size: 12px;">
         © 2026 Santamonica · Genova · Lungomare Lombardo 27, 16145 Genova<br>
-        <span class="version-tag">regala.html · v 2026.07.14.01</span>
+        <span class="version-tag">regala.html · v 2026.07.14.02</span>
       </p>
     </footer>
 
@@ -672,25 +797,47 @@
   <script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
   <script defer src="/cookieconsent-config.js"></script>
 
-  <!-- Costruzione dei mailto "Richiedi questo buono" + checkbox abbinamento vini -->
+  <!-- Costruzione dei mailto "Richiedi questo buono" + checkbox abbinamento vini + scelta consegna obbligatoria -->
   <script>
     (function() {
       var MAIL = 'info@santamonicagenova.it';
       var SUBJECT = 'Richiesta buono regalo Santamonica';
 
-      function buildHref(label) {
+      function consegnaText(value) {
+        if (value === 'fisico') return 'Ritiro in ristorante (pagamento in loco, voucher stampato in confezione)';
+        if (value === 'elettronico') return 'Invio via email (pagamento elettronico, PDF a chi acquista)';
+        return null;
+      }
+
+      function buildHref(label, consegnaValue) {
+        var consegnaLine = consegnaText(consegnaValue) || '〈scegliere la modalità di consegna prima di inviare〉';
         var body = 'Buongiorno,\n\nvorrei acquistare il seguente buono regalo Santamonica:\n\n• ' + label +
-          '\n\nModalità preferita (ritiro in ristorante con voucher stampato in confezione / invio elettronico via email): ' +
+          '\n\nModalità di consegna richiesta: ' + consegnaLine +
           '\n\nResto in attesa delle modalità di pagamento. Grazie.\n\n' +
           '(Se è un regalo, può indicare qui nome del destinatario ed eventuale dedica: )';
         return 'mailto:' + MAIL + '?subject=' + encodeURIComponent(SUBJECT) + '&body=' + encodeURIComponent(body);
       }
 
-      // imposta href iniziale su tutti i bottoni
-      document.querySelectorAll('a.btn-buy').forEach(function(btn) {
-        var label = btn.getAttribute('data-label-base');
-        if (label) btn.setAttribute('href', buildHref(label));
-      });
+      function currentLabel(card, btn) {
+        var vc = card.querySelector('.vini-check');
+        if (vc) return vc.checked ? btn.getAttribute('data-label-vini') : btn.getAttribute('data-label-base');
+        return btn.getAttribute('data-label-base');
+      }
+
+      function currentConsegna(card) {
+        var r = card.querySelector('.consegna-radio:checked');
+        return r ? r.value : null;
+      }
+
+      function updateCardHref(card) {
+        var btn = card.querySelector('.btn-buy');
+        if (!btn) return;
+        var label = currentLabel(card, btn);
+        if (label) btn.setAttribute('href', buildHref(label, currentConsegna(card)));
+      }
+
+      // imposta href iniziale su tutte le schede (senza consegna selezionata: placeholder nel corpo mail)
+      document.querySelectorAll('.voucher-card').forEach(function(card) { updateCardHref(card); });
 
       // checkbox abbinamento vini: aggiorna prezzo mostrato + label del mailto
       document.querySelectorAll('.vini-check').forEach(function(chk) {
@@ -698,13 +845,37 @@
           var card = chk.closest('.voucher-card');
           if (!card) return;
           var num = card.querySelector('.eur-num');
-          var btn = card.querySelector('.btn-buy');
-          if (!num || !btn) return;
+          if (!num) return;
           var on = chk.checked;
           num.textContent = on ? (num.getAttribute('data-vini') || num.textContent)
                                : (num.getAttribute('data-base') || num.textContent);
-          var label = on ? btn.getAttribute('data-label-vini') : btn.getAttribute('data-label-base');
-          if (label) btn.setAttribute('href', buildHref(label));
+          updateCardHref(card);
+        });
+      });
+
+      // scelta consegna: obbligatoria, aggiorna il corpo mail e nasconde l'avviso quando selezionata
+      document.querySelectorAll('.consegna-radio').forEach(function(r) {
+        r.addEventListener('change', function() {
+          var card = r.closest('.voucher-card');
+          if (!card) return;
+          updateCardHref(card);
+          var err = card.querySelector('.consegna-error');
+          if (err) err.style.display = 'none';
+        });
+      });
+
+      // click su "Richiedi questo buono": blocca l'apertura della mail se non è stata scelta la consegna
+      document.querySelectorAll('a.btn-buy').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          var card = btn.closest('.voucher-card');
+          if (!card) return;
+          if (!currentConsegna(card)) {
+            e.preventDefault();
+            var err = card.querySelector('.consegna-error');
+            if (err) err.style.display = 'block';
+            var grp = card.querySelector('.consegna-toggle');
+            if (grp) grp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
         });
       });
 
@@ -721,9 +892,8 @@
           var btn = card.querySelector('.btn-buy');
           if (num) num.textContent = val;
           if (btn) {
-            var label = 'Buono libero — ' + val + ' €';
-            btn.setAttribute('data-label-base', label);
-            btn.setAttribute('href', buildHref(label));
+            btn.setAttribute('data-label-base', 'Buono libero — ' + val + ' €');
+            updateCardHref(card);
           }
         });
       }).catch(function(){ /* offline o file assente: restano i valori in pagina */ });

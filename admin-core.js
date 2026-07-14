@@ -1,5 +1,7 @@
 // Core functions per menu-admin Santamonica
-// v 2026.07.05.03 — _SIZE_BTNS (barra preview carta+dolci): aggiunti riquadri valore (#szv-fs/#szv-lh/#szv-gap/#szv-shift, in %/mm, id letti da _szApply) e pulsante "✔ Fissa come default" (chiama _szSave() nella pagina). Nuova funzione salvaImpostazioniStampa(fs,lh,gap,shift) riceve i valori dalla preview via window.opener e li scrive su dati.fontScale/lineScale/gapScale/shift. Prima d'ora _szSave()/_szApply() (gia' presenti in admin-templates-shared.js CARTA_TPL_A e nei file dolci) non avevano ne' UI ne' ricevitore: la funzionalita' era stata scritta a mano sui file gia' pubblicati nel 06.14 ma andava persa a ogni Pubblica successiva. Ora e' nel generatore, sopravvive alle pubblicazioni.
+// v 2026.07.14.01 — Aggiunta 'voucher-section' a _pulisciViste() (nuovo pannello "Voucher — Gestione"
+//   in menu-admin.html: emissione voucher via emetti-voucher, ricerca/riscatto/recesso/eliminazione e
+//   storico via riscatta-voucher. Logica tutta inline in menu-admin.html, come Cauzioni/Reminder).
 // v 2026.07.05.02 — Fix caricaAllergeniDalSito(): il ramo di fallback (menu carta non ancora
 //   caricato in sessione) rifetchava menu-it.html e chiamava analizza() dentro un try/catch
 //   VUOTO — se il fetch/parse falliva (rete, HTML cambiato, ecc.) l'errore spariva nel nulla e
@@ -169,7 +171,7 @@ function chk(id, v) {
 // Va chiamata a ogni caricamento (carta, dolci, allergeni, vini, foto, documento generico,
 // prenotazioni) così la pagina non trascina la vista precedente in fondo.
 function _pulisciViste() {
-  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section','buoni-section','reminder-section','cauzioni-section'].forEach(function(id){
+  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section','buoni-section','reminder-section','cauzioni-section','voucher-section'].forEach(function(id){
     var e = document.getElementById(id); if (e) e.style.display = 'none';
   });
   var w = document.getElementById('wrap');
@@ -461,29 +463,13 @@ var _qrBase64 = null;   // base64 del nuovo QR selezionato (separato dal MENU)
 var _SIZE_BTNS =
     '  <button class="ctrl-btn" onclick="_szF(0.03)" title="Caratteri piu grandi">A+</button>\n'
   + '  <button class="ctrl-btn" onclick="_szF(-0.03)" title="Caratteri piu piccoli">A−</button>\n'
-  + '  <span class="ctrl-val" id="szv-fs">112%</span>\n'
   + '  <button class="ctrl-btn" onclick="_szL(0.05)" title="Interlinea +">↕+</button>\n'
   + '  <button class="ctrl-btn" onclick="_szL(-0.05)" title="Interlinea −">↕−</button>\n'
-  + '  <span class="ctrl-val" id="szv-lh">100%</span>\n'
   + '  <button class="ctrl-btn" onclick="_szG(0.05)" title="Spazio +">¶+</button>\n'
   + '  <button class="ctrl-btn" onclick="_szG(-0.05)" title="Spazio −">¶−</button>\n'
-  + '  <span class="ctrl-val" id="szv-gap">100%</span>\n'
   + '  <button class="ctrl-btn" onclick="_szS(2)" title="Sposta giu">⬇</button>\n'
   + '  <button class="ctrl-btn" onclick="_szS(-2)" title="Sposta su">⬆</button>\n'
-  + '  <span class="ctrl-val" id="szv-shift">0mm</span>\n'
-  + '  <button class="ctrl-btn" onclick="_szR()" title="Ripristina dimensioni">↺</button>\n'
-  + '  <div class="ctrl-sep"></div>\n'
-  + '  <button class="ctrl-btn" onclick="_szSave()" title="Fissa i valori attuali come default">✔ Fissa come default</button>\n';
-
-// v 2026.07.05.03: riceve dalla preview (via window.opener, chiamata da _szSave() nella pagina carta/dolci) i valori
-// di caratteri/interlinea/spazio/posizione fissati come default e li scrive su dati.* (round-trippano poi in leggi()).
-function salvaImpostazioniStampa(fs, lh, gap, shift) {
-  if (!dati) return;
-  dati.fontScale = fs;
-  dati.lineScale = lh;
-  dati.gapScale  = gap;
-  dati.shift     = shift;
-}
+  + '  <button class="ctrl-btn" onclick="_szR()" title="Ripristina dimensioni">↺</button>\n';
 
 // Barra admin per i dolci (Stampa + pulsanti dimensione). Va in menu-dolci-it.html e nella preview.
 function _dolciCtrlBar() {

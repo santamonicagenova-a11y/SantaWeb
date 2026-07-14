@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!-- v 2026.07.14.01 — Sezione "Buoni regalo" (#regalo, mai toccata dal rifacimento voucher del 10/6):
+     il pulsante apriva un mailto: a info@ con oggetto fisso, mai aggiornato a puntare a /regala.html
+     (esiste dal 10/6). Corretto: href → /regala.html, etichetta "Scopri i buoni regalo" (IT/EN/FR in
+     translations.json). Corretto anche il testo (regalo_body, IT/EN/FR): validità 6→12 mesi, tolto
+     "escluso Sabato e festivi"/"contattaci per acquistarlo" (contraddiceva voucher-termini.html §7/§11
+     e il flusso reale su regala.html) → allineato ai fatti già approvati. Gate: delta fattuale che
+     recepisce contenuto già gated (P1+P2 Claude, P3 non riaperta). -->
 <!-- v 2026.06.29.01 — P3 AEO bucket A: rimosso "gourmet" (filler) da meta/og/twitter + page_description + JSON-LD + hero; meta accorciata ~140c; H1 con entità "Ristorante sul mare"; definizione hero front-load "a Genova". TITLE/og:title invariati (rinvio go-live pillar /cucina-di-pesce). Gate: P1+P2 + P3 a 3 vendor (Gemini+Grok+DeepSeek), raw conservato. -->
 <!-- v 2026.06.24.03 — AEO quick win #1 (audit seo-geo-aeo): le 6 domande FAQ ora avvolte in <h3 class="faq-q"> dentro <summary> = heading formulati come domanda (segnale AEO). Aspetto invariato via CSS (.faq-item summary h3 { font:inherit; display:inline }). Testo domande INVARIATO → JSON-LD FAQPage non toccato. Gate: solo markup (nessun testo pubblico nuovo) → P1+P2, P3 non dovuta. -->
 <!-- v 2026.06.24.02 — AEO quick win #2+#3 (audit seo-geo-aeo): FAQ — (2) liste estraibili: "Come si prenota?" e parcheggio passano a <ul>; (3) risposta parcheggio riscritta answer-first ("No, non ci sono parcheggi privati…"). JSON-LD FAQPage allineato 1:1 (testo parcheggio aggiornato). +CSS .faq-answer ul/li. Gate: P1+P2; P3 = debito (Zapier task esauriti). -->
@@ -533,8 +540,8 @@
     <div class="regalo-inner reveal">
       <p class="section-label" data-i18n="regalo_label">Un dono speciale</p>
       <h2 class="section-title" data-i18n="regalo_title">Buoni <em>regalo</em></h2>
-      <p class="regalo-body" data-i18n="regalo_body">Regala un pranzo o una cena al Santamonica. I Buoni Regalo sono utilizzabili tutti i giorni (salvo disponibilit&agrave;) escluso Sabato e festivi, con validit&agrave; di 6 mesi dall&rsquo;acquisto. Contattaci per acquistarlo.</p>
-      <a href="mailto:info@santamonicagenova.it?subject=Buono Regalo Santamonica" class="btn-primary" data-i18n="regalo_btn">Richiedi un buono</a>
+      <p class="regalo-body" data-i18n="regalo_body">Regala un&rsquo;esperienza al Santamonica: i nostri men&ugrave; degustazione per due o un buono di valore libero, da spendere quando preferisce. Validit&agrave; 12 mesi.</p>
+      <a href="/regala.html" class="btn-primary" data-i18n="regalo_btn">Scopri i buoni regalo</a>
     </div>
   </div>
 </section>

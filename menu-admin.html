@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- v 2026.07.14.01 — Nuovo pannello "Voucher — Gestione" (#voucher-section, voce nav dopo "Buoni
+     regalo"): emissione voucher (chiama emetti-voucher, azione 'emit') + ricerca/gestione per codice
+     (chiama riscatta-voucher: 'lookup'/'redeem'/'recesso'/'delete') + storico ultimi 50 (riscatta-voucher
+     azione 'list', nuova in questa sessione, redeploy v.03). Stesso secret VOUCHER_ADMIN_SECRET dei due
+     strumenti interni voucher-generator.html / voucher-riscatto.html, chiave propria in localStorage
+     (pattern identico al pannello Cauzioni). Bump ?v= admin-core.js a 2026.07.14.01 (_pulisciViste
+     +'voucher-section'). Chiude la richiesta di gestione voucher direttamente da menu-admin, senza
+     aprire strumenti separati. -->
 <!-- v 2026.07.10.01 — Prenotazioni online: nuovo blocco "Limita i posti su un orario già aperto"
      (data + tendina orari + max posti + lista limiti attivi con coperti occupati/max e rimozione).
      Tabella reservation_slot_caps (slot_date, slot_time, max_covers) + azioni set_slot_cap/
@@ -168,6 +176,7 @@
   <button class="qa-btn" onclick="apriSezioneDocGenerico()">Documento generico</button>
   <button class="qa-btn" onclick="apriSezionePrenotazioni()">Prenotazioni online</button>
   <button class="qa-btn" onclick="apriSezioneBuoni()">Buoni regalo</button>
+  <button class="qa-btn" onclick="apriSezioneVoucher()">Voucher — Gestione</button>
   <button class="qa-btn" onclick="apriSezioneReminder()">Reminder prenotazioni</button>
   <button class="qa-btn" onclick="location.href='gestionale.html'">Gestionale</button>
   <button class="qa-btn" onclick="apriSezioneCauzioni()">Cauzioni (storico)</button>
@@ -227,6 +236,7 @@
         <li><strong>Carta vini</strong>: «Menù Vini» → scegli il PDF → <strong>Converti e Pubblica</strong> (si apre prima un'anteprima; ogni pagina del PDF diventa un'immagine fedele)</li>
         <li><strong>Foto cucina / Foto sito</strong>: scegli le immagini → <strong>Pubblica foto</strong></li>
         <li><strong>Buoni regalo</strong>: imposta i valori → <strong>Pubblica valori</strong></li>
+        <li><strong>Voucher — Gestione</strong>: emetti un nuovo voucher, cerca/riscatta/annulla per codice, storico completo</li>
         <li><strong>Prenotazioni online</strong>: chiusure/aperture (giorno, servizio o singolo orario) → si applicano subito</li>
       </ul>
 
@@ -614,11 +624,102 @@
   </div>
 </div>
 
+<div id="voucher-section" style="max-width:900px;margin:1.5rem auto;padding:0 1rem;display:none;">
+  <div class="fs">
+    <div class="fs-head">Voucher regalo — Gestione</div>
+    <div class="fs-body">
+      <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">
+        Emetti nuovi voucher e gestisci quelli esistenti (riscatto totale/parziale, diritto di recesso, cancellazione). La prima volta chiede la chiave amministratore — la stessa che usi per i Voucher e per le Cauzioni.
+      </p>
+
+      <details id="vc-emit-details" style="margin-bottom:1rem;border:1px solid var(--rule);padding:.8rem 1rem;">
+        <summary style="cursor:pointer;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);">+ Genera nuovo voucher</summary>
+        <div style="margin-top:1rem;display:flex;flex-direction:column;gap:.7rem;">
+          <div>
+            <span class="opt-lbl">Tipo</span>
+            <select id="vc-e-tipo" style="width:100%;" onchange="_vcEmitToggle()">
+              <option value="deg6">Esperienza · Degustazione sei portate (per 2)</option>
+              <option value="deg7">Esperienza · Degustazione sette portate, a mano libera (per 2)</option>
+              <option value="valore">Buono libero · valore monetario</option>
+            </select>
+          </div>
+          <label id="vc-e-vini-row" style="display:flex;align-items:center;gap:.4rem;font-size:.78rem;">
+            <input type="checkbox" id="vc-e-vini" /> Abbinamento vini incluso
+          </label>
+          <div id="vc-e-valore-row" style="display:none;" class="opt-row">
+            <div><span class="opt-lbl">Valore buono (€)</span><input type="number" id="vc-e-valore" min="1" step="1" value="100" /></div>
+            <div>
+              <span class="opt-lbl">Eccedenza a carico di</span>
+              <select id="vc-e-eccedenza" style="width:100%;">
+                <option value="destinatario">Destinatario</option>
+                <option value="acquirente">Acquirente</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <span class="opt-lbl">Destinatario (opzionale)</span>
+            <input type="text" id="vc-e-dest" placeholder="Es. Giulia" style="width:100%;" />
+          </div>
+          <div class="opt-row">
+            <div><span class="opt-lbl">Acquirente — nome</span><input type="text" id="vc-e-acq-nome" style="width:100%;" /></div>
+            <div><span class="opt-lbl">Acquirente — email</span><input type="text" id="vc-e-acq-email" style="width:100%;" /></div>
+          </div>
+          <div class="opt-row">
+            <div><span class="opt-lbl">Prezzo pagato (€)</span><input type="number" id="vc-e-prezzo" min="0" step="1" style="width:100%;" /></div>
+            <div>
+              <span class="opt-lbl">Consegna</span>
+              <select id="vc-e-consegna" style="width:100%;">
+                <option value="elettronico">Elettronico (PDF)</option>
+                <option value="fisico">Fisico (stampato)</option>
+              </select>
+            </div>
+            <div><span class="opt-lbl">Data emissione</span><input type="date" id="vc-e-data" style="width:100%;" /></div>
+          </div>
+          <div>
+            <span class="opt-lbl">Note interne (opzionale)</span>
+            <input type="text" id="vc-e-note" style="width:100%;" />
+          </div>
+          <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
+            <button class="btn btn-publish" onclick="emettiVoucherAdmin()">✦ Emetti voucher</button>
+            <span id="vc-e-status" style="font-size:.75rem;color:var(--stone);"></span>
+          </div>
+          <div id="vc-e-result" style="display:none;font-size:.82rem;background:var(--sand);padding:.7rem;">
+            <div id="vc-e-out"></div>
+            <div style="font-size:.72rem;color:var(--stone);margin-top:.4rem;">Per stampare il buono regalo (PDF/cartoncino) usa <code>voucher-generator.html</code> — non serve rigenerare il codice, riportalo lì manualmente.</div>
+          </div>
+        </div>
+      </details>
+
+      <details id="vc-search-details" style="margin-bottom:1.4rem;border:1px solid var(--rule);padding:.8rem 1rem;">
+        <summary style="cursor:pointer;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);">+ Cerca / gestisci un voucher</summary>
+        <div style="margin-top:1rem;display:flex;flex-direction:column;gap:.8rem;">
+          <div style="display:flex;gap:.6rem;">
+            <input type="text" id="vc-s-codice" placeholder="SM-2026-001" style="flex:1;text-transform:uppercase;" onkeydown="if(event.key==='Enter')cercaVoucherAdmin();" />
+            <button class="btn btn-load" style="border:1px solid var(--ink);color:var(--ink)" onclick="cercaVoucherAdmin()">Cerca</button>
+          </div>
+          <div id="vc-s-msg"></div>
+          <div id="vc-s-result" style="font-size:.85rem;color:var(--stone);">Inserisci un codice.</div>
+        </div>
+      </details>
+
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
+        <button class="btn btn-load" onclick="caricaVoucherLista()" style="border:1px solid var(--ink);color:var(--ink)">↻ Aggiorna storico</button>
+        <span id="vc-l-status" style="font-size:.75rem;color:var(--stone);"></span>
+      </div>
+      <div id="vc-l-list" style="font-size:.85rem;">&hellip;</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
+        <button class="btn btn-load" onclick="chiudiSezioneVoucher()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
+        <button class="btn btn-load" onclick="resetVoucherSecret()" title="Cambia chiave amministratore" style="font-size:.6rem;padding:.45rem .7rem;opacity:.7">🔑</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast">✓ Scaricato!</div>
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.06.10.06"></script>
-<script src="admin-core.js?v=2026.07.05.02"></script>
+<script src="admin-core.js?v=2026.07.14.01"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -1323,6 +1424,242 @@ function _czCopyLink() {
 
 function _czOpenLink() {
   if (_czLastLink) window.open(_czLastLink, '_blank');
+}
+
+// ══ VOUCHER — emissione, ricerca/riscatto, storico ══════════
+// Riusa emetti-voucher (azione 'emit') e riscatta-voucher (azioni 'lookup',
+// 'redeem', 'recesso', 'delete', 'list'), stesso secret VOUCHER_ADMIN_SECRET
+// dei due strumenti interni voucher-generator.html / voucher-riscatto.html.
+// Chiave chiesta una tantum, salvata in localStorage con chiave propria.
+var VOUCHER_EMIT_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/emetti-voucher';
+var VOUCHER_MANAGE_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/riscatta-voucher';
+var VC_SECRET_KEY = 'menuadmin.voucher.secret.v1';
+
+function _vcGetSecret() {
+  var s = localStorage.getItem(VC_SECRET_KEY);
+  if (!s) {
+    s = (prompt('Chiave amministratore Voucher (una tantum):') || '').trim();
+    if (s) localStorage.setItem(VC_SECRET_KEY, s);
+  }
+  return s;
+}
+function resetVoucherSecret() {
+  localStorage.removeItem(VC_SECRET_KEY);
+}
+
+function apriSezioneVoucher() {
+  document.getElementById('carica-menu').classList.remove('open');
+  document.getElementById('intro').style.display = 'none';
+  _pulisciViste();
+  document.getElementById('voucher-section').style.display = 'block';
+  var d = document.getElementById('vc-e-data'); if (d && !d.value) d.value = new Date().toISOString().slice(0,10);
+  _vcEmitToggle();
+  caricaVoucherLista();
+}
+function chiudiSezioneVoucher() {
+  document.getElementById('voucher-section').style.display = 'none';
+  if (!document.getElementById('wrap').classList.contains('on'))
+    document.getElementById('intro').style.display = '';
+}
+
+function _vcEmitToggle() {
+  var tipo = document.getElementById('vc-e-tipo').value;
+  var isExp = (tipo === 'deg6' || tipo === 'deg7');
+  document.getElementById('vc-e-vini-row').style.display = isExp ? 'flex' : 'none';
+  document.getElementById('vc-e-valore-row').style.display = isExp ? 'none' : 'flex';
+}
+
+function _vcSetEmitStatus(msg, isErr) {
+  var el = document.getElementById('vc-e-status'); if (!el) return;
+  el.textContent = msg || ''; el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
+}
+
+function emettiVoucherAdmin() {
+  var secret = _vcGetSecret();
+  if (!secret) { _vcSetEmitStatus('Operazione annullata: serve la chiave amministratore.', true); return; }
+
+  var tipoSel = document.getElementById('vc-e-tipo').value;
+  var isExp = (tipoSel === 'deg6' || tipoSel === 'deg7');
+  var vini = document.getElementById('vc-e-vini').checked;
+
+  var descrizione;
+  if (tipoSel === 'deg6') descrizione = 'Degustazione sei portate per 2' + (vini ? ' con abbinamento vini' : '');
+  else if (tipoSel === 'deg7') descrizione = 'Degustazione sette portate (a mano libera) per 2' + (vini ? ' con abbinamento vini' : '');
+  else descrizione = 'Buono libero ' + (document.getElementById('vc-e-valore').value || '') + ' €';
+
+  var payload = {
+    action: 'emit',
+    tipo: isExp ? 'esperienza' : 'valore',
+    descrizione: descrizione,
+    abbinamento_vini: isExp ? vini : false,
+    prezzo_pagato_eur: document.getElementById('vc-e-prezzo').value ? Number(document.getElementById('vc-e-prezzo').value) : null,
+    acquirente_nome: document.getElementById('vc-e-acq-nome').value.trim() || null,
+    acquirente_email: document.getElementById('vc-e-acq-email').value.trim() || null,
+    destinatario: document.getElementById('vc-e-dest').value.trim() || null,
+    consegna: document.getElementById('vc-e-consegna').value,
+    data_emissione: document.getElementById('vc-e-data').value || null,
+    note: document.getElementById('vc-e-note').value.trim() || null
+  };
+  if (!isExp) {
+    payload.valore_eur = document.getElementById('vc-e-valore').value ? Number(document.getElementById('vc-e-valore').value) : null;
+    payload.eccedenza_a_carico = document.getElementById('vc-e-eccedenza').value;
+  }
+
+  document.getElementById('vc-e-result').style.display = 'none';
+  _vcSetEmitStatus('Emissione in corso…');
+  fetch(VOUCHER_EMIT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-voucher-secret': secret },
+    body: JSON.stringify(payload)
+  })
+    .then(function (r) {
+      if (r.status === 401) { localStorage.removeItem(VC_SECRET_KEY); throw new Error('Chiave errata — riprova.'); }
+      return r.json().then(function (j) { return { status: r.status, body: j }; });
+    })
+    .then(function (res) {
+      if (!res.body || !res.body.voucher) throw new Error((res.body && res.body.error) || 'Errore sconosciuto');
+      var v = res.body.voucher;
+      document.getElementById('vc-e-out').innerHTML = '✓ Emesso: <strong>' + _czEsc(v.codice) + '</strong> — scade il ' + (v.data_scadenza || '—');
+      document.getElementById('vc-e-result').style.display = 'block';
+      _vcSetEmitStatus('Fatto.');
+      caricaVoucherLista();
+    })
+    .catch(function (ex) { _vcSetEmitStatus('Impossibile emettere: ' + ex.message, true); });
+}
+
+var VC_STATUS_LABEL = {
+  emesso: 'Emesso — non ancora usato', parziale: 'Uso parziale', riscattato: 'Riscattato',
+  scaduto: 'Scaduto', recesso: 'Annullato (recesso)'
+};
+var VC_STATUS_COLOR = {
+  emesso: 'var(--stone)', parziale: 'var(--stone)', riscattato: 'var(--green)',
+  scaduto: 'var(--rust)', recesso: 'var(--rust)'
+};
+
+function _vcCall(action, extra) {
+  var secret = _vcGetSecret();
+  if (!secret) return Promise.reject(new Error('Operazione annullata: serve la chiave amministratore.'));
+  var payload = Object.assign({ action: action }, extra || {});
+  return fetch(VOUCHER_MANAGE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-voucher-secret': secret },
+    body: JSON.stringify(payload)
+  }).then(function (r) {
+    if (r.status === 401) { localStorage.removeItem(VC_SECRET_KEY); }
+    return r.json().then(function (j) { return { ok: r.ok, j: j }; });
+  });
+}
+
+function _vcSetSearchMsg(text, ok) {
+  document.getElementById('vc-s-msg').innerHTML = text ? ('<div style="font-size:.78rem;padding:.5rem .7rem;border-radius:3px;background:' + (ok ? 'var(--sand)' : '#f7dede') + ';color:' + (ok ? 'var(--ink)' : 'var(--rust)') + ';">' + _czEsc(text) + '</div>') : '';
+}
+
+function cercaVoucherAdmin() {
+  _vcSetSearchMsg('');
+  var codice = document.getElementById('vc-s-codice').value.trim().toUpperCase();
+  if (!codice) { _vcSetSearchMsg('Inserisci un codice.', false); return; }
+  document.getElementById('vc-s-result').innerHTML = 'Ricerca…';
+  _vcCall('lookup', { codice: codice }).then(function (res) {
+    if (res.ok && res.j && res.j.voucher) _vcRenderCard(res.j.voucher);
+    else { document.getElementById('vc-s-result').innerHTML = 'Nessun voucher trovato.'; _vcSetSearchMsg((res.j && res.j.error) || 'Errore di ricerca.', false); }
+  }).catch(function (ex) { _vcSetSearchMsg(ex.message, false); });
+}
+
+function _vcRenderCard(v) {
+  var st = VC_STATUS_LABEL[v.stato] || v.stato, color = VC_STATUS_COLOR[v.stato] || 'var(--stone)';
+  var isExp = v.tipo === 'esperienza';
+  var h = '<div style="border:1px solid var(--rule);padding:.8rem 1rem;">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;"><strong style="font-family:monospace;font-size:1.05rem;">' + _czEsc(v.codice) + '</strong><span style="font-size:.75rem;color:' + color + ';font-weight:600;">' + _czEsc(st) + '</span></div>';
+  h += '<div style="font-size:.82rem;color:var(--ink);line-height:1.7;">';
+  h += '<div>' + (isExp ? 'Esperienza' : 'Buono libero') + ' — ' + _czEsc(v.descrizione || '') + '</div>';
+  if (!isExp) h += '<div>Valore iniziale ' + _czEuro(v.valore_eur) + ' · Residuo <strong>' + _czEuro(v.residuo_eur) + '</strong></div>';
+  h += '<div>Acquirente: ' + _czEsc(v.acquirente_nome || '—') + ' · Emesso ' + (v.data_emissione || '—') + ' · Scade ' + (v.data_scadenza || '—') + '</div>';
+  h += '</div>';
+
+  if (v.stato === 'riscattato' || v.stato === 'scaduto' || v.stato === 'recesso') {
+    h += '<p style="font-size:.78rem;color:var(--stone);margin-top:.6rem;">Nessuna azione disponibile.</p>';
+  } else if (isExp) {
+    h += '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;">';
+    h += '<button class="btn btn-publish" onclick="_vcRedeem(\'' + v.codice + '\', null)">Segna come riscattato</button>';
+    h += '<button class="btn btn-load" style="border:1px solid var(--rust);color:var(--rust)" onclick="_vcRecesso(\'' + v.codice + '\')">Diritto di recesso</button>';
+    if (v.stato === 'emesso') h += '<button class="btn btn-load" style="border:1px solid var(--rust);color:var(--rust)" onclick="_vcDelete(\'' + v.codice + '\')">Elimina (mai spedito)</button>';
+    h += '</div>';
+  } else {
+    h += '<div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-top:.8rem;">';
+    h += '<input type="number" id="vc-s-importo" min="0.01" step="0.01" value="' + Number(v.residuo_eur).toFixed(2) + '" style="width:100px;" /> <span style="font-size:.75rem;color:var(--stone);">€ da scalare</span>';
+    h += '<button class="btn btn-publish" onclick="_vcRedeem(\'' + v.codice + '\', document.getElementById(\'vc-s-importo\').value)">Registra riscatto</button>';
+    h += '<button class="btn btn-load" style="border:1px solid var(--ink);color:var(--ink)" onclick="_vcRedeem(\'' + v.codice + '\', null)">Riscatta tutto</button>';
+    if (v.stato === 'emesso') {
+      h += '<button class="btn btn-load" style="border:1px solid var(--rust);color:var(--rust)" onclick="_vcRecesso(\'' + v.codice + '\')">Diritto di recesso</button>';
+      h += '<button class="btn btn-load" style="border:1px solid var(--rust);color:var(--rust)" onclick="_vcDelete(\'' + v.codice + '\')">Elimina (mai spedito)</button>';
+    }
+    h += '</div>';
+  }
+  h += '</div>';
+  document.getElementById('vc-s-result').innerHTML = h;
+}
+
+function _vcRedeem(codice, importo) {
+  _vcSetSearchMsg('');
+  var extra = { codice: codice };
+  if (importo !== null && importo !== undefined && importo !== '') extra.importo = Number(importo);
+  _vcCall('redeem', extra).then(function (res) {
+    if (res.ok && res.j && res.j.voucher) { _vcSetSearchMsg('✓ Riscatto registrato.', true); _vcRenderCard(res.j.voucher); caricaVoucherLista(); }
+    else _vcSetSearchMsg((res.j && res.j.error) || 'Errore durante il riscatto.', false);
+  });
+}
+function _vcRecesso(codice) {
+  if (!confirm('Confermi il recesso? Il voucher ' + codice + ' verrà annullato e non sarà più utilizzabile.')) return;
+  _vcSetSearchMsg('');
+  _vcCall('recesso', { codice: codice }).then(function (res) {
+    if (res.ok && res.j && res.j.voucher) { _vcSetSearchMsg('✓ Recesso registrato: voucher annullato.', true); _vcRenderCard(res.j.voucher); caricaVoucherLista(); }
+    else _vcSetSearchMsg((res.j && res.j.error) || 'Errore durante il recesso.', false);
+  });
+}
+function _vcDelete(codice) {
+  if (!confirm('Confermi l\'eliminazione del voucher ' + codice + '? Sparisce definitivamente. Usalo solo per errori mai spediti al cliente.')) return;
+  _vcSetSearchMsg('');
+  _vcCall('delete', { codice: codice }).then(function (res) {
+    if (res.ok && res.j && res.j.deleted) {
+      _vcSetSearchMsg('✓ Voucher ' + res.j.deleted + ' eliminato.', true);
+      document.getElementById('vc-s-result').innerHTML = 'Inserisci un codice.';
+      document.getElementById('vc-s-codice').value = '';
+      caricaVoucherLista();
+    } else _vcSetSearchMsg((res.j && res.j.error) || 'Errore durante l\'eliminazione.', false);
+  });
+}
+
+function _vcSetListStatus(msg, isErr) {
+  var el = document.getElementById('vc-l-status'); if (!el) return;
+  el.textContent = msg || ''; el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
+}
+
+function _vcRenderList(rows) {
+  var wrap = document.getElementById('vc-l-list');
+  if (!rows.length) { wrap.innerHTML = '<span style="color:var(--stone);">Nessun voucher in archivio.</span>'; return; }
+  wrap.innerHTML = '<div>' + rows.map(function (r) {
+    var label = VC_STATUS_LABEL[r.stato] || r.stato, color = VC_STATUS_COLOR[r.stato] || 'var(--stone)';
+    var importo = r.tipo === 'esperienza' ? (r.descrizione || '—') : (_czEuro(r.residuo_eur) + ' / ' + _czEuro(r.valore_eur));
+    return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;padding:.5rem 0;border-bottom:1px dotted var(--rule);">' +
+      '<span style="min-width:110px;font-family:monospace;font-weight:600;">' + _czEsc(r.codice) + '</span>' +
+      '<span style="font-size:.78rem;min-width:160px;">' + _czEsc(r.acquirente_nome || '(senza nome)') + '</span>' +
+      '<span style="font-size:.78rem;">' + _czEsc(importo) + '</span>' +
+      '<span style="font-size:.72rem;color:' + color + ';font-weight:500;margin-left:auto;">' + _czEsc(label) + '</span>' +
+      '<span style="font-size:.68rem;color:var(--stone);width:100%;">emesso ' + (r.data_emissione || '—') + ' · creato ' + _czRel(r.created_at) + '</span>' +
+      '</div>';
+  }).join('') + '</div>';
+}
+
+function caricaVoucherLista() {
+  var secret = _vcGetSecret();
+  if (!secret) { _vcSetListStatus('Operazione annullata: serve la chiave amministratore.', true); return; }
+  _vcSetListStatus('Caricamento…');
+  _vcCall('list', { limit: 50 }).then(function (res) {
+    if (!res.ok || !res.j) { _vcSetListStatus('Impossibile caricare: ' + ((res.j && res.j.error) || 'errore'), true); return; }
+    var rows = res.j.rows || [];
+    _vcRenderList(rows);
+    _vcSetListStatus(rows.length + (rows.length === 1 ? ' voucher' : ' voucher'));
+  });
 }
 
 // ══ FOTO CUCINA ══════════════════════════════════════════

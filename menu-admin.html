@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- v 2026.07.14.02 — Assorbito il vecchio pannello separato "Buoni regalo" (#buoni-section + pulsante
+     nav) dentro "Voucher — Gestione": nuovo blocco `<details>` "Valori dei buoni liberi" (3 campi +
+     Pubblica valori) fra "Genera nuovo voucher" e "Cerca/gestisci", riusa le funzioni esistenti
+     caricaVoucherBuoni()/pubblicaVoucherBuoni()/_pubblicaVoucherConfig() in admin-core.js (invariate).
+     Rimossi: pulsante nav "Buoni regalo", sezione #buoni-section, riga nella lista d'aiuto (accorpata
+     nella voce Voucher), funzione apriSezioneBuoni() in admin-core.js (_pulisciViste non elenca più
+     'buoni-section'). apriSezioneVoucher() ora chiama anche caricaVoucherBuoni(). Un solo pannello per
+     tutto ciò che riguarda i voucher. -->
 <!-- v 2026.07.14.01 — Nuovo pannello "Voucher — Gestione" (#voucher-section, voce nav dopo "Buoni
      regalo"): emissione voucher (chiama emetti-voucher, azione 'emit') + ricerca/gestione per codice
      (chiama riscatta-voucher: 'lookup'/'redeem'/'recesso'/'delete') + storico ultimi 50 (riscatta-voucher
@@ -175,7 +183,6 @@
   <button class="qa-btn" onclick="apriSezioneVini()">Menù Vini</button>
   <button class="qa-btn" onclick="apriSezioneDocGenerico()">Documento generico</button>
   <button class="qa-btn" onclick="apriSezionePrenotazioni()">Prenotazioni online</button>
-  <button class="qa-btn" onclick="apriSezioneBuoni()">Buoni regalo</button>
   <button class="qa-btn" onclick="apriSezioneVoucher()">Voucher — Gestione</button>
   <button class="qa-btn" onclick="apriSezioneReminder()">Reminder prenotazioni</button>
   <button class="qa-btn" onclick="location.href='gestionale.html'">Gestionale</button>
@@ -235,8 +242,7 @@
       <ul style="margin:.2rem 0 .2rem 1.2rem;padding:0">
         <li><strong>Carta vini</strong>: «Menù Vini» → scegli il PDF → <strong>Converti e Pubblica</strong> (si apre prima un'anteprima; ogni pagina del PDF diventa un'immagine fedele)</li>
         <li><strong>Foto cucina / Foto sito</strong>: scegli le immagini → <strong>Pubblica foto</strong></li>
-        <li><strong>Buoni regalo</strong>: imposta i valori → <strong>Pubblica valori</strong></li>
-        <li><strong>Voucher — Gestione</strong>: emetti un nuovo voucher, cerca/riscatta/annulla per codice, storico completo</li>
+        <li><strong>Voucher — Gestione</strong>: emetti un nuovo voucher, valori dei buoni liberi, cerca/riscatta/annulla per codice, storico completo</li>
         <li><strong>Prenotazioni online</strong>: chiusure/aperture (giorno, servizio o singolo orario) → si applicano subito</li>
       </ul>
 
@@ -280,35 +286,6 @@
         <button class="btn btn-load" onclick="chiudiFotoSito()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
         <span id="foto-sito-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
       </div>
-    </div>
-  </div>
-</div>
-
-<div id="buoni-section" style="max-width:700px;margin:1.5rem auto;padding:0 1rem;display:none;">
-  <div class="fs">
-    <div class="fs-head">Buoni regalo — valori dei buoni liberi</div>
-    <div class="fs-body">
-      <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">
-        Imposta i tre importi dei <strong>buoni liberi</strong> mostrati sulla pagina dei voucher.
-        Premendo "Pubblica" vengono salvati in <code>voucher-config.json</code> e la pagina
-        <strong>regala</strong> li legge in automatico. Usa il tuo token GitHub (lo stesso della pubblicazione).
-      </p>
-      <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:end;margin-bottom:1.2rem;">
-        <div>
-          <span class="opt-lbl">Buono 1 (€)</span>
-          <input type="number" id="vb-1" min="1" step="1" value="100" style="width:90px;" />
-        </div>
-        <div>
-          <span class="opt-lbl">Buono 2 (€)</span>
-          <input type="number" id="vb-2" min="1" step="1" value="150" style="width:90px;" />
-        </div>
-        <div>
-          <span class="opt-lbl">Buono 3 (€)</span>
-          <input type="number" id="vb-3" min="1" step="1" value="200" style="width:90px;" />
-        </div>
-        <button class="btn btn-publish" onclick="pubblicaVoucherBuoni()">✦ Pubblica valori</button>
-      </div>
-      <div id="vb-status" style="font-size:.82rem;color:var(--stone);">&hellip;</div>
     </div>
   </div>
 </div>
@@ -690,6 +667,33 @@
         </div>
       </details>
 
+      <details id="vc-valori-details" style="margin-bottom:1rem;border:1px solid var(--rule);padding:.8rem 1rem;">
+        <summary style="cursor:pointer;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);">+ Valori dei buoni liberi</summary>
+        <div style="margin-top:1rem;">
+          <p style="font-size:.82rem;color:var(--stone);margin-bottom:1rem;line-height:1.6;">
+            Imposta i tre importi dei <strong>buoni liberi</strong> mostrati sulla pagina dei voucher.
+            Premendo "Pubblica" vengono salvati in <code>voucher-config.json</code> e la pagina
+            <strong>regala</strong> li legge in automatico. Usa il tuo token GitHub (lo stesso della pubblicazione).
+          </p>
+          <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
+            <div>
+              <span class="opt-lbl">Buono 1 (€)</span>
+              <input type="number" id="vb-1" min="1" step="1" value="100" style="width:90px;" />
+            </div>
+            <div>
+              <span class="opt-lbl">Buono 2 (€)</span>
+              <input type="number" id="vb-2" min="1" step="1" value="150" style="width:90px;" />
+            </div>
+            <div>
+              <span class="opt-lbl">Buono 3 (€)</span>
+              <input type="number" id="vb-3" min="1" step="1" value="200" style="width:90px;" />
+            </div>
+            <button class="btn btn-publish" onclick="pubblicaVoucherBuoni()">✦ Pubblica valori</button>
+          </div>
+          <div id="vb-status" style="font-size:.82rem;color:var(--stone);">&hellip;</div>
+        </div>
+      </details>
+
       <details id="vc-search-details" style="margin-bottom:1.4rem;border:1px solid var(--rule);padding:.8rem 1rem;">
         <summary style="cursor:pointer;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);">+ Cerca / gestisci un voucher</summary>
         <div style="margin-top:1rem;display:flex;flex-direction:column;gap:.8rem;">
@@ -719,7 +723,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.06.10.06"></script>
-<script src="admin-core.js?v=2026.07.14.01"></script>
+<script src="admin-core.js?v=2026.07.14.02"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -1455,6 +1459,7 @@ function apriSezioneVoucher() {
   var d = document.getElementById('vc-e-data'); if (d && !d.value) d.value = new Date().toISOString().slice(0,10);
   _vcEmitToggle();
   caricaVoucherLista();
+  caricaVoucherBuoni();
 }
 function chiudiSezioneVoucher() {
   document.getElementById('voucher-section').style.display = 'none';

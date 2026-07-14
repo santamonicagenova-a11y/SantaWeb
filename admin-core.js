@@ -1,4 +1,9 @@
 // Core functions per menu-admin Santamonica
+// v 2026.07.14.02 — Assorbito il pannello "Buoni regalo" dentro "Voucher — Gestione": rimossa
+//   apriSezioneBuoni() (il nav button e la #buoni-section non esistono più in menu-admin.html) e tolto
+//   'buoni-section' da _pulisciViste(). caricaVoucherBuoni()/pubblicaVoucherBuoni()/_pubblicaVoucherConfig()
+//   restano invariate e sono ora richiamate dal nuovo blocco "Valori dei buoni liberi" dentro il pannello
+//   Voucher (chiamata anche da apriSezioneVoucher() in menu-admin.html).
 // v 2026.07.14.01 — Aggiunta 'voucher-section' a _pulisciViste() (nuovo pannello "Voucher — Gestione"
 //   in menu-admin.html: emissione voucher via emetti-voucher, ricerca/riscatto/recesso/eliminazione e
 //   storico via riscatta-voucher. Logica tutta inline in menu-admin.html, come Cauzioni/Reminder).
@@ -171,7 +176,7 @@ function chk(id, v) {
 // Va chiamata a ogni caricamento (carta, dolci, allergeni, vini, foto, documento generico,
 // prenotazioni) così la pagina non trascina la vista precedente in fondo.
 function _pulisciViste() {
-  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section','buoni-section','reminder-section','cauzioni-section','voucher-section'].forEach(function(id){
+  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section','reminder-section','cauzioni-section','voucher-section'].forEach(function(id){
     var e = document.getElementById(id); if (e) e.style.display = 'none';
   });
   var w = document.getElementById('wrap');
@@ -587,16 +592,6 @@ function caricaVoucherBuoni() {
       } else if (st) { st.textContent = 'Nessun config trovato: inserisci i valori e pubblica.'; }
     })
     .catch(function(){ if (st) st.textContent = 'Config non raggiungibile (offline?).'; });
-}
-
-// Apre il pannello "Buoni regalo" (stesso pattern delle altre sezioni).
-function apriSezioneBuoni() {
-  var cm = document.getElementById('carica-menu'); if (cm) cm.classList.remove('open');
-  var intro = document.getElementById('intro'); if (intro) intro.style.display = 'none';
-  _pulisciViste();
-  var bs = document.getElementById('buoni-section');
-  if (bs) bs.style.display = 'block';
-  caricaVoucherBuoni();
 }
 
 // Avvia la pubblicazione dei 3 valori (gestisce il token come gli altri publish).

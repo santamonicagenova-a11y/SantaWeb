@@ -1,11 +1,31 @@
 <!DOCTYPE html>
 <!--
   regala.html
-  Versione: v 2026.07.14.02
-  Pagina: Voucher regalo Santamonica — acquisto su RICHIESTA (email), in attesa dello sblocco Stripe (dec.#28)
-  Fase progetto: Sito — chiusura gate voucher (2026-07-14)
+  Versione: v 2026.07.14.03
+  Pagina: Voucher regalo Santamonica — richiesta automatizzata (form + mail), in attesa dello sblocco
+          Stripe (dec.#28) per il pagamento online
+  Fase progetto: Sito — automazione richiesta→consegna voucher (2026-07-14)
   Lingua: it (IT only, dec. F0.10 C1)
-  Cambi v.07.14.01 → v.07.14.02 (su richiesta Andrea):
+  Cambi v.07.14.02 → v.07.14.03 (su richiesta Andrea — automatizzare tutto il processo
+  richiesta→consegna, sul modello già usato per le prenotazioni):
+    - Il mailto "Richiedi questo buono" è sostituito da un INVIO REALE: nuova sezione condivisa
+      "I tuoi dati" (nome*, email*, telefono/destinatario/dedica opzionali + honeypot anti-spam) in
+      cima alla pagina; i 5 bottoni sono ora <button> che POSTano a una nuova Edge Function pubblica
+      richiedi-voucher (azione 'submit') — non aprono più il client di posta del visitatore.
+    - richiedi-voucher fa: INSERT in una nuova tabella voucher_richieste (Supabase progetto SafeTable,
+      RLS on senza policy anon, accesso solo via funzione) + mail M1 al cliente ("richiesta ricevuta")
+      + mail M1bis a info@santamonicagenova.it con i dati e un link diretto al pannello
+      menu-admin.html?richiesta=ID già precompilato per generare il voucher.
+    - Nuova azione 'complete' (stesso secret VOUCHER_ADMIN_SECRET): quando Andrea emette il voucher dal
+      pannello collegandolo alla richiesta, il cliente riceve in automatico la mail "il tuo buono è
+      pronto" (codice + scadenza + istruzioni ritiro/invio). Il PDF per la consegna elettronica resta
+      da inviare a mano con voucher-generator.html — l'automazione qui è la conferma, non l'allegato.
+    - Il pulsante "Regala" in index.html è TORNATO al mailto generico su decisione esplicita di Andrea
+      (v 2026.07.14.02 di index.html): il CTA home resta semplice, il form completo vive su questa
+      pagina. Gate: nuovo endpoint pubblico + nuova tabella + comunicazioni automatiche reali al
+      cliente → P1+P2 eseguite; P3 (Revisione Oppositiva) NON ancora fatta = debito dichiarato prima
+      del go-live definitivo (pattern identico al debito aperto per submit-reservation il 4/7).
+  Cambi v.07.14.01 → v.07.14.02:
     - La modalità di consegna (ritiro in ristorante / via email) era finora un'istruzione a testo libero
       dentro la mail precompilata ("Indica se preferisci..."). Ora è una scelta esplicita OBBLIGATORIA
       dentro ogni scheda voucher (nuovo blocco radio ".consegna-toggle", 2 opzioni: fisico/elettronico,
@@ -348,6 +368,97 @@
 
     .btn-buy svg { width: 14px; height: 14px; }
 
+    button.btn-buy {
+      border: none;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+    }
+
+    button.btn-buy:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .richiesta-status {
+      margin-top: 10px;
+      font-size: 13px;
+      text-align: center;
+      min-height: 1px;
+    }
+
+    .richiesta-status.ok { color: #2c6e49; font-weight: 600; }
+    .richiesta-status.err { color: var(--terracotta-dark); font-weight: 600; }
+
+    /* ===== "I tuoi dati" — box condivisa di contatto ===== */
+    .contatto-box {
+      background: var(--sand);
+      border-radius: 8px;
+      padding: 32px 28px;
+      margin: 0 0 40px;
+    }
+
+    .contatto-box h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 26px;
+      margin: 0 0 6px;
+      color: var(--ink);
+    }
+
+    .contatto-intro {
+      margin: 0 0 20px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .contatto-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .contatto-lbl {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--terracotta-dark);
+      margin-bottom: 6px;
+    }
+
+    .contatto-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: var(--ink);
+      background: #fff;
+      box-sizing: border-box;
+    }
+
+    .contatto-input:focus {
+      outline: none;
+      border-color: var(--terracotta);
+    }
+
+    .contatto-error {
+      display: none;
+      margin-top: 14px;
+      color: var(--terracotta-dark);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .hp-field {
+      position: absolute;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+
     .cat-divider {
       border: 0;
       border-top: 1px solid var(--rule);
@@ -543,6 +654,40 @@
       </p>
     </header>
 
+    <!-- ===== I TUOI DATI (condivisa da tutte le richieste) ===== -->
+    <section class="contatto-box" id="contatto-box">
+      <h2>I tuoi dati</h2>
+      <p class="contatto-intro">Li usiamo solo per rispondere alla tua richiesta di buono regalo. Compilali una volta, poi scegli il buono qui sotto.</p>
+      <div class="contatto-grid">
+        <div>
+          <label class="contatto-lbl" for="ct-nome">Nome e cognome *</label>
+          <input type="text" id="ct-nome" class="contatto-input" autocomplete="name">
+        </div>
+        <div>
+          <label class="contatto-lbl" for="ct-email">Email *</label>
+          <input type="email" id="ct-email" class="contatto-input" autocomplete="email">
+        </div>
+        <div>
+          <label class="contatto-lbl" for="ct-telefono">Telefono (opzionale)</label>
+          <input type="tel" id="ct-telefono" class="contatto-input" autocomplete="tel">
+        </div>
+        <div>
+          <label class="contatto-lbl" for="ct-destinatario">Nome del destinatario (opzionale)</label>
+          <input type="text" id="ct-destinatario" class="contatto-input">
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <label class="contatto-lbl" for="ct-dedica">Dedica (opzionale)</label>
+        <textarea id="ct-dedica" class="contatto-input" rows="2"></textarea>
+      </div>
+      <!-- honeypot anti-spam: campo invisibile, deve restare vuoto -->
+      <div class="hp-field" aria-hidden="true">
+        <label for="ct-hp">Non compilare questo campo</label>
+        <input type="text" id="ct-hp" tabindex="-1" autocomplete="off">
+      </div>
+      <div id="contatto-error" class="contatto-error"></div>
+    </section>
+
     <!-- ===== CATEGORIA 1 · MENU DEGUSTAZIONE ===== -->
     <div class="cat-head">
       <h2>I nostri menù degustazione, in regalo</h2>
@@ -574,13 +719,12 @@
           </label>
         </div>
         <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
-        <a href="#" class="btn-buy"
-           data-label-base="Menù Degustazione Sei portate, per due persone — 180 € (bevande escluse)"
-           data-label-vini="Menù Degustazione Sei portate, per due persone, con abbinamento vini — 300 €"
+        <button type="button" class="btn-buy" onclick="richiediBuono(this)"
            aria-label="Richiedi il voucher menù degustazione sei portate">
           Richiedi questo buono
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-        </a>
+        </button>
+        <div class="richiesta-status" id="rs-deg6"></div>
       </article>
 
       <!-- DEGUSTAZIONE 7 PORTATE -->
@@ -606,13 +750,12 @@
           </label>
         </div>
         <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
-        <a href="#" class="btn-buy featured"
-           data-label-base="Menù Degustazione Sette portate, per due persone — 220 € (bevande escluse)"
-           data-label-vini="Menù Degustazione Sette portate, per due persone, con abbinamento vini — 360 €"
+        <button type="button" class="btn-buy featured" onclick="richiediBuono(this)"
            aria-label="Richiedi il voucher menù degustazione sette portate">
           Richiedi questo buono
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-        </a>
+        </button>
+        <div class="richiesta-status" id="rs-deg7"></div>
       </article>
 
     </section>
@@ -648,10 +791,11 @@
           </label>
         </div>
         <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
-        <a href="#" class="btn-buy" data-label-base="Buono libero — 100 €" aria-label="Richiedi buono regalo libero da 100 euro">
+        <button type="button" class="btn-buy" onclick="richiediBuono(this)" aria-label="Richiedi buono regalo libero da 100 euro">
           Richiedi questo buono
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-        </a>
+        </button>
+        <div class="richiesta-status" id="rs-libero-0"></div>
       </article>
 
       <!-- 150 -->
@@ -671,10 +815,11 @@
           </label>
         </div>
         <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
-        <a href="#" class="btn-buy featured" data-label-base="Buono libero — 150 €" aria-label="Richiedi buono regalo libero da 150 euro">
+        <button type="button" class="btn-buy featured" onclick="richiediBuono(this)" aria-label="Richiedi buono regalo libero da 150 euro">
           Richiedi questo buono
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-        </a>
+        </button>
+        <div class="richiesta-status" id="rs-libero-1"></div>
       </article>
 
       <!-- 200 -->
@@ -694,10 +839,11 @@
           </label>
         </div>
         <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
-        <a href="#" class="btn-buy" data-label-base="Buono libero — 200 €" aria-label="Richiedi buono regalo libero da 200 euro">
+        <button type="button" class="btn-buy" onclick="richiediBuono(this)" aria-label="Richiedi buono regalo libero da 200 euro">
           Richiedi questo buono
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-        </a>
+        </button>
+        <div class="richiesta-status" id="rs-libero-2"></div>
       </article>
 
     </section>
@@ -707,12 +853,12 @@
       <h2>Come funziona</h2>
       <ol class="steps">
         <li>
-          <h3>Scegli il regalo</h3>
-          <p>Un menù degustazione per due (con o senza abbinamento vini) oppure un buono di valore libero. Indica anche come preferisci riceverlo: ritiro in ristorante o via email.</p>
+          <h3>Compila i tuoi dati</h3>
+          <p>Nome ed email in cima alla pagina, una volta sola. Poi scegli il regalo: un menù degustazione per due (con o senza abbinamento vini) oppure un buono di valore libero, e come preferisci riceverlo — ritiro in ristorante o via email.</p>
         </li>
         <li>
           <h3>Inviaci la richiesta</h3>
-          <p>Premi "Richiedi questo buono": si apre un'email già compilata con la tua scelta. Ti rispondiamo entro 24 ore con le modalità di pagamento.</p>
+          <p>Premi "Richiedi questo buono": la richiesta parte subito, senza aprire nessuna mail. Ti rispondiamo entro 24 ore con le modalità di pagamento.</p>
         </li>
         <li>
           <h3>Ritira o ricevi il buono</h3>
@@ -786,7 +932,7 @@
 
       <p style="margin: 0; font-size: 12px;">
         © 2026 Santamonica · Genova · Lungomare Lombardo 27, 16145 Genova<br>
-        <span class="version-tag">regala.html · v 2026.07.14.02</span>
+        <span class="version-tag">regala.html · v 2026.07.14.03</span>
       </p>
     </footer>
 
@@ -797,49 +943,35 @@
   <script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
   <script defer src="/cookieconsent-config.js"></script>
 
-  <!-- Costruzione dei mailto "Richiedi questo buono" + checkbox abbinamento vini + scelta consegna obbligatoria -->
+  <!-- Invio reale della richiesta (sostituisce il mailto): checkbox abbinamento vini,
+       scelta consegna obbligatoria, dati di contatto condivisi, POST a richiedi-voucher -->
   <script>
     (function() {
-      var MAIL = 'info@santamonicagenova.it';
-      var SUBJECT = 'Richiesta buono regalo Santamonica';
-
-      function consegnaText(value) {
-        if (value === 'fisico') return 'Ritiro in ristorante (pagamento in loco, voucher stampato in confezione)';
-        if (value === 'elettronico') return 'Invio via email (pagamento elettronico, PDF a chi acquista)';
-        return null;
-      }
-
-      function buildHref(label, consegnaValue) {
-        var consegnaLine = consegnaText(consegnaValue) || '〈scegliere la modalità di consegna prima di inviare〉';
-        var body = 'Buongiorno,\n\nvorrei acquistare il seguente buono regalo Santamonica:\n\n• ' + label +
-          '\n\nModalità di consegna richiesta: ' + consegnaLine +
-          '\n\nResto in attesa delle modalità di pagamento. Grazie.\n\n' +
-          '(Se è un regalo, può indicare qui nome del destinatario ed eventuale dedica: )';
-        return 'mailto:' + MAIL + '?subject=' + encodeURIComponent(SUBJECT) + '&body=' + encodeURIComponent(body);
-      }
-
-      function currentLabel(card, btn) {
-        var vc = card.querySelector('.vini-check');
-        if (vc) return vc.checked ? btn.getAttribute('data-label-vini') : btn.getAttribute('data-label-base');
-        return btn.getAttribute('data-label-base');
-      }
+      var RICHIEDI_VOUCHER_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/richiedi-voucher';
 
       function currentConsegna(card) {
         var r = card.querySelector('.consegna-radio:checked');
         return r ? r.value : null;
       }
 
-      function updateCardHref(card) {
-        var btn = card.querySelector('.btn-buy');
-        if (!btn) return;
-        var label = currentLabel(card, btn);
-        if (label) btn.setAttribute('href', buildHref(label, currentConsegna(card)));
+      function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
       }
 
-      // imposta href iniziale su tutte le schede (senza consegna selezionata: placeholder nel corpo mail)
-      document.querySelectorAll('.voucher-card').forEach(function(card) { updateCardHref(card); });
+      function setContattoError(msg) {
+        var err = document.getElementById('contatto-error');
+        if (!err) return;
+        if (msg) { err.textContent = msg; err.style.display = 'block'; }
+        else { err.style.display = 'none'; }
+      }
 
-      // checkbox abbinamento vini: aggiorna prezzo mostrato + label del mailto
+      function setRichiestaStatus(statusEl, msg, cls) {
+        if (!statusEl) return;
+        statusEl.textContent = msg || '';
+        statusEl.className = 'richiesta-status' + (cls ? ' ' + cls : '');
+      }
+
+      // checkbox abbinamento vini: aggiorna solo il prezzo mostrato
       document.querySelectorAll('.vini-check').forEach(function(chk) {
         chk.addEventListener('change', function() {
           var card = chk.closest('.voucher-card');
@@ -849,33 +981,16 @@
           var on = chk.checked;
           num.textContent = on ? (num.getAttribute('data-vini') || num.textContent)
                                : (num.getAttribute('data-base') || num.textContent);
-          updateCardHref(card);
         });
       });
 
-      // scelta consegna: obbligatoria, aggiorna il corpo mail e nasconde l'avviso quando selezionata
+      // scelta consegna: nasconde l'avviso quando viene selezionata
       document.querySelectorAll('.consegna-radio').forEach(function(r) {
         r.addEventListener('change', function() {
           var card = r.closest('.voucher-card');
           if (!card) return;
-          updateCardHref(card);
           var err = card.querySelector('.consegna-error');
           if (err) err.style.display = 'none';
-        });
-      });
-
-      // click su "Richiedi questo buono": blocca l'apertura della mail se non è stata scelta la consegna
-      document.querySelectorAll('a.btn-buy').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-          var card = btn.closest('.voucher-card');
-          if (!card) return;
-          if (!currentConsegna(card)) {
-            e.preventDefault();
-            var err = card.querySelector('.consegna-error');
-            if (err) err.style.display = 'block';
-            var grp = card.querySelector('.consegna-toggle');
-            if (grp) grp.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
         });
       });
 
@@ -889,14 +1004,88 @@
           var val = cfg.liberi[i];
           if (val == null) return;
           var num = card.querySelector('.eur-num');
-          var btn = card.querySelector('.btn-buy');
           if (num) num.textContent = val;
-          if (btn) {
-            btn.setAttribute('data-label-base', 'Buono libero — ' + val + ' €');
-            updateCardHref(card);
-          }
         });
       }).catch(function(){ /* offline o file assente: restano i valori in pagina */ });
+
+      // ── Invio della richiesta al click su "Richiedi questo buono" ──
+      window.richiediBuono = function(btn) {
+        var card = btn.closest('.voucher-card');
+        if (!card) return;
+
+        // 1) consegna obbligatoria per scheda
+        var consegna = currentConsegna(card);
+        if (!consegna) {
+          var err = card.querySelector('.consegna-error');
+          if (err) err.style.display = 'block';
+          var grp = card.querySelector('.consegna-toggle');
+          if (grp) grp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+
+        // 2) dati di contatto condivisi, obbligatori nome+email
+        var nome = document.getElementById('ct-nome').value.trim();
+        var email = document.getElementById('ct-email').value.trim();
+        var telefono = document.getElementById('ct-telefono').value.trim();
+        var destinatario = document.getElementById('ct-destinatario').value.trim();
+        var dedica = document.getElementById('ct-dedica').value.trim();
+        var hp = document.getElementById('ct-hp').value;
+
+        if (nome.length < 2 || !isValidEmail(email)) {
+          setContattoError('Compila nome ed email (validi) qui sopra prima di inviare la richiesta.');
+          document.getElementById('contatto-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+        setContattoError(null);
+
+        // 3) tipo prodotto: deg6/deg7 dal data-card della scheda, valore dal buono libero
+        var tipo = card.getAttribute('data-card') || 'valore';
+        var vini = card.querySelector('.vini-check');
+        var abbinamentoVini = vini ? !!vini.checked : false;
+        var valoreEur = null;
+        if (tipo !== 'deg6' && tipo !== 'deg7') {
+          tipo = 'valore';
+          var num = card.querySelector('.eur-num');
+          valoreEur = num ? parseFloat(num.textContent) : null;
+        }
+
+        var statusId = 'rs-' + (card.getAttribute('data-card') || ('libero-' + card.getAttribute('data-libero-index')));
+        var statusEl = document.getElementById(statusId);
+        setRichiestaStatus(statusEl, 'Invio in corso…', '');
+        btn.disabled = true;
+
+        fetch(RICHIEDI_VOUCHER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'submit',
+            tipo: tipo,
+            abbinamento_vini: abbinamentoVini,
+            valore_eur: valoreEur,
+            consegna: consegna,
+            nome: nome,
+            email: email,
+            telefono: telefono || undefined,
+            destinatario: destinatario || undefined,
+            dedica: dedica || undefined,
+            _hp: hp,
+            user_agent: navigator.userAgent,
+          }),
+        }).then(function(r) { return r.json().then(function(j) { return { status: r.status, body: j }; }); })
+          .then(function(res) {
+            if (res.status === 201 && res.body && res.body.ok) {
+              btn.textContent = '✓ Richiesta inviata';
+              setRichiestaStatus(statusEl, 'Ti risponderemo entro 24 ore con le modalità di pagamento.', 'ok');
+            } else {
+              btn.disabled = false;
+              setRichiestaStatus(statusEl, (res.body && res.body.error) || 'Errore di invio, riprova o chiamaci al 010 5533155.', 'err');
+            }
+          })
+          .catch(function() {
+            btn.disabled = false;
+            setRichiestaStatus(statusEl, 'Errore di rete: riprova o chiamaci al 010 5533155.', 'err');
+          });
+      };
     })();
   </script>
 

@@ -1,4 +1,20 @@
 <!DOCTYPE html>
+<!-- v 2026.07.15.01 — Fix da Revisione Oppositiva (P3, Grok+DeepSeek, 15/7/2026) su richiedi-voucher:
+     _vrRenderList ora mostra un badge rosso "⚠ IN SOSPESO" sulle richieste ancora 'nuova' da più di
+     48 ore, per rendere visibile il rischio (segnalato come il più insidioso da entrambi i vendor)
+     che l'admin generi un voucher dal form diretto senza passare da "Usa per generare" e la richiesta
+     resti 'nuova' per sempre. Nessun'altra modifica al pannello. Vedi
+     progetto-sito/P3_RAW_voucher_richiesta_v2026.07.15.01.md per il verbale completo. -->
+<!-- v 2026.07.14.03 — Nuovo blocco "Richieste da evadere" (#vc-richieste-details, in cima al pannello
+     Voucher, aperto di default): lista le richieste arrivate dal form di regala.html (richiedi-voucher,
+     azione 'list') con bottone "→ Usa per generare il voucher" che precompila "Genera nuovo voucher"
+     (tipo/vini/valore/destinatario/acquirente/consegna/note) e ricorda l'id della richiesta
+     (window._vcActiveRichiestaId). emettiVoucherAdmin(), a emissione riuscita, se c'è una richiesta
+     collegata chiama richiedi-voucher azione 'complete' (stesso secret VOUCHER_ADMIN_SECRET): collega
+     il codice, marca la richiesta evasa, e il cliente riceve in automatico la mail "il tuo buono è
+     pronto" — senza dover scrivere nulla a mano. Nuovo deep-link menu-admin.html?richiesta=ID (usato dal
+     bottone nella mail M1bis di richiedi-voucher): apre il pannello Voucher e precompila subito la
+     scheda. Nessuna modifica ad admin-core.js in questa sessione. -->
 <!-- v 2026.07.14.02 — Assorbito il vecchio pannello separato "Buoni regalo" (#buoni-section + pulsante
      nav) dentro "Voucher — Gestione": nuovo blocco `<details>` "Valori dei buoni liberi" (3 campi +
      Pubblica valori) fra "Genera nuovo voucher" e "Cerca/gestisci", riusa le funzioni esistenti
@@ -609,9 +625,24 @@
         Emetti nuovi voucher e gestisci quelli esistenti (riscatto totale/parziale, diritto di recesso, cancellazione). La prima volta chiede la chiave amministratore — la stessa che usi per i Voucher e per le Cauzioni.
       </p>
 
+      <details id="vc-richieste-details" open style="margin-bottom:1rem;border:1px solid var(--rule);padding:.8rem 1rem;">
+        <summary style="cursor:pointer;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);">+ Richieste da evadere</summary>
+        <div style="margin-top:1rem;">
+          <p style="font-size:.82rem;color:var(--stone);margin-bottom:.8rem;line-height:1.6;">
+            Le richieste arrivate dal form di <code>regala.html</code>. "Usa per generare il voucher" precompila la scheda qui sotto; una volta emesso, il cliente riceve in automatico la mail "il tuo buono è pronto".
+          </p>
+          <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:.8rem;">
+            <button class="btn btn-load" onclick="caricaVoucherRichieste()" style="border:1px solid var(--ink);color:var(--ink)">↻ Aggiorna richieste</button>
+            <span id="vr-status" style="font-size:.75rem;color:var(--stone);"></span>
+          </div>
+          <div id="vr-list" style="font-size:.85rem;">&hellip;</div>
+        </div>
+      </details>
+
       <details id="vc-emit-details" style="margin-bottom:1rem;border:1px solid var(--rule);padding:.8rem 1rem;">
         <summary style="cursor:pointer;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);">+ Genera nuovo voucher</summary>
         <div style="margin-top:1rem;display:flex;flex-direction:column;gap:.7rem;">
+          <div id="vc-e-richiesta-badge" style="display:none;font-size:.78rem;background:var(--sand);border-left:3px solid var(--gold, #b89d6a);padding:.5rem .7rem;"></div>
           <div>
             <span class="opt-lbl">Tipo</span>
             <select id="vc-e-tipo" style="width:100%;" onchange="_vcEmitToggle()">
@@ -1437,6 +1468,7 @@ function _czOpenLink() {
 // Chiave chiesta una tantum, salvata in localStorage con chiave propria.
 var VOUCHER_EMIT_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/emetti-voucher';
 var VOUCHER_MANAGE_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/riscatta-voucher';
+var VOUCHER_RICHIESTE_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/richiedi-voucher';
 var VC_SECRET_KEY = 'menuadmin.voucher.secret.v1';
 
 function _vcGetSecret() {
@@ -1460,6 +1492,7 @@ function apriSezioneVoucher() {
   _vcEmitToggle();
   caricaVoucherLista();
   caricaVoucherBuoni();
+  caricaVoucherRichieste();
 }
 function chiudiSezioneVoucher() {
   document.getElementById('voucher-section').style.display = 'none';
@@ -1528,6 +1561,23 @@ function emettiVoucherAdmin() {
       document.getElementById('vc-e-result').style.display = 'block';
       _vcSetEmitStatus('Fatto.');
       caricaVoucherLista();
+
+      // Se l'emissione parte da una richiesta del form (badge attivo), collega il codice e
+      // notifica in automatico il cliente ("il tuo buono è pronto") via richiedi-voucher/'complete'.
+      if (window._vcActiveRichiestaId) {
+        var rid = window._vcActiveRichiestaId;
+        window._vcActiveRichiestaId = null;
+        var badge = document.getElementById('vc-e-richiesta-badge'); if (badge) badge.style.display = 'none';
+        _vrCall('complete', { id: rid, codice: v.codice }).then(function (res2) {
+          if (res2.ok && res2.j && res2.j.ok) {
+            document.getElementById('vc-e-out').innerHTML += '<br>✓ Cliente notificato via mail ("il tuo buono regalo è pronto").';
+          } else {
+            document.getElementById('vc-e-out').innerHTML += '<br>⚠ Voucher emesso ma la notifica al cliente non è partita (' +
+              _czEsc((res2.j && res2.j.error) || 'errore sconosciuto') + '): contattalo tu a mano.';
+          }
+          caricaVoucherRichieste();
+        });
+      }
     })
     .catch(function (ex) { _vcSetEmitStatus('Impossibile emettere: ' + ex.message, true); });
 }
@@ -1666,6 +1716,148 @@ function caricaVoucherLista() {
     _vcSetListStatus(rows.length + (rows.length === 1 ? ' voucher' : ' voucher'));
   });
 }
+
+// ══ VOUCHER — richieste dal form di regala.html ═════════════
+// Riusa richiedi-voucher (azioni 'list' e 'complete'), stesso secret VOUCHER_ADMIN_SECRET
+// del resto del pannello Voucher. Cache client-side in window._vrRows per popolare
+// il form di emissione senza un secondo giro di rete.
+var VR_STATO_LABEL = { nuova: 'Da evadere', in_lavorazione: 'In lavorazione', evasa: 'Evasa', annullata: 'Annullata' };
+var VR_STATO_COLOR = { nuova: 'var(--rust)', in_lavorazione: 'var(--stone)', evasa: 'var(--green)', annullata: 'var(--stone)' };
+window._vrRows = [];
+window._vcActiveRichiestaId = null;
+
+function _vrCall(action, extra) {
+  var secret = _vcGetSecret();
+  if (!secret) return Promise.reject(new Error('Operazione annullata: serve la chiave amministratore.'));
+  var payload = Object.assign({ action: action }, extra || {});
+  return fetch(VOUCHER_RICHIESTE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-voucher-secret': secret },
+    body: JSON.stringify(payload)
+  }).then(function (r) {
+    if (r.status === 401) { localStorage.removeItem(VC_SECRET_KEY); }
+    return r.json().then(function (j) { return { ok: r.ok, j: j }; });
+  });
+}
+
+function _vrSetStatus(msg, isErr) {
+  var el = document.getElementById('vr-status'); if (!el) return;
+  el.textContent = msg || ''; el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
+}
+
+// Stessa logica di descrizioneRichiesta() lato server (richiedi-voucher), per mostrare
+// un'etichetta leggibile senza dover richiamare il server.
+var VR_TIPO_LABELS = {
+  deg6: { base: 'Menù Degustazione Sei portate, per due persone', vini: 'con abbinamento vini', prezzoBase: 180, prezzoVini: 300 },
+  deg7: { base: 'Menù Degustazione Sette portate, per due persone', vini: 'con abbinamento vini', prezzoBase: 220, prezzoVini: 360 }
+};
+function _vrDescrizione(r) {
+  if (r.tipo === 'valore') return 'Buono libero — ' + r.valore_eur + ' €';
+  var t = VR_TIPO_LABELS[r.tipo];
+  if (!t) return r.tipo;
+  var prezzo = r.abbinamento_vini ? t.prezzoVini : t.prezzoBase;
+  return t.base + (r.abbinamento_vini ? ' ' + t.vini : '') + ' — ' + prezzo + ' € (bevande escluse)';
+}
+function _vrConsegnaLabel(v) {
+  return v === 'fisico' ? 'Ritiro in ristorante' : (v === 'elettronico' ? 'Via email' : v);
+}
+
+function _vrRenderList(rows) {
+  var wrap = document.getElementById('vr-list');
+  if (!rows.length) { wrap.innerHTML = '<span style="color:var(--stone);">Nessuna richiesta.</span>'; return; }
+  wrap.innerHTML = '<div>' + rows.map(function (r) {
+    var label = VR_STATO_LABEL[r.stato] || r.stato, color = VR_STATO_COLOR[r.stato] || 'var(--stone)';
+    var genBtn = r.stato === 'nuova'
+      ? '<button class="btn btn-publish" style="font-size:.68rem;padding:.35rem .6rem;margin-left:.5rem;" onclick="_vrUsaPerGenerare(\'' + r.id + '\')">→ Usa per generare il voucher</button>'
+      : (r.codice_voucher ? '<span style="font-size:.7rem;color:var(--stone);margin-left:.5rem;">→ ' + _czEsc(r.codice_voucher) + '</span>' : '');
+    // Badge "in sospeso": richiesta ancora 'nuova' da più di 48 ore — segnala visivamente il
+    // rischio (emerso in Revisione Oppositiva 15/7) che l'admin dimentichi di evaderla passando
+    // dal form "Genera nuovo voucher" senza collegarla, lasciandola 'nuova' per sempre.
+    var isStale = r.stato === 'nuova' && (Date.now() - new Date(r.created_at).getTime()) > 48 * 60 * 60 * 1000;
+    var staleBadge = isStale
+      ? '<span style="font-size:.66rem;color:#fff;background:var(--rust);padding:.1rem .4rem;border-radius:3px;margin-left:.4rem;">⚠ IN SOSPESO</span>'
+      : '';
+    return '<div style="padding:.6rem 0;border-bottom:1px dotted var(--rule);' + (isStale ? 'background:#fdf3ee;' : '') + '">' +
+      '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;">' +
+      '<strong style="font-size:.82rem;">' + _czEsc(r.nome) + '</strong>' +
+      '<span style="font-size:.72rem;color:var(--stone);">' + _czEsc(r.email) + '</span>' +
+      staleBadge +
+      '<span style="font-size:.72rem;color:' + color + ';font-weight:600;margin-left:auto;">' + _czEsc(label) + '</span>' +
+      '</div>' +
+      '<div style="font-size:.78rem;color:var(--ink);margin-top:.3rem;">' + _czEsc(_vrDescrizione(r)) + ' · ' + _czEsc(_vrConsegnaLabel(r.consegna)) + '</div>' +
+      (r.destinatario || r.dedica ? '<div style="font-size:.72rem;color:var(--stone);margin-top:.2rem;">' +
+        (r.destinatario ? 'Per: ' + _czEsc(r.destinatario) + ' ' : '') + (r.dedica ? '— "' + _czEsc(r.dedica) + '"' : '') + '</div>' : '') +
+      '<div style="font-size:.68rem;color:var(--stone);margin-top:.3rem;">ricevuta ' + _czRel(r.created_at) + genBtn + '</div>' +
+      '</div>';
+  }).join('') + '</div>';
+}
+
+function caricaVoucherRichieste() {
+  var secret = _vcGetSecret();
+  if (!secret) { _vrSetStatus('Operazione annullata: serve la chiave amministratore.', true); return; }
+  _vrSetStatus('Caricamento…');
+  _vrCall('list', { limit: 50 }).then(function (res) {
+    if (!res.ok || !res.j) { _vrSetStatus('Impossibile caricare: ' + ((res.j && res.j.error) || 'errore'), true); return; }
+    var rows = res.j.rows || [];
+    window._vrRows = rows;
+    _vrRenderList(rows);
+    var daEvadere = rows.filter(function (r) { return r.stato === 'nuova'; }).length;
+    _vrSetStatus(rows.length + ' richieste, ' + daEvadere + ' da evadere');
+  }).catch(function (ex) { _vrSetStatus(ex.message, true); });
+}
+
+// Precompila "Genera nuovo voucher" con i dati della richiesta e collega l'id per la
+// notifica automatica al cliente dopo l'emissione (vedi emettiVoucherAdmin).
+function _vrPrefill(r) {
+  var det = document.getElementById('vc-emit-details'); if (det) det.open = true;
+
+  document.getElementById('vc-e-tipo').value = (r.tipo === 'deg6' || r.tipo === 'deg7') ? r.tipo : 'valore';
+  _vcEmitToggle();
+  document.getElementById('vc-e-vini').checked = !!r.abbinamento_vini;
+  if (r.tipo === 'valore' && r.valore_eur != null) document.getElementById('vc-e-valore').value = r.valore_eur;
+  document.getElementById('vc-e-dest').value = r.destinatario || '';
+  document.getElementById('vc-e-acq-nome').value = r.nome || '';
+  document.getElementById('vc-e-acq-email').value = r.email || '';
+  document.getElementById('vc-e-consegna').value = r.consegna || 'elettronico';
+  var dEl = document.getElementById('vc-e-data'); if (dEl && !dEl.value) dEl.value = new Date().toISOString().slice(0, 10);
+
+  var noteParts = [];
+  if (r.telefono) noteParts.push('Tel: ' + r.telefono);
+  if (r.dedica) noteParts.push('Dedica: ' + r.dedica);
+  if (r.note) noteParts.push('Note cliente: ' + r.note);
+  document.getElementById('vc-e-note').value = noteParts.join(' — ');
+
+  window._vcActiveRichiestaId = r.id;
+  var badge = document.getElementById('vc-e-richiesta-badge');
+  if (badge) {
+    badge.style.display = 'block';
+    badge.textContent = 'Collegata alla richiesta di ' + r.nome + ' (' + r.email + '): a emissione avvenuta il cliente riceve in automatico la mail "buono pronto".';
+  }
+  det && det.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function _vrUsaPerGenerare(id) {
+  var r = (window._vrRows || []).filter(function (x) { return x.id === id; })[0];
+  if (r) { _vrPrefill(r); return; }
+  // riga non in cache (es. deep-link diretto): la recupera singolarmente
+  _vrCall('list', { id: id }).then(function (res) {
+    var row = res.ok && res.j && res.j.rows && res.j.rows[0];
+    if (row) _vrPrefill(row);
+    else _vrSetStatus('Richiesta non trovata.', true);
+  });
+}
+
+// Deep-link menu-admin.html?richiesta=ID (bottone nella mail M1bis di richiedi-voucher):
+// apre il pannello Voucher e precompila subito la scheda di emissione.
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var richiestaId = params.get('richiesta');
+  if (!richiestaId) return;
+  window.addEventListener('DOMContentLoaded', function () {
+    apriSezioneVoucher();
+    _vrUsaPerGenerare(richiestaId);
+  });
+})();
 
 // ══ FOTO CUCINA ══════════════════════════════════════════
 var fotoDati = [null,null,null,null,null,null];
@@ -2096,7 +2288,7 @@ async function _eseguiPubblicaFotoSito(token) {
   </div>
 </div>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.14.02</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.15.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

@@ -1,11 +1,24 @@
 <!DOCTYPE html>
 <!--
   regala.html
-  Versione: v 2026.07.14.03
+  Versione: v 2026.07.19.01
   Pagina: Voucher regalo Santamonica — richiesta automatizzata (form + mail), in attesa dello sblocco
           Stripe (dec.#28) per il pagamento online
   Fase progetto: Sito — automazione richiesta→consegna voucher (2026-07-14)
   Lingua: it (IT only, dec. F0.10 C1)
+  Cambi v.07.14.03 → v.07.19.01 (segnalato da Andrea: "manca l'opzione di chi paga la differenza"):
+    - Le 3 schede del buono libero (100/150/200 €) avevano solo la scelta "come lo ricevi" ma non
+      chiedevano MAI chi paga l'eventuale differenza se la spesa supera il valore del buono — la
+      scelta esisteva già come campo admin-only (voucher-generator/menu-admin, colonna
+      vouchers.eccedenza_a_carico) ma il cliente non poteva mai esprimerla, e Andrea doveva
+      indovinarla o chiederla a voce. Nuovo blocco ".eccedenza-toggle" (stessa UX del blocco
+      consegna: radiogroup obbligatorio, 2 opzioni "chi lo usa"/"io che lo regalo", avviso inline +
+      scroll se non selezionato) dentro ognuna delle 3 schede buono libero SOLO (non si applica ai
+      due voucher degustazione, esperienza a prezzo fisso). La scelta viaggia nel payload
+      (eccedenza_a_carico) fino a richiedi-voucher → voucher_richieste (nuova colonna, stesso CHECK
+      di vouchers.eccedenza_a_carico) → mostrata nella mail admin (M1bis) e nel form di emissione
+      precompilato (menu-admin.html), così l'admin vede la scelta del cliente invece di indovinarla.
+    - "Uso parziale" nel blocco Informazioni essenziali ora menziona esplicitamente questo caso.
   Cambi v.07.14.02 → v.07.14.03 (su richiesta Andrea — automatizzare tutto il processo
   richiesta→consegna, sul modello già usato per le prenotazioni):
     - Il mailto "Richiedi questo buono" è sostituito da un INVIO REALE: nuova sezione condivisa
@@ -62,8 +75,11 @@
       sono letti a runtime da /voucher-config.json (fallback ai valori in pagina). Coordinato con menu-admin.
   GATE: contenuto pubblico → P1+P2 + P3 (3 vendor, 10/6) eseguite sui testi/Termini. IVA (ultimo bloccante)
         confermata dal commercialista il 14/7, recepita in voucher-termini.html v 2026.07.14.01. Lead
-        riscritto il 14/7 = micro-fix di copy (P1+P2, no P3: tono/contenuto invariati). Pronto per sign-off
-        finale Andrea e go-live.
+        riscritto il 14/7 = micro-fix di copy (P1+P2, no P3: tono/contenuto invariati). Blocco eccedenza
+        (19/7) = P1+P2 eseguite (nessun nuovo obbligo legale, il concetto "eccedenza a carico di" era
+        già nei Termini §10 dal 10/6 come principio, qui diventa scelta esplicita del cliente anziché
+        default admin); P3 (Revisione Oppositiva) NON ancora fatta su questo frammento = debito
+        dichiarato, da chiudere prima del sign-off finale insieme al resto della pagina.
 -->
 <html lang="it">
 <head>
@@ -333,7 +349,7 @@
       cursor: pointer;
     }
 
-    .consegna-error {
+    .consegna-error, .eccedenza-error {
       display: none;
       color: var(--terracotta-dark);
       font-size: 12px;
@@ -341,6 +357,25 @@
       margin: -6px 0 14px;
       text-align: left;
       width: 100%;
+    }
+
+    /* ===== Scelta eccedenza (solo buono libero, obbligatoria) ===== */
+    .eccedenza-toggle {
+      width: 100%;
+      text-align: left;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      background: var(--sand);
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    .eccedenza-toggle .consegna-title {
+      display: block;
+      font-weight: 600;
+      font-size: 12.5px;
+      margin-bottom: 8px;
     }
 
     .btn-buy {
@@ -791,6 +826,18 @@
           </label>
         </div>
         <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
+        <div class="eccedenza-toggle" role="radiogroup" aria-label="Chi paga l'eventuale differenza — buono libero 100 euro">
+          <span class="consegna-title">Se la spesa supera il valore, chi paga la differenza? <span class="req-star">*</span></span>
+          <label class="consegna-option">
+            <input type="radio" name="eccedenza-libero-0" class="eccedenza-radio" value="destinatario">
+            <span>Chi lo usa, al momento del conto</span>
+          </label>
+          <label class="consegna-option">
+            <input type="radio" name="eccedenza-libero-0" class="eccedenza-radio" value="acquirente">
+            <span>Io che lo regalo — ricontattatemi per il saldo</span>
+          </label>
+        </div>
+        <div class="eccedenza-error">Scegli chi paga l'eventuale differenza prima di inviare la richiesta.</div>
         <button type="button" class="btn-buy" onclick="richiediBuono(this)" aria-label="Richiedi buono regalo libero da 100 euro">
           Richiedi questo buono
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
@@ -815,6 +862,18 @@
           </label>
         </div>
         <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
+        <div class="eccedenza-toggle" role="radiogroup" aria-label="Chi paga l'eventuale differenza — buono libero 150 euro">
+          <span class="consegna-title">Se la spesa supera il valore, chi paga la differenza? <span class="req-star">*</span></span>
+          <label class="consegna-option">
+            <input type="radio" name="eccedenza-libero-1" class="eccedenza-radio" value="destinatario">
+            <span>Chi lo usa, al momento del conto</span>
+          </label>
+          <label class="consegna-option">
+            <input type="radio" name="eccedenza-libero-1" class="eccedenza-radio" value="acquirente">
+            <span>Io che lo regalo — ricontattatemi per il saldo</span>
+          </label>
+        </div>
+        <div class="eccedenza-error">Scegli chi paga l'eventuale differenza prima di inviare la richiesta.</div>
         <button type="button" class="btn-buy featured" onclick="richiediBuono(this)" aria-label="Richiedi buono regalo libero da 150 euro">
           Richiedi questo buono
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
@@ -839,6 +898,18 @@
           </label>
         </div>
         <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
+        <div class="eccedenza-toggle" role="radiogroup" aria-label="Chi paga l'eventuale differenza — buono libero 200 euro">
+          <span class="consegna-title">Se la spesa supera il valore, chi paga la differenza? <span class="req-star">*</span></span>
+          <label class="consegna-option">
+            <input type="radio" name="eccedenza-libero-2" class="eccedenza-radio" value="destinatario">
+            <span>Chi lo usa, al momento del conto</span>
+          </label>
+          <label class="consegna-option">
+            <input type="radio" name="eccedenza-libero-2" class="eccedenza-radio" value="acquirente">
+            <span>Io che lo regalo — ricontattatemi per il saldo</span>
+          </label>
+        </div>
+        <div class="eccedenza-error">Scegli chi paga l'eventuale differenza prima di inviare la richiesta.</div>
         <button type="button" class="btn-buy" onclick="richiediBuono(this)" aria-label="Richiedi buono regalo libero da 200 euro">
           Richiedi questo buono
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
@@ -894,7 +965,7 @@
         </div>
         <div class="info-item">
           <h3>Uso parziale</h3>
-          <p>Per il buono libero, l'eventuale residuo resta come credito per visite successive entro la scadenza. I voucher degustazione valgono per l'esperienza indicata.</p>
+          <p>Per il buono libero, l'eventuale residuo resta come credito per visite successive entro la scadenza. Se invece la spesa supera il valore del buono, la differenza è a carico di chi hai indicato al momento della richiesta. I voucher degustazione valgono per l'esperienza indicata.</p>
         </div>
         <div class="info-item">
           <h3>Cumulabilità e periodi</h3>
@@ -932,7 +1003,7 @@
 
       <p style="margin: 0; font-size: 12px;">
         © 2026 Santamonica · Genova · Lungomare Lombardo 27, 16145 Genova<br>
-        <span class="version-tag">regala.html · v 2026.07.14.03</span>
+        <span class="version-tag">regala.html · v 2026.07.19.01</span>
       </p>
     </footer>
 
@@ -951,6 +1022,11 @@
 
       function currentConsegna(card) {
         var r = card.querySelector('.consegna-radio:checked');
+        return r ? r.value : null;
+      }
+
+      function currentEccedenza(card) {
+        var r = card.querySelector('.eccedenza-radio:checked');
         return r ? r.value : null;
       }
 
@@ -994,6 +1070,16 @@
         });
       });
 
+      // scelta eccedenza (solo buono libero): nasconde l'avviso quando viene selezionata
+      document.querySelectorAll('.eccedenza-radio').forEach(function(r) {
+        r.addEventListener('change', function() {
+          var card = r.closest('.voucher-card');
+          if (!card) return;
+          var err = card.querySelector('.eccedenza-error');
+          if (err) err.style.display = 'none';
+        });
+      });
+
       // valori dei 3 buoni liberi da voucher-config.json (fallback: valori già in pagina)
       fetch('/voucher-config.json', { cache: 'no-store' }).then(function(r) {
         return r.ok ? r.json() : null;
@@ -1020,6 +1106,17 @@
           if (err) err.style.display = 'block';
           var grp = card.querySelector('.consegna-toggle');
           if (grp) grp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+
+        // 1b) per il buono libero, chi paga l'eventuale differenza è obbligatorio
+        var isLibero = card.hasAttribute('data-libero-index');
+        var eccedenza = isLibero ? currentEccedenza(card) : null;
+        if (isLibero && !eccedenza) {
+          var eccErr = card.querySelector('.eccedenza-error');
+          if (eccErr) eccErr.style.display = 'block';
+          var eccGrp = card.querySelector('.eccedenza-toggle');
+          if (eccGrp) eccGrp.scrollIntoView({ behavior: 'smooth', block: 'center' });
           return;
         }
 
@@ -1062,6 +1159,7 @@
             tipo: tipo,
             abbinamento_vini: abbinamentoVini,
             valore_eur: valoreEur,
+            eccedenza_a_carico: eccedenza || undefined,
             consegna: consegna,
             nome: nome,
             email: email,

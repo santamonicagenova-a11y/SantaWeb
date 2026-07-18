@@ -1,4 +1,13 @@
 <!DOCTYPE html>
+<!-- v 2026.07.19.01 — "Genera nuovo voucher" ora precompila anche "Eccedenza a carico di" quando
+     apri il pannello da una richiesta collegata (_vrPrefill): regala.html chiede ora al cliente chi
+     paga l'eventuale differenza sul buono libero (destinatario/acquirente), il valore arriva su
+     voucher_richieste.eccedenza_a_carico e viene letto qui invece di lasciare sempre il default
+     "Destinatario" del select — prima l'admin doveva indovinare o chiedere a voce la scelta del
+     cliente. Anche l'elenco unico dei voucher (_vrDescrizione, testo sotto ogni richiesta "da
+     evadere") ora mostra "· eccedenza a carico di chi regala/chi riceve" per i buoni liberi, a
+     colpo d'occhio prima ancora di aprire il form di emissione.
+-->
 <!-- v 2026.07.18.05 — Fix root cause dell'errore "PDF non generato (Error parsing CSS component
      value, unexpected EOF): invio la mail senza allegato" segnalato da Andrea su un'emissione
      reale (non solo test): è un bug noto di html2canvas 1.4.1, non specifico al cartoncino —
@@ -2018,8 +2027,14 @@ var VR_TIPO_LABELS = {
   deg6: { base: 'Menù Degustazione Sei portate, per due persone', vini: 'con abbinamento vini', prezzoBase: 180, prezzoVini: 300 },
   deg7: { base: 'Menù Degustazione Sette portate, per due persone', vini: 'con abbinamento vini', prezzoBase: 220, prezzoVini: 360 }
 };
+function _vrEccedenzaLabel(v) {
+  return v === 'acquirente' ? 'chi regala' : (v === 'destinatario' ? 'chi riceve' : null);
+}
 function _vrDescrizione(r) {
-  if (r.tipo === 'valore') return 'Buono libero — ' + r.valore_eur + ' €';
+  if (r.tipo === 'valore') {
+    var eccLbl = _vrEccedenzaLabel(r.eccedenza_a_carico);
+    return 'Buono libero — ' + r.valore_eur + ' €' + (eccLbl ? ' · eccedenza a carico di ' + eccLbl : '');
+  }
   var t = VR_TIPO_LABELS[r.tipo];
   if (!t) return r.tipo;
   var prezzo = r.abbinamento_vini ? t.prezzoVini : t.prezzoBase;
@@ -2038,6 +2053,7 @@ function _vrPrefill(r) {
   _vcEmitToggle();
   document.getElementById('vc-e-vini').checked = !!r.abbinamento_vini;
   if (r.tipo === 'valore' && r.valore_eur != null) document.getElementById('vc-e-valore').value = r.valore_eur;
+  if (r.tipo === 'valore' && r.eccedenza_a_carico) document.getElementById('vc-e-eccedenza').value = r.eccedenza_a_carico;
   document.getElementById('vc-e-dest').value = r.destinatario || '';
   document.getElementById('vc-e-acq-nome').value = r.nome || '';
   document.getElementById('vc-e-acq-email').value = r.email || '';
@@ -2724,7 +2740,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.18.05</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.19.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

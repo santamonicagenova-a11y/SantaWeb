@@ -1,4 +1,16 @@
 <!DOCTYPE html>
+<!-- v 2026.07.18.05 — Fix root cause dell'errore "PDF non generato (Error parsing CSS component
+     value, unexpected EOF): invio la mail senza allegato" segnalato da Andrea su un'emissione
+     reale (non solo test): è un bug noto di html2canvas 1.4.1, non specifico al cartoncino —
+     in modalità classica html2canvas parsa a mano TUTTE le regole CSS del documento (menu-admin.html
+     è una pagina lunghissima) e può incappare in un valore che il suo tokenizer interno non
+     digerisce, facendo fallire l'intera cattura. `_vpGeneratePdfBase64` ora tenta PRIMA con
+     `foreignObjectRendering:true` (delega la cattura al motore SVG del browser, bypassa il parser
+     CSS interno — fix standard documentato per questo identico messaggio d'errore); se anche
+     quello fallisse, ripiega sulla modalità classica come prima. Combinato col retry già presente
+     in emettiVoucherAdmin() (v.18.04), ora sono fino a 4 tentativi reali di cattura prima di
+     arrendersi al fallback senza allegato. Gate: micro-fix tecnico su libreria di terze parti,
+     nessun testo pubblico toccato → P3 non dovuta. -->
 <!-- v 2026.07.18.04 — Due correzioni su segnalazione Andrea (mail di test SM-2026-001).
      (1) La mail "il tuo buono è pronto" prometteva "in un'altra email" il PDF quando la
      generazione client-side falliva — quella seconda mail non è mai esistita in nessun percorso
@@ -2681,7 +2693,22 @@ async function _eseguiPubblicaFotoSito(token) {
         var MAX_DIM = 4096;
         var scale = 2;
         if (rect.width * scale > MAX_DIM) scale = Math.max(1, MAX_DIM / rect.width);
-        window.html2canvas(card, { scale: scale, backgroundColor: '#ffffff' }).then(function(canvas){
+
+        // Fix "Error parsing CSS component value, unexpected EOF" (bug noto di html2canvas 1.4.1,
+        // v 2026.07.18.05): in modalità classica html2canvas legge e ri-serializza a mano TUTTE le
+        // regole CSS del documento (non solo quelle del cartoncino) con un suo parser interno, e su
+        // una pagina lunga come menu-admin.html (centinaia di regole/variabili CSS in tutto il
+        // pannello) può incappare in un valore che il suo parser non digerisce, facendo fallire la
+        // cattura per l'intero voucher anche se il cartoncino in sé è innocuo. Primo tentativo con
+        // foreignObjectRendering:true (fix standard per questo errore: delega la cattura al motore
+        // SVG del browser invece del parser CSS interno); se anche quello fallisse, secondo
+        // tentativo in modalità classica come rete di sicurezza.
+        function catturaCanvas(foreignObject) {
+          return window.html2canvas(card, { scale: scale, backgroundColor: '#ffffff', foreignObjectRendering: foreignObject });
+        }
+        catturaCanvas(true).catch(function () {
+          return catturaCanvas(false);
+        }).then(function(canvas){
           try {
             var jsPDF = window.jspdf.jsPDF;
             var pageWmm = 190, pageHmm = pageWmm * (canvas.height / canvas.width);
@@ -2697,7 +2724,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.18.04</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.18.05</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

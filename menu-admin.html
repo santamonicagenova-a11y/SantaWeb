@@ -1,4 +1,21 @@
 <!DOCTYPE html>
+<!-- v 2026.07.18.04 — Due correzioni su segnalazione Andrea (mail di test SM-2026-001).
+     (1) La mail "il tuo buono è pronto" prometteva "in un'altra email" il PDF quando la
+     generazione client-side falliva — quella seconda mail non è mai esistita in nessun percorso
+     di codice (falsa promessa). Fix: richiedi-voucher v 2026.07.18.01 (testo onesto, nessun
+     impegno) + emettiVoucherAdmin() ora fa un retry automatico della generazione PDF
+     (generaPdfConRetry, 1 tentativo extra) prima di arrendersi e cadere nel fallback senza
+     allegato — riduce le occasioni in cui il fallback scatta. (2) Pulsante "Elimina" ora SEMPRE
+     presente su ogni voucher dell'elenco unico (_vuRowVoucher), indipendentemente dallo stato —
+     prima appariva solo per stato='emesso', e per riscattato/scaduto/recesso non c'era alcun
+     pulsante. riscatta-voucher v 2026.07.18.02 rimuove il vincolo di stato su 'delete' (richiesta
+     esplicita per pulire voucher di prova finiti in qualunque stato durante i test); _vcDelete()
+     ora riceve anche lo stato e mostra un testo di conferma più severo quando non è 'emesso'
+     ("cancella ogni traccia anche se già usato/riscattato — mai su un voucher reale"). Gate:
+     tooling/vista admin interna, azioni protette da secret + conferma esplicita → P3 non dovuta.
+     Nota: relax del vincolo 'delete' è una scelta deliberata per la fase di test, non revocata
+     automaticamente — nessun'azione di pulizia dati fiscali reali è prevista da questo pulsante,
+     resta all'admin non usarlo su un voucher realmente consegnato a un cliente. -->
 <!-- v 2026.07.18.03 — Due aggiunte su richiesta Andrea. (1) Campo "Note" testo libero per ogni riga
      dell'elenco voucher emessi (_vuRowVoucher): input pre-compilato con la nota esistente + pulsante
      "💾 Salva" (anche Invio), nuova funzione _vuSaveNote() → nuova azione 'update_note' su
@@ -1700,7 +1717,19 @@ function emettiVoucherAdmin() {
         return;
       }
       _vcSetEmitStatus('Genero il PDF e invio la mail al cliente…');
-      window._vpGeneratePdfBase64().then(function (pdfBase64) {
+      // Un tentativo extra prima di rinunciare: la cattura html2canvas può fallire per motivi
+      // transitori (font non ancora pronto nonostante document.fonts.ready, tab in background,
+      // primo giro a freddo delle CDN) — un solo retry silenzioso riduce le volte in cui si
+      // finisce nel fallback "senza allegato" qui sotto, che ora NON promette più una seconda
+      // mail automatica (vedi richiedi-voucher v 2026.07.18.01: prima il testo diceva "in
+      // un'altra email" ma nessuna mail simile è mai stata inviata da nessun percorso di codice).
+      function generaPdfConRetry(tentativiRimasti) {
+        return window._vpGeneratePdfBase64().catch(function (ex) {
+          if (tentativiRimasti > 0) return generaPdfConRetry(tentativiRimasti - 1);
+          throw ex;
+        });
+      }
+      generaPdfConRetry(1).then(function (pdfBase64) {
         var pdfFilename = 'buono-regalo-' + v.codice + '.pdf';
         var call = rid
           ? _vrCall('complete', { id: rid, codice: v.codice, pdf_base64: pdfBase64, pdf_filename: pdfFilename })
@@ -1807,8 +1836,14 @@ function _vcRecesso(codice) {
     else _vuSetMsg((res.j && res.j.error) || 'Errore durante il recesso.', false);
   });
 }
-function _vcDelete(codice) {
-  if (!confirm('Confermi l\'eliminazione del voucher ' + codice + '? Sparisce definitivamente. Usalo solo per errori mai spediti al cliente.')) return;
+// stato è opzionale (passato dall'elenco unico): usato solo per differenziare il testo di
+// conferma — riscatta-voucher v 2026.07.18.02 consente delete su qualunque stato.
+function _vcDelete(codice, stato) {
+  var finale = (stato === 'riscattato' || stato === 'scaduto' || stato === 'recesso' || stato === 'parziale');
+  var msg = finale
+    ? ('Confermi l\'eliminazione DEFINITIVA del voucher ' + codice + ', già in stato "' + (VC_STATUS_LABEL[stato] || stato) + '"? Cancella ogni traccia anche se già usato o riscattato — usalo SOLO per pulire voucher di prova, MAI su un voucher reale già consegnato a un cliente.')
+    : ('Confermi l\'eliminazione del voucher ' + codice + '? Sparisce definitivamente. Usalo per errori mai spediti al cliente, o per pulire un voucher di prova.');
+  if (!confirm(msg)) return;
   _vuSetMsg('');
   _vcCall('delete', { codice: codice }).then(function (res) {
     if (res.ok && res.j && res.j.deleted) {
@@ -1890,22 +1925,25 @@ function _vuRowVoucher(v) {
   var st = VC_STATUS_LABEL[v.stato] || v.stato, color = VC_STATUS_COLOR[v.stato] || 'var(--stone)';
   var isExp = v.tipo === 'esperienza';
   var importo = isExp ? (v.descrizione || '') : (_czEuro(v.residuo_eur) + ' / ' + _czEuro(v.valore_eur));
+  var finale = (v.stato === 'riscattato' || v.stato === 'scaduto' || v.stato === 'recesso');
   var actions = '';
-  if (v.stato === 'riscattato' || v.stato === 'scaduto' || v.stato === 'recesso') {
-    actions = '<span style="font-size:.7rem;color:var(--stone);">—</span>';
+  if (finale) {
+    actions += '<span style="font-size:.7rem;color:var(--stone);">—</span>';
   } else if (isExp) {
     actions += '<button class="btn btn-publish" style="font-size:.68rem;padding:.35rem .6rem;" onclick="_vcRedeem(\'' + v.codice + '\', null)">Riscatta</button>';
     actions += '<button class="btn btn-load" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--rust);color:var(--rust)" onclick="_vcRecesso(\'' + v.codice + '\')">Recesso</button>';
-    if (v.stato === 'emesso') actions += '<button class="btn btn-load" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--rust);color:var(--rust)" onclick="_vcDelete(\'' + v.codice + '\')">Elimina</button>';
   } else {
     actions += '<input type="number" id="vu-imp-' + v.codice + '" min="0.01" step="0.01" value="' + Number(v.residuo_eur).toFixed(2) + '" style="width:76px;font-size:.7rem;padding:.3rem .5rem;" />';
     actions += '<button class="btn btn-publish" style="font-size:.68rem;padding:.35rem .6rem;" onclick="_vcRedeem(\'' + v.codice + '\', document.getElementById(\'vu-imp-' + v.codice + '\').value)">Registra</button>';
     actions += '<button class="btn btn-load" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--ink);color:var(--ink)" onclick="_vcRedeem(\'' + v.codice + '\', null)">Tutto</button>';
     if (v.stato === 'emesso') {
       actions += '<button class="btn btn-load" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--rust);color:var(--rust)" onclick="_vcRecesso(\'' + v.codice + '\')">Recesso</button>';
-      actions += '<button class="btn btn-load" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--rust);color:var(--rust)" onclick="_vcDelete(\'' + v.codice + '\')">Elimina</button>';
     }
   }
+  // Elimina è sempre disponibile, indipendentemente dallo stato (richiesta esplicita Andrea per
+  // poter ripulire i voucher di prova, anche quelli finiti riscattati/scaduti/in recesso durante
+  // i test) — riscatta-voucher v 2026.07.18.02 non ristringe più 'delete' a stato='emesso'.
+  actions += '<button class="btn btn-load" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--rust);color:var(--rust)" onclick="_vcDelete(\'' + v.codice + '\', \'' + v.stato + '\')">Elimina</button>';
   return '<div style="padding:.6rem 0;border-bottom:1px dotted var(--rule);">' +
     '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;">' +
     '<span style="font-family:monospace;font-weight:600;font-size:.85rem;min-width:100px;">' + _czEsc(v.codice) + '</span>' +
@@ -2659,7 +2697,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.18.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.18.04</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

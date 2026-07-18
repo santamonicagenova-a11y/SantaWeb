@@ -1,4 +1,27 @@
 <!DOCTYPE html>
+<!-- v 2026.07.18.03 — Due aggiunte su richiesta Andrea. (1) Campo "Note" testo libero per ogni riga
+     dell'elenco voucher emessi (_vuRowVoucher): input pre-compilato con la nota esistente + pulsante
+     "💾 Salva" (anche Invio), nuova funzione _vuSaveNote() → nuova azione 'update_note' su
+     riscatta-voucher (v 2026.07.18.01, Supabase deploy diretto, nessun vincolo di stato: annotabile
+     anche un voucher già riscattato/scaduto/recesso). (2) "Valori dei buoni liberi" rinominato
+     "Setup" (#vc-valori-details), aggiunto un blocco "Azzera contatore codici voucher" (campi Anno +
+     Riparti da, pulsante ↺, conferma con preview del prossimo codice) → nuova funzione
+     azzeraContatoreVoucher() → nuova azione 'reset_counter' su emetti-voucher (v 2026.07.18.01,
+     upsert diretto su voucher_counter, stesso meccanismo ON CONFLICT(anno) del trigger
+     assegna_codice_voucher; NON tocca/cancella i voucher già emessi). Motivo: Andrea sta facendo
+     prove di emissione e non vuole che i primi voucher veri partano da codici successivi a quelli
+     di test — dopo le prove azzera il contatore, poi elimina a mano (già possibile) i voucher di
+     prova ancora in stato "emesso". Gate: tooling/vista admin interna, azioni distruttive protette
+     da secret admin + conferma esplicita → P3 non dovuta. -->
+<!-- v 2026.07.18.02 — Micro-fix di stile sul form "Genera nuovo voucher" (redesign v.01 qui sotto):
+     checkbox "Abbinamento vini incluso" (vc-e-vini) era visivamente staccata dalla sua label per
+     via della regola globale input[type=checkbox]{margin:auto} che, dentro un <label> display:flex
+     a piena larghezza, spingeva il quadratino verso il centro e il testo tutto a destra — fix
+     margin:0 sul checkbox + label ora display:inline-flex/width:fit-content (si stringe al
+     contenuto, checkbox e testo restano vicini e allineati). Select "Consegna" (vc-e-consegna) e
+     campo "Data emissione" (vc-e-data) ora arrotondati come i pulsanti (border-radius:var(--radius),
+     10px, coerente con .btn — non pillola 999px come Tipo/Destinatario, per non confonderli con
+     l'estetica "chip" di quei due campi). -->
 <!-- v 2026.07.18.01 — Redesign del pannello "Voucher — Gestione" su richiesta Andrea: eliminate le
      tre sezioni separate "Richieste da evadere" (#vc-richieste-details), "Cerca / gestisci un
      voucher" (#vc-search-details) e "Storico voucher" (#vc-l-list), sostituite da un unico elenco
@@ -682,8 +705,8 @@
               <option value="valore">Buono libero · valore monetario</option>
             </select>
           </div>
-          <label id="vc-e-vini-row" style="display:flex;align-items:center;gap:.4rem;font-size:.78rem;">
-            <input type="checkbox" id="vc-e-vini" /> Abbinamento vini incluso
+          <label id="vc-e-vini-row" style="display:inline-flex;align-items:center;gap:.5rem;font-size:.78rem;width:fit-content;">
+            <input type="checkbox" id="vc-e-vini" style="margin:0;flex:none;" /> Abbinamento vini incluso
           </label>
           <div id="vc-e-valore-row" style="display:none;" class="opt-row">
             <div><span class="opt-lbl">Valore buono (€)</span><input type="number" id="vc-e-valore" min="1" step="1" value="100" /></div>
@@ -711,12 +734,12 @@
             <div><span class="opt-lbl">Prezzo pagato (€)</span><input type="number" id="vc-e-prezzo" min="0" step="1" style="width:100%;" /></div>
             <div>
               <span class="opt-lbl">Consegna</span>
-              <select id="vc-e-consegna" style="width:100%;">
+              <select id="vc-e-consegna" style="width:100%;border-radius:var(--radius);padding:.45rem .8rem;">
                 <option value="elettronico">Elettronico (PDF)</option>
                 <option value="fisico">Fisico (stampato)</option>
               </select>
             </div>
-            <div><span class="opt-lbl">Data emissione</span><input type="date" id="vc-e-data" style="width:100%;" /></div>
+            <div><span class="opt-lbl">Data emissione</span><input type="date" id="vc-e-data" style="width:100%;border-radius:var(--radius);padding:.4rem .6rem;" /></div>
           </div>
           <div>
             <span class="opt-lbl">Note interne (opzionale)</span>
@@ -736,7 +759,7 @@
       </details>
 
       <details id="vc-valori-details" style="margin-bottom:1rem;border:1px solid var(--rule);padding:.8rem 1rem;">
-        <summary style="cursor:pointer;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);">+ Valori dei buoni liberi</summary>
+        <summary style="cursor:pointer;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);">+ Setup</summary>
         <div style="margin-top:1rem;">
           <p style="font-size:.82rem;color:var(--stone);margin-bottom:1rem;line-height:1.6;">
             Imposta i tre importi dei <strong>buoni liberi</strong> mostrati sulla pagina dei voucher.
@@ -758,7 +781,28 @@
             </div>
             <button class="btn btn-publish" onclick="pubblicaVoucherBuoni()">✦ Pubblica valori</button>
           </div>
-          <div id="vb-status" style="font-size:.82rem;color:var(--stone);">&hellip;</div>
+          <div id="vb-status" style="font-size:.82rem;color:var(--stone);margin-bottom:1.4rem;">&hellip;</div>
+
+          <div style="border-top:1px dotted var(--rule);padding-top:1rem;">
+            <p style="font-size:.82rem;color:var(--stone);margin-bottom:.8rem;line-height:1.6;">
+              <strong>Azzera contatore codici voucher</strong> — usalo dopo delle prove, per far ripartire i
+              voucher veri da un codice pulito (es. <code>SM-2026-001</code>) invece di continuare da dove
+              sono arrivati i test. Non cancella i voucher già emessi: quelli si eliminano a mano dall'elenco
+              qui sotto (pulsante "Elimina", solo se ancora in stato "emesso").
+            </p>
+            <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:end;margin-bottom:.8rem;">
+              <div>
+                <span class="opt-lbl">Anno</span>
+                <input type="number" id="vs-anno" min="2020" max="2100" step="1" style="width:90px;" />
+              </div>
+              <div>
+                <span class="opt-lbl">Riparti da (codice)</span>
+                <input type="number" id="vs-ultimo" min="0" step="1" value="0" style="width:90px;" />
+              </div>
+              <button class="btn btn-load" style="border:1px solid var(--rust);color:var(--rust)" onclick="azzeraContatoreVoucher()">↺ Azzera contatore</button>
+            </div>
+            <div id="vs-status" style="font-size:.82rem;color:var(--stone);"></div>
+          </div>
         </div>
       </details>
 
@@ -1519,6 +1563,7 @@ function apriSezioneVoucher() {
   _pulisciViste();
   document.getElementById('voucher-section').style.display = 'block';
   var d = document.getElementById('vc-e-data'); if (d && !d.value) d.value = new Date().toISOString().slice(0,10);
+  var vsAnno = document.getElementById('vs-anno'); if (vsAnno && !vsAnno.value) vsAnno.value = new Date().getFullYear();
   _vcEmitToggle();
   caricaVoucherUnificato();
   caricaVoucherBuoni();
@@ -1683,6 +1728,36 @@ function emettiVoucherAdmin() {
     .catch(function (ex) { _vcSetEmitStatus('Impossibile emettere: ' + ex.message, true); });
 }
 
+// Azzera (o riporta a un valore scelto) il contatore SM-<anno>-NNN, così i voucher veri non
+// ripartono da un codice successivo a quelli usati nelle prove. Non tocca i voucher già emessi
+// (quelli si eliminano a mano dall'elenco, pulsante "Elimina", solo se ancora in stato "emesso").
+function azzeraContatoreVoucher() {
+  var statusEl = document.getElementById('vs-status');
+  var secret = _vcGetSecret();
+  if (!secret) { statusEl.textContent = 'Operazione annullata: serve la chiave amministratore.'; statusEl.style.color = 'var(--rust)'; return; }
+  var annoEl = document.getElementById('vs-anno'), ultimoEl = document.getElementById('vs-ultimo');
+  var anno = annoEl.value ? Number(annoEl.value) : new Date().getFullYear();
+  var ultimo = ultimoEl.value !== '' ? Number(ultimoEl.value) : 0;
+  var prossimoPreview = 'SM-' + anno + '-' + String(ultimo + 1).padStart(3, '0');
+  if (!confirm('Confermi l\'azzeramento del contatore per il ' + anno + '? Il prossimo voucher emesso partirà da ' + prossimoPreview + '. I voucher già emessi non vengono toccati.')) return;
+  statusEl.textContent = 'Azzeramento in corso…'; statusEl.style.color = 'var(--stone)';
+  fetch(VOUCHER_EMIT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-voucher-secret': secret },
+    body: JSON.stringify({ action: 'reset_counter', anno: anno, ultimo: ultimo })
+  })
+    .then(function (r) {
+      if (r.status === 401) { localStorage.removeItem(VC_SECRET_KEY); throw new Error('Chiave errata — riprova.'); }
+      return r.json();
+    })
+    .then(function (j) {
+      if (!j || !j.ok) throw new Error((j && j.error) || 'Errore sconosciuto');
+      statusEl.textContent = '✓ Contatore ' + j.anno + ' azzerato a ' + j.ultimo + '. Prossimo voucher: ' + j.prossimo + '.';
+      statusEl.style.color = 'var(--ink)';
+    })
+    .catch(function (ex) { statusEl.textContent = 'Errore: ' + ex.message; statusEl.style.color = 'var(--rust)'; });
+}
+
 var VC_STATUS_LABEL = {
   emesso: 'Emesso — non ancora usato', parziale: 'Uso parziale', riscattato: 'Riscattato',
   scaduto: 'Scaduto', recesso: 'Annullato (recesso)'
@@ -1839,7 +1914,29 @@ function _vuRowVoucher(v) {
     '<div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;">' + actions + '</div>' +
     '</div>' +
     '<div style="font-size:.72rem;color:var(--stone);margin-top:.3rem;">' + (isExp ? 'Esperienza' : 'Buono libero') + ' — ' + _czEsc(importo) + ' · emesso ' + (v.data_emissione || '—') + ' · scade ' + (v.data_scadenza || '—') + '</div>' +
+    '<div style="display:flex;gap:.4rem;align-items:center;margin-top:.4rem;">' +
+    '<input type="text" id="vu-note-' + v.codice + '" value="' + _czEsc(v.note || '') + '" placeholder="Note libere…" style="flex:1;min-width:120px;font-size:.72rem;padding:.3rem .6rem;border-radius:var(--radius);" onkeydown="if(event.key===\'Enter\')_vuSaveNote(\'' + v.codice + '\');" />' +
+    '<button class="btn btn-load" style="font-size:.62rem;padding:.3rem .55rem;border:1px solid var(--ink);color:var(--ink)" onclick="_vuSaveNote(\'' + v.codice + '\')" title="Salva nota">💾 Salva</button>' +
+    '</div>' +
     '</div>';
+}
+
+// Salva la nota interna libera di un voucher (azione update_note su riscatta-voucher, nessun
+// vincolo di stato — anche voucher già riscattati/scaduti restano annotabili).
+function _vuSaveNote(codice) {
+  var el = document.getElementById('vu-note-' + codice);
+  if (!el) return;
+  var note = el.value.trim() || null;
+  _vuSetMsg('');
+  _vcCall('update_note', { codice: codice, note: note }).then(function (res) {
+    if (res.ok && res.j && res.j.voucher) {
+      _vuSetMsg('✓ Nota salvata per ' + codice + '.', true);
+      var vRow = window._vuAllRows && window._vuAllRows.vouchers && window._vuAllRows.vouchers.filter(function (v) { return v.codice === codice; })[0];
+      if (vRow) vRow.note = res.j.voucher.note;
+    } else {
+      _vuSetMsg((res.j && res.j.error) || 'Errore nel salvataggio della nota.', false);
+    }
+  });
 }
 
 // ══ VOUCHER — richieste dal form di regala.html ═════════════
@@ -2562,7 +2659,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.18.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.18.03</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

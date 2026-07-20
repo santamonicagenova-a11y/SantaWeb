@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   regala.html
-  Versione: v 2026.07.20.01
+  Versione: v 2026.07.20.03
   Pagina: Voucher regalo Santamonica — consegna elettronica ORA COMPLETAMENTE AUTOMATICA
           (Stripe Checkout mode='payment' → PDF+mail automatici, nessun intervento admin);
           il ritiro fisico resta sul flusso manuale via mail (richiedi-voucher).
@@ -9,6 +9,19 @@
           automatico (2026-07-20, richiesto da Andrea: "cliente seleziona paga e riceve pdf in
           autonomia, no mail che mi arriva per generare voucher")
   Lingua: it (IT only, dec. F0.10 C1)
+  Cambi v.07.20.02 → v.07.20.03 (riordino sezioni, su richiesta Andrea):
+    - "Come funziona" spostata all'inizio pagina, subito dopo l'header/banner, prima di
+      "I nostri menù degustazione, in regalo" (era dopo le griglie voucher, prima di "Info").
+    - "I tuoi dati" (contatto-box) spostata dove prima stava "Come funziona": dopo la griglia
+      del buono libero, prima di "Informazioni essenziali" (era subito dopo l'header/banner).
+    - Nessuna modifica funzionale: gli ID (#contatto-box, #ct-*) sono invariati, la logica JS
+      (validazione, scrollIntoView) non dipende dalla posizione nel DOM.
+    - Testo step 1 di "Come funziona" adeguato (non parla più di "in cima alla pagina", visto
+      che il modulo dati ora è più in basso).
+  Cambi v.07.20.01 → v.07.20.02:
+    - Info-item "Prenotazione" aggiornata: +"soggetta a disponibilità" + nota mancato
+      arrivo/disdetta tardiva entro 24h → voucher considerato utilizzato. Coordinato con
+      voucher-termini.html §8 (stessa versione, stesso confronto con T&C di due ristoranti terzi).
   Cambi v.07.19.01 → v.07.20.01:
     - NUOVA checkbox condivisa "Ho letto e accetto i Termini e condizioni dei buoni regalo"
       dentro "I tuoi dati" (obbligatoria per ENTRAMBI i flussi, fisico ed elettronico) — prima
@@ -108,9 +121,12 @@
         (19/7) = P1+P2 eseguite (nessun nuovo obbligo legale, il concetto "eccedenza a carico di" era
         già nei Termini §10 dal 10/6 come principio, qui diventa scelta esplicita del cliente anziché
         default admin); P3 (Revisione Oppositiva) NON ancora fatta su questo frammento = debito
-        dichiarato. Checkout automatico + checkbox termini (20/7) = P1+P2 eseguite, P3 NON ancora
-        fatta = stesso debito, esteso a questo frammento — da chiudere in un'unica Revisione
-        Oppositiva prima del sign-off finale di tutta la pagina.
+        dichiarato. Checkout automatico + checkbox termini (20/7.01) = P1+P2 eseguite, P3 NON ancora
+        fatta = stesso debito. Info-item Prenotazione (20/7.02, clausola no-show/disdetta tardiva) =
+        P1+P2 eseguite, P3 NON ancora fatta = si aggiunge allo stesso debito — da chiudere in un'unica
+        Revisione Oppositiva prima del sign-off finale di tutta la pagina e di voucher-termini.html.
+        Riordino sezioni (20/7.03) = solo struttura/UX, nessun contenuto nuovo → non innesca P3, debito
+        invariato rispetto a sopra.
 -->
 <html lang="it">
 <head>
@@ -768,42 +784,28 @@
     <!-- ===== Banner pagamento annullato (mostrato via JS se ?pagamento=annullato) ===== -->
     <div class="payment-banner" id="payment-banner">Il pagamento è stato annullato: nessun addebito è stato effettuato. Puoi riprovare quando vuoi, i tuoi dati sono ancora qui sotto.</div>
 
-    <!-- ===== I TUOI DATI (condivisa da tutte le richieste) ===== -->
-    <section class="contatto-box" id="contatto-box">
-      <h2>I tuoi dati</h2>
-      <p class="contatto-intro">Li usiamo solo per rispondere alla tua richiesta di buono regalo. Compilali una volta, poi scegli il buono qui sotto.</p>
-      <div class="contatto-grid">
-        <div>
-          <label class="contatto-lbl" for="ct-nome">Nome e cognome *</label>
-          <input type="text" id="ct-nome" class="contatto-input" autocomplete="name">
-        </div>
-        <div>
-          <label class="contatto-lbl" for="ct-email">Email *</label>
-          <input type="email" id="ct-email" class="contatto-input" autocomplete="email">
-        </div>
-        <div>
-          <label class="contatto-lbl" for="ct-telefono">Telefono (opzionale)</label>
-          <input type="tel" id="ct-telefono" class="contatto-input" autocomplete="tel">
-        </div>
-        <div>
-          <label class="contatto-lbl" for="ct-destinatario">Nome del destinatario (opzionale)</label>
-          <input type="text" id="ct-destinatario" class="contatto-input">
-        </div>
-      </div>
-      <div style="margin-top:16px;">
-        <label class="contatto-lbl" for="ct-dedica">Dedica (opzionale)</label>
-        <textarea id="ct-dedica" class="contatto-input" rows="2"></textarea>
-      </div>
-      <!-- honeypot anti-spam: campo invisibile, deve restare vuoto -->
-      <div class="hp-field" aria-hidden="true">
-        <label for="ct-hp">Non compilare questo campo</label>
-        <input type="text" id="ct-hp" tabindex="-1" autocomplete="off">
-      </div>
-      <label class="termini-toggle">
-        <input type="checkbox" id="ct-termini">
-        <span>Ho letto e accetto i <a href="/voucher-termini.html" target="_blank" rel="noopener">Termini e condizioni dei buoni regalo</a>. *</span>
-      </label>
-      <div id="contatto-error" class="contatto-error"></div>
+    <!-- ===== HOW IT WORKS ===== -->
+    <section class="how-it-works">
+      <h2>Come funziona</h2>
+      <ol class="steps">
+        <li>
+          <h3>Compila i tuoi dati</h3>
+          <p>Nome ed email nel modulo dei tuoi dati (lo trovi scorrendo la pagina). Poi scegli il regalo: un menù degustazione per due (con o senza abbinamento vini) oppure un buono di valore libero, e come preferisci riceverlo — ritiro in ristorante o via email.</p>
+        </li>
+        <li>
+          <h3>Paga o inviaci la richiesta</h3>
+          <p>Scegliendo "via email" paghi subito online, in sicurezza, e ricevi il PDF nello stesso momento. Scegliendo il ritiro in ristorante ci basta la richiesta: ti rispondiamo entro 24 ore con le modalità di pagamento in loco.</p>
+        </li>
+        <li>
+          <h3>Ritira o ricevi il buono</h3>
+          <p>Pagando online il PDF arriva subito via email, pronto da donare. Pagando in ristorante ritiri il voucher stampato in una confezione. In entrambi i casi con codice univoco e scadenza.</p>
+        </li>
+        <li>
+          <h3>Prenota e riscatta</h3>
+          <p>Il destinatario prenota segnalando il voucher e presenta il codice al tavolo.</p>
+        </li>
+      </ol>
+      <p style="text-align:center;font-size:13px;color:var(--muted);margin:24px 0 0;">Per assistenza: <a href="tel:+390105533155" style="color:var(--terracotta-dark);">010 5533155</a></p>
     </section>
 
     <!-- ===== CATEGORIA 1 · MENU DEGUSTAZIONE ===== -->
@@ -1002,28 +1004,42 @@
 
     </section>
 
-    <!-- ===== HOW IT WORKS ===== -->
-    <section class="how-it-works">
-      <h2>Come funziona</h2>
-      <ol class="steps">
-        <li>
-          <h3>Compila i tuoi dati</h3>
-          <p>Nome ed email in cima alla pagina, una volta sola. Poi scegli il regalo: un menù degustazione per due (con o senza abbinamento vini) oppure un buono di valore libero, e come preferisci riceverlo — ritiro in ristorante o via email.</p>
-        </li>
-        <li>
-          <h3>Paga o inviaci la richiesta</h3>
-          <p>Scegliendo "via email" paghi subito online, in sicurezza, e ricevi il PDF nello stesso momento. Scegliendo il ritiro in ristorante ci basta la richiesta: ti rispondiamo entro 24 ore con le modalità di pagamento in loco.</p>
-        </li>
-        <li>
-          <h3>Ritira o ricevi il buono</h3>
-          <p>Pagando online il PDF arriva subito via email, pronto da donare. Pagando in ristorante ritiri il voucher stampato in una confezione. In entrambi i casi con codice univoco e scadenza.</p>
-        </li>
-        <li>
-          <h3>Prenota e riscatta</h3>
-          <p>Il destinatario prenota segnalando il voucher e presenta il codice al tavolo.</p>
-        </li>
-      </ol>
-      <p style="text-align:center;font-size:13px;color:var(--muted);margin:24px 0 0;">Per assistenza: <a href="tel:+390105533155" style="color:var(--terracotta-dark);">010 5533155</a></p>
+    <!-- ===== I TUOI DATI (condivisa da tutte le richieste) ===== -->
+    <section class="contatto-box" id="contatto-box">
+      <h2>I tuoi dati</h2>
+      <p class="contatto-intro">Li usiamo solo per rispondere alla tua richiesta di buono regalo. Compilali una volta, poi scegli il buono qui sotto.</p>
+      <div class="contatto-grid">
+        <div>
+          <label class="contatto-lbl" for="ct-nome">Nome e cognome *</label>
+          <input type="text" id="ct-nome" class="contatto-input" autocomplete="name">
+        </div>
+        <div>
+          <label class="contatto-lbl" for="ct-email">Email *</label>
+          <input type="email" id="ct-email" class="contatto-input" autocomplete="email">
+        </div>
+        <div>
+          <label class="contatto-lbl" for="ct-telefono">Telefono (opzionale)</label>
+          <input type="tel" id="ct-telefono" class="contatto-input" autocomplete="tel">
+        </div>
+        <div>
+          <label class="contatto-lbl" for="ct-destinatario">Nome del destinatario (opzionale)</label>
+          <input type="text" id="ct-destinatario" class="contatto-input">
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <label class="contatto-lbl" for="ct-dedica">Dedica (opzionale)</label>
+        <textarea id="ct-dedica" class="contatto-input" rows="2"></textarea>
+      </div>
+      <!-- honeypot anti-spam: campo invisibile, deve restare vuoto -->
+      <div class="hp-field" aria-hidden="true">
+        <label for="ct-hp">Non compilare questo campo</label>
+        <input type="text" id="ct-hp" tabindex="-1" autocomplete="off">
+      </div>
+      <label class="termini-toggle">
+        <input type="checkbox" id="ct-termini">
+        <span>Ho letto e accetto i <a href="/voucher-termini.html" target="_blank" rel="noopener">Termini e condizioni dei buoni regalo</a>. *</span>
+      </label>
+      <div id="contatto-error" class="contatto-error"></div>
     </section>
 
     <!-- ===== INFO ===== -->
@@ -1060,7 +1076,7 @@
         </div>
         <div class="info-item">
           <h3>Prenotazione</h3>
-          <p>Obbligatoria: contatta il ristorante segnalando l'utilizzo del voucher al momento della prenotazione.</p>
+          <p>Obbligatoria e soggetta a disponibilità: contatta il ristorante segnalando l'utilizzo del voucher al momento della prenotazione. Disdetta oltre le 24 ore prima, o mancata presentazione, rendono il voucher considerato utilizzato.</p>
         </div>
         <div class="info-item info-item-terms">
           <h3>Condizioni d'uso</h3>
@@ -1086,7 +1102,7 @@
 
       <p style="margin: 0; font-size: 12px;">
         © 2026 Santamonica · Genova · Lungomare Lombardo 27, 16145 Genova<br>
-        <span class="version-tag">regala.html · v 2026.07.20.01</span>
+        <span class="version-tag">regala.html · v 2026.07.20.03</span>
       </p>
     </footer>
 

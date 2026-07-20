@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   regala.html
-  Versione: v 2026.07.20.04
+  Versione: v 2026.07.20.05
   Pagina: Voucher regalo Santamonica — consegna elettronica ORA COMPLETAMENTE AUTOMATICA
           (Stripe Checkout mode='payment' → PDF+mail automatici, nessun intervento admin);
           il ritiro fisico resta sul flusso manuale via mail (richiedi-voucher).
@@ -9,6 +9,18 @@
           automatico (2026-07-20, richiesto da Andrea: "cliente seleziona paga e riceve pdf in
           autonomia, no mail che mi arriva per generare voucher")
   Lingua: it (IT only, dec. F0.10 C1)
+  Cambi v.07.20.04 → v.07.20.05 (su richiesta Andrea: "aggiungere anche il check box x la
+  newsletter come quando si richiede prenotazione?"):
+    - Nuova checkbox condivisa "Acconsento a ricevere comunicazioni sul ristorante..." nel box
+      "I tuoi dati" (id="ct-marketing"), stessa formulazione della checkbox marketing del form
+      prenotazioni in index.html. Opzionale, sotto la checkbox termini.
+    - marketing_consent nel payload di ENTRAMBI gli endpoint (create-voucher-checkout per la
+      consegna elettronica, richiedi-voucher per il ritiro fisico).
+    - Backend coordinato in pari data: entrambe le Edge Function (SafeTable) ora salvano
+      marketing_consent/marketing_consent_at su voucher_richieste e, se true, avviano lo stesso
+      double opt-in Brevo già in uso per le prenotazioni (submit-reservation v15) — lista/template
+      Brevo condivisi, redirect su newsletter-confermata.html. Migrazione DB
+      voucher_richieste_marketing_consent (3 colonne nuove) applicata.
   Cambi v.07.20.03 → v.07.20.04:
     - Rimosso il sottotitolo sotto "I nostri menù degustazione, in regalo" ("Il percorso che lo
       chef Nicolò Lazzaroni costruisce con il pescato del giorno. Per due persone, allo stesso
@@ -130,7 +142,11 @@
         P1+P2 eseguite, P3 NON ancora fatta = si aggiunge allo stesso debito — da chiudere in un'unica
         Revisione Oppositiva prima del sign-off finale di tutta la pagina e di voucher-termini.html.
         Riordino sezioni (20/7.03) = solo struttura/UX, nessun contenuto nuovo → non innesca P3, debito
-        invariato rispetto a sopra.
+        invariato rispetto a sopra. Rimozione sottotitolo (20/7.04) = micro-fix di copy, non
+        innesca P3. Checkbox newsletter + sync Brevo (20/7.05) = comunicazione automatica reale a
+        un nuovo pubblico (acquirenti voucher, non solo prenotanti) → P1+P2 eseguite (riuso 1:1 del
+        pattern già gated per submit-reservation v15), P3 NON ancora fatta = si aggiunge allo
+        stesso debito complessivo della pagina.
 -->
 <html lang="it">
 <head>
@@ -1042,6 +1058,10 @@
         <input type="checkbox" id="ct-termini">
         <span>Ho letto e accetto i <a href="/voucher-termini.html" target="_blank" rel="noopener">Termini e condizioni dei buoni regalo</a>. *</span>
       </label>
+      <label class="termini-toggle">
+        <input type="checkbox" id="ct-marketing">
+        <span>Acconsento a ricevere comunicazioni sul ristorante (eventi, serate a tema, novità). Facoltativo, revocabile in qualsiasi momento.</span>
+      </label>
       <div id="contatto-error" class="contatto-error"></div>
     </section>
 
@@ -1105,7 +1125,7 @@
 
       <p style="margin: 0; font-size: 12px;">
         © 2026 Santamonica · Genova · Lungomare Lombardo 27, 16145 Genova<br>
-        <span class="version-tag">regala.html · v 2026.07.20.04</span>
+        <span class="version-tag">regala.html · v 2026.07.20.05</span>
       </p>
     </footer>
 
@@ -1245,6 +1265,8 @@
         var hp = document.getElementById('ct-hp').value;
         var terminiCheck = document.getElementById('ct-termini');
         var termini = terminiCheck ? !!terminiCheck.checked : false;
+        var marketingCheck = document.getElementById('ct-marketing');
+        var marketingConsent = marketingCheck ? !!marketingCheck.checked : false;
 
         if (nome.length < 2 || !isValidEmail(email)) {
           setContattoError('Compila nome ed email (validi) qui sopra prima di inviare la richiesta.');
@@ -1291,6 +1313,7 @@
               destinatario: destinatario || undefined,
               dedica: dedica || undefined,
               termini_accettati: true,
+              marketing_consent: marketingConsent,
               _hp: hp,
             }),
           }).then(function(r) { return r.json().then(function(j) { return { status: r.status, body: j }; }); })
@@ -1330,6 +1353,7 @@
             destinatario: destinatario || undefined,
             dedica: dedica || undefined,
             termini_accettati: true,
+            marketing_consent: marketingConsent,
             _hp: hp,
             user_agent: navigator.userAgent,
           }),

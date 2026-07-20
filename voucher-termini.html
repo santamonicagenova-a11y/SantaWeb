@@ -1,10 +1,19 @@
 <!DOCTYPE html>
 <!--
   voucher-termini.html
-  Versione: v 2026.07.14.01
+  Versione: v 2026.07.20.01
   Pagina: Termini e condizioni d'uso buoni regalo (voucher) Santamonica
   Fase progetto: Sito — chiusura gate voucher (2026-07-14)
   Lingua: it (IT only, dec. F0.10 C1)
+  Cambi v.07.14.01 → v.07.20.01 (confronto con T&C di due ristoranti terzi, su richiesta Andrea):
+    - §8 NUOVA clausola mancato arrivo/disdetta tardiva: disdetta entro 24h dalla prenotazione o
+      no-show → Voucher considerato utilizzato, non più riscattabile né rimborsabile. Gap reale
+      individuato nel confronto: prima nessuna conseguenza era prevista per un voucher usato per
+      bloccare un tavolo senza presentarsi. Aggiunta anche precisazione "soggetta a disponibilità"
+      sulla prenotazione (punto 1).
+    - §9 aggiunta clausola di chiusura: quanto non espressamente indicato non è compreso nel
+      Voucher (rinforza l'elenco esclusioni già presente).
+    - Coordinato con regala.html (stessa versione, info-item "Prenotazione").
   Cambi v.06.10.04 → v.07.14.01:
     - §3 IVA: sciolto il rinvio "aliquota applicabile" — confermato dal commercialista (Andrea, 14/7) che
       SIA il Voucher Esperienza SIA il Voucher di Valore sono buoni-corrispettivo MONOUSO ai sensi
@@ -31,9 +40,12 @@
   Note: pagina legale sobria, coerente con privacy.html / cookies.html (palette legal pages).
         Banner cookieconsent integrato (autoShow attivo, non è policy page).
         Bottone .cc-manage in footer per coerenza UX cross-page.
-  GATE: documento legale → P1+P2 + P3 (3 vendor, 10/6) eseguite. Ultimo punto BLOCCANTE (classificazione IVA
-        monouso/multiuso) confermato dal commercialista il 14/7 → recepito in questa versione. Gate pronto
-        per sign-off finale Andrea prima del go-live pubblico.
+  GATE: documento legale → P1+P2 + P3 (3 vendor, 10/6) eseguite sul corpo del documento. Ultimo punto
+        BLOCCANTE (classificazione IVA monouso/multiuso) confermato dal commercialista il 14/7 → recepito.
+        NUOVO 20/7: clausola no-show/disdetta tardiva (§8) + clausola di chiusura (§9) = P1+P2 eseguite,
+        P3 NON ancora fatta su questo frammento = si aggiunge al debito P3 già aperto sulla pagina gemella
+        regala.html (checkbox termini + checkout automatico, 20/7) — un'unica Revisione Oppositiva prima
+        del sign-off finale di tutto il pacchetto voucher.
 -->
 <html lang="it">
 <head>
@@ -331,8 +343,8 @@
       <h1>Buoni regalo Santamonica<br><small style="color:var(--muted);font-weight:500;font-size:0.55em;">Condizioni d'uso e informazioni al consumatore</small></h1>
 
       <div class="legal-meta">
-        <span><strong>Versione:</strong> v 2026.07.14.01</span>
-        <span><strong>Ultimo aggiornamento:</strong> 14 luglio 2026</span>
+        <span><strong>Versione:</strong> v 2026.07.20.01</span>
+        <span><strong>Ultimo aggiornamento:</strong> 20 luglio 2026</span>
         <span><strong>Titolare:</strong> Santamonica · Genova</span>
         <span><strong>Lingua:</strong> Italiano</span>
       </div>
@@ -477,10 +489,13 @@
       <h2 class="section-title"><span class="num">8.</span> Modalità di riscatto</h2>
       <p>Per riscattare il Voucher il Beneficiario deve:</p>
       <ol>
-        <li><strong>Prenotare il tavolo</strong> contattando il Ristorante e <strong>indicando esplicitamente che intende utilizzare un voucher</strong> al momento della prenotazione. La prenotazione è obbligatoria.</li>
+        <li><strong>Prenotare il tavolo</strong> contattando il Ristorante e <strong>indicando esplicitamente che intende utilizzare un voucher</strong> al momento della prenotazione. La prenotazione è obbligatoria e, come ogni prenotazione, <strong>soggetta a disponibilità</strong>.</li>
         <li>Al momento del conto, presentare il PDF del Voucher (stampato o su dispositivo) o comunicare il Codice voucher al personale del Ristorante.</li>
       </ol>
       <p>Il Ristorante si riserva di chiedere al Beneficiario un documento d'identità per finalità di verifica antifrode in caso di Codice voucher non univocamente abbinato a una prenotazione registrata.</p>
+      <div class="highlight">
+        <strong>Mancato arrivo o disdetta tardiva:</strong> in caso di disdetta della prenotazione comunicata entro le 24 (ventiquattro) ore precedenti la data e l'orario prenotati, oppure di mancata presentazione (no-show) senza disdetta, il Voucher è considerato <strong>utilizzato</strong> e non è più riscattabile né rimborsabile. La disdetta comunicata con almeno 24 ore di anticipo non comporta invece alcuna conseguenza: il Voucher resta valido e riscattabile fino alla propria scadenza (§7).
+      </div>
     </section>
 
     <!-- ===== §9 ===== -->
@@ -497,6 +512,7 @@
         <li>eventi privatizzati, banchetti dedicati o servizi di catering esterni;</li>
         <li>l'acquisto di altri voucher o gift card.</li>
       </ul>
+      <p>Quanto non espressamente indicato nelle presenti condizioni o sul Voucher stesso non si intende compreso.</p>
     </section>
 
     <!-- ===== §10 ===== -->
@@ -617,7 +633,7 @@
 
       <p style="margin: 0; font-size: 12px;">
         © 2026 Santamonica · Genova · Tutti i diritti riservati.<br>
-        <span class="version-tag">voucher-termini.html · v 2026.07.14.01</span>
+        <span class="version-tag">voucher-termini.html · v 2026.07.20.01</span>
       </p>
     </footer>
 

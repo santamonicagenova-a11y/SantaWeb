@@ -2002,8 +2002,12 @@ function _vuSaveNote(codice) {
 // Riusa richiedi-voucher (azioni 'list' e 'complete'), stesso secret VOUCHER_ADMIN_SECRET
 // del resto del pannello Voucher. Cache client-side in window._vrRows per popolare
 // il form di emissione senza un secondo giro di rete.
-var VR_STATO_LABEL = { nuova: 'Da evadere', in_lavorazione: 'In lavorazione', evasa: 'Evasa', annullata: 'Annullata' };
-var VR_STATO_COLOR = { nuova: 'var(--rust)', in_lavorazione: 'var(--stone)', evasa: 'var(--green)', annullata: 'var(--stone)' };
+// 'attesa_pagamento'/'pagata' sono i due nuovi stati del flusso automatico Stripe (consegna
+// elettronica, 2026-07-20): normalmente non compaiono qui (paga→riceve tutto da solo, senza
+// passare da questo pannello), ma le label restano per difesa — es. se una richiesta 'pagata'
+// finisse in un elenco filtrato per debug, o in futuro si mostrasse anche lo storico automatico.
+var VR_STATO_LABEL = { nuova: 'Da evadere', in_lavorazione: 'In lavorazione', evasa: 'Evasa', annullata: 'Annullata', attesa_pagamento: 'In attesa di pagamento', pagata: 'Pagata (automatico)' };
+var VR_STATO_COLOR = { nuova: 'var(--rust)', in_lavorazione: 'var(--stone)', evasa: 'var(--green)', annullata: 'var(--stone)', attesa_pagamento: 'var(--stone)', pagata: 'var(--green)' };
 window._vrRows = [];
 window._vcActiveRichiestaId = null;
 

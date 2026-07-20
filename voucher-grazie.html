@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<!--
+  voucher-grazie.html — Pagina di conferma acquisto voucher online
+  Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
+  Versione: v 2026.07.20.01
+
+  Atterraggio dopo il pagamento riuscito su Stripe Checkout (create-voucher-checkout,
+  success_url). Pagina statica, nessuna lettura dinamica della sessione in questa prima
+  versione: il PDF del voucher arriva via email pochi istanti dopo (generato ed inviato dal
+  webhook Stripe), non da questa pagina. ?session_id= è presente nell'URL di ritorno ma non
+  ancora usato — riservato per un'eventuale v2 con conferma "in diretta" via lookup.
+  noindex: pagina transazionale, non per SEO.
+-->
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pagamento ricevuto — Ristorante Santamonica</title>
+<meta name="robots" content="noindex, nofollow">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sabbia:   #f7f5f0;
+    --crema:    #faf8f3;
+    --oro:      #c9a961;
+    --inchiostro: #2c2c2c;
+    --bordo:    #e0dcd0;
+    --secondario: #6b6560;
+  }
+
+  body {
+    font-family: 'Jost', Arial, sans-serif;
+    font-weight: 300;
+    background: var(--sabbia);
+    color: var(--inchiostro);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .card {
+    background: #ffffff;
+    border: 1px solid var(--bordo);
+    max-width: 560px;
+    width: 100%;
+    padding: 48px 48px 40px;
+    text-align: center;
+  }
+
+  .icona {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 24px;
+    background: var(--crema);
+    border: 1px solid var(--bordo);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .icona svg {
+    width: 26px;
+    height: 26px;
+    stroke: var(--oro);
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .ristorante {
+    font-family: 'Cormorant', Georgia, serif;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--secondario);
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-family: 'Cormorant', Georgia, serif;
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--inchiostro);
+    margin-bottom: 16px;
+  }
+
+  .sottotitolo {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--secondario);
+    margin-bottom: 32px;
+  }
+
+  .divisore {
+    width: 40px;
+    height: 1px;
+    background: var(--oro);
+    margin: 0 auto 32px;
+  }
+
+  .nota {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--secondario);
+    background: var(--crema);
+    border: 1px solid var(--bordo);
+    padding: 14px 18px;
+    margin-bottom: 32px;
+    text-align: left;
+  }
+
+  .cta {
+    display: inline-block;
+    padding: 13px 32px;
+    background: var(--inchiostro);
+    color: #ffffff;
+    text-decoration: none;
+    font-family: 'Jost', Arial, sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: background 0.2s;
+  }
+
+  .cta:hover {
+    background: #444;
+  }
+
+  footer {
+    margin-top: 24px;
+    font-size: 12px;
+    color: #aaa;
+    line-height: 1.6;
+  }
+
+  footer a { color: #aaa; }
+
+  @media (max-width: 480px) {
+    .card { padding: 36px 28px 32px; }
+    h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="icona">
+    <!-- checkmark -->
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  </div>
+
+  <p class="ristorante">Ristorante Santamonica</p>
+
+  <h1>Pagamento ricevuto</h1>
+
+  <div class="divisore"></div>
+
+  <p class="sottotitolo">
+    Grazie! Il pagamento è andato a buon fine. Il suo buono regalo<br>
+    è in preparazione: riceverà a breve un'email con il PDF pronto,<br>
+    codice e scadenza.
+  </p>
+
+  <p class="nota">Se l'email non arriva entro qualche minuto, controlli anche nello spam, oppure ci scriva a <a href="mailto:info@santamonicagenova.it" style="color:var(--inchiostro);">info@santamonicagenova.it</a> o chiami il <a href="tel:+390105533155" style="color:var(--inchiostro);">010 5533155</a>.</p>
+
+  <a href="https://santamonicagenova.it/" class="cta">Torna al sito</a>
+</div>
+
+<footer>Lungomare Lombardo 27 · Genova · <a href="https://santamonicagenova.it/privacy.html">Privacy</a></footer>
+
+</body>
+</html>

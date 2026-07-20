@@ -1,11 +1,40 @@
 <!DOCTYPE html>
 <!--
   regala.html
-  Versione: v 2026.07.19.01
-  Pagina: Voucher regalo Santamonica — richiesta automatizzata (form + mail), in attesa dello sblocco
-          Stripe (dec.#28) per il pagamento online
-  Fase progetto: Sito — automazione richiesta→consegna voucher (2026-07-14)
+  Versione: v 2026.07.20.01
+  Pagina: Voucher regalo Santamonica — consegna elettronica ORA COMPLETAMENTE AUTOMATICA
+          (Stripe Checkout mode='payment' → PDF+mail automatici, nessun intervento admin);
+          il ritiro fisico resta sul flusso manuale via mail (richiedi-voucher).
+  Fase progetto: Sito — automazione richiesta→consegna voucher (2026-07-14) → acquisto online
+          automatico (2026-07-20, richiesto da Andrea: "cliente seleziona paga e riceve pdf in
+          autonomia, no mail che mi arriva per generare voucher")
   Lingua: it (IT only, dec. F0.10 C1)
+  Cambi v.07.19.01 → v.07.20.01:
+    - NUOVA checkbox condivisa "Ho letto e accetto i Termini e condizioni dei buoni regalo"
+      dentro "I tuoi dati" (obbligatoria per ENTRAMBI i flussi, fisico ed elettronico) — prima
+      l'accettazione dei Termini era solo un link nella pagina, mai un consenso esplicito
+      raccolto; ora è richiesta lato client (blocca l'invio) e validata anche lato server sui
+      due endpoint (richiedi-voucher e create-voucher-checkout, entrambi salvano
+      termini_accettati_at).
+    - Consegna elettronica: il click su "Richiedi questo buono" (ora "Paga e ricevi subito" per
+      questa scelta) NON manda più una richiesta da evadere a mano — POSTa a una nuova Edge
+      Function pubblica create-voucher-checkout, che crea una Stripe Checkout Session
+      (mode='payment', stesso account Stripe LIVE già usato da SafeTable per le cauzioni dal
+      26/4/2026) e reindirizza subito il cliente al pagamento. Dopo il pagamento, il webhook
+      Stripe emette il voucher, genera il PDF del cartoncino lato server e manda la mail col
+      buono pronto — tutto senza intervento del ristorante. Prezzo sempre ricalcolato lato
+      server dal tipo scelto (mai dal client).
+    - Consegna fisica (ritiro in ristorante, pagamento in loco): INVARIATA, resta sul vecchio
+      flusso "richiesta → mail M1/M1bis → Andrea genera ed evade da menu-admin.html" (decisione
+      Andrea: la teniamo come opzione separata, il pagamento in loco non passa da Stripe qui).
+    - Testi "Come funziona" e i due bottoni degustazione/liberi aggiornati per riflettere
+      l'immediatezza della via elettronica ("paghi e ricevi il PDF subito", non più "ti
+      rispondiamo entro 24 ore" che resta vero solo per il ritiro fisico).
+    - Nuova gestione di ?pagamento=annullato (redirect di ritorno da Stripe se l'utente annulla
+      il checkout): banner in cima alla pagina, nessun dato perso (i campi restano compilati).
+    - GATE: contenuto pubblico + pagamento Stripe reale → P1+P2 eseguite in sessione; P3
+      (Revisione Oppositiva) NON ancora fatta su questo frammento = debito dichiarato, si
+      aggiunge al debito P3 già aperto sul resto della pagina (blocco eccedenza del 19/7).
   Cambi v.07.14.03 → v.07.19.01 (segnalato da Andrea: "manca l'opzione di chi paga la differenza"):
     - Le 3 schede del buono libero (100/150/200 €) avevano solo la scelta "come lo ricevi" ma non
       chiedevano MAI chi paga l'eventuale differenza se la spesa supera il valore del buono — la
@@ -79,7 +108,9 @@
         (19/7) = P1+P2 eseguite (nessun nuovo obbligo legale, il concetto "eccedenza a carico di" era
         già nei Termini §10 dal 10/6 come principio, qui diventa scelta esplicita del cliente anziché
         default admin); P3 (Revisione Oppositiva) NON ancora fatta su questo frammento = debito
-        dichiarato, da chiudere prima del sign-off finale insieme al resto della pagina.
+        dichiarato. Checkout automatico + checkbox termini (20/7) = P1+P2 eseguite, P3 NON ancora
+        fatta = stesso debito, esteso a questo frammento — da chiudere in un'unica Revisione
+        Oppositiva prima del sign-off finale di tutta la pagina.
 -->
 <html lang="it">
 <head>
@@ -494,6 +525,51 @@
       overflow: hidden;
     }
 
+    /* ===== Checkbox termini (condivisa, obbligatoria per entrambi i flussi) ===== */
+    .termini-toggle {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 18px;
+      padding: 12px 14px;
+      background: #fff;
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--ink);
+      cursor: pointer;
+      line-height: 1.45;
+    }
+
+    .termini-toggle input {
+      margin-top: 2px;
+      width: 16px;
+      height: 16px;
+      accent-color: var(--terracotta-dark);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .termini-toggle a {
+      color: var(--terracotta-dark);
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+    /* ===== Banner pagamento annullato (redirect di ritorno da Stripe) ===== */
+    .payment-banner {
+      display: none;
+      max-width: 920px;
+      margin: 0 auto 24px;
+      padding: 14px 20px;
+      background: var(--sand);
+      border: 1px solid var(--gold);
+      border-radius: 6px;
+      font-size: 14px;
+      color: var(--ink);
+      text-align: center;
+    }
+
     .cat-divider {
       border: 0;
       border-top: 1px solid var(--rule);
@@ -689,6 +765,9 @@
       </p>
     </header>
 
+    <!-- ===== Banner pagamento annullato (mostrato via JS se ?pagamento=annullato) ===== -->
+    <div class="payment-banner" id="payment-banner">Il pagamento è stato annullato: nessun addebito è stato effettuato. Puoi riprovare quando vuoi, i tuoi dati sono ancora qui sotto.</div>
+
     <!-- ===== I TUOI DATI (condivisa da tutte le richieste) ===== -->
     <section class="contatto-box" id="contatto-box">
       <h2>I tuoi dati</h2>
@@ -720,6 +799,10 @@
         <label for="ct-hp">Non compilare questo campo</label>
         <input type="text" id="ct-hp" tabindex="-1" autocomplete="off">
       </div>
+      <label class="termini-toggle">
+        <input type="checkbox" id="ct-termini">
+        <span>Ho letto e accetto i <a href="/voucher-termini.html" target="_blank" rel="noopener">Termini e condizioni dei buoni regalo</a>. *</span>
+      </label>
       <div id="contatto-error" class="contatto-error"></div>
     </section>
 
@@ -756,7 +839,7 @@
         <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
         <button type="button" class="btn-buy" onclick="richiediBuono(this)"
            aria-label="Richiedi il voucher menù degustazione sei portate">
-          Richiedi questo buono
+          <span class="btn-label">Richiedi questo buono</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
         </button>
         <div class="richiesta-status" id="rs-deg6"></div>
@@ -787,7 +870,7 @@
         <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
         <button type="button" class="btn-buy featured" onclick="richiediBuono(this)"
            aria-label="Richiedi il voucher menù degustazione sette portate">
-          Richiedi questo buono
+          <span class="btn-label">Richiedi questo buono</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
         </button>
         <div class="richiesta-status" id="rs-deg7"></div>
@@ -839,7 +922,7 @@
         </div>
         <div class="eccedenza-error">Scegli chi paga l'eventuale differenza prima di inviare la richiesta.</div>
         <button type="button" class="btn-buy" onclick="richiediBuono(this)" aria-label="Richiedi buono regalo libero da 100 euro">
-          Richiedi questo buono
+          <span class="btn-label">Richiedi questo buono</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
         </button>
         <div class="richiesta-status" id="rs-libero-0"></div>
@@ -875,7 +958,7 @@
         </div>
         <div class="eccedenza-error">Scegli chi paga l'eventuale differenza prima di inviare la richiesta.</div>
         <button type="button" class="btn-buy featured" onclick="richiediBuono(this)" aria-label="Richiedi buono regalo libero da 150 euro">
-          Richiedi questo buono
+          <span class="btn-label">Richiedi questo buono</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
         </button>
         <div class="richiesta-status" id="rs-libero-1"></div>
@@ -911,7 +994,7 @@
         </div>
         <div class="eccedenza-error">Scegli chi paga l'eventuale differenza prima di inviare la richiesta.</div>
         <button type="button" class="btn-buy" onclick="richiediBuono(this)" aria-label="Richiedi buono regalo libero da 200 euro">
-          Richiedi questo buono
+          <span class="btn-label">Richiedi questo buono</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
         </button>
         <div class="richiesta-status" id="rs-libero-2"></div>
@@ -928,12 +1011,12 @@
           <p>Nome ed email in cima alla pagina, una volta sola. Poi scegli il regalo: un menù degustazione per due (con o senza abbinamento vini) oppure un buono di valore libero, e come preferisci riceverlo — ritiro in ristorante o via email.</p>
         </li>
         <li>
-          <h3>Inviaci la richiesta</h3>
-          <p>Premi "Richiedi questo buono": la richiesta parte subito, senza aprire nessuna mail. Ti rispondiamo entro 24 ore con le modalità di pagamento.</p>
+          <h3>Paga o inviaci la richiesta</h3>
+          <p>Scegliendo "via email" paghi subito online, in sicurezza, e ricevi il PDF nello stesso momento. Scegliendo il ritiro in ristorante ci basta la richiesta: ti rispondiamo entro 24 ore con le modalità di pagamento in loco.</p>
         </li>
         <li>
           <h3>Ritira o ricevi il buono</h3>
-          <p>Pagando in ristorante ritiri il voucher stampato in una confezione. Pagando elettronicamente ricevi il PDF via email a te, pronto da donare. In entrambi i casi con codice univoco e scadenza.</p>
+          <p>Pagando online il PDF arriva subito via email, pronto da donare. Pagando in ristorante ritiri il voucher stampato in una confezione. In entrambi i casi con codice univoco e scadenza.</p>
         </li>
         <li>
           <h3>Prenota e riscatta</h3>
@@ -1003,7 +1086,7 @@
 
       <p style="margin: 0; font-size: 12px;">
         © 2026 Santamonica · Genova · Lungomare Lombardo 27, 16145 Genova<br>
-        <span class="version-tag">regala.html · v 2026.07.19.01</span>
+        <span class="version-tag">regala.html · v 2026.07.20.01</span>
       </p>
     </footer>
 
@@ -1019,6 +1102,17 @@
   <script>
     (function() {
       var RICHIEDI_VOUCHER_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/richiedi-voucher';
+      var CREATE_VOUCHER_CHECKOUT_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/create-voucher-checkout';
+
+      // Banner "pagamento annullato" — redirect di ritorno da Stripe Checkout se l'utente
+      // annulla prima di pagare. Nessun dato è andato perso: i campi restano compilati.
+      if (/(^|[?&])pagamento=annullato(&|$)/.test(window.location.search)) {
+        var banner = document.getElementById('payment-banner');
+        if (banner) banner.style.display = 'block';
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      }
 
       function currentConsegna(card) {
         var r = card.querySelector('.consegna-radio:checked');
@@ -1060,13 +1154,16 @@
         });
       });
 
-      // scelta consegna: nasconde l'avviso quando viene selezionata
+      // scelta consegna: nasconde l'avviso quando viene selezionata + aggiorna l'etichetta del
+      // bottone (via email = pagamento immediato, ritiro fisico = richiesta da evadere a mano)
       document.querySelectorAll('.consegna-radio').forEach(function(r) {
         r.addEventListener('change', function() {
           var card = r.closest('.voucher-card');
           if (!card) return;
           var err = card.querySelector('.consegna-error');
           if (err) err.style.display = 'none';
+          var label = card.querySelector('.btn-label');
+          if (label) label.textContent = (r.value === 'elettronico') ? 'Paga e ricevi subito' : 'Richiedi questo buono';
         });
       });
 
@@ -1120,16 +1217,23 @@
           return;
         }
 
-        // 2) dati di contatto condivisi, obbligatori nome+email
+        // 2) dati di contatto condivisi, obbligatori nome+email+accettazione termini
         var nome = document.getElementById('ct-nome').value.trim();
         var email = document.getElementById('ct-email').value.trim();
         var telefono = document.getElementById('ct-telefono').value.trim();
         var destinatario = document.getElementById('ct-destinatario').value.trim();
         var dedica = document.getElementById('ct-dedica').value.trim();
         var hp = document.getElementById('ct-hp').value;
+        var terminiCheck = document.getElementById('ct-termini');
+        var termini = terminiCheck ? !!terminiCheck.checked : false;
 
         if (nome.length < 2 || !isValidEmail(email)) {
           setContattoError('Compila nome ed email (validi) qui sopra prima di inviare la richiesta.');
+          document.getElementById('contatto-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+        if (!termini) {
+          setContattoError('Devi accettare i Termini e condizioni dei buoni regalo prima di inviare la richiesta.');
           document.getElementById('contatto-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
           return;
         }
@@ -1148,8 +1252,48 @@
 
         var statusId = 'rs-' + (card.getAttribute('data-card') || ('libero-' + card.getAttribute('data-libero-index')));
         var statusEl = document.getElementById(statusId);
-        setRichiestaStatus(statusEl, 'Invio in corso…', '');
         btn.disabled = true;
+
+        // Consegna elettronica → pagamento online automatico: crea la sessione Stripe e
+        // reindirizza subito, nessuna mail di richiesta da evadere a mano.
+        if (consegna === 'elettronico') {
+          setRichiestaStatus(statusEl, 'Ti stiamo portando al pagamento…', '');
+          fetch(CREATE_VOUCHER_CHECKOUT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tipo: tipo,
+              abbinamento_vini: abbinamentoVini,
+              valore_eur: valoreEur,
+              eccedenza_a_carico: eccedenza || undefined,
+              nome: nome,
+              email: email,
+              telefono: telefono || undefined,
+              destinatario: destinatario || undefined,
+              dedica: dedica || undefined,
+              termini_accettati: true,
+              _hp: hp,
+            }),
+          }).then(function(r) { return r.json().then(function(j) { return { status: r.status, body: j }; }); })
+            .then(function(res) {
+              if (res.status === 201 && res.body && res.body.ok && res.body.url) {
+                setRichiestaStatus(statusEl, 'Ti stiamo portando al pagamento…', 'ok');
+                window.location.href = res.body.url;
+              } else {
+                btn.disabled = false;
+                setRichiestaStatus(statusEl, (res.body && res.body.error) || 'Errore nella creazione del pagamento, riprova o chiamaci al 010 5533155.', 'err');
+              }
+            })
+            .catch(function() {
+              btn.disabled = false;
+              setRichiestaStatus(statusEl, 'Errore di rete: riprova o chiamaci al 010 5533155.', 'err');
+            });
+          return;
+        }
+
+        // Consegna fisica (ritiro in ristorante, pagamento in loco): invariato, richiesta da
+        // evadere a mano da menu-admin.html.
+        setRichiestaStatus(statusEl, 'Invio in corso…', '');
 
         fetch(RICHIEDI_VOUCHER_URL, {
           method: 'POST',
@@ -1166,6 +1310,7 @@
             telefono: telefono || undefined,
             destinatario: destinatario || undefined,
             dedica: dedica || undefined,
+            termini_accettati: true,
             _hp: hp,
             user_agent: navigator.userAgent,
           }),

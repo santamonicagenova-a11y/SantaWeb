@@ -1,4 +1,13 @@
 <!DOCTYPE html>
+<!-- v 2026.07.21.05 — box "Uso parziale" riallineato al layout del box "Ancora dovuti" (stessa
+     famiglia visiva, colori diversi): Andrea segnala che il box parziale (v.03, bordo a sinistra
+     su sfondo var(--sand) scuro, frase unica) doveva assomigliare al box eccedenza (v.02, sfondo
+     pieno chiaro + riga flex con valore in grassetto). Ora 'parzialeBlock' usa la stessa struttura
+     flex (sfondo pieno #f2e9d3 color crema/oro invece del rosa #f7dede dell'eccedenza, testo
+     #8a6d3a invece di rust) con <strong>"◐ Uso parziale — residuo €X"</strong> + <span>"già
+     utilizzati €Y su €Z"</span> affiancati, niente più border-left/sfondo scuro. Gate: tooling
+     admin interno → P3 non dovuta.
+-->
 <!-- v 2026.07.21.04 — righe voucher più distinguibili nell'elenco unico (_vuRowVoucher):
      Andrea segnala "i voucher in lista non sono ben distinguibili". Riga di separazione tra un
      voucher e l'altro da 'border-bottom:1px dotted var(--rule)' (colore #262b34, quasi invisibile
@@ -2093,8 +2102,9 @@ function _vuRowVoucher(v) {
   var parzialeBlock = '';
   if (!isExp && v.stato === 'parziale') {
     var giaUsato = Math.round((Number(v.valore_eur) - Number(v.residuo_eur)) * 100) / 100;
-    parzialeBlock = '<div style="font-size:.72rem;color:var(--ink);margin-top:.35rem;background:var(--sand);border-left:3px solid var(--gold,#b89d6a);padding:.4rem .6rem;border-radius:3px;">' +
-      '◐ Uso parziale — già utilizzati € ' + giaUsato.toFixed(2).replace('.', ',') + ', residuo disponibile € ' + Number(v.residuo_eur).toFixed(2).replace('.', ',') + ' su € ' + Number(v.valore_eur).toFixed(2).replace('.', ',') + '.' +
+    parzialeBlock = '<div style="font-size:.72rem;color:#8a6d3a;margin-top:.35rem;background:#f2e9d3;padding:.4rem .6rem;border-radius:3px;display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;">' +
+      '<strong>◐ Uso parziale — residuo € ' + Number(v.residuo_eur).toFixed(2).replace('.', ',') + '</strong>' +
+      '<span>già utilizzati € ' + giaUsato.toFixed(2).replace('.', ',') + ' su € ' + Number(v.valore_eur).toFixed(2).replace('.', ',') + '</span>' +
       '</div>';
   }
 
@@ -2896,7 +2906,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.21.04</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.21.05</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

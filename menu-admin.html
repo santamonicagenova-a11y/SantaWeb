@@ -1,4 +1,22 @@
 <!DOCTYPE html>
+<!-- v 2026.07.21.04 — righe voucher più distinguibili nell'elenco unico (_vuRowVoucher):
+     Andrea segnala "i voucher in lista non sono ben distinguibili". Riga di separazione tra un
+     voucher e l'altro da 'border-bottom:1px dotted var(--rule)' (colore #262b34, quasi invisibile
+     sullo sfondo scuro) a '1px solid var(--gold,#b89d6a)' (oro, ben visibile); codice voucher da
+     .85rem peso 600 senza colore esplicito a .95rem peso 700 colore var(--gold,#b89d6a) — un po'
+     più grosso e a colpo d'occhio, coerente con l'oro già usato per i bordi tratteggiati del PDF
+     e per il box "richiesta al cliente". Gate: tooling admin interno → P3 non dovuta.
+-->
+<!-- v 2026.07.21.03 — box evidenziato anche per l'uso parziale "normale" (residuo tra 0 e il
+     valore pieno, nessuna eccedenza): richiesta Andrea dopo aver visto in v.02 che solo
+     l'eccedenza aveva un riquadro colorato — "anche i voucher con uso parziale inferiore al
+     pagato devono essere evidenziati come quelli in cui la spesa è superiore, magari con colori
+     diversi". Nuovo blocco 'parzialeBlock' in _vuRowVoucher (attivo quando v.stato==='parziale'):
+     stessa forma del box eccedenza ma palette gold/sand (var(--sand) sfondo, border-left
+     var(--gold,#b89d6a)) invece di rosso/rust, per distinguere a colpo d'occhio "uso parziale
+     in corso" da "eccedenza dovuta". Mostra già utilizzato + residuo + valore pieno. Gate:
+     tooling admin interno → P3 non dovuta.
+-->
 <!-- v 2026.07.21.02 — 3 richieste Andrea sull'elenco voucher unico (_vuRowVoucher):
      (1) blocco pulsanti riga durante un'azione: ogni bottone/input/checkbox che cambia lo stato
      del voucher ha ora classe 'vu-abtn' + data-vu="<codice>"; _vuLockRow/_vuUnlockRow li
@@ -2067,6 +2085,19 @@ function _vuRowVoucher(v) {
   // mentre un'altra azione della riga è in corso (richiesta Andrea 21/7).
   actions += '<button class="btn btn-load" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--rust);color:var(--rust)" onclick="_vcDelete(\'' + v.codice + '\', \'' + v.stato + '\')">Elimina</button>';
 
+  // Uso parziale in corso (residuo > 0 ma inferiore al valore pieno, nessuna eccedenza): box
+  // evidenziato anche per questo caso su richiesta Andrea 21/7 ("anche i voucher con uso
+  // parziale inferiore al pagato devono essere evidenziati come quelli in cui la spesa è
+  // superiore, con colori diversi") — palette gold/sand invece del rosso/rust dell'eccedenza,
+  // per non confondere le due situazioni a colpo d'occhio.
+  var parzialeBlock = '';
+  if (!isExp && v.stato === 'parziale') {
+    var giaUsato = Math.round((Number(v.valore_eur) - Number(v.residuo_eur)) * 100) / 100;
+    parzialeBlock = '<div style="font-size:.72rem;color:var(--ink);margin-top:.35rem;background:var(--sand);border-left:3px solid var(--gold,#b89d6a);padding:.4rem .6rem;border-radius:3px;">' +
+      '◐ Uso parziale — già utilizzati € ' + giaUsato.toFixed(2).replace('.', ',') + ', residuo disponibile € ' + Number(v.residuo_eur).toFixed(2).replace('.', ',') + ' su € ' + Number(v.valore_eur).toFixed(2).replace('.', ',') + '.' +
+      '</div>';
+  }
+
   // Eccedenza dovuta (riscatto che ha superato il residuo, buono libero): riga dedicata con
   // checkbox "richiesta al cliente" + pulsante di chiusura, finché non è stata saldata.
   var eccedenzaBlock = '';
@@ -2083,15 +2114,16 @@ function _vuRowVoucher(v) {
     }
   }
 
-  return '<div style="padding:.6rem 0;border-bottom:1px dotted var(--rule);">' +
+  return '<div style="padding:.6rem 0;border-bottom:1px solid var(--gold,#b89d6a);">' +
     '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;">' +
-    '<span style="font-family:monospace;font-weight:600;font-size:.85rem;min-width:100px;">' + _czEsc(v.codice) + '</span>' +
+    '<span style="font-family:monospace;font-weight:700;font-size:.95rem;color:var(--gold,#b89d6a);min-width:100px;">' + _czEsc(v.codice) + '</span>' +
     '<span style="font-size:.75rem;">' + _czEsc(v.acquirente_nome || '(senza nome)') + '</span>' +
     '<span style="font-size:.7rem;color:' + color + ';font-weight:600;margin-left:auto;">' + _czEsc(st) + '</span>' +
     '<div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;">' + actions + '</div>' +
     impMsgDiv +
     '</div>' +
     '<div style="font-size:.72rem;color:var(--stone);margin-top:.3rem;">' + (isExp ? 'Esperienza' : 'Buono libero') + ' — ' + _czEsc(importo) + ' · emesso ' + (v.data_emissione || '—') + ' · scade ' + (v.data_scadenza || '—') + '</div>' +
+    parzialeBlock +
     eccedenzaBlock +
     '<div style="display:flex;gap:.4rem;align-items:center;margin-top:.4rem;">' +
     '<input type="text" id="vu-note-' + v.codice + '" value="' + _czEsc(v.note || '') + '" placeholder="Note libere…" style="flex:1;min-width:120px;font-size:.72rem;padding:.3rem .6rem;border-radius:var(--radius);" onkeydown="if(event.key===\'Enter\')_vuSaveNote(\'' + v.codice + '\');" />' +
@@ -2864,7 +2896,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.21.02</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.21.04</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

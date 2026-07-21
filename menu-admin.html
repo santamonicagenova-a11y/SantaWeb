@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<!-- v 2026.07.21.06 — codice voucher +40% nell'elenco unico (_vuRowVoucher): da .95rem (v.04) a
+     1.33rem, su richiesta esplicita Andrea. Nessun'altra modifica.
+-->
 <!-- v 2026.07.21.05 — box "Uso parziale" riallineato al layout del box "Ancora dovuti" (stessa
      famiglia visiva, colori diversi): Andrea segnala che il box parziale (v.03, bordo a sinistra
      su sfondo var(--sand) scuro, frase unica) doveva assomigliare al box eccedenza (v.02, sfondo
@@ -2126,7 +2129,7 @@ function _vuRowVoucher(v) {
 
   return '<div style="padding:.6rem 0;border-bottom:1px solid var(--gold,#b89d6a);">' +
     '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;">' +
-    '<span style="font-family:monospace;font-weight:700;font-size:.95rem;color:var(--gold,#b89d6a);min-width:100px;">' + _czEsc(v.codice) + '</span>' +
+    '<span style="font-family:monospace;font-weight:700;font-size:1.33rem;color:var(--gold,#b89d6a);min-width:100px;">' + _czEsc(v.codice) + '</span>' +
     '<span style="font-size:.75rem;">' + _czEsc(v.acquirente_nome || '(senza nome)') + '</span>' +
     '<span style="font-size:.7rem;color:' + color + ';font-weight:600;margin-left:auto;">' + _czEsc(st) + '</span>' +
     '<div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;">' + actions + '</div>' +
@@ -2906,7 +2909,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.21.05</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.21.06</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

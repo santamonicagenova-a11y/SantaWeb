@@ -1,4 +1,13 @@
 <!DOCTYPE html>
+<!-- v 2026.07.21.01 — rinominati i 2 pulsanti di riscatto del buono libero nell'elenco unico
+     (_vuRowVoucher), su richiesta Andrea dopo aver chiesto a cosa servisse "Tutto": "Registra"
+     → "Utilizzo parziale" (usa la cifra scritta nel campo accanto) e "Tutto" → "Usato tutto"
+     (chiude il voucher usando l'intero residuo, senza scrivere nulla nel campo) — stessa identica
+     funzione di prima (_vcRedeem con importo dal campo o null), solo etichette più esplicite così
+     è chiaro a colpo d'occhio se si sta registrando un pagamento parziale o l'esaurimento del
+     buono. Nessuna modifica a riscatta-voucher. Gate: solo testo pulsanti admin, nessun contenuto
+     pubblico → P3 non dovuta.
+-->
 <!-- v 2026.07.19.01 — "Genera nuovo voucher" ora precompila anche "Eccedenza a carico di" quando
      apri il pannello da una richiesta collegata (_vrPrefill): regala.html chiede ora al cliente chi
      paga l'eventuale differenza sul buono libero (destinatario/acquirente), il valore arriva su
@@ -1955,8 +1964,8 @@ function _vuRowVoucher(v) {
     actions += '<button class="btn btn-load" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--rust);color:var(--rust)" onclick="_vcRecesso(\'' + v.codice + '\')">Recesso</button>';
   } else {
     actions += '<input type="number" id="vu-imp-' + v.codice + '" min="0.01" step="0.01" value="' + Number(v.residuo_eur).toFixed(2) + '" style="width:76px;font-size:.7rem;padding:.3rem .5rem;" />';
-    actions += '<button class="btn btn-publish" style="font-size:.68rem;padding:.35rem .6rem;" onclick="_vcRedeem(\'' + v.codice + '\', document.getElementById(\'vu-imp-' + v.codice + '\').value)">Registra</button>';
-    actions += '<button class="btn btn-load" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--ink);color:var(--ink)" onclick="_vcRedeem(\'' + v.codice + '\', null)">Tutto</button>';
+    actions += '<button class="btn btn-publish" style="font-size:.68rem;padding:.35rem .6rem;" onclick="_vcRedeem(\'' + v.codice + '\', document.getElementById(\'vu-imp-' + v.codice + '\').value)">Utilizzo parziale</button>';
+    actions += '<button class="btn btn-load" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--ink);color:var(--ink)" onclick="_vcRedeem(\'' + v.codice + '\', null)">Usato tutto</button>';
     if (v.stato === 'emesso') {
       actions += '<button class="btn btn-load" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--rust);color:var(--rust)" onclick="_vcRecesso(\'' + v.codice + '\')">Recesso</button>';
     }

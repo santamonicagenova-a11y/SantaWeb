@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- v 2026.07.21.01 — Fase di test del flusso automatico voucher (Stripe Checkout) completata:
+     il pulsante "Buoni regalo" in home torna a puntare a /regala.html (era mailto: da v.07.14.02,
+     quando il flusso automatizzato era ancora in costruzione — ora è live e funzionante). Cliccando
+     il CTA il cliente arriva sulla pagina regala.html e sceglie/paga il buono in autonomia, niente
+     più mail da evadere a mano per la consegna elettronica. Solo href cambiato, etichetta invariata
+     ("Richiedi un buono"/"Request a voucher"/"Demander un bon"). Gate: delta fattuale che recepisce
+     contenuto già gated (regala.html + flusso Stripe già P1+P2+P3, vedi HANDOVER voucher) → P1+P2,
+     P3 non riaperta (stesso precedente della v.07.14.01). -->
 <!-- v 2026.07.15.05 — Ripristinata la sezione "Buoni regalo" (decisione Andrea, revert della v.04
      qui sotto): stesso identico markup HTML + le 3 regole CSS .regalo-section/.regalo-inner/
      .regalo-body. Nessuna modifica di contenuto rispetto a prima della rimozione. -->
@@ -562,7 +570,7 @@
       <p class="section-label" data-i18n="regalo_label">Un dono speciale</p>
       <h2 class="section-title" data-i18n="regalo_title">Buoni <em>regalo</em></h2>
       <p class="regalo-body" data-i18n="regalo_body">Regala un&rsquo;esperienza al Santamonica: i nostri men&ugrave; degustazione per due o un buono di valore libero, da spendere quando preferisce. Validit&agrave; 12 mesi.</p>
-      <a href="mailto:info@santamonicagenova.it?subject=Buono Regalo Santamonica" class="btn-primary" data-i18n="regalo_btn">Richiedi un buono</a>
+      <a href="/regala.html" class="btn-primary" data-i18n="regalo_btn">Richiedi un buono</a>
     </div>
   </div>
 </section>
@@ -803,7 +811,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.07.15.05</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.07.21.01</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>

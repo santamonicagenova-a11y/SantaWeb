@@ -1,4 +1,22 @@
 <!DOCTYPE html>
+<!-- v 2026.07.21.02 — 3 richieste Andrea sull'elenco voucher unico (_vuRowVoucher):
+     (1) blocco pulsanti riga durante un'azione: ogni bottone/input/checkbox che cambia lo stato
+     del voucher ha ora classe 'vu-abtn' + data-vu="<codice>"; _vuLockRow/_vuUnlockRow li
+     disabilitano/riabilitano attorno alle chiamate _vcRedeem/_vcRecesso/_vuToggleEccRichiesta/
+     _vuChiudiEccedenza — Elimina NON porta la classe, resta sempre cliccabile (vale su tutte le
+     righe/situazioni, come richiesto). (2) stato "Uso parziale" ora in rosso: VC_STATUS_COLOR
+     .parziale da var(--stone) a var(--rust) (nessun rosso vero nella palette, --rust=#f59e0b è
+     l'accento già usato per avvisi/errori in tutto il pannello). (3) eccedenza dovuta sul buono
+     libero: quando l'importo digitato supera il residuo, riscatta-voucher (v 2026.07.21.01) non
+     blocca più con 400 ma chiude comunque il voucher (residuo_eur=0, stato=riscattato) e registra
+     la differenza in 3 nuove colonne (eccedenza_dovuta_eur, eccedenza_richiesta, eccedenza_chiusa_
+     at — migrazione applicata su project SafeTable). In fase di digitazione, _vuCheckImporto
+     mostra già "Utilizzati solo €X" (importo < residuo, resta credito) o "Ancora dovuti €X"
+     (importo > residuo, delta) sotto il campo. Dopo il riscatto con eccedenza, la riga mostra un
+     blocco dedicato con checkbox "richiesta al cliente" (azione 'set_eccedenza_richiesta') +
+     pulsante "✓ Chiudi (pagata)" (azione 'chiudi_eccedenza'), finché non risulta saldata. Gate:
+     tooling admin interno, nessun contenuto pubblico → P3 non dovuta.
+-->
 <!-- v 2026.07.21.01 — rinominati i 2 pulsanti di riscatto del buono libero nell'elenco unico
      (_vuRowVoucher), su richiesta Andrea dopo aver chiesto a cosa servisse "Tutto": "Registra"
      → "Utilizzo parziale" (usa la cifra scritta nel campo accanto) e "Tutto" → "Usato tutto"
@@ -1822,7 +1840,7 @@ var VC_STATUS_LABEL = {
   scaduto: 'Scaduto', recesso: 'Annullato (recesso)'
 };
 var VC_STATUS_COLOR = {
-  emesso: 'var(--stone)', parziale: 'var(--stone)', riscattato: 'var(--green)',
+  emesso: 'var(--stone)', parziale: 'var(--rust)', riscattato: 'var(--green)',
   scaduto: 'var(--rust)', recesso: 'var(--rust)'
 };
 
@@ -1849,21 +1867,91 @@ function _vuSetStatus(msg, isErr) {
   el.textContent = msg || ''; el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
 }
 
+// Blocco pulsanti per riga durante un'azione in corso (richiesta Andrea 21/7: "quando cambio lo
+// stato di un voucher gli altri tasti si disabilitano tranne elimina", vale in generale per
+// tutte le situazioni). Ogni bottone/input/checkbox che cambia lo stato del voucher porta la
+// classe 'vu-abtn' + attributo data-vu="<codice>"; Elimina NON la porta apposta, resta sempre
+// cliccabile. Il successo ricarica l'elenco (caricaVoucherUnificato) che ridisegna la riga da
+// zero, quindi lo sblocco esplicito serve solo nel ramo di errore.
+function _vuLockRow(codice) {
+  document.querySelectorAll('.vu-abtn[data-vu="' + codice + '"]').forEach(function (el) {
+    el.disabled = true; el.style.opacity = '.45';
+  });
+}
+function _vuUnlockRow(codice) {
+  document.querySelectorAll('.vu-abtn[data-vu="' + codice + '"]').forEach(function (el) {
+    el.disabled = false; el.style.opacity = '';
+  });
+}
+
 function _vcRedeem(codice, importo) {
   _vuSetMsg('');
+  _vuLockRow(codice);
   var extra = { codice: codice };
   if (importo !== null && importo !== undefined && importo !== '') extra.importo = Number(importo);
   _vcCall('redeem', extra).then(function (res) {
     if (res.ok && res.j && res.j.voucher) { _vuSetMsg('✓ Riscatto registrato.', true); caricaVoucherUnificato(); }
-    else _vuSetMsg((res.j && res.j.error) || 'Errore durante il riscatto.', false);
+    else { _vuSetMsg((res.j && res.j.error) || 'Errore durante il riscatto.', false); _vuUnlockRow(codice); }
   });
 }
 function _vcRecesso(codice) {
   if (!confirm('Confermi il recesso? Il voucher ' + codice + ' verrà annullato e non sarà più utilizzabile.')) return;
   _vuSetMsg('');
+  _vuLockRow(codice);
   _vcCall('recesso', { codice: codice }).then(function (res) {
     if (res.ok && res.j && res.j.voucher) { _vuSetMsg('✓ Recesso registrato: voucher annullato.', true); caricaVoucherUnificato(); }
-    else _vuSetMsg((res.j && res.j.error) || 'Errore durante il recesso.', false);
+    else { _vuSetMsg((res.j && res.j.error) || 'Errore durante il recesso.', false); _vuUnlockRow(codice); }
+  });
+}
+
+// Feedback live mentre l'admin scrive una cifra diversa dal residuo pre-compilato (richiesta
+// Andrea 21/7): sotto il residuo pieno = "Utilizzati solo €X" (parziale, resta credito); sopra
+// il residuo = "Ancora dovuti €X" (il conto del cliente supera il buono, l'eccedenza va chiusa
+// a parte dopo il riscatto — vedi _vuChiudiEccedenza).
+function _vuCheckImporto(codice, residuo) {
+  var el = document.getElementById('vu-imp-' + codice);
+  var msgEl = document.getElementById('vu-imp-msg-' + codice);
+  if (!el || !msgEl) return;
+  var v = Number(el.value);
+  if (!v || isNaN(v) || v <= 0) { msgEl.textContent = ''; return; }
+  var diff = Math.round((v - residuo) * 100) / 100;
+  if (Math.abs(diff) < 0.01) { msgEl.textContent = ''; return; }
+  if (diff < 0) {
+    msgEl.innerHTML = 'Utilizzati solo <strong>€ ' + v.toFixed(2).replace('.', ',') + '</strong> — resta un residuo di € ' + Math.abs(diff).toFixed(2).replace('.', ',') + ' sul buono.';
+    msgEl.style.color = 'var(--stone)';
+  } else {
+    msgEl.innerHTML = 'Ancora dovuti <strong>€ ' + diff.toFixed(2).replace('.', ',') + '</strong> — il conto supera il residuo: il buono si chiude comunque, l\'eccedenza resta da riscuotere a parte.';
+    msgEl.style.color = 'var(--rust)';
+  }
+}
+
+// Checkbox "richiesta al cliente" sull'eccedenza dovuta (voucher già chiuso da un riscatto che
+// ha superato il residuo). Non ricarica l'elenco per non far sparire il focus della checkbox;
+// aggiorna solo la cache locale.
+function _vuToggleEccRichiesta(codice, richiesta) {
+  _vuSetMsg('');
+  _vuLockRow(codice);
+  _vcCall('set_eccedenza_richiesta', { codice: codice, richiesta: richiesta }).then(function (res) {
+    if (res.ok && res.j && res.j.voucher) {
+      _vuSetMsg(richiesta ? '✓ Segnato come richiesto al cliente.' : '✓ Segnato come non ancora richiesto.', true);
+      var vRow = window._vuAllRows && window._vuAllRows.vouchers && window._vuAllRows.vouchers.filter(function (v) { return v.codice === codice; })[0];
+      if (vRow) vRow.eccedenza_richiesta = res.j.voucher.eccedenza_richiesta;
+      _vuUnlockRow(codice);
+    } else {
+      _vuSetMsg((res.j && res.j.error) || 'Errore nel salvataggio.', false);
+      caricaVoucherUnificato();
+    }
+  });
+}
+
+// Chiude definitivamente l'eccedenza dovuta una volta che il cliente l'ha pagata.
+function _vuChiudiEccedenza(codice) {
+  if (!confirm('Confermi che il cliente ha pagato l\'eccedenza dovuta sul voucher ' + codice + '? Non si potrà più modificare.')) return;
+  _vuSetMsg('');
+  _vuLockRow(codice);
+  _vcCall('chiudi_eccedenza', { codice: codice }).then(function (res) {
+    if (res.ok && res.j && res.j.voucher) { _vuSetMsg('✓ Eccedenza chiusa per ' + codice + '.', true); caricaVoucherUnificato(); }
+    else { _vuSetMsg((res.j && res.j.error) || 'Errore durante la chiusura.', false); _vuUnlockRow(codice); }
   });
 }
 // stato è opzionale (passato dall'elenco unico): usato solo per differenziare il testo di
@@ -1957,31 +2045,54 @@ function _vuRowVoucher(v) {
   var importo = isExp ? (v.descrizione || '') : (_czEuro(v.residuo_eur) + ' / ' + _czEuro(v.valore_eur));
   var finale = (v.stato === 'riscattato' || v.stato === 'scaduto' || v.stato === 'recesso');
   var actions = '';
+  var impMsgDiv = '';
   if (finale) {
     actions += '<span style="font-size:.7rem;color:var(--stone);">—</span>';
   } else if (isExp) {
-    actions += '<button class="btn btn-publish" style="font-size:.68rem;padding:.35rem .6rem;" onclick="_vcRedeem(\'' + v.codice + '\', null)">Riscatta</button>';
-    actions += '<button class="btn btn-load" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--rust);color:var(--rust)" onclick="_vcRecesso(\'' + v.codice + '\')">Recesso</button>';
+    actions += '<button class="btn btn-publish vu-abtn" data-vu="' + v.codice + '" style="font-size:.68rem;padding:.35rem .6rem;" onclick="_vcRedeem(\'' + v.codice + '\', null)">Riscatta</button>';
+    actions += '<button class="btn btn-load vu-abtn" data-vu="' + v.codice + '" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--rust);color:var(--rust)" onclick="_vcRecesso(\'' + v.codice + '\')">Recesso</button>';
   } else {
-    actions += '<input type="number" id="vu-imp-' + v.codice + '" min="0.01" step="0.01" value="' + Number(v.residuo_eur).toFixed(2) + '" style="width:76px;font-size:.7rem;padding:.3rem .5rem;" />';
-    actions += '<button class="btn btn-publish" style="font-size:.68rem;padding:.35rem .6rem;" onclick="_vcRedeem(\'' + v.codice + '\', document.getElementById(\'vu-imp-' + v.codice + '\').value)">Utilizzo parziale</button>';
-    actions += '<button class="btn btn-load" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--ink);color:var(--ink)" onclick="_vcRedeem(\'' + v.codice + '\', null)">Usato tutto</button>';
+    actions += '<input type="number" class="vu-abtn" data-vu="' + v.codice + '" id="vu-imp-' + v.codice + '" min="0.01" step="0.01" value="' + Number(v.residuo_eur).toFixed(2) + '" style="width:76px;font-size:.7rem;padding:.3rem .5rem;" oninput="_vuCheckImporto(\'' + v.codice + '\', ' + Number(v.residuo_eur) + ')" />';
+    actions += '<button class="btn btn-publish vu-abtn" data-vu="' + v.codice + '" style="font-size:.68rem;padding:.35rem .6rem;" onclick="_vcRedeem(\'' + v.codice + '\', document.getElementById(\'vu-imp-' + v.codice + '\').value)">Utilizzo parziale</button>';
+    actions += '<button class="btn btn-load vu-abtn" data-vu="' + v.codice + '" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--ink);color:var(--ink)" onclick="_vcRedeem(\'' + v.codice + '\', null)">Usato tutto</button>';
     if (v.stato === 'emesso') {
-      actions += '<button class="btn btn-load" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--rust);color:var(--rust)" onclick="_vcRecesso(\'' + v.codice + '\')">Recesso</button>';
+      actions += '<button class="btn btn-load vu-abtn" data-vu="' + v.codice + '" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--rust);color:var(--rust)" onclick="_vcRecesso(\'' + v.codice + '\')">Recesso</button>';
     }
+    impMsgDiv = '<div id="vu-imp-msg-' + v.codice + '" style="font-size:.68rem;margin-top:.3rem;flex-basis:100%;"></div>';
   }
   // Elimina è sempre disponibile, indipendentemente dallo stato (richiesta esplicita Andrea per
   // poter ripulire i voucher di prova, anche quelli finiti riscattati/scaduti/in recesso durante
-  // i test) — riscatta-voucher v 2026.07.18.02 non ristringe più 'delete' a stato='emesso'.
+  // i test) — riscatta-voucher v 2026.07.18.02 non ristringe più 'delete' a stato='emesso'. NON
+  // porta la classe vu-abtn apposta: è l'unico pulsante che deve restare sempre cliccabile anche
+  // mentre un'altra azione della riga è in corso (richiesta Andrea 21/7).
   actions += '<button class="btn btn-load" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--rust);color:var(--rust)" onclick="_vcDelete(\'' + v.codice + '\', \'' + v.stato + '\')">Elimina</button>';
+
+  // Eccedenza dovuta (riscatto che ha superato il residuo, buono libero): riga dedicata con
+  // checkbox "richiesta al cliente" + pulsante di chiusura, finché non è stata saldata.
+  var eccedenzaBlock = '';
+  if (v.eccedenza_dovuta_eur !== null && v.eccedenza_dovuta_eur !== undefined && Number(v.eccedenza_dovuta_eur) > 0) {
+    if (v.eccedenza_chiusa_at) {
+      eccedenzaBlock = '<div style="font-size:.72rem;color:var(--green);margin-top:.35rem;">✓ Eccedenza di € ' + Number(v.eccedenza_dovuta_eur).toFixed(2).replace('.', ',') + ' saldata il ' + _czEsc(String(v.eccedenza_chiusa_at).slice(0, 10)) + '.</div>';
+    } else {
+      eccedenzaBlock = '<div style="font-size:.72rem;color:var(--rust);margin-top:.35rem;background:#f7dede;padding:.4rem .6rem;border-radius:3px;display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;">' +
+        '<strong>Ancora dovuti € ' + Number(v.eccedenza_dovuta_eur).toFixed(2).replace('.', ',') + '</strong>' +
+        '<label style="display:flex;align-items:center;gap:.3rem;font-weight:normal;cursor:pointer;">' +
+        '<input type="checkbox" class="vu-abtn" data-vu="' + v.codice + '" id="vu-eccrich-' + v.codice + '" ' + (v.eccedenza_richiesta ? 'checked' : '') + ' onchange="_vuToggleEccRichiesta(\'' + v.codice + '\', this.checked)" /> richiesta al cliente</label>' +
+        '<button class="btn btn-load vu-abtn" data-vu="' + v.codice + '" style="font-size:.62rem;padding:.3rem .55rem;border:1px solid var(--green);color:var(--green)" onclick="_vuChiudiEccedenza(\'' + v.codice + '\')">✓ Chiudi (pagata)</button>' +
+        '</div>';
+    }
+  }
+
   return '<div style="padding:.6rem 0;border-bottom:1px dotted var(--rule);">' +
     '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;">' +
     '<span style="font-family:monospace;font-weight:600;font-size:.85rem;min-width:100px;">' + _czEsc(v.codice) + '</span>' +
     '<span style="font-size:.75rem;">' + _czEsc(v.acquirente_nome || '(senza nome)') + '</span>' +
     '<span style="font-size:.7rem;color:' + color + ';font-weight:600;margin-left:auto;">' + _czEsc(st) + '</span>' +
     '<div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;">' + actions + '</div>' +
+    impMsgDiv +
     '</div>' +
     '<div style="font-size:.72rem;color:var(--stone);margin-top:.3rem;">' + (isExp ? 'Esperienza' : 'Buono libero') + ' — ' + _czEsc(importo) + ' · emesso ' + (v.data_emissione || '—') + ' · scade ' + (v.data_scadenza || '—') + '</div>' +
+    eccedenzaBlock +
     '<div style="display:flex;gap:.4rem;align-items:center;margin-top:.4rem;">' +
     '<input type="text" id="vu-note-' + v.codice + '" value="' + _czEsc(v.note || '') + '" placeholder="Note libere…" style="flex:1;min-width:120px;font-size:.72rem;padding:.3rem .6rem;border-radius:var(--radius);" onkeydown="if(event.key===\'Enter\')_vuSaveNote(\'' + v.codice + '\');" />' +
     '<button class="btn btn-load" style="font-size:.62rem;padding:.3rem .55rem;border:1px solid var(--ink);color:var(--ink)" onclick="_vuSaveNote(\'' + v.codice + '\')" title="Salva nota">💾 Salva</button>' +
@@ -2753,7 +2864,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.21.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.21.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

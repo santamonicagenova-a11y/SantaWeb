@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- v 2026.07.21.07 — allineamento testo validità/uso nel voucher stampabile (vp-foot), stesso
+     wording richiesto da Andrea e propagato in tutto il sistema (index.html/translations.json/
+     regala.html/voucher-termini.html/PDF stripe-webhook): "Validità 12 mesi dalla data di
+     emissione. Non utilizzabile nei fine settimana e nelle festività" → "Utilizzabile tutti i
+     giorni, salvo disponibilità, a pranzo o cena, escluso Sabato, Domenica e festivi. Validità 12
+     mesi dalla data di acquisto, poi non più utilizzabile". Nessun'altra modifica. Gate: tooling
+     admin, P3 non dovuta.
+-->
 <!-- v 2026.07.21.06 — codice voucher +40% nell'elenco unico (_vuRowVoucher): da .95rem (v.04) a
      1.33rem, su richiesta esplicita Andrea. Nessun'altra modifica.
 -->
@@ -2786,7 +2794,7 @@ async function _eseguiPubblicaFotoSito(token) {
           </div>
         </div>
         <div class="vp-foot">
-          <strong>Come usarlo:</strong> prenota al ristorante segnalando l'utilizzo del voucher e presenta questo codice al tavolo. Validità 12 mesi dalla data di emissione. Non utilizzabile nei fine settimana e nelle festività · prenotazione obbligatoria · non cumulabile con altre promozioni. Condizioni complete: santamonicagenova.it/voucher-termini.html · info@santamonicagenova.it
+          <strong>Come usarlo:</strong> prenota al ristorante segnalando l'utilizzo del voucher e presenta questo codice al tavolo. Utilizzabile tutti i giorni, salvo disponibilità, a pranzo o cena, escluso Sabato, Domenica e festivi. Validità 12 mesi dalla data di acquisto, poi non più utilizzabile · prenotazione obbligatoria · non cumulabile con altre promozioni. Condizioni complete: santamonicagenova.it/voucher-termini.html · info@santamonicagenova.it
         </div>
       </div>
     </div>
@@ -2909,7 +2917,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.21.06</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.21.07</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

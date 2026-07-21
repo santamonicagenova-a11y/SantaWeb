@@ -1,4 +1,14 @@
 <!DOCTYPE html>
+<!-- v 2026.07.21.02 — Allineamento testo validità/uso del buono regalo (richiesta esplicita Andrea,
+     stesso wording da propagare ovunque nel sistema voucher): regalo_body (IT/EN/FR in
+     translations.json, fallback qui sotto) ora dice "utilizzabile tutti i giorni, salvo
+     disponibilità, a pranzo o a cena, escluso Sabato, Domenica e festivi. Validità 12 mesi dalla
+     data di acquisto" — prima l'IT era rimasto fermo a una versione stale (6 mesi, "contattaci per
+     acquistarlo") mentre qui in fallback e in EN/FR era già a 12 mesi senza esclusione giorni.
+     Stesso testo allineato in parallelo su regala.html, voucher-termini.html §7/§11, PDF voucher
+     (stripe-webhook) e voucher stampabile (menu-admin.html). Gate: delta fattuale che recepisce
+     una policy già in vigore altrove nel sistema (voucher-termini.html §11 già escludeva weekend/
+     festivi dal 10/6) → P1+P2, P3 non riaperta (stesso precedente v.07.14.01/v.07.21.01). -->
 <!-- v 2026.07.21.01 — Fase di test del flusso automatico voucher (Stripe Checkout) completata:
      il pulsante "Buoni regalo" in home torna a puntare a /regala.html (era mailto: da v.07.14.02,
      quando il flusso automatizzato era ancora in costruzione — ora è live e funzionante). Cliccando
@@ -569,7 +579,7 @@
     <div class="regalo-inner reveal">
       <p class="section-label" data-i18n="regalo_label">Un dono speciale</p>
       <h2 class="section-title" data-i18n="regalo_title">Buoni <em>regalo</em></h2>
-      <p class="regalo-body" data-i18n="regalo_body">Regala un&rsquo;esperienza al Santamonica: i nostri men&ugrave; degustazione per due o un buono di valore libero, da spendere quando preferisce. Validit&agrave; 12 mesi.</p>
+      <p class="regalo-body" data-i18n="regalo_body">Regala un pranzo o una cena al Santamonica: buoni utilizzabili tutti i giorni, salvo disponibilit&agrave;, a pranzo o a cena, escluso Sabato, Domenica e festivi. Validit&agrave; 12 mesi dalla data di acquisto.</p>
       <a href="/regala.html" class="btn-primary" data-i18n="regalo_btn">Richiedi un buono</a>
     </div>
   </div>
@@ -811,7 +821,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.07.21.01</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.07.21.02</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>

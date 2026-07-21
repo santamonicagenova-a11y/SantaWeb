@@ -1,10 +1,24 @@
 <!DOCTYPE html>
 <!--
   voucher-termini.html
-  Versione: v 2026.07.20.01
+  Versione: v 2026.07.21.01
   Pagina: Termini e condizioni d'uso buoni regalo (voucher) Santamonica
   Fase progetto: Sito — chiusura gate voucher (2026-07-14)
   Lingua: it (IT only, dec. F0.10 C1)
+  Cambi v.07.20.01 → v.07.21.01 (allineamento testo validità/uso, richiesta esplicita Andrea, stesso
+  wording da propagare in tutto il sistema voucher — vedi anche index.html/translations.json/
+  regala.html/PDF voucher/menu-admin.html):
+    - §5 elenco contenuto PDF: "12 mesi dopo" → "12 mesi dalla data di acquisto".
+    - §7 Validità: "a decorrere dalla data di emissione" → "a decorrere dalla data di acquisto,
+      indicata sul PDF come data di emissione" (i due momenti coincidono in pratica: nel flusso
+      automatico Stripe l'emissione è contestuale al pagamento; nel ritiro fisico il pagamento
+      avviene in loco al momento del ritiro/emissione).
+    - §11 Cumulabilità: "non è inoltre utilizzabile nei fine settimana e nelle festività" (forma
+      negativa) → "è utilizzabile tutti i giorni, salvo disponibilità, a pranzo o a cena, escluso
+      il Sabato, la Domenica e i giorni festivi" (stesso significato, wording positivo richiesto
+      da Andrea). Nessuna modifica di sostanza rispetto alla policy già in vigore dal 10/6.
+    - GATE: delta di wording che recepisce una policy già gated (P3 3 vendor, 10/6) → P1+P2,
+      P3 non riaperta (stesso precedente v.07.14.01 su index.html/regala.html).
   Cambi v.07.14.01 → v.07.20.01 (confronto con T&C di due ristoranti terzi, su richiesta Andrea):
     - §8 NUOVA clausola mancato arrivo/disdetta tardiva: disdetta entro 24h dalla prenotazione o
       no-show → Voucher considerato utilizzato, non più riscattabile né rimborsabile. Gap reale
@@ -460,7 +474,7 @@
       <ul>
         <li>Codice voucher univoco (formato <code>SM-YYYY-NNN</code>)</li>
         <li>Tipologia e contenuto del Voucher (esperienza degustazione o valore, eventuale abbinamento vini)</li>
-        <li>Data di emissione e data di scadenza (12 mesi dopo, vedi §7)</li>
+        <li>Data di emissione e data di scadenza (12 mesi dalla data di acquisto, vedi §7)</li>
         <li>Nome del Beneficiario, se fornito</li>
         <li>Messaggio personale, se fornito</li>
         <li>Sintesi delle condizioni di utilizzo</li>
@@ -478,9 +492,9 @@
     <!-- ===== §7 ===== -->
     <section class="legal-section" id="s7">
       <h2 class="section-title"><span class="num">7.</span> Validità</h2>
-      <p>Il Voucher è valido per <strong>12 mesi (dodici) a decorrere dalla data di emissione</strong> indicata sul PDF. La data di scadenza è riportata in chiaro sul Voucher stesso.</p>
+      <p>Il Voucher è valido per <strong>12 mesi (dodici) a decorrere dalla data di acquisto</strong>, indicata sul PDF come data di emissione. La data di scadenza è riportata in chiaro sul Voucher stesso.</p>
       <div class="highlight">
-        <strong>Importante:</strong> il Voucher non riscattato entro la data di scadenza perde efficacia e non è più utilizzabile né rimborsabile. Non sono previste proroghe, salvo casi eccezionali a discrezione del Ristorante.
+        <strong>Importante:</strong> il Voucher non riscattato entro la data di scadenza perde efficacia; dopo tale data non sarà più utilizzabile né rimborsabile. Non sono previste proroghe, salvo casi eccezionali a discrezione del Ristorante.
       </div>
     </section>
 
@@ -528,7 +542,7 @@
     <section class="legal-section" id="s11">
       <h2 class="section-title"><span class="num">11.</span> Cumulabilità</h2>
       <p>Il Voucher <strong>non è cumulabile</strong> con altre promozioni, sconti, menu fissi a tema, convenzioni o accordi commerciali eventualmente in essere presso il Ristorante. Non è cumulabile con altri voucher Santamonica nella stessa transazione.</p>
-      <p>Il Voucher <strong>non è inoltre utilizzabile nei fine settimana e nelle festività</strong>. Eventuali periodi di chiusura del Ristorante sono consultabili contattando il ristorante al momento della prenotazione.</p>
+      <p>Il Voucher è <strong>utilizzabile tutti i giorni, salvo disponibilità, a pranzo o a cena, escluso il Sabato, la Domenica e i giorni festivi</strong>. Eventuali periodi di chiusura del Ristorante sono consultabili contattando il ristorante al momento della prenotazione.</p>
     </section>
 
     <!-- ===== §12 ===== -->

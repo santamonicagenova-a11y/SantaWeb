@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   regala.html
-  Versione: v 2026.07.21.01
+  Versione: v 2026.07.21.02
   Pagina: Voucher regalo Santamonica — consegna elettronica ORA COMPLETAMENTE AUTOMATICA
           (Stripe Checkout mode='payment' → PDF+mail automatici, nessun intervento admin);
           il ritiro fisico resta sul flusso manuale via mail (richiedi-voucher).
@@ -9,6 +9,17 @@
           automatico (2026-07-20, richiesto da Andrea: "cliente seleziona paga e riceve pdf in
           autonomia, no mail che mi arriva per generare voucher")
   Lingua: it (IT only, dec. F0.10 C1)
+  Cambi v.07.21.01 → v.07.21.02 (allineamento testo validità/uso, richiesta esplicita Andrea, stesso
+  wording da propagare in tutto il sistema voucher — vedi anche index.html/translations.json/
+  voucher-termini.html/PDF/menu-admin.html):
+    - Info-item "Validità": "12 mesi dalla data di emissione" → "12 mesi dalla data di acquisto.
+      Trascorso tale termine il Buono non sarà più utilizzabile."
+    - Info-item "Cumulabilità e periodi": "Non utilizzabile nei fine settimana e nelle festività"
+      → "Utilizzabile tutti i giorni, salvo disponibilità, a pranzo o a cena, escluso Sabato,
+      Domenica e festivi" (stesso significato, wording positivo richiesto da Andrea, coerente con
+      voucher-termini.html §11 già in vigore dal 10/6).
+    - GATE: delta fattuale che recepisce una policy già in vigore su voucher-termini.html (§11
+      escludeva già weekend/festivi) → P1+P2, P3 non riaperta (stesso precedente v.07.14.01).
   Cambi v.07.20.05 → v.07.21.01 (su richiesta Andrea: "invece di avere un pulsante 'richiedi
   questo buono' per ogni tipologia metti solo 1 pulsante di richiesta dopo l'anagrafica del
   cliente"):
@@ -1095,7 +1106,7 @@
       <div class="info-grid">
         <div class="info-item">
           <h3>Validità</h3>
-          <p>12 mesi dalla data di emissione, indicata sul Buono Regalo.</p>
+          <p>12 mesi dalla data di acquisto. Trascorso tale termine il Buono non sarà più utilizzabile.</p>
         </div>
         <div class="info-item">
           <h3>Bevande</h3>
@@ -1115,7 +1126,7 @@
         </div>
         <div class="info-item">
           <h3>Cumulabilità e periodi</h3>
-          <p>Non cumulabile con promozioni, sconti, menu fissi o convenzioni in essere. Non utilizzabile nei fine settimana e nelle festività.</p>
+          <p>Non cumulabile con promozioni, sconti, menu fissi o convenzioni in essere. Utilizzabile tutti i giorni, salvo disponibilità, a pranzo o a cena, escluso Sabato, Domenica e festivi.</p>
         </div>
         <div class="info-item">
           <h3>Recesso</h3>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   regala.html
-  Versione: v 2026.07.20.05
+  Versione: v 2026.07.21.01
   Pagina: Voucher regalo Santamonica — consegna elettronica ORA COMPLETAMENTE AUTOMATICA
           (Stripe Checkout mode='payment' → PDF+mail automatici, nessun intervento admin);
           il ritiro fisico resta sul flusso manuale via mail (richiedi-voucher).
@@ -9,6 +9,27 @@
           automatico (2026-07-20, richiesto da Andrea: "cliente seleziona paga e riceve pdf in
           autonomia, no mail che mi arriva per generare voucher")
   Lingua: it (IT only, dec. F0.10 C1)
+  Cambi v.07.20.05 → v.07.21.01 (su richiesta Andrea: "invece di avere un pulsante 'richiedi
+  questo buono' per ogni tipologia metti solo 1 pulsante di richiesta dopo l'anagrafica del
+  cliente"):
+    - Consolidati i 5 pulsanti "Richiedi questo buono" (uno per scheda: deg6, deg7, libero
+      100/150/200) in UN pulsante condiviso, spostato dentro "I tuoi dati" subito dopo la
+      checkbox newsletter — quindi dopo l'anagrafica, come richiesto.
+    - Nuovo meccanismo di selezione: scegliere "Come lo ricevi?" (consegna) o l'abbinamento vini
+      o "chi paga la differenza" DENTRO una scheda la seleziona automaticamente come "il buono
+      che stai richiedendo" — bordo evidenziato + badge "✓ Selezionato" (.voucher-card.selected).
+      Scegliere gli stessi controlli in un'altra scheda sposta la selezione lì (un solo buono
+      alla volta, coerente con "un solo pulsante" = "una sola richiesta per volta").
+    - Il pulsante condiviso legge tipo/vini/consegna/eccedenza dalla scheda selezionata al
+      momento del click (non richiede una seconda conferma): se nessuna scheda è stata toccata,
+      mostra un avviso e riporta lo sguardo alle schede in alto; se manca consegna o eccedenza
+      sulla scheda scelta, mostra l'avviso già esistente in quella scheda (stessa UX di prima).
+      Etichetta dinamica invariata nel comportamento: "Paga e ricevi subito" per la consegna
+      elettronica, "Richiedi questo buono" per il ritiro fisico o nessuna scelta ancora fatta.
+    - Nessun cambiamento nella validazione lato server (richiedi-voucher/create-voucher-checkout
+      invariate): stesso payload di prima, solo l'interfaccia di scelta è cambiata.
+    - GATE: solo struttura/UX (consolidamento CTA), nessun contenuto pubblico nuovo → non
+      innesca una nuova P3, il debito complessivo della pagina resta quello già dichiarato sotto.
   Cambi v.07.20.04 → v.07.20.05 (su richiesta Andrea: "aggiungere anche il check box x la
   newsletter come quando si richiede prenotazione?"):
     - Nuova checkbox condivisa "Acconsento a ricevere comunicazioni sul ristorante..." nel box
@@ -146,7 +167,9 @@
         innesca P3. Checkbox newsletter + sync Brevo (20/7.05) = comunicazione automatica reale a
         un nuovo pubblico (acquirenti voucher, non solo prenotanti) → P1+P2 eseguite (riuso 1:1 del
         pattern già gated per submit-reservation v15), P3 NON ancora fatta = si aggiunge allo
-        stesso debito complessivo della pagina.
+        stesso debito complessivo della pagina. Consolidamento pulsanti in 1 CTA condiviso
+        (21/7.01) = solo struttura/UX (meccanismo di selezione scheda + spostamento del pulsante),
+        nessun contenuto pubblico nuovo → non innesca P3, debito invariato rispetto a sopra.
 -->
 <html lang="it">
 <head>
@@ -288,6 +311,26 @@
     .voucher-card.featured {
       border-color: var(--gold);
       background: linear-gradient(180deg, #fff 0%, #fdf9f1 100%);
+    }
+
+    /* ===== Selezione del buono (un solo pulsante condiviso in fondo alla pagina) ===== */
+    .voucher-card.selected {
+      border-color: var(--terracotta-dark);
+      box-shadow: 0 0 0 3px rgba(139, 58, 46, 0.18);
+    }
+
+    .voucher-card.selected::after {
+      content: "✓ Selezionato";
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: var(--terracotta-dark);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      padding: 4px 10px;
+      border-radius: 20px;
     }
 
     .deg-portate {
@@ -858,12 +901,6 @@
           </label>
         </div>
         <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
-        <button type="button" class="btn-buy" onclick="richiediBuono(this)"
-           aria-label="Richiedi il voucher menù degustazione sei portate">
-          <span class="btn-label">Richiedi questo buono</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-        </button>
-        <div class="richiesta-status" id="rs-deg6"></div>
       </article>
 
       <!-- DEGUSTAZIONE 7 PORTATE -->
@@ -889,12 +926,6 @@
           </label>
         </div>
         <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
-        <button type="button" class="btn-buy featured" onclick="richiediBuono(this)"
-           aria-label="Richiedi il voucher menù degustazione sette portate">
-          <span class="btn-label">Richiedi questo buono</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-        </button>
-        <div class="richiesta-status" id="rs-deg7"></div>
       </article>
 
     </section>
@@ -942,11 +973,6 @@
           </label>
         </div>
         <div class="eccedenza-error">Scegli chi paga l'eventuale differenza prima di inviare la richiesta.</div>
-        <button type="button" class="btn-buy" onclick="richiediBuono(this)" aria-label="Richiedi buono regalo libero da 100 euro">
-          <span class="btn-label">Richiedi questo buono</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-        </button>
-        <div class="richiesta-status" id="rs-libero-0"></div>
       </article>
 
       <!-- 150 -->
@@ -978,11 +1004,6 @@
           </label>
         </div>
         <div class="eccedenza-error">Scegli chi paga l'eventuale differenza prima di inviare la richiesta.</div>
-        <button type="button" class="btn-buy featured" onclick="richiediBuono(this)" aria-label="Richiedi buono regalo libero da 150 euro">
-          <span class="btn-label">Richiedi questo buono</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-        </button>
-        <div class="richiesta-status" id="rs-libero-1"></div>
       </article>
 
       <!-- 200 -->
@@ -1014,11 +1035,6 @@
           </label>
         </div>
         <div class="eccedenza-error">Scegli chi paga l'eventuale differenza prima di inviare la richiesta.</div>
-        <button type="button" class="btn-buy" onclick="richiediBuono(this)" aria-label="Richiedi buono regalo libero da 200 euro">
-          <span class="btn-label">Richiedi questo buono</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-        </button>
-        <div class="richiesta-status" id="rs-libero-2"></div>
       </article>
 
     </section>
@@ -1026,7 +1042,7 @@
     <!-- ===== I TUOI DATI (condivisa da tutte le richieste) ===== -->
     <section class="contatto-box" id="contatto-box">
       <h2>I tuoi dati</h2>
-      <p class="contatto-intro">Li usiamo solo per rispondere alla tua richiesta di buono regalo. Compilali una volta, poi scegli il buono qui sotto.</p>
+      <p class="contatto-intro">Li usiamo solo per rispondere alla tua richiesta di buono regalo. Scegli il buono qui sopra (basta indicare come vuoi riceverlo), poi completa qui i tuoi dati e invia la richiesta.</p>
       <div class="contatto-grid">
         <div>
           <label class="contatto-lbl" for="ct-nome">Nome e cognome *</label>
@@ -1063,6 +1079,14 @@
         <span>Acconsento a ricevere comunicazioni sul ristorante (eventi, serate a tema, novità). Facoltativo, revocabile in qualsiasi momento.</span>
       </label>
       <div id="contatto-error" class="contatto-error"></div>
+
+      <!-- ===== Pulsante unico, condiviso da tutte le schede: agisce sul buono selezionato ===== -->
+      <button type="button" class="btn-buy" id="btn-buy-shared" onclick="richiediBuonoShared(this)"
+         aria-label="Invia la richiesta per il buono selezionato" style="margin-top:22px;">
+        <span class="btn-label">Richiedi questo buono</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+      </button>
+      <div class="richiesta-status" id="rs-shared"></div>
     </section>
 
     <!-- ===== INFO ===== -->
@@ -1125,7 +1149,7 @@
 
       <p style="margin: 0; font-size: 12px;">
         © 2026 Santamonica · Genova · Lungomare Lombardo 27, 16145 Genova<br>
-        <span class="version-tag">regala.html · v 2026.07.20.05</span>
+        <span class="version-tag">regala.html · v 2026.07.21.01</span>
       </p>
     </footer>
 
@@ -1163,6 +1187,29 @@
         return r ? r.value : null;
       }
 
+      // ── Selezione del buono: un solo pulsante condiviso agisce sulla scheda selezionata.
+      // Toccare consegna/vini/eccedenza dentro una scheda la seleziona automaticamente
+      // (bordo evidenziato + badge "✓ Selezionato"); scegliere gli stessi controlli in
+      // un'altra scheda sposta la selezione lì (un solo buono alla volta). ──
+      var selectedCard = null;
+
+      function updateSharedButtonLabel() {
+        var label = document.querySelector('#btn-buy-shared .btn-label');
+        if (!label) return;
+        var consegna = selectedCard ? currentConsegna(selectedCard) : null;
+        label.textContent = (consegna === 'elettronico') ? 'Paga e ricevi subito' : 'Richiedi questo buono';
+      }
+
+      function selectCard(card) {
+        if (!card) return;
+        document.querySelectorAll('.voucher-card.selected').forEach(function(c) {
+          if (c !== card) c.classList.remove('selected');
+        });
+        card.classList.add('selected');
+        selectedCard = card;
+        updateSharedButtonLabel();
+      }
+
       function isValidEmail(email) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
       }
@@ -1180,39 +1227,42 @@
         statusEl.className = 'richiesta-status' + (cls ? ' ' + cls : '');
       }
 
-      // checkbox abbinamento vini: aggiorna solo il prezzo mostrato
+      // checkbox abbinamento vini: aggiorna solo il prezzo mostrato + seleziona la scheda
       document.querySelectorAll('.vini-check').forEach(function(chk) {
         chk.addEventListener('change', function() {
           var card = chk.closest('.voucher-card');
           if (!card) return;
           var num = card.querySelector('.eur-num');
-          if (!num) return;
-          var on = chk.checked;
-          num.textContent = on ? (num.getAttribute('data-vini') || num.textContent)
-                               : (num.getAttribute('data-base') || num.textContent);
+          if (num) {
+            var on = chk.checked;
+            num.textContent = on ? (num.getAttribute('data-vini') || num.textContent)
+                                 : (num.getAttribute('data-base') || num.textContent);
+          }
+          selectCard(card);
         });
       });
 
-      // scelta consegna: nasconde l'avviso quando viene selezionata + aggiorna l'etichetta del
-      // bottone (via email = pagamento immediato, ritiro fisico = richiesta da evadere a mano)
+      // scelta consegna: nasconde l'avviso, seleziona la scheda e aggiorna l'etichetta del
+      // pulsante condiviso (via email = pagamento immediato, ritiro fisico = richiesta da
+      // evadere a mano)
       document.querySelectorAll('.consegna-radio').forEach(function(r) {
         r.addEventListener('change', function() {
           var card = r.closest('.voucher-card');
           if (!card) return;
           var err = card.querySelector('.consegna-error');
           if (err) err.style.display = 'none';
-          var label = card.querySelector('.btn-label');
-          if (label) label.textContent = (r.value === 'elettronico') ? 'Paga e ricevi subito' : 'Richiedi questo buono';
+          selectCard(card);
         });
       });
 
-      // scelta eccedenza (solo buono libero): nasconde l'avviso quando viene selezionata
+      // scelta eccedenza (solo buono libero): nasconde l'avviso e seleziona la scheda
       document.querySelectorAll('.eccedenza-radio').forEach(function(r) {
         r.addEventListener('change', function() {
           var card = r.closest('.voucher-card');
           if (!card) return;
           var err = card.querySelector('.eccedenza-error');
           if (err) err.style.display = 'none';
+          selectCard(card);
         });
       });
 
@@ -1230,10 +1280,15 @@
         });
       }).catch(function(){ /* offline o file assente: restano i valori in pagina */ });
 
-      // ── Invio della richiesta al click su "Richiedi questo buono" ──
-      window.richiediBuono = function(btn) {
-        var card = btn.closest('.voucher-card');
-        if (!card) return;
+      // ── Invio della richiesta al click sul pulsante unico condiviso ──
+      window.richiediBuonoShared = function(btn) {
+        var card = selectedCard;
+        if (!card) {
+          setContattoError('Scegli uno dei buoni qui sopra (basta indicare come vuoi riceverlo) prima di inviare la richiesta.');
+          var grid = document.querySelector('.voucher-grid');
+          if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
 
         // 1) consegna obbligatoria per scheda
         var consegna = currentConsegna(card);
@@ -1291,8 +1346,7 @@
           valoreEur = num ? parseFloat(num.textContent) : null;
         }
 
-        var statusId = 'rs-' + (card.getAttribute('data-card') || ('libero-' + card.getAttribute('data-libero-index')));
-        var statusEl = document.getElementById(statusId);
+        var statusEl = document.getElementById('rs-shared');
         btn.disabled = true;
 
         // Consegna elettronica → pagamento online automatico: crea la sessione Stripe e

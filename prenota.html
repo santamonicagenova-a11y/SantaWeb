@@ -298,13 +298,13 @@
         <h2 class="step-title">I tuoi dati</h2>
         <form id="contatti-form" novalidate>
           <input type="text" name="_hp" id="p-hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" aria-hidden="true">
-          <div class="field"><label for="p-nome">Nome</label><input type="text" id="p-nome" required autocomplete="name"></div>
+          <div class="field"><label for="p-nome">Nome *</label><input type="text" id="p-nome" required autocomplete="name"></div>
           <div class="field-row">
-            <div class="field"><label for="p-tel">Telefono</label><input type="tel" id="p-tel" required autocomplete="tel"></div>
-            <div class="field"><label for="p-email">Email</label><input type="email" id="p-email" required autocomplete="email"></div>
+            <div class="field"><label for="p-tel">Telefono *</label><input type="tel" id="p-tel" required autocomplete="tel"></div>
+            <div class="field"><label for="p-email">Email *</label><input type="email" id="p-email" required autocomplete="email"></div>
           </div>
           <p class="hint">Email e telefono sono entrambi obbligatori per ricontattarti rapidamente.</p>
-          <div class="field"><label for="p-intolleranze">Intolleranze o allergie</label><input type="text" id="p-intolleranze" required placeholder="Scrivi 'nessuna' se non hai allergie"></div>
+          <div class="field"><label for="p-intolleranze">Intolleranze o allergie *</label><input type="text" id="p-intolleranze" required placeholder="Scrivi 'nessuna' se non hai allergie"></div>
           <div class="field">
             <label for="p-occasione">Occasione (opzionale)</label>
             <select id="p-occasione">
@@ -323,6 +323,7 @@
             <input type="checkbox" id="p-marketing">
             <label for="p-marketing">Acconsento a ricevere comunicazioni sul ristorante (eventi, serate a tema, novità). Facoltativo, revocabile in qualsiasi momento.</label>
           </div>
+          <p class="hint" style="margin-top:-0.4rem;">* campo obbligatorio</p>
           <div class="btn-row">
             <button type="button" class="btn btn-ghost" data-back="3">Indietro</button>
             <button type="submit" class="btn btn-primary">Continua</button>

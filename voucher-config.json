@@ -1,6 +1,6 @@
 {
   "liberi": [
-    100,
+    1,
     150,
     200
   ],
@@ -14,6 +14,6 @@
       "vini": 360
     }
   },
-  "versione": "v 2026.07.04.01",
+  "versione": "v 2026.07.22.01",
   "_nota": "Fonte unica dei valori dei voucher. Modificabile da menu-admin (pannello Buoni regalo) o a mano."
 }

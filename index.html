@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- v 2026.07.22.01 — Wizard prenotazioni /prenota.html con carta a garanzia SEMPRE obbligatoria
+     e conferma automatica (DESIGN_wizard_prenotazioni_carta-obbligatoria_v2026.07.22.01): le 5 CTA
+     "Prenota"/"Evento" ora puntano a /prenota.html invece che a #prenota; rimossi la sezione
+     .prenota-section (form lungo embedded) e tutto il JS associato (disponibilità + submit verso
+     submit-reservation) — quell'endpoint resta deployato ma non più linkato da nessuna pagina
+     pubblica. Nessun'altra modifica di contenuto. -->
 <!-- v 2026.07.21.02 — Allineamento testo validità/uso del buono regalo (richiesta esplicita Andrea,
      stesso wording da propagare ovunque nel sistema voucher): regalo_body (IT/EN/FR in
      translations.json, fallback qui sotto) ora dice "utilizzabile tutti i giorni, salvo
@@ -470,7 +476,7 @@
     <li><a href="#cucina" data-i18n="nav_cucina">Cucina</a></li>
     <li><a href="#cantina" data-i18n="nav_cantina">Cantina</a></li>
     <li><a href="#galleria" data-i18n="nav_galleria">Galleria</a></li>
-    <li><a href="#prenota" data-i18n="nav_evento">Evento</a></li>
+    <li><a href="/prenota.html" data-i18n="nav_evento">Evento</a></li>
     <li><a href="#info" data-i18n="nav_contatti">Contatti</a></li>
   </ul>
   <div class="nav-right">
@@ -479,7 +485,7 @@
       <option value="en">EN</option>
       <option value="fr">FR</option>
     </select>
-    <a href="#prenota" class="nav-cta" data-i18n="nav_prenota">Prenota</a>
+    <a href="/prenota.html" class="nav-cta" data-i18n="nav_prenota">Prenota</a>
   </div>
   <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
@@ -489,14 +495,14 @@
   <a href="#cucina" class="mobile-link" data-i18n="nav_cucina">Cucina</a>
   <a href="#cantina" class="mobile-link" data-i18n="nav_cantina">Cantina</a>
   <a href="#galleria" class="mobile-link" data-i18n="nav_galleria">Galleria</a>
-  <a href="#prenota" class="mobile-link" data-i18n="nav_evento_mobile">Evento speciale</a>
+  <a href="/prenota.html" class="mobile-link" data-i18n="nav_evento_mobile">Evento speciale</a>
   <a href="#info" class="mobile-link" data-i18n="nav_contatti">Contatti</a>
   <select class="mobile-lang-select" id="lang-select-mobile" onchange="setLang(this.value)">
     <option value="it" selected>IT — Italiano</option>
     <option value="en">EN — English</option>
     <option value="fr">FR — Fran&ccedil;ais</option>
   </select>
-  <a href="#prenota" style="font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-style:normal;background:var(--ink);color:var(--warm-white);padding:0.9rem 2.5rem;" data-i18n="nav_prenota">Prenota</a>
+  <a href="/prenota.html" style="font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-style:normal;background:var(--ink);color:var(--warm-white);padding:0.9rem 2.5rem;" data-i18n="nav_prenota">Prenota</a>
 </div>
 
 <section class="hero" style="padding:0;position:relative;">
@@ -505,7 +511,7 @@
     <h1 class="hero-title" data-i18n="hero_title">Ristorante sul mare:<br>Cucina <em>viva</em> a Genova</h1>
     <p class="hero-desc" data-i18n="hero_desc">Santamonica &egrave; un ristorante di pesce a Genova, sul Lungomare Lombardo, con la sala affacciata sul mare aperto. Un progetto in costante divenire, basato sull&rsquo;attenzione al gusto e sulla qualit&agrave; della materia prima. Pesce di Camogli, verdure dell&rsquo;orto genovese, pasta e pane di nostra produzione.</p>
     <div class="hero-actions">
-      <a href="#prenota" class="btn-primary" data-i18n="hero_btn_prenota">Prenota un tavolo</a>
+      <a href="/prenota.html" class="btn-primary" data-i18n="hero_btn_prenota">Prenota un tavolo</a>
       <a href="#cucina" class="btn-secondary" data-i18n="hero_btn_menu">Scopri il menu</a>
     </div>
     <div class="hero-scroll-indicator" data-i18n="hero_scorri">Scorri</div>
@@ -585,112 +591,10 @@
   </div>
 </section>
 
-<section class="prenota-section" id="prenota">
-  <div class="section-inner">
-    <p class="section-label reveal" data-i18n="prenota_label">Prenota un tavolo</p>
-    <h2 class="section-title reveal" data-i18n="prenota_title">Riserva la tua <em>serata</em></h2>
-    <div class="prenota-grid">
-      <div class="reveal">
-        <div class="prenota-intro">
-          <p data-i18n="prenota_p1">Compila il modulo per riservare un tavolo. Ti contatteremo per la conferma.</p>
-          <p data-i18n="prenota_p2">Se &egrave; un&rsquo;occasione speciale &mdash; compleanno, anniversario, cena di lavoro &mdash; segnalacelo: cureremo ogni dettaglio.</p>
-        </div>
-        <div class="prenota-highlights">
-          <div class="prenota-highlight">
-            <div class="prenota-highlight-icon">&#x1F942;</div>
-            <div class="prenota-highlight-text"><strong data-i18n="prenota_h1_title">Occasione speciale?</strong><span data-i18n="prenota_h1_text">Compleanni, anniversari, proposte &mdash; selezionala nel form e creiamo l&rsquo;atmosfera giusta.</span></div>
-          </div>
-          <div class="prenota-highlight">
-            <div class="prenota-highlight-icon">&#x1F33F;</div>
-            <div class="prenota-highlight-text"><strong data-i18n="prenota_h2_title">Intolleranze e allergie</strong><span data-i18n="prenota_h2_text">Segnalacele in anticipo: la cucina si adatta senza compromettere l&rsquo;esperienza.</span></div>
-          </div>
-          <div class="prenota-highlight">
-            <div class="prenota-highlight-icon">&#x1F4CD;</div>
-            <div class="prenota-highlight-text"><strong data-i18n="prenota_h3_title">Tavolo preferito</strong><span data-i18n="prenota_h3_text">Se hai una preferenza &mdash; vista mare, interno, angolo riservato &mdash; faccelo sapere.</span></div>
-          </div>
-        </div>
-      </div>
-      <div class="reveal" style="transition-delay:0.15s">
-        <div class="prenota-form-box">
-          <form id="prenota-form" novalidate>
-            <!-- honeypot anti-bot (campo nascosto, gli umani non lo vedono) -->
-            <input type="text" name="_hp" id="p-hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" aria-hidden="true">
-            <div class="pf-group"><label for="p-nome" data-i18n="prenota_f_nome">Nome</label><input type="text" id="p-nome" name="nome" required></div>
-            <div class="pf-row">
-              <div class="pf-group"><label for="p-tel" data-i18n="prenota_f_tel">Telefono</label><input type="tel" id="p-tel" name="telefono" required></div>
-              <div class="pf-group"><label for="p-email" data-i18n="prenota_f_email">Email</label><input type="email" id="p-email" name="email" required></div>
-            </div>
-            <p class="pf-hint" data-i18n="prenota_contatto_hint">Email e telefono sono entrambi obbligatori per ricontattarti rapidamente.</p>
-            <div class="pf-row">
-              <div class="pf-group"><label for="p-data" data-i18n="prenota_f_data">Data desiderata</label><input type="date" id="p-data" name="data" required></div>
-              <div class="pf-group">
-                <label for="p-orario" data-i18n="prenota_f_orario">Orario</label>
-                <select id="p-orario" name="orario" required>
-                  <option value="" disabled selected data-i18n="prenota_f_orario_sel">Seleziona</option>
-                  <!-- ORARIO ESTIVO 21/6→31/8: pranzo chiuso tutti i giorni; cena 20:00-22:30 mar→dom.
-                       Ripristino 31/8: ripristinare l'optgroup Pranzo (12:30/13:00/13:30/14:00)
-                       e riaggiungere lo slot 19:30 in Cena. -->
-                  <optgroup label="Cena" data-i18n-label="prenota_f_orario_cena">
-                    <option value="20:00">20:00</option>
-                    <option value="20:30">20:30</option>
-                    <option value="21:00">21:00</option>
-                    <option value="21:30">21:30</option>
-                    <option value="22:00">22:00</option>
-                    <option value="22:30">22:30</option>
-                  </optgroup>
-                </select>
-              </div>
-            </div>
-            <p class="pf-hint" id="p-date-closed" style="display:none;color:#9e4a2a;" data-i18n="prenota_date_closed">Per questa data non accettiamo prenotazioni online. Per la disponibilit&agrave; dell'ultimo minuto puoi chiamarci allo 010 5533155.</p>
-            <div class="pf-group">
-              <label for="p-persone" data-i18n="prenota_f_persone">Numero di persone</label>
-              <select id="p-persone" name="persone" required>
-                <option value="" disabled selected data-i18n="prenota_f_persone_sel">Seleziona</option>
-                <option>1</option><option>2</option><option>3</option><option>4</option>
-                <option>5</option><option>6</option>
-              </select>
-            </div>
-            <div class="pf-group">
-              <label for="p-occasione" data-i18n="prenota_f_occasione">Occasione (opzionale)</label>
-              <select id="p-occasione" name="occasione">
-                <option value="" disabled selected data-i18n="prenota_f_occasione_sel">Seleziona</option>
-                <option value="Cena standard" data-i18n="prenota_f_occ_standard">Cena standard</option>
-                <option value="Compleanno" data-i18n="prenota_f_occ1">Compleanno</option>
-                <option value="Anniversario" data-i18n="prenota_f_occ2">Anniversario</option>
-                <option value="Proposta di matrimonio" data-i18n="prenota_f_occ3">Proposta di matrimonio</option>
-                <option value="Cena di lavoro" data-i18n="prenota_f_occ4">Cena di lavoro</option>
-                <option value="Cena romantica" data-i18n="prenota_f_occ5">Cena romantica</option>
-                <option value="Altro" data-i18n="prenota_f_occ6">Altro</option>
-              </select>
-            </div>
-            <div class="pf-group"><label for="p-intolleranze" data-i18n="prenota_f_intolleranze">Intolleranze o allergie</label><input type="text" id="p-intolleranze" name="intolleranze" required data-i18n-placeholder="prenota_f_intolleranze_ph" placeholder="Scrivi 'nessuna' se non hai allergie"></div>
-            <div class="pf-group"><label for="p-richieste" data-i18n="prenota_f_richieste">Richieste particolari</label><textarea id="p-richieste" name="note"></textarea></div>
-            <div class="pf-checkbox">
-              <input type="checkbox" id="p-marketing" name="marketing_consent">
-              <label for="p-marketing" data-i18n="prenota_f_marketing_consent">Acconsento a ricevere comunicazioni sul ristorante (eventi, serate a tema, novit&agrave;). Facoltativo, revocabile in qualsiasi momento.</label>
-            </div>
-            <div style="margin-top:1.5rem;">
-              <button type="submit" id="prenota-btn" class="btn-primary" style="cursor:pointer;font-family:'Jost',sans-serif;border:none;width:100%;text-align:center;" data-i18n="prenota_f_btn">Invia la richiesta</button>
-            </div>
-            <div class="pf-status" id="prenota-status"></div>
-          </form>
-          <!-- Banner mostrato quando le prenotazioni online sono globalmente chiuse (sostituisce il form) -->
-          <div id="prenota-closed" style="display:none;text-align:center;padding:2rem 0;">
-            <div style="font-size:2.5rem;margin-bottom:1rem;">&#x1F4DE;</div>
-            <h3 data-i18n="prenota_closed_title" style="margin:0 0 1rem;font-weight:normal;">Prenotazioni online momentaneamente chiuse</h3>
-            <p data-i18n="prenota_closed_body" style="font-size:1rem;line-height:1.6;color:#555;">Al momento non accettiamo prenotazioni online. Per la disponibilit&agrave; dell'ultimo minuto puoi chiamarci allo 010 5533155.</p>
-          </div>
-          <!-- Schermata thankyou (nascosta finché il form non viene submittato con successo) -->
-          <div id="prenota-thankyou" style="display:none;text-align:center;padding:2rem 0;">
-            <div style="font-size:3rem;margin-bottom:1rem;">&#x2709;&#xFE0F;</div>
-            <h3 data-i18n="prenota_thankyou_title" style="margin:0 0 1rem;font-weight:normal;">Richiesta ricevuta</h3>
-            <p data-i18n="prenota_thankyou_body" style="font-size:1rem;line-height:1.6;color:#555;">Grazie. Abbiamo ricevuto la tua richiesta di prenotazione e ti abbiamo inviato una mail di conferma. Ti contattiamo a breve con i passi finali.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<!-- La sezione #prenota (form lungo embedded) è stata sostituita dal wizard dedicato
+     /prenota.html (v 2026.07.22.01, DESIGN_wizard_prenotazioni_carta-obbligatoria) —
+     carta di garanzia sempre obbligatoria + conferma automatica. Le CTA "Prenota"
+     ora puntano a /prenota.html invece che a questa sezione. -->
 
 <section id="info">
   <div class="section-inner">
@@ -821,7 +725,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.07.21.02</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.07.22.01</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>
@@ -910,213 +814,10 @@
   }, { threshold: 0.12 });
   reveals.forEach(function(el) { observer.observe(el); });
 
-  var pForm = document.getElementById('prenota-form');
-  var pBtn = document.getElementById('prenota-btn');
-  var pStatus = document.getElementById('prenota-status');
-
-  // Stato prenotazioni online (interruttore globale + chiusure per giorno/servizio).
-  // Gestito da menu-admin; letto qui via Edge Function reservations-status.
-  var STATUS_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/reservations-status';
-  var resOnlineOpen = true;
-  var resClosures = [];
-  var resOpenings = [];
-  var resSlotClosures = [];
-  var resSlotOpenings = [];
-
-  function slotClosedFor(dateStr, time) {
-    return resSlotClosures.some(function (s) { return s.date === dateStr && s.time === time; });
-  }
-  function slotOpenFor(dateStr, time) {
-    return resSlotOpenings.some(function (s) { return s.date === dateStr && s.time === time; });
-  }
-
-  function closuresForDate(dateStr) {
-    var set = { pranzo: false, cena: false };
-    resClosures.forEach(function (c) {
-      if (c.date !== dateStr) return;
-      if (c.service === 'tutto') { set.pranzo = true; set.cena = true; }
-      else if (c.service === 'pranzo') { set.pranzo = true; }
-      else if (c.service === 'cena') { set.cena = true; }
-    });
-    return set;
-  }
-
-  function openingsForDate(dateStr) {
-    var set = { pranzo: false, cena: false };
-    resOpenings.forEach(function (o) {
-      if (o.date !== dateStr) return;
-      if (o.service === 'tutto') { set.pranzo = true; set.cena = true; }
-      else if (o.service === 'pranzo') { set.pranzo = true; }
-      else if (o.service === 'cena') { set.cena = true; }
-    });
-    return set;
-  }
-
-  // Servizi disponibili per una data = (schedule normale ∪ aperture straordinarie) − chiusure.
-  function servicesForDate(dateStr) {
-    var d = new Date(dateStr + 'T00:00:00');
-    var base = (typeof window.getServicesByDay === 'function')
-      ? window.getServicesByDay(d.getDay())
-      : ['pranzo', 'cena'];
-    var set = { pranzo: base.indexOf('pranzo') !== -1, cena: base.indexOf('cena') !== -1 };
-    var op = openingsForDate(dateStr);
-    if (op.pranzo) set.pranzo = true;
-    if (op.cena) set.cena = true;
-    var cl = closuresForDate(dateStr);
-    if (cl.pranzo) set.pranzo = false;
-    if (cl.cena) set.cena = false;
-    return set;
-  }
-
-  function applyReservationsStatus() {
-    var closedBanner = document.getElementById('prenota-closed');
-    var thankyou = document.getElementById('prenota-thankyou');
-    var thankyouOpen = thankyou && thankyou.style.display !== 'none';
-    if (!resOnlineOpen) {
-      if (pForm) pForm.style.display = 'none';
-      if (closedBanner) closedBanner.style.display = '';
-    } else {
-      if (closedBanner) closedBanner.style.display = 'none';
-      if (pForm && !thankyouOpen) pForm.style.display = '';
-    }
-  }
-
-  function loadReservationsStatus() {
-    fetch(STATUS_URL, { cache: 'no-store' })
-      .then(function (r) { return r.json(); })
-      .then(function (d) {
-        resOnlineOpen = !(d && d.online_open === false);
-        resClosures = (d && d.closures) || [];
-        resOpenings = (d && d.openings) || [];
-        resSlotClosures = (d && d.slot_closures) || [];
-        resSlotOpenings = (d && d.slot_openings) || [];
-        applyReservationsStatus();
-        updateOrarioSlots();
-      })
-      .catch(function () { /* fail-open: il form resta usabile, il blocco è comunque server-side */ });
-  }
-
-  function updateOrarioSlots() {
-    var dataInput = document.getElementById('p-data');
-    var orarioSelect = document.getElementById('p-orario');
-    if (!dataInput || !orarioSelect) return;
-    var optgroups = orarioSelect.querySelectorAll('optgroup');
-    var dateMsg = document.getElementById('p-date-closed');
-    if (!dataInput.value) {
-      optgroups.forEach(function (g) {
-        g.style.display = '';
-        g.querySelectorAll('option').forEach(function (o) { o.style.display = ''; o.disabled = false; });
-      });
-      if (dateMsg) dateMsg.style.display = 'none';
-      return;
-    }
-    var dateStr = dataInput.value;
-    var svc = servicesForDate(dateStr);
-    var anyOpen = false;
-    optgroups.forEach(function (g) {
-      var key = g.getAttribute('data-i18n-label') || '';
-      var s = key.indexOf('cena') !== -1 ? 'cena' : 'pranzo';
-      var serviceVisible = !!svc[s];
-      var groupHasVisible = false;
-      g.querySelectorAll('option').forEach(function (o) {
-        var t = o.value;
-        // Visibile = aperto in via straordinaria su quell'orario, OPPURE
-        //            (il servizio è disponibile E l'orario non è chiuso singolarmente).
-        var vis = slotOpenFor(dateStr, t) || (serviceVisible && !slotClosedFor(dateStr, t));
-        o.style.display = vis ? '' : 'none';
-        o.disabled = !vis;
-        if (vis) groupHasVisible = true;
-      });
-      g.style.display = groupHasVisible ? '' : 'none';
-      if (groupHasVisible) anyOpen = true;
-    });
-    var currentVal = orarioSelect.value;
-    if (currentVal) {
-      var opt = orarioSelect.querySelector('option[value="' + currentVal + '"]');
-      if (opt && (opt.style.display === 'none' || (opt.parentElement && opt.parentElement.style.display === 'none'))) {
-        orarioSelect.value = '';
-      }
-    }
-    // Nessuno slot disponibile per la data scelta (giorno chiuso, non aperto in
-    // via straordinaria, o tutti gli orari chiusi singolarmente): mostra il messaggio.
-    if (dateMsg) {
-      dateMsg.style.display = anyOpen ? 'none' : '';
-    }
-  }
-  document.getElementById('p-data').addEventListener('change', updateOrarioSlots);
-  loadReservationsStatus();
-  // Endpoint backend prenotazioni (Edge Function Supabase, Fase 1 carta-garanzia)
-  var EDGE_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/submit-reservation';
-
-  pForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    pBtn.disabled = true;
-    pStatus.textContent = '';
-    pStatus.className = 'pf-status';
-
-    var payload = {
-      nome: document.getElementById('p-nome').value.trim(),
-      email: document.getElementById('p-email').value.trim(),
-      telefono: document.getElementById('p-tel').value.trim(),
-      data: document.getElementById('p-data').value,
-      orario: document.getElementById('p-orario').value,
-      persone: parseInt(document.getElementById('p-persone').value, 10),
-      intolleranze: document.getElementById('p-intolleranze').value.trim(),
-      occasione: document.getElementById('p-occasione').value,
-      note: document.getElementById('p-richieste').value.trim(),
-      marketing_consent: document.getElementById('p-marketing').checked,
-      user_agent: navigator.userAgent || '',
-      _hp: document.getElementById('p-hp').value
-    };
-
-    // Validazione client-side base
-    if (!payload.nome || !payload.email || !payload.telefono || !payload.data || !payload.orario || !payload.persone) {
-      pStatus.textContent = (T[currentLang] && T[currentLang].prenota_error_validation) || 'Compila tutti i campi obbligatori.';
-      pStatus.className = 'pf-status error';
-      pBtn.disabled = false;
-      return;
-    }
-
-    try {
-      var res = await fetch(EDGE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (res.status === 201) {
-        // Successo: nascondo form, mostro schermata thankyou
-        pForm.style.display = 'none';
-        document.getElementById('prenota-thankyou').style.display = '';
-        // Scroll fluido sulla thankyou per visibilità
-        var ty = document.getElementById('prenota-thankyou');
-        if (ty && ty.scrollIntoView) ty.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      } else if (res.status === 429) {
-        pStatus.textContent = (T[currentLang] && T[currentLang].prenota_error_rate_limit) || 'Troppe richieste in poco tempo. Riprova tra un\'ora o chiamaci al 010 5533155.';
-        pStatus.className = 'pf-status error';
-        pBtn.disabled = false;
-      } else if (res.status === 403) {
-        var ebClosed = {};
-        try { ebClosed = await res.json(); } catch (_) {}
-        pStatus.textContent = ebClosed.error || (T[currentLang] && T[currentLang].prenota_error_closed) || 'Per questa data non accettiamo prenotazioni online. Chiamaci al 010 5533155.';
-        pStatus.className = 'pf-status error';
-        pBtn.disabled = false;
-        // Aggiorna lo stato per riflettere eventuali chiusure appena impostate
-        loadReservationsStatus();
-      } else if (res.status === 400) {
-        var errBody = {};
-        try { errBody = await res.json(); } catch (_) {}
-        pStatus.textContent = errBody.error || (T[currentLang] && T[currentLang].prenota_error_validation) || 'Verifica i dati inseriti.';
-        pStatus.className = 'pf-status error';
-        pBtn.disabled = false;
-      } else {
-        throw new Error('HTTP ' + res.status);
-      }
-    } catch (err) {
-      pStatus.textContent = (T[currentLang] && T[currentLang].prenota_error_generic) || 'Errore di connessione. Riprova o chiamaci al 010 5533155.';
-      pStatus.className = 'pf-status error';
-      pBtn.disabled = false;
-    }
-  });
+  // Il vecchio form prenotazioni embedded (#prenota-form) e tutta la logica di
+  // disponibilità/submit associata sono stati rimossi: il wizard dedicato
+  // /prenota.html (v 2026.07.22.01) li sostituisce integralmente, chiamando
+  // reservations-status e create-reservation-checkout per conto proprio.
 
   var galleryImages = [];
   var currentImg = 0;

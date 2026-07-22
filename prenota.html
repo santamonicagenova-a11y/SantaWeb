@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<!--
+  prenota.html — Wizard prenotazioni con carta a garanzia obbligatoria
+  Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
+  Versione: v 2026.07.22.01
+
+  DESIGN_wizard_prenotazioni_carta-obbligatoria_v2026.07.22.01 — sostituisce il vecchio form
+  embedded in index.html#prenota. 5 passi (data → persone → orario → contatti → carta),
+  impostazione ispirata al widget TheFork (analizzato: Etra Genova), conferma AUTOMATICA e
+  ISTANTANEA appena la carta è registrata — nessuna revisione manuale.
+
+  Legge orari.js (fonte unica orari) per sapere quali servizi sono attivi in un giorno della
+  settimana; legge reservations-status (Edge Function pubblica, stessa già in uso dal vecchio
+  form) per chiusure/aperture/limiti posti; invia la richiesta finale a
+  create-reservation-checkout (nuova Edge Function) che crea la prenotazione + la sessione
+  Stripe Checkout (mode=setup, nessun addebito) e ritorna l'URL a cui reindirizzare.
+
+  IT-only (come regala.html, voucher-grazie.html, gestionale.html — nessuna pagina
+  transazionale del sito è multilingua).
+-->
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prenota un tavolo — Ristorante Santamonica</title>
+<meta name="description" content="Prenota un tavolo al Ristorante Santamonica: scegli data, orario e numero di persone, registra la carta a garanzia e ricevi la conferma immediata.">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sabbia:     #f7f5f0;
+    --crema:      #faf8f3;
+    --oro:        #c9a961;
+    --inchiostro: #2c2c2c;
+    --bordo:      #e0dcd0;
+    --secondario: #6b6560;
+    --errore:     #9e4a2a;
+    --ok:         #2c6e49;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Jost', Arial, sans-serif;
+    font-weight: 300;
+    background: var(--sabbia);
+    color: var(--inchiostro);
+    min-height: 100vh;
+  }
+
+  a { color: inherit; }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--bordo);
+    background: #fff;
+  }
+  .topbar-logo {
+    font-family: 'Cormorant', Georgia, serif;
+    font-size: 1.3rem; letter-spacing: 0.04em; text-decoration: none; color: var(--inchiostro);
+  }
+  .topbar-phone { font-size: 0.85rem; color: var(--secondario); text-decoration: none; }
+  .topbar-phone strong { color: var(--inchiostro); font-weight: 500; }
+
+  .wrap { max-width: 640px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  .page-title {
+    font-family: 'Cormorant', Georgia, serif; font-weight: 500;
+    font-size: clamp(1.8rem, 5vw, 2.4rem);
+    text-align: center; margin-bottom: 0.4rem;
+  }
+  .page-sub { text-align: center; color: var(--secondario); font-size: 0.95rem; margin-bottom: 2rem; }
+
+  /* ── Stepper ── */
+  .stepper {
+    display: flex; justify-content: space-between; margin-bottom: 2.2rem; gap: 4px;
+  }
+  .stepper-item {
+    flex: 1; text-align: center; font-size: 0.68rem; letter-spacing: 0.04em;
+    color: var(--secondario); text-transform: uppercase;
+  }
+  .stepper-dot {
+    width: 28px; height: 28px; border-radius: 50%; margin: 0 auto 0.4rem;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; border: 1.5px solid var(--bordo); color: var(--secondario);
+    font-family: 'Jost', sans-serif; font-size: 0.85rem; transition: all .2s;
+  }
+  .stepper-item.done .stepper-dot { background: var(--oro); border-color: var(--oro); color: #fff; }
+  .stepper-item.active .stepper-dot { border-color: var(--inchiostro); color: var(--inchiostro); font-weight: 500; }
+  .stepper-item.active { color: var(--inchiostro); }
+
+  /* ── Card / step container ── */
+  .card {
+    background: #fff; border: 1px solid var(--bordo); padding: 1.8rem 1.6rem;
+  }
+  .step { display: none; }
+  .step.active { display: block; animation: fadein .25s ease; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .step-label { font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--oro); margin-bottom: 0.3rem; }
+  .step-title { font-family: 'Cormorant', Georgia, serif; font-size: 1.5rem; font-weight: 500; margin-bottom: 1.4rem; }
+
+  /* ── Calendario ── */
+  .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .cal-nav button {
+    background: none; border: 1px solid var(--bordo); width: 34px; height: 34px; cursor: pointer;
+    font-size: 1rem; color: var(--inchiostro); border-radius: 50%;
+  }
+  .cal-nav button:disabled { opacity: 0.3; cursor: default; }
+  .cal-month-label { font-family: 'Cormorant', Georgia, serif; font-size: 1.15rem; text-transform: capitalize; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal-dow { text-align: center; font-size: 0.68rem; color: var(--secondario); padding-bottom: 4px; text-transform: uppercase; }
+  .cal-day {
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    border: 1px solid transparent; border-radius: 6px; font-size: 0.9rem; cursor: pointer;
+    background: var(--crema); position: relative;
+  }
+  .cal-day.empty { visibility: hidden; }
+  .cal-day.closed, .cal-day.full, .cal-day.past { background: none; color: #c7c2b8; cursor: default; }
+  .cal-day.closed::after, .cal-day.full::after {
+    content: ''; position: absolute; bottom: 4px; width: 3px; height: 3px; border-radius: 50%; background: #c7c2b8;
+  }
+  .cal-day.selectable:hover { border-color: var(--oro); }
+  .cal-day.selected { background: var(--inchiostro); color: #fff; }
+  .cal-legend { margin-top: 1rem; font-size: 0.78rem; color: var(--secondario); }
+
+  /* ── Persone ── */
+  .persone-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; }
+  .persona-btn {
+    padding: 1.1rem 0; text-align: center; border: 1px solid var(--bordo); background: var(--crema);
+    cursor: pointer; font-family: 'Jost', sans-serif; font-size: 1.1rem; border-radius: 4px;
+  }
+  .persona-btn:hover { border-color: var(--oro); }
+  .persona-btn.selected { background: var(--inchiostro); color: #fff; border-color: var(--inchiostro); }
+
+  /* ── Orario ── */
+  .orario-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; }
+  .orario-btn {
+    padding: 0.9rem 0.4rem; text-align: center; border: 1px solid var(--bordo); background: var(--crema);
+    cursor: pointer; font-family: 'Jost', sans-serif; font-size: 1rem; border-radius: 4px;
+  }
+  .orario-btn:hover:not(:disabled) { border-color: var(--oro); }
+  .orario-btn.selected { background: var(--inchiostro); color: #fff; border-color: var(--inchiostro); }
+  .orario-btn:disabled { opacity: 0.35; cursor: default; text-decoration: line-through; }
+  .orario-cap { display: block; font-size: 0.65rem; margin-top: 2px; opacity: 0.75; }
+  .orario-empty { color: var(--secondario); font-size: 0.9rem; }
+
+  /* ── Form contatti ── */
+  .field { margin-bottom: 1.1rem; }
+  .field label { display: block; font-size: 0.82rem; color: var(--secondario); margin-bottom: 0.35rem; }
+  .field input, .field select, .field textarea {
+    width: 100%; padding: 0.7rem 0.8rem; border: 1px solid var(--bordo); background: var(--crema);
+    font-family: 'Jost', sans-serif; font-size: 0.95rem; color: var(--inchiostro); border-radius: 4px;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--oro); }
+  .field textarea { min-height: 70px; resize: vertical; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+  .hint { font-size: 0.78rem; color: var(--secondario); margin: -0.6rem 0 1rem; }
+  .checkbox-row { display: flex; gap: 0.6rem; align-items: flex-start; margin-bottom: 1.3rem; }
+  .checkbox-row input { width: auto; margin-top: 3px; }
+  .checkbox-row label { font-size: 0.82rem; color: var(--secondario); line-height: 1.4; }
+
+  /* ── Riepilogo + garanzia ── */
+  .riepilogo { background: var(--crema); border: 1px solid var(--bordo); padding: 1rem 1.2rem; margin-bottom: 1.4rem; font-size: 0.92rem; }
+  .riepilogo-row { display: flex; justify-content: space-between; padding: 0.35rem 0; }
+  .riepilogo-row + .riepilogo-row { border-top: 1px dashed var(--bordo); }
+  .riepilogo-label { color: var(--secondario); }
+  .riepilogo-val { font-weight: 500; text-align: right; }
+
+  .rules { display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 1.6rem; }
+  .rule { display: flex; gap: 0.7rem; font-size: 0.86rem; line-height: 1.5; color: #444; }
+  .rule .dot { flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--oro); margin-top: 0.5rem; }
+  .rule b { color: var(--inchiostro); }
+
+  /* ── Bottoni ── */
+  .btn-row { display: flex; gap: 0.7rem; margin-top: 1.6rem; }
+  .btn {
+    flex: 1; padding: 0.95rem 1rem; border: none; cursor: pointer; text-align: center;
+    font-family: 'Jost', sans-serif; font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase;
+    border-radius: 4px; transition: opacity .15s;
+  }
+  .btn-primary { background: var(--inchiostro); color: #fff; }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:disabled { opacity: 0.5; cursor: default; }
+  .btn-ghost { background: none; border: 1px solid var(--bordo); color: var(--inchiostro); flex: 0 0 auto; padding-left: 1.4rem; padding-right: 1.4rem; }
+  .btn-ghost:hover { border-color: var(--inchiostro); }
+
+  .status-msg { margin-top: 1rem; font-size: 0.85rem; padding: 0.8rem 1rem; border-radius: 4px; display: none; }
+  .status-msg.show { display: block; }
+  .status-msg.error { background: #fbeae3; color: var(--errore); border: 1px solid #eecbb9; }
+
+  .spinner {
+    display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4);
+    border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; margin-right: 0.5rem; vertical-align: -2px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .closed-banner, .resume-card { background: #fff; border: 1px solid var(--bordo); padding: 2rem 1.6rem; text-align: center; }
+  .closed-banner .icon, .resume-card .icon { font-size: 2.4rem; margin-bottom: 0.8rem; }
+  .closed-banner h2, .resume-card h2 { font-family: 'Cormorant', Georgia, serif; font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; }
+  .closed-banner p, .resume-card p { color: var(--secondario); font-size: 0.92rem; line-height: 1.6; margin-bottom: 1rem; }
+
+  footer.foot { text-align: center; margin-top: 2rem; font-size: 0.78rem; color: #aaa; }
+  footer.foot a { color: #aaa; }
+
+  @media (max-width: 480px) {
+    .card { padding: 1.4rem 1.1rem; }
+    .persone-grid, .orario-grid { grid-template-columns: repeat(3, 1fr); }
+    .field-row { grid-template-columns: 1fr; }
+    .stepper-item { font-size: 0; }
+    .stepper-dot { margin-bottom: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/" class="topbar-logo">Santamonica</a>
+  <a href="tel:+390105533155" class="topbar-phone">Serve aiuto? <strong>010 5533155</strong></a>
+</div>
+
+<div class="wrap">
+  <h1 class="page-title">Prenota un tavolo</h1>
+  <p class="page-sub">Cinque passaggi rapidi: data, persone, orario, contatti e la carta a garanzia.</p>
+
+  <!-- ═══ Banner: prenotazioni online chiuse ═══ -->
+  <div class="closed-banner" id="closed-banner" style="display:none;">
+    <div class="icon">📞</div>
+    <h2>Prenotazioni online momentaneamente chiuse</h2>
+    <p>Al momento non accettiamo prenotazioni online. Per la disponibilità dell'ultimo minuto puoi chiamarci allo 010 5533155.</p>
+    <a href="tel:+390105533155" class="btn btn-primary" style="display:inline-block;">Chiama il ristorante</a>
+  </div>
+
+  <!-- ═══ Resume card (?resume=SHORT_ID) ═══ -->
+  <div class="resume-card" id="resume-card" style="display:none;">
+    <div class="icon" id="resume-icon">⏳</div>
+    <h2 id="resume-title">Hai una prenotazione in sospeso</h2>
+    <p id="resume-body">Recupero i dati…</p>
+    <div id="resume-actions"></div>
+  </div>
+
+  <!-- ═══ Wizard ═══ -->
+  <div id="wizard-wrap">
+    <div class="stepper" id="stepper">
+      <div class="stepper-item active" data-step="1"><div class="stepper-dot">1</div>Data</div>
+      <div class="stepper-item" data-step="2"><div class="stepper-dot">2</div>Persone</div>
+      <div class="stepper-item" data-step="3"><div class="stepper-dot">3</div>Orario</div>
+      <div class="stepper-item" data-step="4"><div class="stepper-dot">4</div>Contatti</div>
+      <div class="stepper-item" data-step="5"><div class="stepper-dot">5</div>Garanzia</div>
+    </div>
+
+    <div class="card">
+
+      <!-- STEP 1 — DATA -->
+      <section class="step active" id="step-1">
+        <p class="step-label">Passo 1 di 5</p>
+        <h2 class="step-title">Che giorno vieni a trovarci?</h2>
+        <div class="cal-nav">
+          <button type="button" id="cal-prev" aria-label="Mese precedente">‹</button>
+          <div class="cal-month-label" id="cal-month-label"></div>
+          <button type="button" id="cal-next" aria-label="Mese successivo">›</button>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+        <p class="cal-legend">I giorni in grigio sono chiusi o già al completo. Chiamaci al 010 5533155 per richieste fuori calendario.</p>
+      </section>
+
+      <!-- STEP 2 — PERSONE -->
+      <section class="step" id="step-2">
+        <p class="step-label">Passo 2 di 5</p>
+        <h2 class="step-title">In quanti sarete?</h2>
+        <div class="persone-grid" id="persone-grid"></div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-ghost" data-back="1">Indietro</button>
+        </div>
+      </section>
+
+      <!-- STEP 3 — ORARIO -->
+      <section class="step" id="step-3">
+        <p class="step-label">Passo 3 di 5</p>
+        <h2 class="step-title">A che ora?</h2>
+        <div class="orario-grid" id="orario-grid"></div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-ghost" data-back="2">Indietro</button>
+        </div>
+      </section>
+
+      <!-- STEP 4 — CONTATTI -->
+      <section class="step" id="step-4">
+        <p class="step-label">Passo 4 di 5</p>
+        <h2 class="step-title">I tuoi dati</h2>
+        <form id="contatti-form" novalidate>
+          <input type="text" name="_hp" id="p-hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" aria-hidden="true">
+          <div class="field"><label for="p-nome">Nome</label><input type="text" id="p-nome" required autocomplete="name"></div>
+          <div class="field-row">
+            <div class="field"><label for="p-tel">Telefono</label><input type="tel" id="p-tel" required autocomplete="tel"></div>
+            <div class="field"><label for="p-email">Email</label><input type="email" id="p-email" required autocomplete="email"></div>
+          </div>
+          <p class="hint">Email e telefono sono entrambi obbligatori per ricontattarti rapidamente.</p>
+          <div class="field"><label for="p-intolleranze">Intolleranze o allergie</label><input type="text" id="p-intolleranze" required placeholder="Scrivi 'nessuna' se non hai allergie"></div>
+          <div class="field">
+            <label for="p-occasione">Occasione (opzionale)</label>
+            <select id="p-occasione">
+              <option value="" selected>Seleziona</option>
+              <option value="Cena standard">Cena standard</option>
+              <option value="Compleanno">Compleanno</option>
+              <option value="Anniversario">Anniversario</option>
+              <option value="Proposta di matrimonio">Proposta di matrimonio</option>
+              <option value="Cena di lavoro">Cena di lavoro</option>
+              <option value="Cena romantica">Cena romantica</option>
+              <option value="Altro">Altro</option>
+            </select>
+          </div>
+          <div class="field"><label for="p-note">Richieste particolari (opzionale)</label><textarea id="p-note"></textarea></div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="p-marketing">
+            <label for="p-marketing">Acconsento a ricevere comunicazioni sul ristorante (eventi, serate a tema, novità). Facoltativo, revocabile in qualsiasi momento.</label>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn btn-ghost" data-back="3">Indietro</button>
+            <button type="submit" class="btn btn-primary">Continua</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- STEP 5 — RIEPILOGO + GARANZIA -->
+      <section class="step" id="step-5">
+        <p class="step-label">Passo 5 di 5</p>
+        <h2 class="step-title">Ultimo passo: la carta a garanzia</h2>
+
+        <div class="riepilogo" id="riepilogo"></div>
+
+        <div class="rules">
+          <div class="rule"><span class="dot"></span><span><b>Nessun addebito immediato.</b> La carta viene solo registrata in modo sicuro.</span></div>
+          <div class="rule"><span class="dot"></span><span><b>Disdetta o modifica gratuita</b> fino a <b>24 ore</b> prima dell'orario della prenotazione.</span></div>
+          <div class="rule"><span class="dot"></span><span>Oltre tale termine, in caso di <b>mancata presentazione</b> o <b>riduzione dei coperti</b>, sarà addebitata una penale di <b>25&nbsp;€ per persona</b>.</span></div>
+          <div class="rule"><span class="dot"></span><span>I dati della carta sono <b>cifrati e non visibili</b> al ristorante: la registrazione avviene sulla pagina sicura di Stripe.</span></div>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn btn-ghost" data-back="4">Indietro</button>
+          <button type="button" class="btn btn-primary" id="confirm-btn">Registra la carta e conferma</button>
+        </div>
+        <div class="status-msg" id="confirm-status"></div>
+      </section>
+
+    </div>
+  </div>
+
+  <footer class="foot">Lungomare Lombardo 27 · Genova · <a href="/privacy.html">Privacy</a></footer>
+</div>
+
+<script src="orari.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var STATUS_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/reservations-status';
+  var CAUZIONE_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/get-cauzione';
+  var CHECKOUT_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/create-reservation-checkout';
+
+  // ORARIO ESTIVO 21/6→31/8/2026: pranzo chiuso tutti i giorni; cena 20:00-22:30 mar→dom (lun
+  // chiuso). SPECULARE a submit-reservation/create-reservation-checkout e a orari.js
+  // (getServicesByDay dà il servizio pranzo/cena per giorno; questi due array danno gli slot
+  // discreti dentro ciascun servizio). RIPRISTINO 31/8 allo schedule 7/6:
+  //   PRANZO = ["12:30", "13:00", "13:30", "14:00"]; CENA = ["19:30","20:00","20:30","21:00","21:30","22:00"];
+  var PRANZO = [];
+  var CENA = ["20:00", "20:30", "21:00", "21:30", "22:00", "22:30"];
+
+  var state = {
+    online_open: true,
+    closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [],
+    calMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+    selectedDate: null,
+    selectedPersone: null,
+    selectedOrario: null,
+    step: 1,
+  };
+
+  var MESI = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+  var DOW = ['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
+
+  function todayStr() {
+    var d = new Date(); d.setHours(0,0,0,0);
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function fmtDateStr(y,m,d) { return y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0'); }
+
+  /* ── disponibilità (stessa logica già in uso nel vecchio form embedded) ── */
+  function slotClosedFor(dateStr, time) { return state.slot_closures.some(function(s){ return s.date===dateStr && s.time===time; }); }
+  function slotOpenFor(dateStr, time) { return state.slot_openings.some(function(s){ return s.date===dateStr && s.time===time; }); }
+  function closuresForDate(dateStr) {
+    var set = { pranzo:false, cena:false };
+    state.closures.forEach(function(c){
+      if (c.date !== dateStr) return;
+      if (c.service==='tutto') { set.pranzo=true; set.cena=true; }
+      else set[c.service] = true;
+    });
+    return set;
+  }
+  function openingsForDate(dateStr) {
+    var set = { pranzo:false, cena:false };
+    state.openings.forEach(function(o){
+      if (o.date !== dateStr) return;
+      if (o.service==='tutto') { set.pranzo=true; set.cena=true; }
+      else set[o.service] = true;
+    });
+    return set;
+  }
+  function servicesForDate(dateStr) {
+    var d = new Date(dateStr + 'T00:00:00');
+    var base = (typeof window.getServicesByDay === 'function') ? window.getServicesByDay(d.getDay()) : ['pranzo','cena'];
+    var set = { pranzo: base.indexOf('pranzo')!==-1, cena: base.indexOf('cena')!==-1 };
+    var op = openingsForDate(dateStr);
+    if (op.pranzo) set.pranzo = true;
+    if (op.cena) set.cena = true;
+    var cl = closuresForDate(dateStr);
+    if (cl.pranzo) set.pranzo = false;
+    if (cl.cena) set.cena = false;
+    return set;
+  }
+  function capForSlot(dateStr, time) {
+    return state.slot_caps.find(function(c){ return c.date===dateStr && c.time===time; }) || null;
+  }
+  function getSlotsForDate(dateStr) {
+    var svc = servicesForDate(dateStr);
+    var times = [];
+    if (svc.pranzo) PRANZO.forEach(function(t){ times.push(t); });
+    if (svc.cena) CENA.forEach(function(t){ times.push(t); });
+    state.slot_openings.filter(function(o){ return o.date===dateStr; }).forEach(function(o){
+      if (times.indexOf(o.time) === -1) times.push(o.time);
+    });
+    times = times.filter(function(t){ return slotOpenFor(dateStr,t) || !slotClosedFor(dateStr,t); });
+    times.sort();
+    return times.map(function(t){
+      var cap = capForSlot(dateStr,t);
+      return { time: t, capMax: cap ? cap.max_covers : null, capUsed: cap ? cap.current_covers : 0 };
+    });
+  }
+  function dayStatus(dateStr) {
+    if (dateStr < todayStr()) return 'past';
+    var slots = getSlotsForDate(dateStr);
+    if (slots.length === 0) return 'closed';
+    var allFull = slots.every(function(s){ return s.capMax !== null && s.capUsed >= s.capMax; });
+    if (allFull) return 'full';
+    return 'selectable';
+  }
+
+  /* ── caricamento stato ── */
+  function loadStatus() {
+    return fetch(STATUS_URL, { cache: 'no-store' })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        state.online_open = !(d && d.online_open === false);
+        state.closures = (d && d.closures) || [];
+        state.openings = (d && d.openings) || [];
+        state.slot_closures = (d && d.slot_closures) || [];
+        state.slot_openings = (d && d.slot_openings) || [];
+        state.slot_caps = (d && d.slot_caps) || [];
+      })
+      .catch(function(){ /* fail-open: il wizard resta usabile, il blocco è comunque server-side */ });
+  }
+
+  /* ── stepper / navigazione ── */
+  function goToStep(n) {
+    state.step = n;
+    document.querySelectorAll('.step').forEach(function(s){ s.classList.remove('active'); });
+    document.getElementById('step-' + n).classList.add('active');
+    document.querySelectorAll('.stepper-item').forEach(function(el){
+      var s = parseInt(el.getAttribute('data-step'), 10);
+      el.classList.toggle('active', s === n);
+      el.classList.toggle('done', s < n);
+    });
+    document.getElementById('wizard-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  document.querySelectorAll('[data-back]').forEach(function(btn){
+    btn.addEventListener('click', function(){ goToStep(parseInt(btn.getAttribute('data-back'), 10)); });
+  });
+
+  /* ── STEP 1: calendario ── */
+  function renderCalendar() {
+    var y = state.calMonth.getFullYear(), m = state.calMonth.getMonth();
+    document.getElementById('cal-month-label').textContent = MESI[m] + ' ' + y;
+    var firstOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    document.getElementById('cal-prev').disabled = (y === firstOfMonth.getFullYear() && m === firstOfMonth.getMonth());
+    var maxMonth = new Date(firstOfMonth.getFullYear(), firstOfMonth.getMonth() + 6, 1);
+    document.getElementById('cal-next').disabled = (y === maxMonth.getFullYear() && m === maxMonth.getMonth());
+
+    var grid = document.getElementById('cal-grid');
+    grid.innerHTML = '';
+    DOW.forEach(function(d){ var el = document.createElement('div'); el.className='cal-dow'; el.textContent=d; grid.appendChild(el); });
+
+    var firstDay = new Date(y, m, 1);
+    var startOffset = (firstDay.getDay() + 6) % 7; // lun=0
+    for (var i = 0; i < startOffset; i++) { var e = document.createElement('div'); e.className='cal-day empty'; grid.appendChild(e); }
+
+    var daysInMonth = new Date(y, m + 1, 0).getDate();
+    for (var d = 1; d <= daysInMonth; d++) {
+      var dateStr = fmtDateStr(y, m, d);
+      var status = dayStatus(dateStr);
+      var cell = document.createElement('div');
+      cell.className = 'cal-day ' + (status === 'selectable' ? 'selectable' : status);
+      cell.textContent = d;
+      if (state.selectedDate === dateStr) cell.classList.add('selected');
+      if (status === 'selectable') {
+        cell.addEventListener('click', function(ds){ return function(){ selectDate(ds); }; }(dateStr));
+      }
+      grid.appendChild(cell);
+    }
+  }
+  function selectDate(dateStr) {
+    state.selectedDate = dateStr;
+    state.selectedOrario = null;
+    renderCalendar();
+    goToStep(2);
+  }
+  document.getElementById('cal-prev').addEventListener('click', function(){
+    state.calMonth = new Date(state.calMonth.getFullYear(), state.calMonth.getMonth() - 1, 1);
+    renderCalendar();
+  });
+  document.getElementById('cal-next').addEventListener('click', function(){
+    state.calMonth = new Date(state.calMonth.getFullYear(), state.calMonth.getMonth() + 1, 1);
+    renderCalendar();
+  });
+
+  /* ── STEP 2: persone ── */
+  function renderPersone() {
+    var grid = document.getElementById('persone-grid');
+    grid.innerHTML = '';
+    for (var n = 1; n <= 6; n++) {
+      var btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'persona-btn'; btn.textContent = n;
+      if (state.selectedPersone === n) btn.classList.add('selected');
+      btn.addEventListener('click', function(num){ return function(){ selectPersone(num); }; }(n));
+      grid.appendChild(btn);
+    }
+  }
+  function selectPersone(n) {
+    state.selectedPersone = n;
+    renderPersone();
+    goToStep(3);
+    renderOrario();
+  }
+
+  /* ── STEP 3: orario ── */
+  function renderOrario() {
+    var grid = document.getElementById('orario-grid');
+    grid.innerHTML = '';
+    if (!state.selectedDate) return;
+    var slots = getSlotsForDate(state.selectedDate);
+    if (!slots.length) {
+      grid.innerHTML = '<p class="orario-empty">Nessun orario disponibile per questa data. Chiamaci al 010 5533155.</p>';
+      return;
+    }
+    slots.forEach(function(s){
+      var remaining = s.capMax !== null ? Math.max(0, s.capMax - s.capUsed) : null;
+      var disabled = remaining !== null && remaining < (state.selectedPersone || 1);
+      var btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'orario-btn';
+      btn.innerHTML = s.time + (remaining !== null ? '<span class="orario-cap">' + remaining + ' post' + (remaining===1?'o':'i') + '</span>' : '');
+      if (disabled) btn.disabled = true;
+      if (state.selectedOrario === s.time) btn.classList.add('selected');
+      if (!disabled) btn.addEventListener('click', function(t){ return function(){ selectOrario(t); }; }(s.time));
+      grid.appendChild(btn);
+    });
+  }
+  function selectOrario(t) {
+    state.selectedOrario = t;
+    renderOrario();
+    goToStep(4);
+  }
+
+  /* ── STEP 4: contatti ── */
+  document.getElementById('contatti-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var nome = document.getElementById('p-nome').value.trim();
+    var tel = document.getElementById('p-tel').value.trim();
+    var email = document.getElementById('p-email').value.trim();
+    var intoll = document.getElementById('p-intolleranze').value.trim();
+    if (!nome || !tel || !email || !intoll) return;
+    renderRiepilogo();
+    goToStep(5);
+  });
+
+  /* ── STEP 5: riepilogo + garanzia ── */
+  function formatDateIt(dateStr) {
+    var d = new Date(dateStr + 'T00:00:00');
+    var giorni = ['domenica','lunedì','martedì','mercoledì','giovedì','venerdì','sabato'];
+    return giorni[d.getDay()] + ' ' + d.getDate() + ' ' + MESI[d.getMonth()] + ' ' + d.getFullYear();
+  }
+  function renderRiepilogo() {
+    var box = document.getElementById('riepilogo');
+    box.innerHTML =
+      row('Data', formatDateIt(state.selectedDate)) +
+      row('Orario', state.selectedOrario) +
+      row('Persone', state.selectedPersone) +
+      row('Nome', document.getElementById('p-nome').value.trim()) +
+      row('Contatti', document.getElementById('p-tel').value.trim() + ' · ' + document.getElementById('p-email').value.trim());
+    function row(l,v) { return '<div class="riepilogo-row"><span class="riepilogo-label">'+l+'</span><span class="riepilogo-val">'+v+'</span></div>'; }
+  }
+
+  var confirmBtn = document.getElementById('confirm-btn');
+  var confirmStatus = document.getElementById('confirm-status');
+  confirmBtn.addEventListener('click', function(){
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<span class="spinner"></span>Un momento…';
+    confirmStatus.className = 'status-msg';
+    confirmStatus.textContent = '';
+
+    var payload = {
+      nome: document.getElementById('p-nome').value.trim(),
+      email: document.getElementById('p-email').value.trim(),
+      telefono: document.getElementById('p-tel').value.trim(),
+      data: state.selectedDate,
+      orario: state.selectedOrario,
+      persone: state.selectedPersone,
+      intolleranze: document.getElementById('p-intolleranze').value.trim(),
+      occasione: document.getElementById('p-occasione').value,
+      note: document.getElementById('p-note').value.trim(),
+      marketing_consent: document.getElementById('p-marketing').checked,
+      _hp: document.getElementById('p-hp').value,
+    };
+
+    fetch(CHECKOUT_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+    })
+      .then(function(res){ return res.json().then(function(body){ return { status: res.status, body: body }; }); })
+      .then(function(r){
+        if (r.status === 201 && r.body && r.body.url) {
+          window.location.href = r.body.url;
+          return;
+        }
+        var msg = (r.body && r.body.error) || 'Qualcosa non ha funzionato. Riprova o chiamaci al 010 5533155.';
+        confirmStatus.textContent = msg;
+        confirmStatus.className = 'status-msg error show';
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Registra la carta e conferma';
+        if (r.status === 403 || r.status === 409) { loadStatus().then(function(){ renderOrario(); }); }
+      })
+      .catch(function(){
+        confirmStatus.textContent = 'Errore di connessione. Riprova o chiamaci al 010 5533155.';
+        confirmStatus.className = 'status-msg error show';
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Registra la carta e conferma';
+      });
+  });
+
+  /* ── resume flow (?resume=SHORT_ID) ── */
+  function initResume(shortId) {
+    document.getElementById('wizard-wrap').style.display = 'none';
+    var card = document.getElementById('resume-card');
+    card.style.display = '';
+    fetch(CAUZIONE_URL + '?short_id=' + encodeURIComponent(shortId))
+      .then(function(r){ return r.status === 404 ? null : r.json(); })
+      .then(function(data){
+        var icon = document.getElementById('resume-icon');
+        var title = document.getElementById('resume-title');
+        var body = document.getElementById('resume-body');
+        var actions = document.getElementById('resume-actions');
+        if (data && data.status === 'pending' && data.stripe_session_url) {
+          icon.textContent = '⏳';
+          title.textContent = 'Hai una prenotazione in sospeso';
+          body.textContent = (data.nome_cliente ? data.nome_cliente + ', ' : '') + 'la sua registrazione della carta a garanzia non è ancora completata.';
+          actions.innerHTML = '<a class="btn btn-primary" style="display:inline-block;" href="' + data.stripe_session_url + '">Riprendi la registrazione carta</a>';
+        } else if (data && data.status && data.status !== 'pending') {
+          icon.textContent = '✓';
+          title.textContent = 'Prenotazione già confermata';
+          body.textContent = 'Questa prenotazione risulta già confermata. A presto!';
+          actions.innerHTML = '<a class="btn btn-primary" style="display:inline-block;" href="/">Torna al sito</a>';
+        } else {
+          icon.textContent = '📞';
+          title.textContent = 'Link non più valido';
+          body.textContent = 'Questo link di registrazione carta non è più valido (probabilmente scaduto). Ci chiami al 010 5533155 oppure inizi una nuova prenotazione.';
+          actions.innerHTML = '<a class="btn btn-primary" style="display:inline-block;margin-right:0.6rem;" href="tel:+390105533155">Chiama</a>' +
+                               '<a class="btn btn-ghost" style="display:inline-block;" href="/prenota.html">Nuova prenotazione</a>';
+        }
+      })
+      .catch(function(){
+        document.getElementById('resume-title').textContent = 'Errore di connessione';
+        document.getElementById('resume-body').textContent = 'Non riusciamo a recuperare i dati. Ci chiami al 010 5533155.';
+      });
+  }
+
+  /* ── init ── */
+  function init() {
+    var params = new URLSearchParams(window.location.search);
+    var resumeId = params.get('resume');
+    loadStatus().then(function(){
+      if (!state.online_open) {
+        document.getElementById('wizard-wrap').style.display = 'none';
+        document.getElementById('closed-banner').style.display = '';
+        return;
+      }
+      if (resumeId) { initResume(resumeId); return; }
+      renderCalendar();
+      renderPersone();
+    });
+  }
+  init();
+})();
+</script>
+</body>
+</html>

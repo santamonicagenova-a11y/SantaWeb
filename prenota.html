@@ -2,18 +2,22 @@
 <!--
   prenota.html — Wizard prenotazioni con carta a garanzia obbligatoria
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.07.22.01
+  Versione: v 2026.07.22.02
 
   DESIGN_wizard_prenotazioni_carta-obbligatoria_v2026.07.22.01 — sostituisce il vecchio form
   embedded in index.html#prenota. 5 passi (data → persone → orario → contatti → carta),
   impostazione ispirata al widget TheFork (analizzato: Etra Genova), conferma AUTOMATICA e
-  ISTANTANEA appena la carta è registrata — nessuna revisione manuale.
+  ISTANTANEA appena la carta è registrata — nessuna revisione manuale, salvo i giorni della
+  settimana impostati come "liberi" da menu-admin (v.02, richiesta Andrea): in quei giorni
+  il passo 5 chiede solo conferma (niente carta) e la prenotazione va in revisione manuale
+  come il vecchio sistema — vedi cardRequiredForDate() e create-reservation-checkout v2.
 
   Legge orari.js (fonte unica orari) per sapere quali servizi sono attivi in un giorno della
   settimana; legge reservations-status (Edge Function pubblica, stessa già in uso dal vecchio
-  form) per chiusure/aperture/limiti posti; invia la richiesta finale a
-  create-reservation-checkout (nuova Edge Function) che crea la prenotazione + la sessione
-  Stripe Checkout (mode=setup, nessun addebito) e ritorna l'URL a cui reindirizzare.
+  form — ora ritorna anche card_required_days) per chiusure/aperture/limiti posti/giorni carta;
+  invia la richiesta finale a create-reservation-checkout (Edge Function) che decide da sola,
+  server-side, se creare la sessione Stripe (mode=setup) o inserire la prenotazione in
+  pending_review — il client si limita ad adattare la UI del passo 5 di conseguenza.
 
   IT-only (come regala.html, voucher-grazie.html, gestionale.html — nessuna pagina
   transazionale del sito è multilingua).
@@ -331,19 +335,22 @@
         </form>
       </section>
 
-      <!-- STEP 5 — RIEPILOGO + GARANZIA -->
+      <!-- STEP 5 — RIEPILOGO + GARANZIA (contenuto adattato in JS a seconda che il giorno
+           scelto richieda o no la carta — vedi renderStep5() e card_required_days) -->
       <section class="step" id="step-5">
         <p class="step-label">Passo 5 di 5</p>
-        <h2 class="step-title">Ultimo passo: la carta a garanzia</h2>
+        <h2 class="step-title" id="step5-title">Ultimo passo: la carta a garanzia</h2>
 
         <div class="riepilogo" id="riepilogo"></div>
 
-        <div class="rules">
+        <div class="rules" id="step5-rules">
           <div class="rule"><span class="dot"></span><span><b>Nessun addebito immediato.</b> La carta viene solo registrata in modo sicuro.</span></div>
           <div class="rule"><span class="dot"></span><span><b>Disdetta o modifica gratuita</b> fino a <b>24 ore</b> prima dell'orario della prenotazione.</span></div>
           <div class="rule"><span class="dot"></span><span>Oltre tale termine, in caso di <b>mancata presentazione</b> o <b>riduzione dei coperti</b>, sarà addebitata una penale di <b>25&nbsp;€ per persona</b>.</span></div>
           <div class="rule"><span class="dot"></span><span>I dati della carta sono <b>cifrati e non visibili</b> al ristorante: la registrazione avviene sulla pagina sicura di Stripe.</span></div>
         </div>
+
+        <p class="hint" id="step5-nocard-note" style="display:none;">Per questo giorno non chiediamo la carta di credito: la sua richiesta sarà confermata a mano dal ristorante, che la ricontatterà a breve.</p>
 
         <div class="btn-row">
           <button type="button" class="btn btn-ghost" data-back="4">Indietro</button>
@@ -353,6 +360,14 @@
       </section>
 
     </div>
+  </div>
+
+  <!-- Schermata "richiesta ricevuta" per il ramo senza carta (giorno "libero", pending_review) -->
+  <div class="resume-card" id="pending-card" style="display:none;">
+    <div class="icon">📨</div>
+    <h2>Richiesta ricevuta</h2>
+    <p>Grazie! Abbiamo ricevuto la sua richiesta di prenotazione e le abbiamo inviato una mail di conferma. La contatteremo a breve per la conferma definitiva.</p>
+    <a href="/" class="btn btn-primary" style="display:inline-block;">Torna al sito</a>
   </div>
 
   <footer class="foot">Lungomare Lombardo 27 · Genova · <a href="/privacy.html">Privacy</a></footer>
@@ -377,6 +392,7 @@
 
   var state = {
     online_open: true,
+    card_required_days: [0,1,2,3,4,5,6],
     closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [],
     calMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
     selectedDate: null,
@@ -384,6 +400,15 @@
     selectedOrario: null,
     step: 1,
   };
+
+  // Giorno della settimana (0=domenica..6=sabato, come Date.getDay()) in cui il ristorante
+  // chiede la carta a garanzia — impostabile da menu-admin.html sotto "Prenotazioni online".
+  // Default = tutti i 7 giorni finché reservations-status non dice altro.
+  function cardRequiredForDate(dateStr) {
+    if (!dateStr) return true;
+    var day = new Date(dateStr + 'T00:00:00').getDay();
+    return state.card_required_days.indexOf(day) !== -1;
+  }
 
   var MESI = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
   var DOW = ['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
@@ -460,6 +485,7 @@
       .then(function(r){ return r.json(); })
       .then(function(d){
         state.online_open = !(d && d.online_open === false);
+        state.card_required_days = (d && Array.isArray(d.card_required_days)) ? d.card_required_days : [0,1,2,3,4,5,6];
         state.closures = (d && d.closures) || [];
         state.openings = (d && d.openings) || [];
         state.slot_closures = (d && d.slot_closures) || [];
@@ -605,6 +631,14 @@
       row('Nome', document.getElementById('p-nome').value.trim()) +
       row('Contatti', document.getElementById('p-tel').value.trim() + ' · ' + document.getElementById('p-email').value.trim());
     function row(l,v) { return '<div class="riepilogo-row"><span class="riepilogo-label">'+l+'</span><span class="riepilogo-val">'+v+'</span></div>'; }
+
+    // Il giorno scelto determina se questo passo chiede la carta (Stripe) o se la
+    // prenotazione va semplicemente in revisione manuale (vedi cardRequiredForDate).
+    var needsCard = cardRequiredForDate(state.selectedDate);
+    document.getElementById('step5-title').textContent = needsCard ? 'Ultimo passo: la carta a garanzia' : 'Ultimo passo: conferma la richiesta';
+    document.getElementById('step5-rules').style.display = needsCard ? '' : 'none';
+    document.getElementById('step5-nocard-note').style.display = needsCard ? 'none' : '';
+    confirmBtn.textContent = needsCard ? 'Registra la carta e conferma' : 'Invia la richiesta';
   }
 
   var confirmBtn = document.getElementById('confirm-btn');
@@ -638,11 +672,17 @@
           window.location.href = r.body.url;
           return;
         }
+        if (r.status === 201 && r.body && r.body.pending) {
+          // Giorno "libero": nessuna carta richiesta, prenotazione in revisione manuale.
+          document.getElementById('wizard-wrap').style.display = 'none';
+          document.getElementById('pending-card').style.display = '';
+          return;
+        }
         var msg = (r.body && r.body.error) || 'Qualcosa non ha funzionato. Riprova o chiamaci al 010 5533155.';
         confirmStatus.textContent = msg;
         confirmStatus.className = 'status-msg error show';
         confirmBtn.disabled = false;
-        confirmBtn.textContent = 'Registra la carta e conferma';
+        confirmBtn.textContent = cardRequiredForDate(state.selectedDate) ? 'Registra la carta e conferma' : 'Invia la richiesta';
         if (r.status === 403 || r.status === 409) { loadStatus().then(function(){ renderOrario(); }); }
       })
       .catch(function(){

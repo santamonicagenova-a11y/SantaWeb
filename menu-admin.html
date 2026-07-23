@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- v 2026.07.22.02 — nuovo pannello "Carta a garanzia — giorni della settimana" sotto
+     "Prenotazioni online" (richiesta Andrea): 7 checkbox Lun-Dom + pulsante Salva, azione
+     set_card_required_days su set-reservations-config v5. I giorni NON selezionati fanno
+     entrare il wizard /prenota.html nel ramo "pending_review" invece di Stripe (vedi
+     create-reservation-checkout v2). Vedi DESIGN_wizard_prenotazioni_carta-obbligatoria e
+     HANDOVER_SANTAMONICA_SITO_v2026.07.22.01.md. -->
 <!-- v 2026.07.21.07 — allineamento testo validità/uso nel voucher stampabile (vp-foot), stesso
      wording richiesto da Andrea e propagato in tutto il sistema (index.html/translations.json/
      regala.html/voucher-termini.html/PDF stripe-webhook): "Validità 12 mesi dalla data di
@@ -656,6 +662,23 @@
       <div class="sub">Limiti attivi (da oggi in poi)</div>
       <div id="pren-slot-caps-list" style="font-size:.85rem;">&hellip;</div>
 
+      <div class="sub" style="margin-top:1.4rem;">Carta a garanzia — giorni della settimana</div>
+      <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
+        Il wizard <code>/prenota.html</code> chiede la carta a garanzia SOLO nei giorni selezionati.
+        Nei giorni non selezionati la prenotazione va in revisione manuale come il vecchio sistema
+        (arriva la mail da confermare, come oggi) — nessuna carta richiesta automaticamente.
+      </p>
+      <div id="pren-card-days" style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
+        <label style="display:flex;align-items:center;gap:.35rem;font-size:.8rem;"><input type="checkbox" class="pren-card-day-cb" data-day="1" /> Lun</label>
+        <label style="display:flex;align-items:center;gap:.35rem;font-size:.8rem;"><input type="checkbox" class="pren-card-day-cb" data-day="2" /> Mar</label>
+        <label style="display:flex;align-items:center;gap:.35rem;font-size:.8rem;"><input type="checkbox" class="pren-card-day-cb" data-day="3" /> Mer</label>
+        <label style="display:flex;align-items:center;gap:.35rem;font-size:.8rem;"><input type="checkbox" class="pren-card-day-cb" data-day="4" /> Gio</label>
+        <label style="display:flex;align-items:center;gap:.35rem;font-size:.8rem;"><input type="checkbox" class="pren-card-day-cb" data-day="5" /> Ven</label>
+        <label style="display:flex;align-items:center;gap:.35rem;font-size:.8rem;"><input type="checkbox" class="pren-card-day-cb" data-day="6" /> Sab</label>
+        <label style="display:flex;align-items:center;gap:.35rem;font-size:.8rem;"><input type="checkbox" class="pren-card-day-cb" data-day="0" /> Dom</label>
+      </div>
+      <button class="btn btn-publish" onclick="saveCardRequiredDays()">💾 Salva giorni carta</button>
+
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
         <button class="btn btn-load" onclick="chiudiSezionePrenotazioni()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
         <span id="pren-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
@@ -938,7 +961,7 @@
 // usato per la pubblicazione. Vedi progetto-sito CLAUDE.md sessione 13.
 var PREN_STATUS_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/reservations-status';
 var PREN_CONFIG_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/set-reservations-config';
-var prenState = { online_open: true, closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [] };
+var prenState = { online_open: true, card_required_days: [0,1,2,3,4,5,6], closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [] };
 
 function apriSezionePrenotazioni() {
   document.getElementById('carica-menu').classList.remove('open');
@@ -1065,6 +1088,10 @@ function renderPrenUI() {
     lbl.style.color = prenState.online_open ? 'var(--green)' : 'var(--rust)';
   }
   if (btn) btn.textContent = prenState.online_open ? 'Chiudi tutte le prenotazioni' : 'Riapri le prenotazioni';
+  var cardDays = prenState.card_required_days || [0,1,2,3,4,5,6];
+  document.querySelectorAll('.pren-card-day-cb').forEach(function (cb) {
+    cb.checked = cardDays.indexOf(Number(cb.getAttribute('data-day'))) !== -1;
+  });
   _prenRenderList('pren-closures-list', prenState.closures || [], 'Nessuna chiusura attiva.', 'var(--rust)', removePrenClosure);
   _prenRenderList('pren-openings-list', prenState.openings || [], 'Nessuna apertura straordinaria attiva.', 'var(--green)', removePrenOpening);
   _prenRenderSlotList('pren-slot-closures-list', prenState.slot_closures || [], 'Nessun orario chiuso singolarmente.', 'var(--rust)', removePrenSlotClosure);
@@ -1091,6 +1118,7 @@ function loadPrenStatus() {
     .then(function (r) { return r.json(); })
     .then(function (d) {
       prenState.online_open = !(d && d.online_open === false);
+      prenState.card_required_days = (d && Array.isArray(d.card_required_days)) ? d.card_required_days : [0,1,2,3,4,5,6];
       prenState.closures = (d && d.closures) || [];
       prenState.openings = (d && d.openings) || [];
       prenState.slot_closures = (d && d.slot_closures) || [];
@@ -1123,6 +1151,7 @@ function _prenFetch(payload) {
 function _prenApply(res, okMsg) {
   if (res.status === 200 && res.body && res.body.ok) {
     prenState.online_open = !(res.body.online_open === false);
+    prenState.card_required_days = Array.isArray(res.body.card_required_days) ? res.body.card_required_days : prenState.card_required_days;
     prenState.closures = res.body.closures || [];
     prenState.openings = res.body.openings || [];
     prenState.slot_closures = res.body.slot_closures || [];
@@ -1165,6 +1194,17 @@ function togglePrenOpen() {
   var newOpen = !prenState.online_open;
   if (!newOpen && !window.confirm('Chiudere TUTTE le prenotazioni online? Il form del sito si disabiliterà finché non riapri.')) return;
   _prenConfig({ action: 'set_open', open: newOpen }, newOpen ? 'Prenotazioni riaperte.' : 'Prenotazioni chiuse.');
+}
+
+// Giorni della settimana in cui il wizard /prenota.html chiede la carta a garanzia.
+// I giorni NON selezionati vanno in revisione manuale (pending_review), come il vecchio sistema.
+function saveCardRequiredDays() {
+  var days = [];
+  document.querySelectorAll('.pren-card-day-cb').forEach(function (cb) {
+    if (cb.checked) days.push(Number(cb.getAttribute('data-day')));
+  });
+  if (days.length === 0 && !window.confirm('Nessun giorno selezionato: TUTTE le prenotazioni andranno in revisione manuale, mai carta automatica. Confermi?')) return;
+  _prenConfig({ action: 'set_card_required_days', days: days }, 'Giorni carta a garanzia salvati.');
 }
 
 function addPrenClosure() {
@@ -2917,7 +2957,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.21.07</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.22.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

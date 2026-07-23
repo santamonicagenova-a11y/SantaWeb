@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<!-- v 2026.07.23.03 — aggiunte 2 righe di separazione (stesso stile hr di v.23.02) anche prima di
+     "Chiudi un singolo orario (lasciando aperti gli altri)" e "Apri un singolo orario extra
+     (fuori dagli orari normali)" (richiesta Andrea, solo estetico). -->
 <!-- v 2026.07.23.02 — titoli dei paragrafi di "Prenotazioni online" più grandi e in evidenza
      (colore var(--rust), regola scoperta a #prenotazioni-section .sub per non toccare altri
      pannelli che condividono la classe .sub) + riga di separazione prima di "Carta a garanzia —
@@ -600,7 +603,8 @@
       <div class="sub">Aperture attive (da oggi in poi)</div>
       <div id="pren-openings-list" style="font-size:.85rem;">&hellip;</div>
 
-      <div class="sub" style="margin-top:1.4rem;">Chiudi un singolo orario (lasciando aperti gli altri)</div>
+      <hr style="border:none;border-top:1px solid var(--rule);margin:1.6rem 0 0;">
+      <div class="sub" style="margin-top:1rem;">Chiudi un singolo orario (lasciando aperti gli altri)</div>
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
         <div>
           <span class="opt-lbl">Data</span>
@@ -622,7 +626,8 @@
       <div class="sub">Orari chiusi (da oggi in poi)</div>
       <div id="pren-slot-closures-list" style="font-size:.85rem;">&hellip;</div>
 
-      <div class="sub" style="margin-top:1.4rem;">Apri un singolo orario extra (fuori dagli orari normali)</div>
+      <hr style="border:none;border-top:1px solid var(--rule);margin:1.6rem 0 0;">
+      <div class="sub" style="margin-top:1rem;">Apri un singolo orario extra (fuori dagli orari normali)</div>
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
         <div>
           <span class="opt-lbl">Data</span>
@@ -2970,7 +2975,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.23.02</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.23.03</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

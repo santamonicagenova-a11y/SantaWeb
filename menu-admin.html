@@ -1,10 +1,17 @@
 <!DOCTYPE html>
-<!-- v 2026.07.22.02 — nuovo pannello "Carta a garanzia — giorni della settimana" sotto
+<!-- v 2026.07.23.02 — titoli dei paragrafi di "Prenotazioni online" più grandi e in evidenza
+     (colore var(--rust), regola scoperta a #prenotazioni-section .sub per non toccare altri
+     pannelli che condividono la classe .sub) + riga di separazione prima di "Carta a garanzia —
+     giorni della settimana" (richiesta Andrea, solo estetico). -->
+<!-- v 2026.07.23.01 — nuovo pannello "Carta a garanzia — giorni della settimana" sotto
      "Prenotazioni online" (richiesta Andrea): 7 checkbox Lun-Dom + pulsante Salva, azione
      set_card_required_days su set-reservations-config v5. I giorni NON selezionati fanno
      entrare il wizard /prenota.html nel ramo "pending_review" invece di Stripe (vedi
      create-reservation-checkout v2). Vedi DESIGN_wizard_prenotazioni_carta-obbligatoria e
-     HANDOVER_SANTAMONICA_SITO_v2026.07.22.01.md. -->
+     HANDOVER_SANTAMONICA_SITO_v2026.07.23.01.md. (Nota: questo blocco e il resto del lavoro sul
+     wizard erano stati datati per errore 07.22 nella prima stesura — corretto il 23/7, vera data
+     di tutta questa sessione: la data era stata presa dal nome del documento di design, scritto
+     in una sessione precedente il 22/7, senza controllare la data odierna.) -->
 <!-- v 2026.07.21.07 — allineamento testo validità/uso nel voucher stampabile (vp-foot), stesso
      wording richiesto da Andrea e propagato in tutto il sistema (index.html/translations.json/
      regala.html/voucher-termini.html/PDF stripe-webhook): "Validità 12 mesi dalla data di
@@ -336,6 +343,11 @@
     .opt-row { display:grid; grid-template-columns:90px 90px 90px; gap:.5rem; margin-bottom:.8rem; align-items:end; }
     .opt-lbl { font-size:.6rem; color:var(--stone); letter-spacing:.08em; text-transform:uppercase; display:block; margin-bottom:.2rem; }
     .sub { font-size:.65rem; color:var(--stone); letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem; margin-top:.8rem; }
+    /* v 2026.07.23.02 — titoli dei paragrafi più grandi e in evidenza SOLO dentro
+       "Prenotazioni online" (richiesta Andrea): scoperto che .sub è condivisa da altri
+       pannelli (reminder-section), quindi qui si scopa la regola invece di toccare la
+       classe base, per non cambiare l'aspetto altrove. */
+    #prenotazioni-section .sub { font-size:.9rem; font-weight:600; color:var(--rust); letter-spacing:.04em; }
 
     input[type=text], input[type=number] { width:100%; padding:.4rem .5rem; border:1px solid var(--rule); border-radius:var(--radius); background:var(--field); font-family:'Inter',sans-serif; font-size:.82rem; color:var(--ink); }
     input:focus { outline:none; border-color:var(--rust); box-shadow:0 0 0 3px rgba(245,158,11,.16); }
@@ -662,7 +674,8 @@
       <div class="sub">Limiti attivi (da oggi in poi)</div>
       <div id="pren-slot-caps-list" style="font-size:.85rem;">&hellip;</div>
 
-      <div class="sub" style="margin-top:1.4rem;">Carta a garanzia — giorni della settimana</div>
+      <hr style="border:none;border-top:1px solid var(--rule);margin:1.6rem 0 0;">
+      <div class="sub" style="margin-top:1rem;">Carta a garanzia — giorni della settimana</div>
       <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
         Il wizard <code>/prenota.html</code> chiede la carta a garanzia SOLO nei giorni selezionati.
         Nei giorni non selezionati la prenotazione va in revisione manuale come il vecchio sistema
@@ -2957,7 +2970,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.22.02</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.23.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

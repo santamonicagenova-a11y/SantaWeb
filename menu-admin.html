@@ -1,4 +1,18 @@
 <!DOCTYPE html>
+<!-- v 2026.07.25.03 — UNIFICAZIONE (richiesta Andrea: "se aggiungo una voce da menu-admin la
+     vedo anche in NSA?"): la sezione "Rubrica professionisti" ora punta alla rubrica CONDIVISA
+     di NoShowApp (tabelle professionals/professional_uses sul progetto ltgvyanqzkpulocypsve),
+     non più a un modulo privato separato — un'unica lista, aggiungi/modifica/elimina da uno dei
+     due posti e si vede anche nell'altro. Nuova Edge Function `rubrica-professionisti-admin` su
+     quel progetto (stesso auth github_token, service role) fa da ponte: le voci create da qui
+     vengono attribuite all'account Supabase reale di Santamonica su NoShowApp (profiles.id
+     50dc0961-…, role=admin), così sono modificabili anche dall'app NoShowApp stessa. RUB_URL
+     aggiornato; rimossi i campi "Segnalato da"/"Chi" dal form (lo schema condiviso usa solo
+     `ristorante`, sempre "Santamonica" da qui — non un nome libero per persona). La singola voce
+     già inserita nel vecchio modulo privato (Francesco Remondini) è stata migrata a mano nella
+     tabella condivisa; le tabelle professionisti/professionisti_note_uso su SafeTable e la
+     vecchia Edge Function rubrica-professionisti sono ora superate (da eliminare).
+-->
 <!-- v 2026.07.25.02 — nuova sezione "Rubrica professionisti" (voce "Rubrica professionisti" nella
      barra azioni → #rubrica-section): elenco PRIVATO di Santamonica (elettricista, idraulico,
      muratore, ecc. da lista predefinita + "altro") con aggiungi/modifica/elimina contatto e
@@ -730,9 +744,10 @@
     <div class="fs-head">Rubrica professionisti — elettricista, idraulico, ecc.</div>
     <div class="fs-body">
       <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">
-        Elenco <strong>privato</strong> di Santamonica (non condiviso con altri ristoranti). Aggiungi, modifica
-        o elimina i contatti; ogni contatto può avere più <strong>note d'uso</strong> (com'è andata una volta
-        chiamato). Le modifiche usano il tuo token GitHub (lo stesso della pubblicazione).
+        Stessa rubrica <strong>condivisa</strong> dell'app NoShowApp (elettricista, idraulico, ecc.): aggiungi,
+        modifica o elimina qui e la vedi anche da lì, e viceversa. Ogni contatto può avere più
+        <strong>note d'uso</strong> (com'è andata una volta chiamato). Le modifiche usano il tuo token GitHub
+        (lo stesso della pubblicazione).
       </p>
 
       <div class="sub" style="margin-top:0;">Nuovo contatto</div>
@@ -755,7 +770,6 @@
       </div>
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
         <div style="flex:1;min-width:14rem;"><span class="opt-lbl">Note</span><input type="text" id="rub-note" placeholder="Es: interviene anche di notte, buon prezzo…" style="width:100%;" /></div>
-        <div><span class="opt-lbl">Segnalato da</span><input type="text" id="rub-segnalato-da" placeholder="Es: Andrea" style="width:8rem;" /></div>
       </div>
       <div style="display:flex;gap:.6rem;margin-bottom:1.2rem;">
         <button class="btn btn-publish" id="rub-submit-btn" onclick="salvaProfessionista()">+ Aggiungi</button>
@@ -1419,7 +1433,7 @@ function removePrenSlotCap(date, time) {
 // A differenza della rubrica condivisa costruita in NoShowApp, qui sia lettura sia
 // scrittura passano dal token: è un elenco interno di Santamonica, non un database
 // tra ristoratori. Vedi progetto-sito CLAUDE.md, sessione 25/7.
-var RUB_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/rubrica-professionisti';
+var RUB_URL = 'https://ltgvyanqzkpulocypsve.supabase.co/functions/v1/rubrica-professionisti-admin';
 var RUB_CATEGORIE = [
   ['elettricista', 'Elettricista'], ['idraulico', 'Idraulico'], ['muratore', 'Muratore / edile'],
   ['fabbro', 'Fabbro'], ['imbianchino', 'Imbianchino'], ['falegname', 'Falegname'], ['vetraio', 'Vetraio'],
@@ -1513,7 +1527,6 @@ function _rubClearForm() {
   document.getElementById('rub-telefono').value = '';
   document.getElementById('rub-email').value = '';
   document.getElementById('rub-note').value = '';
-  document.getElementById('rub-segnalato-da').value = '';
   rubEditId = null;
   document.getElementById('rub-submit-btn').textContent = '+ Aggiungi';
   document.getElementById('rub-cancel-edit-btn').style.display = 'none';
@@ -1526,13 +1539,12 @@ function salvaProfessionista() {
   var telefono = document.getElementById('rub-telefono').value.trim();
   var email = document.getElementById('rub-email').value.trim();
   var note = document.getElementById('rub-note').value.trim();
-  var segnalatoDa = document.getElementById('rub-segnalato-da').value.trim();
   if (!categoria) { _rubSetStatus('Seleziona una categoria.', true); return; }
   if (!nome) { _rubSetStatus('Il nome è obbligatorio.', true); return; }
   var payload = {
     action: rubEditId ? 'update' : 'create',
     category: categoria, category_other: categoriaAltro, name: nome,
-    phone: telefono, email: email, note: note, segnalato_da: segnalatoDa
+    phone: telefono, email: email, note: note
   };
   if (rubEditId) payload.id = rubEditId;
   _rubSetStatus('Salvataggio…');
@@ -1556,7 +1568,6 @@ function modificaProfessionista(id) {
   document.getElementById('rub-telefono').value = r.phone || '';
   document.getElementById('rub-email').value = r.email || '';
   document.getElementById('rub-note').value = r.note || '';
-  document.getElementById('rub-segnalato-da').value = r.segnalato_da || '';
   document.getElementById('rub-submit-btn').textContent = '💾 Salva modifiche';
   document.getElementById('rub-cancel-edit-btn').style.display = '';
   document.getElementById('rub-categoria').scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1590,13 +1601,13 @@ function renderRubricaProfessionisti() {
   list.innerHTML = rows.map(function (r) {
     var catLabel = (r.category === 'altro' && r.category_other) ? _rubEscHtml(r.category_other) : _rubEscHtml(RUB_CATEGORIE_MAP[r.category] || r.category);
     var d = r.created_at ? new Date(r.created_at).toLocaleDateString('it-IT') : '—';
-    var usi = rubState.note_uso.filter(function (u) { return u.professionista_id === r.id; });
+    var usi = rubState.note_uso.filter(function (u) { return u.professional_id === r.id; });
     var isOpen = !!rubUsiAperti[r.id];
     var usiHtml = usi.map(function (u) {
       var du = u.created_at ? new Date(u.created_at).toLocaleDateString('it-IT') : '—';
       return '<div style="background:var(--sand);border-radius:var(--radius);padding:.5rem .7rem;font-size:.78rem;margin-bottom:.4rem;">' +
         '<div>' + _rubEscHtml(u.note) + '</div>' +
-        '<div style="color:var(--stone);margin-top:.2rem;font-size:.72rem;">' + _rubEscHtml(u.usato_da || '—') + ' · ' + du +
+        '<div style="color:var(--stone);margin-top:.2rem;font-size:.72rem;">' + _rubEscHtml(u.ristorante || '—') + ' · ' + du +
         ' · <span onclick="eliminaNotaUsoProfessionista(\'' + u.id + '\')" style="color:var(--rust);cursor:pointer;">elimina</span></div>' +
         '</div>';
     }).join('') || '<p style="color:var(--stone);font-size:.78rem;">Nessuna nota ancora.</p>';
@@ -1609,7 +1620,7 @@ function renderRubricaProfessionisti() {
       (r.phone ? '<div style="font-size:.8rem;margin-top:.2rem;"><a href="tel:' + _rubEscHtml(r.phone) + '" style="color:var(--ink);">📞 ' + _rubEscHtml(r.phone) + '</a></div>' : '') +
       (r.email ? '<div style="font-size:.8rem;"><a href="mailto:' + _rubEscHtml(r.email) + '" style="color:var(--ink);">✉ ' + _rubEscHtml(r.email) + '</a></div>' : '') +
       (r.note ? '<div style="font-size:.8rem;margin-top:.3rem;">' + _rubEscHtml(r.note) + '</div>' : '') +
-      '<div style="font-size:.72rem;color:var(--stone);margin-top:.3rem;">Segnalato da ' + _rubEscHtml(r.segnalato_da || '—') + ' · ' + d + '</div>' +
+      '<div style="font-size:.72rem;color:var(--stone);margin-top:.3rem;">Segnalato da ' + _rubEscHtml(r.ristorante || '—') + ' · ' + d + '</div>' +
       '</div>' +
       '<div style="display:flex;flex-direction:column;gap:.3rem;">' +
       '<button class="btn btn-load" style="font-size:.72rem;padding:.25rem .6rem;" onclick="modificaProfessionista(\'' + r.id + '\')">✎ Modifica</button>' +
@@ -1621,7 +1632,6 @@ function renderRubricaProfessionisti() {
       usiHtml +
       '<div style="display:flex;gap:.4rem;margin-top:.4rem;">' +
       '<input type="text" id="rub-usi-input-' + r.id + '" placeholder="Com\'è andata?" style="flex:1;padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-size:.78rem;color:var(--ink);" />' +
-      '<input type="text" id="rub-usi-chi-' + r.id + '" placeholder="Chi" style="width:5rem;padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-size:.78rem;color:var(--ink);" />' +
       '<button class="btn btn-publish" style="font-size:.72rem;padding:.3rem .7rem;" onclick="aggiungiNotaUsoProfessionista(\'' + r.id + '\')">Invia</button>' +
       '</div>' +
       '</div>' +
@@ -1638,12 +1648,11 @@ function toggleUsiRubrica(id) {
 
 function aggiungiNotaUsoProfessionista(id) {
   var inputNote = document.getElementById('rub-usi-input-' + id);
-  var inputChi = document.getElementById('rub-usi-chi-' + id);
   var nota = inputNote.value.trim();
   if (!nota) return;
   rubUsiAperti[id] = true;
   _rubSetStatus('Invio nota…');
-  _rubFetch({ action: 'add_use', professionista_id: id, note: nota, usato_da: inputChi.value.trim() })
+  _rubFetch({ action: 'add_use', professionista_id: id, note: nota })
     .then(function (res) { _rubApply(res, 'Nota aggiunta.'); })
     .catch(function (e) { _rubErr(e, 'Errore di connessione.'); });
 }
@@ -3296,7 +3305,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.25.02</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.25.03</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

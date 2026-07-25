@@ -2,11 +2,15 @@
 <!--
   prenota.html — Wizard prenotazioni con carta a garanzia obbligatoria
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.07.25.02
+  Versione: v 2026.07.25.03
   (Corretta il 23/7 la data di questo file: la prima stesura e il giro successivo erano stati
   datati per errore 07.22 — presa la data dal nome del documento di design, scritto in una
   sessione precedente il 22/7, senza controllare la data odierna. Tutto il lavoro sul wizard è
   in realtà del 23/7.)
+  v 2026.07.25.03 — Penale/ore-disdetta dinamici al passo 5 (id="step5-penale"/"step5-ore-
+  disdetta") invece dei valori fissi "25€"/"24 ore": ora leggono state.penale_eur/
+  ore_disdetta_default da reservations-status v6, impostabili dal nuovo pannello "Garanzia —
+  penale e disdetta" in menu-admin.html (richiesta Andrea).
   v 2026.07.25.02 — Rimossi gli array locali PRANZO/CENA fissi: gli orari discreti ora vengono
   da orari.js#getPeriodSlots(dateStr), che sceglie il periodo giusto per la DATA scelta dal
   cliente (non per "oggi"). Prima, un cliente che prenotava oggi (in piena estate) un servizio
@@ -355,8 +359,8 @@
 
         <div class="rules" id="step5-rules">
           <div class="rule"><span class="dot"></span><span><b>Nessun addebito immediato.</b> La carta viene solo registrata in modo sicuro.</span></div>
-          <div class="rule"><span class="dot"></span><span><b>Disdetta o modifica gratuita</b> fino a <b>24 ore</b> prima dell'orario della prenotazione.</span></div>
-          <div class="rule"><span class="dot"></span><span>Oltre tale termine, in caso di <b>mancata presentazione</b> o <b>riduzione dei coperti</b>, sarà addebitata una penale di <b>25&nbsp;€ per persona</b>.</span></div>
+          <div class="rule"><span class="dot"></span><span><b>Disdetta o modifica gratuita</b> fino a <b id="step5-ore-disdetta">24 ore</b> prima dell'orario della prenotazione.</span></div>
+          <div class="rule"><span class="dot"></span><span>Oltre tale termine, in caso di <b>mancata presentazione</b> o <b>riduzione dei coperti</b>, sarà addebitata una penale di <b id="step5-penale">25&nbsp;€ per persona</b>.</span></div>
           <div class="rule"><span class="dot"></span><span>I dati della carta sono <b>cifrati e non visibili</b> al ristorante: la registrazione avviene sulla pagina sicura di Stripe.</span></div>
         </div>
 
@@ -401,6 +405,8 @@
   var state = {
     online_open: true,
     card_required_days: [0,1,2,3,4,5,6],
+    penale_eur: 25,
+    ore_disdetta_default: 24,
     closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [],
     calMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
     selectedDate: null,
@@ -494,6 +500,10 @@
       .then(function(d){
         state.online_open = !(d && d.online_open === false);
         state.card_required_days = (d && Array.isArray(d.card_required_days)) ? d.card_required_days : [0,1,2,3,4,5,6];
+        state.penale_eur = (d && d.penale_eur != null) ? Number(d.penale_eur) : 25;
+        state.ore_disdetta_default = (d && d.ore_disdetta_default != null) ? Number(d.ore_disdetta_default) : 24;
+        document.getElementById('step5-ore-disdetta').textContent = state.ore_disdetta_default + ' ore';
+        document.getElementById('step5-penale').innerHTML = state.penale_eur + ' € per persona';
         state.closures = (d && d.closures) || [];
         state.openings = (d && d.openings) || [];
         state.slot_closures = (d && d.slot_closures) || [];

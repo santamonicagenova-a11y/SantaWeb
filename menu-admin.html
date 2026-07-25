@@ -1,4 +1,15 @@
 <!DOCTYPE html>
+<!-- v 2026.07.25.04 — nuovo pannello "Garanzia — penale e disdetta" sotto "Carta a garanzia —
+     giorni della settimana" (richiesta Andrea): due campi (penale €/persona, ore disdetta
+     gratuita) + pulsante Salva, azione set_guarantee_defaults su set-reservations-config v6.
+     Questi due valori sostituiscono le costanti fisse 25€/24h ovunque nel sistema di
+     prenotazione: nel wizard /prenota.html (passo 5, giorni con carta obbligatoria), nella
+     Stripe Checkout Session + riga cauzioni (create-reservation-checkout v4), e nel link "Apri
+     SafeTable con dati pre-compilati" della mail M1bis (giorni "liberi", senza carta
+     automatica) — è quest'ultimo il caso esplicitamente richiesto da Andrea: poter cambiare
+     penale/disdetta prima di generare la garanzia a mano da quella mail. Nuove colonne
+     reservation_settings.penale_eur/.ore_disdetta_default (default 25/24, comportamento
+     invariato finché non configurato). -->
 <!-- v 2026.07.25.03 — UNIFICAZIONE (richiesta Andrea: "se aggiungo una voce da menu-admin la
      vedo anche in NSA?"): la sezione "Rubrica professionisti" ora punta alla rubrica CONDIVISA
      di NoShowApp (tabelle professionals/professional_uses sul progetto ltgvyanqzkpulocypsve),
@@ -731,6 +742,27 @@
       </div>
       <button class="btn btn-publish" onclick="saveCardRequiredDays()">💾 Salva giorni carta</button>
 
+      <hr style="border:none;border-top:1px solid var(--rule);margin:1.6rem 0 0;">
+      <div class="sub" style="margin-top:1rem;">Garanzia — penale e disdetta</div>
+      <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
+        Questi due valori sono i default usati ovunque si parli di garanzia: nel passo 5 del wizard
+        <code>/prenota.html</code> (giorni con carta obbligatoria), nella Stripe Checkout Session e nella riga
+        cauzioni collegata, e nel link <strong>"Apri SafeTable con dati pre-compilati"</strong> della mail che
+        arriva quando un cliente prenota in un giorno "libero" (senza carta automatica) — così quando generi
+        la garanzia a mano da quella mail, SafeTable si apre già con i valori aggiornati.
+      </p>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
+        <div>
+          <span class="opt-lbl">Penale (€/persona)</span>
+          <input type="number" id="pren-guarantee-penale" min="1" max="500" step="1" placeholder="es. 25" style="width:7rem;" />
+        </div>
+        <div>
+          <span class="opt-lbl">Ore disdetta gratuita</span>
+          <input type="number" id="pren-guarantee-ore" min="1" max="168" step="1" placeholder="es. 24" style="width:7rem;" />
+        </div>
+        <button class="btn btn-publish" onclick="saveGuaranteeDefaults()">💾 Salva garanzia</button>
+      </div>
+
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
         <button class="btn btn-load" onclick="chiudiSezionePrenotazioni()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
         <span id="pren-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
@@ -1071,7 +1103,7 @@
 // usato per la pubblicazione. Vedi progetto-sito CLAUDE.md sessione 13.
 var PREN_STATUS_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/reservations-status';
 var PREN_CONFIG_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/set-reservations-config';
-var prenState = { online_open: true, card_required_days: [0,1,2,3,4,5,6], closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [] };
+var prenState = { online_open: true, card_required_days: [0,1,2,3,4,5,6], penale_eur: 25, ore_disdetta_default: 24, closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [] };
 
 function apriSezionePrenotazioni() {
   document.getElementById('carica-menu').classList.remove('open');
@@ -1202,6 +1234,10 @@ function renderPrenUI() {
   document.querySelectorAll('.pren-card-day-cb').forEach(function (cb) {
     cb.checked = cardDays.indexOf(Number(cb.getAttribute('data-day'))) !== -1;
   });
+  var penaleEl = document.getElementById('pren-guarantee-penale');
+  var oreEl = document.getElementById('pren-guarantee-ore');
+  if (penaleEl) penaleEl.value = prenState.penale_eur != null ? prenState.penale_eur : 25;
+  if (oreEl) oreEl.value = prenState.ore_disdetta_default != null ? prenState.ore_disdetta_default : 24;
   _prenRenderList('pren-closures-list', prenState.closures || [], 'Nessuna chiusura attiva.', 'var(--rust)', removePrenClosure);
   _prenRenderList('pren-openings-list', prenState.openings || [], 'Nessuna apertura straordinaria attiva.', 'var(--green)', removePrenOpening);
   _prenRenderSlotList('pren-slot-closures-list', prenState.slot_closures || [], 'Nessun orario chiuso singolarmente.', 'var(--rust)', removePrenSlotClosure);
@@ -1229,6 +1265,8 @@ function loadPrenStatus() {
     .then(function (d) {
       prenState.online_open = !(d && d.online_open === false);
       prenState.card_required_days = (d && Array.isArray(d.card_required_days)) ? d.card_required_days : [0,1,2,3,4,5,6];
+      prenState.penale_eur = (d && d.penale_eur != null) ? d.penale_eur : 25;
+      prenState.ore_disdetta_default = (d && d.ore_disdetta_default != null) ? d.ore_disdetta_default : 24;
       prenState.closures = (d && d.closures) || [];
       prenState.openings = (d && d.openings) || [];
       prenState.slot_closures = (d && d.slot_closures) || [];
@@ -1262,6 +1300,8 @@ function _prenApply(res, okMsg) {
   if (res.status === 200 && res.body && res.body.ok) {
     prenState.online_open = !(res.body.online_open === false);
     prenState.card_required_days = Array.isArray(res.body.card_required_days) ? res.body.card_required_days : prenState.card_required_days;
+    prenState.penale_eur = res.body.penale_eur != null ? res.body.penale_eur : prenState.penale_eur;
+    prenState.ore_disdetta_default = res.body.ore_disdetta_default != null ? res.body.ore_disdetta_default : prenState.ore_disdetta_default;
     prenState.closures = res.body.closures || [];
     prenState.openings = res.body.openings || [];
     prenState.slot_closures = res.body.slot_closures || [];
@@ -1315,6 +1355,16 @@ function saveCardRequiredDays() {
   });
   if (days.length === 0 && !window.confirm('Nessun giorno selezionato: TUTTE le prenotazioni andranno in revisione manuale, mai carta automatica. Confermi?')) return;
   _prenConfig({ action: 'set_card_required_days', days: days }, 'Giorni carta a garanzia salvati.');
+}
+
+// Penale (€/persona) e ore di disdetta gratuita: default usati ovunque si generi una garanzia
+// (wizard carta obbligatoria, link "Apri SafeTable" nella mail dei giorni "liberi").
+function saveGuaranteeDefaults() {
+  var penale = Number(document.getElementById('pren-guarantee-penale').value);
+  var ore = Number(document.getElementById('pren-guarantee-ore').value);
+  if (!Number.isFinite(penale) || penale <= 0 || penale > 500) { _prenSetStatus('Penale non valida (1-500 €).', true); return; }
+  if (!Number.isInteger(ore) || ore < 1 || ore > 168) { _prenSetStatus('Ore disdetta non valide (numero intero tra 1 e 168).', true); return; }
+  _prenConfig({ action: 'set_guarantee_defaults', penale_eur: penale, ore_disdetta: ore }, 'Garanzia (penale/disdetta) salvata.');
 }
 
 function addPrenClosure() {
@@ -3305,7 +3355,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.25.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.25.04</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

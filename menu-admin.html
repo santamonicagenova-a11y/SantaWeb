@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!-- v 2026.07.25.01 — chiarito il testo della lista "Limiti impostati" nella sezione "Limita i posti
+     su un orario già aperto": Andrea aveva letto "Limiti attivi (da oggi in poi)" come se il limite
+     si ripetesse ogni giorno da quella data in poi. Non è così: ogni limite vale SOLO per la sua
+     singola coppia data+orario (tabella reservation_slot_caps, chiave unica su slot_date+slot_time
+     — verificato anche via test diretto in sessione, un limite su una data/ora non ha toccato
+     nessun'altra). "Da oggi in poi" si riferiva solo al filtro della lista (nasconde i limiti di
+     date già passate), non alla durata della regola. Solo testo, nessuna modifica funzionale. -->
 <!-- v 2026.07.23.03 — aggiunte 2 righe di separazione (stesso stile hr di v.23.02) anche prima di
      "Chiudi un singolo orario (lasciando aperti gli altri)" e "Apri un singolo orario extra
      (fuori dagli orari normali)" (richiesta Andrea, solo estetico). -->
@@ -676,7 +683,7 @@
         </div>
         <button class="btn btn-publish" onclick="addPrenSlotCap()">+ Imposta limite</button>
       </div>
-      <div class="sub">Limiti attivi (da oggi in poi)</div>
+      <div class="sub">Limiti impostati (solo quelli non ancora passati; ognuno vale SOLO per la sua data+orario specifici, non si ripete sui giorni successivi)</div>
       <div id="pren-slot-caps-list" style="font-size:.85rem;">&hellip;</div>
 
       <hr style="border:none;border-top:1px solid var(--rule);margin:1.6rem 0 0;">
@@ -2975,7 +2982,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.23.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.25.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

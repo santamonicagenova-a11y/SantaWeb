@@ -1,4 +1,15 @@
 <!DOCTYPE html>
+<!-- v 2026.07.25.01 — riepilogo occupazione per fascia oraria nella vista giorno (richiesta Andrea:
+     poter vedere nel gestionale quanti posti sono prenotati e quanti liberi per ogni orario, con
+     limite massimo impostabile). Il limite si imposta da menu-admin.html → "Prenotazioni online" →
+     "Limita i posti su un orario già aperto" (pannello già esistente da luglio, tabella
+     reservation_slot_caps, azioni set_slot_cap/remove_slot_cap su set-reservations-config v4) —
+     qui si aggiunge solo la VISUALIZZAZIONE nel gestionale, che prima non c'era. Nuova barra di
+     chip sopra la lista prenotazioni (slots-bar/renderSlots), un chip per ogni orario che ha
+     prenotazioni attive e/o un limite: senza limite mostra solo i coperti prenotati; con limite
+     mostra anche i posti liberi, colorato in arancio quando restano pochi posti (≤15% del
+     massimo, min 2) e in rosso quando è pieno. Dati da gestionale-day v3 (nuovo campo `slots`),
+     nessuna modifica alle azioni esistenti. -->
 <!-- v 2026.07.09.02 — reminder via WhatsApp/SMS, stesso pattern già in produzione su SafeTable
      (inviaWhatsApp()/inviaSMS(): link wa.me/sms: con messaggio precompilato, nessun provider/account
      nuovo — Andrea legge/rivede e invia lui dal cellulare). Bottoni "📱 WhatsApp"/"💬 SMS" aggiunti
@@ -142,6 +153,15 @@
     .search-bar input[type=text]:focus { outline:1px solid var(--rust); }
     .res-date { min-width:96px; font-size:.85rem; }
     .res-date .res-time { display:block; font-size:.68rem; color:var(--stone); margin-top:.1rem; }
+
+    .slots-bar { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem; }
+    .slot-chip { border:1px solid var(--rule); background:#fff; padding:.35rem .7rem; font-size:.72rem; letter-spacing:.02em; display:flex; gap:.4rem; align-items:baseline; }
+    .slot-chip .slot-time { font-weight:400; }
+    .slot-chip .slot-nums { color:var(--stone); }
+    .slot-chip.capped .slot-nums { color:var(--ink); }
+    .slot-chip.full { border-color:var(--rust); background:#f6e7e2; }
+    .slot-chip.full .slot-nums { color:var(--rust); font-weight:500; }
+    .slot-chip.near-full { border-color:#d9a441; background:#faf1de; }
   </style>
 </head>
 <body>
@@ -185,6 +205,8 @@
     <button class="btn btn-ok" id="new-res-toggle-btn" onclick="toggleNewResForm()" style="margin-left:auto;">+ Nuova prenotazione</button>
   </div>
 
+  <div class="slots-bar" id="slots-bar"></div>
+
   <div class="new-res-wrap" id="new-res-wrap">
     <div class="new-res-box">
       <h3>Nuova prenotazione manuale</h3>
@@ -223,7 +245,7 @@
   <div class="status-line" id="search-status"></div>
 </div>
 
-<footer class="ver">v 2026.07.09.02</footer>
+<footer class="ver">v 2026.07.25.01</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';
@@ -425,10 +447,37 @@ function loadDay() {
   fetch(DAY_URL + '?date=' + curDate, { cache: 'no-store' })
     .then(function (r) { return r.json(); })
     .then(function (d) {
+      renderSlots(d.slots || []);
       renderDay(d.reservations || []);
       _daySetStatus('');
     })
     .catch(function () { _daySetStatus('Errore nel caricamento delle prenotazioni.', true); });
+}
+
+// Riepilogo occupazione per fascia oraria (gestionale-day v3): un chip per ogni orario che ha
+// almeno una prenotazione attiva o un limite posti configurato (pannello "Limita i posti su un
+// orario già aperto" in menu-admin.html). Senza limite mostra solo i coperti prenotati (nessun
+// concetto di "pieno" perché non c'è un tetto); con limite mostra anche i posti liberi e
+// colora il chip quando lo slot è pieno o vicino al pieno.
+function renderSlots(slots) {
+  var bar = document.getElementById('slots-bar');
+  bar.innerHTML = '';
+  if (!slots.length) return;
+  slots.forEach(function (s) {
+    var chip = document.createElement('div'); chip.className = 'slot-chip';
+    var numsHtml;
+    if (s.max_covers == null) {
+      numsHtml = s.current_covers + ' prenotati';
+    } else {
+      var free = s.max_covers - s.current_covers;
+      chip.classList.add('capped');
+      if (free <= 0) { chip.classList.add('full'); }
+      else if (free <= Math.max(2, Math.round(s.max_covers * 0.15))) { chip.classList.add('near-full'); }
+      numsHtml = s.current_covers + '/' + s.max_covers + ' · ' + (free > 0 ? free + ' liberi' : 'pieno');
+    }
+    chip.innerHTML = '<span class="slot-time">' + s.time + '</span><span class="slot-nums">' + numsHtml + '</span>';
+    bar.appendChild(chip);
+  });
 }
 
 function statusBadge(r) {

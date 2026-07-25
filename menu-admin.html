@@ -1,4 +1,16 @@
 <!DOCTYPE html>
+<!-- v 2026.07.25.02 — nuova sezione "Rubrica professionisti" (voce "Rubrica professionisti" nella
+     barra azioni → #rubrica-section): elenco PRIVATO di Santamonica (elettricista, idraulico,
+     muratore, ecc. da lista predefinita + "altro") con aggiungi/modifica/elimina contatto e
+     "note d'uso" (chi lo ha usato dopo, testo libero, niente voto). Backend nuovo su SafeTable
+     (xbksultfskvzgncncada): tabelle professionisti + professionisti_note_uso (RLS attivo, nessuna
+     policy pubblica — accesso solo dalla Edge Function service-role) + Edge Function
+     rubrica-professionisti (POST, auth col token GitHub gh_token come Prenotazioni/Reminder/
+     Voucher; azioni list/create/update/delete/add_use/delete_use). Riusa _prenGhToken() per il
+     token. Nota: è un modulo SEPARATO dalla rubrica condivisa costruita in NoShowApp lo stesso
+     giorno — qui i contatti NON sono condivisi con altri ristoranti. Bump ?v= admin-core.js a
+     2026.07.25.01 (aggiunto 'rubrica-section' a _pulisciViste()).
+-->
 <!-- v 2026.07.25.01 — chiarito il testo della lista "Limiti impostati" nella sezione "Limita i posti
      su un orario già aperto": Andrea aveva letto "Limiti attivi (da oggi in poi)" come se il limite
      si ripetesse ogni giorno da quella data in poi. Non è così: ogni limite vale SOLO per la sua
@@ -402,6 +414,7 @@
   <button class="qa-btn" onclick="apriSezioneReminder()">Reminder prenotazioni</button>
   <button class="qa-btn" onclick="location.href='gestionale.html'">Gestionale</button>
   <button class="qa-btn" onclick="apriSezioneCauzioni()">Cauzioni (storico)</button>
+  <button class="qa-btn" onclick="apriSezioneRubrica()">Rubrica professionisti</button>
 </div>
 
 <div id="intro">
@@ -712,6 +725,64 @@
   </div>
 </div>
 
+<div id="rubrica-section" style="max-width:700px;margin:1.5rem auto;padding:0 1rem;display:none;">
+  <div class="fs">
+    <div class="fs-head">Rubrica professionisti — elettricista, idraulico, ecc.</div>
+    <div class="fs-body">
+      <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">
+        Elenco <strong>privato</strong> di Santamonica (non condiviso con altri ristoranti). Aggiungi, modifica
+        o elimina i contatti; ogni contatto può avere più <strong>note d'uso</strong> (com'è andata una volta
+        chiamato). Le modifiche usano il tuo token GitHub (lo stesso della pubblicazione).
+      </p>
+
+      <div class="sub" style="margin-top:0;">Nuovo contatto</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:.6rem;">
+        <div>
+          <span class="opt-lbl">Categoria</span>
+          <select id="rub-categoria" onchange="document.getElementById('rub-categoria-altro-wrap').style.display=(this.value==='altro'?'block':'none')" style="padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);">
+            <option value="">Seleziona…</option>
+          </select>
+        </div>
+        <div id="rub-categoria-altro-wrap" style="display:none;">
+          <span class="opt-lbl">Specifica categoria</span>
+          <input type="text" id="rub-categoria-altro" placeholder="Es: tecnico allarmi" style="width:12rem;" />
+        </div>
+      </div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:.6rem;">
+        <div><span class="opt-lbl">Nome / ditta</span><input type="text" id="rub-nome" placeholder="Es: Mario Rossi Impianti" style="width:14rem;" /></div>
+        <div><span class="opt-lbl">Telefono</span><input type="tel" id="rub-telefono" placeholder="+39 347 1234567" style="width:11rem;" /></div>
+        <div><span class="opt-lbl">Email</span><input type="email" id="rub-email" placeholder="mario@esempio.it" style="width:12rem;" /></div>
+      </div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
+        <div style="flex:1;min-width:14rem;"><span class="opt-lbl">Note</span><input type="text" id="rub-note" placeholder="Es: interviene anche di notte, buon prezzo…" style="width:100%;" /></div>
+        <div><span class="opt-lbl">Segnalato da</span><input type="text" id="rub-segnalato-da" placeholder="Es: Andrea" style="width:8rem;" /></div>
+      </div>
+      <div style="display:flex;gap:.6rem;margin-bottom:1.2rem;">
+        <button class="btn btn-publish" id="rub-submit-btn" onclick="salvaProfessionista()">+ Aggiungi</button>
+        <button class="btn btn-load" id="rub-cancel-edit-btn" style="display:none;border:1px solid var(--ink);color:var(--ink)" onclick="annullaModificaProfessionista()">Annulla modifica</button>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--rule);margin:0 0 1.2rem;">
+
+      <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:.8rem;">
+        <span class="opt-lbl" style="margin:0;">Filtra</span>
+        <select id="rub-filtro-categoria" onchange="renderRubricaProfessionisti()" style="padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);">
+          <option value="">Tutte le categorie</option>
+        </select>
+        <input type="text" id="rub-filtro-testo" placeholder="Cerca per nome o note…" oninput="renderRubricaProfessionisti()" style="flex:1;min-width:10rem;padding:.35rem .6rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);" />
+      </div>
+
+      <div class="sub">Professionisti (<span id="rub-count">0</span>)</div>
+      <div id="rub-list" style="font-size:.85rem;">…</div>
+
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
+        <button class="btn btn-load" onclick="chiudiSezioneRubrica()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
+        <span id="rub-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="reminder-section" style="max-width:700px;margin:1.5rem auto;padding:0 1rem;display:none;">
   <div class="fs">
     <div class="fs-head">Reminder prenotazioni — Setup messaggio &amp; tempistiche</div>
@@ -978,7 +1049,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.06.10.06"></script>
-<script src="admin-core.js?v=2026.07.14.02"></script>
+<script src="admin-core.js?v=2026.07.25.01"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -1340,6 +1411,249 @@ function addPrenSlotCap() {
 
 function removePrenSlotCap(date, time) {
   _prenConfig({ action: 'remove_slot_cap', date: date, time: time }, 'Limite rimosso.');
+}
+
+// ══ RUBRICA PROFESSIONISTI (privata, non condivisa con altri ristoranti) ════
+// CRUD via Edge Function rubrica-professionisti (auth col token GitHub gh_token,
+// stesso meccanismo/token di prenotazioni online e reminder — riusa _prenGhToken()).
+// A differenza della rubrica condivisa costruita in NoShowApp, qui sia lettura sia
+// scrittura passano dal token: è un elenco interno di Santamonica, non un database
+// tra ristoratori. Vedi progetto-sito CLAUDE.md, sessione 25/7.
+var RUB_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/rubrica-professionisti';
+var RUB_CATEGORIE = [
+  ['elettricista', 'Elettricista'], ['idraulico', 'Idraulico'], ['muratore', 'Muratore / edile'],
+  ['fabbro', 'Fabbro'], ['imbianchino', 'Imbianchino'], ['falegname', 'Falegname'], ['vetraio', 'Vetraio'],
+  ['giardiniere', 'Giardiniere / manutenzione verde'], ['frigorista_hvac', 'Frigorista / climatizzazione'],
+  ['allarmi_videosorveglianza', 'Allarmi / videosorveglianza'], ['disinfestazione', 'Disinfestazione / derattizzazione'],
+  ['pulizie_sanificazione', 'Pulizie / sanificazione'], ['tappezziere', 'Tappezziere'],
+  ['informatico_pos', 'Informatico / POS'], ['commercialista', 'Commercialista / consulente'],
+  ['corriere_fornitore', 'Corriere / fornitore'], ['altro', 'Altro']
+];
+var RUB_CATEGORIE_MAP = {};
+RUB_CATEGORIE.forEach(function (c) { RUB_CATEGORIE_MAP[c[0]] = c[1]; });
+var rubState = { professionisti: [], note_uso: [] };
+var rubEditId = null;
+var rubUsiAperti = {};
+
+function _rubEscHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function _rubPopolaCategorie() {
+  var optsHtml = RUB_CATEGORIE.map(function (c) { return '<option value="' + c[0] + '">' + _rubEscHtml(c[1]) + '</option>'; }).join('');
+  var selForm = document.getElementById('rub-categoria');
+  var selFiltro = document.getElementById('rub-filtro-categoria');
+  if (selForm && selForm.options.length <= 1) selForm.insertAdjacentHTML('beforeend', optsHtml);
+  if (selFiltro && selFiltro.options.length <= 1) selFiltro.insertAdjacentHTML('beforeend', optsHtml);
+}
+
+function _rubSetStatus(msg, isErr) {
+  var el = document.getElementById('rub-status');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
+}
+
+function apriSezioneRubrica() {
+  document.getElementById('carica-menu').classList.remove('open');
+  document.getElementById('intro').style.display = 'none';
+  _pulisciViste();
+  document.getElementById('rubrica-section').style.display = 'block';
+  _rubPopolaCategorie();
+  loadRubricaProfessionisti();
+}
+
+function chiudiSezioneRubrica() {
+  document.getElementById('rubrica-section').style.display = 'none';
+  if (!document.getElementById('wrap').classList.contains('on'))
+    document.getElementById('intro').style.display = '';
+}
+
+function _rubFetch(payload) {
+  var token = _prenGhToken();
+  if (!token) return Promise.reject(new Error('no-token'));
+  payload.github_token = token;
+  return fetch(RUB_URL, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+  }).then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); });
+}
+
+function _rubApply(res, okMsg) {
+  if (res.status === 200 && res.body && res.body.ok) {
+    rubState.professionisti = res.body.professionisti || [];
+    rubState.note_uso = res.body.note_uso || [];
+    renderRubricaProfessionisti();
+    _rubSetStatus(okMsg || 'Fatto.');
+  } else if (res.status === 401) {
+    _rubSetStatus('Token GitHub non valido o senza permessi. Reimpostalo col tasto 🔑.', true);
+  } else {
+    _rubSetStatus((res.body && res.body.error) || 'Errore.', true);
+  }
+}
+
+function _rubErr(e, fallback) {
+  if (e && e.message === 'no-token') _rubSetStatus('Operazione annullata: serve il token GitHub.', true);
+  else _rubSetStatus(fallback, true);
+}
+
+function loadRubricaProfessionisti() {
+  _rubSetStatus('Caricamento…');
+  _rubFetch({ action: 'list' })
+    .then(function (res) { _rubApply(res, ''); })
+    .catch(function (e) { _rubErr(e, 'Errore di connessione.'); });
+}
+
+function _rubClearForm() {
+  document.getElementById('rub-categoria').value = '';
+  document.getElementById('rub-categoria-altro-wrap').style.display = 'none';
+  document.getElementById('rub-categoria-altro').value = '';
+  document.getElementById('rub-nome').value = '';
+  document.getElementById('rub-telefono').value = '';
+  document.getElementById('rub-email').value = '';
+  document.getElementById('rub-note').value = '';
+  document.getElementById('rub-segnalato-da').value = '';
+  rubEditId = null;
+  document.getElementById('rub-submit-btn').textContent = '+ Aggiungi';
+  document.getElementById('rub-cancel-edit-btn').style.display = 'none';
+}
+
+function salvaProfessionista() {
+  var categoria = document.getElementById('rub-categoria').value;
+  var categoriaAltro = document.getElementById('rub-categoria-altro').value.trim();
+  var nome = document.getElementById('rub-nome').value.trim();
+  var telefono = document.getElementById('rub-telefono').value.trim();
+  var email = document.getElementById('rub-email').value.trim();
+  var note = document.getElementById('rub-note').value.trim();
+  var segnalatoDa = document.getElementById('rub-segnalato-da').value.trim();
+  if (!categoria) { _rubSetStatus('Seleziona una categoria.', true); return; }
+  if (!nome) { _rubSetStatus('Il nome è obbligatorio.', true); return; }
+  var payload = {
+    action: rubEditId ? 'update' : 'create',
+    category: categoria, category_other: categoriaAltro, name: nome,
+    phone: telefono, email: email, note: note, segnalato_da: segnalatoDa
+  };
+  if (rubEditId) payload.id = rubEditId;
+  _rubSetStatus('Salvataggio…');
+  _rubFetch(payload)
+    .then(function (res) {
+      var ok = res.status === 200 && res.body && res.body.ok;
+      _rubApply(res, rubEditId ? 'Contatto aggiornato.' : 'Contatto aggiunto.');
+      if (ok) _rubClearForm();
+    })
+    .catch(function (e) { _rubErr(e, 'Errore di connessione.'); });
+}
+
+function modificaProfessionista(id) {
+  var r = rubState.professionisti.filter(function (p) { return p.id === id; })[0];
+  if (!r) return;
+  rubEditId = id;
+  document.getElementById('rub-categoria').value = r.category;
+  document.getElementById('rub-categoria-altro-wrap').style.display = (r.category === 'altro') ? 'block' : 'none';
+  document.getElementById('rub-categoria-altro').value = r.category_other || '';
+  document.getElementById('rub-nome').value = r.name || '';
+  document.getElementById('rub-telefono').value = r.phone || '';
+  document.getElementById('rub-email').value = r.email || '';
+  document.getElementById('rub-note').value = r.note || '';
+  document.getElementById('rub-segnalato-da').value = r.segnalato_da || '';
+  document.getElementById('rub-submit-btn').textContent = '💾 Salva modifiche';
+  document.getElementById('rub-cancel-edit-btn').style.display = '';
+  document.getElementById('rub-categoria').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function annullaModificaProfessionista() { _rubClearForm(); }
+
+function eliminaProfessionista(id) {
+  if (!window.confirm('Eliminare questo professionista? Vengono eliminate anche le note d\'uso collegate.')) return;
+  _rubSetStatus('Eliminazione…');
+  _rubFetch({ action: 'delete', id: id })
+    .then(function (res) { _rubApply(res, 'Contatto eliminato.'); })
+    .catch(function (e) { _rubErr(e, 'Errore di connessione.'); });
+}
+
+function renderRubricaProfessionisti() {
+  var list = document.getElementById('rub-list');
+  var catFiltro = document.getElementById('rub-filtro-categoria').value;
+  var testo = (document.getElementById('rub-filtro-testo').value || '').trim().toLowerCase();
+  var rows = rubState.professionisti.slice();
+  if (catFiltro) rows = rows.filter(function (r) { return r.category === catFiltro; });
+  if (testo) {
+    rows = rows.filter(function (r) {
+      return (r.name || '').toLowerCase().indexOf(testo) > -1 ||
+        (r.note || '').toLowerCase().indexOf(testo) > -1 ||
+        (r.category_other || '').toLowerCase().indexOf(testo) > -1;
+    });
+  }
+  document.getElementById('rub-count').textContent = rows.length;
+  if (rows.length === 0) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun professionista trovato.</p>'; return; }
+  list.innerHTML = rows.map(function (r) {
+    var catLabel = (r.category === 'altro' && r.category_other) ? _rubEscHtml(r.category_other) : _rubEscHtml(RUB_CATEGORIE_MAP[r.category] || r.category);
+    var d = r.created_at ? new Date(r.created_at).toLocaleDateString('it-IT') : '—';
+    var usi = rubState.note_uso.filter(function (u) { return u.professionista_id === r.id; });
+    var isOpen = !!rubUsiAperti[r.id];
+    var usiHtml = usi.map(function (u) {
+      var du = u.created_at ? new Date(u.created_at).toLocaleDateString('it-IT') : '—';
+      return '<div style="background:var(--sand);border-radius:var(--radius);padding:.5rem .7rem;font-size:.78rem;margin-bottom:.4rem;">' +
+        '<div>' + _rubEscHtml(u.note) + '</div>' +
+        '<div style="color:var(--stone);margin-top:.2rem;font-size:.72rem;">' + _rubEscHtml(u.usato_da || '—') + ' · ' + du +
+        ' · <span onclick="eliminaNotaUsoProfessionista(\'' + u.id + '\')" style="color:var(--rust);cursor:pointer;">elimina</span></div>' +
+        '</div>';
+    }).join('') || '<p style="color:var(--stone);font-size:.78rem;">Nessuna nota ancora.</p>';
+    return '<div class="fs" style="margin-bottom:.8rem;">' +
+      '<div class="fs-body" style="padding:.8rem 1rem;">' +
+      '<div style="display:flex;justify-content:space-between;gap:.6rem;">' +
+      '<div>' +
+      '<strong style="font-size:.9rem;">' + _rubEscHtml(r.name) + '</strong>' +
+      '<div style="font-size:.78rem;color:var(--stone);">' + catLabel + '</div>' +
+      (r.phone ? '<div style="font-size:.8rem;margin-top:.2rem;"><a href="tel:' + _rubEscHtml(r.phone) + '" style="color:var(--ink);">📞 ' + _rubEscHtml(r.phone) + '</a></div>' : '') +
+      (r.email ? '<div style="font-size:.8rem;"><a href="mailto:' + _rubEscHtml(r.email) + '" style="color:var(--ink);">✉ ' + _rubEscHtml(r.email) + '</a></div>' : '') +
+      (r.note ? '<div style="font-size:.8rem;margin-top:.3rem;">' + _rubEscHtml(r.note) + '</div>' : '') +
+      '<div style="font-size:.72rem;color:var(--stone);margin-top:.3rem;">Segnalato da ' + _rubEscHtml(r.segnalato_da || '—') + ' · ' + d + '</div>' +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:.3rem;">' +
+      '<button class="btn btn-load" style="font-size:.72rem;padding:.25rem .6rem;" onclick="modificaProfessionista(\'' + r.id + '\')">✎ Modifica</button>' +
+      '<button class="btn btn-load" style="font-size:.72rem;padding:.25rem .6rem;border:1px solid var(--rust);color:var(--rust);" onclick="eliminaProfessionista(\'' + r.id + '\')">🗑 Elimina</button>' +
+      '</div>' +
+      '</div>' +
+      '<button onclick="toggleUsiRubrica(\'' + r.id + '\')" style="margin-top:.5rem;background:none;border:none;color:var(--ink);font-size:.75rem;cursor:pointer;padding:0;text-decoration:underline;">💬 Note d\'uso (' + usi.length + ')</button>' +
+      '<div id="rub-usi-' + r.id + '" style="' + (isOpen ? '' : 'display:none;') + 'margin-top:.5rem;">' +
+      usiHtml +
+      '<div style="display:flex;gap:.4rem;margin-top:.4rem;">' +
+      '<input type="text" id="rub-usi-input-' + r.id + '" placeholder="Com\'è andata?" style="flex:1;padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-size:.78rem;color:var(--ink);" />' +
+      '<input type="text" id="rub-usi-chi-' + r.id + '" placeholder="Chi" style="width:5rem;padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-size:.78rem;color:var(--ink);" />' +
+      '<button class="btn btn-publish" style="font-size:.72rem;padding:.3rem .7rem;" onclick="aggiungiNotaUsoProfessionista(\'' + r.id + '\')">Invia</button>' +
+      '</div>' +
+      '</div>' +
+      '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function toggleUsiRubrica(id) {
+  rubUsiAperti[id] = !rubUsiAperti[id];
+  var el = document.getElementById('rub-usi-' + id);
+  if (el) el.style.display = rubUsiAperti[id] ? '' : 'none';
+}
+
+function aggiungiNotaUsoProfessionista(id) {
+  var inputNote = document.getElementById('rub-usi-input-' + id);
+  var inputChi = document.getElementById('rub-usi-chi-' + id);
+  var nota = inputNote.value.trim();
+  if (!nota) return;
+  rubUsiAperti[id] = true;
+  _rubSetStatus('Invio nota…');
+  _rubFetch({ action: 'add_use', professionista_id: id, note: nota, usato_da: inputChi.value.trim() })
+    .then(function (res) { _rubApply(res, 'Nota aggiunta.'); })
+    .catch(function (e) { _rubErr(e, 'Errore di connessione.'); });
+}
+
+function eliminaNotaUsoProfessionista(id) {
+  if (!window.confirm('Eliminare questa nota?')) return;
+  _rubSetStatus('Eliminazione…');
+  _rubFetch({ action: 'delete_use', id: id })
+    .then(function (res) { _rubApply(res, 'Nota eliminata.'); })
+    .catch(function (e) { _rubErr(e, 'Errore di connessione.'); });
 }
 
 // ══ REMINDER PRENOTAZIONI (setup messaggio + tempistiche) ════
@@ -2982,7 +3296,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.25.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.25.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

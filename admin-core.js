@@ -1,4 +1,9 @@
 // Core functions per menu-admin Santamonica
+// v 2026.07.25.01 — Aggiunta 'rubrica-section' a _pulisciViste() (nuovo pannello "Rubrica
+//   professionisti" in menu-admin.html: elenco privato elettricista/idraulico/ecc. con
+//   aggiungi/modifica/elimina + note d'uso, via Edge Function rubrica-professionisti,
+//   auth col token GitHub gh_token come Prenotazioni/Reminder/Voucher). Logica tutta
+//   inline in menu-admin.html.
 // v 2026.07.14.02 — Assorbito il pannello "Buoni regalo" dentro "Voucher — Gestione": rimossa
 //   apriSezioneBuoni() (il nav button e la #buoni-section non esistono più in menu-admin.html) e tolto
 //   'buoni-section' da _pulisciViste(). caricaVoucherBuoni()/pubblicaVoucherBuoni()/_pubblicaVoucherConfig()
@@ -176,7 +181,7 @@ function chk(id, v) {
 // Va chiamata a ogni caricamento (carta, dolci, allergeni, vini, foto, documento generico,
 // prenotazioni) così la pagina non trascina la vista precedente in fondo.
 function _pulisciViste() {
-  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section','reminder-section','cauzioni-section','voucher-section'].forEach(function(id){
+  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section','reminder-section','cauzioni-section','voucher-section','rubrica-section'].forEach(function(id){
     var e = document.getElementById(id); if (e) e.style.display = 'none';
   });
   var w = document.getElementById('wrap');

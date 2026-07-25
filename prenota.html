@@ -2,11 +2,17 @@
 <!--
   prenota.html — Wizard prenotazioni con carta a garanzia obbligatoria
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.07.23.02
+  Versione: v 2026.07.25.02
   (Corretta il 23/7 la data di questo file: la prima stesura e il giro successivo erano stati
   datati per errore 07.22 — presa la data dal nome del documento di design, scritto in una
   sessione precedente il 22/7, senza controllare la data odierna. Tutto il lavoro sul wizard è
   in realtà del 23/7.)
+  v 2026.07.25.02 — Rimossi gli array locali PRANZO/CENA fissi: gli orari discreti ora vengono
+  da orari.js#getPeriodSlots(dateStr), che sceglie il periodo giusto per la DATA scelta dal
+  cliente (non per "oggi"). Prima, un cliente che prenotava oggi (in piena estate) un servizio
+  attivo solo da una data futura si vedeva rifiutare la richiesta perché il sistema applicava
+  l'orario di OGGI a qualsiasi data. servicesForDate() ora chiama window.getServicesForDate
+  (sostituisce getServicesByDay, rimossa da orari.js perché non teneva conto della data).
 
   DESIGN_wizard_prenotazioni_carta-obbligatoria_v2026.07.22.01 — sostituisce il vecchio form
   embedded in index.html#prenota. 5 passi (data → persone → orario → contatti → carta),
@@ -386,13 +392,11 @@
   var CAUZIONE_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/get-cauzione';
   var CHECKOUT_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/create-reservation-checkout';
 
-  // ORARIO ESTIVO 21/6→31/8/2026: pranzo chiuso tutti i giorni; cena 20:00-22:30 mar→dom (lun
-  // chiuso). SPECULARE a submit-reservation/create-reservation-checkout e a orari.js
-  // (getServicesByDay dà il servizio pranzo/cena per giorno; questi due array danno gli slot
-  // discreti dentro ciascun servizio). RIPRISTINO 31/8 allo schedule 7/6:
-  //   PRANZO = ["12:30", "13:00", "13:30", "14:00"]; CENA = ["19:30","20:00","20:30","21:00","21:30","22:00"];
-  var PRANZO = [];
-  var CENA = ["20:00", "20:30", "21:00", "21:30", "22:00", "22:30"];
+  // v 2026.07.25.02: gli orari discreti di pranzo/cena NON sono più array fissi qui — vengono
+  // da orari.js#getPeriodSlots(dateStr), che sceglie il periodo giusto per la DATA scelta dal
+  // cliente (non per "oggi"). Questo permette di prenotare già ora un servizio che sarà attivo
+  // solo da una data futura (es. un pranzo di settembre, prenotabile oggi anche se in piena
+  // estate il pranzo è chiuso). Vedi servicesForDate()/getSlotsForDate() più sotto.
 
   var state = {
     online_open: true,
@@ -445,8 +449,7 @@
     return set;
   }
   function servicesForDate(dateStr) {
-    var d = new Date(dateStr + 'T00:00:00');
-    var base = (typeof window.getServicesByDay === 'function') ? window.getServicesByDay(d.getDay()) : ['pranzo','cena'];
+    var base = (typeof window.getServicesForDate === 'function') ? window.getServicesForDate(dateStr) : ['pranzo','cena'];
     var set = { pranzo: base.indexOf('pranzo')!==-1, cena: base.indexOf('cena')!==-1 };
     var op = openingsForDate(dateStr);
     if (op.pranzo) set.pranzo = true;
@@ -461,9 +464,10 @@
   }
   function getSlotsForDate(dateStr) {
     var svc = servicesForDate(dateStr);
+    var periodSlots = (typeof window.getPeriodSlots === 'function') ? window.getPeriodSlots(dateStr) : { pranzo: [], cena: [] };
     var times = [];
-    if (svc.pranzo) PRANZO.forEach(function(t){ times.push(t); });
-    if (svc.cena) CENA.forEach(function(t){ times.push(t); });
+    if (svc.pranzo) periodSlots.pranzo.forEach(function(t){ times.push(t); });
+    if (svc.cena) periodSlots.cena.forEach(function(t){ times.push(t); });
     state.slot_openings.filter(function(o){ return o.date===dateStr; }).forEach(function(o){
       if (times.indexOf(o.time) === -1) times.push(o.time);
     });

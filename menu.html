@@ -42,7 +42,6 @@
       --rust:  #9e4a2a;
       --rule:  #d4c9b8;
     }
-    @media (max-width:640px){.pg{width:auto!important;max-width:100%!important;min-height:0!important;margin:0!important;padding:26px 16px!important;box-shadow:none!important;}.logo{font-size:1.9rem!important;letter-spacing:.1em!important;}.logo-sub{font-size:.6rem!important;}.lista-titolo{font-size:1.05rem!important;letter-spacing:.12em!important;}.sez-titolo{font-size:1.3rem!important;letter-spacing:.08em!important;}.sommelier{font-size:.62rem!important;}html,body{overflow-x:hidden!important;}}
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -91,13 +90,6 @@
       width: 1px;
       height: 1.4rem;
       background: var(--rule);
-    }
-    .ctrl-val {
-      font-family: 'Jost', sans-serif;
-      font-size: .62rem;
-      color: var(--stone);
-      min-width: 2.6em;
-      text-align: center;
     }
 
     /* ══════════════════════════════════════
@@ -148,15 +140,13 @@
     .degu {
       text-align: center;
       flex: 1;
-      min-height: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
       padding: 4mm 0;
-      transform: translateY(var(--shift, 0));
     }
     .degu-titolo {
-      font-size: calc(1.4rem * var(--fs, 1.12));
+      font-size: 1.4rem;
       font-weight: 600;
       letter-spacing: .16em;
       text-transform: uppercase;
@@ -164,13 +154,13 @@
     }
     .degu-prezzi {
       font-style: italic;
-      font-size: calc(.98rem * var(--fs, 1.12));
-      line-height: calc(1.4 * var(--lh, 1));
+      font-size: .98rem;
+      line-height: 1.4;
       margin-bottom: 2mm;
     }
     .degu-nota {
       font-style: italic;
-      font-size: calc(.98rem * var(--fs, 1.12));
+      font-size: .98rem;
       color: var(--ink);
       margin-bottom: 14mm;
     }
@@ -181,31 +171,29 @@
       text-underline-offset: 2px;
       color: var(--ink);
     }
-    .percorso { margin-bottom: calc(12mm * var(--gap, 1)); }
+    .percorso { margin-bottom: 12mm; }
     .percorso-label {
       font-style: italic;
       font-weight: 700;
-      font-size: calc(1.25rem * var(--fs, 1.12));
+      font-size: 1.25rem;
       margin-bottom: 3mm;
     }
-    .percorso-piatto { font-size: calc(.96rem * var(--fs, 1.12)); line-height: calc(1.95 * var(--lh, 1)); font-style: normal; }
+    .percorso-piatto { font-size: .96rem; line-height: 1.95; font-style: normal; }
     .percorso-piatto em { font-style: normal; }
-    .percorso-libero { font-size: calc(.96rem * var(--fs, 1.12)); line-height: calc(1.95 * var(--lh, 1)); font-style: normal; }
+    .percorso-libero { font-size: .96rem; line-height: 1.95; font-style: normal; }
 
     /* ── sezioni carta ── */
     .pg-content {
       flex: 1;
-      min-height: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      transform: translateY(var(--shift, 0));
     }
-    .sezione { margin-bottom: calc(14mm * var(--gap, 1)); }
+    .sezione { margin-bottom: 14mm; }
     .sezione-titolo {
       font-family: 'Cormorant Garamond', serif;
       font-style: normal;
-      font-size: calc(1.5rem * var(--fs, 1.12));
+      font-size: 1.5rem;
       font-weight: 600;
       letter-spacing: .14em;
       text-transform: uppercase;
@@ -217,24 +205,24 @@
     /* ── piatti carta ── */
     .piatto {
       text-align: center;
-      padding: calc(.5mm * var(--gap, 1)) 0;
-      font-size: calc(.96rem * var(--fs, 1.12));
-      line-height: calc(1.4 * var(--lh, 1));
+      padding: .5mm 0;
+      font-size: .96rem;
+      line-height: 1.4;
     }
     .piatto-prezzo {
-      font-size: calc(.8rem * var(--fs, 1.12));
+      font-size: .8rem;
       color: var(--stone);
       margin-left: .3rem;
     }
     .piatto-unita {
-      font-size: calc(.76rem * var(--fs, 1.12));
+      font-size: .76rem;
       color: var(--stone);
       margin-left: .1rem;
     }
     .piatto-desc {
       font-style: italic;
       font-size: 0.7em;
-      line-height: calc(1.25 * var(--lh, 1));
+      line-height: 1.25;
       color: var(--stone);
       display: block;
       margin-top: 0.3mm;
@@ -242,12 +230,12 @@
     .percorso-desc {
       font-style: italic;
       font-size: 0.7em;
-      line-height: calc(1.25 * var(--lh, 1));
+      line-height: 1.25;
       color: var(--stone);
       display: block;
       margin-top: 0.3mm;
     }
-    .piatto-staccato { margin-top: calc(3.5mm * var(--gap, 1)); }
+    .piatto-staccato { margin-top: 3.5mm; }
 
     .eco::after {
       content: ' *';
@@ -258,7 +246,6 @@
     /* ── note ospite carta ── */
     .note-ospite {
       margin-top: auto;
-      flex-shrink: 0;
       font-style: italic;
       font-size: .73rem;
       color: var(--stone);
@@ -395,8 +382,8 @@
        STAMPA
     ══════════════════════════════════════ */
     @media print {
-      @page { size: A4 portrait; margin: 8mm; }
-      @page orarioPage { size: A4 portrait; margin: 0; }
+      @page { size: A4 portrait; margin: 8mm; } /* v 2026.07.05.01: era margin:0, causava rimpicciolimento auto in stampa (stessa causa/fix gia' applicato a menu-dolci.html il 10/6) */
+      @page orarioPage { size: A4 portrait; margin: 3mm 5mm; } /* v 2026.07.26.01: era margin:0 (full-bleed) - la stampante inventava un margine reale asimmetrico sn/dx; ora dichiarato qui, stesso spazio totale del padding tolto sotto, nessun overflow */
       html { font-size: 20px; } /* +25% leggibilita\u0301 stampa (v 2026.05.14.03) */
       body { background: white; }
       .ctrl-bar { display: none; }
@@ -413,11 +400,11 @@
       }
       #layout-carta .pg:last-child { page-break-after: avoid; }
 
-      /* orario: 1 pagina */
+      /* orario: 1 pagina (isolato su @page dedicata, margin 0 invariato) */
       #layout-orario .pg {
         page: orarioPage;
-        width: 210mm;
-        height: 297mm;
+        width: 200mm;
+        height: 291mm;
         min-height: unset;
         margin: 0;
         box-shadow: none;
@@ -425,7 +412,8 @@
       }
 
       /* ----- v 2026.05.17.02: scaling dedicato orario per evitare trabocco A4 (riduzione aggressiva) ----- */
-      #layout-orario .pg-orario { padding: 3mm 5mm; }
+      /* v 2026.07.26.01: padding spostato nel margine di @page orarioPage (vedi sopra), qui azzerato per non raddoppiare l'inset */
+      #layout-orario .pg-orario { padding: 0; }
       #layout-orario .orario-logo { font-size: 2.9rem; margin-bottom: 3mm; }
       #layout-orario .orario-col { padding: 3mm 5mm; gap: 3mm; }
       #layout-orario .orario-sez-titolo { font-size: 1.18rem; margin-bottom: 2mm; }
@@ -450,7 +438,7 @@ const MENU = {
     "opzioni": [
       {
         "portate": 6,
-        "prezzo": 85,
+        "prezzo": 90,
         "vini": 60
       },
       {
@@ -459,11 +447,11 @@ const MENU = {
         "vini": 70
       }
     ],
-    "nota": "Prezzo a persona, menù da considerarsi per l'intero tavolo.<br>I menù sono disponibili fino alle ore 22:00",
+    "nota": "Prezzo a persona, menù da considerarsi per l'intero tavolo.<br>I menù sono disponibili fino alle 13:30 a pranzo ed alle 21:30 a cena",
     "percorsi": {
       "Sei": [
         {
-          "nome": "Calamaro nostrano, bagna cauda, kefir",
+          "nome": "Calamaro nostrano, piselli freschi, bagna cauda, kefir",
           "sostenibile": true
         },
         {
@@ -496,8 +484,8 @@ const MENU = {
       "titolo": "Crudi",
       "piatti": [
         {
-          "nome": "Ostriche Gillardeau",
-          "prezzo": 7,
+          "nome": "Ostriche Fine de Claire",
+          "prezzo": 4,
           "unita": "cad."
         },
         {
@@ -518,7 +506,7 @@ const MENU = {
         },
         {
           "nome": "Gamberi viola nostrani",
-          "prezzo": 6,
+          "prezzo": 5,
           "unita": "cad.",
           "sostenibile": true
         },
@@ -541,23 +529,23 @@ const MENU = {
       "titolo": "Sfiziosi",
       "piatti": [
         {
-          "nome": "Calamaro nostrano, bagna cauda, kefir",
-          "prezzo": 19,
+          "nome": "Calamaro nostrano, piselli freschi, bagna cauda, kefir",
+          "prezzo": 20,
           "sostenibile": true
         },
         {
           "nome": "Gamberi viola crudi alla puttanesca",
-          "prezzo": 23,
+          "prezzo": 25,
           "sostenibile": true
         },
         {
           "nome": "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce",
-          "prezzo": 19,
+          "prezzo": 22,
           "sostenibile": true
         },
         {
           "nome": "Dentice reale nostrano crudo, ricci di mare, limone, mandorle",
-          "prezzo": 27,
+          "prezzo": 29,
           "sostenibile": true
         },
         {
@@ -578,17 +566,17 @@ const MENU = {
         },
         {
           "nome": "Cappellacci di cinghiale, cardoncelli, ortica, mirtilli",
-          "prezzo": 29,
+          "prezzo": 26,
           "sostenibile": true
         },
         {
           "nome": "Tubetti <em>Mancini</em>, baccalà, preboggion, kosho di agrumi",
-          "prezzo": 22,
+          "prezzo": 24,
           "sostenibile": true
         },
         {
-          "nome": "Riso <em>Riserva San Massimo</em>, ostriche, albicocche, nespole, vaniglia",
-          "prezzo": 29,
+          "nome": "Riso <em>Riserva San Massimo</em>, ostriche, asparago bianco, vaniglia",
+          "prezzo": 34,
           "sostenibile": true
         }
       ],
@@ -598,22 +586,22 @@ const MENU = {
       "titolo": "Non Solo Mare",
       "piatti": [
         {
-          "nome": "Ricciola nostrana pescata ad amo, ciliege, tahina, levistico",
-          "prezzo": 32,
+          "nome": "Ricciola nostrana pescata ad amo, crema di peperonata, purea di melanzane BBQ, tahina",
+          "prezzo": 34,
           "sostenibile": true
         },
         {
           "nome": "Zucchina alla scapece, menta, yogurt, pepe Timut",
-          "prezzo": 17
+          "prezzo": 18
         },
         {
-          "nome": "Merluzzo selvaggio, scarola, foglia di fico",
-          "prezzo": 27,
+          "nome": "Ombrina nostrana pescata ad amo, vignarola, crema di piselli",
+          "prezzo": 34,
           "sostenibile": true
         },
         {
           "nome": "\"Tournedos alla Rossini\"?",
-          "prezzo": 32,
+          "prezzo": 35,
           "descrizione": "(Agnello, fegato di rana pescatrice, burro di gamberi viola, alghe e tartufi di mare)",
           "sostenibile": true
         }
@@ -647,17 +635,20 @@ const MENU = {
     "separatoreDopo": "Crudi",
     "orarioServizio": [
       {
-        "giorno": "Dal martedì alla domenica",
+        "giorno": "Dal martedì al giovedì",
         "fasce": [
-          "20:00 – 22:30"
+          "19:30 – 22:30"
+        ]
+      },
+      {
+        "giorno": "Dal venerdì alla domenica",
+        "fasce": [
+          "12:30 – 14:30",
+          "19:30 – 22:30"
         ]
       }
     ]
-  },
-  "fontScale": 0.97,
-  "lineScale": 1,
-  "gapScale": 1,
-  "shift": 0
+  }
 };
 /* ═════════════════════════════════════════════════════════ */
 
@@ -745,10 +736,6 @@ function buildDegu(degu) {
 function renderCarta() {
   const root = document.getElementById('layout-carta');
   root.innerHTML = '';
-  if (MENU.fontScale) root.style.setProperty('--fs', MENU.fontScale);
-  if (MENU.lineScale) root.style.setProperty('--lh', MENU.lineScale);
-  if (MENU.gapScale) root.style.setProperty('--gap', MENU.gapScale);
-  if (MENU.shift != null) root.style.setProperty('--shift', MENU.shift + 'mm');
 
   // Pag 1: intestazione + degustazione
   const pag1 = document.createElement('div');
@@ -859,18 +846,9 @@ function showLayout(which) {
 }
 
 /* ── init ── */
-var _sz={fs:(MENU.fontScale!=null?MENU.fontScale:1.12),lh:(MENU.lineScale!=null?MENU.lineScale:1),gap:(MENU.gapScale!=null?MENU.gapScale:1),shift:(MENU.shift!=null?MENU.shift:0)};
-function _szApply(){var r=document.getElementById('layout-carta');if(r){r.style.setProperty('--fs',_sz.fs);r.style.setProperty('--lh',_sz.lh);r.style.setProperty('--gap',_sz.gap);r.style.setProperty('--shift',_sz.shift+'mm');}var _sv=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};_sv('szv-fs',Math.round(_sz.fs*100)+'%');_sv('szv-lh',Math.round(_sz.lh*100)+'%');_sv('szv-gap',Math.round(_sz.gap*100)+'%');_sv('szv-shift',(_sz.shift>0?'+':'')+_sz.shift+'mm');}
-function _szF(d){_sz.fs=Math.max(0.85,Math.min(1.4,Math.round((_sz.fs+d)*100)/100));_szApply();}
-function _szL(d){_sz.lh=Math.max(0.8,Math.min(1.5,Math.round((_sz.lh+d)*100)/100));_szApply();}
-function _szG(d){_sz.gap=Math.max(0.6,Math.min(1.7,Math.round((_sz.gap+d)*100)/100));_szApply();}
-function _szS(d){_sz.shift=Math.max(-25,Math.min(25,_sz.shift+d));_szApply();}
-function _szR(){_sz={fs:1.12,lh:1,gap:1,shift:0};_szApply();}
-function _szSave(){try{if(window.opener&&window.opener.salvaImpostazioniStampa){window.opener.salvaImpostazioniStampa(_sz.fs,_sz.lh,_sz.gap,_sz.shift);alert('Impostazioni fissate come default. Torna nel pannello e premi Pubblica per renderle permanenti.');}else{alert('Per salvare, apri questa anteprima dal pulsante Anteprima del pannello.');}}catch(e){alert('Impossibile salvare: '+e.message);}}
 renderCarta();
 renderOrario();
 showLayout('carta');
-_szApply();
 </script>
 </body>
 </html>

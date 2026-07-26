@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.07.26.01 — fix margini asimmetrici in stampa sul foglio orario (@page orarioPage margin:0 → margin:3mm 5mm, padding interno .pg-orario azzerato, stessa area di contenuto 200x291mm, nessun rischio overflow): bump ?v= admin-templates-shared.js a 2026.07.26.01. -->
 <!-- v 2026.07.25.04 — nuovo pannello "Garanzia — penale e disdetta" sotto "Carta a garanzia —
      giorni della settimana" (richiesta Andrea): due campi (penale €/persona, ore disdetta
      gratuita) + pulsante Salva, azione set_guarantee_defaults su set-reservations-config v6.
@@ -36,7 +37,6 @@
      giorno — qui i contatti NON sono condivisi con altri ristoranti. Bump ?v= admin-core.js a
      2026.07.25.01 (aggiunto 'rubrica-section' a _pulisciViste()).
 -->
-<!-- v 2026.07.26.01 — fix margini asimmetrici in stampa sul foglio orario (@page orarioPage margin:0 → margin:3mm 5mm, padding interno azzerato, stessa area di contenuto): bump ?v= admin-templates-shared.js a 2026.07.26.01. -->
 <!-- v 2026.07.25.01 — chiarito il testo della lista "Limiti impostati" nella sezione "Limita i posti
      su un orario già aperto": Andrea aveva letto "Limiti attivi (da oggi in poi)" come se il limite
      si ripetesse ogni giorno da quella data in poi. Non è così: ogni limite vale SOLO per la sua
@@ -3356,7 +3356,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.25.04</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.26.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

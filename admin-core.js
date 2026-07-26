@@ -1,4 +1,9 @@
 // Core functions per menu-admin Santamonica
+// v 2026.07.26.01 — Aggiunto promemoria di stampa sotto la ctrl-bar (carta + dolci): "Salva come
+//   PDF → apri con Foxit Reader → Stampa con Scala 97%" — su questa stampante nessuna
+//   combinazione di margini del browser elimina l'asimmetria residua, confermato da Andrea dopo
+//   il fix di @page orarioPage (v 2026.07.26.01 di admin-templates-shared.js). Nota solo a
+//   schermo (nascosta in stampa via .stampa-hint{display:none} in CARTA_TPL_B).
 // v 2026.07.25.01 — Aggiunta 'rubrica-section' a _pulisciViste() (nuovo pannello "Rubrica
 //   professionisti" in menu-admin.html: elenco privato elettricista/idraulico/ecc. con
 //   aggiungi/modifica/elimina + note d'uso, via Edge Function rubrica-professionisti,
@@ -445,7 +450,8 @@ function costruisciOutput() {
       + '  <button class="ctrl-btn" onclick="window.print()">\u26a1 Stampa</button>\n'
       + '  <div class="ctrl-sep"></div>\n'
       + _SIZE_BTNS
-      + '</div>\n';
+      + '</div>\n'
+      + _STAMPA_HINT;
     html = html.replace('<body>\n', '<body>\n' + CTRL_BAR);
     return html;
   }
@@ -481,13 +487,18 @@ var _SIZE_BTNS =
   + '  <button class="ctrl-btn" onclick="_szS(-2)" title="Sposta su">⬆</button>\n'
   + '  <button class="ctrl-btn" onclick="_szR()" title="Ripristina dimensioni">↺</button>\n';
 
+// Promemoria di stampa (schermo, nascosto in @media print): su questa stampante
+// nessuna combinazione di margini/scala del browser elimina l'asimmetria residua.
+var _STAMPA_HINT = '<div class="stampa-hint">Per una stampa senza margini storti: Stampa → Salva come PDF → apri il PDF con Foxit Reader → Stampa con Scala personalizzata 97%.</div>\n';
+
 // Barra admin per i dolci (Stampa + pulsanti dimensione). Va in menu-dolci-it.html e nella preview.
 function _dolciCtrlBar() {
   return '<div class="ctrl-bar">\n'
     + '  <button class="ctrl-btn" onclick="window.print()">⚡ Stampa</button>\n'
     + '  <div class="ctrl-sep"></div>\n'
     + _SIZE_BTNS
-    + '</div>\n';
+    + '</div>\n'
+    + _STAMPA_HINT;
 }
 
 function apriPreview(lang) {

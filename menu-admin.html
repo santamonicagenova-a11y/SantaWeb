@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.07.26.02 — promemoria di stampa sotto la ctrl-bar (carta + dolci): "Salva come PDF → Foxit → Scala 97%" — su questa stampante nessuna combinazione di margini/scala del browser elimina l'asimmetria residua (confermato da Andrea dopo il fix sotto). Nuova classe .stampa-hint in admin-templates-shared.js (schermo, nascosta in stampa), iniettata da admin-core.js. Bump ?v= admin-templates-shared.js a 2026.07.26.02, admin-core.js a 2026.07.26.01. Memoria: santamonica-stampa-carta-procedura. -->
 <!-- v 2026.07.26.01 — fix margini asimmetrici in stampa sul foglio orario (@page orarioPage margin:0 → margin:3mm 5mm, padding interno .pg-orario azzerato, stessa area di contenuto 200x291mm, nessun rischio overflow): bump ?v= admin-templates-shared.js a 2026.07.26.01. -->
 <!-- v 2026.07.25.04 — nuovo pannello "Garanzia — penale e disdetta" sotto "Carta a garanzia —
      giorni della settimana" (richiesta Andrea): due campi (penale €/persona, ore disdetta
@@ -1095,8 +1096,8 @@
 <div class="toast" id="toast">✓ Scaricato!</div>
 
 <script src="admin-translations.js"></script>
-<script src="admin-templates-shared.js?v=2026.07.26.01"></script>
-<script src="admin-core.js?v=2026.07.25.01"></script>
+<script src="admin-templates-shared.js?v=2026.07.26.02"></script>
+<script src="admin-core.js?v=2026.07.26.01"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -3356,7 +3357,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.26.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.26.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

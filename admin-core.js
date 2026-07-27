@@ -1,4 +1,9 @@
 // Core functions per menu-admin Santamonica
+// v 2026.07.26.02 — Aggiunta 'pacchi-section' a _pulisciViste() (nuovo pannello "Pacchi No-show
+//   (NoShowApp)" in menu-admin.html: elenco in sola lettura dei pacchi No-show registrati per
+//   Santamonica su NoShowApp, via set-reminder-settings azione list_noshow_pacchi → ponte
+//   noshow-pacchi-bridge). Nessun'altra modifica a questo file: la logica del pannello è tutta
+//   inline in menu-admin.html, come gli altri pannelli.
 // v 2026.07.26.01 — Aggiunto promemoria di stampa sotto la ctrl-bar (carta + dolci): "Salva come
 //   PDF → apri con Foxit Reader → Stampa con Scala 97%" — su questa stampante nessuna
 //   combinazione di margini del browser elimina l'asimmetria residua, confermato da Andrea dopo
@@ -186,7 +191,7 @@ function chk(id, v) {
 // Va chiamata a ogni caricamento (carta, dolci, allergeni, vini, foto, documento generico,
 // prenotazioni) così la pagina non trascina la vista precedente in fondo.
 function _pulisciViste() {
-  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section','reminder-section','cauzioni-section','voucher-section','rubrica-section'].forEach(function(id){
+  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section','reminder-section','cauzioni-section','voucher-section','rubrica-section','pacchi-section'].forEach(function(id){
     var e = document.getElementById(id); if (e) e.style.display = 'none';
   });
   var w = document.getElementById('wrap');

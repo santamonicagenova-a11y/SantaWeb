@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- v 2026.07.26.03 — nuovo pannello "Pacchi No-show — storico NoShowApp" (richiesta Andrea):
+     bottone "Pacchi No-show (NoShowApp)" in barra azioni → elenco in SOLA LETTURA dei pacchi
+     No-show registrati per Santamonica su NoShowApp (id/telefono/nome/data/nota), con pulsante
+     Aggiorna. Il browser continua ad autenticarsi solo col token GitHub (come tutto il resto);
+     la richiesta passa da set-reminder-settings (nuova azione list_noshow_pacchi, v7) che internamente
+     interroga il ponte noshow-pacchi-bridge (azione list, v2) su NoShowApp col suo secret dedicato —
+     mai esposto al browser. Aggiunta 'pacchi-section' a _pulisciViste() (admin-core.js v.26.02).
+     Nessuna scrittura/eliminazione da qui: per modificare un pacco si usa l'app NoShowApp. -->
 <!-- v 2026.07.26.02 — promemoria di stampa sotto la ctrl-bar (carta + dolci): "Salva come PDF → Foxit → Scala 97%" — su questa stampante nessuna combinazione di margini/scala del browser elimina l'asimmetria residua (confermato da Andrea dopo il fix sotto). Nuova classe .stampa-hint in admin-templates-shared.js (schermo, nascosta in stampa), iniettata da admin-core.js. Bump ?v= admin-templates-shared.js a 2026.07.26.02, admin-core.js a 2026.07.26.01. Memoria: santamonica-stampa-carta-procedura. -->
 <!-- v 2026.07.26.01 — fix margini asimmetrici in stampa sul foglio orario (@page orarioPage margin:0 → margin:3mm 5mm, padding interno .pg-orario azzerato, stessa area di contenuto 200x291mm, nessun rischio overflow): bump ?v= admin-templates-shared.js a 2026.07.26.01. -->
 <!-- v 2026.07.25.04 — nuovo pannello "Garanzia — penale e disdetta" sotto "Carta a garanzia —
@@ -442,6 +450,7 @@
   <button class="qa-btn" onclick="location.href='gestionale.html'">Gestionale</button>
   <button class="qa-btn" onclick="apriSezioneCauzioni()">Cauzioni (storico)</button>
   <button class="qa-btn" onclick="apriSezioneRubrica()">Rubrica professionisti</button>
+  <button class="qa-btn" onclick="apriSezionePacchi()">Pacchi No-show (NoShowApp)</button>
 </div>
 
 <div id="intro">
@@ -831,6 +840,26 @@
   </div>
 </div>
 
+<div id="pacchi-section" style="max-width:700px;margin:1.5rem auto;padding:0 1rem;display:none;">
+  <div class="fs">
+    <div class="fs-head">Pacchi No-show — storico NoShowApp</div>
+    <div class="fs-body">
+      <p style="font-size:.82rem;color:var(--stone);margin-bottom:1rem;line-height:1.6;">
+        Elenco in <strong>sola lettura</strong> dei pacchi registrati per Santamonica sull'app NoShowApp:
+        include sia quelli creati automaticamente quando segni un No-show nel gestionale, sia quelli
+        inseriti a mano direttamente in NoShowApp. Per modificarli o eliminarli, usa l'app NoShowApp.
+      </p>
+      <button class="btn btn-publish" onclick="loadPacchiNoShow()">🔄 Aggiorna</button>
+      <div class="sub" style="margin-top:1rem;">Pacchi (<span id="pacchi-count">0</span>)</div>
+      <div id="pacchi-list" style="font-size:.85rem;">…</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
+        <button class="btn btn-load" onclick="chiudiSezionePacchi()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
+        <span id="pacchi-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="reminder-section" style="max-width:700px;margin:1.5rem auto;padding:0 1rem;display:none;">
   <div class="fs">
     <div class="fs-head">Reminder prenotazioni — Setup messaggio &amp; tempistiche</div>
@@ -1097,7 +1126,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.07.26.02"></script>
-<script src="admin-core.js?v=2026.07.26.01"></script>
+<script src="admin-core.js?v=2026.07.26.02"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -1733,6 +1762,75 @@ function apriSezioneReminder() {
   _pulisciViste();
   document.getElementById('reminder-section').style.display = 'block';
   loadReminderStatus();
+}
+
+// Pannello "Pacchi No-show (NoShowApp)" — sola lettura, riusa REM_CONFIG_URL/_prenGhToken()
+// (set-reminder-settings, azione list_noshow_pacchi) che a sua volta passa la richiesta al
+// ponte noshow-pacchi-bridge sul progetto NoShowApp col suo secret dedicato (mai esposto qui).
+function apriSezionePacchi() {
+  document.getElementById('carica-menu').classList.remove('open');
+  document.getElementById('intro').style.display = 'none';
+  _pulisciViste();
+  document.getElementById('pacchi-section').style.display = 'block';
+  loadPacchiNoShow();
+}
+
+function chiudiSezionePacchi() {
+  document.getElementById('pacchi-section').style.display = 'none';
+  if (!document.getElementById('wrap').classList.contains('on'))
+    document.getElementById('intro').style.display = '';
+}
+
+function _pacchiSetStatus(msg, isErr) {
+  var el = document.getElementById('pacchi-status');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
+}
+
+function _pacchiFmtDate(dateStr) {
+  if (!dateStr) return '—';
+  var p = String(dateStr).split('-');
+  return p.length === 3 ? (p[2] + '/' + p[1] + '/' + p[0]) : dateStr;
+}
+
+function _pacchiEsc(s) {
+  var d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML;
+}
+
+function loadPacchiNoShow() {
+  _pacchiSetStatus('Caricamento…');
+  _remFetch({ action: 'list_noshow_pacchi' })
+    .then(function (res) {
+      if (res.status === 200 && res.body && res.body.ok) {
+        renderPacchiNoShow(res.body.pacchi || []);
+        _pacchiSetStatus('');
+      } else if (res.status === 401) {
+        _pacchiSetStatus('Token GitHub non valido o senza permessi.', true);
+      } else {
+        _pacchiSetStatus((res.body && res.body.error) || 'Errore nel caricamento.', true);
+      }
+    })
+    .catch(function (e) {
+      if (e && e.message === 'no-token') _pacchiSetStatus('Operazione annullata: serve il token GitHub.', true);
+      else _pacchiSetStatus('Errore di connessione.', true);
+    });
+}
+
+function renderPacchiNoShow(list) {
+  document.getElementById('pacchi-count').textContent = list.length;
+  var box = document.getElementById('pacchi-list');
+  if (!list.length) { box.innerHTML = '<span style="color:var(--stone);">Nessun pacco registrato.</span>'; return; }
+  box.innerHTML = '';
+  list.forEach(function (p) {
+    var row = document.createElement('div');
+    row.style.cssText = 'padding:.5rem 0;border-bottom:1px dotted var(--rule);';
+    row.innerHTML =
+      '<div><strong>' + _pacchiFmtDate(p.date) + '</strong> — ' + (p.name ? _pacchiEsc(p.name) : '(senza nome)') +
+      (p.phone ? ' · ' + _pacchiEsc(p.phone) : '') + '</div>' +
+      (p.note ? '<div style="color:var(--stone);font-size:.8rem;margin-top:.15rem;">' + _pacchiEsc(p.note) + '</div>' : '');
+    box.appendChild(row);
+  });
 }
 
 function chiudiSezioneReminder() {
@@ -3357,7 +3455,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.26.02</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.26.03</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

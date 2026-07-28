@@ -1,14 +1,21 @@
 // Core functions per menu-admin Santamonica
+// v 2026.07.26.04 — Ripristinati 2 elementi persi in una sessione precedente (segnalati da
+//   Andrea, assenti anche sul live prima di questo fix): pulsante "✔ Fissa come default" in
+//   _SIZE_BTNS (nuova funzione salvaImpostazioniStampa(vals), scrive in dati.fontScale/
+//   lineScale/gapScale/shift — stesso oggetto `dati` di carta e dolci — chiamata da _szSave()
+//   in CARTA_TPL_A via window.opener; permanente dopo Pubblica, come il round-trip già
+//   esistente in leggi()) e span col valore corrente (%/mm) accanto a ogni pulsante A+/A−/
+//   interlinea/spazio/sposta.
+// v 2026.07.26.03 — Aggiunto promemoria di stampa sotto la ctrl-bar (carta + dolci): "Salva come
+//   PDF → apri con Foxit Reader → Stampa con Scala 97%" — su questa stampante nessuna
+//   combinazione di margini del browser elimina l'asimmetria residua, confermato da Andrea dopo
+//   il fix di @page orarioPage (v 2026.07.26.01 di admin-templates-shared.js). Nota solo a
+//   schermo (nascosta in stampa via .stampa-hint{display:none} in CARTA_TPL_B).
 // v 2026.07.26.02 — Aggiunta 'pacchi-section' a _pulisciViste() (nuovo pannello "Pacchi No-show
 //   (NoShowApp)" in menu-admin.html: elenco in sola lettura dei pacchi No-show registrati per
 //   Santamonica su NoShowApp, via set-reminder-settings azione list_noshow_pacchi → ponte
 //   noshow-pacchi-bridge). Nessun'altra modifica a questo file: la logica del pannello è tutta
 //   inline in menu-admin.html, come gli altri pannelli.
-// v 2026.07.26.01 — Aggiunto promemoria di stampa sotto la ctrl-bar (carta + dolci): "Salva come
-//   PDF → apri con Foxit Reader → Stampa con Scala 97%" — su questa stampante nessuna
-//   combinazione di margini del browser elimina l'asimmetria residua, confermato da Andrea dopo
-//   il fix di @page orarioPage (v 2026.07.26.01 di admin-templates-shared.js). Nota solo a
-//   schermo (nascosta in stampa via .stampa-hint{display:none} in CARTA_TPL_B).
 // v 2026.07.25.01 — Aggiunta 'rubrica-section' a _pulisciViste() (nuovo pannello "Rubrica
 //   professionisti" in menu-admin.html: elenco privato elettricista/idraulico/ecc. con
 //   aggiungi/modifica/elimina + note d'uso, via Edge Function rubrica-professionisti,
@@ -484,13 +491,31 @@ var _qrBase64 = null;   // base64 del nuovo QR selezionato (separato dal MENU)
 var _SIZE_BTNS =
     '  <button class="ctrl-btn" onclick="_szF(0.03)" title="Caratteri piu grandi">A+</button>\n'
   + '  <button class="ctrl-btn" onclick="_szF(-0.03)" title="Caratteri piu piccoli">A−</button>\n'
+  + '  <span class="sz-val" id="szValFs"></span>\n'
   + '  <button class="ctrl-btn" onclick="_szL(0.05)" title="Interlinea +">↕+</button>\n'
   + '  <button class="ctrl-btn" onclick="_szL(-0.05)" title="Interlinea −">↕−</button>\n'
+  + '  <span class="sz-val" id="szValLh"></span>\n'
   + '  <button class="ctrl-btn" onclick="_szG(0.05)" title="Spazio +">¶+</button>\n'
   + '  <button class="ctrl-btn" onclick="_szG(-0.05)" title="Spazio −">¶−</button>\n'
+  + '  <span class="sz-val" id="szValGap"></span>\n'
   + '  <button class="ctrl-btn" onclick="_szS(2)" title="Sposta giu">⬇</button>\n'
   + '  <button class="ctrl-btn" onclick="_szS(-2)" title="Sposta su">⬆</button>\n'
-  + '  <button class="ctrl-btn" onclick="_szR()" title="Ripristina dimensioni">↺</button>\n';
+  + '  <span class="sz-val" id="szValShift"></span>\n'
+  + '  <button class="ctrl-btn" onclick="_szR()" title="Ripristina dimensioni">↺</button>\n'
+  + '  <button class="ctrl-btn" onclick="_szSave()" title="Fissa i valori attuali come predefiniti per questo menù">✔ Fissa come default</button>\n';
+
+// Chiamata dal pulsante "✔ Fissa come default" nella preview (_szSave() in CARTA_TPL_A):
+// scrive i valori correnti (regolati coi pulsanti A+/A− ecc.) come nuovo default del menù
+// aperto (stesso oggetto `dati`, vale sia per carta sia per dolci). Diventa permanente solo
+// dopo "Pubblica" (round-trip già esistente in leggi(): dati.fontScale/lineScale/gapScale/shift).
+function salvaImpostazioniStampa(vals) {
+  if (!dati || !vals) return;
+  dati.fontScale = vals.fs;
+  dati.lineScale = vals.lh;
+  dati.gapScale  = vals.gap;
+  dati.shift     = vals.shift;
+  alert('Impostazioni di stampa fissate come predefinite. Premi "Pubblica" per renderle permanenti sul sito.');
+}
 
 // Promemoria di stampa (schermo, nascosto in @media print): su questa stampante
 // nessuna combinazione di margini/scala del browser elimina l'asimmetria residua.

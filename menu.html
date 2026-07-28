@@ -92,6 +92,14 @@
       height: 1.4rem;
       background: var(--rule);
     }
+    .sz-val {
+      font-family: 'Jost', sans-serif;
+      font-size: .62rem;
+      color: var(--stone);
+      min-width: 2.4em;
+      display: inline-block;
+      text-align: center;
+    }
 
     .stampa-hint {
       text-align: center;
@@ -662,7 +670,11 @@ const MENU = {
         ]
       }
     ]
-  }
+  },
+  "fontScale": 0.91,
+  "lineScale": 1,
+  "gapScale": 1,
+  "shift": 0
 };
 /* ═════════════════════════════════════════════════════════ */
 
@@ -865,12 +877,13 @@ function showLayout(which) {
 
 /* ── init ── */
 var _sz={fs:(MENU.fontScale!=null?MENU.fontScale:1.12),lh:(MENU.lineScale!=null?MENU.lineScale:1),gap:(MENU.gapScale!=null?MENU.gapScale:1),shift:(MENU.shift!=null?MENU.shift:0)};
-function _szApply(){var r=document.getElementById('layout-carta');if(!r)return;r.style.setProperty('--fs',_sz.fs);r.style.setProperty('--lh',_sz.lh);r.style.setProperty('--gap',_sz.gap);r.style.setProperty('--shift',_sz.shift+'mm');}
+function _szApply(){var r=document.getElementById('layout-carta');if(!r)return;r.style.setProperty('--fs',_sz.fs);r.style.setProperty('--lh',_sz.lh);r.style.setProperty('--gap',_sz.gap);r.style.setProperty('--shift',_sz.shift+'mm');var vf=document.getElementById('szValFs');if(vf)vf.textContent=Math.round(_sz.fs*100)+'%';var vl=document.getElementById('szValLh');if(vl)vl.textContent=Math.round(_sz.lh*100)+'%';var vg=document.getElementById('szValGap');if(vg)vg.textContent=Math.round(_sz.gap*100)+'%';var vs=document.getElementById('szValShift');if(vs)vs.textContent=_sz.shift+'mm';}
 function _szF(d){_sz.fs=Math.max(0.85,Math.min(1.4,Math.round((_sz.fs+d)*100)/100));_szApply();}
 function _szL(d){_sz.lh=Math.max(0.8,Math.min(1.5,Math.round((_sz.lh+d)*100)/100));_szApply();}
 function _szG(d){_sz.gap=Math.max(0.6,Math.min(1.7,Math.round((_sz.gap+d)*100)/100));_szApply();}
 function _szS(d){_sz.shift=Math.max(-25,Math.min(25,_sz.shift+d));_szApply();}
 function _szR(){_sz={fs:1.12,lh:1,gap:1,shift:0};_szApply();}
+function _szSave(){if(window.opener&&window.opener.salvaImpostazioniStampa){window.opener.salvaImpostazioniStampa({fs:_sz.fs,lh:_sz.lh,gap:_sz.gap,shift:_sz.shift});}}
 renderCarta();
 renderOrario();
 showLayout('carta');

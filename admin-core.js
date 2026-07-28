@@ -1,15 +1,15 @@
 // Core functions per menu-admin Santamonica
-// v 2026.07.26.04 — Ripristinati 2 elementi persi in una sessione precedente (segnalati da
+// v 2026.07.28.02 — Ripristinati 2 elementi persi in una sessione precedente (segnalati da
 //   Andrea, assenti anche sul live prima di questo fix): pulsante "✔ Fissa come default" in
 //   _SIZE_BTNS (nuova funzione salvaImpostazioniStampa(vals), scrive in dati.fontScale/
 //   lineScale/gapScale/shift — stesso oggetto `dati` di carta e dolci — chiamata da _szSave()
 //   in CARTA_TPL_A via window.opener; permanente dopo Pubblica, come il round-trip già
 //   esistente in leggi()) e span col valore corrente (%/mm) accanto a ogni pulsante A+/A−/
 //   interlinea/spazio/sposta.
-// v 2026.07.26.03 — Aggiunto promemoria di stampa sotto la ctrl-bar (carta + dolci): "Salva come
+// v 2026.07.28.01 — Aggiunto promemoria di stampa sotto la ctrl-bar (carta + dolci): "Salva come
 //   PDF → apri con Foxit Reader → Stampa con Scala 97%" — su questa stampante nessuna
 //   combinazione di margini del browser elimina l'asimmetria residua, confermato da Andrea dopo
-//   il fix di @page orarioPage (v 2026.07.26.01 di admin-templates-shared.js). Nota solo a
+//   il fix di @page orarioPage (v 2026.07.28.01 di admin-templates-shared.js). Nota solo a
 //   schermo (nascosta in stampa via .stampa-hint{display:none} in CARTA_TPL_B).
 // v 2026.07.26.02 — Aggiunta 'pacchi-section' a _pulisciViste() (nuovo pannello "Pacchi No-show
 //   (NoShowApp)" in menu-admin.html: elenco in sola lettura dei pacchi No-show registrati per

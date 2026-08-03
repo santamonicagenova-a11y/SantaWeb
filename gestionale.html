@@ -1,4 +1,14 @@
 <!DOCTYPE html>
+<!-- v 2026.07.27.01 — flag "cliente segnalato" (pacchi No-show da NoShowApp) su nome cliente,
+     vista giorno E ricerca (richiesta Andrea: quando un cliente presente nello storico pacchi
+     torna a prenotare, il gestionale deve segnalarlo). Nome in ROSSO + nota col dettaglio del
+     pacco più recente sotto, se il telefono (ultime 9 cifre normalizzate) o l'email del cliente
+     combaciano con un pacco su NoShowApp. Se lo stesso cliente risulta ANCHE con almeno una
+     prenotazione onorata in passato (arrivo_status='arrivato'), il colore passa ad ARANCIONE
+     — permanente una volta onorata, resta comunque segnalato (decisione Andrea 27/7/2026). Dati
+     dal campo `pacco` di gestionale-day v4 / gestionale-search v2 (nessuna azione nuova, solo
+     lettura). La stessa segnalazione arriva anche nella mail M1bis di create-reservation-checkout
+     (ramo giorni "liberi") quando arriva una nuova richiesta di prenotazione. -->
 <!-- v 2026.07.25.01 — riepilogo occupazione per fascia oraria nella vista giorno (richiesta Andrea:
      poter vedere nel gestionale quanti posti sono prenotati e quanti liberi per ogni orario, con
      limite massimo impostabile). Il limite si imposta da menu-admin.html → "Prenotazioni online" →
@@ -162,6 +172,12 @@
     .slot-chip.full { border-color:var(--rust); background:#f6e7e2; }
     .slot-chip.full .slot-nums { color:var(--rust); font-weight:500; }
     .slot-chip.near-full { border-color:#d9a441; background:#faf1de; }
+
+    .res-info .nome.pacco-rosso { color:#c0392b; font-weight:500; }
+    .res-info .nome.pacco-arancione { color:#c07a1e; font-weight:500; }
+    .res-info .pacco-note { font-size:.68rem; margin-top:.1rem; }
+    .res-info .pacco-note.pacco-rosso { color:#c0392b; }
+    .res-info .pacco-note.pacco-arancione { color:#c07a1e; }
   </style>
 </head>
 <body>
@@ -245,7 +261,7 @@
   <div class="status-line" id="search-status"></div>
 </div>
 
-<footer class="ver">v 2026.07.25.01</footer>
+<footer class="ver">v 2026.07.27.01</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';
@@ -535,7 +551,7 @@ function renderDay(rows) {
     row.innerHTML =
       '<div class="res-orario">' + r.orario + '</div>' +
       '<div class="res-info">' +
-        '<div class="nome">' + escapeHtml(r.nome) + ' · ' + r.persone + 'p</div>' +
+        nomeConPaccoHtml(r) +
         '<div class="meta">' + (r.telefono ? '<a href="tel:' + escapeHtml(r.telefono) + '">' + escapeHtml(r.telefono) + '</a>' : '') +
           (r.occasione ? ' · ' + escapeHtml(r.occasione) : '') +
           (r.intolleranze ? ' · ' + escapeHtml(r.intolleranze) : '') + '</div>' +
@@ -550,6 +566,25 @@ function renderDay(rows) {
 
 function escapeHtml(s) {
   var d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML;
+}
+
+function fmtItDateVeryShort(dateStr) {
+  if (!dateStr) return '';
+  var p = dateStr.split('-');
+  if (p.length !== 3) return dateStr;
+  return parseInt(p[2], 10) + '/' + parseInt(p[1], 10) + '/' + p[0];
+}
+
+// Nome cliente + eventuale segnalazione pacco (rosso = mai onorato, arancione = onorato
+// almeno una volta in passato ma resta segnalato). r.pacco viene da gestionale-day/-search.
+function nomeConPaccoHtml(r) {
+  var nomeHtml = escapeHtml(r.nome);
+  if (!r.pacco) return '<div class="nome">' + nomeHtml + ' · ' + r.persone + 'p</div>';
+  var cls = r.pacco.level === 'arancione' ? 'pacco-arancione' : 'pacco-rosso';
+  var icon = r.pacco.level === 'arancione' ? '⚠' : '⛔';
+  var noteTxt = icon + ' ' + (r.pacco.date ? fmtItDateVeryShort(r.pacco.date) + ' — ' : '') + (r.pacco.note || 'pacco No-show');
+  return '<div class="nome ' + cls + '">' + nomeHtml + ' · ' + r.persone + 'p</div>' +
+    '<div class="pacco-note ' + cls + '">' + escapeHtml(noteTxt) + '</div>';
 }
 
 function fmtItDateShort(dateStr) {
@@ -602,7 +637,7 @@ function renderSearch(rows) {
     row.innerHTML =
       '<div class="res-date">' + fmtItDateShort(r.data) + '<span class="res-time">' + r.orario + '</span></div>' +
       '<div class="res-info">' +
-        '<div class="nome">' + escapeHtml(r.nome) + ' · ' + r.persone + 'p</div>' +
+        nomeConPaccoHtml(r) +
         '<div class="meta">' + (r.telefono ? '<a href="tel:' + escapeHtml(r.telefono) + '">' + escapeHtml(r.telefono) + '</a>' : '') +
           (r.email ? ' · ' + escapeHtml(r.email) : '') +
           (r.occasione ? ' · ' + escapeHtml(r.occasione) : '') + '</div>' +

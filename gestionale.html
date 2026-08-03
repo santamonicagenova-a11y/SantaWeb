@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- v 2026.07.27.01 — flag "cliente segnalato" (pacchi No-show da NoShowApp) su nome cliente,
+<!-- v 2026.08.03.01 — flag "cliente segnalato" (pacchi No-show da NoShowApp) su nome cliente,
      vista giorno E ricerca (richiesta Andrea: quando un cliente presente nello storico pacchi
      torna a prenotare, il gestionale deve segnalarlo). Nome in ROSSO + nota col dettaglio del
      pacco più recente sotto, se il telefono (ultime 9 cifre normalizzate) o l'email del cliente
      combaciano con un pacco su NoShowApp. Se lo stesso cliente risulta ANCHE con almeno una
      prenotazione onorata in passato (arrivo_status='arrivato'), il colore passa ad ARANCIONE
-     — permanente una volta onorata, resta comunque segnalato (decisione Andrea 27/7/2026). Dati
+     — permanente una volta onorata, resta comunque segnalato (decisione Andrea 27/7/2026, committato 3/8/2026). Dati
      dal campo `pacco` di gestionale-day v4 / gestionale-search v2 (nessuna azione nuova, solo
      lettura). La stessa segnalazione arriva anche nella mail M1bis di create-reservation-checkout
      (ramo giorni "liberi") quando arriva una nuova richiesta di prenotazione. -->
@@ -261,7 +261,7 @@
   <div class="status-line" id="search-status"></div>
 </div>
 
-<footer class="ver">v 2026.07.27.01</footer>
+<footer class="ver">v 2026.08.03.01</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';

@@ -519,7 +519,7 @@ function salvaImpostazioniStampa(vals) {
 
 // Promemoria di stampa (schermo, nascosto in @media print): su questa stampante
 // nessuna combinazione di margini/scala del browser elimina l'asimmetria residua.
-var _STAMPA_HINT = '<div class="stampa-hint">Per una stampa senza margini storti: Stampa → Salva come PDF → apri il PDF con Foxit Reader → Stampa con Scala personalizzata 97%.</div>\n';
+var _STAMPA_HINT = '<style>@media print{.stampa-hint{display:none!important}}</style><div class="stampa-hint">Per una stampa senza margini storti: Stampa → Salva come PDF → apri il PDF con Foxit Reader → Stampa con Scala personalizzata 97%.</div>\n';
 
 // Barra admin per i dolci (Stampa + pulsanti dimensione). Va in menu-dolci-it.html e nella preview.
 function _dolciCtrlBar() {

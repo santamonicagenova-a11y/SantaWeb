@@ -42,6 +42,7 @@
       --rust:  #9e4a2a;
       --rule:  #d4c9b8;
     }
+    @media (max-width:640px){.pg{width:auto!important;max-width:100%!important;min-height:0!important;margin:0!important;padding:26px 16px!important;box-shadow:none!important;}.logo{font-size:1.9rem!important;letter-spacing:.1em!important;}.logo-sub{font-size:.6rem!important;}.lista-titolo{font-size:1.05rem!important;letter-spacing:.12em!important;}.sez-titolo{font-size:1.3rem!important;letter-spacing:.08em!important;}.sommelier{font-size:.62rem!important;}html,body{overflow-x:hidden!important;}}
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -90,6 +91,24 @@
       width: 1px;
       height: 1.4rem;
       background: var(--rule);
+    }
+    .sz-val {
+      font-family: 'Jost', sans-serif;
+      font-size: .62rem;
+      color: var(--stone);
+      min-width: 2.4em;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .stampa-hint {
+      text-align: center;
+      font-family: 'Jost', sans-serif;
+      font-size: .68rem;
+      color: var(--stone);
+      padding: .4rem 1rem .8rem;
+      background: var(--cream);
+      border-bottom: 1px solid var(--rule);
     }
 
     /* ══════════════════════════════════════
@@ -144,9 +163,10 @@
       flex-direction: column;
       justify-content: center;
       padding: 4mm 0;
+      transform: translateY(var(--shift, 0));
     }
     .degu-titolo {
-      font-size: 1.4rem;
+      font-size: calc(1.4rem * var(--fs, 1.12));
       font-weight: 600;
       letter-spacing: .16em;
       text-transform: uppercase;
@@ -154,13 +174,13 @@
     }
     .degu-prezzi {
       font-style: italic;
-      font-size: .98rem;
-      line-height: 1.4;
+      font-size: calc(.98rem * var(--fs, 1.12));
+      line-height: calc(1.4 * var(--lh, 1));
       margin-bottom: 2mm;
     }
     .degu-nota {
       font-style: italic;
-      font-size: .98rem;
+      font-size: calc(.98rem * var(--fs, 1.12));
       color: var(--ink);
       margin-bottom: 14mm;
     }
@@ -171,16 +191,16 @@
       text-underline-offset: 2px;
       color: var(--ink);
     }
-    .percorso { margin-bottom: 12mm; }
+    .percorso { margin-bottom: calc(12mm * var(--gap, 1)); }
     .percorso-label {
       font-style: italic;
       font-weight: 700;
-      font-size: 1.25rem;
+      font-size: calc(1.25rem * var(--fs, 1.12));
       margin-bottom: 3mm;
     }
-    .percorso-piatto { font-size: .96rem; line-height: 1.95; font-style: normal; }
+    .percorso-piatto { font-size: calc(.96rem * var(--fs, 1.12)); line-height: calc(1.95 * var(--lh, 1)); font-style: normal; }
     .percorso-piatto em { font-style: normal; }
-    .percorso-libero { font-size: .96rem; line-height: 1.95; font-style: normal; }
+    .percorso-libero { font-size: calc(.96rem * var(--fs, 1.12)); line-height: calc(1.95 * var(--lh, 1)); font-style: normal; }
 
     /* ── sezioni carta ── */
     .pg-content {
@@ -188,12 +208,13 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      transform: translateY(var(--shift, 0));
     }
-    .sezione { margin-bottom: 14mm; }
+    .sezione { margin-bottom: calc(14mm * var(--gap, 1)); }
     .sezione-titolo {
       font-family: 'Cormorant Garamond', serif;
       font-style: normal;
-      font-size: 1.5rem;
+      font-size: calc(1.5rem * var(--fs, 1.12));
       font-weight: 600;
       letter-spacing: .14em;
       text-transform: uppercase;
@@ -205,24 +226,24 @@
     /* ── piatti carta ── */
     .piatto {
       text-align: center;
-      padding: .5mm 0;
-      font-size: .96rem;
-      line-height: 1.4;
+      padding: calc(.5mm * var(--gap, 1)) 0;
+      font-size: calc(.96rem * var(--fs, 1.12));
+      line-height: calc(1.4 * var(--lh, 1));
     }
     .piatto-prezzo {
-      font-size: .8rem;
+      font-size: calc(.8rem * var(--fs, 1.12));
       color: var(--stone);
       margin-left: .3rem;
     }
     .piatto-unita {
-      font-size: .76rem;
+      font-size: calc(.76rem * var(--fs, 1.12));
       color: var(--stone);
       margin-left: .1rem;
     }
     .piatto-desc {
       font-style: italic;
       font-size: 0.7em;
-      line-height: 1.25;
+      line-height: calc(1.25 * var(--lh, 1));
       color: var(--stone);
       display: block;
       margin-top: 0.3mm;
@@ -230,12 +251,12 @@
     .percorso-desc {
       font-style: italic;
       font-size: 0.7em;
-      line-height: 1.25;
+      line-height: calc(1.25 * var(--lh, 1));
       color: var(--stone);
       display: block;
       margin-top: 0.3mm;
     }
-    .piatto-staccato { margin-top: 3.5mm; }
+    .piatto-staccato { margin-top: calc(3.5mm * var(--gap, 1)); }
 
     .eco::after {
       content: ' *';
@@ -382,11 +403,12 @@
        STAMPA
     ══════════════════════════════════════ */
     @media print {
-      @page { size: A4 portrait; margin: 8mm; } /* v 2026.07.05.01: era margin:0, causava rimpicciolimento auto in stampa (stessa causa/fix gia' applicato a menu-dolci.html il 10/6) */
-      @page orarioPage { size: A4 portrait; margin: 3mm 5mm; } /* v 2026.07.28.01: era margin:0 (full-bleed) - la stampante inventava un margine reale asimmetrico sn/dx; ora dichiarato qui, stesso spazio totale del padding tolto sotto, nessun overflow */
+      @page { size: A4 portrait; margin: 8mm; }
+      @page orarioPage { size: A4 portrait; margin: 3mm 5mm; } /* v 2026.07.28.01: era margin:0 (full-bleed) - costringeva la stampante a inventarsi un margine reale, spesso asimmetrico sn/dx (stessa causa gia' isolata sul @page principale il 5/7). Ora la banda di sicurezza e' dichiarata qui invece che nel padding interno di .pg-orario: stesso spazio totale (3mm/5mm), nessun rischio overflow */
       html { font-size: 20px; } /* +25% leggibilita\u0301 stampa (v 2026.05.14.03) */
       body { background: white; }
       .ctrl-bar { display: none; }
+      .stampa-hint { display: none; }
 
       /* carta: 3 pagine */
       #layout-carta .pg {
@@ -400,7 +422,7 @@
       }
       #layout-carta .pg:last-child { page-break-after: avoid; }
 
-      /* orario: 1 pagina (isolato su @page dedicata, margin 0 invariato) */
+      /* orario: 1 pagina */
       #layout-orario .pg {
         page: orarioPage;
         width: 200mm;
@@ -438,7 +460,7 @@ const MENU = {
     "opzioni": [
       {
         "portate": 6,
-        "prezzo": 90,
+        "prezzo": 85,
         "vini": 60
       },
       {
@@ -736,6 +758,10 @@ function buildDegu(degu) {
 function renderCarta() {
   const root = document.getElementById('layout-carta');
   root.innerHTML = '';
+  if (MENU.fontScale) root.style.setProperty('--fs', MENU.fontScale);
+  if (MENU.lineScale) root.style.setProperty('--lh', MENU.lineScale);
+  if (MENU.gapScale) root.style.setProperty('--gap', MENU.gapScale);
+  if (MENU.shift != null) root.style.setProperty('--shift', MENU.shift + 'mm');
 
   // Pag 1: intestazione + degustazione
   const pag1 = document.createElement('div');
@@ -846,9 +872,18 @@ function showLayout(which) {
 }
 
 /* ── init ── */
+var _sz={fs:(MENU.fontScale!=null?MENU.fontScale:1.12),lh:(MENU.lineScale!=null?MENU.lineScale:1),gap:(MENU.gapScale!=null?MENU.gapScale:1),shift:(MENU.shift!=null?MENU.shift:0)};
+function _szApply(){var r=document.getElementById('layout-carta');if(!r)return;r.style.setProperty('--fs',_sz.fs);r.style.setProperty('--lh',_sz.lh);r.style.setProperty('--gap',_sz.gap);r.style.setProperty('--shift',_sz.shift+'mm');var vf=document.getElementById('szValFs');if(vf)vf.textContent=Math.round(_sz.fs*100)+'%';var vl=document.getElementById('szValLh');if(vl)vl.textContent=Math.round(_sz.lh*100)+'%';var vg=document.getElementById('szValGap');if(vg)vg.textContent=Math.round(_sz.gap*100)+'%';var vs=document.getElementById('szValShift');if(vs)vs.textContent=_sz.shift+'mm';}
+function _szF(d){_sz.fs=Math.max(0.85,Math.min(1.4,Math.round((_sz.fs+d)*100)/100));_szApply();}
+function _szL(d){_sz.lh=Math.max(0.8,Math.min(1.5,Math.round((_sz.lh+d)*100)/100));_szApply();}
+function _szG(d){_sz.gap=Math.max(0.6,Math.min(1.7,Math.round((_sz.gap+d)*100)/100));_szApply();}
+function _szS(d){_sz.shift=Math.max(-25,Math.min(25,_sz.shift+d));_szApply();}
+function _szR(){_sz={fs:1.12,lh:1,gap:1,shift:0};_szApply();}
+function _szSave(){if(window.opener&&window.opener.salvaImpostazioniStampa){window.opener.salvaImpostazioniStampa({fs:_sz.fs,lh:_sz.lh,gap:_sz.gap,shift:_sz.shift});}}
 renderCarta();
 renderOrario();
 showLayout('carta');
+_szApply();
 </script>
 </body>
 </html>

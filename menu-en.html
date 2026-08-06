@@ -383,7 +383,7 @@
     ══════════════════════════════════════ */
     @media print {
       @page { size: A4 portrait; margin: 8mm; }
-      @page orarioPage { size: A4 portrait; margin: 3mm 5mm; } /* v 2026.07.26.01: era margin:0 (full-bleed) - costringeva la stampante a inventarsi un margine reale, spesso asimmetrico sn/dx (stessa causa gia' isolata sul @page principale il 5/7). Ora la banda di sicurezza e' dichiarata qui invece che nel padding interno di .pg-orario: stesso spazio totale (3mm/5mm), nessun rischio overflow */
+      @page orarioPage { size: A4 portrait; margin: 3mm 5mm; } /* v 2026.07.28.01: era margin:0 (full-bleed) - costringeva la stampante a inventarsi un margine reale, spesso asimmetrico sn/dx (stessa causa gia' isolata sul @page principale il 5/7). Ora la banda di sicurezza e' dichiarata qui invece che nel padding interno di .pg-orario: stesso spazio totale (3mm/5mm), nessun rischio overflow */
       html { font-size: 20px; } /* +25% leggibilita\u0301 stampa (v 2026.05.14.03) */
       body { background: white; }
       .ctrl-bar { display: none; }
@@ -413,7 +413,7 @@
       }
 
       /* ----- v 2026.05.17.02: scaling dedicato orario per evitare trabocco A4 (riduzione aggressiva) ----- */
-      /* v 2026.07.26.01: padding spostato nel margine di @page orarioPage (vedi sopra), qui azzerato per non raddoppiare l'inset */
+      /* v 2026.07.28.01: padding spostato nel margine di @page orarioPage (vedi sopra), qui azzerato per non raddoppiare l'inset */
       #layout-orario .pg-orario { padding: 0; }
       #layout-orario .orario-logo { font-size: 2.9rem; margin-bottom: 3mm; }
       #layout-orario .orario-col { padding: 3mm 5mm; gap: 3mm; }
@@ -479,7 +479,7 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "<em>Mancini</em> tubetti, salt cod, spinach, citrus kosho",
+          "nome": "<em>Mancini</em> tubetti, salted cod, spinach, citrus kosho",
           "sostenibile": true
         },
         {
@@ -500,8 +500,8 @@ const MENU = {
       "titolo": "Crudi",
       "piatti": [
         {
-          "nome": "Fine de Claire Oysters",
-          "prezzo": 4,
+          "nome": "Gillardeau Oysters",
+          "prezzo": 7,
           "unita": "ea."
         },
         {
@@ -586,7 +586,7 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "<em>Mancini</em> tubetti, salt cod, spinach, citrus kosho",
+          "nome": "<em>Mancini</em> tubetti, salted cod, spinach, citrus kosho",
           "prezzo": 22,
           "sostenibile": true
         },
@@ -629,19 +629,19 @@ const MENU = {
       "piatti": [
         {
           "nome": "Black lemon, lovage and lime ice cream with milk biscuits",
-          "prezzo": 14
+          "prezzo": 12
         },
         {
           "nome": "Pineapple, charcoal parfait, coffee caramel",
-          "prezzo": 14
+          "prezzo": 12
         },
         {
           "nome": "Porcini mushroom ice cream, strawberries, chocolate crumble",
-          "prezzo": 14
+          "prezzo": 12
         },
         {
           "nome": "Sacripantina",
-          "prezzo": 11
+          "prezzo": 12
         },
         {
           "nome": "Ligurian blue cheese and Picolit Zorzettig",

@@ -1,4 +1,6 @@
 // Core functions per menu-admin Santamonica
+// v 2026.08.08.04 — Riquadro laterale dolci: aggiunta riga con testo sottolineato "Dalla Preview
+//   puoi stampare direttamente, senza salvare prima in PDF" (_SIDE_NOTE_HTML.dolci).
 // v 2026.08.08.03 — Carta (solo carta, non dolci): colonna "Nome piatto" allargata a 3fr,
 //   "Descrizione" dimezzata rispetto a prima (1fr invece dell'equivalente di 3fr → 1/4 dello
 //   spazio flessibile invece di 1/2). Nuova classe wrap.is-carta impostata da costruisci() in
@@ -227,6 +229,7 @@ var _SIDE_NOTE_HTML = {
     '<li>Il sito si aggiorna in <strong>~90 secondi</strong></li>' +
     '<li>Per aggiornarli anche in <strong>EN/FR</strong>: aspetta ~1–2 min, poi «Menù alla carta» → Traduci e Pubblica (i dolci vivono dentro la carta tradotta)</li>' +
     '<li>Un dolce ti sembra "tornato indietro"? Ricarica qui con «Menù dolci»: quello che vedi è sempre la versione vera pubblicata</li>' +
+    '<li><span style="text-decoration:underline">Dalla Preview puoi stampare direttamente</span>, senza salvare prima in PDF</li>' +
     '</ul>',
   allergeni:
     '<div class="warn"><strong>Gli allergeni si modificano e pubblicano SOLO da qui.</strong> Sono un dato di sicurezza alimentare: non fidarti mai di una copia salvata altrove, ricarica sempre da qui prima di controllare/correggere.</div>' +

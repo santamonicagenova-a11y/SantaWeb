@@ -317,6 +317,7 @@
 <!-- v 2026.07.05.03 — pannello Reminder: aggiornato il testo (il reminder è automatico per tutte le prenotazioni future dal 7/7, non serve più confermare) + liste "da confermare"/"confermate" unite in una sola "Prossime prenotazioni" senza pulsanti conferma/rifiuta (rimosse confirmReminderRow/rejectReminderRow, ora inutilizzate). -->
 <!-- v 2026.07.05.02 — nuova voce nav "📅 Gestionale (Calendario/Servizio)" → link diretto a gestionale.html (pagina standalone, vista mese/giorno prenotazioni ispirata a TheFork Manager). -->
 <!-- v 2026.07.04.01 — Reminder prenotazioni: nuova voce nav "✉ Reminder prenotazioni" → sezione #reminder-section (setup messaggio+tempistiche del promemoria automatico al cliente + lista prenotazioni da confermare/confermate). Backend nuovo: reservation-confirm (link conferma/rifiuta da mail M1bis), send-reservation-reminders (motore, pg_cron ogni 15 min), reminder-settings-status (GET) + set-reminder-settings (POST, auth gh_token). Bump ?v= admin-core.js a 2026.07.04.01 (aggiunto 'reminder-section' a _pulisciViste). -->
+<!-- v 2026.08.08.04 — riquadro dolci: aggiunta riga sottolineata "Dalla Preview puoi stampare direttamente, senza salvare prima in PDF" (_SIDE_NOTE_HTML.dolci in admin-core.js). Bump ?v= admin-core.js a 2026.08.08.04 + footer. -->
 <!-- v 2026.08.08.03 — carta: colonna "Nome piatto" allargata (3fr) e "Descrizione" dimezzata rispetto a prima, SOLO sulla carta (i dolci restano invariati, stessa griglia condivisa). Nuova regola CSS .wrap.is-carta .grid-row/.grid-hdr; classe assegnata da costruisci() in admin-core.js. Bump ?v= admin-core.js a 2026.08.08.03 + footer. -->
 <!-- v 2026.08.08.02 — riquadro laterale esteso a «Menù dolci» e «Allergeni carta» (stesso rischio confermato: gli archivi locali menu-dolci*.html/menu-allergeni.html erano molto disallineati dal live e risincronizzati in questa sessione). Testo dinamico per tipo via _setCartaSideNote() in admin-core.js. Bump ?v= admin-core.js a 2026.08.08.02 + footer. -->
 <!-- v 2026.08.08.01 — riquadro laterale "📖 Promemoria carta" (fisso, visibile solo su «Menù alla carta»): ricorda che i piatti si pubblicano SOLO dal pannello, mai da file salvati altrove (causa dell'incidente riso 8/8). CSS .carta-side-note + div#carta-side-note in menu-admin.html; toggle in caricaDalSito() e _pulisciViste() di admin-core.js. Vedi progetto-sito/PROCEDURA_menu_modifiche_v2026.08.08.01.md. Bump ?v= admin-core.js a 2026.08.08.01 + footer. -->
@@ -1167,7 +1168,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.07.28.03"></script>
-<script src="admin-core.js?v=2026.08.08.03"></script>
+<script src="admin-core.js?v=2026.08.08.04"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -3496,7 +3497,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.08.08.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.08.08.04</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

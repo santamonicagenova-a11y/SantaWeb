@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!-- v 2026.08.08.02 — la vista giorno (e la ricerca) ora mostrano il DETTAGLIO reale della
+     garanzia (penale, ore disdetta, codice SafeTable) sotto ogni prenotazione, non solo il
+     badge sintetico "✓ Garanzia" — richiesta Andrea dopo il commit della v.01, che aveva
+     esteso il match ma il dettaglio restava visibile solo nel pannello "Garanzie (SafeTable)"
+     dedicato. Nuovo campo `garanzia_detail` da gestionale-day v7 / gestionale-search v5
+     (short_id/penale/ore_disdetta, sia per garanzie collegate esplicitamente sia per quelle
+     matchate per telefono/email+data). -->
 <!-- v 2026.08.08.01 — integrazione SafeTable nel gestionale (richiesta Andrea): (1) nuovo
      pannello "🔒 Garanzie (SafeTable)" (bottone accanto alla ricerca) — elenca TUTTE le
      richieste di garanzia SafeTable, passate e future, non solo quelle già collegate a una
@@ -305,7 +312,7 @@
   <div class="status-line" id="garanzie-status"></div>
 </div>
 
-<footer class="ver">v 2026.08.08.01</footer>
+<footer class="ver">v 2026.08.08.02</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';
@@ -564,6 +571,18 @@ function garanziaBadge(r) {
   return '';
 }
 
+// Riga di dettaglio sotto il nome, con i dati reali della garanzia SafeTable (penale/ore
+// disdetta/codice) — non solo il badge sintetico. r.garanzia_detail viene da gestionale-day v7
+// (collegata via cauzione_short_id, o matchata per telefono/email+data se non collegata).
+function garanziaDetailHtml(r) {
+  if (!r.garanzia_detail) return '';
+  var d = r.garanzia_detail;
+  var txt = 'Garanzia SafeTable — ' + (d.penale != null ? d.penale + ' €/persona' : '—') +
+    ' · disdetta ' + (d.ore_disdetta != null ? d.ore_disdetta + 'h' : '—') +
+    ' · codice ' + d.short_id;
+  return '<div class="gz-meta">' + escapeHtml(txt) + '</div>';
+}
+
 function buildArrivoControls(r, onChanged) {
   var wrap = document.createElement('div'); wrap.className = 'res-actions';
   var opts = [
@@ -599,6 +618,7 @@ function renderDay(rows) {
         '<div class="meta">' + (r.telefono ? '<a href="tel:' + escapeHtml(r.telefono) + '">' + escapeHtml(r.telefono) + '</a>' : '') +
           (r.occasione ? ' · ' + escapeHtml(r.occasione) : '') +
           (r.intolleranze ? ' · ' + escapeHtml(r.intolleranze) : '') + '</div>' +
+        garanziaDetailHtml(r) +
       '</div>' +
       '<div>' + statusBadge(r) + ' ' + confermaBadge(r) + ' ' + garanziaBadge(r) + '</div>';
     var remBtns = buildReminderButtons(r, curDate);
@@ -685,6 +705,7 @@ function renderSearch(rows) {
         '<div class="meta">' + (r.telefono ? '<a href="tel:' + escapeHtml(r.telefono) + '">' + escapeHtml(r.telefono) + '</a>' : '') +
           (r.email ? ' · ' + escapeHtml(r.email) : '') +
           (r.occasione ? ' · ' + escapeHtml(r.occasione) : '') + '</div>' +
+        garanziaDetailHtml(r) +
       '</div>' +
       '<div>' + statusBadge(r) + ' ' + confermaBadge(r) + ' ' + garanziaBadge(r) + '</div>';
     var goBtn = document.createElement('button');

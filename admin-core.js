@@ -1,4 +1,13 @@
 // Core functions per menu-admin Santamonica
+// v 2026.08.08.03 — Carta (solo carta, non dolci): colonna "Nome piatto" allargata a 3fr,
+//   "Descrizione" dimezzata rispetto a prima (1fr invece dell'equivalente di 3fr → 1/4 dello
+//   spazio flessibile invece di 1/2). Nuova classe wrap.is-carta impostata da costruisci() in
+//   base a tipoMenuCorrente, CSS scoping in menu-admin.html (.wrap.is-carta .grid-row/.grid-hdr).
+// v 2026.08.08.02 — Riquadro laterale esteso a «Menù dolci» e «Allergeni carta» (stesso rischio
+//   confermato: gli archivi locali menu-dolci*.html/menu-allergeni.html erano molto disallineati
+//   dal live — prezzi, titoli sezione e allergeni vecchi — e sono stati risincronizzati dal live
+//   in questa sessione). Nuova funzione _setCartaSideNote(tipo) con 3 testi (_SIDE_NOTE_HTML)
+//   chiamata da caricaDalSito() (carta/dolci) e costruisciFormAllergeni() (allergeni).
 // v 2026.08.08.01 — Riquadro laterale fisso "📖 Promemoria carta" visibile solo su «Menù alla
 //   carta»: ricorda che i piatti si pubblicano SOLO da questo pannello (mai da file salvati
 //   altrove), causa dell'incidente riso tornato vecchio dell'8/8/2026. Toggle in caricaDalSito()
@@ -198,6 +207,51 @@ function chk(id, v) {
   return e;
 }
 
+// Testi del riquadro laterale "📖 Promemoria" per carta/dolci/allergeni (v 2026.08.08.02).
+// Stessa regola per tutti e tre: pubblicano SOLO da qui, mai da file salvati altrove — è la
+// causa dell'incidente riso dell'8/8/2026 (menu.html/menu-it.html) e vale identica per i file
+// che il pannello pubblica per dolci e allergeni (menu-dolci*.html, menu-allergeni.html).
+var _SIDE_NOTE_HTML = {
+  carta:
+    '<div class="warn"><strong>I piatti si modificano e pubblicano SOLO da qui.</strong> Non copiare mai file di menù salvati altrove: sovrascriverebbero i piatti con una versione vecchia.</div>' +
+    '<ul>' +
+    '<li>Modifica → <strong>Preview</strong> per controllare → <strong>✦ Traduci e Pubblica</strong></li>' +
+    '<li>Il sito si aggiorna in <strong>~90 secondi</strong></li>' +
+    '<li>Hai toccato anche gli <strong>allergeni</strong>? Pubblica prima la carta, poi «Allergeni carta» → Pubblica, poi ripubblica la carta un\'ultima volta (aggiorna anche EN/FR)</li>' +
+    '<li>Un piatto ti sembra "tornato indietro"? Ricarica qui con «Menù alla carta»: quello che vedi è sempre la versione vera pubblicata</li>' +
+    '</ul>',
+  dolci:
+    '<div class="warn"><strong>I dolci si modificano e pubblicano SOLO da qui.</strong> Non copiare mai file salvati altrove: sovrascriverebbero i dolci con una versione vecchia (prezzi/nomi/note).</div>' +
+    '<ul>' +
+    '<li>Modifica → <strong>Preview 🇮🇹</strong> per controllare → <strong>✦ Traduci e Pubblica</strong> (pubblica l\'italiano)</li>' +
+    '<li>Il sito si aggiorna in <strong>~90 secondi</strong></li>' +
+    '<li>Per aggiornarli anche in <strong>EN/FR</strong>: aspetta ~1–2 min, poi «Menù alla carta» → Traduci e Pubblica (i dolci vivono dentro la carta tradotta)</li>' +
+    '<li>Un dolce ti sembra "tornato indietro"? Ricarica qui con «Menù dolci»: quello che vedi è sempre la versione vera pubblicata</li>' +
+    '</ul>',
+  allergeni:
+    '<div class="warn"><strong>Gli allergeni si modificano e pubblicano SOLO da qui.</strong> Sono un dato di sicurezza alimentare: non fidarti mai di una copia salvata altrove, ricarica sempre da qui prima di controllare/correggere.</div>' +
+    '<ul>' +
+    '<li>Questa pagina riprende i piatti della <strong>carta già pubblicata</strong>: se hai appena cambiato i piatti, pubblica prima la carta e aspetta ~1–2 min <em>prima</em> di aprire qui, altrimenti riprende piatti vecchi</li>' +
+    '<li>Spunta gli allergeni → <strong>✦ Traduci e Pubblica</strong> (pubblica l\'italiano)</li>' +
+    '<li>Per aggiornarli anche in <strong>EN/FR</strong>: aspetta ~1–2 min, poi «Menù alla carta» → Traduci e Pubblica</li>' +
+    '</ul>'
+};
+var _SIDE_NOTE_TITLE = { carta: '📖 Promemoria carta', dolci: '📖 Promemoria dolci', allergeni: '📖 Promemoria allergeni' };
+
+function _setCartaSideNote(tipo) {
+  var sn = document.getElementById('carta-side-note');
+  if (!sn) return;
+  var body = _SIDE_NOTE_HTML[tipo];
+  if (!body) { sn.classList.remove('on'); return; }
+  var h4 = sn.querySelector('h4');
+  if (h4) h4.childNodes[0].nodeValue = _SIDE_NOTE_TITLE[tipo] + ' ';
+  var rest = sn.querySelector('.warn') ? sn.querySelector('.warn').parentNode : sn;
+  // Rimuove tutto tranne l'header <h4>, poi reinietta il corpo del tipo scelto
+  Array.prototype.slice.call(sn.children).forEach(function(c){ if (c.tagName !== 'H4') sn.removeChild(c); });
+  sn.insertAdjacentHTML('beforeend', body);
+  sn.classList.add('on');
+}
+
 // Nasconde TUTTE le viste/sezioni e svuota il form della carta.
 // Va chiamata a ogni caricamento (carta, dolci, allergeni, vini, foto, documento generico,
 // prenotazioni) così la pagina non trascina la vista precedente in fondo.
@@ -206,7 +260,7 @@ function _pulisciViste() {
     var e = document.getElementById(id); if (e) e.style.display = 'none';
   });
   var w = document.getElementById('wrap');
-  if (w) { w.classList.remove('on'); w.innerHTML = ''; }
+  if (w) { w.classList.remove('on'); w.classList.remove('is-carta'); w.innerHTML = ''; }
   var sn = document.getElementById('carta-side-note');
   if (sn) sn.classList.remove('on');
 }
@@ -214,6 +268,7 @@ function _pulisciViste() {
 function costruisci() {
   var wrap = document.getElementById('wrap');
   wrap.innerHTML = '';
+  wrap.classList.toggle('is-carta', tipoMenuCorrente === 'carta'); // v 2026.08.08.03: solo la carta ha "Nome piatto" allargato / "Descrizione" dimezzata (vedi CSS .wrap.is-carta .grid-row)
   var m = dati;
 
   /* Le impostazioni stampa (caratteri/interlinea/spazio/posizione) sono ora PULSANTI nella
@@ -584,8 +639,7 @@ function caricaDalSito(tipo) {
         document.getElementById('intro').style.display = 'none';
         document.getElementById('wrap').classList.add('on');
         costruisci();
-        var sn = document.getElementById('carta-side-note');
-        if (sn) sn.classList.toggle('on', tipo === 'carta');
+        _setCartaSideNote(tipo === 'dolci' ? 'dolci' : 'carta');
         toast('✓ Menù caricato dal sito');
       } catch(ex) {
         document.getElementById('err').textContent = 'Errore: ' + ex.message;
@@ -1422,6 +1476,7 @@ function costruisciFormAllergeni() {
   tipoMenuCorrente = 'allergeni';
   document.getElementById('intro').style.display = 'none';
   document.getElementById('wrap').classList.add('on');
+  _setCartaSideNote('allergeni');
 
   // Sincronizza i piatti del menu carta → struttura allergeni
   // Mantiene gli allergeni già salvati per piatti che esistono ancora

@@ -1,4 +1,8 @@
 // Core functions per menu-admin Santamonica
+// v 2026.08.08.01 — Riquadro laterale fisso "📖 Promemoria carta" visibile solo su «Menù alla
+//   carta»: ricorda che i piatti si pubblicano SOLO da questo pannello (mai da file salvati
+//   altrove), causa dell'incidente riso tornato vecchio dell'8/8/2026. Toggle in caricaDalSito()
+//   (tipo==='carta') e reset in _pulisciViste(). HTML/CSS in menu-admin.html (#carta-side-note).
 // v 2026.07.28.02 — Ripristinati 2 elementi persi in una sessione precedente (segnalati da
 //   Andrea, assenti anche sul live prima di questo fix): pulsante "✔ Fissa come default" in
 //   _SIZE_BTNS (nuova funzione salvaImpostazioniStampa(vals), scrive in dati.fontScale/
@@ -203,6 +207,8 @@ function _pulisciViste() {
   });
   var w = document.getElementById('wrap');
   if (w) { w.classList.remove('on'); w.innerHTML = ''; }
+  var sn = document.getElementById('carta-side-note');
+  if (sn) sn.classList.remove('on');
 }
 
 function costruisci() {
@@ -519,7 +525,7 @@ function salvaImpostazioniStampa(vals) {
 
 // Promemoria di stampa (schermo, nascosto in @media print): su questa stampante
 // nessuna combinazione di margini/scala del browser elimina l'asimmetria residua.
-var _STAMPA_HINT = '<style>@media print{.stampa-hint{display:none!important}}</style><div class="stampa-hint">Per una stampa senza margini storti: Stampa → Salva come PDF → apri il PDF con Foxit Reader → Stampa con Scala personalizzata 97%.</div>\n';
+var _STAMPA_HINT = '<div class="stampa-hint">Per una stampa senza margini storti: Stampa → Salva come PDF → apri il PDF con Foxit Reader → Stampa con Scala personalizzata 97%.</div>\n';
 
 // Barra admin per i dolci (Stampa + pulsanti dimensione). Va in menu-dolci-it.html e nella preview.
 function _dolciCtrlBar() {
@@ -578,6 +584,8 @@ function caricaDalSito(tipo) {
         document.getElementById('intro').style.display = 'none';
         document.getElementById('wrap').classList.add('on');
         costruisci();
+        var sn = document.getElementById('carta-side-note');
+        if (sn) sn.classList.toggle('on', tipo === 'carta');
         toast('✓ Menù caricato dal sito');
       } catch(ex) {
         document.getElementById('err').textContent = 'Errore: ' + ex.message;

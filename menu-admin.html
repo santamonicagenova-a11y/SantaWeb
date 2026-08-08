@@ -317,6 +317,7 @@
 <!-- v 2026.07.05.03 — pannello Reminder: aggiornato il testo (il reminder è automatico per tutte le prenotazioni future dal 7/7, non serve più confermare) + liste "da confermare"/"confermate" unite in una sola "Prossime prenotazioni" senza pulsanti conferma/rifiuta (rimosse confirmReminderRow/rejectReminderRow, ora inutilizzate). -->
 <!-- v 2026.07.05.02 — nuova voce nav "📅 Gestionale (Calendario/Servizio)" → link diretto a gestionale.html (pagina standalone, vista mese/giorno prenotazioni ispirata a TheFork Manager). -->
 <!-- v 2026.07.04.01 — Reminder prenotazioni: nuova voce nav "✉ Reminder prenotazioni" → sezione #reminder-section (setup messaggio+tempistiche del promemoria automatico al cliente + lista prenotazioni da confermare/confermate). Backend nuovo: reservation-confirm (link conferma/rifiuta da mail M1bis), send-reservation-reminders (motore, pg_cron ogni 15 min), reminder-settings-status (GET) + set-reminder-settings (POST, auth gh_token). Bump ?v= admin-core.js a 2026.07.04.01 (aggiunto 'reminder-section' a _pulisciViste). -->
+<!-- v 2026.08.08.01 — riquadro laterale "📖 Promemoria carta" (fisso, visibile solo su «Menù alla carta»): ricorda che i piatti si pubblicano SOLO dal pannello, mai da file salvati altrove (causa dell'incidente riso 8/8). CSS .carta-side-note + div#carta-side-note in menu-admin.html; toggle in caricaDalSito() e _pulisciViste() di admin-core.js. Vedi progetto-sito/PROCEDURA_menu_modifiche_v2026.08.08.01.md. Bump ?v= admin-core.js a 2026.08.08.01 + footer. -->
 <!-- v 2026.06.14.01 — carta: pulsante "+ Aggiungi piatto" in ogni sezione (admin-core.js): bump ?v= admin-core.js a 2026.06.14.01. -->
 <!-- v 2026.06.10.14 — pannello "Buoni regalo" (3 campi valori buoni liberi → pubblica voucher-config.json): nuova voce nav + sezione #buoni-section + bump ?v= admin-core.js a 2026.06.10.13. -->
 <!-- v 2026.06.10.11 — impostazioni stampa carta/dolci da cursori a PULSANTI nella barra della preview: bump ?v= admin-core.js a 2026.06.10.10 e admin-templates-shared.js a 2026.06.10.06 + footer. -->
@@ -398,6 +399,18 @@
 
     .wrap { max-width:900px; margin:1.5rem auto; padding:0 1rem; display:none; }
     .wrap.on { display:block; }
+
+    /* Riquadro laterale promemoria procedura carta (v 2026.08.08.01) */
+    .carta-side-note { position:fixed; top:110px; right:16px; width:230px; background:var(--sand); border:1px solid var(--rule); border-radius:var(--radius-lg); padding:.8rem .9rem; font-size:.72rem; line-height:1.5; color:var(--ink); box-shadow:0 8px 24px rgba(0,0,0,.35); z-index:50; display:none; }
+    .carta-side-note.on { display:block; }
+    .carta-side-note h4 { margin:0 0 .5rem; font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; color:var(--stone); display:flex; justify-content:space-between; align-items:center; }
+    .carta-side-note h4 button { background:none; border:none; color:var(--stone); cursor:pointer; font-size:.85rem; line-height:1; padding:0 .2rem; }
+    .carta-side-note ul { margin:0; padding-left:1.05rem; }
+    .carta-side-note li { margin-bottom:.5rem; }
+    .carta-side-note li:last-child { margin-bottom:0; }
+    .carta-side-note strong { color:var(--ink); }
+    .carta-side-note .warn { border-left:3px solid var(--rust); background:var(--field); padding:.4rem .55rem; margin:0 0 .6rem; border-radius:4px; }
+    @media (max-width:1300px) { .carta-side-note { display:none !important; } }
 
     .fs { background:var(--surface); border:1px solid var(--rule); border-radius:var(--radius-lg); margin-bottom:1.5rem; box-shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 8px 24px rgba(0,0,0,.35); overflow:hidden; }
     .fs-head { background:var(--sand); padding:.65rem 1.2rem; font-size:.7rem; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--stone); border-bottom:1px solid var(--rule); }
@@ -533,6 +546,17 @@
   </details>
   <input type="file" id="file-input" accept=".html" onchange="carica(this)" style="display:none" />
   <div class="err" id="err"></div>
+</div>
+
+<div class="carta-side-note" id="carta-side-note">
+  <h4>📖 Promemoria carta <button type="button" onclick="document.getElementById('carta-side-note').classList.remove('on')" title="Nascondi">✕</button></h4>
+  <div class="warn"><strong>I piatti si modificano e pubblicano SOLO da qui.</strong> Non copiare mai file di menù salvati altrove: sovrascriverebbero i piatti con una versione vecchia.</div>
+  <ul>
+    <li>Modifica → <strong>Preview</strong> per controllare → <strong>✦ Traduci e Pubblica</strong></li>
+    <li>Il sito si aggiorna in <strong>~90 secondi</strong></li>
+    <li>Hai toccato anche gli <strong>allergeni</strong>? Pubblica prima la carta, poi «Allergeni carta» → Pubblica, poi ripubblica la carta un'ultima volta (aggiorna anche EN/FR)</li>
+    <li>Un piatto ti sembra "tornato indietro"? Ricarica qui con «Menù alla carta»: quello che vedi è sempre la versione vera pubblicata</li>
+  </ul>
 </div>
 
 <div class="wrap" id="wrap"></div>
@@ -1139,7 +1163,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.07.28.03"></script>
-<script src="admin-core.js?v=2026.07.28.02"></script>
+<script src="admin-core.js?v=2026.08.08.01"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -3468,7 +3492,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.07.28.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.08.08.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

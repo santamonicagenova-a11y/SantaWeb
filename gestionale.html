@@ -1,4 +1,22 @@
 <!DOCTYPE html>
+<!-- v 2026.08.08.01 — integrazione SafeTable nel gestionale (richiesta Andrea): (1) nuovo
+     pannello "🔒 Garanzie (SafeTable)" (bottone accanto alla ricerca) — elenca TUTTE le
+     richieste di garanzia SafeTable, passate e future, non solo quelle già collegate a una
+     prenotazione (nuova azione list_cauzioni su set-reminder-settings v10, stesso gh_token già
+     usato altrove nel gestionale); filtro Prossime/Passate/Tutte; ogni riga mostra cliente,
+     data/ora, persone, penale/ore disdetta, stato (richiesta/effettuata/arrivata/addebitata/
+     annullata/no-show) e, se trovata, la prenotazione collegata con bottone "Vai al giorno".
+     (2) il badge garanzia nella vista giorno E nella ricerca ora funziona anche per le
+     prenotazioni SENZA link esplicito (gestionale-day v6 / gestionale-search v4 fanno un
+     match automatico per telefono o email sullo stesso giorno) — prima il badge compariva solo
+     per le prenotazioni nate dal wizard con carta obbligatoria; le garanzie generate a mano da
+     SafeTable via il link della mail M1bis (giorni "liberi") restavano invisibili nel
+     gestionale pur esistendo. (3) quando si preme "Arrivato" su una prenotazione senza link
+     esplicito, il backend (set_arrivo_status, set-reminder-settings v10) prova ad agganciare
+     automaticamente la garanzia corrispondente (stesso match) e la marca arrivata in SafeTable
+     — stesso identico effetto dello spunta manuale in SafeTable, ora esteso anche a queste
+     prenotazioni. Nessuna modifica alle azioni esistenti, solo lettura in più + un'estensione
+     del match già usato per il badge garanzia. -->
 <!-- v 2026.08.03.01 — flag "cliente segnalato" (pacchi No-show da NoShowApp) su nome cliente,
      vista giorno E ricerca (richiesta Andrea: quando un cliente presente nello storico pacchi
      torna a prenotare, il gestionale deve segnalarlo). Nome in ROSSO + nota col dettaglio del
@@ -178,6 +196,14 @@
     .res-info .pacco-note { font-size:.68rem; margin-top:.1rem; }
     .res-info .pacco-note.pacco-rosso { color:#c0392b; }
     .res-info .pacco-note.pacco-arancione { color:#c07a1e; }
+
+    .gz-filters { display:flex; gap:.4rem; margin-bottom:1rem; }
+    .badge-charged { background:#eee3f5; color:#6a3d9a; border:1px solid #d7bfe8; }
+    .badge-noshow { background:#f6e7e2; color:var(--rust); border:1px solid #e3bcac; }
+    .res-info .gz-meta { font-size:.72rem; color:var(--stone); margin-top:.15rem; }
+    .res-info .gz-match { font-size:.72rem; margin-top:.25rem; }
+    .res-info .gz-match.found { color:var(--ok); }
+    .res-info .gz-match.missing { color:var(--stone); font-style:italic; }
   </style>
 </head>
 <body>
@@ -194,6 +220,7 @@
   <input type="text" id="search-input" placeholder="Cerca cliente per nome, telefono o email…" onkeydown="if(event.key==='Enter'){event.preventDefault();doSearch();}" />
   <button class="btn" onclick="doSearch()">Cerca</button>
   <button class="btn" id="search-clear-btn" onclick="clearSearch()" style="display:none;">✕ Chiudi ricerca</button>
+  <button class="btn" onclick="openGaranzie()">🔒 Garanzie (SafeTable)</button>
 </div>
 
 <div class="toolbar">
@@ -261,7 +288,24 @@
   <div class="status-line" id="search-status"></div>
 </div>
 
-<footer class="ver">v 2026.08.03.01</footer>
+<div class="day-wrap" id="garanzie-wrap">
+  <div class="day-hdr">
+    <button class="btn" onclick="closeGaranzie()">‹ Torna al mese</button>
+    <div>
+      <h2>Garanzie SafeTable</h2>
+      <div class="sub" id="garanzie-sub"></div>
+    </div>
+  </div>
+  <div class="gz-filters">
+    <button class="btn" id="gz-filter-prossime" onclick="setGaranzieFilter('prossime')">Prossime</button>
+    <button class="btn" id="gz-filter-passate" onclick="setGaranzieFilter('passate')">Passate</button>
+    <button class="btn" id="gz-filter-tutte" onclick="setGaranzieFilter('tutte')">Tutte</button>
+  </div>
+  <div id="garanzie-list"></div>
+  <div class="status-line" id="garanzie-status"></div>
+</div>
+
+<footer class="ver">v 2026.08.08.01</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';
@@ -658,6 +702,129 @@ function goToSearchResultDay(dateStr) {
   document.getElementById('search-wrap').classList.remove('on');
   document.getElementById('search-clear-btn').style.display = 'none';
   openDay(dateStr);
+}
+
+// ══ GARANZIE (SafeTable) — pannello di sola lettura con TUTTE le richieste di garanzia,
+// passate e future, non solo quelle già collegate a una prenotazione (azione list_cauzioni,
+// set-reminder-settings v10). Ogni riga mostra anche, se trovata, la prenotazione collegata
+// (match per link esplicito o per telefono/email+data, calcolato lato server). ═══════════════
+var CAUZIONI_ALL = [];
+var garanzieFilter = 'prossime';
+
+function _garanzieSetStatus(msg, isErr) {
+  var el = document.getElementById('garanzie-status');
+  el.textContent = msg || '';
+  el.className = 'status-line' + (isErr ? ' err' : '');
+}
+
+function openGaranzie() {
+  document.getElementById('cal-wrap').style.display = 'none';
+  document.getElementById('day-wrap').classList.remove('on');
+  document.getElementById('search-wrap').classList.remove('on');
+  document.getElementById('search-clear-btn').style.display = 'none';
+  document.querySelector('.toolbar').style.display = 'none';
+  document.getElementById('garanzie-wrap').classList.add('on');
+  loadGaranzie();
+}
+
+function closeGaranzie() {
+  document.getElementById('garanzie-wrap').classList.remove('on');
+  document.getElementById('cal-wrap').style.display = '';
+  document.querySelector('.toolbar').style.display = '';
+  loadMonth();
+}
+
+function setGaranzieFilter(f) {
+  garanzieFilter = f;
+  renderGaranzie();
+}
+
+function loadGaranzie() {
+  var token = _ghToken();
+  if (!token) { _garanzieSetStatus('Serve il token GitHub per leggere le garanzie SafeTable.', true); return; }
+  _garanzieSetStatus('Caricamento…');
+  fetch(ACTION_URL, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'list_cauzioni', github_token: token }),
+  })
+    .then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); })
+    .then(function (res) {
+      if (res.status === 200 && res.body && res.body.ok) {
+        CAUZIONI_ALL = res.body.cauzioni || [];
+        _garanzieSetStatus('');
+        renderGaranzie();
+      } else if (res.status === 401) {
+        _garanzieSetStatus('Token GitHub non valido o senza permessi.', true);
+      } else {
+        _garanzieSetStatus((res.body && res.body.error) || 'Errore.', true);
+      }
+    })
+    .catch(function () { _garanzieSetStatus('Errore di connessione.', true); });
+}
+
+function garanziaStatusInfo(c) {
+  // status Stripe-driven (pending/confirmed/arrived/charged/cancelled) + no_show_at a parte.
+  if (c.no_show_at) return { cls: 'badge-noshow', label: 'No-show' };
+  if (c.status === 'pending') return { cls: 'badge-cauzione', label: 'Garanzia richiesta' };
+  if (c.status === 'confirmed') return { cls: 'badge-ok', label: '✓ Garanzia effettuata' };
+  if (c.status === 'arrived') return { cls: 'badge-ok', label: '✓ Arrivato' };
+  if (c.status === 'charged') return { cls: 'badge-charged', label: '€ Penale addebitata' };
+  if (c.status === 'cancelled') return { cls: 'badge-no', label: 'Annullata' };
+  return { cls: 'badge-cauzione', label: c.status || '—' };
+}
+
+function fmtDataPrenotazione(dp) {
+  if (!dp) return '—';
+  var parts = String(dp).split(/[T ]/);
+  var datePart = parts[0], timePart = (parts[1] || '').slice(0, 5);
+  return fmtItDateShort(datePart) + (timePart ? ' · ' + timePart : '');
+}
+
+function renderGaranzie() {
+  var todayS = todayStr();
+  var rows = CAUZIONI_ALL.filter(function (c) {
+    var day = String(c.data_prenotazione || '').slice(0, 10);
+    if (garanzieFilter === 'prossime') return day >= todayS;
+    if (garanzieFilter === 'passate') return day < todayS;
+    return true;
+  });
+
+  ['prossime', 'passate', 'tutte'].forEach(function (f) {
+    var b = document.getElementById('gz-filter-' + f);
+    b.classList.toggle('btn-ok', f === garanzieFilter);
+  });
+
+  document.getElementById('garanzie-sub').textContent =
+    rows.length + ' garanzi' + (rows.length === 1 ? 'a' : 'e') + ' (' + garanzieFilter + ', su ' + CAUZIONI_ALL.length + ' totali)';
+
+  var list = document.getElementById('garanzie-list');
+  if (!rows.length) { list.innerHTML = '<div class="empty-msg">Nessuna garanzia in questo filtro.</div>'; return; }
+  list.innerHTML = '';
+  rows.forEach(function (c) {
+    var info = garanziaStatusInfo(c);
+    var row = document.createElement('div'); row.className = 'res-row';
+    var matchHtml = c.reservation_match
+      ? '<div class="gz-match found">✓ Collegata a: ' + escapeHtml(c.reservation_match.nome) + '</div>'
+      : '<div class="gz-match missing">Nessuna prenotazione trovata nel gestionale per questa garanzia</div>';
+    row.innerHTML =
+      '<div class="res-date">' + fmtDataPrenotazione(c.data_prenotazione) + '</div>' +
+      '<div class="res-info">' +
+        '<div class="nome">' + escapeHtml(c.nome_cliente || '—') + ' · ' + (c.persone || '—') + 'p</div>' +
+        '<div class="meta">' + (c.telefono ? '<a href="tel:' + escapeHtml(c.telefono) + '">' + escapeHtml(c.telefono) + '</a>' : '') +
+          (c.email ? ' · ' + escapeHtml(c.email) : '') + '</div>' +
+        '<div class="gz-meta">Penale ' + (c.penale != null ? c.penale + ' €/persona' : '—') + ' · disdetta ' + (c.ore_disdetta != null ? c.ore_disdetta + 'h' : '—') + ' · codice ' + escapeHtml(c.short_id) + '</div>' +
+        matchHtml +
+      '</div>' +
+      '<div><span class="badge ' + info.cls + '">' + info.label + '</span></div>';
+    if (c.reservation_match) {
+      var goBtn = document.createElement('button');
+      goBtn.className = 'btn'; goBtn.textContent = 'Vai al giorno →'; goBtn.style.marginLeft = '.5rem';
+      var day = String(c.data_prenotazione || '').slice(0, 10);
+      goBtn.onclick = function () { closeGaranzie(); openDay(day); };
+      row.appendChild(goBtn);
+    }
+    list.appendChild(row);
+  });
 }
 
 function _ghToken() {

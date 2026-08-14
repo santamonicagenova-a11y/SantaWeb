@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- v 2026.08.14.02 — aggiunto un terzo blocco al pannello "Testi delle mail ai clienti": "La tua
+     risposta di conferma (manuale)" — oggetto+apertura+chiusura del testo precompilato dietro al
+     bottone "✉ Rispondi al cliente" nella mail M1bis (NON una mail automatica, è quella che invii
+     tu a mano). Azione set_mail_texts estesa su set-reservations-config v8, campi reply_subject/
+     reply_intro/reply_closing esposti anche da reservations-status v8. Segnaposto
+     {nome}{data}{orario}{persone}; la chiusura include la firma ("Andrea Giachino" di default). -->
 <!-- v 2026.08.14.01 — nuovo pannello "Testi delle mail ai clienti" sotto "Garanzia — penale e
      disdetta" (richiesta Andrea): oggetto + apertura + chiusura editabili per la mail M1
      "richiesta ricevuta" (submit-reservation, giorni senza carta automatica) e per la mail di
@@ -848,6 +854,18 @@
         <div><span class="opt-lbl">Apertura (dopo "Buongiorno {nome},")</span><textarea id="pren-mail-confirm-intro" rows="2" placeholder="la sua prenotazione è confermata:" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
         <div><span class="opt-lbl">Chiusura extra (facoltativa, prima di "A presto,")</span><textarea id="pren-mail-confirm-closing" rows="2" placeholder="(vuoto = nessuna riga aggiuntiva)" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
       </div>
+
+      <div class="sub" style="margin-top:1rem;font-size:.85rem;">La tua risposta di conferma (manuale)</div>
+      <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
+        Non è una mail automatica: è il testo già pronto dietro al bottone <strong>"✉ Rispondi al cliente"</strong> nella
+        mail di notifica che ricevi tu — lo controlli e invii a mano quando confermi. Segnaposto disponibili:
+        <code>{nome}</code> <code>{data}</code> <code>{orario}</code> <code>{persone}</code>.
+      </p>
+      <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem;">
+        <div><span class="opt-lbl">Oggetto</span><input type="text" id="pren-mail-reply-subject" placeholder="La sua prenotazione al Ristorante Santamonica — {data}" style="width:100%;" /></div>
+        <div><span class="opt-lbl">Apertura (dopo "Buongiorno {nome},")</span><textarea id="pren-mail-reply-intro" rows="2" placeholder="grazie per la sua richiesta di prenotazione:" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
+        <div><span class="opt-lbl">Chiusura (dopo la tabella dati, include la firma)</span><textarea id="pren-mail-reply-closing" rows="3" placeholder="Prenotazione confermata, vi aspettiamo&#10;&#10;Andrea Giachino" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
+      </div>
       <button class="btn btn-publish" onclick="saveMailTexts()">💾 Salva testi mail</button>
 
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
@@ -1210,7 +1228,7 @@
 // usato per la pubblicazione. Vedi progetto-sito CLAUDE.md sessione 13.
 var PREN_STATUS_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/reservations-status';
 var PREN_CONFIG_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/set-reservations-config';
-var prenState = { online_open: true, card_required_days: [0,1,2,3,4,5,6], penale_eur: 25, ore_disdetta_default: 24, m1_subject: '', m1_intro: '', m1_closing: '', confirm_subject: '', confirm_intro: '', confirm_closing: '', closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [] };
+var prenState = { online_open: true, card_required_days: [0,1,2,3,4,5,6], penale_eur: 25, ore_disdetta_default: 24, m1_subject: '', m1_intro: '', m1_closing: '', confirm_subject: '', confirm_intro: '', confirm_closing: '', reply_subject: '', reply_intro: '', reply_closing: '', closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [] };
 
 function apriSezionePrenotazioni() {
   document.getElementById('carica-menu').classList.remove('open');
@@ -1356,6 +1374,9 @@ function renderPrenUI() {
   _prenFillMailTextField('pren-mail-confirm-subject', prenState.confirm_subject);
   _prenFillMailTextField('pren-mail-confirm-intro', prenState.confirm_intro);
   _prenFillMailTextField('pren-mail-confirm-closing', prenState.confirm_closing);
+  _prenFillMailTextField('pren-mail-reply-subject', prenState.reply_subject);
+  _prenFillMailTextField('pren-mail-reply-intro', prenState.reply_intro);
+  _prenFillMailTextField('pren-mail-reply-closing', prenState.reply_closing);
   _prenRenderList('pren-closures-list', prenState.closures || [], 'Nessuna chiusura attiva.', 'var(--rust)', removePrenClosure);
   _prenRenderList('pren-openings-list', prenState.openings || [], 'Nessuna apertura straordinaria attiva.', 'var(--green)', removePrenOpening);
   _prenRenderSlotList('pren-slot-closures-list', prenState.slot_closures || [], 'Nessun orario chiuso singolarmente.', 'var(--rust)', removePrenSlotClosure);
@@ -1391,6 +1412,9 @@ function loadPrenStatus() {
       prenState.confirm_subject = (d && d.confirm_subject) || '';
       prenState.confirm_intro = (d && d.confirm_intro) || '';
       prenState.confirm_closing = (d && d.confirm_closing) || '';
+      prenState.reply_subject = (d && d.reply_subject) || '';
+      prenState.reply_intro = (d && d.reply_intro) || '';
+      prenState.reply_closing = (d && d.reply_closing) || '';
       prenState.closures = (d && d.closures) || [];
       prenState.openings = (d && d.openings) || [];
       prenState.slot_closures = (d && d.slot_closures) || [];
@@ -1432,6 +1456,9 @@ function _prenApply(res, okMsg) {
     prenState.confirm_subject = res.body.confirm_subject != null ? res.body.confirm_subject : prenState.confirm_subject;
     prenState.confirm_intro = res.body.confirm_intro != null ? res.body.confirm_intro : prenState.confirm_intro;
     prenState.confirm_closing = res.body.confirm_closing != null ? res.body.confirm_closing : prenState.confirm_closing;
+    prenState.reply_subject = res.body.reply_subject != null ? res.body.reply_subject : prenState.reply_subject;
+    prenState.reply_intro = res.body.reply_intro != null ? res.body.reply_intro : prenState.reply_intro;
+    prenState.reply_closing = res.body.reply_closing != null ? res.body.reply_closing : prenState.reply_closing;
     prenState.closures = res.body.closures || [];
     prenState.openings = res.body.openings || [];
     prenState.slot_closures = res.body.slot_closures || [];
@@ -1507,6 +1534,9 @@ function saveMailTexts() {
     confirm_subject: val('pren-mail-confirm-subject'),
     confirm_intro: val('pren-mail-confirm-intro'),
     confirm_closing: val('pren-mail-confirm-closing'),
+    reply_subject: val('pren-mail-reply-subject'),
+    reply_intro: val('pren-mail-reply-intro'),
+    reply_closing: val('pren-mail-reply-closing'),
   }, 'Testi mail salvati.');
 }
 
@@ -3567,7 +3597,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.08.08.04</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.08.14.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

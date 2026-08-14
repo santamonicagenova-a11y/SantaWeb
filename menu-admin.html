@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- v 2026.08.14.01 — nuovo pannello "Testi delle mail ai clienti" sotto "Garanzia — penale e
+     disdetta" (richiesta Andrea): oggetto + apertura + chiusura editabili per la mail M1
+     "richiesta ricevuta" (submit-reservation, giorni senza carta automatica) e per la mail di
+     conferma automatica del wizard con carta (stripe-webhook) — azione set_mail_texts su
+     set-reservations-config v7, campi esposti anche da reservations-status v7. Tabella dati e
+     footer restano fissi nel codice per non rischiare di rompere il layout HTML; segnaposto
+     {nome}{data}{orario}{persone}{occasione} (M1) e {nome}{data}{persone}{penale}{ore_disdetta}
+     (conferma) sostituiti a runtime. Campo vuoto = torna al testo predefinito. -->
 <!-- v 2026.07.28.03 — ripristinati "✔ Fissa come default" + valore corrente (%/mm) accanto ai
      pulsanti A+/A−/interlinea/spazio/sposta nella barra della preview di stampa: persi in una
      sessione precedente (assenti anche sul live prima di questo fix), segnalato da Andrea. Nuova
@@ -816,6 +824,32 @@
         <button class="btn btn-publish" onclick="saveGuaranteeDefaults()">💾 Salva garanzia</button>
       </div>
 
+      <hr style="border:none;border-top:1px solid var(--rule);margin:1.6rem 0 0;">
+      <div class="sub" style="margin-top:1rem;">Testi delle mail ai clienti</div>
+      <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
+        Puoi modificare solo <strong>oggetto, frase di apertura e frase di chiusura</strong> di ciascuna mail — la
+        tabella con data/orario/persone e il footer restano fissi (nessun rischio di rompere il layout). Segnaposto
+        disponibili: <code>{nome}</code> <code>{data}</code> <code>{orario}</code> <code>{persone}</code>
+        <code>{occasione}</code> per la mail M1; <code>{nome}</code> <code>{data}</code> <code>{persone}</code>
+        <code>{penale}</code> <code>{ore_disdetta}</code> per la mail di conferma. Lascia un campo vuoto per tornare
+        al testo predefinito.
+      </p>
+
+      <div class="sub" style="margin-top:1rem;font-size:.85rem;">M1 — "Richiesta ricevuta" (giorni senza carta automatica)</div>
+      <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem;">
+        <div><span class="opt-lbl">Oggetto</span><input type="text" id="pren-mail-m1-subject" placeholder="Richiesta ricevuta — Ristorante Santamonica" style="width:100%;" /></div>
+        <div><span class="opt-lbl">Apertura (dopo "Buongiorno {nome},")</span><textarea id="pren-mail-m1-intro" rows="2" placeholder="grazie per la sua richiesta di prenotazione:" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
+        <div><span class="opt-lbl">Chiusura (dopo la tabella dati)</span><textarea id="pren-mail-m1-closing" rows="2" placeholder="Abbiamo ricevuto la sua richiesta e la contatteremo a breve per conferma." style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
+      </div>
+
+      <div class="sub" style="margin-top:1rem;font-size:.85rem;">Conferma automatica (wizard con carta a garanzia)</div>
+      <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem;">
+        <div><span class="opt-lbl">Oggetto</span><input type="text" id="pren-mail-confirm-subject" placeholder="La sua prenotazione è confermata — Ristorante Santamonica" style="width:100%;" /></div>
+        <div><span class="opt-lbl">Apertura (dopo "Buongiorno {nome},")</span><textarea id="pren-mail-confirm-intro" rows="2" placeholder="la sua prenotazione è confermata:" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
+        <div><span class="opt-lbl">Chiusura extra (facoltativa, prima di "A presto,")</span><textarea id="pren-mail-confirm-closing" rows="2" placeholder="(vuoto = nessuna riga aggiuntiva)" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
+      </div>
+      <button class="btn btn-publish" onclick="saveMailTexts()">💾 Salva testi mail</button>
+
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
         <button class="btn btn-load" onclick="chiudiSezionePrenotazioni()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
         <span id="pren-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
@@ -1176,7 +1210,7 @@
 // usato per la pubblicazione. Vedi progetto-sito CLAUDE.md sessione 13.
 var PREN_STATUS_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/reservations-status';
 var PREN_CONFIG_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/set-reservations-config';
-var prenState = { online_open: true, card_required_days: [0,1,2,3,4,5,6], penale_eur: 25, ore_disdetta_default: 24, closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [] };
+var prenState = { online_open: true, card_required_days: [0,1,2,3,4,5,6], penale_eur: 25, ore_disdetta_default: 24, m1_subject: '', m1_intro: '', m1_closing: '', confirm_subject: '', confirm_intro: '', confirm_closing: '', closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [] };
 
 function apriSezionePrenotazioni() {
   document.getElementById('carica-menu').classList.remove('open');
@@ -1295,6 +1329,11 @@ function _prenRenderCapsList(elId, items, emptyMsg, removeFn) {
   });
 }
 
+function _prenFillMailTextField(id, val) {
+  var el = document.getElementById(id);
+  if (el) el.value = val || '';
+}
+
 function renderPrenUI() {
   var lbl = document.getElementById('pren-stato-label');
   var btn = document.getElementById('pren-toggle-btn');
@@ -1311,6 +1350,12 @@ function renderPrenUI() {
   var oreEl = document.getElementById('pren-guarantee-ore');
   if (penaleEl) penaleEl.value = prenState.penale_eur != null ? prenState.penale_eur : 25;
   if (oreEl) oreEl.value = prenState.ore_disdetta_default != null ? prenState.ore_disdetta_default : 24;
+  _prenFillMailTextField('pren-mail-m1-subject', prenState.m1_subject);
+  _prenFillMailTextField('pren-mail-m1-intro', prenState.m1_intro);
+  _prenFillMailTextField('pren-mail-m1-closing', prenState.m1_closing);
+  _prenFillMailTextField('pren-mail-confirm-subject', prenState.confirm_subject);
+  _prenFillMailTextField('pren-mail-confirm-intro', prenState.confirm_intro);
+  _prenFillMailTextField('pren-mail-confirm-closing', prenState.confirm_closing);
   _prenRenderList('pren-closures-list', prenState.closures || [], 'Nessuna chiusura attiva.', 'var(--rust)', removePrenClosure);
   _prenRenderList('pren-openings-list', prenState.openings || [], 'Nessuna apertura straordinaria attiva.', 'var(--green)', removePrenOpening);
   _prenRenderSlotList('pren-slot-closures-list', prenState.slot_closures || [], 'Nessun orario chiuso singolarmente.', 'var(--rust)', removePrenSlotClosure);
@@ -1340,6 +1385,12 @@ function loadPrenStatus() {
       prenState.card_required_days = (d && Array.isArray(d.card_required_days)) ? d.card_required_days : [0,1,2,3,4,5,6];
       prenState.penale_eur = (d && d.penale_eur != null) ? d.penale_eur : 25;
       prenState.ore_disdetta_default = (d && d.ore_disdetta_default != null) ? d.ore_disdetta_default : 24;
+      prenState.m1_subject = (d && d.m1_subject) || '';
+      prenState.m1_intro = (d && d.m1_intro) || '';
+      prenState.m1_closing = (d && d.m1_closing) || '';
+      prenState.confirm_subject = (d && d.confirm_subject) || '';
+      prenState.confirm_intro = (d && d.confirm_intro) || '';
+      prenState.confirm_closing = (d && d.confirm_closing) || '';
       prenState.closures = (d && d.closures) || [];
       prenState.openings = (d && d.openings) || [];
       prenState.slot_closures = (d && d.slot_closures) || [];
@@ -1375,6 +1426,12 @@ function _prenApply(res, okMsg) {
     prenState.card_required_days = Array.isArray(res.body.card_required_days) ? res.body.card_required_days : prenState.card_required_days;
     prenState.penale_eur = res.body.penale_eur != null ? res.body.penale_eur : prenState.penale_eur;
     prenState.ore_disdetta_default = res.body.ore_disdetta_default != null ? res.body.ore_disdetta_default : prenState.ore_disdetta_default;
+    prenState.m1_subject = res.body.m1_subject != null ? res.body.m1_subject : prenState.m1_subject;
+    prenState.m1_intro = res.body.m1_intro != null ? res.body.m1_intro : prenState.m1_intro;
+    prenState.m1_closing = res.body.m1_closing != null ? res.body.m1_closing : prenState.m1_closing;
+    prenState.confirm_subject = res.body.confirm_subject != null ? res.body.confirm_subject : prenState.confirm_subject;
+    prenState.confirm_intro = res.body.confirm_intro != null ? res.body.confirm_intro : prenState.confirm_intro;
+    prenState.confirm_closing = res.body.confirm_closing != null ? res.body.confirm_closing : prenState.confirm_closing;
     prenState.closures = res.body.closures || [];
     prenState.openings = res.body.openings || [];
     prenState.slot_closures = res.body.slot_closures || [];
@@ -1438,6 +1495,19 @@ function saveGuaranteeDefaults() {
   if (!Number.isFinite(penale) || penale <= 0 || penale > 500) { _prenSetStatus('Penale non valida (1-500 €).', true); return; }
   if (!Number.isInteger(ore) || ore < 1 || ore > 168) { _prenSetStatus('Ore disdetta non valide (numero intero tra 1 e 168).', true); return; }
   _prenConfig({ action: 'set_guarantee_defaults', penale_eur: penale, ore_disdetta: ore }, 'Garanzia (penale/disdetta) salvata.');
+}
+
+function saveMailTexts() {
+  var val = function (id) { var el = document.getElementById(id); return el ? el.value : ''; };
+  _prenConfig({
+    action: 'set_mail_texts',
+    m1_subject: val('pren-mail-m1-subject'),
+    m1_intro: val('pren-mail-m1-intro'),
+    m1_closing: val('pren-mail-m1-closing'),
+    confirm_subject: val('pren-mail-confirm-subject'),
+    confirm_intro: val('pren-mail-confirm-intro'),
+    confirm_closing: val('pren-mail-confirm-closing'),
+  }, 'Testi mail salvati.');
 }
 
 function addPrenClosure() {

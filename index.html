@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- v 2026.08.14.01 — Rimosso ogni riferimento allo Chef Nicolò Lazzaroni (uscito dal ristorante,
+     su istruzione esplicita Andrea) da JSON-LD Restaurant (description + employee) e dal testo
+     visibile #cucina. In parallelo, schema Person di Monica Capurro rinforzato per la GEO/entity
+     recognition: @id dedicato, worksFor→#restaurant, sameAs→Instagram personale (@monika_capurro,
+     fonte: audit account Meta 1/6/2026). Gate: delta fattuale (persona non più in organico) →
+     P1+P2, P3 non innescata (stesso precedente dei cambi orario/dato fattuale). -->
 <!-- v 2026.07.23.01 — Wizard prenotazioni /prenota.html con carta a garanzia SEMPRE obbligatoria
      e conferma automatica (DESIGN_wizard_prenotazioni_carta-obbligatoria_v2026.07.22.01, scritto
      in una sessione precedente il 22/7 — l'implementazione è di oggi 23/7): le 5 CTA
@@ -130,7 +136,7 @@
   "@id": "https://santamonicagenova.it/#restaurant",
   "name": "Ristorante Santamonica",
   "alternateName": "Santamonica",
-  "description": "Ristorante di pesce fresco sul Lungomare Lombardo di Genova. Chef Nicolò Lazzaroni, Sommelier Monica Capurro. Segnalato dalla Guida Michelin. Cucina del territorio ligure, cantina curata, vista mare.",
+  "description": "Ristorante di pesce fresco sul Lungomare Lombardo di Genova. Sommelier Monica Capurro. Segnalato dalla Guida Michelin. Cucina del territorio ligure, cantina curata, vista mare.",
   "url": "https://santamonicagenova.it/",
   "logo": "https://santamonicagenova.it/img/logo-santamonica.png",
   "image": "https://santamonicagenova.it/img/hero.jpg",
@@ -163,13 +169,11 @@
   "employee": [
     {
       "@type": "Person",
-      "name": "Nicolò Lazzaroni",
-      "jobTitle": "Chef"
-    },
-    {
-      "@type": "Person",
+      "@id": "https://santamonicagenova.it/#monica-capurro",
       "name": "Monica Capurro",
-      "jobTitle": "Sommelier"
+      "jobTitle": "Sommelier",
+      "worksFor": { "@id": "https://santamonicagenova.it/#restaurant" },
+      "sameAs": ["https://www.instagram.com/monika_capurro/"]
     }
   ],
   "sameAs": [
@@ -529,7 +533,7 @@
       <div class="reveal">
         <p class="section-label" data-i18n="cucina_label">La nostra proposta</p>
         <h2 class="section-title" data-i18n="cucina_title">Cucina <em>del territorio</em></h2>
-        <p class="section-label" style="margin-top:0.25rem;margin-bottom:1.5rem;">Chef Nicol&ograve; Lazzaroni &middot; Sommelier Monica Capurro</p>
+        <p class="section-label" style="margin-top:0.25rem;margin-bottom:1.5rem;">Sommelier Monica Capurro</p>
         <div class="cucina-body">
           <p data-i18n="cucina_p1">La qualit&agrave; della materia prima &egrave; fondamentale: ci rivolgiamo quanto pi&ugrave; possibile a pescatori e produttori locali. Il pesce arriva da Camogli, le verdure da un piccolo orto sulle alture di Genova.</p>
           <p data-i18n="cucina_p2">I nostri piatti sono elaborati ma allo stesso tempo semplici, per valorizzare al meglio i prodotti della Liguria. Pasta fresca, pane, focaccia e dolci sono tutti di nostra produzione.</p>
@@ -727,7 +731,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.07.23.01</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.08.14.01</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>

@@ -2,10 +2,16 @@
   ─────────────────────────────────────────────────────────────────────────
   dove-siamo.html — Dove siamo / Contatti
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.06.21.01
-  Ultimo aggiornamento: 2026-06-21
+  Versione: v 2026.08.14.01
+  Ultimo aggiornamento: 2026-08-14
   Lingua: IT (versione ufficiale)
   Stato: BOZZA INFORMATIVA · F0.12 chiusa (hotfix layout)
+
+  Modifiche v 2026.08.14.01:
+  - Rimosso Nicolò Lazzaroni dallo schema JSON-LD (employee) — uscito dal
+    ristorante, su istruzione esplicita Andrea. Schema Person di Monica Capurro
+    rinforzato: @id dedicato, worksFor→#restaurant, sameAs→Instagram personale.
+    Gate: delta fattuale → P1+P2, P3 non innescata.
 
   Modifiche v 2026.06.21.01 (ORARIO ESTIVO TEMPORANEO 21/6→31/8):
   - openingHoursSpecification statico aggiornato: chiuso a pranzo tutti i giorni;
@@ -153,13 +159,11 @@
     "employee": [
       {
         "@type": "Person",
-        "name": "Nicolò Lazzaroni",
-        "jobTitle": "Chef"
-      },
-      {
-        "@type": "Person",
+        "@id": "https://santamonicagenova.it/#monica-capurro",
         "name": "Monica Capurro",
-        "jobTitle": "Sommelier"
+        "jobTitle": "Sommelier",
+        "worksFor": { "@id": "https://santamonicagenova.it/#restaurant" },
+        "sameAs": ["https://www.instagram.com/monika_capurro/"]
       }
     ]
   }

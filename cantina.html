@@ -1,4 +1,13 @@
 <!DOCTYPE html>
+<!-- v 2026.08.15.02 — import della carta vini stampata reale (~140 vini, PDF "A020 - Menu VINI"):
+     3 nuove colonne su articoli (denominazione DOC/DOCG/IGT, zona = sottozona geografica dentro
+     la carta es. "Liguria di Levante"/"Genova"/"Val Trebbia", sboccatura per le bollicine), tutte
+     esposte ora dal form Catalogo. Ogni vino del PDF è stato riconciliato per nome con l'anagrafica
+     Access esistente (aggiornato se trovato, creato se nuovo — ~19 articoli nuovi), popolando
+     descrizione/gradi/uve/annata/prezzi reali al posto del placeholder "(senza descrizione)".
+     Il generatore della carta vini ora raggruppa per tipologia (capitolo) E per zona/regione
+     (sotto-capitolo), replicando la struttura della carta stampata invece del semplice elenco
+     piatto precedente. -->
 <!-- v 2026.08.15.01 — Gestionale cantina (NUOVO ramo, sessione 15/8/2026): anagrafica vini/bevande
      (578 articoli) migrata da Access a un progetto Supabase dedicato "SantaCantina"
      (wpsghmmvlwkyqiholfzx, separato da SafeTable), con vero magazzino (carichi/scarichi/
@@ -108,7 +117,7 @@
       </div>
       <div id="cat-status" class="status"></div>
       <table>
-        <thead><tr><th>Codice</th><th>Tipologia</th><th>Produttore</th><th>Regione</th><th>Sala</th><th>Calice</th><th>Ubicazione</th><th></th></tr></thead>
+        <thead><tr><th>Codice</th><th>Tipologia</th><th>Produttore</th><th>Zona / Regione</th><th>Sala</th><th>Calice</th><th>Ubicazione</th><th></th></tr></thead>
         <tbody id="cat-tbody"></tbody>
       </table>
 
@@ -128,6 +137,11 @@
           <div class="field"><label>Agente</label><select id="f-agente"></select></div>
           <div class="field"><label>Ubicazione</label><select id="f-ubicazione"></select></div>
           <div class="field"><label>Anno</label><input type="number" id="f-anno" /></div>
+        </div>
+        <div class="grid3">
+          <div class="field"><label>Denominazione (DOC/DOCG/IGT…)</label><input type="text" id="f-denominazione" /></div>
+          <div class="field"><label>Zona (es. Liguria di Levante)</label><input type="text" id="f-zona" /></div>
+          <div class="field"><label>Sboccatura (bollicine)</label><input type="text" id="f-sboccatura" placeholder="es. 7/2024" /></div>
         </div>
         <div class="grid3">
           <div class="field"><label>Costo diretto</label><input type="number" step="0.01" id="f-costo-diretto" /></div>
@@ -389,7 +403,7 @@ function renderCatalogo(rows) {
       '<td>' + (a.codice || '') + (a.nascosto ? ' <span class="badge warn">nascosto</span>' : '') + '</td>' +
       '<td>' + (a.tipologia ? a.tipologia.nome : '') + '</td>' +
       '<td>' + (a.produttore ? (a.produttore.cognome || a.produttore.nome || '') : '') + '</td>' +
-      '<td>' + (a.regione ? a.regione.nome : '') + '</td>' +
+      '<td>' + [a.zona, a.regione ? a.regione.nome : ''].filter(Boolean).join(' — ') + '</td>' +
       '<td>' + eur(a.prezzo_sala) + '</td>' +
       '<td>' + eur(a.prezzo_calice) + '</td>' +
       '<td>' + (a.ubicazione ? a.ubicazione.nome : '') + '</td>' +
@@ -427,6 +441,9 @@ function openCatForm(a) {
   document.getElementById('f-gradi').value = a.gradi || '';
   document.getElementById('f-uve').value = a.uve || '';
   document.getElementById('f-percentuale').value = a.percentuale_enoteca || '';
+  document.getElementById('f-denominazione').value = a.denominazione || '';
+  document.getElementById('f-zona').value = a.zona || '';
+  document.getElementById('f-sboccatura').value = a.sboccatura || '';
   document.getElementById('f-nascosto').checked = !!a.nascosto;
   document.getElementById('f-coravin').checked = !!a.coravin;
   document.getElementById('f-mezza').checked = !!a.mezza_bottiglia;
@@ -456,6 +473,9 @@ document.getElementById('cat-save').addEventListener('click', function () {
     gradi: numOrNull(document.getElementById('f-gradi').value),
     uve: document.getElementById('f-uve').value || null,
     percentuale_enoteca: numOrNull(document.getElementById('f-percentuale').value),
+    denominazione: document.getElementById('f-denominazione').value || null,
+    zona: document.getElementById('f-zona').value || null,
+    sboccatura: document.getElementById('f-sboccatura').value || null,
     nascosto: document.getElementById('f-nascosto').checked,
     coravin: document.getElementById('f-coravin').checked,
     mezza_bottiglia: document.getElementById('f-mezza').checked,
@@ -835,28 +855,41 @@ document.getElementById('carta-genera').addEventListener('click', function () {
 });
 
 function generaHtmlCartaVini(articoli) {
-  var gruppi = {};
-  var ordine = [];
+  // Raggruppa per tipologia (capitolo) poi per zona/regione (sotto-capitolo), stessa struttura della carta stampata.
+  var capitoli = {};
+  var ordineCapitoli = [];
   articoli.forEach(function (a) {
-    var nome = a.tipologia ? a.tipologia.nome : 'Altro';
-    if (!gruppi[nome]) { gruppi[nome] = []; ordine.push(nome); }
-    gruppi[nome].push(a);
+    var cap = a.tipologia ? a.tipologia.nome : 'Altro';
+    if (!capitoli[cap]) { capitoli[cap] = { sotto: {}, ordineSotto: [] }; ordineCapitoli.push(cap); }
+    var c = capitoli[cap];
+    var sub = a.zona || (a.regione ? a.regione.nome : null) || 'Altre regioni';
+    if (!c.sotto[sub]) { c.sotto[sub] = []; c.ordineSotto.push(sub); }
+    c.sotto[sub].push(a);
   });
 
   var body = '';
-  ordine.forEach(function (nome) {
-    body += '<div class="sez-titolo">' + escapeHtml(nome) + '</div>';
-    gruppi[nome].forEach(function (a) {
-      var prod = a.produttore ? (a.produttore.cognome || a.produttore.nome || '') : '';
-      var regione = a.regione ? a.regione.nome : '';
-      var sub = [prod, regione, a.anno].filter(Boolean).join(' · ');
-      var prezzo = a.prezzo_sala ? ('€ ' + Number(a.prezzo_sala).toFixed(0)) : '';
-      var calice = a.prezzo_calice ? (' <span class="calice">calice € ' + Number(a.prezzo_calice).toFixed(0) + '</span>') : '';
-      body +=
-        '<div class="vino">' +
-        '<div class="vino-nome">' + escapeHtml(a.codice || a.descrizione || '') + (sub ? '<span class="vino-sub"> — ' + escapeHtml(sub) + '</span>' : '') + '</div>' +
-        '<div class="vino-prezzo">' + prezzo + calice + '</div>' +
-        '</div>';
+  ordineCapitoli.forEach(function (cap) {
+    body += '<div class="sez-titolo">' + escapeHtml(cap) + '</div>';
+    var c = capitoli[cap];
+    c.ordineSotto.forEach(function (sub) {
+      body += '<div class="sottosez-titolo">' + escapeHtml(sub) + '</div>';
+      c.sotto[sub].forEach(function (a) {
+        var prod = a.produttore ? (a.produttore.cognome || a.produttore.nome || '') : '';
+        var annata = [a.denominazione, a.anno].filter(Boolean).join(' ');
+        var sub2 = [prod, annata].filter(Boolean).join(' — ');
+        var gradiUve = [a.gradi ? (Number(a.gradi) + '%') : null, a.uve].filter(Boolean).join(' · ');
+        var prezzo = a.prezzo_sala ? ('€ ' + Number(a.prezzo_sala).toFixed(0)) : '';
+        var calice = a.prezzo_calice ? (' <span class="calice">calice € ' + Number(a.prezzo_calice).toFixed(0) + '</span>') : '';
+        var descrizione = (a.descrizione && a.descrizione !== '(senza descrizione)') ? a.descrizione : '';
+        body +=
+          '<div class="vino">' +
+          '<div class="vino-nome">' + escapeHtml(a.codice || a.descrizione || '') +
+          (sub2 ? '<span class="vino-sub"> — ' + escapeHtml(sub2) + '</span>' : '') +
+          '</div>' +
+          '<div class="vino-prezzo">' + prezzo + calice + '</div>' +
+          '</div>' +
+          (gradiUve || descrizione ? '<div class="vino-desc">' + escapeHtml([gradiUve, descrizione].filter(Boolean).join(' — ')) + '</div>' : '');
+      });
     });
   });
 
@@ -872,9 +905,11 @@ function generaHtmlCartaVini(articoli) {
     '.pg{max-width:700px;margin:0 auto;}' +
     'h1{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:2rem;text-align:center;margin-bottom:2rem;letter-spacing:.04em;}' +
     '.sez-titolo{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.3rem;margin:2rem 0 .8rem;border-bottom:1px solid var(--rule);padding-bottom:.3rem;text-transform:uppercase;letter-spacing:.06em;}' +
-    '.vino{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding:.35rem 0;font-size:.92rem;}' +
+    '.sottosez-titolo{font-family:"Jost",sans-serif;font-weight:400;font-size:.78rem;margin:1.1rem 0 .4rem;text-transform:uppercase;letter-spacing:.1em;color:var(--stone);}' +
+    '.vino{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding:.3rem 0 0;font-size:.92rem;}' +
     '.vino-nome{flex:1;}' +
     '.vino-sub{color:var(--stone);font-size:.85em;}' +
+    '.vino-desc{font-size:.78rem;color:var(--stone);padding:0 0 .4rem;border-bottom:1px dotted var(--rule);margin-bottom:.15rem;}' +
     '.vino-prezzo{white-space:nowrap;font-variant-numeric:tabular-nums;}' +
     '.calice{color:var(--stone);font-size:.85em;}' +
     '@media print{body{padding:0;}}' +

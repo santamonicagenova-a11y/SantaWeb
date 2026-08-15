@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<!-- v 2026.08.15.01 — Gestionale cantina (NUOVO ramo, sessione 15/8/2026): anagrafica vini/bevande
+     (578 articoli) migrata da Access a un progetto Supabase dedicato "SantaCantina"
+     (wpsghmmvlwkyqiholfzx, separato da SafeTable), con vero magazzino (carichi/scarichi/
+     rettifiche + giacenze) — l'Access di partenza aveva quelle tabelle sostanzialmente vuote.
+     Pagina admin standalone (come gestionale.html — feature grande = pagina propria), 4 sezioni:
+     Catalogo (CRUD articoli + toggle Nascosto), Anagrafiche (CRUD tipologie/produttori/regioni/
+     agenti/distributori/fornitori/categorie fornitori/ubicazioni/unità di misura), Magazzino
+     (registra carichi da fornitore multi-riga, scarichi, rettifiche inventario + vista giacenze
+     correnti), Pubblica carta vini (genera HTML raggruppato per tipologia dagli articoli non
+     nascosti, anteprima, pubblica su menu-vini.html via lo stesso meccanismo GitHub Contents API
+     già usato altrove — sostituisce il vecchio percorso "carica PDF" di menu-admin.html, che
+     resta disponibile come fallback manuale). Stesso pattern di auth (_ghToken, gh_token in
+     localStorage, verificato server-side da ogni Edge Function) e stesso stile visivo di
+     gestionale.html. noindex: pagina interna. -->
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Gestionale Cantina — Santamonica</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root { --cream:#faf7f2; --ink:#1a1714; --stone:#8c7e6e; --rust:#9e4a2a; --rule:#d4c9b8; --sand:#f0ebe0; --ok:#2d6a4f; --warn:#a35b1c; }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--cream); color:var(--ink); font-family:'Jost',sans-serif; font-weight:300; font-size:14px; padding-bottom:4rem; }
+
+    .top-bar { background:var(--ink); color:var(--cream); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; position:sticky; top:0; z-index:50; }
+    .top-bar h1 { font-size:.8rem; font-weight:400; letter-spacing:.18em; text-transform:uppercase; }
+    .logo-sm { font-size:.7rem; letter-spacing:.2em; color:var(--stone); text-transform:uppercase; }
+    .top-bar a.back { color:var(--cream); opacity:.75; font-size:.7rem; letter-spacing:.08em; text-decoration:none; }
+    .top-bar a.back:hover { opacity:1; }
+
+    .btn { padding:.45rem 1.1rem; border:1px solid var(--rule); background:#fff; font-family:'Jost',sans-serif; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; color:var(--ink); }
+    .btn:hover { background:var(--sand); }
+    .btn.primary { background:var(--ink); color:var(--cream); border-color:var(--ink); }
+    .btn.primary:hover { opacity:.9; }
+    .btn.danger { color:var(--rust); border-color:var(--rust); }
+    .btn.small { padding:.3rem .7rem; font-size:.65rem; }
+
+    .tabs { display:flex; gap:0; border-bottom:1px solid var(--rule); background:#fff; position:sticky; top:60px; z-index:40; padding:0 2rem; flex-wrap:wrap; }
+    .tab { padding:.9rem 1.3rem; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; color:var(--stone); border-bottom:2px solid transparent; }
+    .tab.active { color:var(--ink); border-bottom-color:var(--rust); }
+
+    main { max-width:1200px; margin:0 auto; padding:1.5rem 2rem; }
+    .section { display:none; }
+    .section.active { display:block; }
+
+    .toolbar { display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; margin-bottom:1rem; }
+    input[type=text], input[type=number], input[type=date], select, textarea {
+      font-family:'Jost',sans-serif; font-size:.8rem; padding:.45rem .6rem; border:1px solid var(--rule); background:#fff; color:var(--ink);
+    }
+    label { font-size:.68rem; text-transform:uppercase; letter-spacing:.06em; color:var(--stone); display:block; margin-bottom:.2rem; }
+    .field { margin-bottom:.7rem; }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:.7rem; }
+    .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.7rem; }
+
+    table { width:100%; border-collapse:collapse; background:#fff; font-size:.78rem; }
+    th, td { padding:.5rem .6rem; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top; }
+    th { font-size:.65rem; text-transform:uppercase; letter-spacing:.06em; color:var(--stone); font-weight:400; }
+    tr.nascosto td { color:var(--stone); }
+    tr:hover { background:var(--sand); cursor:pointer; }
+
+    .panel { background:#fff; border:1px solid var(--rule); padding:1.2rem; margin-bottom:1.2rem; }
+    .panel h2 { font-size:.85rem; letter-spacing:.08em; text-transform:uppercase; margin-bottom:1rem; }
+    .badge { display:inline-block; padding:.15rem .5rem; font-size:.62rem; text-transform:uppercase; letter-spacing:.05em; border-radius:2px; }
+    .badge.ok { background:#e3f0e9; color:var(--ok); }
+    .badge.warn { background:#f3e6d8; color:var(--warn); }
+
+    .righe-tbl input { width:100%; }
+    .rimuovi-riga { color:var(--rust); cursor:pointer; font-size:.7rem; }
+
+    .status { font-size:.75rem; margin-top:.6rem; }
+    .status.ok { color:var(--ok); }
+    .status.err { color:var(--rust); }
+
+    iframe#preview-frame { width:100%; height:70vh; border:1px solid var(--rule); background:#fff; }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div>
+      <div class="logo-sm">Santamonica</div>
+      <h1>Gestionale Cantina</h1>
+    </div>
+    <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="catalogo">Catalogo</div>
+    <div class="tab" data-tab="anagrafiche">Anagrafiche</div>
+    <div class="tab" data-tab="magazzino">Magazzino</div>
+    <div class="tab" data-tab="carta">Pubblica carta vini</div>
+  </div>
+
+  <main>
+
+    <!-- ===================== CATALOGO ===================== -->
+    <section id="sec-catalogo" class="section active">
+      <div class="toolbar">
+        <input type="text" id="cat-search" placeholder="Cerca per nome…" />
+        <select id="cat-tipologia"><option value="">Tutte le tipologie</option></select>
+        <label style="display:inline-flex;align-items:center;gap:.3rem;margin:0;">
+          <input type="checkbox" id="cat-solo-visibili" /> solo visibili
+        </label>
+        <button class="btn" id="cat-refresh">Aggiorna</button>
+        <button class="btn primary" id="cat-nuovo">+ Nuovo articolo</button>
+      </div>
+      <div id="cat-status" class="status"></div>
+      <table>
+        <thead><tr><th>Codice</th><th>Tipologia</th><th>Produttore</th><th>Regione</th><th>Sala</th><th>Calice</th><th>Ubicazione</th><th></th></tr></thead>
+        <tbody id="cat-tbody"></tbody>
+      </table>
+
+      <div class="panel" id="cat-form-panel" style="display:none;">
+        <h2 id="cat-form-title">Nuovo articolo</h2>
+        <input type="hidden" id="f-id" />
+        <div class="grid2">
+          <div class="field"><label>Codice / nome</label><input type="text" id="f-codice" /></div>
+          <div class="field"><label>Descrizione (obbligatoria)</label><input type="text" id="f-descrizione" /></div>
+        </div>
+        <div class="grid3">
+          <div class="field"><label>Tipologia</label><select id="f-tipologia"></select></div>
+          <div class="field"><label>Produttore</label><select id="f-produttore"></select></div>
+          <div class="field"><label>Regione</label><select id="f-regione"></select></div>
+        </div>
+        <div class="grid3">
+          <div class="field"><label>Agente</label><select id="f-agente"></select></div>
+          <div class="field"><label>Ubicazione</label><select id="f-ubicazione"></select></div>
+          <div class="field"><label>Anno</label><input type="number" id="f-anno" /></div>
+        </div>
+        <div class="grid3">
+          <div class="field"><label>Costo diretto</label><input type="number" step="0.01" id="f-costo-diretto" /></div>
+          <div class="field"><label>Costo distributore</label><input type="number" step="0.01" id="f-costo-distributore" /></div>
+          <div class="field"><label>Prezzo enoteca</label><input type="number" step="0.01" id="f-prezzo-eno" /></div>
+        </div>
+        <div class="grid3">
+          <div class="field"><label>Prezzo sala</label><input type="number" step="0.01" id="f-prezzo-sala" /></div>
+          <div class="field"><label>Prezzo calice</label><input type="number" step="0.01" id="f-prezzo-calice" /></div>
+          <div class="field"><label>Gradi</label><input type="number" step="0.1" id="f-gradi" /></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label>Uve</label><input type="text" id="f-uve" /></div>
+          <div class="field"><label>% enoteca</label><input type="number" id="f-percentuale" /></div>
+        </div>
+        <div class="field">
+          <label style="display:inline-flex;align-items:center;gap:.3rem;"><input type="checkbox" id="f-nascosto" /> Nascosto (escluso dalla carta pubblica)</label>
+          <label style="display:inline-flex;align-items:center;gap:.3rem;margin-left:1rem;"><input type="checkbox" id="f-coravin" /> Coravin</label>
+          <label style="display:inline-flex;align-items:center;gap:.3rem;margin-left:1rem;"><input type="checkbox" id="f-mezza" /> Mezza bottiglia</label>
+        </div>
+        <div class="toolbar" style="margin-top:1rem;">
+          <button class="btn primary" id="cat-save">Salva</button>
+          <button class="btn" id="cat-cancel">Annulla</button>
+          <button class="btn danger" id="cat-delete" style="display:none;margin-left:auto;">Elimina articolo</button>
+        </div>
+        <div id="cat-form-status" class="status"></div>
+      </div>
+    </section>
+
+    <!-- ===================== ANAGRAFICHE ===================== -->
+    <section id="sec-anagrafiche" class="section">
+      <div class="toolbar">
+        <select id="an-tabella"></select>
+        <button class="btn" id="an-refresh">Aggiorna</button>
+        <button class="btn primary" id="an-nuovo">+ Nuova riga</button>
+      </div>
+      <div id="an-status" class="status"></div>
+      <table>
+        <thead id="an-thead"></thead>
+        <tbody id="an-tbody"></tbody>
+      </table>
+
+      <div class="panel" id="an-form-panel" style="display:none;">
+        <h2 id="an-form-title">Nuova riga</h2>
+        <input type="hidden" id="an-f-id" />
+        <div id="an-form-fields"></div>
+        <div class="toolbar" style="margin-top:1rem;">
+          <button class="btn primary" id="an-save">Salva</button>
+          <button class="btn" id="an-cancel">Annulla</button>
+          <button class="btn danger" id="an-delete" style="display:none;margin-left:auto;">Elimina</button>
+        </div>
+        <div id="an-form-status" class="status"></div>
+      </div>
+    </section>
+
+    <!-- ===================== MAGAZZINO ===================== -->
+    <section id="sec-magazzino" class="section">
+      <div class="toolbar">
+        <div class="tab" data-mag="giacenze" style="border:1px solid var(--rule);">Giacenze</div>
+        <div class="tab" data-mag="carico" style="border:1px solid var(--rule);">+ Carico</div>
+        <div class="tab" data-mag="scarico" style="border:1px solid var(--rule);">+ Scarico</div>
+        <div class="tab" data-mag="rettifica" style="border:1px solid var(--rule);">+ Rettifica</div>
+        <div class="tab" data-mag="storico" style="border:1px solid var(--rule);">Storico</div>
+      </div>
+
+      <div id="mag-giacenze" class="mag-view">
+        <div class="toolbar"><button class="btn" id="mag-refresh">Aggiorna</button></div>
+        <table>
+          <thead><tr><th>Codice</th><th>Tipologia</th><th>Giacenza</th></tr></thead>
+          <tbody id="mag-tbody"></tbody>
+        </table>
+      </div>
+
+      <div id="mag-carico" class="mag-view panel" style="display:none;">
+        <h2>Registra carico</h2>
+        <div class="grid3">
+          <div class="field"><label>Data</label><input type="date" id="carico-data" /></div>
+          <div class="field"><label>Fornitore</label><select id="carico-fornitore"></select></div>
+          <div class="field"><label>Numero documento</label><input type="text" id="carico-numero" /></div>
+        </div>
+        <div class="field"><label>Note</label><input type="text" id="carico-note" /></div>
+        <table class="righe-tbl">
+          <thead><tr><th>Articolo</th><th>Quantità</th><th>Prezzo</th><th>Note</th><th></th></tr></thead>
+          <tbody id="carico-righe"></tbody>
+        </table>
+        <button class="btn small" id="carico-add-riga">+ Riga</button>
+        <div class="toolbar" style="margin-top:1rem;"><button class="btn primary" id="carico-save">Registra carico</button></div>
+        <div id="carico-status" class="status"></div>
+      </div>
+
+      <div id="mag-scarico" class="mag-view panel" style="display:none;">
+        <h2>Registra scarico</h2>
+        <div class="grid2">
+          <div class="field"><label>Data</label><input type="date" id="scarico-data" /></div>
+          <div class="field"><label>Causale</label><input type="text" id="scarico-causale" placeholder="consumo / rottura / vendita cantina…" /></div>
+        </div>
+        <div class="field"><label>Note</label><input type="text" id="scarico-note" /></div>
+        <table class="righe-tbl">
+          <thead><tr><th>Articolo</th><th>Quantità</th><th>Note</th><th></th></tr></thead>
+          <tbody id="scarico-righe"></tbody>
+        </table>
+        <button class="btn small" id="scarico-add-riga">+ Riga</button>
+        <div class="toolbar" style="margin-top:1rem;"><button class="btn primary" id="scarico-save">Registra scarico</button></div>
+        <div id="scarico-status" class="status"></div>
+      </div>
+
+      <div id="mag-rettifica" class="mag-view panel" style="display:none;">
+        <h2>Rettifica inventario</h2>
+        <div class="grid3">
+          <div class="field"><label>Articolo</label><select id="rett-articolo"></select></div>
+          <div class="field"><label>Data</label><input type="date" id="rett-data" /></div>
+          <div class="field"><label>Quantità (± delta)</label><input type="number" step="1" id="rett-delta" /></div>
+        </div>
+        <div class="field"><label>Motivo</label><input type="text" id="rett-motivo" placeholder="es. conteggio fisico, rottura non registrata…" /></div>
+        <div class="toolbar" style="margin-top:1rem;"><button class="btn primary" id="rett-save">Registra rettifica</button></div>
+        <div id="rett-status" class="status"></div>
+      </div>
+
+      <div id="mag-storico" class="mag-view" style="display:none;">
+        <div class="toolbar"><button class="btn" id="storico-refresh">Aggiorna</button></div>
+        <h2 style="font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;margin:1rem 0 .5rem;">Ultimi carichi</h2>
+        <table><thead><tr><th>Data</th><th>Fornitore</th><th>Documento</th><th>Righe</th><th></th></tr></thead><tbody id="storico-carichi"></tbody></table>
+        <h2 style="font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;margin:1rem 0 .5rem;">Ultimi scarichi</h2>
+        <table><thead><tr><th>Data</th><th>Causale</th><th>Righe</th><th></th></tr></thead><tbody id="storico-scarichi"></tbody></table>
+        <h2 style="font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;margin:1rem 0 .5rem;">Ultime rettifiche</h2>
+        <table><thead><tr><th>Data</th><th>Articolo</th><th>Delta</th><th>Motivo</th><th></th></tr></thead><tbody id="storico-rettifiche"></tbody></table>
+      </div>
+    </section>
+
+    <!-- ===================== CARTA VINI ===================== -->
+    <section id="sec-carta" class="section">
+      <div class="panel">
+        <h2>Genera e pubblica la carta vini</h2>
+        <p style="font-size:.8rem;color:var(--stone);margin-bottom:1rem;">
+          Genera la pagina <code>menu-vini.html</code> a partire dagli articoli non nascosti, raggruppati per tipologia.
+          L'anteprima qui sotto mostra esattamente cosa verrà pubblicato.
+        </p>
+        <div class="toolbar">
+          <button class="btn primary" id="carta-genera">Genera anteprima</button>
+          <button class="btn" id="carta-pubblica" style="display:none;">Pubblica su menu-vini.html</button>
+        </div>
+        <div id="carta-status" class="status"></div>
+        <iframe id="preview-frame" style="display:none;margin-top:1rem;"></iframe>
+      </div>
+    </section>
+
+  </main>
+
+<script>
+// ============ CONFIG ============
+var EDGE_BASE = 'https://wpsghmmvlwkyqiholfzx.supabase.co/functions/v1';
+var URL_CATALOGO = EDGE_BASE + '/cantina-catalogo';
+var URL_ANAGRAFICHE = EDGE_BASE + '/cantina-anagrafiche';
+var URL_MAGAZZINO = EDGE_BASE + '/cantina-magazzino';
+
+var REPO_OWNER = 'santamonicagenova-a11y';
+var REPO_NAME = 'SantaWeb';
+var VINI_PATH = 'menu-vini.html';
+
+function _ghToken() {
+  var t = localStorage.getItem('gh_token') || '';
+  if (!t) {
+    t = (window.prompt('Incolla il tuo token GitHub (lo stesso della pubblicazione):') || '').trim();
+    if (t) localStorage.setItem('gh_token', t);
+  }
+  return t;
+}
+
+function setStatus(el, msg, ok) {
+  el.textContent = msg;
+  el.className = 'status ' + (ok === true ? 'ok' : ok === false ? 'err' : '');
+}
+
+function fmt(n) { return (n === null || n === undefined || n === '') ? '' : n; }
+function eur(n) { return (n === null || n === undefined || n === '') ? '' : '€ ' + Number(n).toFixed(2); }
+
+// ============ TABS ============
+document.querySelectorAll('.tabs > .tab').forEach(function (t) {
+  t.addEventListener('click', function () {
+    document.querySelectorAll('.tabs > .tab').forEach(function (x) { x.classList.remove('active'); });
+    t.classList.add('active');
+    document.querySelectorAll('.section').forEach(function (s) { s.classList.remove('active'); });
+    document.getElementById('sec-' + t.dataset.tab).classList.add('active');
+    if (t.dataset.tab === 'catalogo' && !window._catLoaded) loadCatalogo();
+    if (t.dataset.tab === 'anagrafiche' && !window._anLoaded) loadAnagraficheTabelle();
+    if (t.dataset.tab === 'magazzino' && !window._magLoaded) { loadGiacenze(); loadSelectsMagazzino(); }
+  });
+});
+
+// ================================================================
+// CATALOGO
+// ================================================================
+var LOOKUP = { tipologie: [], produttori: [], regioni: [], agenti: [], ubicazioni: [] };
+
+function loadLookupSelects() {
+  return fetch(URL_ANAGRAFICHE).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data.ok) throw new Error(data.error);
+    LOOKUP.tipologie = data.tipologie;
+    LOOKUP.produttori = data.produttori;
+    LOOKUP.regioni = data.regioni;
+    LOOKUP.agenti = data.agenti;
+    LOOKUP.ubicazioni = data.ubicazioni;
+    LOOKUP.fornitori = data.fornitori;
+
+    fillSelect(document.getElementById('cat-tipologia'), data.tipologie, 'nome', true);
+    fillSelect(document.getElementById('f-tipologia'), data.tipologie, 'nome');
+    fillSelect(document.getElementById('f-produttore'), data.produttori, function (p) { return p.codice || (p.cognome + ' ' + (p.nome || '')); });
+    fillSelect(document.getElementById('f-regione'), data.regioni, 'nome');
+    fillSelect(document.getElementById('f-agente'), data.agenti, function (a) { return (a.cognome || '') + ' ' + (a.nome || ''); });
+    fillSelect(document.getElementById('f-ubicazione'), data.ubicazioni, 'nome');
+    fillSelect(document.getElementById('carico-fornitore'), data.fornitori, 'ragione_sociale');
+    fillSelect(document.getElementById('cat-search-placeholder'), []); // noop guard
+  });
+}
+
+function fillSelect(sel, rows, labelKeyOrFn, keepFirst) {
+  if (!sel) return;
+  var firstOpt = keepFirst ? sel.querySelector('option') : null;
+  sel.innerHTML = '';
+  var empty = document.createElement('option');
+  empty.value = ''; empty.textContent = keepFirst ? (firstOpt ? firstOpt.textContent : '— tutte —') : '—';
+  sel.appendChild(empty);
+  (rows || []).forEach(function (row) {
+    var opt = document.createElement('option');
+    opt.value = row.id;
+    opt.textContent = typeof labelKeyOrFn === 'function' ? labelKeyOrFn(row) : (row[labelKeyOrFn] || ('#' + row.id));
+    sel.appendChild(opt);
+  });
+}
+
+function loadCatalogo() {
+  window._catLoaded = true;
+  loadLookupSelects().then(fetchCatalogo);
+}
+
+function fetchCatalogo() {
+  var params = new URLSearchParams();
+  var search = document.getElementById('cat-search').value.trim();
+  var tip = document.getElementById('cat-tipologia').value;
+  var soloVis = document.getElementById('cat-solo-visibili').checked;
+  if (search) params.set('search', search);
+  if (tip) params.set('tipologia_id', tip);
+  if (soloVis) params.set('solo_visibili', '1');
+  setStatus(document.getElementById('cat-status'), 'Caricamento…');
+  fetch(URL_CATALOGO + '?' + params.toString()).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data.ok) { setStatus(document.getElementById('cat-status'), data.error, false); return; }
+    renderCatalogo(data.articoli);
+    setStatus(document.getElementById('cat-status'), data.articoli.length + ' articoli');
+  }).catch(function (e) { setStatus(document.getElementById('cat-status'), String(e), false); });
+}
+
+function renderCatalogo(rows) {
+  var tbody = document.getElementById('cat-tbody');
+  tbody.innerHTML = '';
+  rows.forEach(function (a) {
+    var tr = document.createElement('tr');
+    if (a.nascosto) tr.className = 'nascosto';
+    tr.innerHTML =
+      '<td>' + (a.codice || '') + (a.nascosto ? ' <span class="badge warn">nascosto</span>' : '') + '</td>' +
+      '<td>' + (a.tipologia ? a.tipologia.nome : '') + '</td>' +
+      '<td>' + (a.produttore ? (a.produttore.cognome || a.produttore.nome || '') : '') + '</td>' +
+      '<td>' + (a.regione ? a.regione.nome : '') + '</td>' +
+      '<td>' + eur(a.prezzo_sala) + '</td>' +
+      '<td>' + eur(a.prezzo_calice) + '</td>' +
+      '<td>' + (a.ubicazione ? a.ubicazione.nome : '') + '</td>' +
+      '<td></td>';
+    tr.addEventListener('click', function () { openCatForm(a); });
+    tbody.appendChild(tr);
+  });
+}
+
+document.getElementById('cat-refresh').addEventListener('click', fetchCatalogo);
+document.getElementById('cat-search').addEventListener('keyup', function (e) { if (e.key === 'Enter') fetchCatalogo(); });
+document.getElementById('cat-tipologia').addEventListener('change', fetchCatalogo);
+document.getElementById('cat-solo-visibili').addEventListener('change', fetchCatalogo);
+document.getElementById('cat-nuovo').addEventListener('click', function () { openCatForm(null); });
+document.getElementById('cat-cancel').addEventListener('click', function () { document.getElementById('cat-form-panel').style.display = 'none'; });
+
+function openCatForm(a) {
+  a = a || {};
+  document.getElementById('cat-form-panel').style.display = '';
+  document.getElementById('cat-form-title').textContent = a.id ? ('Modifica: ' + (a.codice || '')) : 'Nuovo articolo';
+  document.getElementById('f-id').value = a.id || '';
+  document.getElementById('f-codice').value = a.codice || '';
+  document.getElementById('f-descrizione').value = a.descrizione || '';
+  document.getElementById('f-tipologia').value = a.tipologia_id || '';
+  document.getElementById('f-produttore').value = a.produttore_id || '';
+  document.getElementById('f-regione').value = a.regione_id || '';
+  document.getElementById('f-agente').value = a.agente_id || '';
+  document.getElementById('f-ubicazione').value = a.ubicazione_id || '';
+  document.getElementById('f-anno').value = a.anno || '';
+  document.getElementById('f-costo-diretto').value = a.costo_diretto || '';
+  document.getElementById('f-costo-distributore').value = a.costo_distributore || '';
+  document.getElementById('f-prezzo-eno').value = a.prezzo_eno || '';
+  document.getElementById('f-prezzo-sala').value = a.prezzo_sala || '';
+  document.getElementById('f-prezzo-calice').value = a.prezzo_calice || '';
+  document.getElementById('f-gradi').value = a.gradi || '';
+  document.getElementById('f-uve').value = a.uve || '';
+  document.getElementById('f-percentuale').value = a.percentuale_enoteca || '';
+  document.getElementById('f-nascosto').checked = !!a.nascosto;
+  document.getElementById('f-coravin').checked = !!a.coravin;
+  document.getElementById('f-mezza').checked = !!a.mezza_bottiglia;
+  document.getElementById('cat-delete').style.display = a.id ? '' : 'none';
+  setStatus(document.getElementById('cat-form-status'), '');
+  document.getElementById('cat-form-panel').scrollIntoView({ behavior: 'smooth' });
+}
+
+function numOrNull(v) { v = (v || '').toString().trim(); return v === '' ? null : Number(v); }
+
+document.getElementById('cat-save').addEventListener('click', function () {
+  var articolo = {
+    id: document.getElementById('f-id').value || undefined,
+    codice: document.getElementById('f-codice').value || null,
+    descrizione: document.getElementById('f-descrizione').value,
+    tipologia_id: numOrNull(document.getElementById('f-tipologia').value),
+    produttore_id: numOrNull(document.getElementById('f-produttore').value),
+    regione_id: numOrNull(document.getElementById('f-regione').value),
+    agente_id: numOrNull(document.getElementById('f-agente').value),
+    ubicazione_id: numOrNull(document.getElementById('f-ubicazione').value),
+    anno: numOrNull(document.getElementById('f-anno').value),
+    costo_diretto: numOrNull(document.getElementById('f-costo-diretto').value),
+    costo_distributore: numOrNull(document.getElementById('f-costo-distributore').value),
+    prezzo_eno: numOrNull(document.getElementById('f-prezzo-eno').value),
+    prezzo_sala: numOrNull(document.getElementById('f-prezzo-sala').value),
+    prezzo_calice: numOrNull(document.getElementById('f-prezzo-calice').value),
+    gradi: numOrNull(document.getElementById('f-gradi').value),
+    uve: document.getElementById('f-uve').value || null,
+    percentuale_enoteca: numOrNull(document.getElementById('f-percentuale').value),
+    nascosto: document.getElementById('f-nascosto').checked,
+    coravin: document.getElementById('f-coravin').checked,
+    mezza_bottiglia: document.getElementById('f-mezza').checked,
+  };
+  if (!articolo.descrizione || !articolo.descrizione.trim()) {
+    setStatus(document.getElementById('cat-form-status'), 'La descrizione è obbligatoria', false);
+    return;
+  }
+  setStatus(document.getElementById('cat-form-status'), 'Salvataggio…');
+  fetch(URL_CATALOGO, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'upsert_articolo', github_token: _ghToken(), articolo: articolo }),
+  }).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data.ok) { setStatus(document.getElementById('cat-form-status'), data.error, false); return; }
+    setStatus(document.getElementById('cat-form-status'), 'Salvato.', true);
+    document.getElementById('cat-form-panel').style.display = 'none';
+    fetchCatalogo();
+  }).catch(function (e) { setStatus(document.getElementById('cat-form-status'), String(e), false); });
+});
+
+document.getElementById('cat-delete').addEventListener('click', function () {
+  var id = document.getElementById('f-id').value;
+  if (!id) return;
+  if (!window.confirm('Eliminare definitivamente questo articolo?')) return;
+  fetch(URL_CATALOGO, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'delete_articolo', github_token: _ghToken(), id: Number(id) }),
+  }).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data.ok) { setStatus(document.getElementById('cat-form-status'), data.error, false); return; }
+    document.getElementById('cat-form-panel').style.display = 'none';
+    fetchCatalogo();
+  });
+});
+
+// ================================================================
+// ANAGRAFICHE
+// ================================================================
+var AN_TABLES = {
+  tipologie: { label: 'Tipologie', fields: [{ k: 'nome', l: 'Nome', req: true }] },
+  unita_misura: { label: 'Unità di misura', fields: [{ k: 'sigla', l: 'Sigla' }, { k: 'descrizione', l: 'Descrizione' }] },
+  regioni: { label: 'Regioni', fields: [{ k: 'nome', l: 'Nome', req: true }] },
+  ubicazioni: { label: 'Ubicazioni', fields: [{ k: 'nome', l: 'Nome', req: true }] },
+  categorie_fornitori: { label: 'Categorie fornitori', fields: [{ k: 'nome', l: 'Nome', req: true }] },
+  distributori: { label: 'Distributori', fields: [{ k: 'codice', l: 'Codice' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'telefono_cel', l: 'Cellulare' }, { k: 'email', l: 'Email' }, { k: 'note', l: 'Note' }] },
+  agenti: { label: 'Agenti', fields: [{ k: 'codice', l: 'Codice' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'telefono_cel', l: 'Cellulare' }, { k: 'email', l: 'Email' }, { k: 'note', l: 'Note' }] },
+  produttori: { label: 'Produttori', fields: [{ k: 'codice', l: 'Nome produttore' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'regione_testo', l: 'Regione (testo libero)' }, { k: 'note', l: 'Note' }] },
+  fornitori: { label: 'Fornitori', fields: [{ k: 'ragione_sociale', l: 'Ragione sociale' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'telefono_cel', l: 'Cellulare' }, { k: 'email', l: 'Email' }, { k: 'note', l: 'Note' }] },
+};
+var AN_DATA = {};
+
+function loadAnagraficheTabelle() {
+  window._anLoaded = true;
+  var sel = document.getElementById('an-tabella');
+  sel.innerHTML = '';
+  Object.keys(AN_TABLES).forEach(function (k) {
+    var opt = document.createElement('option');
+    opt.value = k; opt.textContent = AN_TABLES[k].label;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', renderAnagraficaTabella);
+  fetchAnagrafiche();
+}
+
+document.getElementById('an-refresh').addEventListener('click', fetchAnagrafiche);
+document.getElementById('an-nuovo').addEventListener('click', function () { openAnForm(null); });
+document.getElementById('an-cancel').addEventListener('click', function () { document.getElementById('an-form-panel').style.display = 'none'; });
+
+function fetchAnagrafiche() {
+  setStatus(document.getElementById('an-status'), 'Caricamento…');
+  fetch(URL_ANAGRAFICHE).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data.ok) { setStatus(document.getElementById('an-status'), data.error, false); return; }
+    AN_DATA = data;
+    setStatus(document.getElementById('an-status'), '');
+    renderAnagraficaTabella();
+  }).catch(function (e) { setStatus(document.getElementById('an-status'), String(e), false); });
+}
+
+function renderAnagraficaTabella() {
+  var table = document.getElementById('an-tabella').value;
+  var cfg = AN_TABLES[table];
+  var rows = AN_DATA[table] || [];
+  var thead = document.getElementById('an-thead');
+  thead.innerHTML = '<tr>' + cfg.fields.map(function (f) { return '<th>' + f.l + '</th>'; }).join('') + '<th></th></tr>';
+  var tbody = document.getElementById('an-tbody');
+  tbody.innerHTML = '';
+  rows.forEach(function (row) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = cfg.fields.map(function (f) { return '<td>' + fmt(row[f.k]) + '</td>'; }).join('') + '<td></td>';
+    tr.addEventListener('click', function () { openAnForm(row); });
+    tbody.appendChild(tr);
+  });
+}
+
+function openAnForm(row) {
+  row = row || {};
+  var table = document.getElementById('an-tabella').value;
+  var cfg = AN_TABLES[table];
+  document.getElementById('an-form-panel').style.display = '';
+  document.getElementById('an-form-title').textContent = row.id ? ('Modifica ' + cfg.label) : ('Nuova riga — ' + cfg.label);
+  document.getElementById('an-f-id').value = row.id || '';
+  var container = document.getElementById('an-form-fields');
+  container.innerHTML = '';
+  cfg.fields.forEach(function (f) {
+    var div = document.createElement('div');
+    div.className = 'field';
+    div.innerHTML = '<label>' + f.l + (f.req ? ' *' : '') + '</label><input type="text" data-field="' + f.k + '" value="' + (fmt(row[f.k]) + '').replace(/"/g, '&quot;') + '" />';
+    container.appendChild(div);
+  });
+  document.getElementById('an-delete').style.display = row.id ? '' : 'none';
+  setStatus(document.getElementById('an-form-status'), '');
+  document.getElementById('an-form-panel').scrollIntoView({ behavior: 'smooth' });
+}
+
+document.getElementById('an-save').addEventListener('click', function () {
+  var table = document.getElementById('an-tabella').value;
+  var cfg = AN_TABLES[table];
+  var row = { id: document.getElementById('an-f-id').value || undefined };
+  var ok = true;
+  document.querySelectorAll('#an-form-fields [data-field]').forEach(function (inp) {
+    row[inp.dataset.field] = inp.value || null;
+  });
+  cfg.fields.forEach(function (f) { if (f.req && !row[f.k]) ok = false; });
+  if (!ok) { setStatus(document.getElementById('an-form-status'), 'Compila i campi obbligatori (*)', false); return; }
+  setStatus(document.getElementById('an-form-status'), 'Salvataggio…');
+  fetch(URL_ANAGRAFICHE, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'upsert', github_token: _ghToken(), table: table, row: row }),
+  }).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data.ok) { setStatus(document.getElementById('an-form-status'), data.error, false); return; }
+    setStatus(document.getElementById('an-form-status'), 'Salvato.', true);
+    document.getElementById('an-form-panel').style.display = 'none';
+    fetchAnagrafiche();
+  }).catch(function (e) { setStatus(document.getElementById('an-form-status'), String(e), false); });
+});
+
+document.getElementById('an-delete').addEventListener('click', function () {
+  var id = document.getElementById('an-f-id').value;
+  var table = document.getElementById('an-tabella').value;
+  if (!id) return;
+  if (!window.confirm('Eliminare questa riga? Se è referenziata da articoli/movimenti l\'operazione può fallire.')) return;
+  fetch(URL_ANAGRAFICHE, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'delete', github_token: _ghToken(), table: table, id: Number(id) }),
+  }).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data.ok) { setStatus(document.getElementById('an-form-status'), data.error, false); return; }
+    document.getElementById('an-form-panel').style.display = 'none';
+    fetchAnagrafiche();
+  });
+});
+
+// ================================================================
+// MAGAZZINO
+// ================================================================
+document.querySelectorAll('[data-mag]').forEach(function (t) {
+  t.addEventListener('click', function () {
+    document.querySelectorAll('.mag-view').forEach(function (v) { v.style.display = 'none'; });
+    document.getElementById('mag-' + t.dataset.mag).style.display = '';
+    if (t.dataset.mag === 'storico') loadStorico();
+  });
+});
+
+function loadGiacenze() {
+  window._magLoaded = true;
+  setStatus(document.getElementById('cat-status'), '');
+  fetch(URL_MAGAZZINO + '?mode=giacenze').then(function (r) { return r.json(); }).then(function (data) {
+    if (!data.ok) return;
+    var tbody = document.getElementById('mag-tbody');
+    tbody.innerHTML = '';
+    data.giacenze.forEach(function (g) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + (g.codice || '') + '</td><td>' + (g.tipologia || '') + '</td><td>' + g.giacenza + '</td>';
+      tbody.appendChild(tr);
+    });
+  });
+}
+document.getElementById('mag-refresh').addEventListener('click', loadGiacenze);
+
+function loadSelectsMagazzino() {
+  loadLookupSelects().then(function () {
+    fillSelect(document.getElementById('rett-articolo'), [], 'codice');
+    // articoli select popolato via ricerca fetch dedicata (elenco potenzialmente lungo)
+    fetch(URL_CATALOGO).then(function (r) { return r.json(); }).then(function (data) {
+      if (!data.ok) return;
+      window._articoliAll = data.articoli;
+      fillSelect(document.getElementById('rett-articolo'), data.articoli, 'codice');
+    });
+  });
+}
+
+function articoloSelectHtml() {
+  var opts = '<option value="">— seleziona —</option>';
+  (window._articoliAll || []).forEach(function (a) { opts += '<option value="' + a.id + '">' + (a.codice || '#' + a.id) + '</option>'; });
+  return opts;
+}
+
+document.getElementById('carico-add-riga').addEventListener('click', function () {
+  var tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td><select class="riga-articolo">' + articoloSelectHtml() + '</select></td>' +
+    '<td><input type="number" step="1" class="riga-qta" /></td>' +
+    '<td><input type="number" step="0.01" class="riga-prezzo" /></td>' +
+    '<td><input type="text" class="riga-note" /></td>' +
+    '<td><span class="rimuovi-riga">✕</span></td>';
+  tr.querySelector('.rimuovi-riga').addEventListener('click', function () { tr.remove(); });
+  document.getElementById('carico-righe').appendChild(tr);
+});
+
+document.getElementById('scarico-add-riga').addEventListener('click', function () {
+  var tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td><select class="riga-articolo">' + articoloSelectHtml() + '</select></td>' +
+    '<td><input type="number" step="1" class="riga-qta" /></td>' +
+    '<td><input type="text" class="riga-note" /></td>' +
+    '<td><span class="rimuovi-riga">✕</span></td>';
+  tr.querySelector('.rimuovi-riga').addEventListener('click', function () { tr.remove(); });
+  document.getElementById('scarico-righe').appendChild(tr);
+});
+
+document.getElementById('carico-save').addEventListener('click', function () {
+  var righe = [];
+  document.querySelectorAll('#carico-righe tr').forEach(function (tr) {
+    var artId = tr.querySelector('.riga-articolo').value;
+    var qta = tr.querySelector('.riga-qta').value;
+    if (!artId || !qta) return;
+    righe.push({
+      articolo_id: Number(artId),
+      quantita: Number(qta),
+      prezzo: tr.querySelector('.riga-prezzo').value ? Number(tr.querySelector('.riga-prezzo').value) : null,
+      note: tr.querySelector('.riga-note').value || null,
+    });
+  });
+  if (!document.getElementById('carico-data').value || righe.length === 0) {
+    setStatus(document.getElementById('carico-status'), 'Data e almeno una riga sono obbligatorie', false);
+    return;
+  }
+  setStatus(document.getElementById('carico-status'), 'Registrazione…');
+  fetch(URL_MAGAZZINO, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'registra_carico', github_token: _ghToken(),
+      carico: {
+        data: document.getElementById('carico-data').value,
+        fornitore_id: numOrNull(document.getElementById('carico-fornitore').value),
+        numero_documento: document.getElementById('carico-numero').value || null,
+        note: document.getElementById('carico-note').value || null,
+        righe: righe,
+      },
+    }),
+  }).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data.ok) { setStatus(document.getElementById('carico-status'), data.error, false); return; }
+    setStatus(document.getElementById('carico-status'), 'Carico registrato.', true);
+    document.getElementById('carico-righe').innerHTML = '';
+    loadGiacenze();
+  }).catch(function (e) { setStatus(document.getElementById('carico-status'), String(e), false); });
+});
+
+document.getElementById('scarico-save').addEventListener('click', function () {
+  var righe = [];
+  document.querySelectorAll('#scarico-righe tr').forEach(function (tr) {
+    var artId = tr.querySelector('.riga-articolo').value;
+    var qta = tr.querySelector('.riga-qta').value;
+    if (!artId || !qta) return;
+    righe.push({ articolo_id: Number(artId), quantita: Number(qta), note: tr.querySelector('.riga-note').value || null });
+  });
+  if (!document.getElementById('scarico-data').value || righe.length === 0) {
+    setStatus(document.getElementById('scarico-status'), 'Data e almeno una riga sono obbligatorie', false);
+    return;
+  }
+  setStatus(document.getElementById('scarico-status'), 'Registrazione…');
+  fetch(URL_MAGAZZINO, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'registra_scarico', github_token: _ghToken(),
+      scarico: {
+        data: document.getElementById('scarico-data').value,
+        causale: document.getElementById('scarico-causale').value || null,
+        note: document.getElementById('scarico-note').value || null,
+        righe: righe,
+      },
+    }),
+  }).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data.ok) { setStatus(document.getElementById('scarico-status'), data.error, false); return; }
+    setStatus(document.getElementById('scarico-status'), 'Scarico registrato.', true);
+    document.getElementById('scarico-righe').innerHTML = '';
+    loadGiacenze();
+  }).catch(function (e) { setStatus(document.getElementById('scarico-status'), String(e), false); });
+});
+
+document.getElementById('rett-save').addEventListener('click', function () {
+  var articoloId = document.getElementById('rett-articolo').value;
+  var data = document.getElementById('rett-data').value;
+  var delta = document.getElementById('rett-delta').value;
+  if (!articoloId || !data || delta === '') {
+    setStatus(document.getElementById('rett-status'), 'Articolo, data e delta sono obbligatori', false);
+    return;
+  }
+  setStatus(document.getElementById('rett-status'), 'Registrazione…');
+  fetch(URL_MAGAZZINO, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'registra_rettifica', github_token: _ghToken(),
+      rettifica: { articolo_id: Number(articoloId), data: data, quantita_delta: Number(delta), motivo: document.getElementById('rett-motivo').value || null },
+    }),
+  }).then(function (r) { return r.json(); }).then(function (d) {
+    if (!d.ok) { setStatus(document.getElementById('rett-status'), d.error, false); return; }
+    setStatus(document.getElementById('rett-status'), 'Rettifica registrata.', true);
+    document.getElementById('rett-delta').value = '';
+    document.getElementById('rett-motivo').value = '';
+    loadGiacenze();
+  }).catch(function (e) { setStatus(document.getElementById('rett-status'), String(e), false); });
+});
+
+function loadStorico() {
+  fetch(URL_MAGAZZINO + '?mode=storico').then(function (r) { return r.json(); }).then(function (data) {
+    if (!data.ok) return;
+    var tc = document.getElementById('storico-carichi'); tc.innerHTML = '';
+    (data.carichi || []).forEach(function (c) {
+      var righeStr = (c.carichi_righe || []).map(function (r) { return (r.articolo ? r.articolo.codice : '#' + r.articolo_id) + ' ×' + r.quantita; }).join(', ');
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + c.data + '</td><td>' + (c.fornitore ? c.fornitore.ragione_sociale : '') + '</td><td>' + (c.numero_documento || '') + '</td><td>' + righeStr + '</td><td><span class="rimuovi-riga" data-del="carico" data-id="' + c.id + '">elimina</span></td>';
+      tc.appendChild(tr);
+    });
+    var ts = document.getElementById('storico-scarichi'); ts.innerHTML = '';
+    (data.scarichi || []).forEach(function (s) {
+      var righeStr = (s.scarichi_righe || []).map(function (r) { return (r.articolo ? r.articolo.codice : '#' + r.articolo_id) + ' ×' + r.quantita; }).join(', ');
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + s.data + '</td><td>' + (s.causale || '') + '</td><td>' + righeStr + '</td><td><span class="rimuovi-riga" data-del="scarico" data-id="' + s.id + '">elimina</span></td>';
+      ts.appendChild(tr);
+    });
+    var tr2 = document.getElementById('storico-rettifiche'); tr2.innerHTML = '';
+    (data.rettifiche || []).forEach(function (r) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + r.data + '</td><td>' + (r.articolo ? r.articolo.codice : '#' + r.articolo_id) + '</td><td>' + r.quantita_delta + '</td><td>' + (r.motivo || '') + '</td><td><span class="rimuovi-riga" data-del="rettifica" data-id="' + r.id + '">elimina</span></td>';
+      tr2.appendChild(tr);
+    });
+    document.querySelectorAll('[data-del]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        if (!window.confirm('Eliminare questo movimento?')) return;
+        var action = 'delete_' + el.dataset.del;
+        fetch(URL_MAGAZZINO, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: action, github_token: _ghToken(), id: Number(el.dataset.id) }),
+        }).then(function (r) { return r.json(); }).then(function () { loadStorico(); loadGiacenze(); });
+      });
+    });
+  });
+}
+document.getElementById('storico-refresh').addEventListener('click', loadStorico);
+
+// ================================================================
+// CARTA VINI — generazione + pubblicazione
+// ================================================================
+var _cartaHtml = '';
+
+function escapeHtml(s) {
+  return (s || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+document.getElementById('carta-genera').addEventListener('click', function () {
+  setStatus(document.getElementById('carta-status'), 'Generazione…');
+  fetch(URL_CATALOGO + '?solo_visibili=1').then(function (r) { return r.json(); }).then(function (data) {
+    if (!data.ok) { setStatus(document.getElementById('carta-status'), data.error, false); return; }
+    _cartaHtml = generaHtmlCartaVini(data.articoli);
+    var frame = document.getElementById('preview-frame');
+    frame.style.display = '';
+    frame.srcdoc = _cartaHtml;
+    document.getElementById('carta-pubblica').style.display = '';
+    setStatus(document.getElementById('carta-status'), data.articoli.length + ' articoli in carta.', true);
+  }).catch(function (e) { setStatus(document.getElementById('carta-status'), String(e), false); });
+});
+
+function generaHtmlCartaVini(articoli) {
+  var gruppi = {};
+  var ordine = [];
+  articoli.forEach(function (a) {
+    var nome = a.tipologia ? a.tipologia.nome : 'Altro';
+    if (!gruppi[nome]) { gruppi[nome] = []; ordine.push(nome); }
+    gruppi[nome].push(a);
+  });
+
+  var body = '';
+  ordine.forEach(function (nome) {
+    body += '<div class="sez-titolo">' + escapeHtml(nome) + '</div>';
+    gruppi[nome].forEach(function (a) {
+      var prod = a.produttore ? (a.produttore.cognome || a.produttore.nome || '') : '';
+      var regione = a.regione ? a.regione.nome : '';
+      var sub = [prod, regione, a.anno].filter(Boolean).join(' · ');
+      var prezzo = a.prezzo_sala ? ('€ ' + Number(a.prezzo_sala).toFixed(0)) : '';
+      var calice = a.prezzo_calice ? (' <span class="calice">calice € ' + Number(a.prezzo_calice).toFixed(0) + '</span>') : '';
+      body +=
+        '<div class="vino">' +
+        '<div class="vino-nome">' + escapeHtml(a.codice || a.descrizione || '') + (sub ? '<span class="vino-sub"> — ' + escapeHtml(sub) + '</span>' : '') + '</div>' +
+        '<div class="vino-prezzo">' + prezzo + calice + '</div>' +
+        '</div>';
+    });
+  });
+
+  return '<!DOCTYPE html>\n<html lang="it"><head><meta charset="UTF-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+    '<title>Carta dei Vini — Ristorante Santamonica</title>' +
+    '<meta name="description" content="Carta dei vini del Ristorante Santamonica, Genova.">' +
+    '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Jost:wght@300;400&display=swap" rel="stylesheet">' +
+    '<style>' +
+    ':root{--cream:#faf7f2;--ink:#1a1714;--stone:#8c7e6e;--rule:#d4c9b8;}' +
+    '*{box-sizing:border-box;margin:0;padding:0;}' +
+    'body{background:var(--cream);color:var(--ink);font-family:"Jost",sans-serif;font-weight:300;padding:2rem 1rem;}' +
+    '.pg{max-width:700px;margin:0 auto;}' +
+    'h1{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:2rem;text-align:center;margin-bottom:2rem;letter-spacing:.04em;}' +
+    '.sez-titolo{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.3rem;margin:2rem 0 .8rem;border-bottom:1px solid var(--rule);padding-bottom:.3rem;text-transform:uppercase;letter-spacing:.06em;}' +
+    '.vino{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding:.35rem 0;font-size:.92rem;}' +
+    '.vino-nome{flex:1;}' +
+    '.vino-sub{color:var(--stone);font-size:.85em;}' +
+    '.vino-prezzo{white-space:nowrap;font-variant-numeric:tabular-nums;}' +
+    '.calice{color:var(--stone);font-size:.85em;}' +
+    '@media print{body{padding:0;}}' +
+    '</style></head><body>' +
+    '<div class="pg"><h1>Carta dei Vini</h1>' + body + '</div>' +
+    '</body></html>';
+}
+
+document.getElementById('carta-pubblica').addEventListener('click', function () {
+  if (!_cartaHtml) return;
+  if (!window.confirm('Pubblicare questa carta vini su menu-vini.html? Sostituirà la versione attuale sul sito.')) return;
+  var token = _ghToken();
+  setStatus(document.getElementById('carta-status'), 'Pubblicazione…');
+  var apiUrl = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + VINI_PATH;
+  fetch(apiUrl, { headers: { Authorization: 'token ' + token } })
+    .then(function (r) { return r.ok ? r.json() : Promise.reject('Impossibile leggere il file corrente (' + r.status + ')'); })
+    .then(function (current) {
+      var contentB64 = btoa(unescape(encodeURIComponent(_cartaHtml)));
+      return fetch(apiUrl, {
+        method: 'PUT',
+        headers: { Authorization: 'token ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: 'Pubblica carta vini da gestionale cantina', content: contentB64, sha: current.sha }),
+      });
+    })
+    .then(function (r) { return r.ok ? r.json() : Promise.reject('Errore pubblicazione (' + r.status + ')'); })
+    .then(function () { setStatus(document.getElementById('carta-status'), 'Pubblicato su menu-vini.html.', true); })
+    .catch(function (e) { setStatus(document.getElementById('carta-status'), String(e), false); });
+});
+
+// init
+loadCatalogo();
+</script>
+</body>
+</html>

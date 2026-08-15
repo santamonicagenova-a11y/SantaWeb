@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v 2026.08.15.03 — import della carta vini stampata reale (~140 vini, PDF "A020 - Menu VINI"):
+<!-- v 2026.08.15.04 — import della carta vini stampata reale (~140 vini, PDF "A020 - Menu VINI"):
      3 nuove colonne su articoli (denominazione DOC/DOCG/IGT, zona = sottozona geografica dentro
      la carta es. "Liguria di Levante"/"Genova"/"Val Trebbia", sboccatura per le bollicine), tutte
      esposte ora dal form Catalogo. Ogni vino del PDF è stato riconciliato per nome con l'anagrafica
@@ -91,7 +91,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.08.15.03</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.08.15.04</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -858,7 +858,7 @@ document.getElementById('carta-genera').addEventListener('click', function () {
   fetch(URL_CATALOGO + '?solo_visibili=1').then(function (r) { return r.json(); }).then(function (data) {
     if (!data.ok) { setStatus(document.getElementById('carta-status'), data.error, false); return; }
     var tutti = data.articoli || [];
-    var articoli = tutti.filter(function (a) { return !a.tipologia || a.tipologia.in_carta !== false; });
+    var articoli = tutti.filter(function (a) { return !a.tipologia_id || CARTA_TIP_SELEZIONATE[a.tipologia_id] !== false; });
     _cartaHtml = generaHtmlCartaVini(articoli);
     var frame = document.getElementById('preview-frame');
     frame.style.display = '';
@@ -953,6 +953,12 @@ function generaHtmlCartaVini(articoli) {
     '</body></html>';
 }
 
+// Categorie che vanno in carta per default (le uniche presenti nella carta stampata reale).
+// NON persistito su DB: le spunte servono solo per la generazione della sessione corrente —
+// ogni volta che si riapre la pagina si riparte sempre da questo elenco.
+var CARTA_TIP_DEFAULT = ['Bianco', 'Rosso', 'Rosato', 'Bolle', 'Bolle Rosé', 'Champagne', 'Champagne Rosé', 'Birra'];
+var CARTA_TIP_SELEZIONATE = {}; // tipologia_id -> bool, solo in memoria per questa sessione
+
 function loadCartaTipologieSetup() {
   setStatus(document.getElementById('carta-tipologie-status'), 'Caricamento…');
   fetch(URL_ANAGRAFICHE).then(function (r) { return r.json(); }).then(function (data) {
@@ -960,27 +966,20 @@ function loadCartaTipologieSetup() {
     var list = document.getElementById('carta-tipologie-list');
     list.innerHTML = '';
     (data.tipologie || []).forEach(function (t) {
+      CARTA_TIP_SELEZIONATE[t.id] = CARTA_TIP_DEFAULT.indexOf(t.nome) !== -1;
       var wrap = document.createElement('label');
       wrap.style.cssText = 'display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;text-transform:none;letter-spacing:0;color:var(--ink);cursor:pointer;';
       var cb = document.createElement('input');
       cb.type = 'checkbox';
-      cb.checked = t.in_carta !== false;
+      cb.checked = CARTA_TIP_SELEZIONATE[t.id];
       var span = document.createElement('span');
       span.textContent = t.nome;
       wrap.appendChild(cb);
       wrap.appendChild(span);
       list.appendChild(wrap);
       cb.addEventListener('change', function () {
-        setStatus(document.getElementById('carta-tipologie-status'), 'Salvataggio…');
-        fetch(URL_ANAGRAFICHE, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'upsert', github_token: _ghToken(), table: 'tipologie', row: { id: t.id, nome: t.nome, in_carta: cb.checked } }),
-        }).then(function (r) { return r.json(); }).then(function (d) {
-          if (!d.ok) { setStatus(document.getElementById('carta-tipologie-status'), d.error, false); cb.checked = !cb.checked; return; }
-          t.in_carta = cb.checked;
-          setStatus(document.getElementById('carta-tipologie-status'), 'Salvato — rigenera l\'anteprima per vedere l\'effetto.', true);
-        }).catch(function (e) { setStatus(document.getElementById('carta-tipologie-status'), String(e), false); cb.checked = !cb.checked; });
+        CARTA_TIP_SELEZIONATE[t.id] = cb.checked;
+        setStatus(document.getElementById('carta-tipologie-status'), 'Vale solo per questa sessione — rigenera l\'anteprima per vedere l\'effetto.', true);
       });
     });
     setStatus(document.getElementById('carta-tipologie-status'), '');

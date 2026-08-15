@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v 2026.08.15.02 — import della carta vini stampata reale (~140 vini, PDF "A020 - Menu VINI"):
+<!-- v 2026.08.15.03 — import della carta vini stampata reale (~140 vini, PDF "A020 - Menu VINI"):
      3 nuove colonne su articoli (denominazione DOC/DOCG/IGT, zona = sottozona geografica dentro
      la carta es. "Liguria di Levante"/"Genova"/"Val Trebbia", sboccatura per le bollicine), tutte
      esposte ora dal form Catalogo. Ogni vino del PDF è stato riconciliato per nome con l'anagrafica
@@ -91,7 +91,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.08.15.02</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.08.15.03</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -287,6 +287,16 @@
         <div id="carta-status" class="status"></div>
         <iframe id="preview-frame" style="display:none;margin-top:1rem;"></iframe>
       </div>
+
+      <div class="panel">
+        <h2>Categorie incluse in carta</h2>
+        <p style="font-size:.8rem;color:var(--stone);margin-bottom:1rem;">
+          Solo gli articoli delle categorie selezionate finiscono nella carta pubblicata — utile per escludere le
+          categorie da bar (Grappa, Gin, Rum, Amari…) che vivono nello stesso database ma non vanno in carta vini.
+        </p>
+        <div id="carta-tipologie-list" style="display:flex;flex-wrap:wrap;gap:.6rem 1.6rem;margin-bottom:.5rem;"></div>
+        <div id="carta-tipologie-status" class="status"></div>
+      </div>
     </section>
 
   </main>
@@ -329,6 +339,7 @@ document.querySelectorAll('.tabs > .tab').forEach(function (t) {
     if (t.dataset.tab === 'catalogo' && !window._catLoaded) loadCatalogo();
     if (t.dataset.tab === 'anagrafiche' && !window._anLoaded) loadAnagraficheTabelle();
     if (t.dataset.tab === 'magazzino' && !window._magLoaded) { loadGiacenze(); loadSelectsMagazzino(); }
+    if (t.dataset.tab === 'carta' && !window._cartaSetupLoaded) { window._cartaSetupLoaded = true; loadCartaTipologieSetup(); }
   });
 });
 
@@ -403,7 +414,7 @@ function renderCatalogo(rows) {
     tr.innerHTML =
       '<td>' + (a.codice || '') + (a.nascosto ? ' <span class="badge warn">nascosto</span>' : '') + '</td>' +
       '<td>' + (a.tipologia ? a.tipologia.nome : '') + '</td>' +
-      '<td>' + (a.produttore ? (a.produttore.cognome || a.produttore.nome || '') : '') + '</td>' +
+      '<td>' + (a.produttore ? (a.produttore.codice || a.produttore.cognome || a.produttore.nome || '') : '') + '</td>' +
       '<td>' + [a.zona, a.regione ? a.regione.nome : ''].filter(Boolean).join(' — ') + '</td>' +
       '<td>' + eur(a.prezzo_sala) + '</td>' +
       '<td>' + eur(a.prezzo_calice) + '</td>' +
@@ -846,14 +857,55 @@ document.getElementById('carta-genera').addEventListener('click', function () {
   setStatus(document.getElementById('carta-status'), 'Generazione…');
   fetch(URL_CATALOGO + '?solo_visibili=1').then(function (r) { return r.json(); }).then(function (data) {
     if (!data.ok) { setStatus(document.getElementById('carta-status'), data.error, false); return; }
-    _cartaHtml = generaHtmlCartaVini(data.articoli);
+    var tutti = data.articoli || [];
+    var articoli = tutti.filter(function (a) { return !a.tipologia || a.tipologia.in_carta !== false; });
+    _cartaHtml = generaHtmlCartaVini(articoli);
     var frame = document.getElementById('preview-frame');
     frame.style.display = '';
     frame.srcdoc = _cartaHtml;
     document.getElementById('carta-pubblica').style.display = '';
-    setStatus(document.getElementById('carta-status'), data.articoli.length + ' articoli in carta.', true);
+    var escl = tutti.length - articoli.length;
+    setStatus(document.getElementById('carta-status'), articoli.length + ' articoli in carta' + (escl ? ' (' + escl + ' esclusi per categoria)' : '') + '.', true);
   }).catch(function (e) { setStatus(document.getElementById('carta-status'), String(e), false); });
 });
+
+// Ogni vino su una riga sola, come nella carta stampata: nome in grassetto+corsivo+sottolineato,
+// poi "- Produttore (denominazione/millesimo/sboccatura) grado% - Uve: ... - Zona/Regione - € prezzo[, € calice]. Descrizione."
+function rigaVinoHtml(a) {
+  var nome = a.codice || a.descrizione || '';
+  var prod = a.produttore ? (a.produttore.codice || a.produttore.cognome || a.produttore.nome || '') : '';
+
+  var paren = '';
+  if (a.sboccatura) paren = 'sboccatura ' + a.sboccatura;
+  else if (a.denominazione && a.anno) paren = a.denominazione + ' ' + a.anno;
+  else if (a.denominazione) paren = a.denominazione;
+  else if (a.anno) paren = String(a.anno);
+
+  var grado = a.gradi ? (Number(a.gradi) + '%') : '';
+
+  var seg1parts = [];
+  if (prod) seg1parts.push(prod + (paren ? ' (' + paren + ')' : ''));
+  else if (paren) seg1parts.push('(' + paren + ')');
+  if (grado) seg1parts.push(grado);
+  var seg1 = seg1parts.join(' ');
+
+  var seg2 = a.uve ? ('Uve: ' + a.uve) : '';
+  var seg3 = a.zona || (a.regione ? a.regione.nome : '') || '';
+
+  var prezzoParts = [];
+  if (a.prezzo_sala) prezzoParts.push('€ ' + Number(a.prezzo_sala).toFixed(0));
+  if (a.prezzo_calice) prezzoParts.push('€ ' + Number(a.prezzo_calice).toFixed(0));
+  var seg4 = prezzoParts.join(', ');
+
+  var segmenti = [seg1, seg2, seg3, seg4].filter(Boolean).map(escapeHtml);
+
+  var descrizione = (a.descrizione && a.descrizione !== '(senza descrizione)') ? a.descrizione : '';
+
+  var html = '<span class="vino-nome">' + escapeHtml(nome) + '</span>';
+  if (segmenti.length) html += ' - ' + segmenti.join(' - ');
+  html += descrizione ? ('. ' + escapeHtml(descrizione)) : '.';
+  return html;
+}
 
 function generaHtmlCartaVini(articoli) {
   // Raggruppa per tipologia (capitolo) poi per zona/regione (sotto-capitolo), stessa struttura della carta stampata.
@@ -875,21 +927,7 @@ function generaHtmlCartaVini(articoli) {
     c.ordineSotto.forEach(function (sub) {
       body += '<div class="sottosez-titolo">' + escapeHtml(sub) + '</div>';
       c.sotto[sub].forEach(function (a) {
-        var prod = a.produttore ? (a.produttore.cognome || a.produttore.nome || '') : '';
-        var annata = [a.denominazione, a.anno].filter(Boolean).join(' ');
-        var sub2 = [prod, annata].filter(Boolean).join(' — ');
-        var gradiUve = [a.gradi ? (Number(a.gradi) + '%') : null, a.uve].filter(Boolean).join(' · ');
-        var prezzo = a.prezzo_sala ? ('€ ' + Number(a.prezzo_sala).toFixed(0)) : '';
-        var calice = a.prezzo_calice ? (' <span class="calice">calice € ' + Number(a.prezzo_calice).toFixed(0) + '</span>') : '';
-        var descrizione = (a.descrizione && a.descrizione !== '(senza descrizione)') ? a.descrizione : '';
-        body +=
-          '<div class="vino">' +
-          '<div class="vino-nome">' + escapeHtml(a.codice || a.descrizione || '') +
-          (sub2 ? '<span class="vino-sub"> — ' + escapeHtml(sub2) + '</span>' : '') +
-          '</div>' +
-          '<div class="vino-prezzo">' + prezzo + calice + '</div>' +
-          '</div>' +
-          (gradiUve || descrizione ? '<div class="vino-desc">' + escapeHtml([gradiUve, descrizione].filter(Boolean).join(' — ')) + '</div>' : '');
+        body += '<p class="vino">' + rigaVinoHtml(a) + '</p>';
       });
     });
   });
@@ -907,16 +945,46 @@ function generaHtmlCartaVini(articoli) {
     'h1{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:2rem;text-align:center;margin-bottom:2rem;letter-spacing:.04em;}' +
     '.sez-titolo{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.3rem;margin:2rem 0 .8rem;border-bottom:1px solid var(--rule);padding-bottom:.3rem;text-transform:uppercase;letter-spacing:.06em;}' +
     '.sottosez-titolo{font-family:"Jost",sans-serif;font-weight:400;font-size:.78rem;margin:1.1rem 0 .4rem;text-transform:uppercase;letter-spacing:.1em;color:var(--stone);}' +
-    '.vino{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding:.3rem 0 0;font-size:.92rem;}' +
-    '.vino-nome{flex:1;}' +
-    '.vino-sub{color:var(--stone);font-size:.85em;}' +
-    '.vino-desc{font-size:.78rem;color:var(--stone);padding:0 0 .4rem;border-bottom:1px dotted var(--rule);margin-bottom:.15rem;}' +
-    '.vino-prezzo{white-space:nowrap;font-variant-numeric:tabular-nums;}' +
-    '.calice{color:var(--stone);font-size:.85em;}' +
+    '.vino{font-size:.9rem;line-height:1.55;margin:0 0 .6rem;text-align:justify;}' +
+    '.vino-nome{font-weight:600;font-style:italic;text-decoration:underline;}' +
     '@media print{body{padding:0;}}' +
     '</style></head><body>' +
     '<div class="pg"><h1>Carta dei Vini</h1>' + body + '</div>' +
     '</body></html>';
+}
+
+function loadCartaTipologieSetup() {
+  setStatus(document.getElementById('carta-tipologie-status'), 'Caricamento…');
+  fetch(URL_ANAGRAFICHE).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data.ok) { setStatus(document.getElementById('carta-tipologie-status'), data.error, false); return; }
+    var list = document.getElementById('carta-tipologie-list');
+    list.innerHTML = '';
+    (data.tipologie || []).forEach(function (t) {
+      var wrap = document.createElement('label');
+      wrap.style.cssText = 'display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;text-transform:none;letter-spacing:0;color:var(--ink);cursor:pointer;';
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = t.in_carta !== false;
+      var span = document.createElement('span');
+      span.textContent = t.nome;
+      wrap.appendChild(cb);
+      wrap.appendChild(span);
+      list.appendChild(wrap);
+      cb.addEventListener('change', function () {
+        setStatus(document.getElementById('carta-tipologie-status'), 'Salvataggio…');
+        fetch(URL_ANAGRAFICHE, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'upsert', github_token: _ghToken(), table: 'tipologie', row: { id: t.id, nome: t.nome, in_carta: cb.checked } }),
+        }).then(function (r) { return r.json(); }).then(function (d) {
+          if (!d.ok) { setStatus(document.getElementById('carta-tipologie-status'), d.error, false); cb.checked = !cb.checked; return; }
+          t.in_carta = cb.checked;
+          setStatus(document.getElementById('carta-tipologie-status'), 'Salvato — rigenera l\'anteprima per vedere l\'effetto.', true);
+        }).catch(function (e) { setStatus(document.getElementById('carta-tipologie-status'), String(e), false); cb.checked = !cb.checked; });
+      });
+    });
+    setStatus(document.getElementById('carta-tipologie-status'), '');
+  }).catch(function (e) { setStatus(document.getElementById('carta-tipologie-status'), String(e), false); });
 }
 
 document.getElementById('carta-pubblica').addEventListener('click', function () {

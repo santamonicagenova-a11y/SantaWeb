@@ -1,4 +1,15 @@
 <!DOCTYPE html>
+<!-- v 2026.08.22.04 — due cambi: (1) campo Descrizione nel form articolo diventa una textarea
+     più grande e ridimensionabile (era un input a riga singola, difficile da rileggere); (2)
+     Denominazione e Zona diventano vere anagrafiche collegate (tabelle `denominazioni`/`zone`
+     su Supabase, nuove colonne articoli.denominazione_id/zona_id al posto del testo libero
+     precedente) — gestibili dal pannello Anagrafiche come le altre lookup, selezionabili da
+     tendina nel form articolo invece di testo libero (elimina i duplicati per refuso, es.
+     "millesimo"/"millesimo " visti in sessione). Dati esistenti migrati 1:1 (68 denominazioni +
+     84 zone su articoli, verificato). `cantina-catalogo` → v6/v7 (JOIN su denominazioni/zone,
+     upsert su denominazione_id/zona_id), `cantina-anagrafiche` → v5 (nuove tabelle whitelisted).
+     Tutti i punti della carta vini che leggevano `a.denominazione`/`a.zona` come stringa ora
+     leggono `.nome` dall'oggetto risolto (nessun cambio all'impaginazione/ordinamento). -->
 <!-- v 2026.08.22.03 — corretto il default della spunta "nuova pagina" (v.22.02 la faceva partire
      spenta per tutti): ora parte allineata a "categoria inclusa in carta" — attiva sulle categorie
      già selezionate di default (Bianchi/Rossi/Rosati/Bollicine/Bollicine Rosé/Champagne/Champagne
@@ -193,7 +204,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.08.22.03</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.08.22.04</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -246,7 +257,10 @@
         <input type="hidden" id="f-id" />
         <div class="grid2">
           <div class="field"><label>Codice / nome</label><input type="text" id="f-codice" /></div>
-          <div class="field"><label>Descrizione (obbligatoria)</label><input type="text" id="f-descrizione" /></div>
+        </div>
+        <div class="field">
+          <label>Descrizione (obbligatoria)</label>
+          <textarea id="f-descrizione" rows="5" style="width:100%;font:inherit;padding:.5rem;border:1px solid var(--rule);border-radius:4px;resize:vertical;"></textarea>
         </div>
         <div class="grid3">
           <div class="field"><label>Tipologia</label><select id="f-tipologia"></select></div>
@@ -259,8 +273,8 @@
           <div class="field"><label>Anno</label><input type="number" id="f-anno" /></div>
         </div>
         <div class="grid3">
-          <div class="field"><label>Denominazione (DOC/DOCG/IGT…)</label><input type="text" id="f-denominazione" /></div>
-          <div class="field"><label>Zona (es. Levante, Genova, Ponente)</label><input type="text" id="f-zona" /></div>
+          <div class="field"><label>Denominazione (DOC/DOCG/IGT…)</label><select id="f-denominazione"></select></div>
+          <div class="field"><label>Zona (es. Levante, Genova, Ponente)</label><select id="f-zona"></select></div>
           <div class="field"><label>Sboccatura (bollicine)</label><input type="text" id="f-sboccatura" placeholder="es. 7/2024" /></div>
         </div>
         <div class="grid3">
@@ -483,6 +497,8 @@ function loadLookupSelects() {
     LOOKUP.agenti = data.agenti;
     LOOKUP.ubicazioni = data.ubicazioni;
     LOOKUP.fornitori = data.fornitori;
+    LOOKUP.denominazioni = data.denominazioni;
+    LOOKUP.zone = data.zone;
 
     fillSelect(document.getElementById('cat-tipologia'), data.tipologie, 'nome', true);
     fillSelect(document.getElementById('f-tipologia'), data.tipologie, 'nome');
@@ -490,6 +506,8 @@ function loadLookupSelects() {
     fillSelect(document.getElementById('f-regione'), data.regioni, 'nome');
     fillSelect(document.getElementById('f-agente'), data.agenti, function (a) { return (a.cognome || '') + ' ' + (a.nome || ''); });
     fillSelect(document.getElementById('f-ubicazione'), data.ubicazioni, 'nome');
+    fillSelect(document.getElementById('f-denominazione'), data.denominazioni, 'nome');
+    fillSelect(document.getElementById('f-zona'), data.zone, 'nome');
     fillSelect(document.getElementById('carico-fornitore'), data.fornitori, 'ragione_sociale');
     var nomeProduttore = function (p) { return p.codice || (p.cognome + ' ' + (p.nome || '')); };
     var nomeAgente = function (a) { return (a.cognome || '') + ' ' + (a.nome || ''); };
@@ -595,7 +613,7 @@ function renderCatalogo(rows) {
       '<td>' + (a.codice || '') + (a.nascosto ? ' <span class="badge warn">nascosto</span>' : '') + '</td>' +
       '<td>' + (a.tipologia ? a.tipologia.nome : '') + '</td>' +
       '<td>' + (a.produttore ? (a.produttore.codice || a.produttore.cognome || a.produttore.nome || '') : '') + '</td>' +
-      '<td>' + [a.zona, a.regione ? a.regione.nome : ''].filter(Boolean).join(' — ') + '</td>' +
+      '<td>' + [a.zona ? a.zona.nome : '', a.regione ? a.regione.nome : ''].filter(Boolean).join(' — ') + '</td>' +
       '<td>' + eur(a.prezzo_sala) + '</td>' +
       '<td>' + eur(a.prezzo_calice) + '</td>' +
       '<td>' + (a.ubicazione ? a.ubicazione.nome : '') + '</td>' +
@@ -630,8 +648,8 @@ function openCatForm(a) {
   document.getElementById('f-gradi').value = a.gradi || '';
   document.getElementById('f-uve').value = a.uve || '';
   document.getElementById('f-percentuale').value = a.percentuale_enoteca || '';
-  document.getElementById('f-denominazione').value = a.denominazione || '';
-  document.getElementById('f-zona').value = a.zona || '';
+  document.getElementById('f-denominazione').value = a.denominazione ? a.denominazione.id : '';
+  document.getElementById('f-zona').value = a.zona ? a.zona.id : '';
   document.getElementById('f-sboccatura').value = a.sboccatura || '';
   document.getElementById('f-nascosto').checked = !!a.nascosto;
   document.getElementById('f-coravin').checked = !!a.coravin;
@@ -663,8 +681,8 @@ document.getElementById('cat-save').addEventListener('click', function () {
     gradi: numOrNull(document.getElementById('f-gradi').value),
     uve: document.getElementById('f-uve').value || null,
     percentuale_enoteca: numOrNull(document.getElementById('f-percentuale').value),
-    denominazione: document.getElementById('f-denominazione').value || null,
-    zona: document.getElementById('f-zona').value || null,
+    denominazione_id: numOrNull(document.getElementById('f-denominazione').value),
+    zona_id: numOrNull(document.getElementById('f-zona').value),
     sboccatura: document.getElementById('f-sboccatura').value || null,
     nascosto: document.getElementById('f-nascosto').checked,
     coravin: document.getElementById('f-coravin').checked,
@@ -712,6 +730,8 @@ var AN_TABLES = {
   regioni: { label: 'Regioni', fields: [{ k: 'nome', l: 'Nome', req: true }] },
   ubicazioni: { label: 'Ubicazioni', fields: [{ k: 'nome', l: 'Nome', req: true }] },
   categorie_fornitori: { label: 'Categorie fornitori', fields: [{ k: 'nome', l: 'Nome', req: true }] },
+  denominazioni: { label: 'Denominazioni', fields: [{ k: 'nome', l: 'Nome', req: true }] },
+  zone: { label: 'Zone', fields: [{ k: 'nome', l: 'Nome', req: true }] },
   distributori: { label: 'Distributori', fields: [{ k: 'codice', l: 'Codice' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'telefono_cel', l: 'Cellulare' }, { k: 'email', l: 'Email' }, { k: 'note', l: 'Note' }] },
   agenti: { label: 'Agenti', fields: [{ k: 'codice', l: 'Codice' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'telefono_cel', l: 'Cellulare' }, { k: 'email', l: 'Email' }, { k: 'note', l: 'Note' }] },
   produttori: { label: 'Produttori', fields: [{ k: 'codice', l: 'Nome produttore' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'regione_testo', l: 'Regione (testo libero)' }, { k: 'note', l: 'Note' }] },
@@ -1132,9 +1152,10 @@ function rigaVinoHtml(a) {
   var prod = a.produttore ? (a.produttore.codice || a.produttore.cognome || a.produttore.nome || '') : '';
 
   var paren = '';
+  var nomeDenom = a.denominazione ? a.denominazione.nome : '';
   if (a.sboccatura) paren = 'sboccatura ' + a.sboccatura;
-  else if (a.denominazione && a.anno) paren = a.denominazione + ' ' + a.anno;
-  else if (a.denominazione) paren = a.denominazione;
+  else if (nomeDenom && a.anno) paren = nomeDenom + ' ' + a.anno;
+  else if (nomeDenom) paren = nomeDenom;
   else if (a.anno) paren = String(a.anno);
 
   var grado = a.gradi ? (Number(a.gradi) + '%') : '';
@@ -1252,7 +1273,7 @@ function generaHtmlCartaVini(articoli) {
     if (!capitoli[cap]) { capitoli[cap] = { sotto: {}, ordineSotto: [], tipologiaId: a.tipologia_id }; ordineCapitoli.push(cap); }
     var c = capitoli[cap];
     var eterogenea = CARTA_CATEGORIE_ALTRE_REGIONI.indexOf(cap) !== -1;
-    var sub = a.zona || (eterogenea ? 'Altre regioni' : (a.regione ? a.regione.nome : null)) || 'Altre regioni';
+    var sub = (a.zona ? a.zona.nome : null) || (eterogenea ? 'Altre regioni' : (a.regione ? a.regione.nome : null)) || 'Altre regioni';
     if (!c.sotto[sub]) { c.sotto[sub] = []; c.ordineSotto.push(sub); }
     c.sotto[sub].push(a);
   });

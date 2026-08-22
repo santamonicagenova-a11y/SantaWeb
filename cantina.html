@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- v 2026.08.22.05 — Anagrafiche: campo Regione dei Produttori (`regione_testo`, testo libero)
+     sostituito da `regione_id` (FK vera su `regioni`, stessa tabella già usata da articoli e dal
+     filtro Regione del catalogo). Dati esistenti migrati 1:1 per nome (114/114, nessun orfano —
+     match esatto su tutte le 15 regioni distinte già usate). Aggiunto supporto generico ai campi
+     "select" nel pannello Anagrafiche (finora solo input testo): `openAnForm` disegna una tendina
+     per i campi con `type:'select'`, la tabella risolve l'id in nome via `anFieldDisplay()`, il
+     salvataggio converte il valore in numero. Riusabile per future FK simili in altre anagrafiche.
+     `cantina-anagrafiche` → v6 (whitelist produttori: regione_testo → regione_id). -->
 <!-- v 2026.08.22.04 — due cambi: (1) campo Descrizione nel form articolo diventa una textarea
      più grande e ridimensionabile (era un input a riga singola, difficile da rileggere); (2)
      Denominazione e Zona diventano vere anagrafiche collegate (tabelle `denominazioni`/`zone`
@@ -204,7 +212,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.08.22.04</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.08.22.05</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -734,7 +742,7 @@ var AN_TABLES = {
   zone: { label: 'Zone', fields: [{ k: 'nome', l: 'Nome', req: true }] },
   distributori: { label: 'Distributori', fields: [{ k: 'codice', l: 'Codice' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'telefono_cel', l: 'Cellulare' }, { k: 'email', l: 'Email' }, { k: 'note', l: 'Note' }] },
   agenti: { label: 'Agenti', fields: [{ k: 'codice', l: 'Codice' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'telefono_cel', l: 'Cellulare' }, { k: 'email', l: 'Email' }, { k: 'note', l: 'Note' }] },
-  produttori: { label: 'Produttori', fields: [{ k: 'codice', l: 'Nome produttore' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'regione_testo', l: 'Regione (testo libero)' }, { k: 'note', l: 'Note' }] },
+  produttori: { label: 'Produttori', fields: [{ k: 'codice', l: 'Nome produttore' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'regione_id', l: 'Regione', type: 'select', optionsTable: 'regioni', labelKey: 'nome' }, { k: 'note', l: 'Note' }] },
   fornitori: { label: 'Fornitori', fields: [{ k: 'ragione_sociale', l: 'Ragione sociale' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'telefono_cel', l: 'Cellulare' }, { k: 'email', l: 'Email' }, { k: 'note', l: 'Note' }] },
 };
 var AN_DATA = {};
@@ -776,10 +784,21 @@ function renderAnagraficaTabella() {
   tbody.innerHTML = '';
   rows.forEach(function (row) {
     var tr = document.createElement('tr');
-    tr.innerHTML = cfg.fields.map(function (f) { return '<td>' + fmt(row[f.k]) + '</td>'; }).join('') + '<td></td>';
+    tr.innerHTML = cfg.fields.map(function (f) { return '<td>' + anFieldDisplay(f, row) + '</td>'; }).join('') + '<td></td>';
     tr.addEventListener('click', function () { openAnForm(row); });
     tbody.appendChild(tr);
   });
+}
+
+// Per i campi di tipo "select" (FK verso un'altra anagrafica, es. Regione dei produttori) mostra
+// il nome risolto invece dell'id grezzo, usando i dati già caricati in AN_DATA.
+function anFieldDisplay(f, row) {
+  if (f.type === 'select') {
+    var opts = AN_DATA[f.optionsTable] || [];
+    var match = opts.filter(function (o) { return String(o.id) === String(row[f.k]); })[0];
+    return match ? fmt(match[f.labelKey]) : '';
+  }
+  return fmt(row[f.k]);
 }
 
 function openAnForm(row) {
@@ -794,7 +813,16 @@ function openAnForm(row) {
   cfg.fields.forEach(function (f) {
     var div = document.createElement('div');
     div.className = 'field';
-    div.innerHTML = '<label>' + f.l + (f.req ? ' *' : '') + '</label><input type="text" data-field="' + f.k + '" value="' + (fmt(row[f.k]) + '').replace(/"/g, '&quot;') + '" />';
+    if (f.type === 'select') {
+      var opts = AN_DATA[f.optionsTable] || [];
+      var html = '<option value="">—</option>' + opts.map(function (o) {
+        var sel = String(o.id) === String(row[f.k] || '') ? ' selected' : '';
+        return '<option value="' + o.id + '"' + sel + '>' + fmt(o[f.labelKey]) + '</option>';
+      }).join('');
+      div.innerHTML = '<label>' + f.l + (f.req ? ' *' : '') + '</label><select data-field="' + f.k + '">' + html + '</select>';
+    } else {
+      div.innerHTML = '<label>' + f.l + (f.req ? ' *' : '') + '</label><input type="text" data-field="' + f.k + '" value="' + (fmt(row[f.k]) + '').replace(/"/g, '&quot;') + '" />';
+    }
     container.appendChild(div);
   });
   document.getElementById('an-delete').style.display = row.id ? '' : 'none';
@@ -808,7 +836,8 @@ document.getElementById('an-save').addEventListener('click', function () {
   var row = { id: document.getElementById('an-f-id').value || undefined };
   var ok = true;
   document.querySelectorAll('#an-form-fields [data-field]').forEach(function (inp) {
-    row[inp.dataset.field] = inp.value || null;
+    var f = cfg.fields.filter(function (x) { return x.k === inp.dataset.field; })[0];
+    row[inp.dataset.field] = (f && f.type === 'select') ? (inp.value === '' ? null : Number(inp.value)) : (inp.value || null);
   });
   cfg.fields.forEach(function (f) { if (f.req && !row[f.k]) ok = false; });
   if (!ok) { setStatus(document.getElementById('an-form-status'), 'Compila i campi obbligatori (*)', false); return; }

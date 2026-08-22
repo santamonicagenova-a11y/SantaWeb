@@ -1,5 +1,107 @@
 <!DOCTYPE html>
-<!-- v 2026.08.15.04 — import della carta vini stampata reale (~140 vini, PDF "A020 - Menu VINI"):
+<!-- v 2026.08.22.03 — corretto il default della spunta "nuova pagina" (v.22.02 la faceva partire
+     spenta per tutti): ora parte allineata a "categoria inclusa in carta" — attiva sulle categorie
+     già selezionate di default (Bianchi/Rossi/Rosati/Bollicine/Bollicine Rosé/Champagne/Champagne
+     Rosé/Birra), spenta sulle altre. Aggiunto anche un pulsante "Ripristina predefiniti" che
+     riporta entrambe le spunte (categoria + nuova pagina) allo stato iniziale, scartando qualunque
+     scelta fatta in sessione. -->
+<!-- v 2026.08.22.02 — spunta "nuova pagina" ora NON flaggata di default all'apertura pagina (era
+     flaggata di default in v.22.01): di default nessun capitolo forza un'interruzione di stampa,
+     va spuntata a mano su quei capitoli dove la si vuole. Coerente col resto del pannello, dove le
+     categorie in carta partono già selezionate ma le interruzioni di pagina no. -->
+<!-- v 2026.08.22.01 — controllo manuale delle interruzioni di pagina in stampa: nel pannello
+     "Categorie incluse in carta" ogni capitolo ha ora anche una spunta "nuova pagina" (default
+     attiva, comportamento di sempre); togliendola quel capitolo continua sulla stessa pagina
+     stampata del precedente invece di iniziarne una nuova. Vale solo per la sessione corrente
+     (si rigenera l'anteprima per vedere l'effetto), come le altre spunte di questo pannello. -->
+<!-- v 2026.08.21.36 — nuovo pulsante "Stampa" nel pannello carta vini, di fianco a "Pubblica su
+     menu-vini.html": apre l'anteprima appena generata in una nuova scheda e avvia subito la
+     stampa del browser, usando le stesse regole @media print già presenti nell'HTML pubblicato
+     (un capitolo per pagina). Compare solo dopo aver generato l'anteprima, come il pulsante Pubblica. -->
+<!-- v 2026.08.21.35 — carta vini pubblicata: aggiunte regole CSS solo per la stampa (@media print)
+     che spezzano la pagina in modo pulito — ogni capitolo (Bianchi/Rossi/Bollicine...) parte da
+     una nuova pagina, i sotto-titoli regione non restano orfani a fine pagina, nessuna riga vino
+     viene tagliata a metà tra due pagine. A schermo (sito pubblico) resta invece un unico flusso
+     continuo senza interruzioni: le regole break-* si applicano solo in stampa. -->
+<!-- v 2026.08.21.34 — aggiunte 18 descrizioni mancanti trovate in un secondo PDF archivio più
+     vecchio (zzzz - vecchi.pdf): Egesta, Arò, Bianco 2020 Davitha, Campo di Colonnello, Ciliegia,
+     Gewürztraminer In der Eben, Gewürztraminer Turmhof (2ª bottiglia), Lissa, Macerato, Mansano,
+     Mu, Privo L'eretico, Riccio Bianco, Rissêu, San Rocco, Sar-do-né, Tatan, tre ma. Restano senza
+     descrizione (non trovate in nessuno dei due PDF): 5 Terre Anfora, Gewurz MB, Ruchè "Xenio". -->
+<!-- v 2026.08.21.33 — fix nel raggruppamento annate: la testata (produttore/uve/descrizione) prendeva
+     i dati dal primo membro in ordine alfabetico di codice, spesso un'annata "legacy" senza
+     descrizione/uve compilati (es. "Bamboo Road" 2019) — ora prende il primo membro con dati reali. -->
+<!-- v 2026.08.21.32 — stesso vino con annate diverse (es. "Bamboo Road" 2020/2022/2023) ora esce
+     come nel PDF: una sola riga di testata (nome-produttore-uve-descrizione) seguita da un elenco
+     "Annata AAAA grado% - prezzo", invece di ripetere l'intera riga per ogni annata. Si applica
+     solo agli articoli il cui codice termina già con un anno a 4 cifre, stesso produttore+nome. -->
+<!-- v 2026.08.21.30 — corretti 23 nomi dove le virgolette del PDF non erano mai state salvate come
+     caratteri letterali (es. "Animante" Franciacorta..., "Bamboo Road" 2020/22/23, Catarratto
+     "Macerato"...), causando corsivo su tutto il nome invece che sulla parte giusta; tolto il
+     fallback "tutto corsivo" da Champagne/Champagne Rosé/Birra (mai tra virgolette nel PDF); il
+     riconoscimento virgolette ora capisce anche quelle tipografiche “ ” oltre alle dritte " ". -->
+<!-- v 2026.08.21.28 — corsivo di precisione: solo il testo TRA le virgolette letterali del nome
+     diventa corsivo (es. `"100" Ancestrale` → corsivo solo su "100", "Ancestrale" resta dritto),
+     non più tutto il nome. Se il nome non ha virgolette letterali nel dato, resta il comportamento
+     precedente basato sul flag `virgolette` (tutto corsivo o niente). -->
+<!-- v 2026.08.21.26 — corretto un disallineamento: le tipologie Bianco/Rosso/Rosato/Passito/Moscato
+     sono state rinominate al plurale (Bianchi/Rossi/Rosati/Passiti/Moscati) in Anagrafiche — le
+     costanti dell'ordine capitoli/categorie default, ferme al singolare, non le riconoscevano più
+     e finivano tutte in coda in ordine casuale. Aggiornate a Bianchi/Rossi/Rosati ovunque. -->
+<!-- v 2026.08.21.24 — Corsivo condizionale sul nome vino: solo i nomi tra virgolette nella carta
+     stampata (es. "Axillo") sono in corsivo, i nomi "nudi" come i vitigni usati direttamente
+     (Albarola, Nebbiolo, Cinque Terre, Friulano, Sauvignon, Coronata, Cimixà, Granaccia, Rossese
+     di Dolceacqua, Pigato/Vermentino Müragni, Amarone della Valpolicella, Pinot Nero Dosaggio
+     Zero, Ansonaco, Bianco di Fognano — 18 articoli) restano solo sottolineati come nel PDF.
+     Nuova colonna `virgolette` (default true) + checkbox nel form Catalogo per le voci future. -->
+<!-- v 2026.08.21.22 — Catalogo: il filtro "Visibilità" (select Tutti/Solo visibili/Solo nascosti)
+     torna ad essere una semplice checkbox "solo visibili", spuntata di default all'apertura. -->
+<!-- v 2026.08.21.20 — Champagne/Champagne Rosé: rimosso il sotto-titolo "Francia" (è sempre Francia,
+     ridondante dirlo) — restano elenco piatto come nel PDF, il raggruppamento interno resta
+     invariato, solo il titolo non viene più stampato. -->
+<!-- v 2026.08.21.18 — rinominate le zone "Liguria di Levante"→"Levante" e "Liguria di Ponente"→
+     "Ponente" (35+7 articoli in DB) per uniformarle alle righe che già usavano il nome corto;
+     aggiornata la costante di ordinamento sotto-capitoli di conseguenza. -->
+<!-- v 2026.08.21.16 — Catalogo: tolti i filtri Descrizione/Zona/Denominazione/Ubicazione/Gradi
+     da-a/Coravin/Mezza bottiglia (troppi per l'uso quotidiano); Visibilità ora parte di default su
+     "Solo visibili" (anche dopo "Pulisci filtri"), invece di "Tutti". -->
+<!-- v 2026.08.21.13 — Catalogo: pannello filtri completo su ogni campo (codice, descrizione,
+     tipologia, produttore, regione, zona, denominazione, agente, ubicazione, uve, anno, gradi,
+     prezzo sala, prezzo calice, visibilità, coravin, mezza bottiglia). Un solo fetch di tutto il
+     catalogo, tutti i filtri applicati e componibili lato client, istantanei, + "Pulisci filtri". -->
+<!-- v 2026.08.21.12 — ordine dei CAPITOLI (Bollicine/Bianco/Rosso/...) fissato secondo la sequenza
+     esatta del PDF (Bollicine, Bollicine Rosé, Champagne, Champagne Rosé, Bianco, Rosato, Rosso,
+     Birra), invece dell'ordine casuale precedente. -->
+<!-- v 2026.08.21.10 — corretto un refuso nelle costanti JS: la tipologia in DB si chiama davvero
+     "Bollicine"/"Bollicine Rosé", non "Bolle"/"Bolle Rosé" come scritto finora — per questo restavano
+     fuori dal default categorie e dal riconoscimento "Altre regioni". -->
+<!-- v 2026.08.21.08 — ordinamento sotto-capitoli corretto guardando la struttura reale della carta
+     stampata (PDF fornito da Andrea): Bolle/Bolle Rosé/Rosato hanno solo Liguria+Altre regioni,
+     ma Bianco/Rosso NON hanno affatto un "Altre regioni" — ogni regione ha il suo sotto-capitolo
+     dedicato. Nuova regola generale: zone di Liguria sempre per prime (Liguria, Liguria di
+     Levante, Genova, Liguria di Ponente), poi le altre regioni in ordine alfabetico italiano,
+     "Altre regioni" (solo dove esiste) sempre per ultimo. "Val Trebbia" resta accostata a
+     "Emilia-Romagna" invece di finire al suo posto alfabetico. -->
+<!-- v 2026.08.21.07 — titoli sotto-capitolo (regioni: Liguria/Piemonte/Toscana/Altre regioni...)
+     portati alla stessa dimensione dei titoli capitolo (ROSSO/BIANCO/BOLLE...), e questi ultimi
+     ingranditi del 50% (1.3rem → 1.95rem). -->
+<!-- v 2026.08.21.06 — "Altre regioni" spostato sempre in fondo al capitolo (dopo Liguria e le altre
+     regioni nominate), non più in ordine casuale di inserimento. -->
+<!-- v 2026.08.21.05 — regione sottolineata nei sotto-capitoli eterogenei "Altre regioni" (Bolle/Bolle
+     Rosé/Rosato), per farla risaltare visivamente al posto del sotto-titolo di sezione che lì manca. -->
+<!-- v 2026.08.21.04 — icone bottiglia/calice (estratte dalla carta vini stampata) accanto ai due
+     prezzi in riga (bottiglia intera / calice), al posto del semplice "€ X, € Y" testuale. SVG
+     inline in currentColor, coerenti col resto della riga sia a schermo sia in stampa. -->
+<!-- v 2026.08.21.03 — fix 92 descrizioni con nome/produttore duplicato in testa (bug esteso oltre
+     "100 Ancestrale", risalito al testo originale del PDF per ognuna) + logica zona/regione in riga
+     corretta: la zona (es. "Liguria di Levante") non si ripete mai in riga essendo già il sotto-
+     titolo di sezione; la regione si scrive in riga SOLO per le categorie col sotto-capitolo
+     eterogeneo "Altre regioni" (Bolle/Bolle Rosé/Rosato), dove più regioni diverse condividono lo
+     stesso sotto-titolo e vanno quindi distinte riga per riga. -->
+<!-- v 2026.08.21.02 — categorie in carta rese NON persistite: le checkbox del pannello "Categorie
+     incluse in carta" ripartono sempre dal default (8 categorie vino/birra) ad ogni apertura della
+     pagina, le modifiche valgono solo per la sessione di lavoro corrente (colonna DB rimossa). -->
+<!-- v 2026.08.21.01 — import della carta vini stampata reale (~140 vini, PDF "A020 - Menu VINI"):
      3 nuove colonne su articoli (denominazione DOC/DOCG/IGT, zona = sottozona geografica dentro
      la carta es. "Liguria di Levante"/"Genova"/"Val Trebbia", sboccatura per le bollicine), tutte
      esposte ora dal form Catalogo. Ogni vino del PDF è stato riconciliato per nome con l'anagrafica
@@ -91,7 +193,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.08.15.04</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.08.22.03</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -107,14 +209,31 @@
 
     <!-- ===================== CATALOGO ===================== -->
     <section id="sec-catalogo" class="section active">
-      <div class="toolbar">
-        <input type="text" id="cat-search" placeholder="Cerca per nome…" />
-        <select id="cat-tipologia"><option value="">Tutte le tipologie</option></select>
-        <label style="display:inline-flex;align-items:center;gap:.3rem;margin:0;">
-          <input type="checkbox" id="cat-solo-visibili" /> solo visibili
-        </label>
-        <button class="btn" id="cat-refresh">Aggiorna</button>
-        <button class="btn primary" id="cat-nuovo">+ Nuovo articolo</button>
+      <div class="panel" style="padding:1rem 1.2rem;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.7rem .9rem;">
+          <div class="field" style="margin-bottom:0;"><label>Codice / nome</label><input type="text" id="cat-f-codice" placeholder="cerca…" /></div>
+          <div class="field" style="margin-bottom:0;"><label>Tipologia</label><select id="cat-tipologia"><option value="">Tutte</option></select></div>
+          <div class="field" style="margin-bottom:0;"><label>Produttore</label><select id="cat-f-produttore"><option value="">Tutti</option></select></div>
+          <div class="field" style="margin-bottom:0;"><label>Regione</label><select id="cat-f-regione"><option value="">Tutte</option></select></div>
+          <div class="field" style="margin-bottom:0;"><label>Agente</label><select id="cat-f-agente"><option value="">Tutti</option></select></div>
+          <div class="field" style="margin-bottom:0;"><label>Uve</label><input type="text" id="cat-f-uve" placeholder="cerca…" /></div>
+          <div class="field" style="margin-bottom:0;"><label>Anno da</label><input type="number" id="cat-f-anno-da" /></div>
+          <div class="field" style="margin-bottom:0;"><label>Anno a</label><input type="number" id="cat-f-anno-a" /></div>
+          <div class="field" style="margin-bottom:0;"><label>Prezzo sala da (€)</label><input type="number" step="0.01" id="cat-f-sala-da" /></div>
+          <div class="field" style="margin-bottom:0;"><label>Prezzo sala a (€)</label><input type="number" step="0.01" id="cat-f-sala-a" /></div>
+          <div class="field" style="margin-bottom:0;"><label>Prezzo calice da (€)</label><input type="number" step="0.01" id="cat-f-calice-da" /></div>
+          <div class="field" style="margin-bottom:0;"><label>Prezzo calice a (€)</label><input type="number" step="0.01" id="cat-f-calice-a" /></div>
+          <div class="field" style="margin-bottom:0;display:flex;align-items:flex-end;">
+            <label style="display:inline-flex;align-items:center;gap:.35rem;text-transform:none;letter-spacing:0;color:var(--ink);font-size:.8rem;">
+              <input type="checkbox" id="cat-f-solo-visibili" checked /> solo visibili
+            </label>
+          </div>
+        </div>
+        <div class="toolbar" style="margin-top:.9rem;">
+          <button class="btn" id="cat-refresh">Aggiorna dal database</button>
+          <button class="btn" id="cat-f-reset">Pulisci filtri</button>
+          <button class="btn primary" id="cat-nuovo" style="margin-left:auto;">+ Nuovo articolo</button>
+        </div>
       </div>
       <div id="cat-status" class="status"></div>
       <table>
@@ -141,7 +260,7 @@
         </div>
         <div class="grid3">
           <div class="field"><label>Denominazione (DOC/DOCG/IGT…)</label><input type="text" id="f-denominazione" /></div>
-          <div class="field"><label>Zona (es. Liguria di Levante)</label><input type="text" id="f-zona" /></div>
+          <div class="field"><label>Zona (es. Levante, Genova, Ponente)</label><input type="text" id="f-zona" /></div>
           <div class="field"><label>Sboccatura (bollicine)</label><input type="text" id="f-sboccatura" placeholder="es. 7/2024" /></div>
         </div>
         <div class="grid3">
@@ -162,6 +281,7 @@
           <label style="display:inline-flex;align-items:center;gap:.3rem;"><input type="checkbox" id="f-nascosto" /> Nascosto (escluso dalla carta pubblica)</label>
           <label style="display:inline-flex;align-items:center;gap:.3rem;margin-left:1rem;"><input type="checkbox" id="f-coravin" /> Coravin</label>
           <label style="display:inline-flex;align-items:center;gap:.3rem;margin-left:1rem;"><input type="checkbox" id="f-mezza" /> Mezza bottiglia</label>
+          <label style="display:inline-flex;align-items:center;gap:.3rem;margin-left:1rem;"><input type="checkbox" id="f-virgolette" checked /> Nome tra virgolette in carta (corsivo)</label>
         </div>
         <div class="toolbar" style="margin-top:1rem;">
           <button class="btn primary" id="cat-save">Salva</button>
@@ -283,6 +403,7 @@
         <div class="toolbar">
           <button class="btn primary" id="carta-genera">Genera anteprima</button>
           <button class="btn" id="carta-pubblica" style="display:none;">Pubblica su menu-vini.html</button>
+          <button class="btn" id="carta-stampa" style="display:none;">Stampa</button>
         </div>
         <div id="carta-status" class="status"></div>
         <iframe id="preview-frame" style="display:none;margin-top:1rem;"></iframe>
@@ -293,7 +414,12 @@
         <p style="font-size:.8rem;color:var(--stone);margin-bottom:1rem;">
           Solo gli articoli delle categorie selezionate finiscono nella carta pubblicata — utile per escludere le
           categorie da bar (Grappa, Gin, Rum, Amari…) che vivono nello stesso database ma non vanno in carta vini.
+          "Nuova pagina" conta solo per la stampa: di default è attiva sulle categorie che vanno in carta (una
+          pagina nuova per ciascuna) e spenta sulle altre; puoi cambiarla capitolo per capitolo.
         </p>
+        <div class="toolbar" style="margin-bottom:.6rem;">
+          <button class="btn" id="carta-tipologie-reset">Ripristina predefiniti</button>
+        </div>
         <div id="carta-tipologie-list" style="display:flex;flex-wrap:wrap;gap:.6rem 1.6rem;margin-bottom:.5rem;"></div>
         <div id="carta-tipologie-status" class="status"></div>
       </div>
@@ -365,7 +491,11 @@ function loadLookupSelects() {
     fillSelect(document.getElementById('f-agente'), data.agenti, function (a) { return (a.cognome || '') + ' ' + (a.nome || ''); });
     fillSelect(document.getElementById('f-ubicazione'), data.ubicazioni, 'nome');
     fillSelect(document.getElementById('carico-fornitore'), data.fornitori, 'ragione_sociale');
-    fillSelect(document.getElementById('cat-search-placeholder'), []); // noop guard
+    var nomeProduttore = function (p) { return p.codice || (p.cognome + ' ' + (p.nome || '')); };
+    var nomeAgente = function (a) { return (a.cognome || '') + ' ' + (a.nome || ''); };
+    fillSelect(document.getElementById('cat-f-produttore'), data.produttori, nomeProduttore, true);
+    fillSelect(document.getElementById('cat-f-regione'), data.regioni, 'nome', true);
+    fillSelect(document.getElementById('cat-f-agente'), data.agenti, nomeAgente, true);
   });
 }
 
@@ -389,21 +519,71 @@ function loadCatalogo() {
   loadLookupSelects().then(fetchCatalogo);
 }
 
+// Un solo fetch di tutto il catalogo: tutti i filtri (ogni campo) vengono applicati lato client,
+// così restano istantanei e componibili tra loro senza andare ogni volta al database.
 function fetchCatalogo() {
-  var params = new URLSearchParams();
-  var search = document.getElementById('cat-search').value.trim();
-  var tip = document.getElementById('cat-tipologia').value;
-  var soloVis = document.getElementById('cat-solo-visibili').checked;
-  if (search) params.set('search', search);
-  if (tip) params.set('tipologia_id', tip);
-  if (soloVis) params.set('solo_visibili', '1');
   setStatus(document.getElementById('cat-status'), 'Caricamento…');
-  fetch(URL_CATALOGO + '?' + params.toString()).then(function (r) { return r.json(); }).then(function (data) {
+  fetch(URL_CATALOGO).then(function (r) { return r.json(); }).then(function (data) {
     if (!data.ok) { setStatus(document.getElementById('cat-status'), data.error, false); return; }
-    renderCatalogo(data.articoli);
-    setStatus(document.getElementById('cat-status'), data.articoli.length + ' articoli');
+    window._catalogoAll = data.articoli;
+    applicaFiltriCatalogo();
   }).catch(function (e) { setStatus(document.getElementById('cat-status'), String(e), false); });
 }
+
+function testoContiene(valore, filtro) {
+  return (valore || '').toString().toLowerCase().indexOf(filtro.toLowerCase()) !== -1;
+}
+
+function applicaFiltriCatalogo() {
+  var tutti = window._catalogoAll || [];
+  var fCodice = document.getElementById('cat-f-codice').value.trim();
+  var fTipologia = document.getElementById('cat-tipologia').value;
+  var fProduttore = document.getElementById('cat-f-produttore').value;
+  var fRegione = document.getElementById('cat-f-regione').value;
+  var fAgente = document.getElementById('cat-f-agente').value;
+  var fUve = document.getElementById('cat-f-uve').value.trim();
+  var fAnnoDa = document.getElementById('cat-f-anno-da').value;
+  var fAnnoA = document.getElementById('cat-f-anno-a').value;
+  var fSalaDa = document.getElementById('cat-f-sala-da').value;
+  var fSalaA = document.getElementById('cat-f-sala-a').value;
+  var fCaliceDa = document.getElementById('cat-f-calice-da').value;
+  var fCaliceA = document.getElementById('cat-f-calice-a').value;
+  var fSoloVisibili = document.getElementById('cat-f-solo-visibili').checked;
+
+  var filtrati = tutti.filter(function (a) {
+    if (fCodice && !testoContiene(a.codice, fCodice)) return false;
+    if (fTipologia && String(a.tipologia_id) !== fTipologia) return false;
+    if (fProduttore && String(a.produttore_id) !== fProduttore) return false;
+    if (fRegione && String(a.regione_id) !== fRegione) return false;
+    if (fAgente && String(a.agente_id) !== fAgente) return false;
+    if (fUve && !testoContiene(a.uve, fUve)) return false;
+    if (fAnnoDa && (a.anno == null || a.anno < Number(fAnnoDa))) return false;
+    if (fAnnoA && (a.anno == null || a.anno > Number(fAnnoA))) return false;
+    if (fSalaDa && (a.prezzo_sala == null || Number(a.prezzo_sala) < Number(fSalaDa))) return false;
+    if (fSalaA && (a.prezzo_sala == null || Number(a.prezzo_sala) > Number(fSalaA))) return false;
+    if (fCaliceDa && (a.prezzo_calice == null || Number(a.prezzo_calice) < Number(fCaliceDa))) return false;
+    if (fCaliceA && (a.prezzo_calice == null || Number(a.prezzo_calice) > Number(fCaliceA))) return false;
+    if (fSoloVisibili && a.nascosto) return false;
+    return true;
+  });
+
+  renderCatalogo(filtrati);
+  var msg = filtrati.length + ' di ' + tutti.length + ' articoli';
+  setStatus(document.getElementById('cat-status'), msg);
+}
+
+document.querySelectorAll('#sec-catalogo .panel input[type=text], #sec-catalogo .panel input[type=number]').forEach(function (inp) {
+  inp.addEventListener('input', applicaFiltriCatalogo);
+});
+document.querySelectorAll('#sec-catalogo .panel select, #sec-catalogo .panel input[type=checkbox]').forEach(function (el) {
+  el.addEventListener('change', applicaFiltriCatalogo);
+});
+document.getElementById('cat-f-reset').addEventListener('click', function () {
+  document.querySelectorAll('#sec-catalogo .panel input[type=text], #sec-catalogo .panel input[type=number]').forEach(function (inp) { inp.value = ''; });
+  document.querySelectorAll('#sec-catalogo .panel select').forEach(function (sel) { sel.value = ''; });
+  document.getElementById('cat-f-solo-visibili').checked = true; // default: solo visibili
+  applicaFiltriCatalogo();
+});
 
 function renderCatalogo(rows) {
   var tbody = document.getElementById('cat-tbody');
@@ -426,9 +606,6 @@ function renderCatalogo(rows) {
 }
 
 document.getElementById('cat-refresh').addEventListener('click', fetchCatalogo);
-document.getElementById('cat-search').addEventListener('keyup', function (e) { if (e.key === 'Enter') fetchCatalogo(); });
-document.getElementById('cat-tipologia').addEventListener('change', fetchCatalogo);
-document.getElementById('cat-solo-visibili').addEventListener('change', fetchCatalogo);
 document.getElementById('cat-nuovo').addEventListener('click', function () { openCatForm(null); });
 document.getElementById('cat-cancel').addEventListener('click', function () { document.getElementById('cat-form-panel').style.display = 'none'; });
 
@@ -459,6 +636,7 @@ function openCatForm(a) {
   document.getElementById('f-nascosto').checked = !!a.nascosto;
   document.getElementById('f-coravin').checked = !!a.coravin;
   document.getElementById('f-mezza').checked = !!a.mezza_bottiglia;
+  document.getElementById('f-virgolette').checked = a.virgolette !== false;
   document.getElementById('cat-delete').style.display = a.id ? '' : 'none';
   setStatus(document.getElementById('cat-form-status'), '');
   document.getElementById('cat-form-panel').scrollIntoView({ behavior: 'smooth' });
@@ -491,6 +669,7 @@ document.getElementById('cat-save').addEventListener('click', function () {
     nascosto: document.getElementById('f-nascosto').checked,
     coravin: document.getElementById('f-coravin').checked,
     mezza_bottiglia: document.getElementById('f-mezza').checked,
+    virgolette: document.getElementById('f-virgolette').checked,
   };
   if (!articolo.descrizione || !articolo.descrizione.trim()) {
     setStatus(document.getElementById('cat-form-status'), 'La descrizione è obbligatoria', false);
@@ -864,13 +1043,90 @@ document.getElementById('carta-genera').addEventListener('click', function () {
     frame.style.display = '';
     frame.srcdoc = _cartaHtml;
     document.getElementById('carta-pubblica').style.display = '';
+    document.getElementById('carta-stampa').style.display = '';
     var escl = tutti.length - articoli.length;
     setStatus(document.getElementById('carta-status'), articoli.length + ' articoli in carta' + (escl ? ' (' + escl + ' esclusi per categoria)' : '') + '.', true);
   }).catch(function (e) { setStatus(document.getElementById('carta-status'), String(e), false); });
 });
 
-// Ogni vino su una riga sola, come nella carta stampata: nome in grassetto+corsivo+sottolineato,
-// poi "- Produttore (denominazione/millesimo/sboccatura) grado% - Uve: ... - Zona/Regione - € prezzo[, € calice]. Descrizione."
+document.getElementById('carta-stampa').addEventListener('click', function () {
+  if (!_cartaHtml) return;
+  // Apre la carta in una nuova scheda e avvia subito la stampa: le regole @media print
+  // già presenti nell'HTML generato si occupano dell'impaginazione (un capitolo per pagina, ecc.).
+  var w = window.open('', '_blank');
+  if (!w) { setStatus(document.getElementById('carta-status'), 'Il browser ha bloccato la finestra di stampa (popup). Consenti i popup per questo sito e riprova.', false); return; }
+  w.document.open();
+  w.document.write(_cartaHtml);
+  w.document.close();
+  setTimeout(function () { w.focus(); w.print(); }, 300);
+});
+
+// Ordine dei capitoli esattamente come nella carta stampata (PDF fornito da Andrea).
+var CARTA_ORDINE_CAPITOLI = ['Bollicine', 'Bollicine Rosé', 'Champagne', 'Champagne Rosé', 'Bianchi', 'Rosati', 'Rossi', 'Birra'];
+
+// Categorie in cui il PDF stampato usa un unico sotto-capitolo "ALTRE REGIONI" eterogeneo
+// (Liguria + tutto il resto mischiato): per queste il nome della regione va scritto riga per riga
+// perché il sotto-titolo da solo non la identifica. Le altre categorie (Bianco/Rosso/Champagne...)
+// hanno un sotto-capitolo per ogni singola regione (es. "PIEMONTE", "TOSCANA"): lì il nome è già
+// nel titolo e ripeterlo in riga sarebbe ridondante.
+var CARTA_CATEGORIE_ALTRE_REGIONI = ['Bollicine', 'Bollicine Rosé', 'Rosati'];
+
+// Capitoli senza sotto-titolo di regione: nel PDF Champagne/Champagne Rosé sono un elenco piatto
+// (è sempre Francia, non serve dirlo), niente "Francia" stampato come sotto-capitolo.
+var CARTA_CAPITOLI_SENZA_SOTTOTITOLO = ['Champagne', 'Champagne Rosé'];
+
+// Ordine dei sotto-capitoli come nella carta stampata: le zone di Liguria vanno sempre per prime
+// (in questo preciso ordine), poi tutte le altre regioni in ordine alfabetico italiano, "Altre
+// regioni" (bucket eterogeneo) sempre per ultimo. "Val Trebbia" (sotto-zona dell'Emilia-Romagna)
+// va subito dopo "Emilia-Romagna" e non al suo posto alfabetico, per restare vicino alla regione
+// di cui fa parte — esattamente come nella carta stampata.
+var CARTA_ORDINE_LIGURIA = ['Liguria', 'Levante', 'Genova', 'Ponente'];
+var CARTA_CHIAVE_ORDINAMENTO_SPECIALE = { 'Val Trebbia': 'Emilia-RomagnaVal Trebbia' };
+
+function confrontaSottoCapitoli(a, b) {
+  if (a === 'Altre regioni') return b === 'Altre regioni' ? 0 : 1;
+  if (b === 'Altre regioni') return -1;
+  var ia = CARTA_ORDINE_LIGURIA.indexOf(a);
+  var ib = CARTA_ORDINE_LIGURIA.indexOf(b);
+  if (ia !== -1 || ib !== -1) {
+    if (ia !== -1 && ib !== -1) return ia - ib;
+    return ia !== -1 ? -1 : 1;
+  }
+  var chiaveA = CARTA_CHIAVE_ORDINAMENTO_SPECIALE[a] || a;
+  var chiaveB = CARTA_CHIAVE_ORDINAMENTO_SPECIALE[b] || b;
+  return chiaveA.localeCompare(chiaveB, 'it');
+}
+
+// Icone bottiglia/calice (estratte dalla carta vini stampata) per marcare i due prezzi: intera vs calice.
+// currentColor eredita il colore del testo, così restano coerenti col resto della riga.
+var ICONA_BOTTIGLIA = '<svg class="ic-prezzo" viewBox="0 0 24 24" width="11" height="11" aria-hidden="true"><path d="M9 2h6v3.5c0 .6.2 1.1.6 1.5L17 8.5c.6.6 1 1.5 1 2.4V20a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-9.1c0-.9.4-1.8 1-2.4l1.4-1.5c.4-.4.6-.9.6-1.5V2Z" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M9 2h6M8.5 12h7" stroke="currentColor" stroke-width="1"/></svg>';
+var ICONA_CALICE = '<svg class="ic-prezzo" viewBox="0 0 24 24" width="11" height="11" aria-hidden="true"><path d="M7 3h10l-1 6a4 4 0 0 1-8 0L7 3Z" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M12 13v6M9 21h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>';
+
+// Corsivo solo sulla parte tra virgolette, non su tutto il nome: es. `"100" Ancestrale` diventa
+// "<em>100</em>" Ancestrale (corsivo solo su "100"). Se il nome non ha virgolette letterali nel
+// dato, si usa il flag `virgolette` dell'articolo per decidere se corsivare tutto il nome o niente
+// (caso dei nomi "nudi" tipo vitigni: Albarola, Nebbiolo...).
+function formattaNomeVino(nome, virgolette) {
+  // Riconosce sia le virgolette dritte " " sia quelle tipografiche “ ” (a volte incollate da Word/PDF).
+  if (/["“]/.test(nome)) {
+    var html = '';
+    var regex = /["“]([^"”]*)["”]/g;
+    var lastIndex = 0;
+    var m;
+    while ((m = regex.exec(nome))) {
+      html += escapeHtml(nome.slice(lastIndex, m.index));
+      html += '"<em>' + escapeHtml(m[1]) + '</em>"';
+      lastIndex = regex.lastIndex;
+    }
+    html += escapeHtml(nome.slice(lastIndex));
+    return html;
+  }
+  return virgolette === false ? escapeHtml(nome) : '<em>' + escapeHtml(nome) + '</em>';
+}
+
+// Ogni vino su una riga sola, come nella carta stampata: nome in grassetto+sottolineato (corsivo
+// solo sulla parte tra virgolette), poi "- Produttore (denominazione/millesimo/sboccatura) grado%
+// - Uve: ... [- Regione] - 🍾 € prezzo 🍷 € calice. Descrizione."
 function rigaVinoHtml(a) {
   var nome = a.codice || a.descrizione || '';
   var prod = a.produttore ? (a.produttore.codice || a.produttore.cognome || a.produttore.nome || '') : '';
@@ -890,44 +1146,150 @@ function rigaVinoHtml(a) {
   var seg1 = seg1parts.join(' ');
 
   var seg2 = a.uve ? ('Uve: ' + a.uve) : '';
-  var seg3 = a.zona || (a.regione ? a.regione.nome : '') || '';
 
+  // La zona (es. "Liguria di Levante") è già il sotto-titolo della sezione: non si ripete mai in riga.
+  // La regione si scrive in riga SOLO per le categorie col sotto-capitolo eterogeneo "Altre regioni",
+  // sottolineata perché lì sostituisce il sotto-titolo di sezione (le regioni sono mischiate).
+  var capNome = a.tipologia ? a.tipologia.nome : '';
+  var eterogenea = CARTA_CATEGORIE_ALTRE_REGIONI.indexOf(capNome) !== -1;
+  var nomeRegione = (!a.zona && eterogenea && a.regione) ? a.regione.nome : '';
+  var seg3Html = nomeRegione ? '<span class="vino-regione">' + escapeHtml(nomeRegione) + '</span>' : '';
+
+  // Prezzo bottiglia con icona bottiglia, prezzo calice con icona calice — non passano da escapeHtml
+  // (contengono markup SVG), gli altri segmenti sì.
   var prezzoParts = [];
-  if (a.prezzo_sala) prezzoParts.push('€ ' + Number(a.prezzo_sala).toFixed(0));
-  if (a.prezzo_calice) prezzoParts.push('€ ' + Number(a.prezzo_calice).toFixed(0));
-  var seg4 = prezzoParts.join(', ');
+  if (a.prezzo_sala) prezzoParts.push(ICONA_BOTTIGLIA + ' € ' + Number(a.prezzo_sala).toFixed(0));
+  if (a.prezzo_calice) prezzoParts.push(ICONA_CALICE + ' € ' + Number(a.prezzo_calice).toFixed(0));
+  var seg4Html = prezzoParts.join('&nbsp;&nbsp;');
 
-  var segmenti = [seg1, seg2, seg3, seg4].filter(Boolean).map(escapeHtml);
+  var segmenti = [seg1, seg2].filter(Boolean).map(escapeHtml);
+  if (seg3Html) segmenti.push(seg3Html);
+  if (seg4Html) segmenti.push(seg4Html);
 
   var descrizione = (a.descrizione && a.descrizione !== '(senza descrizione)') ? a.descrizione : '';
 
-  var html = '<span class="vino-nome">' + escapeHtml(nome) + '</span>';
+  var html = '<span class="vino-nome">' + formattaNomeVino(nome, a.virgolette) + '</span>';
   if (segmenti.length) html += ' - ' + segmenti.join(' - ');
   html += descrizione ? ('. ' + escapeHtml(descrizione)) : '.';
   return html;
 }
 
+// Stesso vino, annate diverse (stesso produttore + stesso nome col solo anno finale diverso, es.
+// `"Bamboo Road" 2020/2022/2023`): nella carta stampata compaiono come UNA riga di testata
+// (nome-produttore-uve-descrizione) seguita da un elenco "Annata AAAA grado% - prezzo", non come
+// righe separate identiche ripetute per ogni annata. Un articolo entra nel raggruppamento solo se
+// il suo codice termina già con un anno a 4 cifre (altrimenti resta sempre una riga singola).
+function nomeSenzaAnnataFinale(codice) {
+  return (codice || '').replace(/\s+\d{4}\s*$/, '').trim();
+}
+
+function raggruppaAnnate(lista) {
+  var gruppi = {};
+  var ordine = [];
+  lista.forEach(function (a) {
+    var codice = a.codice || a.descrizione || '';
+    var haAnnataFinale = /\d{4}\s*$/.test(codice.trim());
+    var chiave = (haAnnataFinale ? 'V|' : 'S|') + (a.produttore_id || 0) + '|' + nomeSenzaAnnataFinale(codice);
+    if (!gruppi[chiave]) { gruppi[chiave] = { base: nomeSenzaAnnataFinale(codice), membri: [] }; ordine.push(chiave); }
+    gruppi[chiave].membri.push(a);
+  });
+  return ordine.map(function (chiave) {
+    var g = gruppi[chiave];
+    return g.membri.length > 1 ? { tipo: 'annate', base: g.base, membri: g.membri } : { tipo: 'singolo', articolo: g.membri[0] };
+  });
+}
+
+function rigaGruppoAnnateHtml(gruppo) {
+  // La testata (produttore/uve/descrizione) va presa dal primo membro che ha dati reali, non dal
+  // primo in ordine alfabetico — altrimenti un'annata "legacy" senza descrizione/uve la lascerebbe vuota.
+  var primo = gruppo.membri.filter(function (m) { return m.descrizione && m.descrizione !== '(senza descrizione)'; })[0] || gruppo.membri[0];
+  var prod = primo.produttore ? (primo.produttore.codice || primo.produttore.cognome || primo.produttore.nome || '') : '';
+  var seg2 = primo.uve ? ('Uve: ' + primo.uve) : '';
+
+  var capNome = primo.tipologia ? primo.tipologia.nome : '';
+  var eterogenea = CARTA_CATEGORIE_ALTRE_REGIONI.indexOf(capNome) !== -1;
+  var nomeRegione = (!primo.zona && eterogenea && primo.regione) ? primo.regione.nome : '';
+  var seg3Html = nomeRegione ? '<span class="vino-regione">' + escapeHtml(nomeRegione) + '</span>' : '';
+
+  var segmenti = [prod, seg2].filter(Boolean).map(escapeHtml);
+  if (seg3Html) segmenti.push(seg3Html);
+
+  var descrizione = (primo.descrizione && primo.descrizione !== '(senza descrizione)') ? primo.descrizione : '';
+
+  var testata = '<span class="vino-nome">' + formattaNomeVino(gruppo.base, primo.virgolette) + '</span>';
+  if (segmenti.length) testata += ' - ' + segmenti.join(' - ');
+  testata += descrizione ? ('. ' + escapeHtml(descrizione)) : '.';
+
+  var membriOrdinati = gruppo.membri.slice().sort(function (x, y) {
+    return (Number(x.anno) || 0) - (Number(y.anno) || 0);
+  });
+
+  var righeAnnate = membriOrdinati.map(function (a) {
+    var annoLabel = a.anno || (nomeSenzaAnnataFinale(a.codice) !== (a.codice || '').trim() ? (a.codice || '').trim().slice(-4) : '');
+    var grado = a.gradi ? (Number(a.gradi) + '%') : '';
+    var prezzoParts = [];
+    if (a.prezzo_sala) prezzoParts.push(ICONA_BOTTIGLIA + ' € ' + Number(a.prezzo_sala).toFixed(0));
+    if (a.prezzo_calice) prezzoParts.push(ICONA_CALICE + ' € ' + Number(a.prezzo_calice).toFixed(0));
+    var pezzi = ['Annata ' + escapeHtml(String(annoLabel || '?'))];
+    if (grado) pezzi.push(escapeHtml(grado));
+    var riga = pezzi.join(' ');
+    if (prezzoParts.length) riga += ' - ' + prezzoParts.join('&nbsp;&nbsp;');
+    return '<div class="vino-annata">' + riga + '</div>';
+  }).join('');
+
+  return '<p class="vino">' + testata + '</p><div class="vino-annate-lista">' + righeAnnate + '</div>';
+}
+
 function generaHtmlCartaVini(articoli) {
   // Raggruppa per tipologia (capitolo) poi per zona/regione (sotto-capitolo), stessa struttura della carta stampata.
+  // Nelle categorie con sotto-capitolo eterogeneo (Bolle/Bolle Rosé/Rosato) tutto ciò che non è
+  // "Liguria" finisce in UN SOLO sotto-capitolo "Altre regioni" (le regioni si distinguono in riga,
+  // vedi rigaVinoHtml) — non si spezza in un sotto-capitolo per regione come nelle altre categorie.
   var capitoli = {};
   var ordineCapitoli = [];
   articoli.forEach(function (a) {
     var cap = a.tipologia ? a.tipologia.nome : 'Altro';
-    if (!capitoli[cap]) { capitoli[cap] = { sotto: {}, ordineSotto: [] }; ordineCapitoli.push(cap); }
+    if (!capitoli[cap]) { capitoli[cap] = { sotto: {}, ordineSotto: [], tipologiaId: a.tipologia_id }; ordineCapitoli.push(cap); }
     var c = capitoli[cap];
-    var sub = a.zona || (a.regione ? a.regione.nome : null) || 'Altre regioni';
+    var eterogenea = CARTA_CATEGORIE_ALTRE_REGIONI.indexOf(cap) !== -1;
+    var sub = a.zona || (eterogenea ? 'Altre regioni' : (a.regione ? a.regione.nome : null)) || 'Altre regioni';
     if (!c.sotto[sub]) { c.sotto[sub] = []; c.ordineSotto.push(sub); }
     c.sotto[sub].push(a);
   });
 
+  // Ordine dei sotto-capitoli come nella carta stampata: le zone di Liguria sempre per prime
+  // (nell'ordine esatto della carta: Liguria, Liguria di Levante, Genova, Liguria di Ponente),
+  // poi tutte le altre regioni in ordine alfabetico, "Altre regioni" (bucket eterogeneo, solo
+  // Bolle/Bolle Rosé/Rosato) sempre per ultimo.
+  Object.keys(capitoli).forEach(function (cap) {
+    capitoli[cap].ordineSotto.sort(confrontaSottoCapitoli);
+  });
+
+  // Ordine dei capitoli come nella carta stampata: eventuali categorie non previste (es. "Altro")
+  // finiscono in fondo, nell'ordine in cui sono comparse.
+  ordineCapitoli.sort(function (a, b) {
+    var ia = CARTA_ORDINE_CAPITOLI.indexOf(a);
+    var ib = CARTA_ORDINE_CAPITOLI.indexOf(b);
+    if (ia === -1 && ib === -1) return 0;
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
+  });
+
   var body = '';
   ordineCapitoli.forEach(function (cap) {
-    body += '<div class="sez-titolo">' + escapeHtml(cap) + '</div>';
     var c = capitoli[cap];
+    var forzaPagina = CARTA_BREAK_CAPITOLI[c.tipologiaId] === true; // default: nessuna interruzione forzata, si sceglie capitolo per capitolo
+    body += '<div class="sez-titolo" data-break="' + (forzaPagina ? '1' : '0') + '">' + escapeHtml(cap) + '</div>';
+    var mostraSottotitolo = CARTA_CAPITOLI_SENZA_SOTTOTITOLO.indexOf(cap) === -1;
     c.ordineSotto.forEach(function (sub) {
-      body += '<div class="sottosez-titolo">' + escapeHtml(sub) + '</div>';
-      c.sotto[sub].forEach(function (a) {
-        body += '<p class="vino">' + rigaVinoHtml(a) + '</p>';
+      if (mostraSottotitolo) body += '<div class="sottosez-titolo">' + escapeHtml(sub) + '</div>';
+      raggruppaAnnate(c.sotto[sub]).forEach(function (voce) {
+        if (voce.tipo === 'annate') {
+          body += rigaGruppoAnnateHtml(voce);
+        } else {
+          body += '<p class="vino">' + rigaVinoHtml(voce.articolo) + '</p>';
+        }
       });
     });
   });
@@ -943,11 +1305,22 @@ function generaHtmlCartaVini(articoli) {
     'body{background:var(--cream);color:var(--ink);font-family:"Jost",sans-serif;font-weight:300;padding:2rem 1rem;}' +
     '.pg{max-width:700px;margin:0 auto;}' +
     'h1{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:2rem;text-align:center;margin-bottom:2rem;letter-spacing:.04em;}' +
-    '.sez-titolo{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.3rem;margin:2rem 0 .8rem;border-bottom:1px solid var(--rule);padding-bottom:.3rem;text-transform:uppercase;letter-spacing:.06em;}' +
-    '.sottosez-titolo{font-family:"Jost",sans-serif;font-weight:400;font-size:.78rem;margin:1.1rem 0 .4rem;text-transform:uppercase;letter-spacing:.1em;color:var(--stone);}' +
+    '.sez-titolo{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.95rem;margin:2rem 0 .8rem;border-bottom:1px solid var(--rule);padding-bottom:.3rem;text-transform:uppercase;letter-spacing:.06em;}' +
+    '.sottosez-titolo{font-family:"Jost",sans-serif;font-weight:400;font-size:1.95rem;margin:1.1rem 0 .4rem;text-transform:uppercase;letter-spacing:.1em;color:var(--stone);}' +
     '.vino{font-size:.9rem;line-height:1.55;margin:0 0 .6rem;text-align:justify;}' +
-    '.vino-nome{font-weight:600;font-style:italic;text-decoration:underline;}' +
-    '@media print{body{padding:0;}}' +
+    '.vino-nome{font-weight:600;text-decoration:underline;}' +
+    '.vino-nome em{font-style:italic;}' +
+    '.vino-annate-lista{margin:-.35rem 0 .6rem 1.2rem;font-size:.85rem;line-height:1.5;}' +
+    '.ic-prezzo{vertical-align:-1px;margin:0 1px 0 0;opacity:.8;}' +
+    '.vino-regione{text-decoration:underline;}' +
+    '@media print{' +
+      'body{padding:0;}' +
+      '.sez-titolo{break-after:avoid;}' +
+      '.sez-titolo[data-break="1"]{break-before:page;}' +
+      'h1+.sez-titolo{break-before:avoid;}' +
+      '.sottosez-titolo{break-after:avoid;break-inside:avoid;}' +
+      '.vino,.vino-annate-lista{break-inside:avoid;}' +
+    '}' +
     '</style></head><body>' +
     '<div class="pg"><h1>Carta dei Vini</h1>' + body + '</div>' +
     '</body></html>';
@@ -956,35 +1329,65 @@ function generaHtmlCartaVini(articoli) {
 // Categorie che vanno in carta per default (le uniche presenti nella carta stampata reale).
 // NON persistito su DB: le spunte servono solo per la generazione della sessione corrente —
 // ogni volta che si riapre la pagina si riparte sempre da questo elenco.
-var CARTA_TIP_DEFAULT = ['Bianco', 'Rosso', 'Rosato', 'Bolle', 'Bolle Rosé', 'Champagne', 'Champagne Rosé', 'Birra'];
+var CARTA_TIP_DEFAULT = ['Bianchi', 'Rossi', 'Rosati', 'Bollicine', 'Bollicine Rosé', 'Champagne', 'Champagne Rosé', 'Birra'];
 var CARTA_TIP_SELEZIONATE = {}; // tipologia_id -> bool, solo in memoria per questa sessione
+var CARTA_BREAK_CAPITOLI = {}; // tipologia_id -> bool ("nuova pagina prima di questo capitolo"), default true, solo in memoria
 
-function loadCartaTipologieSetup() {
+function loadCartaTipologieSetup(messaggioFinale) {
   setStatus(document.getElementById('carta-tipologie-status'), 'Caricamento…');
   fetch(URL_ANAGRAFICHE).then(function (r) { return r.json(); }).then(function (data) {
     if (!data.ok) { setStatus(document.getElementById('carta-tipologie-status'), data.error, false); return; }
     var list = document.getElementById('carta-tipologie-list');
     list.innerHTML = '';
     (data.tipologie || []).forEach(function (t) {
-      CARTA_TIP_SELEZIONATE[t.id] = CARTA_TIP_DEFAULT.indexOf(t.nome) !== -1;
+      var isDefault = CARTA_TIP_DEFAULT.indexOf(t.nome) !== -1;
+      CARTA_TIP_SELEZIONATE[t.id] = isDefault;
+      CARTA_BREAK_CAPITOLI[t.id] = isDefault; // "nuova pagina" parte allineata a "categoria in carta": attiva sulle categorie di default, spenta sulle altre
+      var riga = document.createElement('div');
+      riga.style.cssText = 'display:inline-flex;align-items:center;gap:.7rem;';
+
       var wrap = document.createElement('label');
       wrap.style.cssText = 'display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;text-transform:none;letter-spacing:0;color:var(--ink);cursor:pointer;';
       var cb = document.createElement('input');
       cb.type = 'checkbox';
-      cb.checked = CARTA_TIP_SELEZIONATE[t.id];
+      cb.checked = isDefault;
       var span = document.createElement('span');
       span.textContent = t.nome;
       wrap.appendChild(cb);
       wrap.appendChild(span);
-      list.appendChild(wrap);
       cb.addEventListener('change', function () {
         CARTA_TIP_SELEZIONATE[t.id] = cb.checked;
         setStatus(document.getElementById('carta-tipologie-status'), 'Vale solo per questa sessione — rigenera l\'anteprima per vedere l\'effetto.', true);
       });
+
+      var wrapPagina = document.createElement('label');
+      wrapPagina.title = 'Solo per la stampa: se spuntato, questo capitolo inizia sempre da una nuova pagina; se tolto, può continuare sulla stessa pagina del capitolo precedente.';
+      wrapPagina.style.cssText = 'display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;text-transform:none;letter-spacing:0;color:var(--stone);cursor:pointer;';
+      var cbPagina = document.createElement('input');
+      cbPagina.type = 'checkbox';
+      cbPagina.checked = isDefault;
+      var spanPagina = document.createElement('span');
+      spanPagina.textContent = 'nuova pagina';
+      wrapPagina.appendChild(cbPagina);
+      wrapPagina.appendChild(spanPagina);
+      cbPagina.addEventListener('change', function () {
+        CARTA_BREAK_CAPITOLI[t.id] = cbPagina.checked;
+        setStatus(document.getElementById('carta-tipologie-status'), 'Vale solo per questa sessione — rigenera l\'anteprima per vedere l\'effetto.', true);
+      });
+
+      riga.appendChild(wrap);
+      riga.appendChild(wrapPagina);
+      list.appendChild(riga);
     });
-    setStatus(document.getElementById('carta-tipologie-status'), '');
+    setStatus(document.getElementById('carta-tipologie-status'), messaggioFinale || '', !!messaggioFinale);
   }).catch(function (e) { setStatus(document.getElementById('carta-tipologie-status'), String(e), false); });
 }
+
+document.getElementById('carta-tipologie-reset').addEventListener('click', function () {
+  // Ricarica da zero la lista: entrambe le spunte (categoria in carta + nuova pagina) tornano
+  // ai valori di default (isDefault per entrambe), scartando qualunque scelta fatta in sessione.
+  loadCartaTipologieSetup('Ripristinati i valori di default — rigenera l\'anteprima per vedere l\'effetto.');
+});
 
 document.getElementById('carta-pubblica').addEventListener('click', function () {
   if (!_cartaHtml) return;

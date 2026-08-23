@@ -1,4 +1,77 @@
 <!DOCTYPE html>
+<!-- v 2026.08.22.22 — nell'elenco annate dei vini con più vendemmie, la parola "Annata" torna alla
+     dimensione standard del testo (nuova classe `.annata-label`, 12pt come `.vino`) invece di
+     ereditare quella più piccola di `.vino-annate-lista` (0,85rem≈10.2pt); l'anno accanto resta a
+     10pt (.num-inline, invariato). -->
+<!-- v 2026.08.22.21 — anche le percentuali delle uve (es. "Vermentino 95%, altre varietà 5%" nel
+     segmento "Uve: ...") ora a 10pt come le altre percentuali/numeri — nuova funzione
+     `evidenziaPercentuali()` che, su testo già escapato, avvolge ogni "NN%" in uno span
+     .num-inline via regex. Applicata al segmento Uve sia in rigaVinoHtml sia in
+     rigaGruppoAnnateHtml. Il resto del testo "Uve: ..." (nomi vitigni) resta alla dimensione
+     normale del paragrafo. -->
+<!-- v 2026.08.22.20 — tutti i numeri (prezzi, grado alcolico incl. %, annate incl. le parentesi
+     che le racchiudono) a 10pt fisso, indipendentemente dal contesto in cui compaiono — nuova
+     classe `.num-inline` per grado/annata/parentesi, `.prezzo-nowrap` estesa con font-size:10pt.
+     In rigaVinoHtml il segmento "produttore (denominazione anno) grado%" ora costruisce l'HTML a
+     mano invece di passare da escapeHtml generico (necessario per poter inserire gli span). Colto
+     e corretto un bug della v.22.17: la protezione anti-a-capo icona/prezzo non era mai arrivata
+     alla riga "Annata AAAA grado% - prezzo" dei vini con più vendemmie (rigaGruppoAnnateHtml) —
+     ora anche lì i prezzi sono avvolti in .prezzo-nowrap. -->
+<!-- v 2026.08.22.19 — sotto-titolo regione (.sottosez-titolo) a 20pt (era 22pt). -->
+<!-- v 2026.08.22.18 — testo dei vini (.vino) a 12pt esatti (era 10.8pt). -->
+<!-- v 2026.08.22.17 — evitato che un a-capo separi l'icona bottiglia/calice dal prezzo, o il
+     simbolo € dal valore: ogni blocco "icona € prezzo" è ora avvolto in uno span con
+     white-space:nowrap (nuova classe .prezzo-nowrap) e usa &nbsp; al posto degli spazi normali
+     al suo interno. Il gap tra prezzo bottiglia e prezzo calice resta uno spazio interrompibile
+     (non richiesto che i due restino insieme). Applicato sia a rigaVinoHtml sia a
+     rigaGruppoAnnateHtml (stesso pattern in entrambe le funzioni). -->
+<!-- v 2026.08.22.16 — segnalato che la riga "Axillo" (prima voce di Bollicine) andava a capo dopo
+     "fine" nella stampa: aumentati sotto-titolo regione (.sottosez-titolo 20pt→22pt) e testo dei
+     vini (.vino 8.8pt→10.8pt, +2pt). Valori facilmente ritoccabili se serve ancora. -->
+<!-- v 2026.08.22.15 — margini di stampa: aggiunta regola `@page{margin:1.5cm;}` — 1,5 cm su tutti
+     e 4 i lati del foglio quando si stampa la carta vini (bottone Stampa o Ctrl+P dal browser).
+     Non tocca la resa a schermo (pubblicazione web), solo l'output di stampa. -->
+<!-- v 2026.08.22.14 — titolo capitolo (.sez-titolo, es. "Bollicine") a 24pt (era 12pt); sotto-
+     titolo regione (.sottosez-titolo, es. "Genova") a 20pt (era 1.95rem≈23.4pt) — ora la
+     gerarchia visiva capitolo>sotto-capitolo è corretta. -->
+<!-- v 2026.08.22.13 — corretto un fraintendimento delle 2 modifiche precedenti (.12/.vino-nome
+     scartata in corsa): non era il testo del paragrafo (.vino) a dover crescere, ma il TITOLO
+     del capitolo (.sez-titolo, es. "Bollicine"). Ripristinato `.vino` a 8.8pt (dimensione di
+     v.22.09, prima dei tentativi .10/.11/.12); `.sez-titolo` portato a 12pt esplicito (era 1.95rem
+     ≈23.4pt). `.vino-nome` (nome del singolo vino) resta come prima, nessuna dimensione propria. -->
+<!-- v 2026.08.22.12 — testo dei vini (.vino) a 16pt (era 12pt). -->
+<!-- v 2026.08.22.11 — testo dei vini (.vino) a 12pt esatti (era 10.8pt). -->
+<!-- v 2026.08.22.10 — testo dei vini (.vino) aumentato di 2pt (8.8pt→10.8pt, torna alla dimensione
+     originaria pre-v.22.09). Aumentato lo spazio prima dei titoli (capitolo .sez-titolo margin-top
+     2rem→2.8rem, sotto-capitolo/regione .sottosez-titolo margin-top 1.1rem→1.8rem) per staccare
+     meglio la fine di un paragrafo dal titolo che segue. -->
+<!-- v 2026.08.22.09 — rifinitura grafica carta vini: tolto il titolo "Carta dei Vini" in cima alla
+     pagina; i titoli capitolo (Bollicine, Bianchi...) ora centrati (prima allineati a sinistra),
+     senza più la riga di separazione sotto (border-bottom tolto) tra capitolo e ciò che segue
+     (sotto-titolo regione o vino diretto); il loro font passa da Cormorant Garamond a Jost (lo
+     stesso del paragrafo vino), stessa dimensione di prima (1.95rem, invariata). Il testo dei vini
+     (.vino) riduce la dimensione di 2 punti: da .9rem (~10.8pt) a 8.8pt esplicito. Sistemata anche
+     la regola di stampa che evitava un salto pagina prima del primo capitolo (prima ancorata a
+     "h1+.sez-titolo", ora tolto l'h1 si usa ".pg>.sez-titolo:first-child"). -->
+<!-- v 2026.08.22.08 — la Zona nel form articolo torna EDITABILE (era stata bloccata in v.22.07
+     insieme alla Regione): tolto `disabled`, tolta l'auto-compilazione dal produttore (né al
+     cambio Produttore né aprendo un articolo esistente, che ora legge di nuovo il proprio valore
+     salvato come prima di v.22.07). La Regione resta invece sola lettura, derivata dal produttore
+     (nessun cambiamento lì) — solo la Zona torna a comportamento manuale. -->
+<!-- v 2026.08.22.07 — aggiunto il campo Zona ai Produttori (`produttori.zona_id`, FK su `zone`,
+     stesso pattern select generico di Regione). Regione e Zona nel form articolo diventano **sola
+     lettura** (select disabilitati, etichetta "(dal produttore)"): non si modificano più a mano
+     sull'articolo, si modificano solo sull'anagrafica del produttore — l'articolo le eredita
+     sempre dal produttore selezionato, sia aprendo un articolo esistente sia cambiando produttore
+     da tendina (prima si leggeva il valore storico salvato sull'articolo, ora si legge sempre
+     dall'anagrafica corrente del produttore). `cantina-anagrafiche` → v7 (whitelist produttori
+     +zona_id). Nota: gli articoli salvati prima di questa modifica mantengono in DB il valore
+     storico finché non vengono riaperti e risalvati (nessun ribackfill di massa eseguito). -->
+<!-- v 2026.08.22.06 — nel form articolo (Catalogo), cambiando Produttore la Regione si aggiorna
+     automaticamente prendendola dall'anagrafica del produttore selezionato (ora possibile grazie
+     alla FK vera aggiunta in v.22.05); se il produttore non ha regione impostata, la Regione viene
+     svuotata. Vale sia inserendo un nuovo articolo sia modificandone uno esistente e cambiando
+     produttore da tendina. Non tocca la Regione se non si cambia il Produttore. -->
 <!-- v 2026.08.22.05 — Anagrafiche: campo Regione dei Produttori (`regione_testo`, testo libero)
      sostituito da `regione_id` (FK vera su `regioni`, stessa tabella già usata da articoli e dal
      filtro Regione del catalogo). Dati esistenti migrati 1:1 per nome (114/114, nessun orfano —
@@ -212,7 +285,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.08.22.05</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.08.22.22</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -273,7 +346,7 @@
         <div class="grid3">
           <div class="field"><label>Tipologia</label><select id="f-tipologia"></select></div>
           <div class="field"><label>Produttore</label><select id="f-produttore"></select></div>
-          <div class="field"><label>Regione</label><select id="f-regione"></select></div>
+          <div class="field"><label>Regione <span style="font-weight:400;color:var(--stone);">(dal produttore)</span></label><select id="f-regione" disabled></select></div>
         </div>
         <div class="grid3">
           <div class="field"><label>Agente</label><select id="f-agente"></select></div>
@@ -517,6 +590,14 @@ function loadLookupSelects() {
     fillSelect(document.getElementById('f-denominazione'), data.denominazioni, 'nome');
     fillSelect(document.getElementById('f-zona'), data.zone, 'nome');
     fillSelect(document.getElementById('carico-fornitore'), data.fornitori, 'ragione_sociale');
+    if (!window._fProduttoreRegioneBound) {
+      window._fProduttoreRegioneBound = true;
+      document.getElementById('f-produttore').addEventListener('change', function () {
+        var pid = this.value;
+        var p = LOOKUP.produttori.filter(function (x) { return String(x.id) === pid; })[0];
+        document.getElementById('f-regione').value = (p && p.regione_id) ? p.regione_id : '';
+      });
+    }
     var nomeProduttore = function (p) { return p.codice || (p.cognome + ' ' + (p.nome || '')); };
     var nomeAgente = function (a) { return (a.cognome || '') + ' ' + (a.nome || ''); };
     fillSelect(document.getElementById('cat-f-produttore'), data.produttori, nomeProduttore, true);
@@ -644,7 +725,10 @@ function openCatForm(a) {
   document.getElementById('f-descrizione').value = a.descrizione || '';
   document.getElementById('f-tipologia').value = a.tipologia_id || '';
   document.getElementById('f-produttore').value = a.produttore_id || '';
-  document.getElementById('f-regione').value = a.regione_id || '';
+  // Regione e Zona sono sola lettura, derivate dal produttore (non dal valore storico salvato
+  // sull'articolo): sempre allineate all'anagrafica corrente del produttore selezionato.
+  var _prodRZ = LOOKUP.produttori.filter(function (x) { return String(x.id) === String(a.produttore_id || ''); })[0];
+  document.getElementById('f-regione').value = (_prodRZ && _prodRZ.regione_id) ? _prodRZ.regione_id : '';
   document.getElementById('f-agente').value = a.agente_id || '';
   document.getElementById('f-ubicazione').value = a.ubicazione_id || '';
   document.getElementById('f-anno').value = a.anno || '';
@@ -742,7 +826,7 @@ var AN_TABLES = {
   zone: { label: 'Zone', fields: [{ k: 'nome', l: 'Nome', req: true }] },
   distributori: { label: 'Distributori', fields: [{ k: 'codice', l: 'Codice' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'telefono_cel', l: 'Cellulare' }, { k: 'email', l: 'Email' }, { k: 'note', l: 'Note' }] },
   agenti: { label: 'Agenti', fields: [{ k: 'codice', l: 'Codice' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'telefono_cel', l: 'Cellulare' }, { k: 'email', l: 'Email' }, { k: 'note', l: 'Note' }] },
-  produttori: { label: 'Produttori', fields: [{ k: 'codice', l: 'Nome produttore' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'regione_id', l: 'Regione', type: 'select', optionsTable: 'regioni', labelKey: 'nome' }, { k: 'note', l: 'Note' }] },
+  produttori: { label: 'Produttori', fields: [{ k: 'codice', l: 'Nome produttore' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'regione_id', l: 'Regione', type: 'select', optionsTable: 'regioni', labelKey: 'nome' }, { k: 'zona_id', l: 'Zona', type: 'select', optionsTable: 'zone', labelKey: 'nome' }, { k: 'note', l: 'Note' }] },
   fornitori: { label: 'Fornitori', fields: [{ k: 'ragione_sociale', l: 'Ragione sociale' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'telefono_cel', l: 'Cellulare' }, { k: 'email', l: 'Email' }, { k: 'note', l: 'Note' }] },
 };
 var AN_DATA = {};
@@ -1081,6 +1165,12 @@ function escapeHtml(s) {
   return (s || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// Testo già escapato: evidenzia ogni "NN%" (percentuali uve, es. "Vermentino 95%") a dimensione
+// ridotta (.num-inline), come già fatto per prezzi/grado alcolico/annata.
+function evidenziaPercentuali(escapedText) {
+  return escapedText.replace(/(\d+(?:[.,]\d+)?%)/g, '<span class="num-inline">$1</span>');
+}
+
 document.getElementById('carta-genera').addEventListener('click', function () {
   setStatus(document.getElementById('carta-status'), 'Generazione…');
   fetch(URL_CATALOGO + '?solo_visibili=1').then(function (r) { return r.json(); }).then(function (data) {
@@ -1188,12 +1278,14 @@ function rigaVinoHtml(a) {
   else if (a.anno) paren = String(a.anno);
 
   var grado = a.gradi ? (Number(a.gradi) + '%') : '';
+  // Numeri (annata, grado%) e le parentesi che li racchiudono vanno a dimensione ridotta (.num-inline).
+  var parenHtml = paren ? '<span class="num-inline">(' + escapeHtml(paren) + ')</span>' : '';
+  var gradoHtml = grado ? '<span class="num-inline">' + escapeHtml(grado) + '</span>' : '';
 
-  var seg1parts = [];
-  if (prod) seg1parts.push(prod + (paren ? ' (' + paren + ')' : ''));
-  else if (paren) seg1parts.push('(' + paren + ')');
-  if (grado) seg1parts.push(grado);
-  var seg1 = seg1parts.join(' ');
+  var seg1Html = '';
+  if (prod) seg1Html = escapeHtml(prod) + (parenHtml ? ' ' + parenHtml : '');
+  else if (parenHtml) seg1Html = parenHtml;
+  if (gradoHtml) seg1Html = seg1Html ? (seg1Html + ' ' + gradoHtml) : gradoHtml;
 
   var seg2 = a.uve ? ('Uve: ' + a.uve) : '';
 
@@ -1208,11 +1300,13 @@ function rigaVinoHtml(a) {
   // Prezzo bottiglia con icona bottiglia, prezzo calice con icona calice — non passano da escapeHtml
   // (contengono markup SVG), gli altri segmenti sì.
   var prezzoParts = [];
-  if (a.prezzo_sala) prezzoParts.push(ICONA_BOTTIGLIA + ' € ' + Number(a.prezzo_sala).toFixed(0));
-  if (a.prezzo_calice) prezzoParts.push(ICONA_CALICE + ' € ' + Number(a.prezzo_calice).toFixed(0));
+  if (a.prezzo_sala) prezzoParts.push('<span class="prezzo-nowrap">' + ICONA_BOTTIGLIA + '&nbsp;€&nbsp;' + Number(a.prezzo_sala).toFixed(0) + '</span>');
+  if (a.prezzo_calice) prezzoParts.push('<span class="prezzo-nowrap">' + ICONA_CALICE + '&nbsp;€&nbsp;' + Number(a.prezzo_calice).toFixed(0) + '</span>');
   var seg4Html = prezzoParts.join('&nbsp;&nbsp;');
 
-  var segmenti = [seg1, seg2].filter(Boolean).map(escapeHtml);
+  var segmenti = [];
+  if (seg1Html) segmenti.push(seg1Html);
+  if (seg2) segmenti.push(evidenziaPercentuali(escapeHtml(seg2)));
   if (seg3Html) segmenti.push(seg3Html);
   if (seg4Html) segmenti.push(seg4Html);
 
@@ -1261,7 +1355,9 @@ function rigaGruppoAnnateHtml(gruppo) {
   var nomeRegione = (!primo.zona && eterogenea && primo.regione) ? primo.regione.nome : '';
   var seg3Html = nomeRegione ? '<span class="vino-regione">' + escapeHtml(nomeRegione) + '</span>' : '';
 
-  var segmenti = [prod, seg2].filter(Boolean).map(escapeHtml);
+  var segmenti = [];
+  if (prod) segmenti.push(escapeHtml(prod));
+  if (seg2) segmenti.push(evidenziaPercentuali(escapeHtml(seg2)));
   if (seg3Html) segmenti.push(seg3Html);
 
   var descrizione = (primo.descrizione && primo.descrizione !== '(senza descrizione)') ? primo.descrizione : '';
@@ -1278,10 +1374,10 @@ function rigaGruppoAnnateHtml(gruppo) {
     var annoLabel = a.anno || (nomeSenzaAnnataFinale(a.codice) !== (a.codice || '').trim() ? (a.codice || '').trim().slice(-4) : '');
     var grado = a.gradi ? (Number(a.gradi) + '%') : '';
     var prezzoParts = [];
-    if (a.prezzo_sala) prezzoParts.push(ICONA_BOTTIGLIA + ' € ' + Number(a.prezzo_sala).toFixed(0));
-    if (a.prezzo_calice) prezzoParts.push(ICONA_CALICE + ' € ' + Number(a.prezzo_calice).toFixed(0));
-    var pezzi = ['Annata ' + escapeHtml(String(annoLabel || '?'))];
-    if (grado) pezzi.push(escapeHtml(grado));
+    if (a.prezzo_sala) prezzoParts.push('<span class="prezzo-nowrap">' + ICONA_BOTTIGLIA + '&nbsp;€&nbsp;' + Number(a.prezzo_sala).toFixed(0) + '</span>');
+    if (a.prezzo_calice) prezzoParts.push('<span class="prezzo-nowrap">' + ICONA_CALICE + '&nbsp;€&nbsp;' + Number(a.prezzo_calice).toFixed(0) + '</span>');
+    var pezzi = ['<span class="annata-label">Annata</span> <span class="num-inline">' + escapeHtml(String(annoLabel || '?')) + '</span>'];
+    if (grado) pezzi.push('<span class="num-inline">' + escapeHtml(grado) + '</span>');
     var riga = pezzi.join(' ');
     if (prezzoParts.length) riga += ' - ' + prezzoParts.join('&nbsp;&nbsp;');
     return '<div class="vino-annata">' + riga + '</div>';
@@ -1354,25 +1450,28 @@ function generaHtmlCartaVini(articoli) {
     '*{box-sizing:border-box;margin:0;padding:0;}' +
     'body{background:var(--cream);color:var(--ink);font-family:"Jost",sans-serif;font-weight:300;padding:2rem 1rem;}' +
     '.pg{max-width:700px;margin:0 auto;}' +
-    'h1{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:2rem;text-align:center;margin-bottom:2rem;letter-spacing:.04em;}' +
-    '.sez-titolo{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.95rem;margin:2rem 0 .8rem;border-bottom:1px solid var(--rule);padding-bottom:.3rem;text-transform:uppercase;letter-spacing:.06em;}' +
-    '.sottosez-titolo{font-family:"Jost",sans-serif;font-weight:400;font-size:1.95rem;margin:1.1rem 0 .4rem;text-transform:uppercase;letter-spacing:.1em;color:var(--stone);}' +
-    '.vino{font-size:.9rem;line-height:1.55;margin:0 0 .6rem;text-align:justify;}' +
+    '.sez-titolo{font-family:"Jost",sans-serif;font-weight:300;font-size:24pt;margin:2.8rem 0 .8rem;text-align:center;text-transform:uppercase;letter-spacing:.06em;}' +
+    '.sottosez-titolo{font-family:"Jost",sans-serif;font-weight:400;font-size:20pt;margin:1.8rem 0 .4rem;text-transform:uppercase;letter-spacing:.1em;color:var(--stone);}' +
+    '.vino{font-size:12pt;line-height:1.55;margin:0 0 .6rem;text-align:justify;}' +
     '.vino-nome{font-weight:600;text-decoration:underline;}' +
     '.vino-nome em{font-style:italic;}' +
     '.vino-annate-lista{margin:-.35rem 0 .6rem 1.2rem;font-size:.85rem;line-height:1.5;}' +
     '.ic-prezzo{vertical-align:-1px;margin:0 1px 0 0;opacity:.8;}' +
+    '.prezzo-nowrap{white-space:nowrap;font-size:10pt;}' +
+    '.num-inline{font-size:10pt;}' +
+    '.annata-label{font-size:12pt;}' +
     '.vino-regione{text-decoration:underline;}' +
+    '@page{margin:1.5cm;}' +
     '@media print{' +
       'body{padding:0;}' +
       '.sez-titolo{break-after:avoid;}' +
       '.sez-titolo[data-break="1"]{break-before:page;}' +
-      'h1+.sez-titolo{break-before:avoid;}' +
+      '.pg>.sez-titolo:first-child{break-before:avoid;}' +
       '.sottosez-titolo{break-after:avoid;break-inside:avoid;}' +
       '.vino,.vino-annate-lista{break-inside:avoid;}' +
     '}' +
     '</style></head><body>' +
-    '<div class="pg"><h1>Carta dei Vini</h1>' + body + '</div>' +
+    '<div class="pg">' + body + '</div>' +
     '</body></html>';
 }
 

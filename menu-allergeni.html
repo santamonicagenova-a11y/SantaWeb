@@ -1,318 +1,329 @@
 <!DOCTYPE html>
-<!-- v 2026.06.14.01 — Intestazione pagina stampabile: rimossi sottotitolo indirizzo "Santamonica — Lungomare Lombardo 27, Genova" + separatore sotto l'header (border-bottom .pg-header) e il blocco .nota-legale "Informativa ai sensi del Reg. UE 1169/2011…"; quel testo dell'informativa è ora il titolo della legenda in fondo (sostituisce "Allergeni regolamentati (Reg. UE 1169/2011):"). Solo testo IT spostato/rimosso, nessun contenuto legale nuovo. -->
+<!-- v 2026.08.23.01 — Fix mobile: .pg sganciato da larghezza A4 fissa, righe piatto/allergeni in colonna sotto 640px (overflow orizzontale su smartphone). Precedente v 2026.06.14.01 — Intestazione pagina stampabile: rimossi sottotitolo indirizzo "Santamonica — Lungomare Lombardo 27, Genova" + separatore sotto l'header (border-bottom .pg-header) e il blocco .nota-legale "Informativa ai sensi del Reg. UE 1169/2011…"; quel testo dell'informativa è ora il titolo della legenda in fondo (sostituisce "Allergeni regolamentati (Reg. UE 1169/2011):"). Solo testo IT spostato/rimosso, nessun contenuto legale nuovo. -->
 <!-- v 2026.05.22.01 — F0.21-e: allineamento vocabolario allergeni: "latte" -> "latticini" (coerenza con menu-dolci e output EN/FR). -->
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-  <title>Allergeni — Santamonica</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --cream: #faf7f2;
-      --ink:   #1a1714;
-      --stone: #8c7e6e;
-      --rust:  #9e4a2a;
-      --rule:  #d4c9b8;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<title>Allergeni — Santamonica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+:root {
+--cream: #faf7f2;
+--ink: #1a1714;
+--stone: #8c7e6e;
+--rust: #9e4a2a;
+--rule: #d4c9b8;
+}
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      background: var(--cream);
-      color: var(--ink);
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-weight: 400;
-    }
+body {
+background: var(--cream);
+color: var(--ink);
+font-family: 'Cormorant Garamond', Georgia, serif;
+font-weight: 400;
+}
 
-    /* ── ctrl bar ── */
-    .ctrl-bar {
-      text-align: center;
-      padding: .9rem 1rem;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: var(--cream);
-      border-bottom: 1px solid var(--rule);
-      display: flex;
-      gap: .7rem;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .ctrl-btn {
-      padding: .4rem 1.3rem;
-      background: transparent;
-      border: 1px solid var(--ink);
-      font-family: 'Jost', sans-serif;
-      font-size: .68rem;
-      letter-spacing: .16em;
-      text-transform: uppercase;
-      cursor: pointer;
-      color: var(--ink);
-      transition: background .2s, color .2s;
-    }
-    .ctrl-btn:hover {
-      background: var(--ink);
-      color: var(--cream);
-    }
+/* ── ctrl bar ── */
+.ctrl-bar {
+text-align: center;
+padding: .9rem 1rem;
+position: sticky;
+top: 0;
+z-index: 10;
+background: var(--cream);
+border-bottom: 1px solid var(--rule);
+display: flex;
+gap: .7rem;
+justify-content: center;
+align-items: center;
+flex-wrap: wrap;
+}
+.ctrl-btn {
+padding: .4rem 1.3rem;
+background: transparent;
+border: 1px solid var(--ink);
+font-family: 'Jost', sans-serif;
+font-size: .68rem;
+letter-spacing: .16em;
+text-transform: uppercase;
+cursor: pointer;
+color: var(--ink);
+transition: background .2s, color .2s;
+}
+.ctrl-btn:hover {
+background: var(--ink);
+color: var(--cream);
+}
 
-    /* ── pagina A4 ── */
-    .pg {
-      width: 210mm;
-      min-height: 297mm;
-      margin: 2rem auto;
-      padding: 16mm 22mm 14mm;
-      background: #fff;
-      box-shadow: 0 2px 24px rgba(0,0,0,.10);
-      display: flex;
-      flex-direction: column;
-    }
+/* ── pagina A4 ── */
+.pg {
+width: 210mm;
+min-height: 297mm;
+margin: 2rem auto;
+padding: 16mm 22mm 14mm;
+background: #fff;
+box-shadow: 0 2px 24px rgba(0,0,0,.10);
+display: flex;
+flex-direction: column;
+}
 
-    /* ── intestazione ── */
-    .pg-header {
-      text-align: center;
-      margin-bottom: 8mm;
-    }
-    .pg-header-title {
-      font-size: 1.9rem;
-      font-weight: 600;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      line-height: 1;
-    }
-    .pg-header-sub {
-      margin-top: .4rem;
-      font-family: 'Jost', sans-serif;
-      font-size: .65rem;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      color: var(--stone);
-    }
+/* ── intestazione ── */
+.pg-header {
+text-align: center;
+margin-bottom: 8mm;
+}
+.pg-header-title {
+font-size: 1.9rem;
+font-weight: 600;
+letter-spacing: .22em;
+text-transform: uppercase;
+line-height: 1;
+}
+.pg-header-sub {
+margin-top: .4rem;
+font-family: 'Jost', sans-serif;
+font-size: .65rem;
+letter-spacing: .2em;
+text-transform: uppercase;
+color: var(--stone);
+}
 
-    /* ── nota legale ── */
-    .nota-legale {
-      font-style: italic;
-      font-size: .72rem;
-      color: var(--stone);
-      text-align: center;
-      line-height: 1.6;
-      margin-bottom: 7mm;
-      padding-bottom: 5mm;
-      border-bottom: 1px solid var(--rule);
-    }
+/* ── nota legale ── */
+.nota-legale {
+font-style: italic;
+font-size: .72rem;
+color: var(--stone);
+text-align: center;
+line-height: 1.6;
+margin-bottom: 7mm;
+padding-bottom: 5mm;
+border-bottom: 1px solid var(--rule);
+}
 
-    /* ── sezioni ── */
-    .sezione {
-      margin-bottom: 7mm;
-    }
-    .sezione-titolo {
-      font-size: 1.1rem;
-      font-weight: 600;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      margin-bottom: 3mm;
-      padding-bottom: 1.5mm;
-      border-bottom: 1px solid var(--rule);
-    }
+/* ── sezioni ── */
+.sezione {
+margin-bottom: 7mm;
+}
+.sezione-titolo {
+font-size: 1.1rem;
+font-weight: 600;
+letter-spacing: .14em;
+text-transform: uppercase;
+margin-bottom: 3mm;
+padding-bottom: 1.5mm;
+border-bottom: 1px solid var(--rule);
+}
 
-    /* ── piatto ── */
-    .piatto-row {
-      display: flex;
-      align-items: baseline;
-      padding: 2mm 0;
-      border-bottom: 1px dotted var(--rule);
-      gap: 4mm;
-    }
-    .piatto-row:last-child {
-      border-bottom: none;
-    }
-    .piatto-nome {
-      font-size: .9rem;
-      font-weight: 400;
-      flex: 0 0 38%;
-      line-height: 1.3;
-    }
-    .piatto-allergeni {
-      font-style: italic;
-      font-size: .82rem;
-      color: var(--ink);
-      flex: 1;
-      line-height: 1.4;
-    }
-    .piatto-allergeni-vuoti {
-      font-style: italic;
-      font-size: .78rem;
-      color: var(--stone);
-    }
+/* ── piatto ── */
+.piatto-row {
+display: flex;
+align-items: baseline;
+padding: 2mm 0;
+border-bottom: 1px dotted var(--rule);
+gap: 4mm;
+}
+.piatto-row:last-child {
+border-bottom: none;
+}
+.piatto-nome {
+font-size: .9rem;
+font-weight: 400;
+flex: 0 0 38%;
+line-height: 1.3;
+}
+.piatto-allergeni {
+font-style: italic;
+font-size: .82rem;
+color: var(--ink);
+flex: 1;
+line-height: 1.4;
+}
+.piatto-allergeni-vuoti {
+font-style: italic;
+font-size: .78rem;
+color: var(--stone);
+}
 
-    /* ── legenda in fondo ── */
-    .legenda {
-      margin-top: auto;
-      padding-top: 5mm;
-      border-top: 1px solid var(--rule);
-      font-size: .67rem;
-      color: var(--stone);
-      font-style: italic;
-      line-height: 1.65;
-      text-align: center;
-    }
-    .legenda strong {
-      font-style: normal;
-      font-weight: 600;
-      color: var(--ink);
-    }
+/* ── legenda in fondo ── */
+.legenda {
+margin-top: auto;
+padding-top: 5mm;
+border-top: 1px solid var(--rule);
+font-size: .67rem;
+color: var(--stone);
+font-style: italic;
+line-height: 1.65;
+text-align: center;
+}
+.legenda strong {
+font-style: normal;
+font-weight: 600;
+color: var(--ink);
+}
 
-    /* ── stampa ── */
-    @media print {
-      @page { size: A4 portrait; margin: 0; }
-      body { background: white; }
-      .ctrl-bar { display: none; }
-      .pg {
-        width: 210mm;
-        height: 297mm;
-        min-height: unset;
-        margin: 0;
-        padding: 14mm 20mm 12mm;
-        box-shadow: none;
-        page-break-after: always;
-      }
-      .pg:last-child { page-break-after: avoid; }
-    }
-  </style>
+/* ── stampa ── */
+@media print {
+@page { size: A4 portrait; margin: 0; }
+body { background: white; }
+.ctrl-bar { display: none; }
+.pg {
+width: 210mm;
+height: 297mm;
+min-height: unset;
+margin: 0;
+padding: 14mm 20mm 12mm;
+box-shadow: none;
+page-break-after: always;
+}
+.pg:last-child { page-break-after: avoid; }
+}
+</style>
+<style>
+@media (max-width:640px){
+.pg{width:auto!important;max-width:100%!important;min-height:0!important;margin:0!important;padding:20px 16px!important;box-shadow:none!important;}
+.pg-header-title{font-size:1.5rem!important;letter-spacing:.14em!important;}
+.sezione-titolo{font-size:.95rem!important;}
+.piatto-row{flex-wrap:wrap!important;padding:2.5mm 0!important;}
+.piatto-nome{flex:1 1 100%!important;}
+.piatto-allergeni,.piatto-allergeni-vuoti{flex:1 1 100%!important;margin-top:.5mm!important;}
+html,body{overflow-x:hidden!important;}
+}
+</style>
 </head>
 <body>
 
 <div class="ctrl-bar">
-  <button class="ctrl-btn" onclick="window.print()">✦ Stampa / Salva PDF</button>
+<button class="ctrl-btn" onclick="window.print()">✦ Stampa / Salva PDF</button>
 </div>
 
 <div id="layout-allergeni"></div>
 
 <script>
 /* ═══════════════════════════════════════════════════════
-   ALLERGENI  —  modifica solo qui per aggiornare tutto
-   ═══════════════════════════════════════════════════════ */
+ALLERGENI — modifica solo qui per aggiornare tutto
+═══════════════════════════════════════════════════════ */
 const ALLERGENI_DATA = {
-  "sezioni": [
-    {
-      "titolo": "Golosità",
-      "piatti": [
-        {
-          "nome": "Gelato al limone nero, levistico, lime, cracker di latte",
-          "allergeni": [
-            "glutine",
-            "latte"
-          ]
-        },
-        {
-          "nome": "Ananas, parfait al carbone, caramello al caffè",
-          "allergeni": [
-            "glutine",
-            "uova",
-            "latte"
-          ]
-        },
-        {
-          "nome": "Gelato al porcino, fragole, terra al cioccolato",
-          "allergeni": [
-            "uova",
-            "latte"
-          ]
-        },
-        {
-          "nome": "Sacripantina",
-          "allergeni": [
-            "glutine",
-            "uova",
-            "latte",
-            "frutta a guscio",
-            "solfiti"
-          ]
-        },
-        {
-          "nome": "Erborinato ligure e Picolit Zorzettig",
-          "allergeni": [
-            "latte",
-            "solfiti"
-          ]
-        }
-      ]
-    }
-  ]
+"sezioni": [
+{
+"titolo": "Golosità",
+"piatti": [
+{
+"nome": "Gelato al limone nero, levistico, lime, cracker di latte",
+"allergeni": [
+"glutine",
+"latte"
+]
+},
+{
+"nome": "Ananas, parfait al carbone, caramello al caffè",
+"allergeni": [
+"glutine",
+"uova",
+"latte"
+]
+},
+{
+"nome": "Gelato al porcino, fragole, terra al cioccolato",
+"allergeni": [
+"uova",
+"latte"
+]
+},
+{
+"nome": "Sacripantina",
+"allergeni": [
+"glutine",
+"uova",
+"latte",
+"frutta a guscio",
+"solfiti"
+]
+},
+{
+"nome": "Erborinato ligure e Picolit Zorzettig",
+"allergeni": [
+"latte",
+"solfiti"
+]
+}
+]
+}
+]
 };
 /* ═════════════════════════════════════════════════════════ */
 
 const TUTTI_ALLERGENI = [
-  "glutine","crostacei","uova","pesce","arachidi",
-  "soia","latticini","frutta a guscio","sedano",
-  "senape","sesamo","solfiti","lupini","molluschi"
+"glutine","crostacei","uova","pesce","arachidi",
+"soia","latticini","frutta a guscio","sedano",
+"senape","sesamo","solfiti","lupini","molluschi"
 ];
 
 function render() {
-  var root = document.getElementById('layout-allergeni');
-  root.innerHTML = '';
+var root = document.getElementById('layout-allergeni');
+root.innerHTML = '';
 
-  var pg = document.createElement('div');
-  pg.className = 'pg';
+var pg = document.createElement('div');
+pg.className = 'pg';
 
-  // Intestazione
-  pg.innerHTML = '<div class="pg-header">' +
-    '<div class="pg-header-title">Allergeni</div>' +
-    '</div>';
+// Intestazione
+pg.innerHTML = '<div class="pg-header">' +
+'<div class="pg-header-title">Allergeni</div>' +
+'</div>';
 
-  // Sezioni
-  ALLERGENI_DATA.sezioni.forEach(function(sez) {
-    var sezDiv = document.createElement('div');
-    sezDiv.className = 'sezione';
+// Sezioni
+ALLERGENI_DATA.sezioni.forEach(function(sez) {
+var sezDiv = document.createElement('div');
+sezDiv.className = 'sezione';
 
-    var titolo = document.createElement('div');
-    titolo.className = 'sezione-titolo';
-    titolo.textContent = sez.titolo;
-    sezDiv.appendChild(titolo);
+var titolo = document.createElement('div');
+titolo.className = 'sezione-titolo';
+titolo.textContent = sez.titolo;
+sezDiv.appendChild(titolo);
 
-    sez.piatti.forEach(function(piatto) {
-      var row = document.createElement('div');
-      row.className = 'piatto-row';
+sez.piatti.forEach(function(piatto) {
+var row = document.createElement('div');
+row.className = 'piatto-row';
 
-      var nome = document.createElement('div');
-      nome.className = 'piatto-nome';
-      nome.innerHTML = piatto.nome;
+var nome = document.createElement('div');
+nome.className = 'piatto-nome';
+nome.innerHTML = piatto.nome;
 
-      var all = document.createElement('div');
-      if (piatto.allergeni && piatto.allergeni.length > 0) {
-        all.className = 'piatto-allergeni';
-        all.textContent = piatto.allergeni.join(', ');
-      } else {
-        all.className = 'piatto-allergeni-vuoti';
-        all.textContent = 'nessun allergene dichiarato';
-      }
+var all = document.createElement('div');
+if (piatto.allergeni && piatto.allergeni.length > 0) {
+all.className = 'piatto-allergeni';
+all.textContent = piatto.allergeni.join(', ');
+} else {
+all.className = 'piatto-allergeni-vuoti';
+all.textContent = 'nessun allergene dichiarato';
+}
 
-      row.appendChild(nome);
-      row.appendChild(all);
-      sezDiv.appendChild(row);
-    });
+row.appendChild(nome);
+row.appendChild(all);
+sezDiv.appendChild(row);
+});
 
-    pg.appendChild(sezDiv);
-  });
+pg.appendChild(sezDiv);
+});
 
-  // Legenda allergeni
-  var legenda = document.createElement('div');
-  legenda.className = 'legenda';
-  legenda.innerHTML = '<strong>Informativa ai sensi del Reg. UE 1169/2011. Per ulteriori informazioni sugli allergeni presenti nei nostri piatti si prega di rivolgersi al personale di sala.</strong><br>' +
-    TUTTI_ALLERGENI.join(' &bull; ');
-  pg.appendChild(legenda);
+// Legenda allergeni
+var legenda = document.createElement('div');
+legenda.className = 'legenda';
+legenda.innerHTML = '<strong>Informativa ai sensi del Reg. UE 1169/2011. Per ulteriori informazioni sugli allergeni presenti nei nostri piatti si prega di rivolgersi al personale di sala.</strong><br>' +
+TUTTI_ALLERGENI.join(' &bull; ');
+pg.appendChild(legenda);
 
-  root.appendChild(pg);
+root.appendChild(pg);
 }
 
 render();
 
-/* versione v 2026.05.22.01 */
+/* versione v 2026.08.23.01 */
 </script>
 </body>
 </html>

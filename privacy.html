@@ -1,715 +1,725 @@
 <!--
-  ─────────────────────────────────────────────────────────────────────────
-  privacy.html — Informativa Privacy
-  Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.05.27.02
-  Ultimo aggiornamento: 2026-05-27
-  Lingua: IT (versione ufficiale)
-  Stato: BOZZA DIY pubblicata · F0.8 revisione legale sospesa (decisione utente 17-05-2026)
-  Schema di riferimento: v3 (ROADMAP_Santamonica_Web v.16 §F0.24)
+─────────────────────────────────────────────────────────────────────────
+privacy.html — Informativa Privacy
+Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
+Versione: v 2026.05.27.02
+Ultimo aggiornamento: 2026-05-27
+Lingua: IT (versione ufficiale)
+Stato: BOZZA DIY pubblicata · F0.8 revisione legale sospesa (decisione utente 17-05-2026)
+Schema di riferimento: v3 (ROADMAP_Santamonica_Web v.16 §F0.24)
 
-  Modifiche v 2026.05.27.02 (F0.25 — go-live flusso prenotazioni con carta di garanzia, Fase 1):
-  - [§4 +1 riga base giuridica] Aggiunta riga per il trattamento di tokenizzazione
-    carta di credito a garanzia della prenotazione (Stripe SetupIntent, nessun
-    addebito immediato). Base giuridica art. 6(1)(b) GDPR esecuzione del
-    contratto di ristorazione + art. 6(1)(f) legittimo interesse al recupero
-    del danno da no-show. Specificato PCI DSS Level 1 di Stripe e che il PAN
-    non transita mai dai sistemi del Titolare.
-  - [§6 +1 riga conservazione] Aggiunta riga «Token Stripe della carta di
-    garanzia su prenotazione»: conservazione massima 30 giorni dopo la
-    prenotazione, poi cleanup automatico via job pg_cron Supabase.
-  - [§7 +2 destinatari, +1 estensione] Aggiunti Supabase, Inc. (database
-    operativo prenotazioni e Edge Functions, server AWS EU eu-west-1) e
-    Resend, Inc. (mail transazionali del flusso prenotazioni). Estesa la
-    descrizione di Stripe Payments Europe Limited per includere la garanzia
-    carta sulle prenotazioni oltre ai voucher.
-  - [§8 trasferimenti USA] Aggiunti Resend e Supabase all'elenco dei
-    fornitori statunitensi certificati DPF. Precisato che il database
-    operativo Supabase risiede su server AWS in Irlanda (UE) e il
-    trasferimento verso la società madre USA riguarda solo le funzioni
-    amministrative del servizio.
-  - [release coordinata] Bump versioning come release F0.25: privacy.html
-    v 2026.05.27.02 (questo file) coordinato con index.html v 2026.05.27.06
-    (form prenotazioni cablato a Edge Function Supabase) e translations.json
-    v 2026.05.27.06 (chiavi nuove form e schermata thankyou). Edge Function
-    backend in produzione: submit-reservation v4 su Supabase project
-    xbksultfskvzgncncada.
+Modifiche v 2026.08.23.01 (fix mobile — tabelle in overflow-x su smartphone):
+- [§3/§4/§6/§7 CSS] Estesa la media query @media (max-width:600px): le tabelle
+con contenuto non comprimibile (URL, nomi fornitori) sbordavano a destra sullo
+schermo invece di andare a capo. Aggiunto display:block + overflow-x:auto sulle
+table, word-break/overflow-wrap su th/td, e html,body{overflow-x:hidden} di
+sicurezza. Stesso fix di cookies.html. Nessuna modifica di contenuto.
 
-  Modifiche v 2026.05.27.01 (F0.24 — GA4 + Meta Pixel attivati live · allineamento informativa):
-  - [§3 corretta dichiarazione obsoleta] Riscritto il paragrafo a chiusura della
-    tabella «Quali dati raccogliamo»: rimossa la frase «non utilizziamo Google
-    Analytics né Facebook Pixel» (non più vera dal 27 maggio 2026). Conservata
-    la dichiarazione veridica sull'assenza di geolocalizzazione precisa, con
-    rinvio espresso alla §12 e alla Cookie Policy per la disciplina dei
-    trattamenti GA4 e Meta Pixel.
-  - [§4 +1 riga base giuridica] Aggiunta riga «Misurazione del traffico del sito
-    e dell'efficacia delle campagne pubblicitarie» — base giuridica art. 6(1)(a)
-    GDPR (consenso) e art. 122 D.Lgs. 196/2003 (ePrivacy) — dati interessati:
-    identificativi pseudonimi e dati di navigazione gestiti da GA4 e Meta Pixel.
-  - [§6 +1 riga conservazione] Aggiunta riga rimando alle durate dei cookie GA4
-    e Meta Pixel (dettaglio in cookies.html §4-§5: _ga/_ga_<ID> 2 anni, _fbp/_fbc
-    3 mesi; revoca consenso = cancellazione automatica).
-  - [§7 tabella destinatari aggiornata] Estesa la riga Google Ireland Limited /
-    Google LLC per includere «Google Analytics 4 (misurazione del traffico del
-    sito) — solo previo consenso esplicito». Aggiunta riga nuova «Meta Platforms
-    Ireland Limited / Meta Platforms, Inc. — Meta Pixel (misurazione campagne
-    pubblicitarie e creazione di pubblici di retargeting) — solo previo
-    consenso esplicito — Irlanda / Stati Uniti».
-  - [§8 trasferimenti USA] Aggiunto «Meta» all'elenco dei fornitori statunitensi
-    certificati al EU-U.S. Data Privacy Framework, in coerenza con quanto
-    riportato nel registro pubblico dataprivacyframework.gov.
-  - [§12 cookie riformulato] Riscritto il paragrafo §12: rimossa la frase «Non
-    utilizziamo cookie analitici di profilazione» (non più veridica). Inserita
-    la descrizione corretta dello stato attuale: oltre a Cloudflare Web Analytics
-    (privacy-first, senza cookie, sempre attivo per legittimo interesse alla
-    sicurezza e statistiche aggregate), il sito carica — previo consenso esplicito
-    raccolto tramite il banner CookieConsent v3 nelle categorie «Statistica»
-    (GA4) e «Marketing» (Meta Pixel) — gli script di tracciamento corrispondenti.
-    Rinvio alla Cookie Policy per il dettaglio analitico dei cookie posati,
-    durate e modalità di gestione/revoca delle preferenze.
-  - [release coordinata] Bump versioning come release F0.24: privacy.html
-    v 2026.05.27.01 (questo file) coordinato con cookieconsent-config.js
-    v 2026.05.27.01 (compilate costanti GA4_MEASUREMENT_ID e META_PIXEL_ID) e
-    _headers v 2026.05.27.02 (estensione CSP per GA4/Meta + fix wildcard
-    *.google-analytics.com per endpoint regionali europei). Convenzione
-    progetto §12 ROADMAP: stesso NN sui file rilasciati nella stessa sessione.
-    cookies.html resta a v 2026.05.23.01 (già allineata in F0.23 con tabelle
-    cookie GA4/Meta).
+Modifiche v 2026.05.27.02 (F0.25 — go-live flusso prenotazioni con carta di garanzia, Fase 1):
+- [§4 +1 riga base giuridica] Aggiunta riga per il trattamento di tokenizzazione
+carta di credito a garanzia della prenotazione (Stripe SetupIntent, nessun
+addebito immediato). Base giuridica art. 6(1)(b) GDPR esecuzione del
+contratto di ristorazione + art. 6(1)(f) legittimo interesse al recupero
+del danno da no-show. Specificato PCI DSS Level 1 di Stripe e che il PAN
+non transita mai dai sistemi del Titolare.
+- [§6 +1 riga conservazione] Aggiunta riga «Token Stripe della carta di
+garanzia su prenotazione»: conservazione massima 30 giorni dopo la
+prenotazione, poi cleanup automatico via job pg_cron Supabase.
+- [§7 +2 destinatari, +1 estensione] Aggiunti Supabase, Inc. (database
+operativo prenotazioni e Edge Functions, server AWS EU eu-west-1) e
+Resend, Inc. (mail transazionali del flusso prenotazioni). Estesa la
+descrizione di Stripe Payments Europe Limited per includere la garanzia
+carta sulle prenotazioni oltre ai voucher.
+- [§8 trasferimenti USA] Aggiunti Resend e Supabase all'elenco dei
+fornitori statunitensi certificati DPF. Precisato che il database
+operativo Supabase risiede su server AWS in Irlanda (UE) e il
+trasferimento verso la società madre USA riguarda solo le funzioni
+amministrative del servizio.
+- [release coordinata] Bump versioning come release F0.25: privacy.html
+v 2026.05.27.02 (questo file) coordinato con index.html v 2026.05.27.06
+(form prenotazioni cablato a Edge Function Supabase) e translations.json
+v 2026.05.27.06 (chiavi nuove form e schermata thankyou). Edge Function
+backend in produzione: submit-reservation v4 su Supabase project
+xbksultfskvzgncncada.
 
-  Modifiche v 2026.05.20.01 (F0.13 — Stripe Payment Links attivi · P3.22c parte Stripe rimosso):
-  - [P3.22c parte Stripe rimosso] Eliminato il disclaimer di §12 «Nota —
-    sistema pagamenti voucher (Stripe)»: il sistema di pagamento voucher
-    tramite Stripe Payment Links è ora effettivamente operativo
-    (regala.html v 2026.05.20.01 + 3 Payment Links Live mode + ToS via
-    voucher-termini.html). Rimossa anche la parentetica «o, in futuro, da
-    Stripe nella pagina di checkout» nel paragrafo successivo (Stripe ora
-    parte integrante dello stato corrente). Chiusura simmetrica al
-    F0.12 fatto su Maps (v 2026.05.19.03).
-  - [release coordinata] Bump versioning per coerenza con release F0.13
-    (regala.html v 2026.05.20.01 refactor Stripe + voucher-termini.html
-    v 2026.05.20.01 NUOVO F0.14 + cookies.html v 2026.05.20.01).
-    Convenzione progetto §12 ROADMAP: stesso NN sui file rilasciati nella
-    stessa sessione.
+Modifiche v 2026.05.27.01 (F0.24 — GA4 + Meta Pixel attivati live · allineamento informativa):
+- [§3 corretta dichiarazione obsoleta] Riscritto il paragrafo a chiusura della
+tabella «Quali dati raccogliamo»: rimossa la frase «non utilizziamo Google
+Analytics né Facebook Pixel» (non più vera dal 27 maggio 2026). Conservata
+la dichiarazione veridica sull'assenza di geolocalizzazione precisa, con
+rinvio espresso alla §12 e alla Cookie Policy per la disciplina dei
+trattamenti GA4 e Meta Pixel.
+- [§4 +1 riga base giuridica] Aggiunta riga «Misurazione del traffico del sito
+e dell'efficacia delle campagne pubblicitarie» — base giuridica art. 6(1)(a)
+GDPR (consenso) e art. 122 D.Lgs. 196/2003 (ePrivacy) — dati interessati:
+identificativi pseudonimi e dati di navigazione gestiti da GA4 e Meta Pixel.
+- [§6 +1 riga conservazione] Aggiunta riga rimando alle durate dei cookie GA4
+e Meta Pixel (dettaglio in cookies.html §4-§5: _ga/_ga_<ID> 2 anni, _fbp/_fbc
+3 mesi; revoca consenso = cancellazione automatica).
+- [§7 tabella destinatari aggiornata] Estesa la riga Google Ireland Limited /
+Google LLC per includere «Google Analytics 4 (misurazione del traffico del
+sito) — solo previo consenso esplicito». Aggiunta riga nuova «Meta Platforms
+Ireland Limited / Meta Platforms, Inc. — Meta Pixel (misurazione campagne
+pubblicitarie e creazione di pubblici di retargeting) — solo previo
+consenso esplicito — Irlanda / Stati Uniti».
+- [§8 trasferimenti USA] Aggiunto «Meta» all'elenco dei fornitori statunitensi
+certificati al EU-U.S. Data Privacy Framework, in coerenza con quanto
+riportato nel registro pubblico dataprivacyframework.gov.
+- [§12 cookie riformulato] Riscritto il paragrafo §12: rimossa la frase «Non
+utilizziamo cookie analitici di profilazione» (non più veridica). Inserita
+la descrizione corretta dello stato attuale: oltre a Cloudflare Web Analytics
+(privacy-first, senza cookie, sempre attivo per legittimo interesse alla
+sicurezza e statistiche aggregate), il sito carica — previo consenso esplicito
+raccolto tramite il banner CookieConsent v3 nelle categorie «Statistica»
+(GA4) e «Marketing» (Meta Pixel) — gli script di tracciamento corrispondenti.
+Rinvio alla Cookie Policy per il dettaglio analitico dei cookie posati,
+durate e modalità di gestione/revoca delle preferenze.
+- [release coordinata] Bump versioning come release F0.24: privacy.html
+v 2026.05.27.01 (questo file) coordinato con cookieconsent-config.js
+v 2026.05.27.01 (compilate costanti GA4_MEASUREMENT_ID e META_PIXEL_ID) e
+_headers v 2026.05.27.02 (estensione CSP per GA4/Meta + fix wildcard
+*.google-analytics.com per endpoint regionali europei). Convenzione
+progetto §12 ROADMAP: stesso NN sui file rilasciati nella stessa sessione.
+cookies.html resta a v 2026.05.23.01 (già allineata in F0.23 con tabelle
+cookie GA4/Meta).
 
-  Modifiche v 2026.05.19.03 (F0.12 — Maps attivo · P3.22c parte Maps rimosso):
-  - [P3.22c parte Maps rimosso] Riformulato il disclaimer di §12 «Cookie e
-    tecnologie simili»: rimossa la menzione di Google Maps come servizio
-    «in fase di predisposizione tecnica e non ancora operativo» (la mappa
-    è ora effettivamente operativa, gestita da iframemanager con consent
-    gate). La nota per Stripe è stata riformulata per coprire solo il
-    sistema di pagamento voucher (rimozione completa prevista a F0.13).
-  - [release coordinata] Bump versioning per coerenza con release F0.12
-    (cookieconsent-config.js v 2026.05.19.05 + cookies.html v 2026.05.19.03
-    + dove-siamo.html v 2026.05.19.05 + index.html v 2026.05.19.05).
-    Convenzione progetto §12 ROADMAP: stesso NN sui file rilasciati nella
-    stessa sessione.
+Modifiche v 2026.05.20.01 (F0.13 — Stripe Payment Links attivi · P3.22c parte Stripe rimosso):
+- [P3.22c parte Stripe rimosso] Eliminato il disclaimer di §12 «Nota —
+sistema pagamenti voucher (Stripe)»: il sistema di pagamento voucher
+tramite Stripe Payment Links è ora effettivamente operativo
+(regala.html v 2026.05.20.01 + 3 Payment Links Live mode + ToS via
+voucher-termini.html). Rimossa anche la parentetica «o, in futuro, da
+Stripe nella pagina di checkout» nel paragrafo successivo (Stripe ora
+parte integrante dello stato corrente). Chiusura simmetrica al
+F0.12 fatto su Maps (v 2026.05.19.03).
+- [release coordinata] Bump versioning per coerenza con release F0.13
+(regala.html v 2026.05.20.01 refactor Stripe + voucher-termini.html
+v 2026.05.20.01 NUOVO F0.14 + cookies.html v 2026.05.20.01).
+Convenzione progetto §12 ROADMAP: stesso NN sui file rilasciati nella
+stessa sessione.
 
-  Modifiche v 2026.05.19.02 (F0.9 chiusura — verifica funzionale):
-  - [bug fix scoperto in verifica P3.8] Aggiunto bottone «Gestisci preferenze
-    cookie» attivo (data-cc="show-preferencesModal", classe .cc-manage) al
-    termine della §12.
-  - Aggiunto blocco CSS button.cc-manage.
+Modifiche v 2026.05.19.03 (F0.12 — Maps attivo · P3.22c parte Maps rimosso):
+- [P3.22c parte Maps rimosso] Riformulato il disclaimer di §12 «Cookie e
+tecnologie simili»: rimossa la menzione di Google Maps come servizio
+«in fase di predisposizione tecnica e non ancora operativo» (la mappa
+è ora effettivamente operativa, gestita da iframemanager con consent
+gate). La nota per Stripe è stata riformulata per coprire solo il
+sistema di pagamento voucher (rimozione completa prevista a F0.13).
+- [release coordinata] Bump versioning per coerenza con release F0.12
+(cookieconsent-config.js v 2026.05.19.05 + cookies.html v 2026.05.19.03
++ dove-siamo.html v 2026.05.19.05 + index.html v 2026.05.19.05).
+Convenzione progetto §12 ROADMAP: stesso NN sui file rilasciati nella
+stessa sessione.
 
-  Modifiche v 2026.05.19.01 (Passata 3 loop F0.9):
-  - [P3.21] Rimosso blocco duplicato con path errati che generava 404.
-  - [P3.22c] Aggiunto disclaimer in §12 (rimosso parte Maps in v.03).
-  - [fix UI] Allineata sigla versione legal-meta header.
-  ─────────────────────────────────────────────────────────────────────────
+Modifiche v 2026.05.19.02 (F0.9 chiusura — verifica funzionale):
+- [bug fix scoperto in verifica P3.8] Aggiunto bottone «Gestisci preferenze
+cookie» attivo (data-cc="show-preferencesModal", classe .cc-manage) al
+termine della §12.
+- Aggiunto blocco CSS button.cc-manage.
+
+Modifiche v 2026.05.19.01 (Passata 3 loop F0.9):
+- [P3.21] Rimosso blocco duplicato con path errati che generava 404.
+- [P3.22c] Aggiunto disclaimer in §12 (rimosso parte Maps in v.03).
+- [fix UI] Allineata sigla versione legal-meta header.
+─────────────────────────────────────────────────────────────────────────
 -->
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="index, follow">
-  <title>Informativa Privacy — Santamonica</title>
-  <meta name="description" content="Informativa sul trattamento dei dati personali del ristorante Santamonica (Il Giuliano di Andrea Giachino e C. S.a.s.), ai sensi del Reg. UE 2016/679 (GDPR) e del D.Lgs. 196/2003.">
-  <link rel="canonical" href="https://santamonicagenova.it/privacy.html">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index, follow">
+<title>Informativa Privacy — Santamonica</title>
+<meta name="description" content="Informativa sul trattamento dei dati personali del ristorante Santamonica (Il Giuliano di Andrea Giachino e C. S.a.s.), ai sensi del Reg. UE 2016/679 (GDPR) e del D.Lgs. 196/2003.">
+<link rel="canonical" href="https://santamonicagenova.it/privacy.html">
 
-  <!-- F0.9: vanilla-cookieconsent v3.1.0 (bundle locale) -->
-  <link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.css">
+<!-- F0.9: vanilla-cookieconsent v3.1.0 (bundle locale) -->
+<link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.css">
 
-  <style>
-    :root {
-      --bg: #faf8f4;
-      --surface: #ffffff;
-      --text: #2a2520;
-      --text-soft: #5a544c;
-      --accent: #8b3a2e;
-      --rule: #e6dfd4;
-      --summary-bg: #f3ede2;
-      --code-bg: #efe9dd;
-      --serif: "Cormorant Garamond", "Georgia", "Times New Roman", serif;
-      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
-    }
-    * { box-sizing: border-box; }
-    html { -webkit-text-size-adjust: 100%; }
-    body {
-      margin: 0;
-      font-family: var(--sans);
-      font-size: 16px;
-      line-height: 1.65;
-      color: var(--text);
-      background: var(--bg);
-    }
-    .legal-page { max-width: 780px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
-    header.legal-head { border-bottom: 1px solid var(--rule); padding-bottom: 1.5rem; margin-bottom: 2.5rem; }
-    header.legal-head .breadcrumb { font-size: 0.85rem; color: var(--text-soft); margin-bottom: 1rem; }
-    header.legal-head .breadcrumb a { color: var(--text-soft); text-decoration: none; border-bottom: 1px dotted var(--text-soft); }
-    h1 { font-family: var(--serif); font-weight: 500; font-size: 2.25rem; line-height: 1.2; margin: 0 0 0.5rem; color: var(--text); }
-    .legal-meta { font-size: 0.875rem; color: var(--text-soft); }
-    h2 { font-family: var(--serif); font-weight: 500; font-size: 1.5rem; margin: 3rem 0 0.75rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); color: var(--text); }
-    h2:first-of-type { border-top: none; padding-top: 0; }
-    h3 { font-family: var(--sans); font-weight: 600; font-size: 1.05rem; margin: 1.75rem 0 0.5rem; color: var(--text); }
-    p { margin: 0.75rem 0; }
-    ul, ol { padding-left: 1.4rem; margin: 0.75rem 0; }
-    li { margin: 0.35rem 0; }
-    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(139, 58, 46, 0.3); }
-    a:hover { border-bottom-color: var(--accent); }
-    button.cc-manage {
-      display: inline-block;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 0.7rem 1.4rem;
-      font-family: var(--sans);
-      font-size: 0.95rem;
-      font-weight: 500;
-      cursor: pointer;
-      margin: 0.5rem 0;
-      border-radius: 2px;
-      transition: background .15s;
-    }
-    button.cc-manage:hover { background: #6d2c23; }
-    .summary { background: var(--summary-bg); border-left: 3px solid var(--accent); padding: 1rem 1.2rem; margin: 1rem 0 1.5rem; font-size: 0.95rem; }
-    .summary strong { color: var(--accent); }
-    table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.92rem; }
-    th, td { text-align: left; vertical-align: top; padding: 0.7rem 0.8rem; border-bottom: 1px solid var(--rule); }
-    th { background: var(--surface); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-soft); }
-    td code, p code { background: var(--code-bg); padding: 0.1rem 0.35rem; border-radius: 2px; font-size: 0.88em; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
-    .toc { background: var(--surface); border: 1px solid var(--rule); padding: 1.2rem 1.4rem; margin: 2rem 0 3rem; font-size: 0.92rem; }
-    .toc strong { display: block; font-family: var(--serif); font-weight: 500; font-size: 1.05rem; margin-bottom: 0.6rem; color: var(--text-soft); }
-    .toc ol { padding-left: 1.2rem; margin: 0; }
-    .toc li { margin: 0.2rem 0; }
-    .toc a { border-bottom: none; }
-    .toc a:hover { text-decoration: underline; }
-    footer.legal-foot { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); font-size: 0.82rem; color: var(--text-soft); }
-    .changelog { font-size: 0.88rem; }
-    .changelog dt { font-weight: 600; margin-top: 0.5rem; }
-    .changelog dd { margin-left: 1.2rem; color: var(--text-soft); }
-    @media (max-width: 600px) {
-      .legal-page { padding: 2rem 1.1rem 3.5rem; }
-      h1 { font-size: 1.8rem; }
-      h2 { font-size: 1.3rem; }
-      table { font-size: 0.85rem; }
-      th, td { padding: 0.55rem 0.5rem; }
-    }
-  </style>
+<style>
+:root {
+--bg: #faf8f4;
+--surface: #ffffff;
+--text: #2a2520;
+--text-soft: #5a544c;
+--accent: #8b3a2e;
+--rule: #e6dfd4;
+--summary-bg: #f3ede2;
+--code-bg: #efe9dd;
+--serif: "Cormorant Garamond", "Georgia", "Times New Roman", serif;
+--sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+margin: 0;
+font-family: var(--sans);
+font-size: 16px;
+line-height: 1.65;
+color: var(--text);
+background: var(--bg);
+}
+.legal-page { max-width: 780px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+header.legal-head { border-bottom: 1px solid var(--rule); padding-bottom: 1.5rem; margin-bottom: 2.5rem; }
+header.legal-head .breadcrumb { font-size: 0.85rem; color: var(--text-soft); margin-bottom: 1rem; }
+header.legal-head .breadcrumb a { color: var(--text-soft); text-decoration: none; border-bottom: 1px dotted var(--text-soft); }
+h1 { font-family: var(--serif); font-weight: 500; font-size: 2.25rem; line-height: 1.2; margin: 0 0 0.5rem; color: var(--text); }
+.legal-meta { font-size: 0.875rem; color: var(--text-soft); }
+h2 { font-family: var(--serif); font-weight: 500; font-size: 1.5rem; margin: 3rem 0 0.75rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); color: var(--text); }
+h2:first-of-type { border-top: none; padding-top: 0; }
+h3 { font-family: var(--sans); font-weight: 600; font-size: 1.05rem; margin: 1.75rem 0 0.5rem; color: var(--text); }
+p { margin: 0.75rem 0; }
+ul, ol { padding-left: 1.4rem; margin: 0.75rem 0; }
+li { margin: 0.35rem 0; }
+a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(139, 58, 46, 0.3); }
+a:hover { border-bottom-color: var(--accent); }
+button.cc-manage {
+display: inline-block;
+background: var(--accent);
+color: #fff;
+border: none;
+padding: 0.7rem 1.4rem;
+font-family: var(--sans);
+font-size: 0.95rem;
+font-weight: 500;
+cursor: pointer;
+margin: 0.5rem 0;
+border-radius: 2px;
+transition: background .15s;
+}
+button.cc-manage:hover { background: #6d2c23; }
+.summary { background: var(--summary-bg); border-left: 3px solid var(--accent); padding: 1rem 1.2rem; margin: 1rem 0 1.5rem; font-size: 0.95rem; }
+.summary strong { color: var(--accent); }
+table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.92rem; }
+th, td { text-align: left; vertical-align: top; padding: 0.7rem 0.8rem; border-bottom: 1px solid var(--rule); }
+th { background: var(--surface); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-soft); }
+td code, p code { background: var(--code-bg); padding: 0.1rem 0.35rem; border-radius: 2px; font-size: 0.88em; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+.toc { background: var(--surface); border: 1px solid var(--rule); padding: 1.2rem 1.4rem; margin: 2rem 0 3rem; font-size: 0.92rem; }
+.toc strong { display: block; font-family: var(--serif); font-weight: 500; font-size: 1.05rem; margin-bottom: 0.6rem; color: var(--text-soft); }
+.toc ol { padding-left: 1.2rem; margin: 0; }
+.toc li { margin: 0.2rem 0; }
+.toc a { border-bottom: none; }
+.toc a:hover { text-decoration: underline; }
+footer.legal-foot { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); font-size: 0.82rem; color: var(--text-soft); }
+.changelog { font-size: 0.88rem; }
+.changelog dt { font-weight: 600; margin-top: 0.5rem; }
+.changelog dd { margin-left: 1.2rem; color: var(--text-soft); }
+@media (max-width: 600px) {
+.legal-page { padding: 2rem 1.1rem 3.5rem; }
+h1 { font-size: 1.8rem; }
+h2 { font-size: 1.3rem; }
+table { font-size: 0.85rem; display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+th, td { padding: 0.55rem 0.5rem; word-break: break-word; overflow-wrap: anywhere; }
+html, body { overflow-x: hidden; }
+}
+</style>
 </head>
 <body>
 
 <main class="legal-page" id="content">
 
-  <header class="legal-head">
-    <div class="breadcrumb"><a href="/">Santamonica</a> &nbsp;›&nbsp; Privacy</div>
-    <h1>Informativa sulla Privacy</h1>
-    <p class="legal-meta">
-      Ultimo aggiornamento: <strong>27 maggio 2026</strong> · Versione&nbsp;<strong>v&nbsp;2026.05.27.02</strong> · Lingua&nbsp;ufficiale: italiano
-    </p>
-  </header>
+<header class="legal-head">
+<div class="breadcrumb"><a href="/">Santamonica</a> &nbsp;›&nbsp; Privacy</div>
+<h1>Informativa sulla Privacy</h1>
+<p class="legal-meta">
+Ultimo aggiornamento: <strong>23 agosto 2026</strong> · Versione&nbsp;<strong>v&nbsp;2026.08.23.01</strong> · Lingua&nbsp;ufficiale: italiano
+</p>
+</header>
 
-  <nav class="toc" aria-label="Indice">
-    <strong>In questa pagina</strong>
-    <ol>
-      <li><a href="#s1">Chi tratta i tuoi dati</a></li>
-      <li><a href="#s2">In sintesi</a></li>
-      <li><a href="#s3">Quali dati raccogliamo</a></li>
-      <li><a href="#s4">Perché li trattiamo e con quale base giuridica</a></li>
-      <li><a href="#s5">Come li proteggiamo</a></li>
-      <li><a href="#s6">Per quanto tempo li conserviamo</a></li>
-      <li><a href="#s7">A chi possiamo comunicarli</a></li>
-      <li><a href="#s8">Trasferimenti fuori dall'Unione Europea</a></li>
-      <li><a href="#s9">I tuoi diritti</a></li>
-      <li><a href="#s10">Come esercitarli</a></li>
-      <li><a href="#s11">Minori</a></li>
-      <li><a href="#s12">Cookie e tecnologie simili</a></li>
-      <li><a href="#s13">Modifiche all'informativa</a></li>
-    </ol>
-  </nav>
+<nav class="toc" aria-label="Indice">
+<strong>In questa pagina</strong>
+<ol>
+<li><a href="#s1">Chi tratta i tuoi dati</a></li>
+<li><a href="#s2">In sintesi</a></li>
+<li><a href="#s3">Quali dati raccogliamo</a></li>
+<li><a href="#s4">Perché li trattiamo e con quale base giuridica</a></li>
+<li><a href="#s5">Come li proteggiamo</a></li>
+<li><a href="#s6">Per quanto tempo li conserviamo</a></li>
+<li><a href="#s7">A chi possiamo comunicarli</a></li>
+<li><a href="#s8">Trasferimenti fuori dall'Unione Europea</a></li>
+<li><a href="#s9">I tuoi diritti</a></li>
+<li><a href="#s10">Come esercitarli</a></li>
+<li><a href="#s11">Minori</a></li>
+<li><a href="#s12">Cookie e tecnologie simili</a></li>
+<li><a href="#s13">Modifiche all'informativa</a></li>
+</ol>
+</nav>
 
-  <p>La presente informativa è resa ai sensi degli articoli&nbsp;13 e&nbsp;14 del Regolamento (UE) 2016/679 (di seguito, «<strong>GDPR</strong>») e del D.Lgs. 30 giugno 2003, n.&nbsp;196 («<strong>Codice Privacy</strong>») come modificato dal D.Lgs.&nbsp;101/2018, e descrive come il Titolare tratta i dati personali raccolti tramite il sito <code>santamonicagenova.it</code> e in occasione delle attività del ristorante&nbsp;Santamonica.</p>
+<p>La presente informativa è resa ai sensi degli articoli&nbsp;13 e&nbsp;14 del Regolamento (UE) 2016/679 (di seguito, «<strong>GDPR</strong>») e del D.Lgs. 30 giugno 2003, n.&nbsp;196 («<strong>Codice Privacy</strong>») come modificato dal D.Lgs.&nbsp;101/2018, e descrive come il Titolare tratta i dati personali raccolti tramite il sito <code>santamonicagenova.it</code> e in occasione delle attività del ristorante&nbsp;Santamonica.</p>
 
-  <p>La versione in italiano è quella ufficiale e prevale in caso di discordanza con eventuali traduzioni di cortesia in altre lingue.</p>
+<p>La versione in italiano è quella ufficiale e prevale in caso di discordanza con eventuali traduzioni di cortesia in altre lingue.</p>
 
-  <h2 id="s1">1. Chi tratta i tuoi dati (Titolare del trattamento)</h2>
+<h2 id="s1">1. Chi tratta i tuoi dati (Titolare del trattamento)</h2>
 
-  <div class="summary">
-    <strong>In breve:</strong> il titolare è la società che gestisce il ristorante Santamonica. Tutte le richieste in materia di privacy si inviano a <a href="mailto:privacy@santamonicagenova.it">privacy@santamonicagenova.it</a>.
-  </div>
+<div class="summary">
+<strong>In breve:</strong> il titolare è la società che gestisce il ristorante Santamonica. Tutte le richieste in materia di privacy si inviano a <a href="/cdn-cgi/l/email-protection#0b7b79627d6a68724b786a657f6a66646562686a6c6e65647d6a25627f"><span class="__cf_email__" data-cfemail="92e2e0fbe4f3f1ebd2e1f3fce6f3fffdfcfbf1f3f5f7fcfde4f3bcfbe6">[email&#160;protected]</span></a>.
+</div>
 
-  <p>Il Titolare del trattamento è:</p>
-  <ul>
-    <li><strong>Il Giuliano di Andrea Giachino e C. S.a.s.</strong> (di seguito anche «il&nbsp;Titolare»)</li>
-    <li>Sede legale: Lungomare Lombardo&nbsp;27, 16145 Genova&nbsp;(GE), Italia</li>
-    <li>P.IVA e Codice Fiscale: <code>02395420991</code></li>
-    <li>PEC: <a href="mailto:ilgiulianosas@legalmail.it">ilgiulianosas@legalmail.it</a></li>
-    <li>Email dedicata alla privacy: <a href="mailto:privacy@santamonicagenova.it">privacy@santamonicagenova.it</a></li>
-  </ul>
+<p>Il Titolare del trattamento è:</p>
+<ul>
+<li><strong>Il Giuliano di Andrea Giachino e C. S.a.s.</strong> (di seguito anche «il&nbsp;Titolare»)</li>
+<li>Sede legale: Lungomare Lombardo&nbsp;27, 16145 Genova&nbsp;(GE), Italia</li>
+<li>P.IVA e Codice Fiscale: <code>02395420991</code></li>
+<li>PEC: <a href="/cdn-cgi/l/email-protection#167f7a717f637a7f777879657765567a7371777a7b777f7a387f62"><span class="__cf_email__" data-cfemail="8de4e1eae4f8e1e4ece3e2feecfecde1e8eaece1e0ece4e1a3e4f9">[email&#160;protected]</span></a></li>
+<li>Email dedicata alla privacy: <a href="/cdn-cgi/l/email-protection#1767657e6176746e5764767963767a78797e7476707279786176397e63"><span class="__cf_email__" data-cfemail="50202239263133291023313e24313d3f3e39333137353e3f26317e3924">[email&#160;protected]</span></a></li>
+</ul>
 
-  <p>Il Titolare non ha nominato un Responsabile della protezione dei dati (DPO) in quanto, in considerazione dell'oggetto e della portata delle attività svolte, non ricorrono i presupposti previsti dall'art.&nbsp;37 GDPR. L'indirizzo email indicato sopra resta in ogni momento il punto di contatto in materia di privacy.</p>
+<p>Il Titolare non ha nominato un Responsabile della protezione dei dati (DPO) in quanto, in considerazione dell'oggetto e della portata delle attività svolte, non ricorrono i presupposti previsti dall'art.&nbsp;37 GDPR. L'indirizzo email indicato sopra resta in ogni momento il punto di contatto in materia di privacy.</p>
 
-  <h2 id="s2">2. In sintesi</h2>
+<h2 id="s2">2. In sintesi</h2>
 
-  <div class="summary">
-    <strong>In breve:</strong> raccogliamo solo i dati che ci servono per <em>prenotare il tuo tavolo</em>, gestire le tue eventuali <em>allergie</em> (con consenso separato), inviarti la <em>newsletter</em> se la chiedi, e vendere i <em>voucher regalo</em>. Non profiliamo, non vendiamo i tuoi dati a terzi, non li usiamo per pubblicità mirata. Puoi cancellarti, accedere ai tuoi dati o opporti al trattamento in qualunque momento.
-  </div>
+<div class="summary">
+<strong>In breve:</strong> raccogliamo solo i dati che ci servono per <em>prenotare il tuo tavolo</em>, gestire le tue eventuali <em>allergie</em> (con consenso separato), inviarti la <em>newsletter</em> se la chiedi, e vendere i <em>voucher regalo</em>. Non profiliamo, non vendiamo i tuoi dati a terzi, non li usiamo per pubblicità mirata. Puoi cancellarti, accedere ai tuoi dati o opporti al trattamento in qualunque momento.
+</div>
 
-  <p>Questa informativa è scritta in linguaggio chiaro come richiesto dall'art.&nbsp;12 GDPR. Ogni sezione inizia con una sintesi e prosegue con i dettagli tecnici per chi desidera approfondire. Se qualcosa non ti è chiaro, scrivici: cercheremo di spiegartelo nel modo più semplice possibile.</p>
+<p>Questa informativa è scritta in linguaggio chiaro come richiesto dall'art.&nbsp;12 GDPR. Ogni sezione inizia con una sintesi e prosegue con i dettagli tecnici per chi desidera approfondire. Se qualcosa non ti è chiaro, scrivici: cercheremo di spiegartelo nel modo più semplice possibile.</p>
 
-  <h2 id="s3">3. Quali dati raccogliamo</h2>
+<h2 id="s3">3. Quali dati raccogliamo</h2>
 
-  <div class="summary">
-    <strong>In breve:</strong> raccogliamo solo dati che fornisci tu stesso (prenotazione, newsletter, voucher) oppure dati tecnici minimi che il tuo browser invia automaticamente. Le allergie, se le dichiari, sono trattate come <em>categoria particolare</em> con consenso esplicito.
-  </div>
+<div class="summary">
+<strong>In breve:</strong> raccogliamo solo dati che fornisci tu stesso (prenotazione, newsletter, voucher) oppure dati tecnici minimi che il tuo browser invia automaticamente. Le allergie, se le dichiari, sono trattate come <em>categoria particolare</em> con consenso esplicito.
+</div>
 
-  <table>
-    <thead>
-      <tr><th>Categoria di dati</th><th>Esempi</th><th>Origine</th></tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Identificativi e contatti</td>
-        <td>Nome, telefono, email</td>
-        <td>Fornito dall'interessato (form prenotazione, voucher, newsletter)</td>
-      </tr>
-      <tr>
-        <td>Dati di prenotazione</td>
-        <td>Data, ora, numero di persone, occasione, richieste particolari</td>
-        <td>Fornito dall'interessato</td>
-      </tr>
-      <tr>
-        <td><strong>Allergie e intolleranze alimentari</strong></td>
-        <td>Indicazioni testuali fornite nel campo dedicato del form</td>
-        <td>Fornito dall'interessato — <strong>categoria particolare ex art.&nbsp;9 GDPR</strong>, trattata solo con consenso esplicito separato</td>
-      </tr>
-      <tr>
-        <td>Dati relativi ai voucher regalo</td>
-        <td>Nome dell'acquirente, nome ed email del destinatario, importo, eventuale dedica, codice voucher, stato (attivo/riscattato)</td>
-        <td>Fornito dall'acquirente in fase di acquisto</td>
-      </tr>
-      <tr>
-        <td>Dati di pagamento</td>
-        <td>Importo della transazione, identificativi tecnici del pagamento</td>
-        <td>Generati da Stripe; il Titolare <strong>non riceve né memorizza</strong> i dati della carta</td>
-      </tr>
-      <tr>
-        <td>Dati tecnici e di navigazione</td>
-        <td>Indirizzo IP, user agent, pagine visitate, timestamp, statistiche aggregate</td>
-        <td>Raccolti automaticamente da Cloudflare per sicurezza della rete e analytics privacy-first (senza cookie)</td>
-      </tr>
-      <tr>
-        <td>Audit log dei consensi</td>
-        <td>Timestamp, lingua, fonte e tipologia di consenso in chiaro; email e indirizzo IP <em>esclusivamente</em> sotto forma di hash crittografico HMAC-SHA-256</td>
-        <td>Generato lato server al momento del rilascio del consenso (newsletter, allergie) per consentire al Titolare di dimostrare il consenso ai sensi dell'art.&nbsp;7 GDPR</td>
-      </tr>
-    </tbody>
-  </table>
+<table>
+<thead>
+<tr><th>Categoria di dati</th><th>Esempi</th><th>Origine</th></tr>
+</thead>
+<tbody>
+<tr>
+<td>Identificativi e contatti</td>
+<td>Nome, telefono, email</td>
+<td>Fornito dall'interessato (form prenotazione, voucher, newsletter)</td>
+</tr>
+<tr>
+<td>Dati di prenotazione</td>
+<td>Data, ora, numero di persone, occasione, richieste particolari</td>
+<td>Fornito dall'interessato</td>
+</tr>
+<tr>
+<td><strong>Allergie e intolleranze alimentari</strong></td>
+<td>Indicazioni testuali fornite nel campo dedicato del form</td>
+<td>Fornito dall'interessato — <strong>categoria particolare ex art.&nbsp;9 GDPR</strong>, trattata solo con consenso esplicito separato</td>
+</tr>
+<tr>
+<td>Dati relativi ai voucher regalo</td>
+<td>Nome dell'acquirente, nome ed email del destinatario, importo, eventuale dedica, codice voucher, stato (attivo/riscattato)</td>
+<td>Fornito dall'acquirente in fase di acquisto</td>
+</tr>
+<tr>
+<td>Dati di pagamento</td>
+<td>Importo della transazione, identificativi tecnici del pagamento</td>
+<td>Generati da Stripe; il Titolare <strong>non riceve né memorizza</strong> i dati della carta</td>
+</tr>
+<tr>
+<td>Dati tecnici e di navigazione</td>
+<td>Indirizzo IP, user agent, pagine visitate, timestamp, statistiche aggregate</td>
+<td>Raccolti automaticamente da Cloudflare per sicurezza della rete e analytics privacy-first (senza cookie)</td>
+</tr>
+<tr>
+<td>Audit log dei consensi</td>
+<td>Timestamp, lingua, fonte e tipologia di consenso in chiaro; email e indirizzo IP <em>esclusivamente</em> sotto forma di hash crittografico HMAC-SHA-256</td>
+<td>Generato lato server al momento del rilascio del consenso (newsletter, allergie) per consentire al Titolare di dimostrare il consenso ai sensi dell'art.&nbsp;7 GDPR</td>
+</tr>
+</tbody>
+</table>
 
-  <p>Non raccogliamo dati di geolocalizzazione precisa né effettuiamo profilazione comportamentale dell'utente. Il sito si avvale di <strong>Google Analytics 4</strong> per la misurazione aggregata del traffico e di <strong>Meta Pixel</strong> per la misurazione dell'efficacia delle campagne pubblicitarie su Facebook e Instagram: entrambi i servizi sono attivati <strong>esclusivamente previo consenso esplicito</strong> dell'interessato, raccolto tramite il banner cookie (categorie «Statistica» e «Marketing»), e possono essere revocati in qualunque momento dal pannello «Gestisci preferenze». Il dettaglio operativo dei trattamenti, dei cookie posati, delle durate e delle modalità di revoca è descritto al §&nbsp;12 «Cookie e tecnologie simili» e nella <a href="/cookies.html">Cookie Policy</a> dedicata.</p>
+<p>Non raccogliamo dati di geolocalizzazione precisa né effettuiamo profilazione comportamentale dell'utente. Il sito si avvale di <strong>Google Analytics 4</strong> per la misurazione aggregata del traffico e di <strong>Meta Pixel</strong> per la misurazione dell'efficacia delle campagne pubblicitarie su Facebook e Instagram: entrambi i servizi sono attivati <strong>esclusivamente previo consenso esplicito</strong> dell'interessato, raccolto tramite il banner cookie (categorie «Statistica» e «Marketing»), e possono essere revocati in qualunque momento dal pannello «Gestisci preferenze». Il dettaglio operativo dei trattamenti, dei cookie posati, delle durate e delle modalità di revoca è descritto al §&nbsp;12 «Cookie e tecnologie simili» e nella <a href="/cookies.html">Cookie Policy</a> dedicata.</p>
 
-  <p><strong>Una nota sui voucher regalo.</strong> Quando acquisti un voucher per un'altra persona, ci fornisci alcuni dati che la riguardano (nome, email, eventuale dedica). La persona destinataria riceverà questa informativa, in forma sintetica e tramite link, contestualmente all'email di consegna del voucher, ai sensi dell'art.&nbsp;14 GDPR. Ti chiediamo di assicurarti, prima dell'acquisto, che la persona sia informata e d'accordo con il fatto che ci comunichi i suoi dati.</p>
+<p><strong>Una nota sui voucher regalo.</strong> Quando acquisti un voucher per un'altra persona, ci fornisci alcuni dati che la riguardano (nome, email, eventuale dedica). La persona destinataria riceverà questa informativa, in forma sintetica e tramite link, contestualmente all'email di consegna del voucher, ai sensi dell'art.&nbsp;14 GDPR. Ti chiediamo di assicurarti, prima dell'acquisto, che la persona sia informata e d'accordo con il fatto che ci comunichi i suoi dati.</p>
 
-  <h2 id="s4">4. Perché li trattiamo e con quale base giuridica</h2>
+<h2 id="s4">4. Perché li trattiamo e con quale base giuridica</h2>
 
-  <div class="summary">
-    <strong>In breve:</strong> ogni dato che raccogliamo ha una finalità precisa e una base giuridica esplicita (esecuzione di un contratto, consenso, obbligo di legge, legittimo interesse).
-  </div>
+<div class="summary">
+<strong>In breve:</strong> ogni dato che raccogliamo ha una finalità precisa e una base giuridica esplicita (esecuzione di un contratto, consenso, obbligo di legge, legittimo interesse).
+</div>
 
-  <table>
-    <thead>
-      <tr><th>Finalità</th><th>Base giuridica</th><th>Dati interessati</th></tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Gestire la tua prenotazione (conferma, modifica, contatto in caso di necessità)</td>
-        <td>Art.&nbsp;6(1)(b) GDPR — esecuzione di misure precontrattuali e del contratto di ristorazione</td>
-        <td>Identificativi, contatti, dati di prenotazione</td>
-      </tr>
-      <tr>
-        <td>Acquisire una garanzia sulla prenotazione tramite tokenizzazione carta di credito (autorizzazione di pagamento <em>SetupIntent</em>, nessun addebito immediato) e poter addebitare una penale in caso di mancata presentazione (no-show) entro i termini di disdetta indicati</td>
-        <td>Art.&nbsp;6(1)(b) GDPR — esecuzione del contratto di ristorazione; art.&nbsp;6(1)(f) — legittimo interesse del Titolare al recupero del danno da mancata presentazione. Il dato del numero di carta non transita né viene memorizzato dai sistemi del Titolare: la raccolta avviene sulla pagina sicura del fornitore Stripe, certificato PCI&nbsp;DSS Level&nbsp;1. Il Titolare detiene esclusivamente un identificativo tokenizzato del metodo di pagamento</td>
-        <td>Token Stripe del metodo di pagamento (<code>payment_method_id</code>), identificativo cliente Stripe, importo della penale e ore di disdetta concordate</td>
-      </tr>
-      <tr>
-        <td>Tenere conto di allergie e intolleranze in cucina</td>
-        <td><strong>Art.&nbsp;9(2)(a) GDPR — consenso esplicito</strong>, raccolto con checkbox dedicata e separata da quella della prenotazione</td>
-        <td>Allergie/intolleranze dichiarate</td>
-      </tr>
-      <tr>
-        <td>Inviarti la newsletter con eventi, menu stagionali, iniziative</td>
-        <td>Art.&nbsp;6(1)(a) GDPR — consenso, con doppia conferma (double opt-in) e disiscrizione in un click</td>
-        <td>Email, nome, lingua, fonte di iscrizione</td>
-      </tr>
-      <tr>
-        <td>Dimostrare la validità dei consensi ricevuti</td>
-        <td>Art.&nbsp;7 GDPR — onere della prova del consenso; art.&nbsp;2947 c.c.</td>
-        <td>Audit log <code>consents.json</code> in forma HMAC</td>
-      </tr>
-      <tr>
-        <td>Vendere e gestire i voucher regalo (incasso, emissione, riscatto)</td>
-        <td>Art.&nbsp;6(1)(b) GDPR — contratto</td>
-        <td>Dati acquirente e destinatario, importo, codice</td>
-      </tr>
-      <tr>
-        <td>Adempimenti fiscali e contabili sulle vendite</td>
-        <td>Art.&nbsp;6(1)(c) GDPR — obbligo di legge; DPR&nbsp;600/1973; art.&nbsp;2220 c.c.</td>
-        <td>Dati transazione e fatturazione</td>
-      </tr>
-      <tr>
-        <td>Garantire la sicurezza del sito e prevenire abusi</td>
-        <td>Art.&nbsp;6(1)(f) GDPR — legittimo interesse del Titolare alla sicurezza dei sistemi informatici</td>
-        <td>IP, log di accesso, statistiche aggregate Cloudflare</td>
-      </tr>
-      <tr>
-        <td>Misurare il traffico del sito e l'efficacia delle campagne pubblicitarie (Google Analytics 4 e Meta Pixel)</td>
-        <td>Art.&nbsp;6(1)(a) GDPR — <strong>consenso</strong> raccolto tramite il banner cookie; art.&nbsp;122 D.Lgs.&nbsp;196/2003 (ePrivacy) per l'archiviazione di informazioni nel dispositivo dell'utente; revocabile in qualunque momento dal pannello «Gestisci preferenze»</td>
-        <td>Identificativi pseudonimi (cookie <code>_ga</code>, <code>_ga_&lt;ID&gt;</code>, <code>_fbp</code>, <code>_fbc</code>), pagine visitate, eventi di interazione, sorgente del traffico</td>
-      </tr>
-      <tr>
-        <td>Rispondere alle richieste di esercizio dei diritti (DSAR) e adempiere all'obbligo di riscontro</td>
-        <td>Art.&nbsp;6(1)(c) GDPR — obbligo legale derivante dagli artt.&nbsp;12 e&nbsp;15-22 GDPR; art.&nbsp;6(1)(f) per la conservazione difensiva del registro DSAR</td>
-        <td>Email, oggetto della richiesta, esito</td>
-      </tr>
-      <tr>
-        <td>Difendere o far valere un diritto in sede giudiziaria</td>
-        <td>Art.&nbsp;6(1)(f) — legittimo interesse; art.&nbsp;9(2)(f) per categorie particolari</td>
-        <td>Per il tempo strettamente necessario</td>
-      </tr>
-    </tbody>
-  </table>
+<table>
+<thead>
+<tr><th>Finalità</th><th>Base giuridica</th><th>Dati interessati</th></tr>
+</thead>
+<tbody>
+<tr>
+<td>Gestire la tua prenotazione (conferma, modifica, contatto in caso di necessità)</td>
+<td>Art.&nbsp;6(1)(b) GDPR — esecuzione di misure precontrattuali e del contratto di ristorazione</td>
+<td>Identificativi, contatti, dati di prenotazione</td>
+</tr>
+<tr>
+<td>Acquisire una garanzia sulla prenotazione tramite tokenizzazione carta di credito (autorizzazione di pagamento <em>SetupIntent</em>, nessun addebito immediato) e poter addebitare una penale in caso di mancata presentazione (no-show) entro i termini di disdetta indicati</td>
+<td>Art.&nbsp;6(1)(b) GDPR — esecuzione del contratto di ristorazione; art.&nbsp;6(1)(f) — legittimo interesse del Titolare al recupero del danno da mancata presentazione. Il dato del numero di carta non transita né viene memorizzato dai sistemi del Titolare: la raccolta avviene sulla pagina sicura del fornitore Stripe, certificato PCI&nbsp;DSS Level&nbsp;1. Il Titolare detiene esclusivamente un identificativo tokenizzato del metodo di pagamento</td>
+<td>Token Stripe del metodo di pagamento (<code>payment_method_id</code>), identificativo cliente Stripe, importo della penale e ore di disdetta concordate</td>
+</tr>
+<tr>
+<td>Tenere conto di allergie e intolleranze in cucina</td>
+<td><strong>Art.&nbsp;9(2)(a) GDPR — consenso esplicito</strong>, raccolto con checkbox dedicata e separata da quella della prenotazione</td>
+<td>Allergie/intolleranze dichiarate</td>
+</tr>
+<tr>
+<td>Inviarti la newsletter con eventi, menu stagionali, iniziative</td>
+<td>Art.&nbsp;6(1)(a) GDPR — consenso, con doppia conferma (double opt-in) e disiscrizione in un click</td>
+<td>Email, nome, lingua, fonte di iscrizione</td>
+</tr>
+<tr>
+<td>Dimostrare la validità dei consensi ricevuti</td>
+<td>Art.&nbsp;7 GDPR — onere della prova del consenso; art.&nbsp;2947 c.c.</td>
+<td>Audit log <code>consents.json</code> in forma HMAC</td>
+</tr>
+<tr>
+<td>Vendere e gestire i voucher regalo (incasso, emissione, riscatto)</td>
+<td>Art.&nbsp;6(1)(b) GDPR — contratto</td>
+<td>Dati acquirente e destinatario, importo, codice</td>
+</tr>
+<tr>
+<td>Adempimenti fiscali e contabili sulle vendite</td>
+<td>Art.&nbsp;6(1)(c) GDPR — obbligo di legge; DPR&nbsp;600/1973; art.&nbsp;2220 c.c.</td>
+<td>Dati transazione e fatturazione</td>
+</tr>
+<tr>
+<td>Garantire la sicurezza del sito e prevenire abusi</td>
+<td>Art.&nbsp;6(1)(f) GDPR — legittimo interesse del Titolare alla sicurezza dei sistemi informatici</td>
+<td>IP, log di accesso, statistiche aggregate Cloudflare</td>
+</tr>
+<tr>
+<td>Misurare il traffico del sito e l'efficacia delle campagne pubblicitarie (Google Analytics 4 e Meta Pixel)</td>
+<td>Art.&nbsp;6(1)(a) GDPR — <strong>consenso</strong> raccolto tramite il banner cookie; art.&nbsp;122 D.Lgs.&nbsp;196/2003 (ePrivacy) per l'archiviazione di informazioni nel dispositivo dell'utente; revocabile in qualunque momento dal pannello «Gestisci preferenze»</td>
+<td>Identificativi pseudonimi (cookie <code>_ga</code>, <code>_ga_&lt;ID&gt;</code>, <code>_fbp</code>, <code>_fbc</code>), pagine visitate, eventi di interazione, sorgente del traffico</td>
+</tr>
+<tr>
+<td>Rispondere alle richieste di esercizio dei diritti (DSAR) e adempiere all'obbligo di riscontro</td>
+<td>Art.&nbsp;6(1)(c) GDPR — obbligo legale derivante dagli artt.&nbsp;12 e&nbsp;15-22 GDPR; art.&nbsp;6(1)(f) per la conservazione difensiva del registro DSAR</td>
+<td>Email, oggetto della richiesta, esito</td>
+</tr>
+<tr>
+<td>Difendere o far valere un diritto in sede giudiziaria</td>
+<td>Art.&nbsp;6(1)(f) — legittimo interesse; art.&nbsp;9(2)(f) per categorie particolari</td>
+<td>Per il tempo strettamente necessario</td>
+</tr>
+</tbody>
+</table>
 
-  <p>Nessuna delle finalità sopra elencate comporta processi decisionali automatizzati o profilazione produttivi di effetti giuridici o significativamente incidenti sulla persona ai sensi dell'art.&nbsp;22 GDPR. In particolare, le misurazioni statistiche operate da Google Analytics 4 e da Meta Pixel — pur potendo costituire profilazione in senso lato sui sistemi di Google e Meta come titolari autonomi — non sono utilizzate dal Titolare per assumere decisioni automatizzate nei confronti dell'utente.</p>
+<p>Nessuna delle finalità sopra elencate comporta processi decisionali automatizzati o profilazione produttivi di effetti giuridici o significativamente incidenti sulla persona ai sensi dell'art.&nbsp;22 GDPR. In particolare, le misurazioni statistiche operate da Google Analytics 4 e da Meta Pixel — pur potendo costituire profilazione in senso lato sui sistemi di Google e Meta come titolari autonomi — non sono utilizzate dal Titolare per assumere decisioni automatizzate nei confronti dell'utente.</p>
 
-  <h2 id="s5">5. Come li proteggiamo (misure di sicurezza)</h2>
+<h2 id="s5">5. Come li proteggiamo (misure di sicurezza)</h2>
 
-  <div class="summary">
-    <strong>In breve:</strong> traffico cifrato HTTPS, hash crittografici per gli audit, autenticazione a due fattori sugli strumenti di gestione, accesso limitato alle sole persone autorizzate.
-  </div>
+<div class="summary">
+<strong>In breve:</strong> traffico cifrato HTTPS, hash crittografici per gli audit, autenticazione a due fattori sugli strumenti di gestione, accesso limitato alle sole persone autorizzate.
+</div>
 
-  <p>Le misure tecniche e organizzative adottate ai sensi dell'art.&nbsp;32 GDPR includono, in sintesi:</p>
-  <ul>
-    <li>cifratura del traffico tra browser e server (HTTPS/TLS) imposta in modo permanente (HSTS) sul dominio <code>santamonicagenova.it</code>;</li>
-    <li>hashing HMAC-SHA-256 con <em>salt</em> custodito lato server per i log dei consensi (newsletter e allergie): l'email e l'IP non sono mai memorizzati in chiaro nell'audit log;</li>
-    <li>autenticazione a due fattori (2FA) obbligatoria su tutti gli strumenti di gestione (Google, Stripe, Cloudflare, GitHub);</li>
-    <li>token di accesso al repository in modalità <em>fine-grained</em>, con permessi minimi e scadenza periodica;</li>
-    <li>policy di sicurezza HTTP (CSP, X-Frame-Options, Referrer-Policy, Permissions-Policy) configurate a livello di server;</li>
-    <li>aggiornamento regolare delle dipendenze software e monitoraggio delle vulnerabilità;</li>
-    <li>backup periodico dei dati operativi e procedura documentata di risposta alle violazioni di sicurezza (data breach) con notifica al Garante entro 72 ore nei casi previsti dall'art.&nbsp;33 GDPR.</li>
-  </ul>
+<p>Le misure tecniche e organizzative adottate ai sensi dell'art.&nbsp;32 GDPR includono, in sintesi:</p>
+<ul>
+<li>cifratura del traffico tra browser e server (HTTPS/TLS) imposta in modo permanente (HSTS) sul dominio <code>santamonicagenova.it</code>;</li>
+<li>hashing HMAC-SHA-256 con <em>salt</em> custodito lato server per i log dei consensi (newsletter e allergie): l'email e l'IP non sono mai memorizzati in chiaro nell'audit log;</li>
+<li>autenticazione a due fattori (2FA) obbligatoria su tutti gli strumenti di gestione (Google, Stripe, Cloudflare, GitHub);</li>
+<li>token di accesso al repository in modalità <em>fine-grained</em>, con permessi minimi e scadenza periodica;</li>
+<li>policy di sicurezza HTTP (CSP, X-Frame-Options, Referrer-Policy, Permissions-Policy) configurate a livello di server;</li>
+<li>aggiornamento regolare delle dipendenze software e monitoraggio delle vulnerabilità;</li>
+<li>backup periodico dei dati operativi e procedura documentata di risposta alle violazioni di sicurezza (data breach) con notifica al Garante entro 72 ore nei casi previsti dall'art.&nbsp;33 GDPR.</li>
+</ul>
 
-  <h2 id="s6">6. Per quanto tempo li conserviamo</h2>
+<h2 id="s6">6. Per quanto tempo li conserviamo</h2>
 
-  <div class="summary">
-    <strong>In breve:</strong> conserviamo ogni dato solo per il tempo strettamente necessario alla finalità, oppure per il tempo imposto dalla legge (10 anni per i dati fiscali). Le allergie sono cancellate <strong>entro 48 ore</strong> dopo la prenotazione.
-  </div>
+<div class="summary">
+<strong>In breve:</strong> conserviamo ogni dato solo per il tempo strettamente necessario alla finalità, oppure per il tempo imposto dalla legge (10 anni per i dati fiscali). Le allergie sono cancellate <strong>entro 48 ore</strong> dopo la prenotazione.
+</div>
 
-  <table>
-    <thead>
-      <tr><th>Categoria</th><th>Periodo di conservazione</th><th>Riferimento</th></tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Email iscritta alla newsletter (Brevo)</td>
-        <td>Fino alla revoca del consenso (link «disiscrizione»)</td>
-        <td>Art.&nbsp;6(1)(a) GDPR</td>
-      </tr>
-      <tr>
-        <td>Audit log consenso newsletter</td>
-        <td>24 mesi dopo la revoca</td>
-        <td>Art.&nbsp;7 GDPR · art.&nbsp;2947 c.c.</td>
-      </tr>
-      <tr>
-        <td><strong>Allergie e intolleranze</strong></td>
-        <td><strong>Massimo 48 ore dopo la data della prenotazione</strong>, dopodiché cancellate</td>
-        <td>Art.&nbsp;9(2)(a) GDPR · principio di minimizzazione</td>
-      </tr>
-      <tr>
-        <td>Audit log consenso allergie</td>
-        <td>24 mesi dopo la prenotazione (solo in forma hash)</td>
-        <td>Art.&nbsp;9(2)(a) · art.&nbsp;7 GDPR</td>
-      </tr>
-      <tr>
-        <td>Dati delle prenotazioni (form)</td>
-        <td>Fino a 12 mesi dalla data della prenotazione</td>
-        <td>Art.&nbsp;5(1)(e) GDPR — limitazione della conservazione</td>
-      </tr>
-      <tr>
-        <td>Token Stripe della carta di garanzia su prenotazione</td>
-        <td>Fino a 30 giorni dopo la data della prenotazione, salvo addebito penale in caso di no-show; trascorsi i 30 giorni il token viene cancellato e il cliente Stripe è cessato</td>
-        <td>Art.&nbsp;5(1)(e) GDPR · principio di minimizzazione</td>
-      </tr>
-      <tr>
-        <td>Voucher attivi non ancora riscattati</td>
-        <td>Fino alla data di scadenza (12 mesi dall'acquisto) + 5 anni</td>
-        <td>Art.&nbsp;6(1)(c) · DPR&nbsp;600/1973</td>
-      </tr>
-      <tr>
-        <td>Voucher riscattati o rimborsati</td>
-        <td>10 anni dal riscatto</td>
-        <td>Art.&nbsp;2220 c.c. — scritture contabili</td>
-      </tr>
-      <tr>
-        <td>Transazioni Stripe</td>
-        <td>10 anni (gestiti direttamente da Stripe)</td>
-        <td>Obblighi fiscali — non cancellabili anche su richiesta</td>
-      </tr>
-      <tr>
-        <td>Email transazionali (conferme automatiche)</td>
-        <td>Fino a 24 mesi</td>
-        <td>Art.&nbsp;6(1)(b) GDPR</td>
-      </tr>
-      <tr>
-        <td>Log tecnici di traffico Cloudflare</td>
-        <td>7 giorni</td>
-        <td>Art.&nbsp;6(1)(f) — sicurezza dei sistemi</td>
-      </tr>
-      <tr>
-        <td>Cookie e dati di misurazione Google Analytics 4 (se acconsentiti)</td>
-        <td>Da 1&nbsp;minuto (<code>_gat</code>) e 24&nbsp;ore (<code>_gid</code>) fino a 2&nbsp;anni (<code>_ga</code>, <code>_ga_&lt;ID&gt;</code>); dati conservati nella property GA4 fino a 14&nbsp;mesi (impostazione di default); cancellazione automatica alla revoca del consenso</td>
-        <td>Art.&nbsp;6(1)(a) GDPR · art.&nbsp;122 D.Lgs.&nbsp;196/2003 · dettaglio in <a href="/cookies.html#s4-ga4-cookies">cookies.html §4</a></td>
-      </tr>
-      <tr>
-        <td>Cookie e dati di misurazione Meta Pixel (se acconsentiti)</td>
-        <td>3&nbsp;mesi (<code>_fbp</code>, <code>_fbc</code>, <code>fr</code>); cancellazione automatica alla revoca del consenso</td>
-        <td>Art.&nbsp;6(1)(a) GDPR · art.&nbsp;122 D.Lgs.&nbsp;196/2003 · dettaglio in <a href="/cookies.html#s4-meta-cookies">cookies.html §4</a></td>
-      </tr>
-      <tr>
-        <td>Registro richieste di esercizio diritti (DSAR)</td>
-        <td>5 anni dalla risposta</td>
-        <td>Art.&nbsp;12 GDPR · esigenze di difesa</td>
-      </tr>
-      <tr>
-        <td>Registro violazioni di sicurezza (data breach)</td>
-        <td>10 anni dall'evento</td>
-        <td>Art.&nbsp;33(5) GDPR — obbligo di documentazione</td>
-      </tr>
-    </tbody>
-  </table>
+<table>
+<thead>
+<tr><th>Categoria</th><th>Periodo di conservazione</th><th>Riferimento</th></tr>
+</thead>
+<tbody>
+<tr>
+<td>Email iscritta alla newsletter (Brevo)</td>
+<td>Fino alla revoca del consenso (link «disiscrizione»)</td>
+<td>Art.&nbsp;6(1)(a) GDPR</td>
+</tr>
+<tr>
+<td>Audit log consenso newsletter</td>
+<td>24 mesi dopo la revoca</td>
+<td>Art.&nbsp;7 GDPR · art.&nbsp;2947 c.c.</td>
+</tr>
+<tr>
+<td><strong>Allergie e intolleranze</strong></td>
+<td><strong>Massimo 48 ore dopo la data della prenotazione</strong>, dopodiché cancellate</td>
+<td>Art.&nbsp;9(2)(a) GDPR · principio di minimizzazione</td>
+</tr>
+<tr>
+<td>Audit log consenso allergie</td>
+<td>24 mesi dopo la prenotazione (solo in forma hash)</td>
+<td>Art.&nbsp;9(2)(a) · art.&nbsp;7 GDPR</td>
+</tr>
+<tr>
+<td>Dati delle prenotazioni (form)</td>
+<td>Fino a 12 mesi dalla data della prenotazione</td>
+<td>Art.&nbsp;5(1)(e) GDPR — limitazione della conservazione</td>
+</tr>
+<tr>
+<td>Token Stripe della carta di garanzia su prenotazione</td>
+<td>Fino a 30 giorni dopo la data della prenotazione, salvo addebito penale in caso di no-show; trascorsi i 30 giorni il token viene cancellato e il cliente Stripe è cessato</td>
+<td>Art.&nbsp;5(1)(e) GDPR · principio di minimizzazione</td>
+</tr>
+<tr>
+<td>Voucher attivi non ancora riscattati</td>
+<td>Fino alla data di scadenza (12 mesi dall'acquisto) + 5 anni</td>
+<td>Art.&nbsp;6(1)(c) · DPR&nbsp;600/1973</td>
+</tr>
+<tr>
+<td>Voucher riscattati o rimborsati</td>
+<td>10 anni dal riscatto</td>
+<td>Art.&nbsp;2220 c.c. — scritture contabili</td>
+</tr>
+<tr>
+<td>Transazioni Stripe</td>
+<td>10 anni (gestiti direttamente da Stripe)</td>
+<td>Obblighi fiscali — non cancellabili anche su richiesta</td>
+</tr>
+<tr>
+<td>Email transazionali (conferme automatiche)</td>
+<td>Fino a 24 mesi</td>
+<td>Art.&nbsp;6(1)(b) GDPR</td>
+</tr>
+<tr>
+<td>Log tecnici di traffico Cloudflare</td>
+<td>7 giorni</td>
+<td>Art.&nbsp;6(1)(f) — sicurezza dei sistemi</td>
+</tr>
+<tr>
+<td>Cookie e dati di misurazione Google Analytics 4 (se acconsentiti)</td>
+<td>Da 1&nbsp;minuto (<code>_gat</code>) e 24&nbsp;ore (<code>_gid</code>) fino a 2&nbsp;anni (<code>_ga</code>, <code>_ga_&lt;ID&gt;</code>); dati conservati nella property GA4 fino a 14&nbsp;mesi (impostazione di default); cancellazione automatica alla revoca del consenso</td>
+<td>Art.&nbsp;6(1)(a) GDPR · art.&nbsp;122 D.Lgs.&nbsp;196/2003 · dettaglio in <a href="/cookies.html#s4-ga4-cookies">cookies.html §4</a></td>
+</tr>
+<tr>
+<td>Cookie e dati di misurazione Meta Pixel (se acconsentiti)</td>
+<td>3&nbsp;mesi (<code>_fbp</code>, <code>_fbc</code>, <code>fr</code>); cancellazione automatica alla revoca del consenso</td>
+<td>Art.&nbsp;6(1)(a) GDPR · art.&nbsp;122 D.Lgs.&nbsp;196/2003 · dettaglio in <a href="/cookies.html#s4-meta-cookies">cookies.html §4</a></td>
+</tr>
+<tr>
+<td>Registro richieste di esercizio diritti (DSAR)</td>
+<td>5 anni dalla risposta</td>
+<td>Art.&nbsp;12 GDPR · esigenze di difesa</td>
+</tr>
+<tr>
+<td>Registro violazioni di sicurezza (data breach)</td>
+<td>10 anni dall'evento</td>
+<td>Art.&nbsp;33(5) GDPR — obbligo di documentazione</td>
+</tr>
+</tbody>
+</table>
 
-  <p>Al termine dei periodi indicati i dati sono cancellati o resi anonimi in modo irreversibile, salvo quando una norma imperativa imponga la prosecuzione della conservazione.</p>
+<p>Al termine dei periodi indicati i dati sono cancellati o resi anonimi in modo irreversibile, salvo quando una norma imperativa imponga la prosecuzione della conservazione.</p>
 
-  <h2 id="s7">7. A chi possiamo comunicarli (destinatari)</h2>
+<h2 id="s7">7. A chi possiamo comunicarli (destinatari)</h2>
 
-  <div class="summary">
-    <strong>In breve:</strong> i tuoi dati sono accessibili solo a fornitori tecnici scelti per la loro affidabilità e nominati responsabili del trattamento ai sensi dell'art.&nbsp;28 GDPR. Non li vendiamo a nessuno.
-  </div>
+<div class="summary">
+<strong>In breve:</strong> i tuoi dati sono accessibili solo a fornitori tecnici scelti per la loro affidabilità e nominati responsabili del trattamento ai sensi dell'art.&nbsp;28 GDPR. Non li vendiamo a nessuno.
+</div>
 
-  <p>Per fornire i servizi descritti il Titolare si avvale dei seguenti fornitori, nominati responsabili del trattamento ex art.&nbsp;28 GDPR oppure operanti come titolari autonomi nei limiti delle rispettive informative:</p>
+<p>Per fornire i servizi descritti il Titolare si avvale dei seguenti fornitori, nominati responsabili del trattamento ex art.&nbsp;28 GDPR oppure operanti come titolari autonomi nei limiti delle rispettive informative:</p>
 
-  <table>
-    <thead>
-      <tr><th>Fornitore</th><th>Servizio</th><th>Sede</th></tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Cloudflare, Inc.</td>
-        <td>Hosting del sito (Pages), proxy applicativo (Functions, Workers), instradamento email (Email Routing), web analytics privacy-first senza cookie</td>
-        <td>Stati Uniti (con filiali UE)</td>
-      </tr>
-      <tr>
-        <td>Stripe Payments Europe Limited (con sub-responsabile Stripe, Inc.)</td>
-        <td>Processo dei pagamenti per i voucher regalo; tokenizzazione della carta di credito a garanzia sulle prenotazioni (autorizzazione di pagamento <em>SetupIntent</em>, nessun addebito immediato) ed eventuale addebito della penale in caso di no-show</td>
-        <td>Dublino (Irlanda) + Stati Uniti</td>
-      </tr>
-      <tr>
-        <td>Supabase, Inc. (con sub-responsabile Amazon Web Services EMEA SARL)</td>
-        <td>Database delle prenotazioni e <em>Edge Functions</em> serverless che ricevono il form prenotazioni del sito e inoltrano le mail transazionali al provider Resend</td>
-        <td>Server in Irlanda (UE — <code>eu-west-1</code>) · società Supabase Inc. con sede negli Stati Uniti</td>
-      </tr>
-      <tr>
-        <td>Resend, Inc.</td>
-        <td>Invio delle mail transazionali del flusso prenotazioni (conferma di presa in carico al cliente, notifica al ristorante)</td>
-        <td>Stati Uniti</td>
-      </tr>
-      <tr>
-        <td>Sendinblue SAS («Brevo»)</td>
-        <td>Invio della newsletter e delle email transazionali; gestione iscrizioni con doppio opt-in</td>
-        <td>Francia (UE)</td>
-      </tr>
-      <tr>
-        <td>DeepL SE</td>
-        <td>Traduzione automatica del menu (testi non personali)</td>
-        <td>Germania (UE)</td>
-      </tr>
-      <tr>
-        <td>Formspree, Inc.</td>
-        <td>Instradamento dei messaggi inviati tramite i form del sito</td>
-        <td>Stati Uniti</td>
-      </tr>
-      <tr>
-        <td>Google Ireland Limited / Google LLC</td>
-        <td>Mappa di Google Maps incorporata (consent gate via iframemanager); aggregazione recensioni pubbliche tramite Places API (nessun dato personale degli utenti del sito viene inviato); <strong>Google Analytics 4</strong> per la misurazione del traffico del sito — solo previo consenso esplicito tramite il banner cookie (categoria «Statistica»)</td>
-        <td>Irlanda / Stati Uniti</td>
-      </tr>
-      <tr>
-        <td>Meta Platforms Ireland Limited / Meta Platforms, Inc.</td>
-        <td><strong>Meta Pixel</strong> per la misurazione dell'efficacia delle campagne pubblicitarie su Facebook e Instagram e per la creazione di pubblici di retargeting — solo previo consenso esplicito tramite il banner cookie (categoria «Marketing»). Meta opera come titolare autonomo del trattamento dei dati raccolti tramite il Pixel, secondo la propria informativa.</td>
-        <td>Irlanda / Stati Uniti</td>
-      </tr>
-      <tr>
-        <td>GitHub, Inc. (Microsoft Corporation)</td>
-        <td>Versionamento del codice sorgente e archiviazione dei file di audit log (in forma hash)</td>
-        <td>Stati Uniti</td>
-      </tr>
-      <tr>
-        <td>Consulente fiscale del Titolare</td>
-        <td>Adempimenti contabili e fiscali</td>
-        <td>Italia</td>
-      </tr>
-      <tr>
-        <td>Autorità pubbliche</td>
-        <td>Comunicazione su richiesta motivata di autorità giudiziarie, fiscali, di pubblica sicurezza</td>
-        <td>Italia</td>
-      </tr>
-    </tbody>
-  </table>
+<table>
+<thead>
+<tr><th>Fornitore</th><th>Servizio</th><th>Sede</th></tr>
+</thead>
+<tbody>
+<tr>
+<td>Cloudflare, Inc.</td>
+<td>Hosting del sito (Pages), proxy applicativo (Functions, Workers), instradamento email (Email Routing), web analytics privacy-first senza cookie</td>
+<td>Stati Uniti (con filiali UE)</td>
+</tr>
+<tr>
+<td>Stripe Payments Europe Limited (con sub-responsabile Stripe, Inc.)</td>
+<td>Processo dei pagamenti per i voucher regalo; tokenizzazione della carta di credito a garanzia sulle prenotazioni (autorizzazione di pagamento <em>SetupIntent</em>, nessun addebito immediato) ed eventuale addebito della penale in caso di no-show</td>
+<td>Dublino (Irlanda) + Stati Uniti</td>
+</tr>
+<tr>
+<td>Supabase, Inc. (con sub-responsabile Amazon Web Services EMEA SARL)</td>
+<td>Database delle prenotazioni e <em>Edge Functions</em> serverless che ricevono il form prenotazioni del sito e inoltrano le mail transazionali al provider Resend</td>
+<td>Server in Irlanda (UE — <code>eu-west-1</code>) · società Supabase Inc. con sede negli Stati Uniti</td>
+</tr>
+<tr>
+<td>Resend, Inc.</td>
+<td>Invio delle mail transazionali del flusso prenotazioni (conferma di presa in carico al cliente, notifica al ristorante)</td>
+<td>Stati Uniti</td>
+</tr>
+<tr>
+<td>Sendinblue SAS («Brevo»)</td>
+<td>Invio della newsletter e delle email transazionali; gestione iscrizioni con doppio opt-in</td>
+<td>Francia (UE)</td>
+</tr>
+<tr>
+<td>DeepL SE</td>
+<td>Traduzione automatica del menu (testi non personali)</td>
+<td>Germania (UE)</td>
+</tr>
+<tr>
+<td>Formspree, Inc.</td>
+<td>Instradamento dei messaggi inviati tramite i form del sito</td>
+<td>Stati Uniti</td>
+</tr>
+<tr>
+<td>Google Ireland Limited / Google LLC</td>
+<td>Mappa di Google Maps incorporata (consent gate via iframemanager); aggregazione recensioni pubbliche tramite Places API (nessun dato personale degli utenti del sito viene inviato); <strong>Google Analytics 4</strong> per la misurazione del traffico del sito — solo previo consenso esplicito tramite il banner cookie (categoria «Statistica»)</td>
+<td>Irlanda / Stati Uniti</td>
+</tr>
+<tr>
+<td>Meta Platforms Ireland Limited / Meta Platforms, Inc.</td>
+<td><strong>Meta Pixel</strong> per la misurazione dell'efficacia delle campagne pubblicitarie su Facebook e Instagram e per la creazione di pubblici di retargeting — solo previo consenso esplicito tramite il banner cookie (categoria «Marketing»). Meta opera come titolare autonomo del trattamento dei dati raccolti tramite il Pixel, secondo la propria informativa.</td>
+<td>Irlanda / Stati Uniti</td>
+</tr>
+<tr>
+<td>GitHub, Inc. (Microsoft Corporation)</td>
+<td>Versionamento del codice sorgente e archiviazione dei file di audit log (in forma hash)</td>
+<td>Stati Uniti</td>
+</tr>
+<tr>
+<td>Consulente fiscale del Titolare</td>
+<td>Adempimenti contabili e fiscali</td>
+<td>Italia</td>
+</tr>
+<tr>
+<td>Autorità pubbliche</td>
+<td>Comunicazione su richiesta motivata di autorità giudiziarie, fiscali, di pubblica sicurezza</td>
+<td>Italia</td>
+</tr>
+</tbody>
+</table>
 
-  <p>La libreria <em>vanilla-cookieconsent</em> utilizzata per il banner cookie è eseguita esclusivamente nel tuo browser e non invia dati a terzi.</p>
+<p>La libreria <em>vanilla-cookieconsent</em> utilizzata per il banner cookie è eseguita esclusivamente nel tuo browser e non invia dati a terzi.</p>
 
-  <p>I tuoi dati non sono mai venduti, ceduti per finalità di marketing di terzi, né utilizzati per profilazione pubblicitaria su altre piattaforme.</p>
+<p>I tuoi dati non sono mai venduti, ceduti per finalità di marketing di terzi, né utilizzati per profilazione pubblicitaria su altre piattaforme.</p>
 
-  <h2 id="s8">8. Trasferimenti fuori dall'Unione Europea</h2>
+<h2 id="s8">8. Trasferimenti fuori dall'Unione Europea</h2>
 
-  <div class="summary">
-    <strong>In breve:</strong> alcuni fornitori hanno server negli Stati Uniti. In quei casi il trasferimento avviene sulla base del <em>Data Privacy Framework</em> UE-USA, integrato — ove necessario — da Clausole Contrattuali Standard. Monitoriamo l'evoluzione giurisprudenziale e normativa europea in materia.
-  </div>
+<div class="summary">
+<strong>In breve:</strong> alcuni fornitori hanno server negli Stati Uniti. In quei casi il trasferimento avviene sulla base del <em>Data Privacy Framework</em> UE-USA, integrato — ove necessario — da Clausole Contrattuali Standard. Monitoriamo l'evoluzione giurisprudenziale e normativa europea in materia.
+</div>
 
-  <p>Alcuni dei fornitori sopra elencati (Cloudflare, Stripe, Google, Meta, GitHub, Resend, Supabase) hanno sede o operano server negli Stati Uniti e risultano certificati al <em>EU-U.S. Data Privacy Framework</em>. Si precisa che il database operativo Supabase relativo alle prenotazioni del sito risiede su server Amazon Web Services nell'Unione Europea (Irlanda, <code>eu-west-1</code>): il trasferimento verso la società madre Supabase Inc. (USA) riguarda esclusivamente le funzioni di gestione amministrativa del servizio (dashboard di amministrazione, fatturazione). Per altri fornitori statunitensi (in particolare Formspree), la verifica della certificazione DPF è in corso e, nelle more, il trasferimento avviene sulla base di Clausole Contrattuali Standard. Il trasferimento dei dati al di fuori dello Spazio Economico Europeo avviene quindi nel rispetto degli artt.&nbsp;44 e seguenti del GDPR, attraverso una combinazione di:</p>
-  <ul>
-    <li>adesione del fornitore al <strong>EU-U.S. Data Privacy Framework</strong> (decisione di adeguatezza della Commissione europea del 10&nbsp;luglio&nbsp;2023);</li>
-    <li>Clausole Contrattuali Standard approvate dalla Commissione (decisione di esecuzione (UE) 2021/914) integrate nei contratti con i fornitori;</li>
-    <li>misure tecniche supplementari (cifratura, pseudonimizzazione, minimizzazione) ove applicabili.</li>
-  </ul>
-  <p>Il Titolare verifica annualmente l'effettiva persistenza della certificazione DPF dei propri fornitori statunitensi tramite il registro pubblico <code>dataprivacyframework.gov</code> e si riserva di adottare misure ulteriori in caso di pronuncia giurisprudenziale o intervento normativo che modifichi il quadro attuale.</p>
-  <p>Puoi ottenere copia delle garanzie contrattuali in essere scrivendo a <a href="mailto:privacy@santamonicagenova.it">privacy@santamonicagenova.it</a>.</p>
+<p>Alcuni dei fornitori sopra elencati (Cloudflare, Stripe, Google, Meta, GitHub, Resend, Supabase) hanno sede o operano server negli Stati Uniti e risultano certificati al <em>EU-U.S. Data Privacy Framework</em>. Si precisa che il database operativo Supabase relativo alle prenotazioni del sito risiede su server Amazon Web Services nell'Unione Europea (Irlanda, <code>eu-west-1</code>): il trasferimento verso la società madre Supabase Inc. (USA) riguarda esclusivamente le funzioni di gestione amministrativa del servizio (dashboard di amministrazione, fatturazione). Per altri fornitori statunitensi (in particolare Formspree), la verifica della certificazione DPF è in corso e, nelle more, il trasferimento avviene sulla base di Clausole Contrattuali Standard. Il trasferimento dei dati al di fuori dello Spazio Economico Europeo avviene quindi nel rispetto degli artt.&nbsp;44 e seguenti del GDPR, attraverso una combinazione di:</p>
+<ul>
+<li>adesione del fornitore al <strong>EU-U.S. Data Privacy Framework</strong> (decisione di adeguatezza della Commissione europea del 10&nbsp;luglio&nbsp;2023);</li>
+<li>Clausole Contrattuali Standard approvate dalla Commissione (decisione di esecuzione (UE) 2021/914) integrate nei contratti con i fornitori;</li>
+<li>misure tecniche supplementari (cifratura, pseudonimizzazione, minimizzazione) ove applicabili.</li>
+</ul>
+<p>Il Titolare verifica annualmente l'effettiva persistenza della certificazione DPF dei propri fornitori statunitensi tramite il registro pubblico <code>dataprivacyframework.gov</code> e si riserva di adottare misure ulteriori in caso di pronuncia giurisprudenziale o intervento normativo che modifichi il quadro attuale.</p>
+<p>Puoi ottenere copia delle garanzie contrattuali in essere scrivendo a <a href="/cdn-cgi/l/email-protection#b7c7c5dec1d6d4cef7c4d6d9c3d6dad8d9ded4d6d0d2d9d8c1d699dec3"><span class="__cf_email__" data-cfemail="20505249564143596053414e54414d4f4e49434147454e4f56410e4954">[email&#160;protected]</span></a>.</p>
 
-  <h2 id="s9">9. I tuoi diritti</h2>
+<h2 id="s9">9. I tuoi diritti</h2>
 
-  <div class="summary">
-    <strong>In breve:</strong> puoi accedere ai tuoi dati, correggerli, cancellarli, limitarne l'uso, riceverli in formato portabile, opporti al trattamento, revocare il consenso e presentare reclamo al Garante. Nessun costo, salvo richieste manifestamente abusive.
-  </div>
+<div class="summary">
+<strong>In breve:</strong> puoi accedere ai tuoi dati, correggerli, cancellarli, limitarne l'uso, riceverli in formato portabile, opporti al trattamento, revocare il consenso e presentare reclamo al Garante. Nessun costo, salvo richieste manifestamente abusive.
+</div>
 
-  <p>In qualità di interessato puoi esercitare in qualunque momento i seguenti diritti previsti dagli artt.&nbsp;15-21 GDPR:</p>
-  <ul>
-    <li><strong>diritto di accesso</strong> (art.&nbsp;15): ottenere conferma del trattamento e una copia dei tuoi dati;</li>
-    <li><strong>diritto di rettifica</strong> (art.&nbsp;16): correggere dati inesatti o integrarli se incompleti;</li>
-    <li><strong>diritto alla cancellazione</strong> o «all'oblio» (art.&nbsp;17): chiedere la cancellazione, salvo quando ostino obblighi di legge (es. obblighi fiscali decennali);</li>
-    <li><strong>diritto di limitazione</strong> (art.&nbsp;18): chiedere la sospensione del trattamento mentre verifichiamo o contestiamo qualcosa;</li>
-    <li><strong>diritto alla portabilità</strong> (art.&nbsp;20): ricevere i dati che ci hai fornito in formato strutturato e leggibile, o trasmetterli a un altro titolare;</li>
-    <li><strong>diritto di opposizione</strong> (art.&nbsp;21): opporsi al trattamento fondato sul legittimo interesse o, in qualunque momento e senza necessità di motivazione, al marketing diretto;</li>
-    <li><strong>diritto di revocare il consenso</strong> in qualunque momento (art.&nbsp;7&nbsp;§&nbsp;3), senza pregiudizio per la liceità del trattamento precedente alla revoca;</li>
-    <li><strong>diritto di presentare reclamo all'autorità di controllo</strong> (art.&nbsp;77 GDPR — vedi § successivo).</li>
-  </ul>
+<p>In qualità di interessato puoi esercitare in qualunque momento i seguenti diritti previsti dagli artt.&nbsp;15-21 GDPR:</p>
+<ul>
+<li><strong>diritto di accesso</strong> (art.&nbsp;15): ottenere conferma del trattamento e una copia dei tuoi dati;</li>
+<li><strong>diritto di rettifica</strong> (art.&nbsp;16): correggere dati inesatti o integrarli se incompleti;</li>
+<li><strong>diritto alla cancellazione</strong> o «all'oblio» (art.&nbsp;17): chiedere la cancellazione, salvo quando ostino obblighi di legge (es. obblighi fiscali decennali);</li>
+<li><strong>diritto di limitazione</strong> (art.&nbsp;18): chiedere la sospensione del trattamento mentre verifichiamo o contestiamo qualcosa;</li>
+<li><strong>diritto alla portabilità</strong> (art.&nbsp;20): ricevere i dati che ci hai fornito in formato strutturato e leggibile, o trasmetterli a un altro titolare;</li>
+<li><strong>diritto di opposizione</strong> (art.&nbsp;21): opporsi al trattamento fondato sul legittimo interesse o, in qualunque momento e senza necessità di motivazione, al marketing diretto;</li>
+<li><strong>diritto di revocare il consenso</strong> in qualunque momento (art.&nbsp;7&nbsp;§&nbsp;3), senza pregiudizio per la liceità del trattamento precedente alla revoca;</li>
+<li><strong>diritto di presentare reclamo all'autorità di controllo</strong> (art.&nbsp;77 GDPR — vedi § successivo).</li>
+</ul>
 
-  <p><strong>Decisioni automatizzate (art.&nbsp;22 GDPR).</strong> A fini di trasparenza, segnaliamo che il Titolare <strong>non effettua</strong> processi decisionali interamente automatizzati né profilazione produttivi di effetti giuridici o significativamente incidenti sulla persona. Il diritto di cui all'art.&nbsp;22 GDPR non trova pertanto applicazione in concreto.</p>
+<p><strong>Decisioni automatizzate (art.&nbsp;22 GDPR).</strong> A fini di trasparenza, segnaliamo che il Titolare <strong>non effettua</strong> processi decisionali interamente automatizzati né profilazione produttivi di effetti giuridici o significativamente incidenti sulla persona. Il diritto di cui all'art.&nbsp;22 GDPR non trova pertanto applicazione in concreto.</p>
 
-  <h2 id="s10">10. Come esercitarli</h2>
+<h2 id="s10">10. Come esercitarli</h2>
 
-  <div class="summary">
-    <strong>In breve:</strong> scrivici a <a href="mailto:privacy@santamonicagenova.it">privacy@santamonicagenova.it</a>. Rispondiamo entro un mese (estendibile fino a tre nei casi complessi). Se non sei soddisfatto puoi rivolgerti al Garante italiano o all'autorità del tuo Paese.
-  </div>
+<div class="summary">
+<strong>In breve:</strong> scrivici a <a href="/cdn-cgi/l/email-protection#f787859e8196948eb784969983969a98999e9496909299988196d99e83"><span class="__cf_email__" data-cfemail="95e5e7fce3f4f6ecd5e6f4fbe1f4f8fafbfcf6f4f2f0fbfae3f4bbfce1">[email&#160;protected]</span></a>. Rispondiamo entro un mese (estendibile fino a tre nei casi complessi). Se non sei soddisfatto puoi rivolgerti al Garante italiano o all'autorità del tuo Paese.
+</div>
 
-  <p>Per esercitare i tuoi diritti puoi:</p>
-  <ul>
-    <li>scrivere a <a href="mailto:privacy@santamonicagenova.it">privacy@santamonicagenova.it</a> (canale ordinario);</li>
-    <li>oppure inviare una PEC a <a href="mailto:ilgiulianosas@legalmail.it">ilgiulianosas@legalmail.it</a>;</li>
-    <li>oppure scriverci all'indirizzo postale della sede legale indicato al §&nbsp;1.</li>
-  </ul>
+<p>Per esercitare i tuoi diritti puoi:</p>
+<ul>
+<li>scrivere a <a href="/cdn-cgi/l/email-protection#3343415a4552504a7340525d47525e5c5d5a505254565d5c45521d5a47"><span class="__cf_email__" data-cfemail="5626243f2037352f1625373822373b39383f3537313338392037783f22">[email&#160;protected]</span></a> (canale ordinario);</li>
+<li>oppure inviare una PEC a <a href="/cdn-cgi/l/email-protection#0a63666d637f66636b6465796b794a666f6d6b66676b636624637e"><span class="__cf_email__" data-cfemail="ec85808b859980858d82839f8d9fac80898b8d80818d8580c28598">[email&#160;protected]</span></a>;</li>
+<li>oppure scriverci all'indirizzo postale della sede legale indicato al §&nbsp;1.</li>
+</ul>
 
-  <p>Per consentirci di gestire la richiesta in modo accurato e sicuro, indica nel messaggio: il diritto che intendi esercitare, una descrizione sintetica della richiesta, e — solo se necessario per identificarti senza ambiguità — informazioni utili a collegarti al trattamento (es. la data di una prenotazione, il codice di un voucher). In caso di dubbio sull'identità potremo chiederti elementi ulteriori, ai sensi dell'art.&nbsp;12(6) GDPR.</p>
+<p>Per consentirci di gestire la richiesta in modo accurato e sicuro, indica nel messaggio: il diritto che intendi esercitare, una descrizione sintetica della richiesta, e — solo se necessario per identificarti senza ambiguità — informazioni utili a collegarti al trattamento (es. la data di una prenotazione, il codice di un voucher). In caso di dubbio sull'identità potremo chiederti elementi ulteriori, ai sensi dell'art.&nbsp;12(6) GDPR.</p>
 
-  <p>Risponderemo senza ingiustificato ritardo e comunque entro <strong>un mese</strong> dal ricevimento della richiesta, ai sensi dell'art.&nbsp;12(3) GDPR. Tale termine può essere prorogato di ulteriori <strong>due mesi</strong>, ove necessario, tenuto conto della complessità o del numero delle richieste; in tal caso ti informeremo della proroga e dei motivi entro il primo mese. L'esercizio dei diritti è gratuito; in caso di richieste manifestamente infondate o eccessive, in particolare per il loro carattere ripetitivo, ci riserviamo, ai sensi dell'art.&nbsp;12(5) GDPR, di addebitare un contributo ragionevole o di rifiutare l'evasione, motivando la decisione.</p>
+<p>Risponderemo senza ingiustificato ritardo e comunque entro <strong>un mese</strong> dal ricevimento della richiesta, ai sensi dell'art.&nbsp;12(3) GDPR. Tale termine può essere prorogato di ulteriori <strong>due mesi</strong>, ove necessario, tenuto conto della complessità o del numero delle richieste; in tal caso ti informeremo della proroga e dei motivi entro il primo mese. L'esercizio dei diritti è gratuito; in caso di richieste manifestamente infondate o eccessive, in particolare per il loro carattere ripetitivo, ci riserviamo, ai sensi dell'art.&nbsp;12(5) GDPR, di addebitare un contributo ragionevole o di rifiutare l'evasione, motivando la decisione.</p>
 
-  <p>Se ritieni che il trattamento dei tuoi dati violi il GDPR, hai diritto di proporre reclamo all'autorità di controllo competente:</p>
-  <ul>
-    <li>per i residenti in Italia, al <strong>Garante per la protezione dei dati personali</strong> — Piazza Venezia 11, 00187 Roma — <a href="https://www.garanteprivacy.it" target="_blank" rel="noopener">www.garanteprivacy.it</a>;</li>
-    <li>per i residenti in Francia, alla <strong>CNIL</strong> — <a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>;</li>
-    <li>per i residenti nel Regno Unito, all'<strong>ICO</strong> — <a href="https://ico.org.uk" target="_blank" rel="noopener">ico.org.uk</a>;</li>
-    <li>per residenti in altri Stati membri, all'autorità di controllo del proprio Paese o del luogo di lavoro abituale (art.&nbsp;77 GDPR).</li>
-  </ul>
+<p>Se ritieni che il trattamento dei tuoi dati violi il GDPR, hai diritto di proporre reclamo all'autorità di controllo competente:</p>
+<ul>
+<li>per i residenti in Italia, al <strong>Garante per la protezione dei dati personali</strong> — Piazza Venezia 11, 00187 Roma — <a href="https://www.garanteprivacy.it" target="_blank" rel="noopener">www.garanteprivacy.it</a>;</li>
+<li>per i residenti in Francia, alla <strong>CNIL</strong> — <a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>;</li>
+<li>per i residenti nel Regno Unito, all'<strong>ICO</strong> — <a href="https://ico.org.uk" target="_blank" rel="noopener">ico.org.uk</a>;</li>
+<li>per residenti in altri Stati membri, all'autorità di controllo del proprio Paese o del luogo di lavoro abituale (art.&nbsp;77 GDPR).</li>
+</ul>
 
-  <h2 id="s11">11. Minori</h2>
+<h2 id="s11">11. Minori</h2>
 
-  <div class="summary">
-    <strong>In breve:</strong> i servizi del sito non sono pensati per minori di 14 anni. Al di sotto di questa soglia il consenso al trattamento dei dati deve essere prestato da chi esercita la responsabilità genitoriale.
-  </div>
+<div class="summary">
+<strong>In breve:</strong> i servizi del sito non sono pensati per minori di 14 anni. Al di sotto di questa soglia il consenso al trattamento dei dati deve essere prestato da chi esercita la responsabilità genitoriale.
+</div>
 
-  <p>Ai sensi dell'art.&nbsp;8 GDPR e dell'art.&nbsp;2-quinquies del D.Lgs.&nbsp;196/2003, in Italia il minore può prestare validamente il consenso al trattamento dei propri dati in relazione ai servizi della società dell'informazione al compimento del <strong>quattordicesimo anno di età</strong>. Al di sotto di tale soglia il consenso deve essere prestato da chi esercita la responsabilità genitoriale.</p>
-  <p>Le versioni dell'informativa in altre lingue, una volta pubblicate, faranno riferimento alle soglie nazionali corrispondenti (15&nbsp;anni in Francia, 13&nbsp;anni nel Regno Unito).</p>
-  <p>Se vieni a conoscenza del fatto che un minore al di sotto della soglia applicabile ci ha fornito dati senza il consenso parentale, ti invitiamo a segnalarcelo: provvederemo prontamente alla cancellazione.</p>
+<p>Ai sensi dell'art.&nbsp;8 GDPR e dell'art.&nbsp;2-quinquies del D.Lgs.&nbsp;196/2003, in Italia il minore può prestare validamente il consenso al trattamento dei propri dati in relazione ai servizi della società dell'informazione al compimento del <strong>quattordicesimo anno di età</strong>. Al di sotto di tale soglia il consenso deve essere prestato da chi esercita la responsabilità genitoriale.</p>
+<p>Le versioni dell'informativa in altre lingue, una volta pubblicate, faranno riferimento alle soglie nazionali corrispondenti (15&nbsp;anni in Francia, 13&nbsp;anni nel Regno Unito).</p>
+<p>Se vieni a conoscenza del fatto che un minore al di sotto della soglia applicabile ci ha fornito dati senza il consenso parentale, ti invitiamo a segnalarcelo: provvederemo prontamente alla cancellazione.</p>
 
-  <h2 id="s12">12. Cookie e tecnologie simili</h2>
+<h2 id="s12">12. Cookie e tecnologie simili</h2>
 
-  <div class="summary">
-    <strong>In breve:</strong> usiamo pochissimi cookie, tutti descritti nella <a href="/cookies.html">Cookie Policy</a> dedicata. Puoi rivedere o ritirare il consenso in qualunque momento dal pannello «Gestisci preferenze».
-  </div>
+<div class="summary">
+<strong>In breve:</strong> usiamo pochissimi cookie, tutti descritti nella <a href="/cookies.html">Cookie Policy</a> dedicata. Puoi rivedere o ritirare il consenso in qualunque momento dal pannello «Gestisci preferenze».
+</div>
 
-  <p>Il sito utilizza cookie tecnici necessari al funzionamento (sempre attivi: gestione del consenso, sicurezza, preferenze di lingua) e, <strong>previo consenso espresso tramite il banner</strong>, cookie non strettamente tecnici nelle seguenti categorie:</p>
-  <ul>
-    <li><strong>Statistica</strong> — <em>Google Analytics 4</em> (Google Ireland Limited / Google LLC): misurazione aggregata del traffico del sito, delle pagine visitate, della sorgente di provenienza e degli eventi di interazione. Cookie di prima parte posati sul dominio <code>santamonicagenova.it</code>: <code>_ga</code> e <code>_ga_&lt;ID&gt;</code> (durata 2 anni), <code>_gid</code> (24 ore), <code>_gat</code> (1 minuto). Property GA4: <em>Ristorante Santamonica</em>. Indirizzo IP raccolto in forma anonimizzata.</li>
-    <li><strong>Marketing</strong> — <em>Meta Pixel</em> (Meta Platforms Ireland Limited / Meta Platforms, Inc.): misurazione dell'efficacia delle campagne pubblicitarie su Facebook e Instagram e creazione di pubblici di retargeting. Cookie di prima parte: <code>_fbp</code>, <code>_fbc</code>, <code>fr</code> (durata 3 mesi).</li>
-    <li><strong>Contenuti esterni</strong> — <em>Google Maps</em> (mappa incorporata della pagina «Dove siamo»): caricamento subordinato al consenso e gestito tramite content blocker (<em>iframemanager</em>).</li>
-  </ul>
-  <p>Gli script di Google Analytics 4 e di Meta Pixel sono iniettati nella pagina <strong>esclusivamente dopo la prestazione del consenso</strong> dell'utente per le rispettive categorie tramite il banner <em>vanilla-cookieconsent</em> (v3). La revoca del consenso, sempre disponibile dal pannello «Gestisci preferenze», comporta la cancellazione automatica dei cookie già posati e l'interruzione immediata dell'iniezione degli script.</p>
-  <p>Indipendentemente dal consenso, il sito utilizza <strong>Cloudflare Web Analytics</strong> per raccogliere statistiche aggregate di traffico in forma privacy-first <em>senza</em> impostare cookie nel browser dell'utente (base giuridica: art.&nbsp;6(1)(f) GDPR — legittimo interesse alla sicurezza e all'analisi statistica anonima dei sistemi).</p>
-  <p>I cookie di Stripe vengono installati esclusivamente nel momento in cui l'utente clicchi su «Acquista» nella pagina <a href="/regala.html">regala</a> e venga reindirizzato a <code>checkout.stripe.com</code> (sito esterno del fornitore del servizio di pagamento).</p>
-  <p>Per il dettaglio aggiornato dei cookie utilizzati, della loro durata e delle modalità di gestione delle preferenze, consulta la <a href="/cookies.html"><strong>Cookie Policy</strong></a>.</p>
+<p>Il sito utilizza cookie tecnici necessari al funzionamento (sempre attivi: gestione del consenso, sicurezza, preferenze di lingua) e, <strong>previo consenso espresso tramite il banner</strong>, cookie non strettamente tecnici nelle seguenti categorie:</p>
+<ul>
+<li><strong>Statistica</strong> — <em>Google Analytics 4</em> (Google Ireland Limited / Google LLC): misurazione aggregata del traffico del sito, delle pagine visitate, della sorgente di provenienza e degli eventi di interazione. Cookie di prima parte posati sul dominio <code>santamonicagenova.it</code>: <code>_ga</code> e <code>_ga_&lt;ID&gt;</code> (durata 2 anni), <code>_gid</code> (24 ore), <code>_gat</code> (1 minuto). Property GA4: <em>Ristorante Santamonica</em>. Indirizzo IP raccolto in forma anonimizzata.</li>
+<li><strong>Marketing</strong> — <em>Meta Pixel</em> (Meta Platforms Ireland Limited / Meta Platforms, Inc.): misurazione dell'efficacia delle campagne pubblicitarie su Facebook e Instagram e creazione di pubblici di retargeting. Cookie di prima parte: <code>_fbp</code>, <code>_fbc</code>, <code>fr</code> (durata 3 mesi).</li>
+<li><strong>Contenuti esterni</strong> — <em>Google Maps</em> (mappa incorporata della pagina «Dove siamo»): caricamento subordinato al consenso e gestito tramite content blocker (<em>iframemanager</em>).</li>
+</ul>
+<p>Gli script di Google Analytics 4 e di Meta Pixel sono iniettati nella pagina <strong>esclusivamente dopo la prestazione del consenso</strong> dell'utente per le rispettive categorie tramite il banner <em>vanilla-cookieconsent</em> (v3). La revoca del consenso, sempre disponibile dal pannello «Gestisci preferenze», comporta la cancellazione automatica dei cookie già posati e l'interruzione immediata dell'iniezione degli script.</p>
+<p>Indipendentemente dal consenso, il sito utilizza <strong>Cloudflare Web Analytics</strong> per raccogliere statistiche aggregate di traffico in forma privacy-first <em>senza</em> impostare cookie nel browser dell'utente (base giuridica: art.&nbsp;6(1)(f) GDPR — legittimo interesse alla sicurezza e all'analisi statistica anonima dei sistemi).</p>
+<p>I cookie di Stripe vengono installati esclusivamente nel momento in cui l'utente clicchi su «Acquista» nella pagina <a href="/regala.html">regala</a> e venga reindirizzato a <code>checkout.stripe.com</code> (sito esterno del fornitore del servizio di pagamento).</p>
+<p>Per il dettaglio aggiornato dei cookie utilizzati, della loro durata e delle modalità di gestione delle preferenze, consulta la <a href="/cookies.html"><strong>Cookie Policy</strong></a>.</p>
 
-  <p><button type="button" class="cc-manage" data-cc="show-preferencesModal">Gestisci preferenze cookie</button></p>
+<p><button type="button" class="cc-manage" data-cc="show-preferencesModal">Gestisci preferenze cookie</button></p>
 
-  <h2 id="s13">13. Modifiche all'informativa</h2>
+<h2 id="s13">13. Modifiche all'informativa</h2>
 
-  <div class="summary">
-    <strong>In breve:</strong> aggiorniamo questa pagina quando cambiano le pratiche o la normativa. Le modifiche sostanziali sono comunicate via banner sul sito e — se sei iscritto alla newsletter — via email.
-  </div>
+<div class="summary">
+<strong>In breve:</strong> aggiorniamo questa pagina quando cambiano le pratiche o la normativa. Le modifiche sostanziali sono comunicate via banner sul sito e — se sei iscritto alla newsletter — via email.
+</div>
 
-  <p>Il Titolare si riserva di aggiornare la presente informativa per riflettere modifiche normative, dei servizi offerti o dell'organizzazione interna. Le modifiche meramente formali (correzioni redazionali, riformulazioni che non incidono sul significato) sono pubblicate senza preavviso. Le modifiche sostanziali (nuove finalità, nuovi destinatari, nuove basi giuridiche, modifiche significative dei tempi di conservazione) sono segnalate per almeno 30 giorni tramite avviso ben visibile sulla home del sito e, se sei iscritto alla newsletter, tramite comunicazione via email.</p>
-  <p>La data riportata in apertura («Ultimo aggiornamento») e la sigla di versione consentono di identificare in modo univoco l'edizione vigente. Lo storico delle versioni è disponibile su richiesta scrivendo a <a href="mailto:privacy@santamonicagenova.it">privacy@santamonicagenova.it</a>.</p>
+<p>Il Titolare si riserva di aggiornare la presente informativa per riflettere modifiche normative, dei servizi offerti o dell'organizzazione interna. Le modifiche meramente formali (correzioni redazionali, riformulazioni che non incidono sul significato) sono pubblicate senza preavviso. Le modifiche sostanziali (nuove finalità, nuovi destinatari, nuove basi giuridiche, modifiche significative dei tempi di conservazione) sono segnalate per almeno 30 giorni tramite avviso ben visibile sulla home del sito e, se sei iscritto alla newsletter, tramite comunicazione via email.</p>
+<p>La data riportata in apertura («Ultimo aggiornamento») e la sigla di versione consentono di identificare in modo univoco l'edizione vigente. Lo storico delle versioni è disponibile su richiesta scrivendo a <a href="/cdn-cgi/l/email-protection#6717150e1106041e2714060913060a08090e0406000209081106490e13"><span class="__cf_email__" data-cfemail="1767657e6176746e5764767963767a78797e7476707279786176397e63">[email&#160;protected]</span></a>.</p>
 
-  <h3>Storico delle versioni</h3>
-  <dl class="changelog">
-    <dt>v 2026.05.27.02 — 27 maggio 2026</dt>
-    <dd>F0.25 — Allineamento informativa al go-live del flusso prenotazioni con carta di garanzia (Fase 1). Modifiche sostanziali: (1) §4 — aggiunta riga nella tabella delle basi giuridiche per il trattamento «Acquisire una garanzia sulla prenotazione tramite tokenizzazione carta di credito (<em>Stripe SetupIntent</em>, nessun addebito immediato)»; base giuridica art.&nbsp;6(1)(b) GDPR esecuzione del contratto + art.&nbsp;6(1)(f) legittimo interesse al recupero del danno da no-show. Specificato che il numero di carta non transita né è memorizzato dai sistemi del Titolare (raccolta sulla pagina Stripe certificata PCI&nbsp;DSS Level&nbsp;1). (2) §6 — aggiunta riga nella tabella di conservazione per il token Stripe della carta di garanzia: conservazione massima 30 giorni dopo la data della prenotazione, salvo addebito penale in caso di no-show. (3) §7 — estesa la descrizione del fornitore Stripe Payments Europe Limited per includere la tokenizzazione carta a garanzia delle prenotazioni; aggiunti due nuovi fornitori: <strong>Supabase, Inc.</strong> (database operativo prenotazioni e Edge Functions, server in Irlanda con sub-responsabile AWS EMEA SARL) e <strong>Resend, Inc.</strong> (invio mail transazionali di conferma presa in carico al cliente e notifica al ristorante). (4) §8 — aggiunti Resend e Supabase all'elenco dei fornitori statunitensi certificati al EU-U.S. Data Privacy Framework; precisato che il database operativo Supabase risiede su server Amazon Web Services in Irlanda (UE) e che il trasferimento verso la società madre USA riguarda solo le funzioni amministrative. Release coordinata con: <code>_archivio-export/SafeTable/supabase/functions/submit-reservation/index.ts</code> v4 (Edge Function backend prenotazioni), <code>translations.json</code> v 2026.05.27.06 (chiavi nuove form: <code>prenota_f_marketing_consent</code>, <code>prenota_thankyou_*</code>, <code>prenota_error_*</code>), <code>index.html</code> v 2026.05.27.06 (form prenotazioni cablato a Edge Function Supabase, telefono <code>required</code>, checkbox marketing opt-in, honeypot, schermata thankyou). Documento di design autoritativo: <code>progetto-sito/DESIGN_carta_garanzia_prenotazioni_v2026.05.27.01.md</code> v 2026.05.27.05.</dd>
-    <dt>v 2026.05.27.01 — 27 maggio 2026</dt>
-    <dd>F0.24 — Allineamento informativa all'attivazione effettiva di <strong>Google Analytics 4</strong> (Measurement ID <code>G-YP71EKXSXX</code>) e <strong>Meta Pixel</strong> (Pixel ID <code>927118130347955</code>) sul live <code>santamonicagenova.it</code> in data 27 maggio 2026. Modifiche sostanziali: (1) §3 — rimossa la dichiarazione obsoleta «non utilizziamo Google Analytics né Facebook Pixel» (non più veridica), riformulato il paragrafo per descrivere correttamente lo stato attuale con rinvio a §12 e alla Cookie Policy; (2) §4 — aggiunta riga «Misurazione del traffico e dell'efficacia delle campagne pubblicitarie» nella tabella delle basi giuridiche (consenso art.&nbsp;6(1)(a) GDPR + art.&nbsp;122 D.Lgs.&nbsp;196/2003); (3) §4 — precisata la portata della clausola sull'art.&nbsp;22 GDPR a fronte dell'introduzione di GA4/Pixel; (4) §6 — aggiunte due righe alla tabella di conservazione con il dettaglio delle durate dei cookie GA4 (<code>_ga</code>, <code>_ga_&lt;ID&gt;</code>, <code>_gid</code>, <code>_gat</code>) e Meta (<code>_fbp</code>, <code>_fbc</code>, <code>fr</code>); (5) §7 — estesa la riga «Google Ireland Limited / Google LLC» per includere GA4; aggiunta nuova riga «Meta Platforms Ireland Limited / Meta Platforms, Inc.» fra i destinatari; (6) §8 — aggiunto «Meta» all'elenco dei fornitori statunitensi certificati al EU-U.S. Data Privacy Framework; (7) §12 — riscritto integralmente il paragrafo «Cookie e tecnologie simili»: rimossa la dichiarazione obsoleta «Non utilizziamo cookie analitici di profilazione», sostituita con la descrizione corretta delle categorie «Statistica» (GA4) e «Marketing» (Meta Pixel) attivate previo consenso, dei cookie posati, delle durate e delle modalità di revoca. Release coordinata con <code>cookieconsent-config.js</code> v 2026.05.27.01 (compilate costanti <code>GA4_MEASUREMENT_ID</code> e <code>META_PIXEL_ID</code>) e <code>_headers</code> v 2026.05.27.02 (estensione CSP per googletagmanager.com, connect.facebook.net, *.google-analytics.com con wildcard per endpoint regionali europei, www.facebook.com). <a href="/cookies.html">cookies.html</a> resta a v 2026.05.23.01 (già allineata in F0.23 con tabelle cookie GA4/Meta).</dd>
-    <dt>v 2026.05.20.01 — 20 maggio 2026</dt>
-    <dd>F0.13 — Stripe Payment Links attivati. Rimosso il disclaimer di §12 «Nota — sistema pagamenti voucher (Stripe)»: il sistema di pagamento voucher tramite <strong>Stripe Payment Links</strong> è ora effettivamente operativo (chiusura simmetrica del F0.12 fatto su Maps). Riformulato il paragrafo successivo per descrivere lo stato corrente di entrambi i servizi terzi (Google Maps via iframemanager + Stripe via reindirizzamento checkout esterno). Chiusura completa del backlog P3.22c (loop 3 passate F0.9, Passata 3 autocritica + adversarial). Release coordinata con <a href="/regala.html">regala.html</a> v 2026.05.20.01 (refactor: rimozione form Formspree + 3 bottoni Stripe Payment Links + link a voucher-termini operativo), <a href="/voucher-termini.html">voucher-termini.html</a> v 2026.05.20.01 (NUOVO · F0.14 · 20 sezioni · loop 3 passate inline applicato), <a href="/cookies.html">cookies.html</a> v 2026.05.20.01 (rimozione simmetrica disclaimer §4). Nessuna modifica al testo sostanziale dell'informativa al di fuori della §12.</dd>
-    <dt>v 2026.05.19.03 — 19 maggio 2026</dt>
-    <dd>F0.12 — Google Maps attiva con consent gate (iframemanager). Riformulato il disclaimer di §12 «Cookie e tecnologie simili»: rimossa la menzione di Google Maps come servizio in fase di predisposizione (ora effettivamente operativo, gestito da <em>content blocker</em> iframemanager con consent gate). La nota relativa a Stripe è stata mantenuta e ristretta al solo sistema di pagamento voucher (rimozione completa prevista a F0.13 con l'attivazione effettiva dei Payment Links). Release coordinata con <code>cookieconsent-config.js</code> v 2026.05.19.05, <a href="/cookies.html">cookies.html</a> v 2026.05.19.03 (tabella dettagliata cookie Maps in §4, chiusura P3.9), <code>dove-siamo.html</code> v 2026.05.19.05 (placeholder iframemanager al posto di iframe OSM) e <code>index.html</code> v 2026.05.19.05 (sezione #info semplificata con segnaposto SVG cliccabile). Nessuna modifica al testo sostanziale dell'informativa al di fuori della §12.</dd>
-    <dt>v 2026.05.19.02 — 19 maggio 2026</dt>
-    <dd>F0.9 chiusura — verifica funzionale: aggiunto bottone «Gestisci preferenze cookie» attivo (<code>data-cc="show-preferencesModal"</code>) al termine della §12 «Cookie e tecnologie simili». Coerente con il bottone già presente in <a href="/cookies.html">cookies.html</a> §3 dalla v 2026.05.17.02. Disposizione necessaria a seguito dell'introduzione, in <code>cookieconsent-config.js</code> v 2026.05.19.02, di <code>autoShow: !isPolicyPage</code> che disabilita l'auto-mostra del banner su questa pagina (paradosso UX: «leggi la policy per acconsentire al banner che ti chiede di acconsentire alla policy»). Aggiunto blocco CSS <code>button.cc-manage</code>. Nessuna modifica sostanziale al testo dell'informativa.</dd>
-    <dt>v 2026.05.19.01 — 19 maggio 2026</dt>
-    <dd>Loop 3 passate F0.9 — Passata 3 (autocritica + adversarial): rimosso blocco duplicato di tag con path errati (<code>/assets/cookieconsent/v3/…</code>) che generava errori 404 ad ogni pageload (P3.21); aggiunto disclaimer in §12 per chiarire che Google Maps e Stripe sono in fase di predisposizione tecnica e non ancora operativi (P3.22c); corretta discrepanza pre-esistente sulla sigla versione visibile nell'header della pagina. Nessuna modifica sostanziale al testo dell'informativa.</dd>
-    <dt>v 2026.05.17.02 — 17 maggio 2026</dt>
-    <dd>Integrazione effettiva dei tag <code>&lt;link&gt;</code> e <code>&lt;script&gt;</code> per il caricamento del banner di consenso (vanilla-cookieconsent v3.1.0, bundle locale) nel rilascio operativo F0.9 del ROADMAP v.11. Nessuna modifica sostanziale al testo dell'informativa.</dd>
-    <dt>v 2026.05.17.01 — 17 maggio 2026</dt>
-    <dd>Predisposizione testuale per integrazione del banner di consenso cookie. Nessuna modifica sostanziale al testo dell'informativa.</dd>
-    <dt>v 2026.05.16.02 — 16 maggio 2026</dt>
-    <dd>Revisione interna iterativa pre-revisione legale: correzione termini di riscontro DSAR (1 mese + 2 di proroga); rimozione di art.&nbsp;12 come «base giuridica»; integrazione informativa al destinatario di voucher ex art.&nbsp;14 GDPR; precisazioni su audit log HMAC; allineamento sezione minori; aggiornamento riferimenti trasferimenti USA al quadro DPF; lessico «sub-responsabile» (art.&nbsp;28 GDPR).</dd>
-    <dt>v 2026.05.16.01 — 16 maggio 2026</dt>
-    <dd>Prima stesura DIY conforme a GDPR e Codice Privacy.</dd>
-  </dl>
+<h3>Storico delle versioni</h3>
+<dl class="changelog">
+<dt>v 2026.08.23.01 — 23 agosto 2026</dt>
+<dd>Fix mobile: tabelle §3/§4/§6/§7 con <code>overflow-x:auto</code> invece di sbordare a destra su smartphone (stesso fix di cookies.html, contenuto non comprimibile — URL, nomi fornitori — forzava la larghezza minima colonna oltre lo schermo). Nessuna modifica di contenuto, solo comportamento responsive sotto i 600px.</dd>
+<dt>v 2026.05.27.02 — 27 maggio 2026</dt>
+<dd>F0.25 — Allineamento informativa al go-live del flusso prenotazioni con carta di garanzia (Fase 1). Modifiche sostanziali: (1) §4 — aggiunta riga nella tabella delle basi giuridiche per il trattamento «Acquisire una garanzia sulla prenotazione tramite tokenizzazione carta di credito (<em>Stripe SetupIntent</em>, nessun addebito immediato)»; base giuridica art.&nbsp;6(1)(b) GDPR esecuzione del contratto + art.&nbsp;6(1)(f) legittimo interesse al recupero del danno da no-show. Specificato che il numero di carta non transita né è memorizzato dai sistemi del Titolare (raccolta sulla pagina Stripe certificata PCI&nbsp;DSS Level&nbsp;1). (2) §6 — aggiunta riga nella tabella di conservazione per il token Stripe della carta di garanzia: conservazione massima 30 giorni dopo la data della prenotazione, salvo addebito penale in caso di no-show. (3) §7 — estesa la descrizione del fornitore Stripe Payments Europe Limited per includere la tokenizzazione carta a garanzia delle prenotazioni; aggiunti due nuovi fornitori: <strong>Supabase, Inc.</strong> (database operativo prenotazioni e Edge Functions, server in Irlanda con sub-responsabile AWS EMEA SARL) e <strong>Resend, Inc.</strong> (invio mail transazionali di conferma presa in carico al cliente e notifica al ristorante). (4) §8 — aggiunti Resend e Supabase all'elenco dei fornitori statunitensi certificati al EU-U.S. Data Privacy Framework; precisato che il database operativo Supabase risiede su server Amazon Web Services in Irlanda (UE) e che il trasferimento verso la società madre USA riguarda solo le funzioni amministrative. Release coordinata con: <code>_archivio-export/SafeTable/supabase/functions/submit-reservation/index.ts</code> v4 (Edge Function backend prenotazioni), <code>translations.json</code> v 2026.05.27.06 (chiavi nuove form: <code>prenota_f_marketing_consent</code>, <code>prenota_thankyou_*</code>, <code>prenota_error_*</code>), <code>index.html</code> v 2026.05.27.06 (form prenotazioni cablato a Edge Function Supabase, telefono <code>required</code>, checkbox marketing opt-in, honeypot, schermata thankyou). Documento di design autoritativo: <code>progetto-sito/DESIGN_carta_garanzia_prenotazioni_v2026.05.27.01.md</code> v 2026.05.27.05.</dd>
+<dt>v 2026.05.27.01 — 27 maggio 2026</dt>
+<dd>F0.24 — Allineamento informativa all'attivazione effettiva di <strong>Google Analytics 4</strong> (Measurement ID <code>G-YP71EKXSXX</code>) e <strong>Meta Pixel</strong> (Pixel ID <code>927118130347955</code>) sul live <code>santamonicagenova.it</code> in data 27 maggio 2026. Modifiche sostanziali: (1) §3 — rimossa la dichiarazione obsoleta «non utilizziamo Google Analytics né Facebook Pixel» (non più veridica), riformulato il paragrafo per descrivere correttamente lo stato attuale con rinvio a §12 e alla Cookie Policy; (2) §4 — aggiunta riga «Misurazione del traffico e dell'efficacia delle campagne pubblicitarie» nella tabella delle basi giuridiche (consenso art.&nbsp;6(1)(a) GDPR + art.&nbsp;122 D.Lgs.&nbsp;196/2003); (3) §4 — precisata la portata della clausola sull'art.&nbsp;22 GDPR a fronte dell'introduzione di GA4/Pixel; (4) §6 — aggiunte due righe alla tabella di conservazione con il dettaglio delle durate dei cookie GA4 (<code>_ga</code>, <code>_ga_&lt;ID&gt;</code>, <code>_gid</code>, <code>_gat</code>) e Meta (<code>_fbp</code>, <code>_fbc</code>, <code>fr</code>); (5) §7 — estesa la riga «Google Ireland Limited / Google LLC» per includere GA4; aggiunta nuova riga «Meta Platforms Ireland Limited / Meta Platforms, Inc.» fra i destinatari; (6) §8 — aggiunto «Meta» all'elenco dei fornitori statunitensi certificati al EU-U.S. Data Privacy Framework; (7) §12 — riscritto integralmente il paragrafo «Cookie e tecnologie simili»: rimossa la dichiarazione obsoleta «Non utilizziamo cookie analitici di profilazione», sostituita con la descrizione corretta delle categorie «Statistica» (GA4) e «Marketing» (Meta Pixel) attivate previo consenso, dei cookie posati, delle durate e delle modalità di revoca. Release coordinata con <code>cookieconsent-config.js</code> v 2026.05.27.01 (compilate costanti <code>GA4_MEASUREMENT_ID</code> e <code>META_PIXEL_ID</code>) e <code>_headers</code> v 2026.05.27.02 (estensione CSP per googletagmanager.com, connect.facebook.net, *.google-analytics.com con wildcard per endpoint regionali europei, www.facebook.com). <a href="/cookies.html">cookies.html</a> resta a v 2026.05.23.01 (già allineata in F0.23 con tabelle cookie GA4/Meta).</dd>
+<dt>v 2026.05.20.01 — 20 maggio 2026</dt>
+<dd>F0.13 — Stripe Payment Links attivati. Rimosso il disclaimer di §12 «Nota — sistema pagamenti voucher (Stripe)»: il sistema di pagamento voucher tramite <strong>Stripe Payment Links</strong> è ora effettivamente operativo (chiusura simmetrica del F0.12 fatto su Maps). Riformulato il paragrafo successivo per descrivere lo stato corrente di entrambi i servizi terzi (Google Maps via iframemanager + Stripe via reindirizzamento checkout esterno). Chiusura completa del backlog P3.22c (loop 3 passate F0.9, Passata 3 autocritica + adversarial). Release coordinata con <a href="/regala.html">regala.html</a> v 2026.05.20.01 (refactor: rimozione form Formspree + 3 bottoni Stripe Payment Links + link a voucher-termini operativo), <a href="/voucher-termini.html">voucher-termini.html</a> v 2026.05.20.01 (NUOVO · F0.14 · 20 sezioni · loop 3 passate inline applicato), <a href="/cookies.html">cookies.html</a> v 2026.05.20.01 (rimozione simmetrica disclaimer §4). Nessuna modifica al testo sostanziale dell'informativa al di fuori della §12.</dd>
+<dt>v 2026.05.19.03 — 19 maggio 2026</dt>
+<dd>F0.12 — Google Maps attiva con consent gate (iframemanager). Riformulato il disclaimer di §12 «Cookie e tecnologie simili»: rimossa la menzione di Google Maps come servizio in fase di predisposizione (ora effettivamente operativo, gestito da <em>content blocker</em> iframemanager con consent gate). La nota relativa a Stripe è stata mantenuta e ristretta al solo sistema di pagamento voucher (rimozione completa prevista a F0.13 con l'attivazione effettiva dei Payment Links). Release coordinata con <code>cookieconsent-config.js</code> v 2026.05.19.05, <a href="/cookies.html">cookies.html</a> v 2026.05.19.03 (tabella dettagliata cookie Maps in §4, chiusura P3.9), <code>dove-siamo.html</code> v 2026.05.19.05 (placeholder iframemanager al posto di iframe OSM) e <code>index.html</code> v 2026.05.19.05 (sezione #info semplificata con segnaposto SVG cliccabile). Nessuna modifica al testo sostanziale dell'informativa al di fuori della §12.</dd>
+<dt>v 2026.05.19.02 — 19 maggio 2026</dt>
+<dd>F0.9 chiusura — verifica funzionale: aggiunto bottone «Gestisci preferenze cookie» attivo (<code>data-cc="show-preferencesModal"</code>) al termine della §12 «Cookie e tecnologie simili». Coerente con il bottone già presente in <a href="/cookies.html">cookies.html</a> §3 dalla v 2026.05.17.02. Disposizione necessaria a seguito dell'introduzione, in <code>cookieconsent-config.js</code> v 2026.05.19.02, di <code>autoShow: !isPolicyPage</code> che disabilita l'auto-mostra del banner su questa pagina (paradosso UX: «leggi la policy per acconsentire al banner che ti chiede di acconsentire alla policy»). Aggiunto blocco CSS <code>button.cc-manage</code>. Nessuna modifica sostanziale al testo dell'informativa.</dd>
+<dt>v 2026.05.19.01 — 19 maggio 2026</dt>
+<dd>Loop 3 passate F0.9 — Passata 3 (autocritica + adversarial): rimosso blocco duplicato di tag con path errati (<code>/assets/cookieconsent/v3/…</code>) che generava errori 404 ad ogni pageload (P3.21); aggiunto disclaimer in §12 per chiarire che Google Maps e Stripe sono in fase di predisposizione tecnica e non ancora operativi (P3.22c); corretta discrepanza pre-esistente sulla sigla versione visibile nell'header della pagina. Nessuna modifica sostanziale al testo dell'informativa.</dd>
+<dt>v 2026.05.17.02 — 17 maggio 2026</dt>
+<dd>Integrazione effettiva dei tag <code>&lt;link&gt;</code> e <code>&lt;script&gt;</code> per il caricamento del banner di consenso (vanilla-cookieconsent v3.1.0, bundle locale) nel rilascio operativo F0.9 del ROADMAP v.11. Nessuna modifica sostanziale al testo dell'informativa.</dd>
+<dt>v 2026.05.17.01 — 17 maggio 2026</dt>
+<dd>Predisposizione testuale per integrazione del banner di consenso cookie. Nessuna modifica sostanziale al testo dell'informativa.</dd>
+<dt>v 2026.05.16.02 — 16 maggio 2026</dt>
+<dd>Revisione interna iterativa pre-revisione legale: correzione termini di riscontro DSAR (1 mese + 2 di proroga); rimozione di art.&nbsp;12 come «base giuridica»; integrazione informativa al destinatario di voucher ex art.&nbsp;14 GDPR; precisazioni su audit log HMAC; allineamento sezione minori; aggiornamento riferimenti trasferimenti USA al quadro DPF; lessico «sub-responsabile» (art.&nbsp;28 GDPR).</dd>
+<dt>v 2026.05.16.01 — 16 maggio 2026</dt>
+<dd>Prima stesura DIY conforme a GDPR e Codice Privacy.</dd>
+</dl>
 
-  <footer class="legal-foot">
-    Informativa Privacy · v&nbsp;2026.05.27.02 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
-  </footer>
+<footer class="legal-foot">
+Informativa Privacy · v&nbsp;2026.08.23.01 · Il Giuliano di Andrea Giachino e C. S.a.s. · P.IVA 02395420991
+</footer>
 
 </main>
 
 <!-- F0.9: cookie consent — bundle locale + config -->
-<script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
 <script defer src="/cookieconsent-config.js"></script>
 
 </body>
 </html>
-<!-- Fine privacy.html · v 2026.05.27.02 -->
+<!-- Fine privacy.html · v 2026.08.23.01 -->

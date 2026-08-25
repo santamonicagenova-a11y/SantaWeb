@@ -1,4 +1,18 @@
 <!DOCTYPE html>
+<!-- v 2026.08.22.25 — nella tabella Catalogo aggiunta la colonna "Annata" (mostra `articoli.anno`)
+     al posto della vecchia colonna Ubicazione (già rimossa dal codice in v.22.23; lo screenshot
+     con Ubicazione ancora visibile era una versione non ancora pubblicata sul sito). -->
+<!-- v 2026.08.22.24 — ordinamento alfabetico dei vini dentro ogni sotto-capitolo corretto: prima
+     veniva ereditato l'ORDER BY codice del database, che tiene conto del carattere `"` di apertura
+     nei nomi tra virgolette (es. `"100" Ancestrale`, `"Axillo"`) — questi finivano ammassati in
+     un blocco a parte invece di essere intercalati per lettera vera. Aggiunto un riordino lato
+     client (chiaveAlfabetica) che ignora le virgolette (dritte e tipografiche) nel confronto. -->
+<!-- v 2026.08.22.23 — campo Ubicazione eliminato del tutto (mai usato in carta vini): tabella
+     `ubicazioni` e colonna `articoli.ubicazione_id` cancellate su Supabase (nessun'altra FK vi
+     puntava). `cantina-catalogo`→v8 e `cantina-anagrafiche`→v8 aggiornate di conseguenza. Tolti
+     dal frontend: colonna tabella Catalogo, campo nel form articolo, voce "Ubicazioni" nel
+     pannello Anagrafiche, tutti i riferimenti JS (LOOKUP, fillSelect, riga tabella, carica/salva
+     form). -->
 <!-- v 2026.08.22.22 — nell'elenco annate dei vini con più vendemmie, la parola "Annata" torna alla
      dimensione standard del testo (nuova classe `.annata-label`, 12pt come `.vino`) invece di
      ereditare quella più piccola di `.vino-annate-lista` (0,85rem≈10.2pt); l'anno accanto resta a
@@ -285,7 +299,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.08.22.22</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.08.22.25</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -329,7 +343,7 @@
       </div>
       <div id="cat-status" class="status"></div>
       <table>
-        <thead><tr><th>Codice</th><th>Tipologia</th><th>Produttore</th><th>Zona / Regione</th><th>Sala</th><th>Calice</th><th>Ubicazione</th><th></th></tr></thead>
+        <thead><tr><th>Codice</th><th>Tipologia</th><th>Produttore</th><th>Zona / Regione</th><th>Sala</th><th>Calice</th><th>Annata</th><th></th></tr></thead>
         <tbody id="cat-tbody"></tbody>
       </table>
 
@@ -350,7 +364,6 @@
         </div>
         <div class="grid3">
           <div class="field"><label>Agente</label><select id="f-agente"></select></div>
-          <div class="field"><label>Ubicazione</label><select id="f-ubicazione"></select></div>
           <div class="field"><label>Anno</label><input type="number" id="f-anno" /></div>
         </div>
         <div class="grid3">
@@ -567,7 +580,7 @@ document.querySelectorAll('.tabs > .tab').forEach(function (t) {
 // ================================================================
 // CATALOGO
 // ================================================================
-var LOOKUP = { tipologie: [], produttori: [], regioni: [], agenti: [], ubicazioni: [] };
+var LOOKUP = { tipologie: [], produttori: [], regioni: [], agenti: [] };
 
 function loadLookupSelects() {
   return fetch(URL_ANAGRAFICHE).then(function (r) { return r.json(); }).then(function (data) {
@@ -576,7 +589,6 @@ function loadLookupSelects() {
     LOOKUP.produttori = data.produttori;
     LOOKUP.regioni = data.regioni;
     LOOKUP.agenti = data.agenti;
-    LOOKUP.ubicazioni = data.ubicazioni;
     LOOKUP.fornitori = data.fornitori;
     LOOKUP.denominazioni = data.denominazioni;
     LOOKUP.zone = data.zone;
@@ -586,7 +598,6 @@ function loadLookupSelects() {
     fillSelect(document.getElementById('f-produttore'), data.produttori, function (p) { return p.codice || (p.cognome + ' ' + (p.nome || '')); });
     fillSelect(document.getElementById('f-regione'), data.regioni, 'nome');
     fillSelect(document.getElementById('f-agente'), data.agenti, function (a) { return (a.cognome || '') + ' ' + (a.nome || ''); });
-    fillSelect(document.getElementById('f-ubicazione'), data.ubicazioni, 'nome');
     fillSelect(document.getElementById('f-denominazione'), data.denominazioni, 'nome');
     fillSelect(document.getElementById('f-zona'), data.zone, 'nome');
     fillSelect(document.getElementById('carico-fornitore'), data.fornitori, 'ragione_sociale');
@@ -705,7 +716,7 @@ function renderCatalogo(rows) {
       '<td>' + [a.zona ? a.zona.nome : '', a.regione ? a.regione.nome : ''].filter(Boolean).join(' — ') + '</td>' +
       '<td>' + eur(a.prezzo_sala) + '</td>' +
       '<td>' + eur(a.prezzo_calice) + '</td>' +
-      '<td>' + (a.ubicazione ? a.ubicazione.nome : '') + '</td>' +
+      '<td>' + fmt(a.anno) + '</td>' +
       '<td></td>';
     tr.addEventListener('click', function () { openCatForm(a); });
     tbody.appendChild(tr);
@@ -730,7 +741,6 @@ function openCatForm(a) {
   var _prodRZ = LOOKUP.produttori.filter(function (x) { return String(x.id) === String(a.produttore_id || ''); })[0];
   document.getElementById('f-regione').value = (_prodRZ && _prodRZ.regione_id) ? _prodRZ.regione_id : '';
   document.getElementById('f-agente').value = a.agente_id || '';
-  document.getElementById('f-ubicazione').value = a.ubicazione_id || '';
   document.getElementById('f-anno').value = a.anno || '';
   document.getElementById('f-costo-diretto').value = a.costo_diretto || '';
   document.getElementById('f-costo-distributore').value = a.costo_distributore || '';
@@ -763,7 +773,6 @@ document.getElementById('cat-save').addEventListener('click', function () {
     produttore_id: numOrNull(document.getElementById('f-produttore').value),
     regione_id: numOrNull(document.getElementById('f-regione').value),
     agente_id: numOrNull(document.getElementById('f-agente').value),
-    ubicazione_id: numOrNull(document.getElementById('f-ubicazione').value),
     anno: numOrNull(document.getElementById('f-anno').value),
     costo_diretto: numOrNull(document.getElementById('f-costo-diretto').value),
     costo_distributore: numOrNull(document.getElementById('f-costo-distributore').value),
@@ -820,7 +829,6 @@ var AN_TABLES = {
   tipologie: { label: 'Tipologie', fields: [{ k: 'nome', l: 'Nome', req: true }] },
   unita_misura: { label: 'Unità di misura', fields: [{ k: 'sigla', l: 'Sigla' }, { k: 'descrizione', l: 'Descrizione' }] },
   regioni: { label: 'Regioni', fields: [{ k: 'nome', l: 'Nome', req: true }] },
-  ubicazioni: { label: 'Ubicazioni', fields: [{ k: 'nome', l: 'Nome', req: true }] },
   categorie_fornitori: { label: 'Categorie fornitori', fields: [{ k: 'nome', l: 'Nome', req: true }] },
   denominazioni: { label: 'Denominazioni', fields: [{ k: 'nome', l: 'Nome', req: true }] },
   zone: { label: 'Zone', fields: [{ k: 'nome', l: 'Nome', req: true }] },
@@ -1401,6 +1409,23 @@ function generaHtmlCartaVini(articoli) {
     var sub = (a.zona ? a.zona.nome : null) || (eterogenea ? 'Altre regioni' : (a.regione ? a.regione.nome : null)) || 'Altre regioni';
     if (!c.sotto[sub]) { c.sotto[sub] = []; c.ordineSotto.push(sub); }
     c.sotto[sub].push(a);
+  });
+
+  // Ordine alfabetico dei vini dentro ogni sotto-capitolo: le virgolette (dritte o tipografiche)
+  // che aprono il nome di alcuni vini (es. `"100" Ancestrale`, `"Axillo"`) non devono contare
+  // nell'ordinamento — altrimenti finirebbero tutti raggruppati all'inizio/fine per via del
+  // carattere `"` invece di essere intercalati per la lettera vera. L'ordine dato dalla query
+  // (ORDER BY codice lato DB) risente di questo problema, quindi si riordina qui lato client.
+  function chiaveAlfabetica(a) {
+    return (a.codice || a.descrizione || '').replace(/["""]/g, '').trim().toLowerCase();
+  }
+  Object.keys(capitoli).forEach(function (cap) {
+    Object.keys(capitoli[cap].sotto).forEach(function (sub) {
+      capitoli[cap].sotto[sub].sort(function (x, y) {
+        var kx = chiaveAlfabetica(x), ky = chiaveAlfabetica(y);
+        return kx < ky ? -1 : kx > ky ? 1 : 0;
+      });
+    });
   });
 
   // Ordine dei sotto-capitoli come nella carta stampata: le zone di Liguria sempre per prime

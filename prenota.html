@@ -2,7 +2,10 @@
 <!--
   prenota.html — Wizard prenotazioni con carta a garanzia obbligatoria
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.07.25.03
+  Versione: v 2026.08.26.01
+  v 2026.08.26.01 — Aggiunto campo "CAP (facoltativo)" al passo 4 (Contatti), richiesta Andrea
+  per capire da dove arrivano gli ospiti. Facoltativo, nessuna validazione client-side oltre
+  al maxlength; il payload invia `cap` a create-reservation-checkout, che valida/salva.
   (Corretta il 23/7 la data di questo file: la prima stesura e il giro successivo erano stati
   datati per errore 07.22 — presa la data dal nome del documento di design, scritto in una
   sessione precedente il 22/7, senza controllare la data odierna. Tutto il lavoro sul wizard è
@@ -337,6 +340,8 @@
             </select>
           </div>
           <div class="field"><label for="p-note">Richieste particolari (opzionale)</label><textarea id="p-note"></textarea></div>
+          <div class="field"><label for="p-cap">CAP (facoltativo)</label><input type="text" id="p-cap" inputmode="numeric" maxlength="5" autocomplete="postal-code"></div>
+          <p class="hint" style="margin-top:-0.4rem;">Ci aiuta a capire da dove arrivano i nostri ospiti.</p>
           <div class="checkbox-row">
             <input type="checkbox" id="p-marketing">
             <label for="p-marketing">Acconsento a ricevere comunicazioni sul ristorante (eventi, serate a tema, novità). Facoltativo, revocabile in qualsiasi momento.</label>
@@ -677,6 +682,7 @@
       intolleranze: document.getElementById('p-intolleranze').value.trim(),
       occasione: document.getElementById('p-occasione').value,
       note: document.getElementById('p-note').value.trim(),
+      cap: document.getElementById('p-cap').value.trim(),
       marketing_consent: document.getElementById('p-marketing').checked,
       _hp: document.getElementById('p-hp').value,
     };

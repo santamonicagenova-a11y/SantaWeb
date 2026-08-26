@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.08.26.01 — RECUPERO DATI: la tabella allergeni della carta (Antipasti/Amidi e Carboidrati/Non Solo Mare) era stata sostituita per errore dai soli allergeni dei dolci ("Golosità") nel commit GitHub 98c285c del 8/8/2026 (root cause rintracciata confrontando lo storico commit del file: ultimo buono 8903505, stesso giorno, poche ore prima). Ripristinati i 13 piatti/allergeni dell'ultima versione buona (sezione "Antipasti" rinominata "Sfiziosi" per allinearsi al nome attuale della sezione in menu.html — solo il titolo, nessun dato allergeni toccato). ATTENZIONE Andrea: 4 piatti sono cambiati sul menù dal 8/8 a oggi e i loro allergeni NON sono stati riverificati da Claude (dato non disponibile) — vedi nota a parte in chat. -->
 <!-- v 2026.08.23.01 — Fix mobile: .pg sganciato da larghezza A4 fissa, righe piatto/allergeni in colonna sotto 640px (overflow orizzontale su smartphone). Precedente v 2026.06.14.01 — Intestazione pagina stampabile: rimossi sottotitolo indirizzo "Santamonica — Lungomare Lombardo 27, Genova" + separatore sotto l'header (border-bottom .pg-header) e il blocco .nota-legale "Informativa ai sensi del Reg. UE 1169/2011…"; quel testo dell'informativa è ora il titolo della legenda in fondo (sostituisce "Allergeni regolamentati (Reg. UE 1169/2011):"). Solo testo IT spostato/rimosso, nessun contenuto legale nuovo. -->
 <!-- v 2026.05.22.01 — F0.21-e: allineamento vocabolario allergeni: "latte" -> "latticini" (coerenza con menu-dolci e output EN/FR). -->
 <html lang="it">
@@ -209,52 +210,133 @@ html,body{overflow-x:hidden!important;}
 ALLERGENI — modifica solo qui per aggiornare tutto
 ═══════════════════════════════════════════════════════ */
 const ALLERGENI_DATA = {
-"sezioni": [
-{
-"titolo": "Golosità",
-"piatti": [
-{
-"nome": "Gelato al limone nero, levistico, lime, cracker di latte",
-"allergeni": [
-"glutine",
-"latte"
-]
-},
-{
-"nome": "Ananas, parfait al carbone, caramello al caffè",
-"allergeni": [
-"glutine",
-"uova",
-"latte"
-]
-},
-{
-"nome": "Gelato al porcino, fragole, terra al cioccolato",
-"allergeni": [
-"uova",
-"latte"
-]
-},
-{
-"nome": "Sacripantina",
-"allergeni": [
-"glutine",
-"uova",
-"latte",
-"frutta a guscio",
-"solfiti"
-]
-},
-{
-"nome": "Erborinato ligure e Picolit Zorzettig",
-"allergeni": [
-"latte",
-"solfiti"
-]
-}
-]
-}
-]
+  "sezioni": [
+    {
+      "titolo": "Sfiziosi",
+      "piatti": [
+        {
+          "nome": "Calamaro nostrano, piselli freschi, bagna cauda, kefir",
+          "allergeni": [
+            "pesce",
+            "latte",
+            "solfiti",
+            "molluschi"
+          ]
+        },
+        {
+          "nome": "Gamberi viola crudi alla puttanesca",
+          "allergeni": [
+            "crostacei"
+          ]
+        },
+        {
+          "nome": "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce",
+          "allergeni": [
+            "pesce",
+            "frutta a guscio",
+            "solfiti"
+          ]
+        },
+        {
+          "nome": "Dentice reale nostrano crudo, ricci di mare, limone, mandorle",
+          "allergeni": [
+            "glutine",
+            "pesce",
+            "frutta a guscio"
+          ]
+        },
+        {
+          "nome": "“Non formaggi”",
+          "allergeni": [
+            "frutta a guscio",
+            "solfiti"
+          ]
+        }
+      ]
+    },
+    {
+      "titolo": "Amidi e Carboidrati",
+      "piatti": [
+        {
+          "nome": "Spaghettoni quadrati Mancini, anemoni di mare, nduja, maggiorana",
+          "allergeni": [
+            "glutine",
+            "latte"
+          ]
+        },
+        {
+          "nome": "Cappellacci di cinghiale, cardoncelli, ortica, mirtilli",
+          "allergeni": [
+            "glutine",
+            "uova",
+            "pesce",
+            "sedano",
+            "solfiti"
+          ]
+        },
+        {
+          "nome": "Tubetti Mancini, baccalà, spinaci, kosho di agrumi",
+          "allergeni": [
+            "glutine",
+            "pesce",
+            "soia",
+            "latte"
+          ]
+        },
+        {
+          "nome": "Riso Riserva San Massimo, ostriche, nespole, albicocche",
+          "allergeni": [
+            "glutine",
+            "pesce",
+            "soia",
+            "latte",
+            "molluschi"
+          ]
+        }
+      ]
+    },
+    {
+      "titolo": "Non Solo Mare",
+      "piatti": [
+        {
+          "nome": "Ricciola nostrana, crema di peperonata, purea di melanzane BBQ, tahina",
+          "allergeni": [
+            "pesce",
+            "sesamo",
+            "solfiti"
+          ]
+        },
+        {
+          "nome": "Porro arrosto, noci macadamia, fondo di verdure e pesche",
+          "allergeni": [
+            "frutta a guscio",
+            "solfiti"
+          ]
+        },
+        {
+          "nome": "Merluzzo selvaggio, scarola, foglie di fico",
+          "allergeni": [
+            "uova",
+            "pesce",
+            "latte",
+            "frutta a guscio",
+            "solfiti"
+          ]
+        },
+        {
+          "nome": "\"Tournedos alla Rossini\"?",
+          "allergeni": [
+            "crostacei",
+            "pesce",
+            "latte",
+            "sedano",
+            "solfiti",
+            "molluschi"
+          ]
+        }
+      ]
+    }
+  ]
 };
 /* ═════════════════════════════════════════════════════════ */
 
@@ -323,7 +405,7 @@ root.appendChild(pg);
 
 render();
 
-/* versione v 2026.08.23.01 */
+/* versione v 2026.08.26.01 */
 </script>
 </body>
 </html>

@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- v 2026.08.26.01 — Nav desktop: voce "Evento" (puntava già a /prenota.html, link duplicato
+     rispetto al CTA "Prenota" separato) rietichettata "Prenota" per corrispondere alla
+     destinazione reale. Nessun cambio di link, solo testo + data-i18n riallineato alla chiave
+     nav_prenota già esistente (stesso testo del CTA, nessuna nuova chiave in translations.json).
+     Gate: micro-fix testuale, nessun contenuto normativo/fattuale toccato → P1+P2, P3 non innescata
+     (stesso precedente dei micro-fix di label). -->
 <!-- v 2026.08.14.01 — Rimosso ogni riferimento allo Chef Nicolò Lazzaroni (uscito dal ristorante,
      su istruzione esplicita Andrea) da JSON-LD Restaurant (description + employee) e dal testo
      visibile #cucina. In parallelo, schema Person di Monica Capurro rinforzato per la GEO/entity
@@ -482,7 +488,7 @@
     <li><a href="#cucina" data-i18n="nav_cucina">Cucina</a></li>
     <li><a href="#cantina" data-i18n="nav_cantina">Cantina</a></li>
     <li><a href="#galleria" data-i18n="nav_galleria">Galleria</a></li>
-    <li><a href="/prenota.html" data-i18n="nav_evento">Evento</a></li>
+    <li><a href="/prenota.html" data-i18n="nav_prenota">Prenota</a></li>
     <li><a href="#info" data-i18n="nav_contatti">Contatti</a></li>
   </ul>
   <div class="nav-right">
@@ -618,7 +624,7 @@
         <div class="info-block-content">
           Lungomare Lombardo 27<br>16145 Genova &mdash; Italy<br><br>
           <a href="tel:+390105533155">+39 010 553 31 55</a><br>
-          <a href="mailto:info@santamonicagenova.it">info@santamonicagenova.it</a><br><br>
+          <a href="/cdn-cgi/l/email-protection#d5bcbbb3ba95a6b4bba1b4b8babbbcb6b4b2b0bbbaa3b4fbbca1"><span class="__cf_email__" data-cfemail="b9d0d7dfd6f9cad8d7cdd8d4d6d7d0dad8dedcd7d6cfd897d0cd">[email&#160;protected]</span></a><br><br>
           <span data-i18n="info_note_text">Si prega di segnalare eventuali allergie o intolleranze al momento della prenotazione.</span><br><br>
           <span data-i18n="info_animali">&#x1F43E; Accettiamo animali di tutte le taglie.</span>
         </div>
@@ -717,7 +723,7 @@
           Iscrizione avvenuta correttamente. Controlla la tua email per confermare.
         </div>
         <div id="brevo-error" style="display:none;margin-top:0.75rem;padding:0.75rem 1rem;background:#ffeded;color:#661d1d;font-size:0.82rem;font-family:'Jost',sans-serif;">
-          Errore. Riprova o scrivici a info@santamonicagenova.it
+          Errore. Riprova o scrivici a <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ed84838b82ad9e8c83998c808283848e8c8a8883829b8cc38499">[email&#160;protected]</a>
         </div>
       </div>
     </div>
@@ -731,7 +737,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.08.14.01</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.08.26.01</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>
@@ -747,7 +753,7 @@
   <button id="lightbox-next">&#x203a;</button>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   var T = {};
   var currentLang = 'it';
 

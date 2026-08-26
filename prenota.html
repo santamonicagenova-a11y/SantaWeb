@@ -6,6 +6,8 @@
   v 2026.08.26.01 — Aggiunto campo "CAP (facoltativo)" al passo 4 (Contatti), richiesta Andrea
   per capire da dove arrivano gli ospiti. Facoltativo, nessuna validazione client-side oltre
   al maxlength; il payload invia `cap` a create-reservation-checkout, che valida/salva.
+  Layout richiesto da Andrea: 2 righe affiancate — Nome/Telefono, poi Email/CAP (prima era
+  Nome da solo + riga Telefono/Email).
   (Corretta il 23/7 la data di questo file: la prima stesura e il giro successivo erano stati
   datati per errore 07.22 — presa la data dal nome del documento di design, scritto in una
   sessione precedente il 22/7, senza controllare la data odierna. Tutto il lavoro sul wizard è
@@ -319,12 +321,15 @@
         <h2 class="step-title">I tuoi dati</h2>
         <form id="contatti-form" novalidate>
           <input type="text" name="_hp" id="p-hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" aria-hidden="true">
-          <div class="field"><label for="p-nome">Nome *</label><input type="text" id="p-nome" required autocomplete="name"></div>
           <div class="field-row">
+            <div class="field"><label for="p-nome">Nome *</label><input type="text" id="p-nome" required autocomplete="name"></div>
             <div class="field"><label for="p-tel">Telefono *</label><input type="tel" id="p-tel" required autocomplete="tel"></div>
-            <div class="field"><label for="p-email">Email *</label><input type="email" id="p-email" required autocomplete="email"></div>
           </div>
-          <p class="hint">Email e telefono sono entrambi obbligatori per ricontattarti rapidamente.</p>
+          <div class="field-row">
+            <div class="field"><label for="p-email">Email *</label><input type="email" id="p-email" required autocomplete="email"></div>
+            <div class="field"><label for="p-cap">CAP (facoltativo)</label><input type="text" id="p-cap" inputmode="numeric" maxlength="5" autocomplete="postal-code"></div>
+          </div>
+          <p class="hint">Email e telefono sono entrambi obbligatori per ricontattarti rapidamente. Il CAP ci aiuta a capire da dove arrivano i nostri ospiti.</p>
           <div class="field"><label for="p-intolleranze">Intolleranze o allergie *</label><input type="text" id="p-intolleranze" required placeholder="Scrivi 'nessuna' se non hai allergie"></div>
           <div class="field">
             <label for="p-occasione">Occasione (opzionale)</label>
@@ -340,8 +345,6 @@
             </select>
           </div>
           <div class="field"><label for="p-note">Richieste particolari (opzionale)</label><textarea id="p-note"></textarea></div>
-          <div class="field"><label for="p-cap">CAP (facoltativo)</label><input type="text" id="p-cap" inputmode="numeric" maxlength="5" autocomplete="postal-code"></div>
-          <p class="hint" style="margin-top:-0.4rem;">Ci aiuta a capire da dove arrivano i nostri ospiti.</p>
           <div class="checkbox-row">
             <input type="checkbox" id="p-marketing">
             <label for="p-marketing">Acconsento a ricevere comunicazioni sul ristorante (eventi, serate a tema, novità). Facoltativo, revocabile in qualsiasi momento.</label>

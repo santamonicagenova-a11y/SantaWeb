@@ -1,4 +1,14 @@
 <!DOCTYPE html>
+<!-- v 2026.08.27.01 — Correzione GEO Monitor (CORREZIONE_riconoscimenti-FAQ_v2026.08.27.01.md):
+     aggiunte 2 FAQ in coda (posizioni 7-8, ordine delle 6 originali invariato) — "Siete presenti
+     in qualche guida gastronomica?" e "Avete un crudo di pesce?" — con JSON-LD FAQPage allineato
+     1:1 al visibile. Testo "guide gastronomiche" sostituito su richiesta esplicita di Andrea con
+     la sua formulazione esatta ("Sì, siamo presenti nella Guida Michelin, nel Gambero Rosso e nel
+     Golosario. Ma la guida più importante restano sempre gli ospiti che tornano.") — Gambero Rosso
+     e Golosario confermati riconoscimenti reali, non erano l'hallucination ipotizzata nei report
+     GEO Monitor. Campo "award" del JSON-LD Restaurant (sotto, v.04 locale) allineato di conseguenza.
+     Gate: P1+P2+P3 fatti (P3 con debito dichiarato: agente Claude in sessione separata, non vendor
+     diverso — nessun pool multi-vendor disponibile in questo progetto). -->
 <!-- v 2026.08.26.03 — 2 richieste FAQ: (1) il link "tabella allergeni completa" aggiunto in
      v.02 ora apre /menu-allergeni.html in una nuova scheda (target="_blank" rel="noopener"),
      invece di far uscire il visitatore dalla home; (2) risposta "C'è un menù degustazione?"
@@ -150,7 +160,7 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
 <!-- Schema.org JSON-LD · v 2026.05.31.01 (sessione 15 SEO): fix @type da "ItalianRestaurant" (non riconosciuto da schema.org → JSON-LD ignorato da Google) a "Restaurant" (tipo formale). La specificità "ristorante italiano" è già preservata nel campo servesCuisine sottostante. Era F0.11 v 2026.05.19.04 (invariato in v.05 F0.12).
-     v 2026.08.26.04 — campo "award" allineato alla FAQ "guide gastronomiche" (v.04 sotto): aggiunti Gambero Rosso e Golosario, confermati riconoscimenti reali da Andrea (26/8), non erano stati dichiarati prima. -->
+     v 2026.08.27.01 — campo "award" allineato alla FAQ "guide gastronomiche" (v.01 sotto): aggiunti Gambero Rosso e Golosario, confermati riconoscimenti reali da Andrea (27/8), non erano stati dichiarati prima. -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -219,7 +229,7 @@
   "publisher": { "@id": "https://santamonicagenova.it/#restaurant" }
 }
 </script>
-<!-- FAQPage JSON-LD · v 2026.08.26.04 — +2 Q&A IN CODA (8 totali, posizioni 7-8): "guide gastronomiche" e "Crudo". v.04: testo voce "guide gastronomiche" sostituito VERBATIM da Andrea (26/8) — Gambero Rosso e Golosario confermati riconoscimenti reali (non erano hallucination GEO Monitor come ipotizzato in precedenza, erano dati veri mai dichiarati sul sito); Touring Club NON incluso, non menzionato da Andrea. Testo su richiesta esplicita "lascia il testo come l'ho scritto" — nessuna riscrittura P2 applicata a questa voce. Voce "Crudo" invariata (testo post P3 del turno precedente). Le 6 Q&A originali (sotto, ordine invariato) restano quelle già gated (P1+P2+P3 + sign-off Andrea 11/6, fonte GBP_OPERATIVO §3); repurpose dalla funzione GBP "Domande e risposte" dismessa da Google (nov-dic 2025) a FAQ sul sito che alimenta SEO classica + AI di Google ("Ask Maps"/Gemini) + GEO. Il testo è allineato 1:1 con la sezione #faq visibile. IT-only (EN/FR = debito separato, coerente con multilingua). -->
+<!-- FAQPage JSON-LD · v 2026.08.27.01 — +2 Q&A IN CODA (8 totali, posizioni 7-8): "guide gastronomiche" e "Crudo". Testo voce "guide gastronomiche" sostituito VERBATIM da Andrea (27/8) — Gambero Rosso e Golosario confermati riconoscimenti reali (non erano hallucination GEO Monitor come ipotizzato in precedenza, erano dati veri mai dichiarati sul sito); Touring Club NON incluso, non menzionato da Andrea. Testo su richiesta esplicita "lascia il testo come l'ho scritto" — nessuna riscrittura P2 applicata a questa voce. Voce "Crudo" invariata (testo post P3). Le 6 Q&A originali (sotto, ordine invariato) restano quelle già gated (P1+P2+P3 + sign-off Andrea 11/6, fonte GBP_OPERATIVO §3); repurpose dalla funzione GBP "Domande e risposte" dismessa da Google (nov-dic 2025) a FAQ sul sito che alimenta SEO classica + AI di Google ("Ask Maps"/Gemini) + GEO. Il testo è allineato 1:1 con la sezione #faq visibile. IT-only (EN/FR = debito separato, coerente con multilingua). -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -689,7 +699,7 @@
   </div>
 </section>
 
-<!-- FAQ · v 2026.08.26.04 — +2 Q&A IN CODA (8 totali, posizioni 7-8): "guide gastronomiche" e "Crudo".
+<!-- FAQ · v 2026.08.27.01 — +2 Q&A IN CODA (8 totali, posizioni 7-8): "guide gastronomiche" e "Crudo".
      Vedi commento JSON-LD sopra per dettagli (v.04: testo "guide gastronomiche" da Andrea verbatim).
      Le 6 Q&A originali restano quelle del gate completo 11/6 (sign-off Andrea), ordine invariato.
      Allineata 1:1 col JSON-LD FAQPage nell'<head>. IT-only: EN/FR = debito separato
@@ -773,7 +783,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.08.26.03</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.08.27.01</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>

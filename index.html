@@ -149,7 +149,8 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-<!-- Schema.org JSON-LD · v 2026.05.31.01 (sessione 15 SEO): fix @type da "ItalianRestaurant" (non riconosciuto da schema.org → JSON-LD ignorato da Google) a "Restaurant" (tipo formale). La specificità "ristorante italiano" è già preservata nel campo servesCuisine sottostante. Era F0.11 v 2026.05.19.04 (invariato in v.05 F0.12) -->
+<!-- Schema.org JSON-LD · v 2026.05.31.01 (sessione 15 SEO): fix @type da "ItalianRestaurant" (non riconosciuto da schema.org → JSON-LD ignorato da Google) a "Restaurant" (tipo formale). La specificità "ristorante italiano" è già preservata nel campo servesCuisine sottostante. Era F0.11 v 2026.05.19.04 (invariato in v.05 F0.12).
+     v 2026.08.26.04 — campo "award" allineato alla FAQ "guide gastronomiche" (v.04 sotto): aggiunti Gambero Rosso e Golosario, confermati riconoscimenti reali da Andrea (26/8), non erano stati dichiarati prima. -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -172,7 +173,7 @@
   "openingHoursSpecification": [
     { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "20:00", "closes": "22:30" }
   ],
-  "award": "Guida Michelin - Good Cooking",
+  "award": ["Guida Michelin - Good Cooking", "Gambero Rosso", "Golosario"],
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Lungomare Lombardo 27",
@@ -218,7 +219,7 @@
   "publisher": { "@id": "https://santamonicagenova.it/#restaurant" }
 }
 </script>
-<!-- FAQPage JSON-LD · v 2026.06.11.01 (sessione 25 SEO) — 6 Q&A già gated (P1+P2+P3 + sign-off Andrea 11/6, fonte GBP_OPERATIVO §3); repurpose dalla funzione GBP "Domande e risposte" dismessa da Google (nov-dic 2025) a FAQ sul sito che alimenta SEO classica + AI di Google ("Ask Maps"/Gemini) + GEO. Il testo è allineato 1:1 con la sezione #faq visibile. IT-only (EN/FR = debito separato, coerente con multilingua). -->
+<!-- FAQPage JSON-LD · v 2026.08.26.04 — +2 Q&A IN CODA (8 totali, posizioni 7-8): "guide gastronomiche" e "Crudo". v.04: testo voce "guide gastronomiche" sostituito VERBATIM da Andrea (26/8) — Gambero Rosso e Golosario confermati riconoscimenti reali (non erano hallucination GEO Monitor come ipotizzato in precedenza, erano dati veri mai dichiarati sul sito); Touring Club NON incluso, non menzionato da Andrea. Testo su richiesta esplicita "lascia il testo come l'ho scritto" — nessuna riscrittura P2 applicata a questa voce. Voce "Crudo" invariata (testo post P3 del turno precedente). Le 6 Q&A originali (sotto, ordine invariato) restano quelle già gated (P1+P2+P3 + sign-off Andrea 11/6, fonte GBP_OPERATIVO §3); repurpose dalla funzione GBP "Domande e risposte" dismessa da Google (nov-dic 2025) a FAQ sul sito che alimenta SEO classica + AI di Google ("Ask Maps"/Gemini) + GEO. Il testo è allineato 1:1 con la sezione #faq visibile. IT-only (EN/FR = debito separato, coerente con multilingua). -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -255,6 +256,16 @@
       "@type": "Question",
       "name": "C’è parcheggio nelle vicinanze?",
       "acceptedAnswer": { "@type": "Answer", "text": "No, non ci sono parcheggi privati: il Lungomare Lombardo è pedonale. Nelle vie vicine si parcheggia in strada: righe blu a pagamento, righe bianche gratuite, righe bianche e blu a pagamento solo in estate." }
+    },
+    {
+      "@type": "Question",
+      "name": "Siete presenti in qualche guida gastronomica?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Sì, siamo presenti nella Guida Michelin, nel Gambero Rosso e nel Golosario. Ma la guida più importante restano sempre gli ospiti che tornano." }
+    },
+    {
+      "@type": "Question",
+      "name": "Avete un crudo di pesce?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Sì: proponiamo ostriche, scampi e gamberi viola nostrani a crudo, oltre a una selezione di pesce nostrano pescato ad amo e una degustazione di mare per chi desidera un assaggio più completo." }
     }
   ]
 }
@@ -678,7 +689,9 @@
   </div>
 </section>
 
-<!-- FAQ · v 2026.06.11.01 (sessione 25 SEO) — 6 Q&A gate completo (sign-off 11/6).
+<!-- FAQ · v 2026.08.26.04 — +2 Q&A IN CODA (8 totali, posizioni 7-8): "guide gastronomiche" e "Crudo".
+     Vedi commento JSON-LD sopra per dettagli (v.04: testo "guide gastronomiche" da Andrea verbatim).
+     Le 6 Q&A originali restano quelle del gate completo 11/6 (sign-off Andrea), ordine invariato.
      Allineata 1:1 col JSON-LD FAQPage nell'<head>. IT-only: EN/FR = debito separato
      (le stringhe NON usano data-i18n, restano in italiano anche in vista EN/FR). -->
 <section id="faq" class="faq-section">
@@ -709,6 +722,14 @@
       <details class="faq-item">
         <summary><h3 class="faq-q">C&rsquo;&egrave; parcheggio nelle vicinanze?</h3></summary>
         <div class="faq-answer"><p>No, non ci sono parcheggi privati: il Lungomare Lombardo &egrave; pedonale. Nelle vie vicine si parcheggia in strada:</p><ul><li>righe blu: a pagamento</li><li>righe bianche: gratuite</li><li>righe bianche e blu: a pagamento solo in estate</li></ul></div>
+      </details>
+      <details class="faq-item">
+        <summary><h3 class="faq-q">Siete presenti in qualche guida gastronomica?</h3></summary>
+        <div class="faq-answer"><p>S&igrave;, siamo presenti nella Guida Michelin, nel Gambero Rosso e nel Golosario. Ma la guida pi&ugrave; importante restano sempre gli ospiti che tornano.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary><h3 class="faq-q">Avete un crudo di pesce?</h3></summary>
+        <div class="faq-answer"><p>S&igrave;: proponiamo ostriche, scampi e gamberi viola nostrani a crudo, oltre a una selezione di pesce nostrano pescato ad amo e una degustazione di mare per chi desidera un assaggio pi&ugrave; completo.</p></div>
       </details>
     </div>
   </div>

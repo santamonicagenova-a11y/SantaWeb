@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!-- v 2026.08.25.02 — vini con più annate: la testata (nome/produttore/uve/descrizione) e l'elenco
+     annate sotto ora sono avvolti in un unico contenitore `.vino-gruppo` con break-inside:avoid,
+     così in stampa non si separano mai su due pagine diverse (prima erano due elementi fratelli
+     protetti solo singolarmente, un salto pagina poteva ancora infilarsi TRA i due). Margini di
+     stampa: sinistro portato a 1,8cm, gli altri tre restano a 1,5cm (@page con 4 valori). -->
 <!-- v 2026.08.25.01 — correzione data: la sessione era rimasta erroneamente su "22 agosto" per
      tutte le versioni precedenti odierne (v.22.09→v.22.25), quando in realtà era già il 25 agosto.
      Da qui in poi versioning corretto a 2026.08.25.NN; le voci storiche sotto restano invariate
@@ -303,7 +308,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.08.25.01</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.08.25.02</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -1395,7 +1400,7 @@ function rigaGruppoAnnateHtml(gruppo) {
     return '<div class="vino-annata">' + riga + '</div>';
   }).join('');
 
-  return '<p class="vino">' + testata + '</p><div class="vino-annate-lista">' + righeAnnate + '</div>';
+  return '<div class="vino-gruppo"><p class="vino">' + testata + '</p><div class="vino-annate-lista">' + righeAnnate + '</div></div>';
 }
 
 function generaHtmlCartaVini(articoli) {
@@ -1490,7 +1495,7 @@ function generaHtmlCartaVini(articoli) {
     '.num-inline{font-size:10pt;}' +
     '.annata-label{font-size:12pt;}' +
     '.vino-regione{text-decoration:underline;}' +
-    '@page{margin:1.5cm;}' +
+    '@page{margin:1.5cm 1.5cm 1.5cm 1.8cm;}' +
     '@media print{' +
       'body{padding:0;}' +
       '.sez-titolo{break-after:avoid;}' +
@@ -1498,6 +1503,7 @@ function generaHtmlCartaVini(articoli) {
       '.pg>.sez-titolo:first-child{break-before:avoid;}' +
       '.sottosez-titolo{break-after:avoid;break-inside:avoid;}' +
       '.vino,.vino-annate-lista{break-inside:avoid;}' +
+      '.vino-gruppo{break-inside:avoid;}' +
     '}' +
     '</style></head><body>' +
     '<div class="pg">' + body + '</div>' +

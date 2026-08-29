@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!-- v 2026.08.29.02 — sotto-capitoli regione (es. "Friuli-Venezia Giulia" con solo 3 vini) potevano
+     restare orfani in stampa: il titolo finiva in fondo a una pagina con un solo vino sotto,
+     mentre i restanti vini della stessa regione saltavano alla pagina successiva. Ogni sotto-
+     capitolo (titolo regione + tutti i suoi vini) è ora avvolto in un contenitore
+     `.sottosez-gruppo` con break-inside:avoid: se il gruppo è breve viene spostato intero a inizio
+     pagina; se è lungo (es. "Altre regioni" con decine di vini, non ci starebbe comunque su una
+     sola pagina) il browser ignora il vincolo e si spezza come prima — nessuna regressione lì. -->
 <!-- v 2026.08.29.01 — vini con più annate: la testata (nome/produttore/uve/descrizione) e l'elenco
      annate sotto ora sono avvolti in un unico contenitore `.vino-gruppo` con break-inside:avoid,
      così in stampa non si separano mai su due pagine diverse (prima erano due elementi fratelli
@@ -309,7 +316,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.08.29.01</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.08.29.02</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -1464,6 +1471,7 @@ function generaHtmlCartaVini(articoli) {
     body += '<div class="sez-titolo" data-break="' + (forzaPagina ? '1' : '0') + '">' + escapeHtml(cap) + '</div>';
     var mostraSottotitolo = CARTA_CAPITOLI_SENZA_SOTTOTITOLO.indexOf(cap) === -1;
     c.ordineSotto.forEach(function (sub) {
+      body += '<div class="sottosez-gruppo">';
       if (mostraSottotitolo) body += '<div class="sottosez-titolo">' + escapeHtml(sub) + '</div>';
       raggruppaAnnate(c.sotto[sub]).forEach(function (voce) {
         if (voce.tipo === 'annate') {
@@ -1472,6 +1480,7 @@ function generaHtmlCartaVini(articoli) {
           body += '<p class="vino">' + rigaVinoHtml(voce.articolo) + '</p>';
         }
       });
+      body += '</div>';
     });
   });
 
@@ -1505,6 +1514,7 @@ function generaHtmlCartaVini(articoli) {
       '.sottosez-titolo{break-after:avoid;break-inside:avoid;}' +
       '.vino,.vino-annate-lista{break-inside:avoid;}' +
       '.vino-gruppo{break-inside:avoid;}' +
+      '.sottosez-gruppo{break-inside:avoid;}' +
     '}' +
     '</style></head><body>' +
     '<div class="pg">' + body + '</div>' +

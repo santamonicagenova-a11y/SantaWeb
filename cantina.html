@@ -1,4 +1,18 @@
 <!DOCTYPE html>
+<!-- v 2026.08.29.04 — tolto il vincolo `.sottosez-gruppo{break-inside:avoid}` di v.29.02: forzava
+     l'intero sotto-capitolo (titolo+tutti i vini) a saltare in blocco alla pagina successiva
+     quando non ci stava nello spazio residuo, lasciando grosse zone bianche in fondo alla pagina
+     precedente (es. dopo "Liguria" in Bollicine, prima di "Altre regioni"). Priorità: niente
+     spazio bianco, anche a costo di qualche titolo con pochi vini sotto prima di un a-capo — resta
+     comunque `.sottosez-titolo{break-after:avoid}` (già presente), che impedisce solo il caso
+     peggiore di un titolo completamente isolato senza nessun vino sotto. -->
+<!-- v 2026.08.29.03 — quando un capitolo forza una nuova pagina in stampa (data-break="1", o è il
+     primissimo capitolo del documento), il suo margin-top (2,8rem) si sommava al margine della
+     pagina (@page 1,5cm), risultando visibilmente più largo del margine delle altre pagine (es.
+     sopra "Bollicine"). Azzerato margin-top per questi due casi — la pagina nuova è già di per sé
+     una separazione visiva netta, non serve margine extra sopra al titolo. Confermato che il
+     comportamento "Liguria+Altre Regioni consecutive, salto pagina intero solo se Altre Regioni
+     non ci sta" era già corretto (lo spazio bianco visto sotto "Axillo" era proprio quello). -->
 <!-- v 2026.08.29.02 — sotto-capitoli regione (es. "Friuli-Venezia Giulia" con solo 3 vini) potevano
      restare orfani in stampa: il titolo finiva in fondo a una pagina con un solo vino sotto,
      mentre i restanti vini della stessa regione saltavano alla pagina successiva. Ogni sotto-
@@ -316,7 +330,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.08.29.02</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.08.29.04</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -1509,12 +1523,11 @@ function generaHtmlCartaVini(articoli) {
     '@media print{' +
       'body{padding:0;}' +
       '.sez-titolo{break-after:avoid;}' +
-      '.sez-titolo[data-break="1"]{break-before:page;}' +
-      '.pg>.sez-titolo:first-child{break-before:avoid;}' +
+      '.sez-titolo[data-break="1"]{break-before:page;margin-top:0;}' +
+      '.pg>.sez-titolo:first-child{break-before:avoid;margin-top:0;}' +
       '.sottosez-titolo{break-after:avoid;break-inside:avoid;}' +
       '.vino,.vino-annate-lista{break-inside:avoid;}' +
       '.vino-gruppo{break-inside:avoid;}' +
-      '.sottosez-gruppo{break-inside:avoid;}' +
     '}' +
     '</style></head><body>' +
     '<div class="pg">' + body + '</div>' +

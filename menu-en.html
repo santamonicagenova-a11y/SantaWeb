@@ -474,11 +474,11 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "<em>Mancini</em> square spaghettoni, sea anemones, nduja, marjoram",
+          "nome": "<em>Mancini</em> square spaghetti, sea anemones, nduja, marjoram",
           "sostenibile": true
         },
         {
-          "nome": "<em>Mancini</em> pasta, salted cod, spinach, citrus kosho",
+          "nome": "<em>Mancini</em> pasta tubes, salt cod, spinach, citrus kosho",
           "sostenibile": true
         },
         {
@@ -486,7 +486,7 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Black lemon ice cream, lovage, lime, milk biscuits"
+          "nome": "Black lemon, lovage and lime ice cream with milk biscuits"
         }
       ],
       "Sette": "Chef's free interpretation menu"
@@ -526,7 +526,7 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "A selection of locally caught fish, caught by hook and line only",
+          "nome": "A selection of locally caught fish, caught with a hook only",
           "prezzo": 35,
           "sostenibile": true,
           "staccato": true
@@ -544,12 +544,12 @@ const MENU = {
       "titolo": "Sfiziosi",
       "piatti": [
         {
-          "nome": "Raw local red seabream, sea urchins, lemon, almonds",
+          "nome": "Raw local red sea bream, sea urchins, lemon, almonds",
           "prezzo": 27,
           "sostenibile": true
         },
         {
-          "nome": "Raw purple prawns, Puttanesca-style",
+          "nome": "Raw purple prawns, puttanesca-style",
           "prezzo": 23,
           "sostenibile": true
         },
@@ -566,7 +566,7 @@ const MENU = {
         {
           "nome": "“Not cheeses”",
           "prezzo": 22,
-          "descrizione": "(Tasting of ‘artificial’ artisanal cheeses made from cashews and almond milk)"
+          "descrizione": "(Tasting of vegan ‘artisan’ cheeses made from cashews and almond milk)"
         }
       ],
       "titolo_display": "Starters"
@@ -575,17 +575,17 @@ const MENU = {
       "titolo": "Amidi e Carboidrati",
       "piatti": [
         {
-          "nome": "<em>Mancini</em> square spaghettoni, sea anemones, nduja, marjoram",
+          "nome": "<em>Mancini</em> square spaghetti, sea anemones, nduja, marjoram",
           "prezzo": 32,
           "sostenibile": true
         },
         {
-          "nome": "Wild boar cappellacci, cardoncelli mushrooms, rocket, blueberries",
+          "nome": "Cappellacci with wild boar, cockerels, rocket and blueberries",
           "prezzo": 29,
           "sostenibile": true
         },
         {
-          "nome": "<em>Mancini</em> pasta, salted cod, spinach, citrus kosho",
+          "nome": "<em>Mancini</em> pasta tubes, salt cod, spinach, citrus kosho",
           "prezzo": 22,
           "sostenibile": true
         },
@@ -601,7 +601,7 @@ const MENU = {
       "titolo": "Non Solo Mare",
       "piatti": [
         {
-          "nome": "Local yellowtail, cherries, lovage, tahini",
+          "nome": "Local amberjack, aubergines, the umami flavour of tomatoes and peppers, tahini",
           "prezzo": 32,
           "sostenibile": true
         },
@@ -627,7 +627,7 @@ const MENU = {
       "titolo": "Golosità",
       "piatti": [
         {
-          "nome": "Black lemon ice cream, lovage, lime, milk biscuits",
+          "nome": "Black lemon, lovage and lime ice cream with milk biscuits",
           "prezzo": 12
         },
         {
@@ -722,45 +722,126 @@ const MENU = {
     ],
     "sezioni": [
       {
-        "titolo_display": "Golosità",
+        "titolo_display": "Starters",
         "piatti": [
           {
-            "nome": "Black lemon ice cream, lovage, lime, milk biscuits",
+            "nome": "Local squid, fresh peas, bagna cauda, kefir",
+            "allergeni": [
+              "fish",
+              "milk",
+              "sulphites",
+              "molluscs"
+            ]
+          },
+          {
+            "nome": "Raw purple prawns, puttanesca-style",
+            "allergeni": [
+              "crustaceans"
+            ]
+          },
+          {
+            "nome": "Veal sweetbreads, celeriac, hazelnuts, fish stock reduction",
+            "allergeni": [
+              "fish",
+              "nuts",
+              "sulphites"
+            ]
+          },
+          {
+            "nome": "Raw local red sea bream, sea urchins, lemon, almonds",
+            "allergeni": [
+              "gluten",
+              "fish",
+              "nuts"
+            ]
+          },
+          {
+            "nome": "“Not cheeses”",
+            "allergeni": [
+              "nuts",
+              "sulphites"
+            ]
+          }
+        ]
+      },
+      {
+        "titolo_display": "Pasta & Grains",
+        "piatti": [
+          {
+            "nome": "Mancini square spaghettoni, sea anemones, nduja, marjoram",
             "allergeni": [
               "gluten",
               "milk"
             ]
           },
           {
-            "nome": "Pineapple, charcoal parfait, coffee caramel",
+            "nome": "Wild boar cappellacci, cardoncelli mushrooms, nettles, blueberries",
             "allergeni": [
               "gluten",
               "eggs",
+              "fish",
+              "celery",
+              "sulphites"
+            ]
+          },
+          {
+            "nome": "Mancini pasta tubes, salted cod, spinach, citrus kosho",
+            "allergeni": [
+              "gluten",
+              "fish",
+              "soya",
               "milk"
             ]
           },
           {
-            "nome": "Porcini mushroom ice cream, strawberries, chocolate crumble",
+            "nome": "San Massimo Riserva rice, oysters, medlars, apricots",
             "allergeni": [
-              "eggs",
-              "milk"
+              "gluten",
+              "fish",
+              "soya",
+              "milk",
+              "molluscs"
+            ]
+          }
+        ]
+      },
+      {
+        "titolo_display": "Not Only Sea",
+        "piatti": [
+          {
+            "nome": "Local amberjack, peperonata cream, BBQ aubergine purée, tahini",
+            "allergeni": [
+              "fish",
+              "sesame",
+              "sulphites"
             ]
           },
           {
-            "nome": "Sacripantina",
+            "nome": "Roasted leek, macadamia nuts, vegetable stock and peaches",
             "allergeni": [
-              "gluten",
+              "nuts",
+              "sulphites"
+            ]
+          },
+          {
+            "nome": "Wild cod, escarole, fig leaves",
+            "allergeni": [
               "eggs",
+              "fish",
               "milk",
               "nuts",
               "sulphites"
             ]
           },
           {
-            "nome": "Ligurian blue cheese and Picolit Zorzettig",
+            "nome": "&quot;Tournedos à la Rossini&quot;?",
             "allergeni": [
+              "crustaceans",
+              "fish",
               "milk",
-              "sulphites"
+              "celery",
+              "sulphites",
+              "molluscs"
             ]
           }
         ]

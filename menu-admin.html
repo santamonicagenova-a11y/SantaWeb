@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- v 2026.08.31.02 — pulsante "Importa da NoShowApp": tolto il filtro per ristorante (richiesta
+     esplicita Andrea, "vorrei copiare tutto") — ora import_from_nsa (rubrica-professionisti v4)
+     copia TUTTE le voci della rubrica condivisa NSA, non solo quelle di Santamonica; il ristorante
+     di provenienza resta comunque tracciato nel campo segnalato_da ("Importato da NoShowApp
+     (Nome ristorante)"). Dedup per nome+telefono invariata. Solo testo aggiornato qui, nessuna
+     modifica di codice in questo file (il filtro viveva lato Edge Function). -->
 <!-- v 2026.08.31.01 — Rubrica professionisti: ri-separata da NoShowApp (richiesta Andrea).
      Il 25/7/2026 era stata unificata in un'unica tabella condivisa su NoShowApp (progetto
      ltgvyanqzkpulocypsve); ora Santamonica torna ad avere una tabella propria e privata su
@@ -6,11 +12,11 @@
      quel giorno), NoShowApp mantiene la sua (`professionals`/`professional_uses`) invariata.
      RUB_URL ripuntato da NSA a `rubrica-professionisti` (ST, deployata v2, verify_jwt=false).
      Aggiunto pulsante "⇩ Importa da NoShowApp" (azione import_from_nsa sulla stessa funzione):
-     copia una tantum, sola lettura verso NSA, filtrata per ristorante='Santamonica', deduplica
-     per nome+telefono — richiede che il progetto NoShowApp sia attivo (oggi è in pausa). Le due
-     rubriche NON sono più sincronizzate automaticamente: ogni futura modifica da qui resta solo
-     su ST. Prossimo passo (non fatto ora): in NoShowApp, un setup di visibilità dati per-cliente
-     (privato/condiviso, deciso da Andrea come titolare, eventuale feature a pagamento). -->
+     copia una tantum, sola lettura verso NSA, deduplica per nome+telefono — richiede che il
+     progetto NoShowApp sia attivo (oggi è in pausa). Le due rubriche NON sono più sincronizzate
+     automaticamente: ogni futura modifica da qui resta solo su ST. Prossimo passo (non fatto
+     ora): in NoShowApp, un setup di visibilità dati per-cliente (privato/condiviso, deciso da
+     Andrea come titolare, eventuale feature a pagamento). -->
 <!-- v 2026.08.15.01 — nuovo pulsante "Gestionale Cantina" → link a cantina.html (pagina admin
      standalone, nuovo ramo: anagrafica vini/bevande + magazzino su progetto Supabase dedicato
      "SantaCantina", vedi CLAUDE.md progetto-sito). Nessuna altra modifica. -->
@@ -933,7 +939,7 @@
 
       <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:1.2rem;">
         <button class="btn btn-load" id="rub-import-nsa-btn" style="border:1px solid var(--rule);color:var(--ink);font-size:.68rem;" onclick="importaRubricaDaNSA()">⇩ Importa da NoShowApp</button>
-        <span style="font-size:.72rem;color:var(--stone);">Copia una tantum i professionisti già presenti su NoShowApp (richiede che quel progetto sia attivo, non in pausa). Non duplica chi è già qui.</span>
+        <span style="font-size:.72rem;color:var(--stone);">Copia una tantum TUTTI i professionisti già presenti su NoShowApp, di qualunque ristorante (richiede che quel progetto sia attivo, non in pausa). Non duplica chi è già qui.</span>
       </div>
 
       <hr style="border:none;border-top:1px solid var(--rule);margin:0 0 1.2rem;">

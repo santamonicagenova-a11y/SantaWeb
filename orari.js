@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════
    orari.js — FONTE UNICA orari di apertura · Santamonica Web
-   v 2026.07.25.01
+   v 2026.08.31.01
    ───────────────────────────────────────────────────────────────────────
    PER CAMBIARE GLI ORARI: aggiungi/modifica una voce nell'array PERIODS.
    Tutto il resto (display #info, tabella dove-siamo, Schema.org JSON-LD su
@@ -41,6 +41,11 @@
    ═══════════════════════════════════════════════════════════════════════
 
    STORICO
+   - v 2026.08.31.01 (spostamento pranzo ven/sab/dom): Andrea conferma l'11/9 come data di
+     partenza, non l'1/9 come inizialmente deciso il 25/7. Periodo 1 esteso a to:'2026-09-10',
+     Periodo 2 accorciato in testa a from:'2026-09-11'. Cena confermata 19:30 dall'11/9
+     (invariato rispetto al 25/7). STESSA modifica in submit-reservation e
+     create-reservation-checkout (SPECULARE, vedi loro STORICO). Periodo 3 confermato invariato.
    - v 2026.07.25.01 (refactor PERIODS, vedi sopra): sostituiti SERVIZI/SETTIMANA
      con l'array PERIODS. Definiti i 3 periodi già decisi da Andrea il 25/7/2026:
        1) 21/6→31/8/2026: orario estivo (pranzo chiuso, cena 20:00-22:30 mar→dom)
@@ -81,7 +86,7 @@
 
   var PERIODS = [
     { // Orario estivo temporaneo
-      from: '2026-06-21', to: '2026-08-31',
+      from: '2026-06-21', to: '2026-09-10',
       servizi: { pranzo: { opens: '12:30', closes: '14:30' }, cena: { opens: '20:00', closes: '22:30' } },
       slots: { pranzo: [], cena: CENA_ESTATE },
       settimana: [
@@ -95,7 +100,7 @@
       ]
     },
     { // Ripristino schema 7/6: riapre il pranzo di ven/sab/dom, cena torna alle 19:30
-      from: '2026-09-01', to: '2026-09-30',
+      from: '2026-09-11', to: '2026-09-30',
       servizi: { pranzo: { opens: '12:30', closes: '14:30' }, cena: { opens: '19:30', closes: '22:30' } },
       slots: { pranzo: PRANZO_BASE, cena: CENA_BASE },
       settimana: [

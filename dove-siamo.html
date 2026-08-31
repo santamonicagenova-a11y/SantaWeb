@@ -2,10 +2,20 @@
   ─────────────────────────────────────────────────────────────────────────
   dove-siamo.html — Dove siamo / Contatti
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.08.14.01
-  Ultimo aggiornamento: 2026-08-14
+  Versione: v 2026.08.31.01
+  Ultimo aggiornamento: 2026-08-31
   Lingua: IT (versione ufficiale)
   Stato: BOZZA INFORMATIVA · F0.12 chiusa (hotfix layout)
+
+  Modifiche v 2026.08.31.01 (spostamento pranzo ven/sab/dom):
+  - Aggiornato solo il commento "_comment_orari" (cosmetico, il blocco
+    openingHoursSpecification statico NON cambia finché resta valido il
+    Periodo 1 esteso): Andrea conferma l'11/9 come data di ripristino del
+    pranzo ven/sab/dom, non l'1/9 come inizialmente deciso il 25/7.
+    SPECULARE a orari.js v 2026.08.31.01 (Periodo 1 to:'2026-09-10',
+    Periodo 2 from:'2026-09-11'), submit-reservation v31 e
+    create-reservation-checkout v8 (SafeTable). Gate: P1+P2 fatte; P3 debito
+    dichiarato (vedi HANDOVER_Orari-Settembre_v2026.08.31.01.md).
 
   Modifiche v 2026.08.14.01:
   - Rimosso Nicolò Lazzaroni dallo schema JSON-LD (employee) — uscito dal
@@ -147,7 +157,7 @@
     "openingHoursSpecification": [
       { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "20:00", "closes": "22:30" }
     ],
-    "_comment_orari": "openingHoursSpecification STATICO crawler-safe (ORARIO ESTIVO 21/6→31/8: chiuso a pranzo, cena 20:00-22:30 mar→dom, lun chiuso); /orari.js lo ri-inietta identico a runtime. Ripristino 31/8 allo schedule 7/6. Se cambi orari: aggiorna orari.js E questo blocco statico (index.html + dove-siamo.html).",
+    "_comment_orari": "openingHoursSpecification STATICO crawler-safe (ORARIO ESTIVO 21/6→11/9: chiuso a pranzo, cena 20:00-22:30 mar→dom, lun chiuso — v 2026.08.31.01, esteso dal 31/8 all'11/9 su conferma Andrea, orari.js Periodo 1 to:'2026-09-10'); /orari.js lo ri-inietta identico a runtime. Ripristino previsto l'11/9 allo schedule 7/6 (pranzo ven/sab/dom + cena 19:30). Se cambi orari: aggiorna orari.js E questo blocco statico (index.html + dove-siamo.html).",
     "sameAs": [
       "https://www.instagram.com/ristorantesantamonica/",
       "https://www.facebook.com/santamonicage",

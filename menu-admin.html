@@ -1,4 +1,16 @@
 <!DOCTYPE html>
+<!-- v 2026.08.31.01 — Rubrica professionisti: ri-separata da NoShowApp (richiesta Andrea).
+     Il 25/7/2026 era stata unificata in un'unica tabella condivisa su NoShowApp (progetto
+     ltgvyanqzkpulocypsve); ora Santamonica torna ad avere una tabella propria e privata su
+     SafeTable (`professionisti`/`professionisti_note_uso`, ricreate — erano state droppate
+     quel giorno), NoShowApp mantiene la sua (`professionals`/`professional_uses`) invariata.
+     RUB_URL ripuntato da NSA a `rubrica-professionisti` (ST, deployata v2, verify_jwt=false).
+     Aggiunto pulsante "⇩ Importa da NoShowApp" (azione import_from_nsa sulla stessa funzione):
+     copia una tantum, sola lettura verso NSA, filtrata per ristorante='Santamonica', deduplica
+     per nome+telefono — richiede che il progetto NoShowApp sia attivo (oggi è in pausa). Le due
+     rubriche NON sono più sincronizzate automaticamente: ogni futura modifica da qui resta solo
+     su ST. Prossimo passo (non fatto ora): in NoShowApp, un setup di visibilità dati per-cliente
+     (privato/condiviso, deciso da Andrea come titolare, eventuale feature a pagamento). -->
 <!-- v 2026.08.15.01 — nuovo pulsante "Gestionale Cantina" → link a cantina.html (pagina admin
      standalone, nuovo ramo: anagrafica vini/bevande + magazzino su progetto Supabase dedicato
      "SantaCantina", vedi CLAUDE.md progetto-sito). Nessuna altra modifica. -->
@@ -919,6 +931,13 @@
 
       <hr style="border:none;border-top:1px solid var(--rule);margin:0 0 1.2rem;">
 
+      <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:1.2rem;">
+        <button class="btn btn-load" id="rub-import-nsa-btn" style="border:1px solid var(--rule);color:var(--ink);font-size:.68rem;" onclick="importaRubricaDaNSA()">⇩ Importa da NoShowApp</button>
+        <span style="font-size:.72rem;color:var(--stone);">Copia una tantum i professionisti già presenti su NoShowApp (richiede che quel progetto sia attivo, non in pausa). Non duplica chi è già qui.</span>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--rule);margin:0 0 1.2rem;">
+
       <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:.8rem;">
         <span class="opt-lbl" style="margin:0;">Filtra</span>
         <select id="rub-filtro-categoria" onchange="renderRubricaProfessionisti()" style="padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);">
@@ -1657,10 +1676,14 @@ function removePrenSlotCap(date, time) {
 // ══ RUBRICA PROFESSIONISTI (privata, non condivisa con altri ristoranti) ════
 // CRUD via Edge Function rubrica-professionisti (auth col token GitHub gh_token,
 // stesso meccanismo/token di prenotazioni online e reminder — riusa _prenGhToken()).
-// A differenza della rubrica condivisa costruita in NoShowApp, qui sia lettura sia
-// scrittura passano dal token: è un elenco interno di Santamonica, non un database
-// tra ristoratori. Vedi progetto-sito CLAUDE.md, sessione 25/7.
-var RUB_URL = 'https://ltgvyanqzkpulocypsve.supabase.co/functions/v1/rubrica-professionisti-admin';
+// A differenza della rubrica di NoShowApp, qui sia lettura sia scrittura passano
+// dal token: è un elenco interno di Santamonica, non un database tra ristoratori.
+// v 2026.08.31 — tornata alla tabella LOCALE su SafeTable (era stata unificata con
+// NoShowApp il 25/7/2026, poi ri-separata su decisione di Andrea: le due rubriche
+// (Santamonica su ST, NoShowApp su NSA) restano ora due tabelle fisicamente distinte
+// su due progetti diversi — nessun dato condiviso tra le due finché non si costruisce
+// l'apposito setup di visibilità in NoShowApp. Vedi progetto-sito CLAUDE.md.
+var RUB_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/rubrica-professionisti';
 var RUB_CATEGORIE = [
   ['elettricista', 'Elettricista'], ['idraulico', 'Idraulico'], ['muratore', 'Muratore / edile'],
   ['fabbro', 'Fabbro'], ['imbianchino', 'Imbianchino'], ['falegname', 'Falegname'], ['vetraio', 'Vetraio'],
@@ -1744,6 +1767,25 @@ function loadRubricaProfessionisti() {
   _rubFetch({ action: 'list' })
     .then(function (res) { _rubApply(res, ''); })
     .catch(function (e) { _rubErr(e, 'Errore di connessione.'); });
+}
+
+function importaRubricaDaNSA() {
+  var btn = document.getElementById('rub-import-nsa-btn');
+  btn.disabled = true;
+  _rubSetStatus('Importazione da NoShowApp…');
+  _rubFetch({ action: 'import_from_nsa' })
+    .then(function (res) {
+      if (res.status === 200 && res.body && res.body.ok) {
+        rubState.professionisti = res.body.professionisti || [];
+        rubState.note_uso = res.body.note_uso || [];
+        renderRubricaProfessionisti();
+        _rubSetStatus('Importati ' + res.body.imported + ', già presenti ' + res.body.skipped + '.');
+      } else {
+        _rubSetStatus((res.body && res.body.error) || 'Errore durante l\'importazione.', true);
+      }
+    })
+    .catch(function (e) { _rubErr(e, 'Errore di connessione.'); })
+    .then(function () { btn.disabled = false; });
 }
 
 function _rubClearForm() {

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<!-- v 2026.08.31.01 — NUOVO: CRM ospiti (Gestionale Fase 2, pianificato 5/7/2026, costruito
+     31/8/2026). Pagina admin standalone (stesso stile/pattern di gestionale.html/cantina.html:
+     tema chiaro cream/ink/rust, auth _ghToken() con gh_token in localStorage), collegata da un
+     nuovo pulsante "Gestione clienti" in menu-admin.html. Backend: tabella `clienti` (SafeTable,
+     solo arricchimento manuale — nome override/note/tag/clienti puramente manuali) + Edge
+     Function `clienti-crm` (azioni list/detail/upsert/delete). Lo storico visite NON è
+     duplicato: si calcola al volo raggruppando `reservations` per telefono normalizzato (ultime
+     9 cifre, stessa convenzione già in uso per il matching dei pacchi No-show) — ogni nuova
+     prenotazione aggiorna automaticamente le statistiche del cliente, zero sincronizzazione da
+     mantenere. Elenco cercabile/filtrabile per tag, scheda cliente con storico prenotazioni +
+     note libere + tag editabili, pulsante "+ Cliente manuale" per chi non ha mai prenotato dal
+     sito. Vedi progetto-sito/CLAUDE.md. -->
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Gestione Clienti — Santamonica</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root { --cream:#faf7f2; --ink:#1a1714; --stone:#8c7e6e; --rust:#9e4a2a; --rule:#d4c9b8; --sand:#f0ebe0; --ok:#2d6a4f; --warn:#a35b1c; }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--cream); color:var(--ink); font-family:'Jost',sans-serif; font-weight:300; font-size:14px; padding-bottom:4rem; }
+
+    .top-bar { background:var(--ink); color:var(--cream); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; position:sticky; top:0; z-index:50; }
+    .top-bar h1 { font-size:.8rem; font-weight:400; letter-spacing:.18em; text-transform:uppercase; }
+    .top-bar h1 .ver { font-size:.6rem; letter-spacing:.08em; text-transform:none; color:var(--stone); margin-left:.6rem; font-weight:300; vertical-align:middle; }
+    .logo-sm { font-size:.7rem; letter-spacing:.2em; color:var(--stone); text-transform:uppercase; }
+    .top-bar a.back { color:var(--cream); opacity:.75; font-size:.7rem; letter-spacing:.08em; text-decoration:none; }
+    .top-bar a.back:hover { opacity:1; }
+
+    .btn { padding:.45rem 1.1rem; border:1px solid var(--rule); background:#fff; font-family:'Jost',sans-serif; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; color:var(--ink); }
+    .btn:hover { background:var(--sand); }
+    .btn-ok { background:var(--ok); border-color:var(--ok); color:#fff; }
+    .btn-ok:hover { opacity:.88; }
+    .btn-rust { background:var(--rust); border-color:var(--rust); color:#fff; }
+    .btn-rust:hover { opacity:.88; }
+    .btn-sm { padding:.3rem .7rem; font-size:.66rem; }
+
+    .toolbar { max-width:1100px; margin:1.4rem auto .8rem; padding:0 1rem; display:flex; align-items:center; gap:.7rem; flex-wrap:wrap; }
+    .toolbar input[type=text] { padding:.45rem .7rem; border:1px solid var(--rule); background:#fff; font-family:'Jost',sans-serif; font-size:.82rem; color:var(--ink); flex:1; min-width:12rem; }
+    .toolbar select { padding:.45rem .5rem; border:1px solid var(--rule); background:#fff; font-family:'Jost',sans-serif; font-size:.78rem; color:var(--ink); }
+    .toolbar .counts { font-size:.72rem; color:var(--stone); letter-spacing:.04em; margin-left:auto; }
+
+    .wrap { max-width:1100px; margin:0 auto 2rem; padding:0 1rem; }
+    table { width:100%; border-collapse:collapse; background:#fff; font-size:.8rem; }
+    th, td { text-align:left; padding:.55rem .7rem; border-bottom:1px solid var(--rule); }
+    th { font-size:.65rem; letter-spacing:.08em; text-transform:uppercase; color:var(--stone); background:var(--sand); }
+    tr.clickable { cursor:pointer; }
+    tr.clickable:hover { background:var(--sand); }
+    .tag { display:inline-block; padding:.12rem .55rem; border-radius:999px; background:var(--sand); border:1px solid var(--rule); font-size:.66rem; letter-spacing:.03em; color:var(--ink); margin:0 .25rem .15rem 0; }
+    .tag.suggest { cursor:pointer; background:#fff; }
+    .tag.suggest:hover { background:var(--sand); }
+    .manuale-badge { font-size:.62rem; color:var(--warn); letter-spacing:.06em; text-transform:uppercase; }
+    .empty { padding:2rem; text-align:center; color:var(--stone); font-size:.85rem; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(26,23,20,.55); z-index:200; align-items:flex-start; justify-content:center; padding:3rem 1rem; overflow-y:auto; }
+    .modal-overlay.on { display:flex; }
+    .modal { background:#fff; padding:1.6rem; max-width:640px; width:100%; border:1px solid var(--rule); }
+    .modal h3 { font-size:.78rem; font-weight:400; letter-spacing:.1em; text-transform:uppercase; color:var(--stone); margin-bottom:1rem; }
+    .field { margin-bottom:.9rem; }
+    .field label { display:block; font-size:.65rem; letter-spacing:.08em; text-transform:uppercase; color:var(--stone); margin-bottom:.3rem; }
+    .field input[type=text], .field textarea { width:100%; padding:.5rem .6rem; border:1px solid var(--rule); font-family:'Jost',sans-serif; font-size:.85rem; color:var(--ink); }
+    .field textarea { min-height:5rem; resize:vertical; }
+    .modal .actions { display:flex; gap:.6rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .storia-tbl { font-size:.75rem; margin-top:.4rem; max-height:240px; overflow-y:auto; display:block; }
+    .stat-row { display:flex; gap:1.4rem; flex-wrap:wrap; margin-bottom:1rem; font-size:.78rem; }
+    .stat-row b { display:block; font-size:1.1rem; font-weight:400; }
+    .status { font-size:.75rem; color:var(--stone); margin-top:.6rem; }
+    .status.err { color:var(--rust); }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div>
+      <div class="logo-sm">Santamonica</div>
+      <h1>Gestione Clienti <span class="ver">v 2026.08.31.01</span></h1>
+    </div>
+    <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" id="cli-search" placeholder="Cerca per nome, telefono o email…" oninput="renderClienti()" />
+    <select id="cli-filtro-tag" onchange="renderClienti()">
+      <option value="">Tutti i tag</option>
+    </select>
+    <button class="btn" onclick="loadClienti()">↻ Aggiorna</button>
+    <button class="btn btn-ok" onclick="apriModalNuovo()">+ Cliente manuale</button>
+    <span class="counts" id="cli-counts"></span>
+  </div>
+
+  <div class="wrap">
+    <table>
+      <thead>
+        <tr><th>Nome</th><th>Telefono</th><th>Prenotazioni</th><th>Ultima visita</th><th>No-show</th><th>Tag</th></tr>
+      </thead>
+      <tbody id="cli-tbody"></tbody>
+    </table>
+    <div class="empty" id="cli-empty" style="display:none;">Nessun cliente trovato.</div>
+  </div>
+  <div class="status" id="cli-status" style="text-align:center;"></div>
+
+  <!-- Scheda cliente -->
+  <div class="modal-overlay" id="cli-modal">
+    <div class="modal">
+      <h3 id="cli-modal-title">Scheda cliente</h3>
+
+      <div class="stat-row" id="cli-stats"></div>
+
+      <div class="field">
+        <label>Nome</label>
+        <input type="text" id="cli-f-nome" />
+      </div>
+      <div class="field">
+        <label>Telefono</label>
+        <input type="text" id="cli-f-telefono" />
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="text" id="cli-f-email" />
+      </div>
+      <div class="field">
+        <label>Tag</label>
+        <div id="cli-tags-attivi" style="margin-bottom:.4rem;"></div>
+        <div id="cli-tags-suggeriti"></div>
+        <input type="text" id="cli-f-tag-nuovo" placeholder="Aggiungi un tag e premi Invio…" style="margin-top:.4rem;" onkeydown="if(event.key==='Enter'){event.preventDefault();aggiungiTagLibero();}" />
+      </div>
+      <div class="field">
+        <label>Note</label>
+        <textarea id="cli-f-note" placeholder="Preferenze, allergie ricorrenti, aneddoti…"></textarea>
+      </div>
+
+      <div class="field" id="cli-storia-wrap">
+        <label>Storico prenotazioni</label>
+        <table class="storia-tbl">
+          <thead><tr><th>Data</th><th>Orario</th><th>Persone</th><th>Stato</th><th>Occasione</th></tr></thead>
+          <tbody id="cli-storia-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-ok" onclick="salvaCliente()">💾 Salva</button>
+        <button class="btn" onclick="chiudiModal()">Annulla</button>
+        <button class="btn btn-rust" id="cli-elimina-btn" style="display:none;margin-left:auto;" onclick="eliminaCliente()">🗑 Elimina scheda</button>
+      </div>
+      <div class="status" id="cli-modal-status"></div>
+    </div>
+  </div>
+
+<script>
+var URL_CRM = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/clienti-crm';
+var TAG_SUGGERITI = ['VIP', 'Habitué', 'Wine lover', 'Vegetariano', 'Vegano', 'Allergie'];
+var cliState = { clienti: [] };
+var cliEdit = { id: null, telefono_norm: null, tags: [], manuale: false };
+
+function _ghToken() {
+  var t = localStorage.getItem('gh_token') || '';
+  if (!t) {
+    t = (window.prompt('Incolla il tuo token GitHub (lo stesso della pubblicazione):') || '').trim();
+    if (t) localStorage.setItem('gh_token', t);
+  }
+  return t;
+}
+
+function _escHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function _cliFetch(payload) {
+  var token = _ghToken();
+  if (!token) return Promise.reject(new Error('no-token'));
+  payload.github_token = token;
+  return fetch(URL_CRM, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+  }).then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); });
+}
+
+function _setStatus(msg, isErr) {
+  var el = document.getElementById('cli-status');
+  el.textContent = msg || '';
+  el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
+}
+function _setModalStatus(msg, isErr) {
+  var el = document.getElementById('cli-modal-status');
+  el.textContent = msg || '';
+  el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
+}
+
+function loadClienti() {
+  _setStatus('Caricamento…');
+  _cliFetch({ action: 'list' }).then(function (res) {
+    if (res.status === 200 && res.body && res.body.ok) {
+      cliState.clienti = res.body.clienti || [];
+      popolaFiltroTag();
+      renderClienti();
+      _setStatus('');
+    } else if (res.status === 401) {
+      _setStatus('Token GitHub non valido o senza permessi. Ricarica la pagina per reinserirlo.', true);
+    } else {
+      _setStatus((res.body && res.body.error) || 'Errore.', true);
+    }
+  }).catch(function (e) {
+    if (e && e.message === 'no-token') _setStatus('Operazione annullata: serve il token GitHub.', true);
+    else _setStatus('Errore di connessione.', true);
+  });
+}
+
+function popolaFiltroTag() {
+  var sel = document.getElementById('cli-filtro-tag');
+  var current = sel.value;
+  var tagsSet = {};
+  cliState.clienti.forEach(function (c) { (c.tags || []).forEach(function (t) { tagsSet[t] = true; }); });
+  var tags = Object.keys(tagsSet).sort();
+  sel.innerHTML = '<option value="">Tutti i tag</option>' + tags.map(function (t) {
+    return '<option value="' + _escHtml(t) + '">' + _escHtml(t) + '</option>';
+  }).join('');
+  sel.value = current;
+}
+
+function renderClienti() {
+  var q = (document.getElementById('cli-search').value || '').trim().toLowerCase();
+  var tagFiltro = document.getElementById('cli-filtro-tag').value;
+  var list = cliState.clienti.filter(function (c) {
+    if (tagFiltro && (c.tags || []).indexOf(tagFiltro) === -1) return false;
+    if (!q) return true;
+    var hay = [(c.nome || ''), (c.telefono || ''), (c.email || '')].join(' ').toLowerCase();
+    return hay.indexOf(q) !== -1;
+  });
+
+  var tbody = document.getElementById('cli-tbody');
+  document.getElementById('cli-empty').style.display = list.length ? 'none' : 'block';
+  document.getElementById('cli-counts').textContent = list.length + ' / ' + cliState.clienti.length + ' clienti';
+
+  tbody.innerHTML = list.map(function (c, i) {
+    var tagsHtml = (c.tags || []).map(function (t) { return '<span class="tag">' + _escHtml(t) + '</span>'; }).join('');
+    var manuale = c.manuale ? ' <span class="manuale-badge">manuale</span>' : '';
+    return '<tr class="clickable" onclick="apriScheda(' + i + ')">' +
+      '<td>' + _escHtml(c.nome || '(senza nome)') + manuale + '</td>' +
+      '<td>' + _escHtml(c.telefono || '—') + '</td>' +
+      '<td>' + (c.n_prenotazioni || 0) + '</td>' +
+      '<td>' + _escHtml(c.ultima_prenotazione || '—') + '</td>' +
+      '<td>' + (c.n_no_show ? c.n_no_show : '—') + '</td>' +
+      '<td>' + (tagsHtml || '—') + '</td>' +
+      '</tr>';
+  }).join('');
+
+  // indice per apriScheda() sulla lista filtrata corrente
+  renderClienti._current = list;
+}
+
+function apriModalNuovo() {
+  cliEdit = { id: null, telefono_norm: null, tags: [], manuale: true };
+  document.getElementById('cli-modal-title').textContent = 'Nuovo cliente manuale';
+  document.getElementById('cli-f-nome').value = '';
+  document.getElementById('cli-f-telefono').value = '';
+  document.getElementById('cli-f-email').value = '';
+  document.getElementById('cli-f-note').value = '';
+  document.getElementById('cli-stats').innerHTML = '';
+  document.getElementById('cli-storia-wrap').style.display = 'none';
+  document.getElementById('cli-elimina-btn').style.display = 'none';
+  renderTagsModal();
+  _setModalStatus('');
+  document.getElementById('cli-modal').classList.add('on');
+}
+
+function apriScheda(i) {
+  var c = renderClienti._current[i];
+  if (!c) return;
+  cliEdit = { id: c.id, telefono_norm: c.telefono_norm, tags: (c.tags || []).slice(), manuale: c.manuale };
+  document.getElementById('cli-modal-title').textContent = c.nome || '(senza nome)';
+  document.getElementById('cli-f-nome').value = c.nome || '';
+  document.getElementById('cli-f-telefono').value = c.telefono || '';
+  document.getElementById('cli-f-email').value = c.email || '';
+  document.getElementById('cli-f-note').value = c.note || '';
+  document.getElementById('cli-elimina-btn').style.display = c.id ? '' : 'none';
+  renderTagsModal();
+  _setModalStatus('');
+
+  if (c.telefono_norm) {
+    document.getElementById('cli-storia-wrap').style.display = '';
+    document.getElementById('cli-stats').innerHTML =
+      '<div><b>' + (c.n_prenotazioni || 0) + '</b>prenotazioni</div>' +
+      '<div><b>' + (c.n_arrivato || 0) + '</b>arrivate</div>' +
+      '<div><b>' + (c.n_no_show || 0) + '</b>no-show</div>' +
+      '<div><b>' + _escHtml(c.prima_prenotazione || '—') + '</b>prima visita</div>';
+    document.getElementById('cli-storia-tbody').innerHTML = '<tr><td colspan="5" style="color:var(--stone);">Caricamento storico…</td></tr>';
+    _cliFetch({ action: 'detail', telefono_norm: c.telefono_norm }).then(function (res) {
+      if (res.status === 200 && res.body && res.body.ok) {
+        document.getElementById('cli-storia-tbody').innerHTML = (res.body.storia || []).map(function (r) {
+          return '<tr><td>' + _escHtml(r.data) + '</td><td>' + _escHtml(r.orario) + '</td><td>' + (r.persone || '') +
+            '</td><td>' + _escHtml(r.arrivo_status || r.status) + '</td><td>' + _escHtml(r.occasione || '—') + '</td></tr>';
+        }).join('');
+      }
+    });
+  } else {
+    document.getElementById('cli-storia-wrap').style.display = 'none';
+    document.getElementById('cli-stats').innerHTML = '<div><b>—</b>nessuna prenotazione collegata</div>';
+  }
+
+  document.getElementById('cli-modal').classList.add('on');
+}
+
+function renderTagsModal() {
+  document.getElementById('cli-tags-attivi').innerHTML = cliEdit.tags.map(function (t) {
+    return '<span class="tag">' + _escHtml(t) + ' <a href="javascript:void(0)" onclick="rimuoviTag(\'' + _escHtml(t).replace(/'/g, "\\'") + '\')" style="color:var(--rust);text-decoration:none;">✕</a></span>';
+  }).join('') || '<span style="color:var(--stone);font-size:.75rem;">Nessun tag.</span>';
+  document.getElementById('cli-tags-suggeriti').innerHTML = TAG_SUGGERITI
+    .filter(function (t) { return cliEdit.tags.indexOf(t) === -1; })
+    .map(function (t) { return '<span class="tag suggest" onclick="aggiungiTag(\'' + t + '\')">+ ' + t + '</span>'; })
+    .join('');
+}
+function aggiungiTag(t) {
+  if (cliEdit.tags.indexOf(t) === -1) cliEdit.tags.push(t);
+  renderTagsModal();
+}
+function aggiungiTagLibero() {
+  var input = document.getElementById('cli-f-tag-nuovo');
+  var t = (input.value || '').trim();
+  if (t) { aggiungiTag(t); input.value = ''; }
+}
+function rimuoviTag(t) {
+  cliEdit.tags = cliEdit.tags.filter(function (x) { return x !== t; });
+  renderTagsModal();
+}
+
+function chiudiModal() {
+  document.getElementById('cli-modal').classList.remove('on');
+}
+
+function salvaCliente() {
+  var nome = document.getElementById('cli-f-nome').value.trim();
+  var telefono = document.getElementById('cli-f-telefono').value.trim();
+  var email = document.getElementById('cli-f-email').value.trim();
+  var note = document.getElementById('cli-f-note').value.trim();
+  if (!cliEdit.id && !cliEdit.telefono_norm && !telefono && !nome) {
+    _setModalStatus('Inserisci almeno un nome o un telefono.', true); return;
+  }
+  var payload = {
+    action: 'upsert', id: cliEdit.id, nome: nome, telefono: telefono || null, email: email,
+    note: note, tags: cliEdit.tags, manuale: cliEdit.manuale && !cliEdit.telefono_norm && !telefono,
+  };
+  _setModalStatus('Salvataggio…');
+  _cliFetch(payload).then(function (res) {
+    if (res.status === 200 && res.body && res.body.ok) {
+      cliState.clienti = res.body.clienti || [];
+      popolaFiltroTag();
+      renderClienti();
+      _setModalStatus('Salvato.');
+      setTimeout(chiudiModal, 500);
+    } else {
+      _setModalStatus((res.body && res.body.error) || 'Errore.', true);
+    }
+  }).catch(function () { _setModalStatus('Errore di connessione.', true); });
+}
+
+function eliminaCliente() {
+  if (!cliEdit.id) return;
+  if (!window.confirm('Eliminare la scheda? (lo storico prenotazioni resta, si perdono solo note/tag/nome personalizzato)')) return;
+  _setModalStatus('Eliminazione…');
+  _cliFetch({ action: 'delete', id: cliEdit.id }).then(function (res) {
+    if (res.status === 200 && res.body && res.body.ok) {
+      cliState.clienti = res.body.clienti || [];
+      popolaFiltroTag();
+      renderClienti();
+      chiudiModal();
+    } else {
+      _setModalStatus((res.body && res.body.error) || 'Errore.', true);
+    }
+  }).catch(function () { _setModalStatus('Errore di connessione.', true); });
+}
+
+loadClienti();
+</script>
+</body>
+</html>

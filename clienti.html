@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!-- v 2026.09.01.02 — stato di arrivo nello storico prenotazioni ora mostrato come badge colorato
+     (In attesa/Arrivato/No-show), stessa palette già in uso in gestionale.html (.badge-wait/-ok/-no)
+     invece del valore grezzo del database (es. "in_attesa"). Richiesta Andrea dopo aver visto lo
+     stato illeggibile nella scheda cliente. -->
 <!-- v 2026.09.01.01 — NUOVO: CRM ospiti (Gestionale Fase 2, pianificato 5/7/2026, costruito
      1/9/2026). Pagina admin standalone (stesso stile/pattern di gestionale.html/cantina.html:
      tema chiaro cream/ink/rust, auth _ghToken() con gh_token in localStorage), collegata da un
@@ -65,6 +69,10 @@
     .field textarea { min-height:5rem; resize:vertical; }
     .modal .actions { display:flex; gap:.6rem; margin-top:1.2rem; flex-wrap:wrap; }
     .storia-tbl { font-size:.75rem; margin-top:.4rem; max-height:240px; overflow-y:auto; display:block; }
+    .badge { font-size:.6rem; letter-spacing:.06em; text-transform:uppercase; padding:.15rem .5rem; border-radius:2px; white-space:nowrap; }
+    .badge-wait { background:var(--sand); color:var(--stone); border:1px solid var(--rule); }
+    .badge-ok { background:#e6f0ea; color:var(--ok); border:1px solid #bcd9c9; }
+    .badge-no { background:#f6e7e2; color:var(--rust); border:1px solid #e3bcac; }
     .stat-row { display:flex; gap:1.4rem; flex-wrap:wrap; margin-bottom:1rem; font-size:.78rem; }
     .stat-row b { display:block; font-size:1.1rem; font-weight:400; }
     .status { font-size:.75rem; color:var(--stone); margin-top:.6rem; }
@@ -75,7 +83,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestione Clienti <span class="ver">v 2026.09.01.01</span></h1>
+      <h1>Gestione Clienti <span class="ver">v 2026.09.01.02</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -161,6 +169,12 @@ function _ghToken() {
     if (t) localStorage.setItem('gh_token', t);
   }
   return t;
+}
+
+var STATO_LABEL = { in_attesa: ['In attesa', 'badge-wait'], arrivato: ['Arrivato', 'badge-ok'], no_show: ['No-show', 'badge-no'] };
+function badgeStato(s) {
+  var def = STATO_LABEL[s] || [s || '—', 'badge-wait'];
+  return '<span class="badge ' + def[1] + '">' + _escHtml(def[0]) + '</span>';
 }
 
 function _escHtml(s) {
@@ -291,7 +305,7 @@ function apriScheda(i) {
       if (res.status === 200 && res.body && res.body.ok) {
         document.getElementById('cli-storia-tbody').innerHTML = (res.body.storia || []).map(function (r) {
           return '<tr><td>' + _escHtml(r.data) + '</td><td>' + _escHtml(r.orario) + '</td><td>' + (r.persone || '') +
-            '</td><td>' + _escHtml(r.arrivo_status || r.status) + '</td><td>' + _escHtml(r.occasione || '—') + '</td></tr>';
+            '</td><td>' + badgeStato(r.arrivo_status || r.status) + '</td><td>' + _escHtml(r.occasione || '—') + '</td></tr>';
         }).join('');
       }
     });

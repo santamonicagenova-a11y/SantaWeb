@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!-- v 2026.09.01.06 — "modalità scheda diretta" per il deep-link da gestionale.html (richiesta
+     Andrea: "si deve aprire direttamente l'anagrafica cliente, non un'altra pagina con la
+     tabella clienti"). Con ?tel=... la toolbar e la tabella restano nascoste, la scheda cliente
+     non è più un modal sopra una tabella dimmerata ma diventa il contenuto diretto della pagina
+     (classe .embedded: niente overlay/sfondo scurito). Pulsante "Annulla" diventa "← Vedi tutti
+     i clienti" in questa modalità: chiudendolo si esce e riappare l'elenco completo (rimuove
+     anche ?tel dalla URL). -->
 <!-- v 2026.09.01.05 — deep-link da gestionale.html: `clienti.html?tel=<telefono_norm>` apre
      subito la scheda del cliente giusto dopo il caricamento della lista (invece di dover
      cercare a mano). Parte dell'integrazione CRM↔gestionale richiesta da Andrea. Refactor
@@ -86,6 +93,10 @@
     .empty { padding:2rem; text-align:center; color:var(--stone); font-size:.85rem; }
 
     .modal-overlay { display:none; position:fixed; inset:0; background:rgba(26,23,20,.55); z-index:200; align-items:flex-start; justify-content:center; padding:3rem 1rem; overflow-y:auto; }
+    /* Modalità "scheda diretta" (deep-link da gestionale.html ?tel=...): niente overlay/sfondo
+       scurito sopra una tabella nascosta dietro — la scheda È il contenuto della pagina. */
+    .modal-overlay.embedded { position:static; background:none; padding:1.4rem 1rem; }
+    .modal-overlay.embedded .modal { max-width:640px; margin:0 auto; box-shadow:0 2px 10px rgba(0,0,0,.08); }
     .modal-overlay.on { display:flex; }
     .modal { background:#fff; padding:1.6rem; max-width:640px; width:100%; border:1px solid var(--rule); }
     .modal h3 { font-size:.78rem; font-weight:400; letter-spacing:.1em; text-transform:uppercase; color:var(--stone); margin-bottom:1rem; }
@@ -109,7 +120,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestione Clienti <span class="ver">v 2026.09.01.05</span></h1>
+      <h1>Gestione Clienti <span class="ver">v 2026.09.01.06</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -185,7 +196,7 @@
 
       <div class="actions">
         <button class="btn btn-ok" onclick="salvaCliente()">💾 Salva</button>
-        <button class="btn" onclick="chiudiModal()">Annulla</button>
+        <button class="btn" id="cli-annulla-btn" onclick="chiudiModal()">Annulla</button>
         <button class="btn btn-rust" id="cli-elimina-btn" style="display:none;margin-left:auto;" onclick="eliminaCliente()">🗑 Elimina scheda</button>
       </div>
       <div class="status" id="cli-modal-status"></div>
@@ -366,9 +377,17 @@ function apriScheda(i) {
 }
 
 // Apre la scheda partendo da un telefono normalizzato (deep-link da gestionale.html, es.
-// clienti.html?tel=3331234567) invece che dall'indice della lista filtrata a video.
+// clienti.html?tel=3331234567) invece che dall'indice della lista filtrata a video. Entra in
+// "modalità scheda diretta": niente tabella/toolbar dietro, la scheda È la pagina (richiesta
+// Andrea: "si deve aprire una finestra direttamente dell'anagrafica cliente, non un'altra
+// pagina con la tabella clienti").
+var focusMode = false;
 function apriSchedaPerTelefono(telNorm) {
   var c = cliState.clienti.filter(function (x) { return x.telefono_norm === telNorm; })[0];
+  focusMode = true;
+  document.querySelector('.toolbar').style.display = 'none';
+  document.querySelector('.wrap').style.display = 'none';
+  document.getElementById('cli-empty').style.display = 'none';
   if (!c) { _setStatus('Cliente non trovato (telefono ' + telNorm + ').', true); return; }
   apriSchedaCliente(c);
 }
@@ -412,6 +431,9 @@ function apriSchedaCliente(c) {
   }
 
   document.getElementById('cli-modal').classList.add('on');
+  document.getElementById('cli-modal').classList.toggle('embedded', focusMode);
+  var annullaBtn = document.getElementById('cli-annulla-btn');
+  annullaBtn.textContent = focusMode ? '← Vedi tutti i clienti' : 'Annulla';
 }
 
 function renderTagsModal() {
@@ -439,6 +461,14 @@ function rimuoviTag(t) {
 
 function chiudiModal() {
   document.getElementById('cli-modal').classList.remove('on');
+  document.getElementById('cli-modal').classList.remove('embedded');
+  if (focusMode) {
+    // "← Vedi tutti i clienti": esce dalla modalità scheda diretta, torna all'elenco completo.
+    focusMode = false;
+    document.querySelector('.toolbar').style.display = '';
+    document.querySelector('.wrap').style.display = '';
+    history.replaceState(null, '', window.location.pathname);
+  }
 }
 
 function salvaCliente() {

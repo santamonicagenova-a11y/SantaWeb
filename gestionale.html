@@ -1,4 +1,16 @@
 <!DOCTYPE html>
+<!-- v 2026.09.01.01 — integrazione CRM nel gestionale (richiesta Andrea: "quando apro le
+     prenotazioni di una giornata devo vedere se il cliente è già venuto, poter modificare la
+     prenotazione e aprire l'anagrafica cliente"). (1) Badge "★ Cliente abituale — già venuto
+     N volte" sotto ogni prenotazione con almeno una visita precedente onorata (arrivo_status=
+     'arrivato' su un'altra prenotazione con lo stesso telefono) — nuovo campo `cliente_storico`
+     da gestionale-day v8. (2) Nuovo pulsante "✎ Modifica" → modale con nome/telefono/email/
+     persone/orario/occasione/intolleranze/note editabili (azione update_reservation su
+     set-reminder-settings v11) — pensato soprattutto per correggere il numero di ospiti dopo
+     la prenotazione, NON permette di cambiare la data (per farlo si cancella e se ne crea una
+     nuova, la disponibilità/capienza non viene ricontrollata su una modifica manuale). (3)
+     Nuovo pulsante "👤 Anagrafica" → apre in una nuova scheda `clienti.html?tel=<telefono
+     normalizzato>`, che si apre già sulla scheda del cliente giusto (clienti.html v.05). -->
 <!-- v 2026.08.08.02 — la vista giorno (e la ricerca) ora mostrano il DETTAGLIO reale della
      garanzia (penale, ore disdetta, codice SafeTable) sotto ogni prenotazione, non solo il
      badge sintetico "✓ Garanzia" — richiesta Andrea dopo il commit della v.01, che aveva
@@ -211,6 +223,15 @@
     .res-info .gz-match { font-size:.72rem; margin-top:.25rem; }
     .res-info .gz-match.found { color:var(--ok); }
     .res-info .gz-match.missing { color:var(--stone); font-style:italic; }
+
+    .res-info .storico-badge { font-size:.68rem; color:var(--ok); margin-top:.15rem; }
+    .res-actions-row { display:flex; gap:.4rem; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(26,23,20,.55); z-index:200; align-items:flex-start; justify-content:center; padding:3rem 1rem; overflow-y:auto; }
+    .modal-overlay.on { display:flex; }
+    .modal { background:#fff; padding:1.6rem; max-width:560px; width:100%; border:1px solid var(--rule); }
+    .modal h3 { font-size:.78rem; font-weight:400; letter-spacing:.1em; text-transform:uppercase; color:var(--stone); margin-bottom:1rem; }
+    .modal .actions { display:flex; gap:.6rem; margin-top:1.2rem; flex-wrap:wrap; align-items:center; }
   </style>
 </head>
 <body>
@@ -283,6 +304,28 @@
   <div class="status-line" id="day-status"></div>
 </div>
 
+<!-- Modifica prenotazione (richiesta Andrea: cambiare es. numero ospiti direttamente da qui) -->
+<div class="modal-overlay" id="edit-res-modal">
+  <div class="modal">
+    <h3>Modifica prenotazione</h3>
+    <div class="form-grid">
+      <div><label>Nome *</label><input type="text" id="er-nome" /></div>
+      <div><label>Telefono *</label><input type="text" id="er-telefono" /></div>
+      <div><label>Email</label><input type="text" id="er-email" /></div>
+      <div><label>Persone *</label><input type="text" id="er-persone" placeholder="es. 2" /></div>
+      <div><label>Orario *</label><input type="text" id="er-orario" placeholder="es. 20:00" /></div>
+      <div><label>Occasione</label><input type="text" id="er-occasione" /></div>
+      <div><label>Intolleranze</label><input type="text" id="er-intolleranze" /></div>
+      <div class="full"><label>Note</label><input type="text" id="er-note" /></div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-ok" onclick="salvaModificaRes()">💾 Salva</button>
+      <button class="btn" onclick="chiudiModificaRes()">Annulla</button>
+      <div class="status-line" id="edit-res-status" style="margin:0;"></div>
+    </div>
+  </div>
+</div>
+
 <div class="day-wrap" id="search-wrap">
   <div class="day-hdr">
     <button class="btn" onclick="clearSearch()">‹ Torna al mese</button>
@@ -312,7 +355,7 @@
   <div class="status-line" id="garanzie-status"></div>
 </div>
 
-<footer class="ver">v 2026.08.08.02</footer>
+<footer class="ver">v 2026.09.01.01</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';
@@ -618,14 +661,111 @@ function renderDay(rows) {
         '<div class="meta">' + (r.telefono ? '<a href="tel:' + escapeHtml(r.telefono) + '">' + escapeHtml(r.telefono) + '</a>' : '') +
           (r.occasione ? ' · ' + escapeHtml(r.occasione) : '') +
           (r.intolleranze ? ' · ' + escapeHtml(r.intolleranze) : '') + '</div>' +
+        storicoClienteHtml(r) +
         garanziaDetailHtml(r) +
       '</div>' +
       '<div>' + statusBadge(r) + ' ' + confermaBadge(r) + ' ' + garanziaBadge(r) + '</div>';
     var remBtns = buildReminderButtons(r, curDate);
     if (remBtns) row.appendChild(remBtns);
     row.appendChild(buildArrivoControls(r, loadDay));
+    row.appendChild(buildCrmControls(r));
     list.appendChild(row);
   });
+}
+
+// Badge "cliente abituale" — integrazione CRM (richiesta Andrea, 1/9/2026): visite_precedenti
+// arriva già calcolato da gestionale-day (arrivo_status='arrivato' su altre prenotazioni con
+// lo stesso telefono, esclusa la riga corrente).
+function storicoClienteHtml(r) {
+  var s = r.cliente_storico;
+  if (!s || !s.visite_precedenti) return '';
+  var volte = s.visite_precedenti === 1 ? 'volta' : 'volte';
+  return '<div class="storico-badge">★ Cliente abituale — già venuto ' + s.visite_precedenti + ' ' + volte +
+    (s.ultima_visita ? ' (ultima il ' + fmtItDateVeryShort(s.ultima_visita) + ')' : '') + '</div>';
+}
+
+// Ultime 9 cifre del telefono — stessa normalizzazione lato server (gestionale-day/clienti-crm),
+// serve per costruire il deep-link verso clienti.html?tel=...
+function normPhoneJs(s) {
+  var digits = String(s || '').replace(/\D/g, '');
+  return digits.length > 9 ? digits.slice(-9) : digits;
+}
+
+// Pulsanti "✎ Modifica" + "👤 Anagrafica" — integrazione CRM nel gestionale (richiesta Andrea).
+function buildCrmControls(r) {
+  var wrap = document.createElement('div');
+  wrap.className = 'res-actions-row';
+  var edit = document.createElement('button');
+  edit.className = 'btn'; edit.textContent = '✎ Modifica';
+  edit.onclick = function () { apriModificaRes(r); };
+  wrap.appendChild(edit);
+  var tel = normPhoneJs(r.telefono);
+  if (tel) {
+    var anag = document.createElement('button');
+    anag.className = 'btn'; anag.textContent = '👤 Anagrafica';
+    anag.onclick = function () { window.open('clienti.html?tel=' + tel, '_blank'); };
+    wrap.appendChild(anag);
+  }
+  return wrap;
+}
+
+var editResCurrentId = null;
+
+function apriModificaRes(r) {
+  editResCurrentId = r.id;
+  document.getElementById('er-nome').value = r.nome || '';
+  document.getElementById('er-telefono').value = r.telefono || '';
+  document.getElementById('er-email').value = r.email || '';
+  document.getElementById('er-persone').value = r.persone || '';
+  document.getElementById('er-orario').value = r.orario || '';
+  document.getElementById('er-occasione').value = r.occasione || '';
+  document.getElementById('er-intolleranze').value = r.intolleranze || '';
+  document.getElementById('er-note').value = r.note || '';
+  document.getElementById('edit-res-status').textContent = '';
+  document.getElementById('edit-res-modal').classList.add('on');
+}
+
+function chiudiModificaRes() {
+  document.getElementById('edit-res-modal').classList.remove('on');
+  editResCurrentId = null;
+}
+
+function salvaModificaRes() {
+  if (!editResCurrentId) return;
+  var statusEl = document.getElementById('edit-res-status');
+  var nome = document.getElementById('er-nome').value.trim();
+  var telefono = document.getElementById('er-telefono').value.trim();
+  var persone = parseInt(document.getElementById('er-persone').value, 10);
+  var orario = document.getElementById('er-orario').value.trim();
+  if (!nome || !telefono || !orario || !persone || persone < 1) {
+    statusEl.textContent = 'Nome, telefono, orario e persone (≥1) sono obbligatori.';
+    statusEl.className = 'status-line err';
+    return;
+  }
+  var token = _ghToken();
+  if (!token) { statusEl.textContent = 'Operazione annullata: serve il token GitHub.'; statusEl.className = 'status-line err'; return; }
+  statusEl.textContent = 'Salvataggio…'; statusEl.className = 'status-line';
+  fetch(ACTION_URL, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'update_reservation', id: editResCurrentId, github_token: token,
+      nome: nome, telefono: telefono, email: document.getElementById('er-email').value.trim(),
+      persone: persone, orario: orario,
+      occasione: document.getElementById('er-occasione').value.trim(),
+      intolleranze: document.getElementById('er-intolleranze').value.trim(),
+      note: document.getElementById('er-note').value.trim(),
+    }),
+  })
+    .then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); })
+    .then(function (res) {
+      if (res.status === 200 && res.body && res.body.ok) {
+        chiudiModificaRes();
+        loadDay();
+      } else {
+        statusEl.textContent = (res.body && res.body.error) || 'Errore.'; statusEl.className = 'status-line err';
+      }
+    })
+    .catch(function () { statusEl.textContent = 'Errore di connessione.'; statusEl.className = 'status-line err'; });
 }
 
 function escapeHtml(s) {

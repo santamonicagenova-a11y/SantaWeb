@@ -1,4 +1,19 @@
 <!DOCTYPE html>
+<!-- v 2026.09.01.05 — deep-link da gestionale.html: `clienti.html?tel=<telefono_norm>` apre
+     subito la scheda del cliente giusto dopo il caricamento della lista (invece di dover
+     cercare a mano). Parte dell'integrazione CRM↔gestionale richiesta da Andrea. Refactor
+     interno: apriScheda(i) ora e' un wrapper su apriSchedaCliente(c), condiviso con la nuova
+     apriSchedaPerTelefono(telNorm). -->
+<!-- v 2026.09.01.04 — verifica REALE dell'iscrizione Brevo (richiesta Andrea: "non puoi
+     comunicare con Brevo e vedere che ha dato il consenso?"). Nuovo pulsante "🔍 Verifica su
+     Brevo" nella scheda cliente (visibile solo se c'è un'email): chiama la nuova azione
+     check_brevo su clienti-crm v3, che fa GET /v3/contacts/{email} su Brevo — con Double Opt-in
+     un contatto entra nella lista Newsletter (ID 2) SOLO dopo aver cliccato il link di conferma,
+     quindi trovarlo in listIds è la prova vera di iscrizione, non solo "richiesta inviata"
+     (stesso controllo già usato da submit-reservation per evitare doppie richieste DOI). 3 esiti
+     mostrati: iscritto confermato / presente ma non confermato / non trovato su Brevo. Chiamata
+     solo su richiesta esplicita (bottone), mai automatica su tutta la lista — un giro Brevo per
+     cliente, non serve/non è pensata per verifiche di massa. -->
 <!-- v 2026.09.01.03 — dati CRM utilizzabili per newsletter/marketing (richiesta Andrea). Nuova
      colonna "Newsletter" in elenco (Sì/No, badge colorato) + filtro "Consenso: tutti/solo
      consenzienti/solo non consenzienti" + pulsante "⇩ Esporta CSV" (esporta la lista filtrata
@@ -94,7 +109,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestione Clienti <span class="ver">v 2026.09.01.03</span></h1>
+      <h1>Gestione Clienti <span class="ver">v 2026.09.01.05</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -132,6 +147,10 @@
       <h3 id="cli-modal-title">Scheda cliente</h3>
 
       <div class="stat-row" id="cli-stats"></div>
+      <div class="field" id="cli-brevo-wrap" style="display:none;">
+        <button class="btn btn-sm" onclick="verificaBrevo()">🔍 Verifica su Brevo</button>
+        <span id="cli-brevo-esito" style="font-size:.78rem;color:var(--stone);margin-left:.5rem;"></span>
+      </div>
 
       <div class="field">
         <label>Nome</label>
@@ -228,6 +247,9 @@ function loadClienti() {
       popolaFiltroTag();
       renderClienti();
       _setStatus('');
+      // Deep-link da gestionale.html (?tel=<telefono_norm>): apre subito la scheda giusta.
+      var telParam = new URLSearchParams(window.location.search).get('tel');
+      if (telParam) apriSchedaPerTelefono(telParam);
     } else if (res.status === 401) {
       _setStatus('Token GitHub non valido o senza permessi. Ricarica la pagina per reinserirlo.', true);
     } else {
@@ -331,6 +353,7 @@ function apriModalNuovo() {
   document.getElementById('cli-stats').innerHTML = '';
   document.getElementById('cli-storia-wrap').style.display = 'none';
   document.getElementById('cli-elimina-btn').style.display = 'none';
+  document.getElementById('cli-brevo-wrap').style.display = 'none';
   renderTagsModal();
   _setModalStatus('');
   document.getElementById('cli-modal').classList.add('on');
@@ -339,7 +362,21 @@ function apriModalNuovo() {
 function apriScheda(i) {
   var c = renderClienti._current[i];
   if (!c) return;
-  cliEdit = { id: c.id, telefono_norm: c.telefono_norm, tags: (c.tags || []).slice(), manuale: c.manuale };
+  apriSchedaCliente(c);
+}
+
+// Apre la scheda partendo da un telefono normalizzato (deep-link da gestionale.html, es.
+// clienti.html?tel=3331234567) invece che dall'indice della lista filtrata a video.
+function apriSchedaPerTelefono(telNorm) {
+  var c = cliState.clienti.filter(function (x) { return x.telefono_norm === telNorm; })[0];
+  if (!c) { _setStatus('Cliente non trovato (telefono ' + telNorm + ').', true); return; }
+  apriSchedaCliente(c);
+}
+
+function apriSchedaCliente(c) {
+  cliEdit = { id: c.id, telefono_norm: c.telefono_norm, tags: (c.tags || []).slice(), manuale: c.manuale, email: c.email || '' };
+  document.getElementById('cli-brevo-wrap').style.display = c.email ? '' : 'none';
+  document.getElementById('cli-brevo-esito').textContent = '';
   document.getElementById('cli-modal-title').textContent = c.nome || '(senza nome)';
   document.getElementById('cli-f-nome').value = c.nome || '';
   document.getElementById('cli-f-telefono').value = c.telefono || '';
@@ -444,6 +481,28 @@ function eliminaCliente() {
       _setModalStatus((res.body && res.body.error) || 'Errore.', true);
     }
   }).catch(function () { _setModalStatus('Errore di connessione.', true); });
+}
+
+// Verifica reale su Brevo: iscritto CONFERMATO solo se presente nella lista Newsletter
+// (Double Opt-in — Brevo lo aggiunge alla lista solo dopo il click di conferma). Legge
+// l'email direttamente dal campo del form (non da cliEdit) così riflette eventuali modifiche
+// non ancora salvate.
+function verificaBrevo() {
+  var email = document.getElementById('cli-f-email').value.trim();
+  var esito = document.getElementById('cli-brevo-esito');
+  if (!email) { esito.textContent = 'Nessuna email.'; esito.style.color = 'var(--rust)'; return; }
+  esito.textContent = 'Verifica in corso…';
+  esito.style.color = 'var(--stone)';
+  _cliFetch({ action: 'check_brevo', email: email }).then(function (res) {
+    if (res.status === 200 && res.body && res.body.ok) {
+      if (res.body.subscribed) { esito.textContent = '✓ Iscritto confermato a Brevo.'; esito.style.color = 'var(--ok)'; }
+      else if (res.body.found) { esito.textContent = 'Presente su Brevo ma non confermato (DOI in sospeso o non completato).'; esito.style.color = 'var(--warn)'; }
+      else { esito.textContent = 'Non trovato su Brevo.'; esito.style.color = 'var(--stone)'; }
+    } else {
+      esito.textContent = (res.body && res.body.error) || 'Errore nella verifica.';
+      esito.style.color = 'var(--rust)';
+    }
+  }).catch(function () { esito.textContent = 'Errore di connessione.'; esito.style.color = 'var(--rust)'; });
 }
 
 loadClienti();

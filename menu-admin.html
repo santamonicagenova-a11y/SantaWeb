@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<!-- v 2026.08.31.03 — nuovo pulsante "Gestione Clienti" → link a clienti.html (pagina admin
+<!-- v 2026.09.01.03 — nuovo pulsante "Gestione Clienti" → link a clienti.html (pagina admin
      standalone nuova, ramo CRM ospiti / Gestionale Fase 2, pianificato 5/7/2026, costruito ora):
      elenco clienti aggregato dalle prenotazioni per telefono, con note libere/tag editabili e
      possibilità di aggiungere clienti manuali. Backend: tabella `clienti` + Edge Function
      `clienti-crm` su SafeTable. Nessuna modifica ad altre parti di questo file. -->
-<!-- v 2026.08.31.02 — pulsante "Importa da NoShowApp": tolto il filtro per ristorante (richiesta
+<!-- v 2026.09.01.02 — pulsante "Importa da NoShowApp": tolto il filtro per ristorante (richiesta
      esplicita Andrea, "vorrei copiare tutto") — ora import_from_nsa (rubrica-professionisti v4)
      copia TUTTE le voci della rubrica condivisa NSA, non solo quelle di Santamonica; il ristorante
      di provenienza resta comunque tracciato nel campo segnalato_da ("Importato da NoShowApp
      (Nome ristorante)"). Dedup per nome+telefono invariata. Solo testo aggiornato qui, nessuna
      modifica di codice in questo file (il filtro viveva lato Edge Function). -->
-<!-- v 2026.08.31.01 — Rubrica professionisti: ri-separata da NoShowApp (richiesta Andrea).
+<!-- v 2026.09.01.01 — Rubrica professionisti: ri-separata da NoShowApp (richiesta Andrea).
      Il 25/7/2026 era stata unificata in un'unica tabella condivisa su NoShowApp (progetto
      ltgvyanqzkpulocypsve); ora Santamonica torna ad avere una tabella propria e privata su
      SafeTable (`professionisti`/`professionisti_note_uso`, ricreate — erano state droppate
@@ -1690,7 +1690,7 @@ function removePrenSlotCap(date, time) {
 // stesso meccanismo/token di prenotazioni online e reminder — riusa _prenGhToken()).
 // A differenza della rubrica di NoShowApp, qui sia lettura sia scrittura passano
 // dal token: è un elenco interno di Santamonica, non un database tra ristoratori.
-// v 2026.08.31 — tornata alla tabella LOCALE su SafeTable (era stata unificata con
+// v 2026.09.01 — tornata alla tabella LOCALE su SafeTable (era stata unificata con
 // NoShowApp il 25/7/2026, poi ri-separata su decisione di Andrea: le due rubriche
 // (Santamonica su ST, NoShowApp su NSA) restano ora due tabelle fisicamente distinte
 // su due progetti diversi — nessun dato condiviso tra le due finché non si costruisce
@@ -3655,7 +3655,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.08.31.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.01.03</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

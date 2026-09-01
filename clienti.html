@@ -1,4 +1,15 @@
 <!DOCTYPE html>
+<!-- v 2026.09.01.03 — dati CRM utilizzabili per newsletter/marketing (richiesta Andrea). Nuova
+     colonna "Newsletter" in elenco (Sì/No, badge colorato) + filtro "Consenso: tutti/solo
+     consenzienti/solo non consenzienti" + pulsante "⇩ Esporta CSV" (esporta la lista filtrata
+     corrente: nome/telefono/email/prenotazioni/ultima visita/no-show/consenso/tag — per campagne
+     mirate, es. import in Brevo). Scheda cliente mostra "Consenso newsletter: Sì, dal gg-mm-aaaa /
+     No" in sola lettura (è un dato legale che arriva dal checkbox di prenotazione, non editabile
+     da qui). Regola di aggregazione (decisione Andrea): un cliente risulta consenziente se
+     ALMENO UNA delle sue prenotazioni ha marketing_consent=true ("basta un sì"). Backend:
+     clienti-crm v2 espone consenso_marketing/consenso_marketing_at/brevo_doi_requested_at
+     (quest'ultimo = richiesta DOI inviata, NON conferma di iscrizione effettiva — non abbiamo
+     visibilità su Brevo da qui). -->
 <!-- v 2026.09.01.02 — stato di arrivo nello storico prenotazioni ora mostrato come badge colorato
      (In attesa/Arrivato/No-show), stessa palette già in uso in gestionale.html (.badge-wait/-ok/-no)
      invece del valore grezzo del database (es. "in_attesa"). Richiesta Andrea dopo aver visto lo
@@ -83,7 +94,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestione Clienti <span class="ver">v 2026.09.01.02</span></h1>
+      <h1>Gestione Clienti <span class="ver">v 2026.09.01.03</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -93,7 +104,13 @@
     <select id="cli-filtro-tag" onchange="renderClienti()">
       <option value="">Tutti i tag</option>
     </select>
+    <select id="cli-filtro-consenso" onchange="renderClienti()">
+      <option value="">Consenso: tutti</option>
+      <option value="si">Solo consenzienti</option>
+      <option value="no">Solo NON consenzienti</option>
+    </select>
     <button class="btn" onclick="loadClienti()">↻ Aggiorna</button>
+    <button class="btn" onclick="esportaCSV()">⇩ Esporta CSV</button>
     <button class="btn btn-ok" onclick="apriModalNuovo()">+ Cliente manuale</button>
     <span class="counts" id="cli-counts"></span>
   </div>
@@ -101,7 +118,7 @@
   <div class="wrap">
     <table>
       <thead>
-        <tr><th>Nome</th><th>Telefono</th><th>Prenotazioni</th><th>Ultima visita</th><th>No-show</th><th>Tag</th></tr>
+        <tr><th>Nome</th><th>Telefono</th><th>Prenotazioni</th><th>Ultima visita</th><th>No-show</th><th>Newsletter</th><th>Tag</th></tr>
       </thead>
       <tbody id="cli-tbody"></tbody>
     </table>
@@ -237,8 +254,11 @@ function popolaFiltroTag() {
 function renderClienti() {
   var q = (document.getElementById('cli-search').value || '').trim().toLowerCase();
   var tagFiltro = document.getElementById('cli-filtro-tag').value;
+  var consensoFiltro = document.getElementById('cli-filtro-consenso').value;
   var list = cliState.clienti.filter(function (c) {
     if (tagFiltro && (c.tags || []).indexOf(tagFiltro) === -1) return false;
+    if (consensoFiltro === 'si' && !c.consenso_marketing) return false;
+    if (consensoFiltro === 'no' && c.consenso_marketing) return false;
     if (!q) return true;
     var hay = [(c.nome || ''), (c.telefono || ''), (c.email || '')].join(' ').toLowerCase();
     return hay.indexOf(q) !== -1;
@@ -251,18 +271,54 @@ function renderClienti() {
   tbody.innerHTML = list.map(function (c, i) {
     var tagsHtml = (c.tags || []).map(function (t) { return '<span class="tag">' + _escHtml(t) + '</span>'; }).join('');
     var manuale = c.manuale ? ' <span class="manuale-badge">manuale</span>' : '';
+    var newsletterHtml = c.consenso_marketing
+      ? '<span class="badge badge-ok">Sì</span>'
+      : '<span class="badge badge-wait">No</span>';
     return '<tr class="clickable" onclick="apriScheda(' + i + ')">' +
       '<td>' + _escHtml(c.nome || '(senza nome)') + manuale + '</td>' +
       '<td>' + _escHtml(c.telefono || '—') + '</td>' +
       '<td>' + (c.n_prenotazioni || 0) + '</td>' +
       '<td>' + _escHtml(c.ultima_prenotazione || '—') + '</td>' +
       '<td>' + (c.n_no_show ? c.n_no_show : '—') + '</td>' +
+      '<td>' + newsletterHtml + '</td>' +
       '<td>' + (tagsHtml || '—') + '</td>' +
       '</tr>';
   }).join('');
 
   // indice per apriScheda() sulla lista filtrata corrente
   renderClienti._current = list;
+}
+
+function _csvCell(s) {
+  var v = String(s == null ? '' : s);
+  if (/[",\n;]/.test(v)) v = '"' + v.replace(/"/g, '""') + '"';
+  return v;
+}
+
+// Esporta la lista attualmente filtrata (ricerca + tag + consenso) in CSV — utile per
+// costruire liste su misura da caricare in Brevo o altri strumenti di campagna.
+function esportaCSV() {
+  var list = renderClienti._current || [];
+  if (!list.length) { _setStatus('Nessun cliente da esportare con i filtri attuali.', true); return; }
+  var header = ['Nome', 'Telefono', 'Email', 'Prenotazioni', 'Ultima visita', 'No-show', 'Consenso newsletter', 'Tag'];
+  var rows = list.map(function (c) {
+    return [
+      c.nome || '', c.telefono || '', c.email || '', c.n_prenotazioni || 0,
+      c.ultima_prenotazione || '', c.n_no_show || 0, c.consenso_marketing ? 'Sì' : 'No',
+      (c.tags || []).join('; '),
+    ].map(_csvCell).join(',');
+  });
+  var csv = '﻿' + header.join(',') + '\n' + rows.join('\n');
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'clienti-santamonica-' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  _setStatus('Esportati ' + list.length + ' clienti.');
 }
 
 function apriModalNuovo() {
@@ -295,11 +351,15 @@ function apriScheda(i) {
 
   if (c.telefono_norm) {
     document.getElementById('cli-storia-wrap').style.display = '';
+    var consensoLabel = c.consenso_marketing
+      ? 'Sì, dal ' + _escHtml((c.consenso_marketing_at || '').slice(0, 10) || '—')
+      : 'No';
     document.getElementById('cli-stats').innerHTML =
       '<div><b>' + (c.n_prenotazioni || 0) + '</b>prenotazioni</div>' +
       '<div><b>' + (c.n_arrivato || 0) + '</b>arrivate</div>' +
       '<div><b>' + (c.n_no_show || 0) + '</b>no-show</div>' +
-      '<div><b>' + _escHtml(c.prima_prenotazione || '—') + '</b>prima visita</div>';
+      '<div><b>' + _escHtml(c.prima_prenotazione || '—') + '</b>prima visita</div>' +
+      '<div><b>' + consensoLabel + '</b>consenso newsletter</div>';
     document.getElementById('cli-storia-tbody').innerHTML = '<tr><td colspan="5" style="color:var(--stone);">Caricamento storico…</td></tr>';
     _cliFetch({ action: 'detail', telefono_norm: c.telefono_norm }).then(function (res) {
       if (res.status === 200 && res.body && res.body.ok) {

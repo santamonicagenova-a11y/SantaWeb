@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- v 2026.09.02.09 — fix cambio tab (segnalato da Andrea): passando da una tab all'altra (Gestione
+     menù / Prenotazioni e voucher / Setup) quello che era caricato sotto (es. la carta) restava
+     visibile invece di sparire. setQaTab() ora chiama _pulisciViste() (admin-core.js) a ogni
+     cambio tab. Inoltre "📖 Procedure di aggiornamento e traduzione" (#intro/#procedure, riguarda
+     solo carta/dolci/allergeni/vini) ora è visibile SOLO sulla tab "Gestione menù e sito",
+     nascosta nelle altre 2. Guardia typeof su _pulisciViste per il primo setQaTab() al
+     caricamento pagina, che scatta PRIMA che admin-core.js sia parsato (script in fondo alla
+     pagina) — nessun crash, semplicemente skip alla prima chiamata. -->
 <!-- v 2026.09.02.08 — fix layout checkbox "Invio attivo" (M4): la regola CSS globale
      input[type=checkbox]{margin:auto} (pensata per centrare i checkbox in altri contesti, es.
      tabelle) dentro la label flex spingeva checkbox e testo agli estremi opposti — segnalato da
@@ -620,6 +628,15 @@
       document.querySelectorAll('.qa-tab').forEach(function(b){ b.classList.toggle('active', b.dataset.group===g); });
       document.querySelectorAll('.qa-group').forEach(function(el){ el.classList.toggle('active', el.dataset.group===g); });
       try{ localStorage.setItem('qaTab', g); }catch(e){}
+      // Cambiando tab si pulisce quello che era aperto sotto (carta caricata, pannello
+      // prenotazioni/voucher/ecc.) — altrimenti restava visibile passando a un'altra tab
+      // (segnalato da Andrea). _pulisciViste() è in admin-core.js, caricato prima che l'utente
+      // possa cliccare (script a fine pagina, ma il DOM è già pronto all'interazione).
+      if (typeof _pulisciViste === 'function') _pulisciViste();
+      // "Procedure di aggiornamento e traduzione" ha senso solo con "Gestione menù e sito"
+      // aperta (riguarda solo carta/dolci/allergeni/vini) — nascosta nelle altre 2 tab.
+      var introEl = document.getElementById('intro');
+      if (introEl) introEl.style.display = (g === 'menu') ? '' : 'none';
     }
     window.setQaTab = setQaTab;
     var saved = 'menu';
@@ -3864,7 +3881,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.02.08</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.02.09</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

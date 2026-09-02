@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- v 2026.09.02.02 — compleanno/anniversario + milestone "Fedelissimo" (2 delle 4 funzionalità
+     CRM aggiunte dopo ricerca su SevenRooms/OpenTable/Resy/Brevo, richiesta Andrea "falle
+     tutte 4" — le altre 2, filtro inattività e mini-dashboard KPI, sono solo in clienti.html
+     perché riguardano la lista aggregata, non la singola scheda). Anagrafica: 2 nuovi campi
+     data (#an-nascita/#an-anniversario) salvati con lo stesso upsert di sempre (clienti-crm
+     v5). storicoClienteHtml(): badge ora a 2 livelli — "★ Cliente abituale" da 1 visita
+     precedente (invariato), "★★ Cliente fedelissimo" da 10 visite totali (9 precedenti + quella
+     corrente). -->
 <!-- v 2026.09.02.01 — badge "mail di ringraziamento" (M4) — richiesta Andrea: "come posso sapere
      se la mail è stata inviata?". Nuova funzione mailRingraziamentoBadge(r): mostra "✉
      Ringraziata gg/mm" (verde) se reservations.thankyou_sent_at è valorizzato, "✉ in coda"
@@ -358,6 +366,8 @@
       <div><label>Nome</label><input type="text" id="an-nome" /></div>
       <div><label>Telefono</label><input type="text" id="an-telefono" /></div>
       <div><label>Email</label><input type="text" id="an-email" /></div>
+      <div><label>Compleanno</label><input type="date" id="an-nascita" /></div>
+      <div><label>Anniversario</label><input type="date" id="an-anniversario" /></div>
     </div>
     <div style="margin:.8rem 0;">
       <label style="display:block;font-size:.62rem;color:var(--stone);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.3rem;">Tag</label>
@@ -414,7 +424,7 @@
   <div class="status-line" id="garanzie-status"></div>
 </div>
 
-<footer class="ver">v 2026.09.02.01</footer>
+<footer class="ver">v 2026.09.02.02</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';
@@ -749,11 +759,15 @@ function renderDay(rows) {
 // Badge "cliente abituale" — integrazione CRM (richiesta Andrea, 1/9/2026): visite_precedenti
 // arriva già calcolato da gestionale-day (arrivo_status='arrivato' su altre prenotazioni con
 // lo stesso telefono, esclusa la riga corrente).
+// Etichetta con milestone (richiesta Andrea dopo ricerca CRM: SevenRooms auto-etichetta a
+// soglie di visite, es. "regular" a 3+). +1 perché s.visite_precedenti esclude la riga corrente
+// — al 10° arrivo effettivo (9 precedenti + questa) scatta già "Fedelissimo".
 function storicoClienteHtml(r) {
   var s = r.cliente_storico;
   if (!s || !s.visite_precedenti) return '';
   var volte = s.visite_precedenti === 1 ? 'volta' : 'volte';
-  return '<div class="storico-badge">★ Cliente abituale — già venuto ' + s.visite_precedenti + ' ' + volte +
+  var stelle = (s.visite_precedenti + 1) >= 10 ? '★★ Cliente fedelissimo' : '★ Cliente abituale';
+  return '<div class="storico-badge">' + stelle + ' — già venuto ' + s.visite_precedenti + ' ' + volte +
     (s.ultima_visita ? ' (ultima il ' + fmtItDateVeryShort(s.ultima_visita) + ')' : '') + '</div>';
 }
 
@@ -808,6 +822,8 @@ function apriAnagrafica(telNorm) {
   document.getElementById('an-nome').value = '';
   document.getElementById('an-telefono').value = '';
   document.getElementById('an-email').value = '';
+  document.getElementById('an-nascita').value = '';
+  document.getElementById('an-anniversario').value = '';
   document.getElementById('an-note').value = '';
   document.getElementById('an-storia-tbody').innerHTML = '<tr><td colspan="5" style="color:var(--stone);">Caricamento…</td></tr>';
   renderAnagraficaTags();
@@ -831,6 +847,8 @@ function apriAnagrafica(telNorm) {
       document.getElementById('an-nome').value = (cliente && cliente.nome) || ultimaRow.nome || '';
       document.getElementById('an-telefono').value = (cliente && cliente.telefono) || ultimaRow.telefono || '';
       document.getElementById('an-email').value = (cliente && cliente.email) || ultimaRow.email || '';
+      document.getElementById('an-nascita').value = (cliente && cliente.data_nascita) || '';
+      document.getElementById('an-anniversario').value = (cliente && cliente.data_anniversario) || '';
       document.getElementById('an-note').value = (cliente && cliente.note) || '';
       renderAnagraficaTags();
 
@@ -893,6 +911,8 @@ function salvaAnagrafica() {
   _crmFetch({
     action: 'upsert', id: anagraficaState.id, nome: nome, telefono: telefono,
     email: document.getElementById('an-email').value.trim(),
+    data_nascita: document.getElementById('an-nascita').value,
+    data_anniversario: document.getElementById('an-anniversario').value,
     note: document.getElementById('an-note').value.trim(),
     tags: anagraficaState.tags, manuale: false,
   }).then(function (res) {

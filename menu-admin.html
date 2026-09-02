@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!-- v 2026.09.02.08 — fix layout checkbox "Invio attivo" (M4): la regola CSS globale
+     input[type=checkbox]{margin:auto} (pensata per centrare i checkbox in altri contesti, es.
+     tabelle) dentro la label flex spingeva checkbox e testo agli estremi opposti — segnalato da
+     Andrea con screenshot. Override mirato margin:0;flex:none; sul solo checkbox di questa
+     label. Nessuna modifica ad altri checkbox della pagina. -->
 <!-- v 2026.09.02.07 — aggiunto M4 al titolo "Ringraziamento post-visita" (stesso trattamento di
      M1/M2/M3: colore --violet, .85rem → .95rem). Solo estetico. -->
 <!-- v 2026.09.02.06 — titoli M1/M2/M3 nei 3 sotto-blocchi "Testi delle mail ai clienti" in
@@ -1016,7 +1021,7 @@
         <code>{persone}</code>.
       </p>
       <label style="display:flex;align-items:center;gap:.5rem;margin-bottom:.8rem;font-size:.85rem;">
-        <input type="checkbox" id="pren-thankyou-enabled" checked onchange="toggleThankyouEnabled()" /> Invio attivo
+        <input type="checkbox" id="pren-thankyou-enabled" checked onchange="toggleThankyouEnabled()" style="margin:0;flex:none;" /> Invio attivo
       </label>
       <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem;">
         <div><span class="opt-lbl">Oggetto</span><input type="text" id="pren-mail-thankyou-subject" placeholder="Grazie per essere stati nostri ospiti — Ristorante Santamonica" style="width:100%;" /></div>
@@ -3859,7 +3864,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.02.07</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.02.08</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

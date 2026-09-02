@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!-- v 2026.09.02.06 — titoli M1/M2/M3 nei 3 sotto-blocchi "Testi delle mail ai clienti" in
+     "Prenotazioni — Setup": aggiunto il prefisso M1/M2/M3 (prima solo M1 lo aveva), colore
+     diverso per ciascuno (--rust/--green/--blue, già usati altrove nella pagina) e dimensione
+     aumentata (.85rem → .95rem). Solo estetico, nessuna modifica funzionale. -->
 <!-- v 2026.09.02.05 — CORREZIONE tempistica mail di RINGRAZIAMENTO (richiesta Andrea, stesso
      giorno della v.04): non parte più all'istante in cui segni "Arrivato" nel gestionale, ma
      il GIORNO DOPO la visita alle 11:00 (fuso Europe/Rome) — nuovo job pg_cron
@@ -976,21 +980,21 @@
         al testo predefinito.
       </p>
 
-      <div class="sub" style="margin-top:1rem;font-size:.85rem;">M1 — "Richiesta ricevuta" (giorni senza carta automatica)</div>
+      <div class="sub" style="margin-top:1rem;font-size:.95rem;color:var(--rust);">M1 — "Richiesta ricevuta" (giorni senza carta automatica)</div>
       <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem;">
         <div><span class="opt-lbl">Oggetto</span><input type="text" id="pren-mail-m1-subject" placeholder="Richiesta ricevuta — Ristorante Santamonica" style="width:100%;" /></div>
         <div><span class="opt-lbl">Apertura (dopo "Buongiorno {nome},")</span><textarea id="pren-mail-m1-intro" rows="2" placeholder="grazie per la sua richiesta di prenotazione:" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
         <div><span class="opt-lbl">Chiusura (dopo la tabella dati)</span><textarea id="pren-mail-m1-closing" rows="2" placeholder="Abbiamo ricevuto la sua richiesta e la contatteremo a breve per conferma." style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
       </div>
 
-      <div class="sub" style="margin-top:1rem;font-size:.85rem;">Conferma automatica (wizard con carta a garanzia)</div>
+      <div class="sub" style="margin-top:1rem;font-size:.95rem;color:var(--green);">M2 — Conferma automatica (wizard con carta a garanzia)</div>
       <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem;">
         <div><span class="opt-lbl">Oggetto</span><input type="text" id="pren-mail-confirm-subject" placeholder="La sua prenotazione è confermata — Ristorante Santamonica" style="width:100%;" /></div>
         <div><span class="opt-lbl">Apertura (dopo "Buongiorno {nome},")</span><textarea id="pren-mail-confirm-intro" rows="2" placeholder="la sua prenotazione è confermata:" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
         <div><span class="opt-lbl">Chiusura extra (facoltativa, prima di "A presto,")</span><textarea id="pren-mail-confirm-closing" rows="2" placeholder="(vuoto = nessuna riga aggiuntiva)" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
       </div>
 
-      <div class="sub" style="margin-top:1rem;font-size:.85rem;">La tua risposta di conferma (manuale)</div>
+      <div class="sub" style="margin-top:1rem;font-size:.95rem;color:var(--blue);">M3 — La tua risposta di conferma (manuale)</div>
       <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
         Non è una mail automatica: è il testo già pronto dietro al bottone <strong>"✉ Rispondi al cliente"</strong> nella
         mail di notifica che ricevi tu — lo controlli e invii a mano quando confermi. Segnaposto disponibili:
@@ -3853,7 +3857,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.02.05</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.02.06</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

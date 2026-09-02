@@ -1,4 +1,14 @@
 <!DOCTYPE html>
+<!-- v 2026.09.02.05 — CORREZIONE tempistica mail di RINGRAZIAMENTO (richiesta Andrea, stesso
+     giorno della v.04): non parte più all'istante in cui segni "Arrivato" nel gestionale, ma
+     il GIORNO DOPO la visita alle 11:00 (fuso Europe/Rome) — nuovo job pg_cron
+     "thankyou-mails-tick" (ogni 15 min, migration add_thankyou_mails_cron_job) che chiama la
+     nuova Edge Function dedicata send-thankyou-mails (v1); set-reminder-settings torna v19
+     (rimosso l'invio sincrono introdotto in v18, ora superato). Testo del pannello aggiornato
+     di conseguenza. IMPORTANTE: durante il deploy la query ha trovato 2 prenotazioni reali già
+     "Arrivato" di ieri (source sito) → per non mandare mail col testo di default mai rivisto da
+     Andrea, l'interruttore "Invio attivo" è stato spento server-side (thankyou_enabled=false):
+     va riacceso da questo pannello dopo aver controllato/personalizzato i testi. -->
 <!-- v 2026.09.02.04 — nuova mail di RINGRAZIAMENTO post-visita (richiesta Andrea): quando dal
      gestionale segni un cliente "Arrivato", se ha prenotato dal sito (mai per prenotazioni
      manuali) e ha un'email, parte in automatico una mail di ringraziamento (al massimo una
@@ -993,10 +1003,11 @@
       </div>
       <div class="sub" style="margin-top:1.6rem;font-size:.85rem;">Ringraziamento post-visita (cliente segnato "Arrivato")</div>
       <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
-        Parte in automatico quando dal <strong>gestionale</strong> segni un cliente come <strong>"Arrivato"</strong> —
-        SOLO se ha prenotato dal sito (mai per prenotazioni telefoniche/manuali inserite da te) e ha un'email.
-        Niente invio per cancellati o no-show. Al massimo una volta per prenotazione. Segnaposto disponibili:
-        <code>{nome}</code> <code>{data}</code> <code>{persone}</code>.
+        Parte in automatico <strong>il giorno dopo la visita alle 11:00</strong> (non subito quando clicchi
+        "Arrivato" nel gestionale) — SOLO per chi ha prenotato dal sito (mai per prenotazioni
+        telefoniche/manuali inserite da te) e ha un'email. Niente invio per cancellati o no-show. Al massimo
+        una volta per prenotazione. Segnaposto disponibili: <code>{nome}</code> <code>{data}</code>
+        <code>{persone}</code>.
       </p>
       <label style="display:flex;align-items:center;gap:.5rem;margin-bottom:.8rem;font-size:.85rem;">
         <input type="checkbox" id="pren-thankyou-enabled" checked onchange="toggleThankyouEnabled()" /> Invio attivo
@@ -3842,7 +3853,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.02.04</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.02.05</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

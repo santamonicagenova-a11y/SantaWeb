@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- v 2026.09.02.01 — badge "mail di ringraziamento" (M4) — richiesta Andrea: "come posso sapere
+     se la mail è stata inviata?". Nuova funzione mailRingraziamentoBadge(r): mostra "✉
+     Ringraziata gg/mm" (verde) se reservations.thankyou_sent_at è valorizzato, "✉ in coda"
+     (ambra) se la prenotazione è arrivata/eleggibile ma non ancora inviata, niente per le altre
+     (no-show/cancellate/manuali). Aggiunta ai badge della vista giorno, ai risultati di ricerca
+     e come 5ª colonna "Mail" nella tabella storico dell'anagrafica cliente. Richiede
+     gestionale-day v16 e gestionale-search v12 (aggiunto thankyou_sent_at/source alla select) e
+     clienti-crm v4 (stesso campo nell'azione detail). Solo lettura, nessuna scrittura nuova. -->
 <!-- v 2026.09.01.02 — "👤 Anagrafica" ora apre la scheda cliente COME OVERLAY DIRETTO sopra
      questa pagina (richiesta Andrea dopo il primo giro: voleva la scheda "sopra" il gestionale,
      non su una tab/pagina separata come faceva la v.01, che linkava a clienti.html?tel=...).
@@ -364,7 +372,7 @@
     <div id="an-storia-wrap">
       <label style="display:block;font-size:.62rem;color:var(--stone);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.3rem;">Storico prenotazioni</label>
       <table style="width:100%;font-size:.75rem;max-height:220px;overflow-y:auto;display:block;">
-        <thead><tr><th style="text-align:left;">Data</th><th style="text-align:left;">Orario</th><th style="text-align:left;">Persone</th><th style="text-align:left;">Stato</th></tr></thead>
+        <thead><tr><th style="text-align:left;">Data</th><th style="text-align:left;">Orario</th><th style="text-align:left;">Persone</th><th style="text-align:left;">Stato</th><th style="text-align:left;">Mail</th></tr></thead>
         <tbody id="an-storia-tbody"></tbody>
       </table>
     </div>
@@ -406,7 +414,7 @@
   <div class="status-line" id="garanzie-status"></div>
 </div>
 
-<footer class="ver">v 2026.09.01.02</footer>
+<footer class="ver">v 2026.09.02.01</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';
@@ -658,6 +666,20 @@ function confermaBadge(r) {
   return '<span class="badge badge-ok">✓ Confermata</span>';
 }
 
+// Badge mail di ringraziamento post-visita (M4, richiesta Andrea: "come posso sapere se la mail
+// è stata inviata?"). Visibile solo per prenotazioni eleggibili (arrivate + originate dal sito,
+// mai per gestionale_manuale) — le altre righe non mostrano nulla (nessun invio possibile/previsto).
+var THANKYOU_ELIGIBLE_SOURCES = ['sito_form', 'sito_form_wizard'];
+function mailRingraziamentoBadge(r) {
+  if (r.arrivo_status !== 'arrivato' || THANKYOU_ELIGIBLE_SOURCES.indexOf(r.source) === -1) return '';
+  if (r.thankyou_sent_at) {
+    var d = new Date(r.thankyou_sent_at);
+    var gg = String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0');
+    return '<span class="badge badge-ok" title="Ringraziamento inviato">✉ Ringraziata ' + gg + '</span>';
+  }
+  return '<span class="badge badge-cauzione" title="Parte il giorno dopo la visita alle 11:00, se attivata in Setup">✉ in coda</span>';
+}
+
 function garanziaBadge(r) {
   if (r.garanzia_status === 'effettuata') return '<span class="badge badge-ok">✓ Garanzia</span>';
   if (r.garanzia_status === 'richiesta') return '<span class="badge badge-cauzione">Garanzia richiesta</span>';
@@ -715,7 +737,7 @@ function renderDay(rows) {
         storicoClienteHtml(r) +
         garanziaDetailHtml(r) +
       '</div>' +
-      '<div>' + statusBadge(r) + ' ' + confermaBadge(r) + ' ' + garanziaBadge(r) + '</div>';
+      '<div>' + statusBadge(r) + ' ' + confermaBadge(r) + ' ' + garanziaBadge(r) + ' ' + mailRingraziamentoBadge(r) + '</div>';
     var remBtns = buildReminderButtons(r, curDate);
     if (remBtns) row.appendChild(remBtns);
     row.appendChild(buildArrivoControls(r, loadDay));
@@ -787,7 +809,7 @@ function apriAnagrafica(telNorm) {
   document.getElementById('an-telefono').value = '';
   document.getElementById('an-email').value = '';
   document.getElementById('an-note').value = '';
-  document.getElementById('an-storia-tbody').innerHTML = '<tr><td colspan="4" style="color:var(--stone);">Caricamento…</td></tr>';
+  document.getElementById('an-storia-tbody').innerHTML = '<tr><td colspan="5" style="color:var(--stone);">Caricamento…</td></tr>';
   renderAnagraficaTags();
   document.getElementById('an-status').textContent = '';
   document.getElementById('anagrafica-modal').classList.add('on');
@@ -825,9 +847,9 @@ function apriAnagrafica(telNorm) {
       document.getElementById('an-storia-tbody').innerHTML = storia.length
         ? storia.map(function (s) {
             return '<tr><td>' + escapeHtml(s.data) + '</td><td>' + escapeHtml(s.orario) + '</td><td>' + (s.persone || '') +
-              '</td><td>' + escapeHtml(s.arrivo_status || s.status || '') + '</td></tr>';
+              '</td><td>' + escapeHtml(s.arrivo_status || s.status || '') + '</td><td>' + mailRingraziamentoBadge(s) + '</td></tr>';
           }).join('')
-        : '<tr><td colspan="4" style="color:var(--stone);">Nessuna prenotazione trovata.</td></tr>';
+        : '<tr><td colspan="5" style="color:var(--stone);">Nessuna prenotazione trovata.</td></tr>';
     })
     .catch(function (e) {
       if (e && e.message === 'no-token') { document.getElementById('an-status').textContent = 'Operazione annullata: serve il token GitHub.'; }
@@ -1020,7 +1042,7 @@ function renderSearch(rows) {
           (r.occasione ? ' · ' + escapeHtml(r.occasione) : '') + '</div>' +
         garanziaDetailHtml(r) +
       '</div>' +
-      '<div>' + statusBadge(r) + ' ' + confermaBadge(r) + ' ' + garanziaBadge(r) + '</div>';
+      '<div>' + statusBadge(r) + ' ' + confermaBadge(r) + ' ' + garanziaBadge(r) + ' ' + mailRingraziamentoBadge(r) + '</div>';
     var goBtn = document.createElement('button');
     goBtn.className = 'btn'; goBtn.textContent = 'Vai al giorno →'; goBtn.style.marginLeft = '.5rem';
     goBtn.onclick = function () { goToSearchResultDay(r.data); };

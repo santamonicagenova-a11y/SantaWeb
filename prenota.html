@@ -2,7 +2,14 @@
 <!--
   prenota.html — Wizard prenotazioni con carta a garanzia obbligatoria
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.08.26.01
+  Versione: v 2026.09.03.01
+  v 2026.09.03.01 — Passo 3 (orario): divisione netta Pranzo/Cena. La griglia orari è ora
+  raggruppata in due sezioni con intestazione ("Pranzo" / "Cena", solo se il servizio è attivo
+  per la data scelta), invece dell'unica lista piatta di orari misti. getSlotsForDate() ora
+  etichetta ogni slot con il periodo di provenienza (da getPeriodSlots(dateStr); gli slot aperti
+  singolarmente da admin senza periodo esplicito vengono assegnati per soglia oraria, <17:00 =
+  pranzo). renderOrario() costruisce una .orario-grid per ciascun periodo presente, dentro un
+  contenitore #orario-wrap (sostituisce il precedente #orario-grid unico).
   v 2026.08.26.01 — Aggiunto campo "CAP (facoltativo)" al passo 4 (Contatti), richiesta Andrea
   per capire da dove arrivano gli ospiti. Facoltativo, nessuna validazione client-side oltre
   al maxlength; il payload invia `cap` a create-reservation-checkout, che valida/salva.
@@ -165,6 +172,11 @@
   .persona-btn.selected { background: var(--inchiostro); color: #fff; border-color: var(--inchiostro); }
 
   /* ── Orario ── */
+  .orario-section + .orario-section { margin-top: 1.6rem; }
+  .orario-section-title {
+    font-family: 'Jost', sans-serif; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--secondario); margin: 0 0 0.7rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--bordo);
+  }
   .orario-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; }
   .orario-btn {
     padding: 0.9rem 0.4rem; text-align: center; border: 1px solid var(--bordo); background: var(--crema);
@@ -309,7 +321,7 @@
       <section class="step" id="step-3">
         <p class="step-label">Passo 3 di 5</p>
         <h2 class="step-title">A che ora?</h2>
-        <div class="orario-grid" id="orario-grid"></div>
+        <div id="orario-wrap"></div>
         <div class="btn-row">
           <button type="button" class="btn btn-ghost" data-back="2">Indietro</button>
         </div>
@@ -479,17 +491,19 @@
   function getSlotsForDate(dateStr) {
     var svc = servicesForDate(dateStr);
     var periodSlots = (typeof window.getPeriodSlots === 'function') ? window.getPeriodSlots(dateStr) : { pranzo: [], cena: [] };
+    var periodOf = {};
     var times = [];
-    if (svc.pranzo) periodSlots.pranzo.forEach(function(t){ times.push(t); });
-    if (svc.cena) periodSlots.cena.forEach(function(t){ times.push(t); });
+    if (svc.pranzo) periodSlots.pranzo.forEach(function(t){ times.push(t); periodOf[t] = 'pranzo'; });
+    if (svc.cena) periodSlots.cena.forEach(function(t){ times.push(t); periodOf[t] = 'cena'; });
     state.slot_openings.filter(function(o){ return o.date===dateStr; }).forEach(function(o){
       if (times.indexOf(o.time) === -1) times.push(o.time);
+      if (!periodOf[o.time]) periodOf[o.time] = (o.time < '17:00') ? 'pranzo' : 'cena';
     });
     times = times.filter(function(t){ return slotOpenFor(dateStr,t) || !slotClosedFor(dateStr,t); });
     times.sort();
     return times.map(function(t){
       var cap = capForSlot(dateStr,t);
-      return { time: t, capMax: cap ? cap.max_covers : null, capUsed: cap ? cap.current_covers : 0 };
+      return { time: t, period: periodOf[t], capMax: cap ? cap.max_covers : null, capUsed: cap ? cap.current_covers : 0 };
     });
   }
   function dayStatus(dateStr) {
@@ -603,15 +617,10 @@
   }
 
   /* ── STEP 3: orario ── */
-  function renderOrario() {
-    var grid = document.getElementById('orario-grid');
-    grid.innerHTML = '';
-    if (!state.selectedDate) return;
-    var slots = getSlotsForDate(state.selectedDate);
-    if (!slots.length) {
-      grid.innerHTML = '<p class="orario-empty">Nessun orario disponibile per questa data. Chiamaci al 010 5533155.</p>';
-      return;
-    }
+  var PERIODO_LABEL = { pranzo: 'Pranzo', cena: 'Cena' };
+  function buildOrarioGrid(slots) {
+    var grid = document.createElement('div');
+    grid.className = 'orario-grid';
     slots.forEach(function(s){
       var remaining = s.capMax !== null ? Math.max(0, s.capMax - s.capUsed) : null;
       var disabled = remaining !== null && remaining < (state.selectedPersone || 1);
@@ -622,6 +631,29 @@
       if (state.selectedOrario === s.time) btn.classList.add('selected');
       if (!disabled) btn.addEventListener('click', function(t){ return function(){ selectOrario(t); }; }(s.time));
       grid.appendChild(btn);
+    });
+    return grid;
+  }
+  function renderOrario() {
+    var wrap = document.getElementById('orario-wrap');
+    wrap.innerHTML = '';
+    if (!state.selectedDate) return;
+    var slots = getSlotsForDate(state.selectedDate);
+    if (!slots.length) {
+      wrap.innerHTML = '<p class="orario-empty">Nessun orario disponibile per questa data. Chiamaci al 010 5533155.</p>';
+      return;
+    }
+    ['pranzo', 'cena'].forEach(function(periodo){
+      var periodoSlots = slots.filter(function(s){ return s.period === periodo; });
+      if (!periodoSlots.length) return;
+      var section = document.createElement('div');
+      section.className = 'orario-section';
+      var title = document.createElement('p');
+      title.className = 'orario-section-title';
+      title.textContent = PERIODO_LABEL[periodo];
+      section.appendChild(title);
+      section.appendChild(buildOrarioGrid(periodoSlots));
+      wrap.appendChild(section);
     });
   }
   function selectOrario(t) {

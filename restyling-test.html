@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<!--
+  RESTYLING TEST — pagina di prova, NON collegata al sito live.
+  Non referenziata da nav/sitemap/robots. Contenuti reali (orari via link a
+  dove-siamo.html, prezzi menu da menu.html, indirizzo/telefono reali).
+  CTA di prenotazione/regalo puntano alle pagine funzionanti esistenti:
+  nessuna nuova logica di form/backend introdotta qui.
+  v 2026.09.04.01
+-->
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anteprima restyling — Santamonica</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400;1,9..144,500;1,9..144,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --abyss:#0A1E2B; --deep:#0E2E3F; --sea:#0F5C68; --sea-light:#E6F0EF;
+    --foam:#FAF6EF; --sand:#E9DCC6; --coral:#E05A2B; --gold:#C9A86A; --ink:#14242F;
+    --line: rgba(10,30,43,.10);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Instrument Sans',system-ui,sans-serif;background:var(--foam);color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  a{color:inherit;text-decoration:none;}
+  img{display:block;max-width:100%;}
+  .serif{font-family:'Fraunces',Georgia,serif;}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 1.25rem;}
+  ::selection{background:var(--sea);color:var(--foam);}
+  .pill{display:inline-flex;align-items:center;gap:.5rem;border-radius:999px;font-weight:700;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:999px;font-weight:700;font-size:.95rem;padding:1rem 1.75rem;transition:transform .25s,background .2s;min-height:52px;}
+  .btn-coral{background:var(--coral);color:#fff;box-shadow:0 16px 36px -14px rgba(224,90,43,.65);}
+  .btn-coral:hover{background:#c94e23;transform:translateY(-2px);}
+  .btn-ghost{border:1px solid rgba(255,255,255,.35);color:#fff;}
+  .btn-ghost:hover{border-color:rgba(255,255,255,.7);}
+  .btn-dark{background:var(--abyss);color:var(--foam);}
+  .btn-dark:hover{background:var(--sea);}
+
+  .grain{position:relative;}
+  .grain::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.08;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .dotted{background-image:radial-gradient(rgba(10,30,43,.14) 1px, transparent 1px);background-size:18px 18px;}
+  .dark-dotted{background-image:radial-gradient(rgba(250,246,239,.10) 1px, transparent 1px);background-size:20px 20px;}
+
+  ::-webkit-scrollbar{width:10px;}
+  ::-webkit-scrollbar-track{background:#EDE6D6;}
+  ::-webkit-scrollbar-thumb{background:var(--abyss);border-radius:99px;border:2px solid #EDE6D6;}
+
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1);}
+  .reveal.is-visible{opacity:1;transform:none;}
+
+  /* ---- barra test ---- */
+  #testbar{position:fixed;top:0;inset-inline:0;z-index:70;background:var(--gold);color:var(--abyss);font-size:.8rem;}
+  #testbar .wrap{display:flex;align-items:center;justify-content:center;gap:.75rem;padding:.5rem 1rem;text-align:center;flex-wrap:wrap;}
+  #testbar button{border:1px solid rgba(10,30,43,.3);background:transparent;color:var(--abyss);font-weight:700;border-radius:999px;padding:.3rem .8rem;cursor:pointer;font-size:.75rem;}
+  #testbar button:hover{background:var(--abyss);color:var(--foam);}
+
+  /* ---- header ---- */
+  header{position:fixed;inset-inline:0;top:36px;z-index:60;transition:all .35s;background:linear-gradient(to bottom, rgba(0,0,0,.45), transparent);}
+  header.scrolled{background:rgba(250,246,239,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);box-shadow:0 10px 40px -18px rgba(10,30,43,.25);}
+  body.no-testbar header{top:0;}
+  .nav-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;height:68px;}
+  .brand{display:flex;align-items:center;gap:.65rem;}
+  .brand .mark{width:40px;height:40px;border-radius:999px;display:grid;place-items:center;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;transition:all .3s;}
+  header.scrolled .brand .mark{background:var(--abyss);color:var(--foam);border-color:transparent;}
+  .brand .name{font-size:1.18rem;font-weight:600;color:#fff;line-height:1.1;transition:color .3s;}
+  header.scrolled .brand .name{color:var(--abyss);}
+  .brand .name em{font-style:italic;font-weight:300;opacity:.85;}
+  .brand .loc{display:block;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-top:2px;transition:color .3s;}
+  header.scrolled .brand .loc{color:rgba(10,30,43,.55);}
+  nav.links{display:none;align-items:center;gap:1.75rem;font-size:.87rem;font-weight:500;}
+  nav.links a{color:rgba(255,255,255,.85);transition:color .3s;padding-bottom:2px;border-bottom:2px solid transparent;}
+  header.scrolled nav.links a{color:rgba(10,30,43,.75);}
+  nav.links a:hover{border-color:var(--coral);}
+  .nav-actions{display:flex;align-items:center;gap:.6rem;}
+  .nav-phone{display:none;align-items:center;gap:.4rem;font-size:.82rem;font-weight:600;color:#fff;transition:color .3s;}
+  header.scrolled .nav-phone{color:var(--abyss);}
+  .nav-cta{background:var(--coral);color:#fff;font-size:.85rem;font-weight:700;padding:.7rem 1.15rem;border-radius:999px;box-shadow:0 12px 28px -10px rgba(224,90,43,.7);}
+  .burger{display:grid;place-items:center;width:44px;height:44px;border-radius:999px;border:1px solid rgba(255,255,255,.3);color:#fff;background:transparent;cursor:pointer;transition:all .3s;}
+  header.scrolled .burger{border-color:rgba(10,30,43,.15);color:var(--abyss);}
+  @media(min-width:1024px){ nav.links{display:flex;} .nav-phone{display:inline-flex;} .burger{display:none;} }
+
+  #mobileMenu{display:none;background:var(--abyss);color:#fff;padding:.5rem 1.5rem 2rem;border-top:1px solid rgba(255,255,255,.1);}
+  #mobileMenu.open{display:block;}
+  #mobileMenu a{display:block;font-family:'Fraunces',serif;font-size:1.5rem;padding:.6rem 0;border-bottom:1px solid rgba(255,255,255,.1);}
+  #mobileMenu .row{margin-top:1.1rem;display:flex;gap:.6rem;}
+  #mobileMenu .row a{flex:1;text-align:center;border-radius:999px;border:1px solid rgba(255,255,255,.25);padding:.85rem;font-size:.95rem;font-weight:600;}
+  #mobileMenu .row a.cta{background:var(--coral);border-color:var(--coral);font-weight:700;}
+
+  /* ---- hero ---- */
+  .hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;background:var(--abyss);overflow:hidden;}
+  .hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .hero .veil-a{position:absolute;inset:0;background:linear-gradient(to top, var(--abyss), rgba(10,30,43,.35) 55%, rgba(10,30,43,.25));}
+  .hero .veil-b{position:absolute;inset:0;background:linear-gradient(to right, rgba(10,30,43,.6), transparent 60%);}
+  .hero-inner{position:relative;width:100%;padding:9rem 0 3rem;}
+  .badges{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.25rem;}
+  .badge{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.5rem .9rem;border-radius:999px;}
+  .badge.gold{background:var(--gold);color:var(--abyss);}
+  .badge.ghost{background:rgba(255,255,255,.15);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25);color:#fff;}
+  .kicker{font-family:'Fraunces',serif;font-style:italic;color:var(--sand);font-size:1.15rem;}
+  h1.hero-title{font-family:'Fraunces',serif;color:#fff;font-weight:500;font-size:clamp(2.6rem,8vw,5.2rem);line-height:.97;letter-spacing:-.01em;margin-top:.5rem;max-width:46rem;}
+  h1.hero-title em{font-weight:300;font-style:italic;color:var(--sand);}
+  .hero-lead{margin-top:1.1rem;color:rgba(255,255,255,.82);font-size:1rem;line-height:1.7;max-width:34rem;}
+  .hero-actions{margin-top:1.6rem;display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;}
+  .hero-info{margin-top:1.9rem;display:grid;grid-template-columns:1fr;gap:.6rem;border-radius:20px;background:rgba(255,255,255,.08);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.15);padding:.6rem;}
+  @media(min-width:640px){ .hero-info{grid-template-columns:repeat(3,1fr);} }
+  .hero-info .item{display:flex;align-items:center;gap:.75rem;border-radius:16px;padding:.75rem 1rem;}
+  .hero-info .ico{width:36px;height:36px;flex-shrink:0;border-radius:999px;background:rgba(255,255,255,.15);display:grid;place-items:center;color:var(--sand);}
+  .hero-info .k{display:block;font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.55);}
+  .hero-info .v{display:block;font-size:.85rem;font-weight:600;color:#fff;}
+
+  /* marquee */
+  .marquee{background:var(--abyss);color:var(--sand);border-top:1px solid rgba(255,255,255,.1);padding:.85rem 0;overflow:hidden;}
+  .marquee .track{display:flex;width:max-content;white-space:nowrap;gap:2rem;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;animation:mq 30s linear infinite;}
+  .marquee .track span.sep{color:var(--coral);}
+  .marquee .grp{display:flex;align-items:center;gap:2rem;}
+  @keyframes mq{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+
+  /* sections generic */
+  section{padding:4.5rem 0;}
+  @media(min-width:768px){ section{padding:6rem 0;} }
+  .eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--sea);}
+  .eyebrow.on-dark{color:var(--gold);}
+  h2.h{font-family:'Fraunces',serif;font-size:clamp(2rem,5vw,3.4rem);line-height:1;margin-top:.7rem;font-weight:500;}
+  h2.h em{font-weight:300;font-style:italic;color:var(--sea);}
+  h2.h.on-dark em{color:var(--sand);}
+
+  /* cucina */
+  .cucina-grid{display:grid;gap:2.5rem;align-items:start;}
+  @media(min-width:1024px){ .cucina-grid{grid-template-columns:1.05fr .95fr;} }
+  .cucina-text p.lead{margin-top:1.1rem;font-size:1rem;line-height:1.75;color:rgba(20,36,47,.75);max-width:34rem;}
+  .feat-row{margin-top:1.6rem;display:grid;gap:.75rem;grid-template-columns:1fr;}
+  @media(min-width:640px){ .feat-row{grid-template-columns:repeat(3,1fr);} }
+  .feat-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:1.15rem;transition:all .3s;}
+  .feat-card:hover{box-shadow:0 20px 46px -22px rgba(10,30,43,.32);transform:translateY(-3px);}
+  .feat-card .ico{width:42px;height:42px;border-radius:999px;background:rgba(15,92,104,.1);color:var(--sea);display:grid;place-items:center;}
+  .feat-card strong{display:block;margin-top:.7rem;font-size:.92rem;}
+  .feat-card span{display:block;margin-top:.25rem;font-size:.78rem;line-height:1.5;color:rgba(20,36,47,.6);}
+  .tag-row{margin-top:1.4rem;display:flex;flex-wrap:wrap;gap:.5rem;}
+  .tag{font-size:.75rem;font-weight:600;background:rgba(10,30,43,.05);border:1px solid var(--line);padding:.45rem .9rem;border-radius:999px;}
+  .collage{display:grid;grid-template-columns:repeat(12,1fr);gap:.7rem;}
+  .collage .big{grid-column:span 7;border-radius:20px;overflow:hidden;height:280px;}
+  .collage .stack{grid-column:span 5;display:flex;flex-direction:column;gap:.7rem;}
+  .collage .stack div{border-radius:20px;overflow:hidden;height:136px;}
+  .collage img{width:100%;height:100%;object-fit:cover;transition:transform .7s;}
+  .collage a:hover img, .collage div:hover img{transform:scale(1.06);}
+  .collage .cap{grid-column:span 12;font-family:'Fraunces',serif;font-style:italic;font-size:.85rem;color:rgba(10,30,43,.5);}
+  @media(max-width:640px){ .collage .big,.collage .stack{grid-column:span 12;} .collage .big{height:220px;} }
+
+  /* quote */
+  .quote-sec{background:rgba(233,220,198,.55);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .quote-sec .wrap{max-width:52rem;text-align:center;}
+  .quote-mark{width:52px;height:52px;border-radius:999px;background:var(--abyss);color:var(--sand);display:grid;place-items:center;margin:0 auto;font-family:'Fraunces',serif;font-size:1.6rem;}
+  .quote-sec p.q{margin-top:1.3rem;font-family:'Fraunces',serif;font-size:clamp(1.4rem,3.4vw,2.1rem);line-height:1.25;}
+  .quote-sec p.q em{font-style:italic;color:var(--sea);}
+  .quote-sec .cite{margin-top:.9rem;font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(10,30,43,.5);}
+
+  /* menu */
+  .menu-sec{background:var(--abyss);color:var(--foam);position:relative;}
+  .menu-head{display:flex;flex-direction:column;gap:1rem;justify-content:space-between;}
+  @media(min-width:768px){ .menu-head{flex-direction:row;align-items:flex-end;} }
+  .menu-head .note{max-width:26rem;font-size:.88rem;line-height:1.6;color:rgba(255,255,255,.6);}
+  .tabs{margin-top:1.5rem;display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.3rem;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{flex-shrink:0;font-size:.8rem;font-weight:700;padding:.7rem 1.15rem;border-radius:999px;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);cursor:pointer;background:transparent;transition:all .2s;}
+  .tab.active{background:var(--foam);color:var(--abyss);border-color:var(--foam);}
+  .menu-panel{margin-top:1.2rem;display:grid;gap:1.1rem;}
+  @media(min-width:1024px){ .menu-panel{grid-template-columns:.9fr 1.1fr;align-items:start;} }
+  .menu-photo{position:relative;border-radius:20px;overflow:hidden;min-height:280px;}
+  .menu-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .menu-photo .ov{position:absolute;inset:0;background:linear-gradient(to top, var(--abyss), transparent 60%);}
+  .menu-photo .cap{position:absolute;bottom:0;padding:1.3rem;}
+  .menu-photo .cap p{font-family:'Fraunces',serif;font-size:1.35rem;line-height:1.2;}
+  .menu-photo .price{margin-top:.5rem;display:inline-block;background:var(--gold);color:var(--abyss);font-weight:700;font-size:.82rem;padding:.4rem .9rem;border-radius:999px;}
+  .dish-list{border-radius:20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);padding:.5rem;}
+  .dish{display:flex;gap:.9rem;align-items:flex-start;padding:.9rem 1rem;border-bottom:1px solid rgba(255,255,255,.1);}
+  .dish:last-child{border-bottom:none;}
+  .dish .n{font-family:'Fraunces',serif;color:rgba(255,255,255,.3);font-size:.9rem;width:1.6rem;flex-shrink:0;}
+  .dish .name{font-weight:600;font-size:.92rem;}
+  .dish .desc{display:block;margin-top:.2rem;font-size:.78rem;color:rgba(255,255,255,.55);line-height:1.5;}
+  .dish .price{font-family:'Fraunces',serif;color:var(--gold);font-size:1rem;flex-shrink:0;}
+  .dish-cta{padding:.8rem;}
+  .menu-links{margin-top:1.4rem;display:flex;flex-wrap:wrap;gap:.6rem;}
+
+  /* galleria */
+  .gal-head{display:flex;flex-direction:column;gap:1rem;}
+  @media(min-width:768px){ .gal-head{flex-direction:row;align-items:flex-end;justify-content:space-between;} }
+  .gal-filters{display:flex;flex-wrap:wrap;gap:.5rem;}
+  .gal-filters button{font-size:.78rem;font-weight:700;padding:.55rem 1.1rem;border-radius:999px;border:1px solid var(--line);color:rgba(20,36,47,.6);background:#fff;cursor:pointer;transition:all .2s;}
+  .gal-filters button.active{background:var(--abyss);color:#fff;border-color:var(--abyss);}
+  .gal-grid{margin-top:1.6rem;column-count:2;column-gap:.75rem;}
+  @media(min-width:768px){ .gal-grid{column-count:3;} }
+  .gal-item{break-inside:avoid;margin-bottom:.75rem;border-radius:18px;overflow:hidden;position:relative;cursor:pointer;border:none;display:block;width:100%;}
+  .gal-item img{width:100%;object-fit:cover;transition:transform .7s;}
+  .gal-item:hover img{transform:scale(1.06);}
+  .gal-item .cap{position:absolute;inset:0;background:linear-gradient(to top, rgba(10,30,43,.75), transparent 55%);opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;padding:1rem;}
+  .gal-item:hover .cap{opacity:1;}
+  .gal-item .cap span{color:#fff;font-family:'Fraunces',serif;font-size:.95rem;}
+  #lightbox{position:fixed;inset:0;z-index:80;background:rgba(10,30,43,.95);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:1.5rem;}
+  #lightbox.open{display:flex;}
+  #lightbox img{max-width:56rem;width:100%;max-height:70vh;object-fit:cover;border-radius:18px;}
+  #lightbox .close{position:absolute;top:1.2rem;right:1.2rem;width:44px;height:44px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;cursor:pointer;font-size:1.1rem;}
+
+  /* cantina */
+  .cantina-sec{background:var(--foam);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .cantina-grid{display:grid;gap:2.5rem;align-items:center;}
+  @media(min-width:1024px){ .cantina-grid{grid-template-columns:1fr 1fr;} }
+  .cantina-photo{position:relative;border-radius:24px;overflow:hidden;height:340px;}
+  .cantina-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .cantina-photo .ov{position:absolute;inset:0;background:linear-gradient(to top, rgba(10,30,43,.85), transparent 55%);}
+  .cantina-photo .cap{position:absolute;bottom:0;padding:1.5rem;}
+  .cantina-photo .cap p{font-family:'Fraunces',serif;font-style:italic;color:var(--sand);font-size:1.2rem;}
+  .cantina-photo .cap small{display:block;margin-top:.4rem;color:rgba(255,255,255,.7);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;font-weight:700;}
+  .cantina-text p.lead{margin-top:1.1rem;font-size:.98rem;line-height:1.75;color:rgba(20,36,47,.7);}
+  .wine-tags{margin-top:1.4rem;display:flex;flex-wrap:wrap;gap:.5rem;}
+  .wine-tag{display:inline-flex;align-items:center;gap:.5rem;background:#fff;border:1px solid var(--line);border-radius:999px;padding:.3rem 1rem .3rem .3rem;font-size:.8rem;}
+  .wine-tag .dot{width:26px;height:26px;border-radius:999px;background:var(--sea);color:#fff;display:grid;place-items:center;font-size:.65rem;}
+
+  /* info */
+  .info-grid{margin-top:2rem;display:grid;gap:1rem;}
+  @media(min-width:1024px){ .info-grid{grid-template-columns:repeat(3,1fr);} }
+  .info-card{border-radius:22px;padding:1.6rem;}
+  .info-card.dark{background:var(--abyss);color:#fff;}
+  .info-card.light{background:#fff;border:1px solid var(--line);}
+  .info-card.tint{background:rgba(233,220,198,.5);border:1px solid var(--line);}
+  .info-card .lbl{display:flex;align-items:center;gap:.5rem;font-size:.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;}
+  .info-card.dark .lbl{color:var(--gold);}
+  .info-card.light .lbl,.info-card.tint .lbl{color:var(--sea);}
+  .info-card .addr{margin-top:.9rem;font-family:'Fraunces',serif;font-size:1.4rem;line-height:1.25;}
+  .info-card .sub{margin-top:.5rem;font-size:.82rem;line-height:1.6;color:rgba(255,255,255,.6);}
+  .info-card.light .sub,.info-card.tint .sub{color:rgba(20,36,47,.6);}
+  .info-card .row-btns{margin-top:1rem;display:flex;gap:.5rem;}
+  .info-card .row-btns a{flex:1;text-align:center;font-size:.78rem;font-weight:700;padding:.75rem;border-radius:999px;}
+
+  /* regalo */
+  .regalo-sec{background:var(--sea);color:#fff;position:relative;overflow:hidden;}
+  .regalo-grid{display:grid;gap:2.5rem;align-items:center;}
+  @media(min-width:1024px){ .regalo-grid{grid-template-columns:1fr 1fr;} }
+  .gift-opts{margin-top:1.5rem;display:grid;gap:.65rem;}
+  .gift-opt{display:flex;align-items:center;gap:1rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:1rem;}
+  .gift-opt .ico{width:42px;height:42px;border-radius:999px;background:rgba(255,255,255,.15);display:grid;place-items:center;flex-shrink:0;}
+  .gift-opt strong{display:block;font-size:.95rem;}
+  .gift-opt span.d{display:block;font-size:.78rem;color:rgba(255,255,255,.65);}
+  .gift-opt .p{margin-left:auto;font-family:'Fraunces',serif;font-size:1.3rem;color:var(--sand);flex-shrink:0;}
+  .regalo-card{background:var(--foam);color:var(--ink);border-radius:24px;padding:1.8rem;box-shadow:0 30px 60px -20px rgba(0,0,0,.35);}
+  .regalo-card .bar{height:6px;border-radius:999px;background:linear-gradient(to right, var(--coral), var(--gold), var(--sea));margin-bottom:1.2rem;}
+
+  /* faq */
+  .faq-sec .wrap{max-width:52rem;}
+  .faq-list{margin-top:2rem;display:grid;gap:.7rem;}
+  .faq-item{border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.7);overflow:hidden;transition:all .2s;}
+  .faq-item.open{background:#fff;border-color:rgba(15,92,104,.3);box-shadow:0 18px 46px -24px rgba(15,92,104,.35);}
+  .faq-q{width:100%;text-align:left;display:flex;align-items:center;gap:1rem;padding:1.1rem 1.3rem;background:transparent;border:none;cursor:pointer;font-family:inherit;}
+  .faq-q .plus{width:32px;height:32px;flex-shrink:0;border-radius:999px;display:grid;place-items:center;font-weight:700;background:rgba(10,30,43,.06);}
+  .faq-item.open .faq-q .plus{background:var(--sea);color:#fff;}
+  .faq-q span{font-weight:600;font-size:.95rem;}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;padding:0 1.3rem;}
+  .faq-item.open .faq-a{max-height:12rem;padding-bottom:1.3rem;}
+  .faq-a p{padding-left:3rem;font-size:.88rem;line-height:1.65;color:rgba(20,36,47,.7);}
+
+  /* prenota cta */
+  .prenota-sec{background:var(--abyss);color:#fff;position:relative;overflow:hidden;}
+  .prenota-sec .bgimg{position:absolute;inset:0;opacity:.18;}
+  .prenota-sec .bgimg img{width:100%;height:100%;object-fit:cover;}
+  .prenota-sec .veil{position:absolute;inset:0;background:linear-gradient(to bottom, var(--abyss), rgba(10,30,43,.85) 40%, var(--abyss));}
+  .prenota-grid{position:relative;display:grid;gap:2.5rem;}
+  @media(min-width:1024px){ .prenota-grid{grid-template-columns:.85fr 1.15fr;align-items:center;} }
+  .prenota-points{margin-top:1.4rem;display:grid;gap:.7rem;}
+  .prenota-point{display:flex;gap:.8rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:1rem;}
+  .prenota-point .ico{width:32px;height:32px;border-radius:999px;background:rgba(52,211,153,.2);color:#6ee7b7;display:grid;place-items:center;flex-shrink:0;}
+  .prenota-point strong{display:block;font-size:.9rem;}
+  .prenota-point span{font-size:.78rem;color:rgba(255,255,255,.6);}
+  .prenota-panel{background:var(--foam);color:var(--ink);border-radius:24px;padding:2rem;box-shadow:0 30px 70px -20px rgba(0,0,0,.4);text-align:center;}
+  .prenota-panel .ico-big{width:64px;height:64px;border-radius:999px;background:var(--coral);color:#fff;display:grid;place-items:center;margin:0 auto;}
+  .prenota-panel h3{margin-top:1.2rem;font-family:'Fraunces',serif;font-size:1.7rem;}
+  .prenota-panel p{margin-top:.6rem;font-size:.88rem;line-height:1.6;color:rgba(20,36,47,.65);}
+  .prenota-panel .btn{margin-top:1.4rem;width:100%;}
+
+  /* footer */
+  footer{background:#081722;color:rgba(255,255,255,.6);}
+  .foot-grid{display:grid;gap:2rem;padding:3rem 0;}
+  @media(min-width:768px){ .foot-grid{grid-template-columns:1.3fr 1fr 1fr 1fr;} }
+  .foot-brand{display:flex;align-items:center;gap:.6rem;}
+  .foot-brand .mark{width:38px;height:38px;border-radius:999px;background:var(--foam);color:var(--abyss);display:grid;place-items:center;}
+  .foot-brand .name{font-family:'Fraunces',serif;color:#fff;font-size:1.15rem;}
+  footer h4{color:#fff;font-size:.75rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;}
+  footer .col p, footer .col a{margin-top:.65rem;font-size:.85rem;display:block;}
+  footer .col a:hover{color:#fff;}
+  .foot-links{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;}
+  .foot-bottom{border-top:1px solid rgba(255,255,255,.1);padding:1.2rem 0;text-align:center;font-size:.72rem;}
+
+  /* sticky mobile */
+  #stickyMobile{position:fixed;bottom:1rem;inset-inline:1rem;z-index:50;}
+  #stickyMobile .bar{background:rgba(10,30,43,.95);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.15);border-radius:999px;padding:.5rem .5rem .5rem 1.1rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 20px 50px -20px rgba(0,0,0,.6);}
+  #stickyMobile .txt{color:#fff;font-size:.7rem;line-height:1.3;}
+  #stickyMobile .txt strong{display:block;font-size:.8rem;}
+  #stickyMobile .btns{display:flex;gap:.5rem;}
+  #stickyMobile .icobtn{width:42px;height:42px;border-radius:999px;border:1px solid rgba(255,255,255,.25);color:#fff;display:grid;place-items:center;}
+  #stickyMobile .cta{height:42px;padding:0 1.2rem;border-radius:999px;background:var(--coral);color:#fff;font-weight:700;font-size:.82rem;display:grid;place-items:center;}
+  @media(min-width:768px){ #stickyMobile{display:none;} }
+  .sticky-spacer{height:88px;}
+  @media(min-width:768px){ .sticky-spacer{display:none;} }
+</style>
+</head>
+<body>
+
+<div id="testbar">
+  <div class="wrap">
+    <strong>● Anteprima restyling</strong>
+    <span>Pagina di prova — non è collegata al sito live, i CTA rimandano alle pagine reali esistenti.</span>
+    <button id="hideTestbar" type="button">Nascondi ✕</button>
+  </div>
+</div>
+
+<header id="siteHeader">
+  <div class="wrap">
+    <div class="nav-row">
+      <a href="#top" class="brand">
+        <span class="mark">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 6c2 0 2 2 4 2s2-2 4-2 2 2 4 2 2-2 4-2 2 2 4 2"/><path d="M2 12c2 0 2 2 4 2s2-2 4-2 2 2 4 2 2-2 4-2 2 2 4 2"/><path d="M2 18c2 0 2 2 4 2s2-2 4-2 2 2 4 2 2-2 4-2 2 2 4 2"/></svg>
+        </span>
+        <span>
+          <span class="name serif">Santamonica <em>sul mare</em></span>
+          <span class="loc">Genova · Lungomare Lombardo</span>
+        </span>
+      </a>
+      <nav class="links">
+        <a href="#cucina">Cucina</a>
+        <a href="#menu">Menu</a>
+        <a href="#cantina">Cantina</a>
+        <a href="#galleria">Galleria</a>
+        <a href="#info">Info</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="tel:+390105533155" class="nav-phone">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2Z"/></svg>
+          010 5533155
+        </a>
+        <a href="/prenota.html" class="nav-cta pill">Prenota</a>
+        <button class="burger" id="burgerBtn" aria-label="Menu" type="button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="mobileMenu">
+    <a href="#cucina">Cucina</a>
+    <a href="#menu">Menu &amp; degustazioni</a>
+    <a href="#cantina">Cantina</a>
+    <a href="#galleria">Galleria</a>
+    <a href="#info">Dove siamo &amp; orari</a>
+    <div class="row">
+      <a href="tel:+390105533155">Chiama</a>
+      <a href="/prenota.html" class="cta">Prenota</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero grain">
+    <img src="img/sito/hero.webp" alt="Sala del ristorante Santamonica affacciata sul mare a Genova">
+    <div class="veil-a"></div>
+    <div class="veil-b"></div>
+    <div class="wrap hero-inner">
+      <div class="reveal badges">
+        <span class="badge gold">★ Guida Michelin</span>
+        <span class="badge ghost">Gambero Rosso</span>
+        <span class="badge ghost">Golosario</span>
+      </div>
+      <p class="reveal kicker">Ristorante di pesce · Genova, Lungomare Lombardo</p>
+      <h1 class="reveal hero-title">Cucina viva<br><em>sul mare di Genova.</em></h1>
+      <p class="reveal hero-lead">Sala affacciata sul mare, cucina contemporanea di pesce nostrano, cantina curata dalla sommelier Monica Capurro. Terrazza estiva quando il tempo lo permette.</p>
+      <div class="reveal hero-actions">
+        <a href="/prenota.html" class="btn btn-coral">Prenota un tavolo
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+        <a href="#menu" class="btn btn-ghost">Vedi il menu</a>
+      </div>
+      <div class="reveal hero-info">
+        <div class="item">
+          <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+          <span><span class="k">Orari</span><span class="v">Mar–Dom · vedi orari aggiornati</span></span>
+        </div>
+        <div class="item">
+          <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+          <span><span class="k">Dove</span><span class="v">Lungomare Lombardo 27, Genova</span></span>
+        </div>
+        <div class="item">
+          <span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2Z"/></svg></span>
+          <span><span class="k">Telefono</span><span class="v">010 5533155</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee">
+    <div class="track" id="marqueeTrack"></div>
+  </div>
+
+  <!-- CUCINA -->
+  <section id="cucina" class="wrap">
+    <div class="cucina-grid">
+      <div class="reveal cucina-text">
+        <p class="eyebrow">La nostra proposta</p>
+        <h2 class="h">Cucina <em>di mare,</em><br>anima contemporanea.</h2>
+        <p class="lead">Pesce nostrano, prodotti del territorio ligure e una cantina curata dalla sommelier Monica Capurro: due menu degustazione e una carta che segue il mercato del giorno.</p>
+        <div class="feat-row">
+          <div class="feat-card">
+            <span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 12c3-4.5 7-7 11.5-7 0 0-.5 2-.5 3.5S18 12 18 12s-.5 1.5-.5 3.5.5 3.5.5 3.5c-4.5 0-8.5-2.5-11.5-7Z"/></svg></span>
+            <strong>Pesce nostrano</strong>
+            <span>Crudi, scampi e gamberi viola, pescato ad amo in selezione</span>
+          </div>
+          <div class="feat-card">
+            <span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V8"/><path d="M12 8C12 4 9 2 5 2c0 4 3 6 7 6Z"/><path d="M12 8c0-4 3-6 7-6 0 4-3 6-7 6Z"/></svg></span>
+            <strong>Pasta fatta in casa</strong>
+            <span>Formati e sughi di mare secondo la stagione</span>
+          </div>
+          <div class="feat-card">
+            <span class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"/><path d="M12 15v7"/><path d="M7 3h10l-1 7a4 4 0 0 1-8 0L7 3Z"/></svg></span>
+            <strong>Cantina curata</strong>
+            <span>Selezione ligure e naturale a cura di Monica Capurro</span>
+          </div>
+        </div>
+        <div class="tag-row">
+          <span class="tag">Crudi nostrani</span>
+          <span class="tag">Menu degustazione</span>
+          <span class="tag">Vista mare</span>
+          <span class="tag">Terrazza estiva</span>
+        </div>
+      </div>
+      <div class="reveal collage">
+        <div class="big"><img src="img/cucina/foto1.jpg" alt="Piatto di pesce del ristorante Santamonica" loading="lazy"></div>
+        <div class="stack">
+          <div><img src="img/cucina/foto2.jpg" alt="Preparazione in cucina" loading="lazy"></div>
+          <div><img src="img/sito/cucina-ingredienti.webp" alt="Ingredienti freschi in cucina" loading="lazy"></div>
+        </div>
+        <p class="cap">Dalla nostra cucina: piatti e materie prime del giorno.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <section class="quote-sec">
+    <div class="reveal wrap">
+      <span class="quote-mark serif">&rdquo;</span>
+      <p class="q">Un ristorante dovrebbe farti stare meglio di quando sei entrato. <em>Tutto il resto viene dopo.</em></p>
+      <p class="cite">Santamonica · Genova</p>
+    </div>
+  </section>
+
+  <!-- MENU -->
+  <section id="menu" class="menu-sec dark-dotted">
+    <div class="wrap">
+      <div class="reveal menu-head">
+        <div>
+          <p class="eyebrow on-dark">Il menu · cambia col mercato</p>
+          <h2 class="h on-dark">Ogni piatto, <em>una storia.</em></h2>
+        </div>
+        <p class="note">Due menu degustazione e la carta. Tabella allergeni disponibile piatto per piatto: segnalacelo in prenotazione.</p>
+      </div>
+      <div class="reveal tabs" id="menuTabs">
+        <button class="tab active" data-tab="sei">6 portate · €85</button>
+        <button class="tab" data-tab="sette">7 portate · €110</button>
+        <button class="tab" data-tab="carta">Alla carta</button>
+      </div>
+
+      <div class="menu-panel" data-panel="sei">
+        <div class="reveal menu-photo">
+          <img src="img/cucina/foto3.jpg" alt="Menu degustazione 6 portate">
+          <div class="ov"></div>
+          <div class="cap">
+            <p class="serif">Il percorso in 6 tappe, dal crudo al dolce</p>
+            <span class="price">€85 a persona · vini +€60</span>
+          </div>
+        </div>
+        <div class="reveal dish-list">
+          <div class="dish"><span class="n serif">01</span><span class="name">Calamaro nostrano, bagna cauda, kefir</span></div>
+          <div class="dish"><span class="n serif">02</span><span class="name">Animella di vitello, sedano rapa, nocciole, fondo di pesce</span></div>
+          <div class="dish"><span class="n serif">03</span><span class="name">Spaghettoni quadrati Mancini, anemoni di mare, nduja, maggiorana</span></div>
+          <div class="dish"><span class="n serif">04</span><span class="name">Tubetti Mancini, baccalà, spinaci, kosho di agrumi</span></div>
+          <div class="dish"><span class="n serif">05</span><span class="name">Secondo dello chef</span></div>
+          <div class="dish"><span class="n serif">06</span><span class="name">Gelato al limone nero, levistico, lime, cracker di latte</span></div>
+          <div class="dish-cta"><a href="/prenota.html" class="btn btn-coral" style="width:100%;">Prenota per assaggiarlo</a></div>
+        </div>
+      </div>
+
+      <div class="menu-panel" data-panel="sette" style="display:none;">
+        <div class="reveal menu-photo">
+          <img src="img/cucina/foto4.jpg" alt="Menu degustazione 7 portate a mano libera">
+          <div class="ov"></div>
+          <div class="cap">
+            <p class="serif">A mano libera, 7 portate a sorpresa</p>
+            <span class="price">€110 a persona · vini +€70</span>
+          </div>
+        </div>
+        <div class="reveal dish-list">
+          <div class="dish"><span class="n serif">—</span><span class="name">Menu a mano libera dello Chef</span><span class="desc" style="margin-left:auto;">Sette portate a sorpresa dal pescato e dal mercato del giorno.</span></div>
+          <div class="dish-cta"><a href="/prenota.html" class="btn btn-coral" style="width:100%;">Prenota per assaggiarlo</a></div>
+        </div>
+      </div>
+
+      <div class="menu-panel" data-panel="carta" style="display:none;">
+        <div class="reveal menu-photo">
+          <img src="img/cucina/foto5.jpg" alt="Piatti alla carta del ristorante Santamonica">
+          <div class="ov"></div>
+          <div class="cap">
+            <p class="serif">Alcuni esempi dalla carta</p>
+            <span class="price">La carta cambia col mercato</span>
+          </div>
+        </div>
+        <div class="reveal dish-list">
+          <div class="dish"><span class="n serif">01</span><span class="name">Degustazione di mare</span><span class="price">€75</span></div>
+          <div class="dish"><span class="n serif">02</span><span class="name">Selezione di pesci nostrani pescati ad amo</span><span class="price">€35</span></div>
+          <div class="dish"><span class="n serif">03</span><span class="name">Dentice reale nostrano crudo, ricci di mare, limone, mandorle</span><span class="price">€27</span></div>
+          <div class="dish"><span class="n serif">04</span><span class="name">Spaghettoni quadrati Mancini, anemoni di mare, nduja, maggiorana</span><span class="price">€32</span></div>
+          <div class="dish"><span class="n serif">05</span><span class="name">Cappellacci di cinghiale, galletti, rucola, mirtilli</span><span class="price">€29</span></div>
+          <div class="dish-cta"><a href="/menu.html" class="btn btn-coral" style="width:100%;">Vedi il menu completo</a></div>
+        </div>
+      </div>
+
+      <div class="reveal menu-links">
+        <a href="/menu.html" class="btn btn-ghost">Carta completa &amp; allergeni</a>
+        <a href="/menu-vini.html" class="btn btn-ghost">Carta dei vini</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERIA -->
+  <section id="galleria" class="wrap">
+    <div class="reveal gal-head">
+      <div>
+        <p class="eyebrow">Galleria · mare, sala, piatti</p>
+        <h2 class="h">Vieni con <em>gli occhi.</em></h2>
+      </div>
+      <div class="gal-filters" id="galFilters">
+        <button class="active" data-f="tutti">Tutti</button>
+        <button data-f="piatti">Piatti</button>
+        <button data-f="sala">Sala &amp; mare</button>
+      </div>
+    </div>
+    <div class="gal-grid" id="galGrid">
+      <button class="reveal gal-item" data-f="piatti" data-i="0"><img src="img/galleria/thumb/foto1.webp" data-full="img/galleria/foto1.webp" alt="Piatto del ristorante Santamonica" loading="lazy"><span class="cap"><span>Piatti</span></span></button>
+      <button class="reveal gal-item" data-f="sala" data-i="1"><img src="img/galleria/thumb/foto2.webp" data-full="img/galleria/foto2.webp" alt="Sala vista mare del ristorante Santamonica" loading="lazy"><span class="cap"><span>Sala &amp; mare</span></span></button>
+      <button class="reveal gal-item" data-f="piatti" data-i="2"><img src="img/galleria/thumb/foto3.webp" data-full="img/galleria/foto3.webp" alt="Piatto del ristorante Santamonica" loading="lazy"><span class="cap"><span>Piatti</span></span></button>
+      <button class="reveal gal-item" data-f="sala" data-i="3"><img src="img/galleria/thumb/foto4.webp" data-full="img/galleria/foto4.webp" alt="Terrazza del ristorante Santamonica" loading="lazy"><span class="cap"><span>Sala &amp; mare</span></span></button>
+      <button class="reveal gal-item" data-f="piatti" data-i="4"><img src="img/galleria/thumb/foto5.webp" data-full="img/galleria/foto5.webp" alt="Piatto del ristorante Santamonica" loading="lazy"><span class="cap"><span>Piatti</span></span></button>
+      <button class="reveal gal-item" data-f="sala" data-i="5"><img src="img/galleria/thumb/foto6.webp" data-full="img/galleria/foto6.webp" alt="Interno del ristorante Santamonica" loading="lazy"><span class="cap"><span>Sala &amp; mare</span></span></button>
+    </div>
+  </section>
+
+  <div id="lightbox">
+    <button class="close" id="lbClose" type="button">✕</button>
+    <img id="lbImg" src="" alt="">
+  </div>
+
+  <!-- CANTINA -->
+  <section id="cantina" class="cantina-sec">
+    <div class="wrap cantina-grid">
+      <div class="reveal cantina-photo">
+        <img src="img/sito/cantina.webp" alt="La cantina del ristorante Santamonica">
+        <div class="ov"></div>
+        <div class="cap">
+          <p>&ldquo;Il vino giusto accompagna il piatto, non lo copre.&rdquo;</p>
+          <small>Monica Capurro · Sommelier</small>
+        </div>
+      </div>
+      <div class="reveal cantina-text">
+        <p class="eyebrow">I nostri vini · curati da Monica</p>
+        <h2 class="h">Una cantina <em>curata.</em></h2>
+        <p class="lead">Selezione con un cuore ligure — l'abbinamento naturale al pesce del nostro mare — e attenzione crescente ai vini naturali. Molte etichette disponibili anche al calice.</p>
+        <div class="wine-tags">
+          <span class="wine-tag"><span class="dot serif">V</span> Vermentino</span>
+          <span class="wine-tag"><span class="dot serif">P</span> Pigato</span>
+          <span class="wine-tag"><span class="dot serif">R</span> Rossese</span>
+          <span class="wine-tag"><span class="dot serif">N</span> Selezione naturale</span>
+        </div>
+        <div style="margin-top:1.5rem;">
+          <a href="/menu-vini.html" class="btn btn-dark">Sfoglia la carta dei vini</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INFO -->
+  <section id="info" class="wrap">
+    <div class="reveal" style="text-align:center;max-width:36rem;margin:0 auto;">
+      <p class="eyebrow">Buono a sapersi</p>
+      <h2 class="h">Quando ci <em>trovi.</em></h2>
+    </div>
+    <div class="info-grid">
+      <div class="reveal info-card dark">
+        <p class="lbl"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Orari</p>
+        <p class="addr serif">Aperto martedì–domenica<br>chiuso il lunedì</p>
+        <p class="sub">Gli orari di pranzo e cena variano in stagione: la pagina Dove Siamo mostra sempre l'orario aggiornato in tempo reale.</p>
+        <div class="row-btns"><a href="/dove-siamo.html" class="btn btn-ghost" style="border-color:rgba(255,255,255,.25);flex:1;">Orari aggiornati</a></div>
+      </div>
+      <div class="reveal info-card light">
+        <p class="lbl"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Dove siamo</p>
+        <p class="addr serif">Lungomare Lombardo 27,<br>16145 Genova</p>
+        <p class="sub">Sala affacciata sul mare in zona Albaro / San Giuliano. Terrazza estiva quando il tempo lo permette.</p>
+        <div class="row-btns">
+          <a href="https://www.google.com/maps/search/?api=1&query=Santamonica+Lungomare+Lombardo+27+Genova" target="_blank" rel="noreferrer" class="btn btn-ghost" style="border-color:var(--line);color:var(--abyss);">Apri in Maps</a>
+          <a href="tel:+390105533155" class="btn btn-dark">010 5533155</a>
+        </div>
+      </div>
+      <div class="reveal info-card tint">
+        <p class="lbl">Come arrivare</p>
+        <p class="sub" style="margin-top:.9rem;">Corso Italia è la via di riferimento; dal centro città una passeggiata lungo il mare porta dritti al ristorante. Parcheggio libero e a pagamento nelle vie limitrofe, disponibilità variabile.</p>
+        <div style="margin-top:1rem;"><a href="/dove-siamo.html" class="btn btn-dark" style="width:100%;">Indicazioni dettagliate</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REGALO -->
+  <section id="regalo" class="regalo-sec">
+    <div class="wrap regalo-grid">
+      <div class="reveal">
+        <p class="eyebrow" style="color:var(--sand);">Un dono speciale</p>
+        <h2 class="h on-dark" style="color:#fff;">Regala una cena <em style="color:var(--sand);">sul mare.</em></h2>
+        <p style="margin-top:1rem;font-size:.95rem;line-height:1.7;color:rgba(255,255,255,.75);max-width:30rem;">Buoni regalo digitali, validi 6 mesi, da usare a pranzo o cena secondo disponibilità.</p>
+        <div class="gift-opts">
+          <div class="gift-opt">
+            <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4"/><path d="M12 8v13"/><path d="M5 12v9h14v-9"/></svg></span>
+            <span><strong>Buono base</strong><span class="d">Da usare come preferisci</span></span>
+            <span class="p serif">€100</span>
+          </div>
+          <div class="gift-opt">
+            <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4"/><path d="M12 8v13"/><path d="M5 12v9h14v-9"/></svg></span>
+            <span><strong>Buono cena</strong><span class="d">Pensato per una cena completa</span></span>
+            <span class="p serif">€150</span>
+          </div>
+          <div class="gift-opt">
+            <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4"/><path d="M12 8v13"/><path d="M5 12v9h14v-9"/></svg></span>
+            <span><strong>Buono degustazione</strong><span class="d">Per l'esperienza completa</span></span>
+            <span class="p serif">€200</span>
+          </div>
+        </div>
+      </div>
+      <div class="reveal regalo-card">
+        <div class="bar"></div>
+        <p class="serif" style="font-size:1.6rem;">Buoni regalo Santamonica</p>
+        <p style="margin-top:.4rem;font-size:.85rem;color:rgba(20,36,47,.6);">3 tagli disponibili · validità 6 mesi · richiesta via form dedicato</p>
+        <a href="/regala.html" class="btn btn-coral" style="width:100%;margin-top:1.4rem;">Scopri i buoni regalo</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-sec">
+    <div class="wrap">
+      <div class="reveal" style="text-align:center;">
+        <p class="eyebrow">Buono a sapersi</p>
+        <h2 class="h">Domande <em>frequenti.</em></h2>
+      </div>
+      <div class="faq-list" id="faqList">
+        <div class="reveal faq-item open">
+          <button class="faq-q" type="button"><span class="plus">–</span><span>Il ristorante ha la vista sul mare?</span></button>
+          <div class="faq-a"><p>Sì, la sala è affacciata sul mare. D'estate apriamo anche la terrazza, quando il tempo lo permette.</p></div>
+        </div>
+        <div class="reveal faq-item">
+          <button class="faq-q" type="button"><span class="plus">+</span><span>C'è un menu degustazione?</span></button>
+          <div class="faq-a"><p>Sì, accanto alla carta proponiamo due menu degustazione: un 6 portate e uno di 7 a mano libera dello Chef. La versione aggiornata è sempre sul sito.</p></div>
+        </div>
+        <div class="reveal faq-item">
+          <button class="faq-q" type="button"><span class="plus">+</span><span>Come si prenota?</span></button>
+          <div class="faq-a"><p>Dal modulo di prenotazione online in pochi secondi, oppure telefonicamente allo 010 5533155.</p></div>
+        </div>
+        <div class="reveal faq-item">
+          <button class="faq-q" type="button"><span class="plus">+</span><span>Gestite allergie e intolleranze?</span></button>
+          <div class="faq-a"><p>Sì. Abbiamo la tabella allergeni piatto per piatto: segnalalo nelle note di prenotazione e ne terremo conto.</p></div>
+        </div>
+        <div class="reveal faq-item">
+          <button class="faq-q" type="button"><span class="plus">+</span><span>Siete in qualche guida?</span></button>
+          <div class="faq-a"><p>Sì, siamo presenti nella Guida Michelin, nel Gambero Rosso e nel Golosario. Ma la guida più importante restano sempre gli ospiti che tornano.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRENOTA CTA -->
+  <section id="prenota" class="prenota-sec">
+    <div class="bgimg"><img src="img/sito/cucina-piatto.webp" alt=""></div>
+    <div class="veil"></div>
+    <div class="wrap prenota-grid">
+      <div class="reveal">
+        <p class="eyebrow" style="color:var(--gold);">Prenota in pochi secondi</p>
+        <h2 class="h on-dark" style="color:#fff;">Il tuo tavolo <em style="color:var(--sand);">sul mare.</em></h2>
+        <p style="margin-top:1rem;font-size:.95rem;line-height:1.7;color:rgba(255,255,255,.65);max-width:28rem;">Per gruppi numerosi ti consigliamo di chiamare direttamente allo <a href="tel:+390105533155" style="color:#fff;font-weight:700;text-decoration:underline;">010 5533155</a>.</p>
+        <div class="prenota-points">
+          <div class="prenota-point">
+            <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span><strong>Conferma rapida</strong><span>Riceverai conferma della tua richiesta</span></span>
+          </div>
+          <div class="prenota-point">
+            <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span><strong>Terrazza o sala</strong><span>Segnala la tua preferenza nelle note</span></span>
+          </div>
+          <div class="prenota-point">
+            <span class="ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <span><strong>Bambini benvenuti</strong><span>Segnalalo e prepariamo lo spazio giusto</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="reveal prenota-panel">
+        <span class="ico-big">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 9h18"/></svg>
+        </span>
+        <h3>Vai alla prenotazione</h3>
+        <p>Questa è una pagina di prova: il modulo reale, sempre aggiornato con orari e disponibilità, si trova su prenota.html.</p>
+        <a href="/prenota.html" class="btn btn-coral">Apri il modulo di prenotazione</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div class="col">
+      <div class="foot-brand">
+        <span class="mark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 6c2 0 2 2 4 2s2-2 4-2 2 2 4 2 2-2 4-2 2 2 4 2"/><path d="M2 12c2 0 2 2 4 2s2-2 4-2 2 2 4 2 2-2 4-2 2 2 4 2"/><path d="M2 18c2 0 2 2 4 2s2-2 4-2 2 2 4 2 2-2 4-2 2 2 4 2"/></svg></span>
+        <span class="name">Santamonica <em style="font-style:italic;font-weight:300;">sul mare</em></span>
+      </div>
+      <p>Ristorante di pesce a Genova, sala affacciata sul mare. Cucina contemporanea, cantina curata.</p>
+      <p style="color:var(--gold);">★ Michelin · Gambero Rosso · Golosario</p>
+    </div>
+    <div class="col">
+      <h4>Contatti</h4>
+      <a href="tel:+390105533155">010 5533155</a>
+      <p>Lungomare Lombardo 27<br>16145 Genova GE</p>
+      <a href="https://www.google.com/maps/search/?api=1&query=Santamonica+Lungomare+Lombardo+27+Genova" target="_blank" rel="noreferrer">Come arrivare →</a>
+    </div>
+    <div class="col">
+      <h4>Info</h4>
+      <a href="/dove-siamo.html">Orari aggiornati</a>
+      <a href="/menu.html">Menu &amp; allergeni</a>
+      <a href="/menu-vini.html">Carta dei vini</a>
+      <a href="/regala.html">Buoni regalo</a>
+    </div>
+    <div class="col">
+      <h4>Esplora</h4>
+      <div class="foot-links">
+        <a href="#cucina">Cucina</a>
+        <a href="#menu">Menu</a>
+        <a href="#cantina">Cantina</a>
+        <a href="#galleria">Galleria</a>
+      </div>
+      <a href="/prenota.html" class="btn btn-coral" style="margin-top:1rem;">Prenota un tavolo</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    Anteprima restyling — pagina di prova, non collegata al sito live · <a href="/privacy.html" style="text-decoration:underline;">Privacy</a> · <a href="/cookies.html" style="text-decoration:underline;">Cookie</a>
+  </div>
+</footer>
+
+<div class="sticky-spacer"></div>
+<div id="stickyMobile">
+  <div class="bar">
+    <span class="txt"><strong>Prenota un tavolo</strong>vista mare</span>
+    <span class="btns">
+      <a href="tel:+390105533155" class="icobtn" aria-label="Chiama">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2Z"/></svg>
+      </a>
+      <a href="/prenota.html" class="cta">Prenota</a>
+    </span>
+  </div>
+</div>
+
+<script>
+(function(){
+  // testbar dismiss
+  var testbar = document.getElementById('testbar');
+  var body = document.body;
+  document.getElementById('hideTestbar').addEventListener('click', function(){
+    testbar.style.display = 'none';
+    body.classList.add('no-testbar');
+  });
+
+  // header scroll state
+  var header = document.getElementById('siteHeader');
+  function onScroll(){
+    if (window.scrollY > 24) header.classList.add('scrolled');
+    else header.classList.remove('scrolled');
+  }
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+
+  // mobile menu
+  var burger = document.getElementById('burgerBtn');
+  var mobileMenu = document.getElementById('mobileMenu');
+  burger.addEventListener('click', function(){
+    mobileMenu.classList.toggle('open');
+  });
+  mobileMenu.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ mobileMenu.classList.remove('open'); });
+  });
+
+  // marquee content
+  var words = ['Pesce nostrano','Cantina curata','Vista mare','Terrazza estiva','Cucina contemporanea','Sommelier Monica Capurro'];
+  var track = document.getElementById('marqueeTrack');
+  for (var r = 0; r < 2; r++) {
+    var grp = document.createElement('div');
+    grp.className = 'grp';
+    words.forEach(function(w){
+      var s = document.createElement('span');
+      s.textContent = w;
+      grp.appendChild(s);
+      var sep = document.createElement('span');
+      sep.className = 'sep';
+      sep.textContent = '✦';
+      grp.appendChild(sep);
+    });
+    track.appendChild(grp);
+  }
+
+  // reveal on scroll
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if (e.isIntersecting) e.target.classList.add('is-visible'); });
+  }, { threshold: .12 });
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+
+  // menu tabs
+  var tabs = document.querySelectorAll('#menuTabs .tab');
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){ x.classList.remove('active'); });
+      t.classList.add('active');
+      var key = t.getAttribute('data-tab');
+      document.querySelectorAll('.menu-panel').forEach(function(p){
+        p.style.display = (p.getAttribute('data-panel') === key) ? 'grid' : 'none';
+      });
+    });
+  });
+
+  // galleria filter
+  var filters = document.querySelectorAll('#galFilters button');
+  var items = document.querySelectorAll('#galGrid .gal-item');
+  filters.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      filters.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      var f = btn.getAttribute('data-f');
+      items.forEach(function(it){
+        it.style.display = (f === 'tutti' || it.getAttribute('data-f') === f) ? 'block' : 'none';
+      });
+    });
+  });
+
+  // lightbox
+  var lightbox = document.getElementById('lightbox');
+  var lbImg = document.getElementById('lbImg');
+  items.forEach(function(it){
+    it.addEventListener('click', function(){
+      var img = it.querySelector('img');
+      lbImg.src = img.getAttribute('data-full');
+      lbImg.alt = img.alt;
+      lightbox.classList.add('open');
+    });
+  });
+  document.getElementById('lbClose').addEventListener('click', function(){ lightbox.classList.remove('open'); });
+  lightbox.addEventListener('click', function(e){ if (e.target === lightbox) lightbox.classList.remove('open'); });
+  window.addEventListener('keydown', function(e){ if (e.key === 'Escape') { lightbox.classList.remove('open'); mobileMenu.classList.remove('open'); } });
+
+  // faq accordion
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var q = item.querySelector('.faq-q');
+    q.addEventListener('click', function(){
+      var wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(function(i){
+        i.classList.remove('open');
+        i.querySelector('.plus').textContent = '+';
+      });
+      if (!wasOpen) {
+        item.classList.add('open');
+        item.querySelector('.plus').textContent = '–';
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -306,15 +306,15 @@
        leggibilità su sfondo scuro. --sand/--terracotta/--sea/--gold invariati: erano
        già pensati per leggersi su sfondo scuro (vedi footer/quote-section esistenti). */
     --sand: #f5f0e8;
-    --warm-white: #0D2A3F;
-    --warm-white-rgb: 13,42,63; /* stessa tinta di --warm-white, in RGB: serve per gli overlay semi-trasparenti (nav a scroll, lightbox) */
+    --warm-white: #241812;
+    --warm-white-rgb: 36,24,18; /* stessa tinta di --warm-white, in RGB: serve per gli overlay semi-trasparenti (nav a scroll, lightbox) */
     --ink: #faf8f4;
     --ink-soft: rgba(245,240,232,0.62);
     --terracotta: #4AA3D1;
     --sea: #4a7c8a;
     --gold: #b89d6a;
     --divider: rgba(245,240,232,0.14);
-    --surface: #14374F; /* superficie leggermente più chiara del fondo, per card/form che devono restare distinguibili */
+    --surface: #33221A; /* superficie leggermente più chiara del fondo, per card/form che devono restare distinguibili */
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; font-size: 16px; }
@@ -328,7 +328,7 @@
   .nav-links a { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); text-decoration: none; transition: color 0.2s; }
   .nav-links a:hover { color: var(--terracotta); }
   .nav-right { display: flex; align-items: center; gap: 1rem; }
-  .nav-cta { font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-white); background: var(--ink); padding: 0.55rem 1.2rem; text-decoration: none; transition: background 0.2s; }
+  .nav-cta { font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-white); background: var(--ink); padding: 0.55rem 1.2rem; border-radius: 4px; text-decoration: none; transition: background 0.2s; }
   .nav-cta:hover { background: var(--terracotta); }
   .lang-select { font-family: 'Jost', sans-serif; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-soft); background: transparent; border: 1px solid var(--divider); padding: 0.35rem 1.4rem 0.35rem 0.6rem; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23f5f0e8' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; transition: border-color 0.2s; }
   .lang-select:hover { border-color: var(--terracotta); color: var(--ink); }
@@ -347,9 +347,9 @@
   .hero-image-panel { position: relative; overflow: hidden; }
   .hero-image-panel img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.05); animation: zoomOut 1.4s 0.1s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
 
-  .btn-primary { display: inline-block; box-sizing: border-box; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-white); background: var(--ink); padding: 0.9rem 2rem; text-decoration: none; transition: background 0.2s; }
+  .btn-primary { display: inline-block; box-sizing: border-box; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--warm-white); background: var(--ink); padding: 0.9rem 2rem; border-radius: 4px; text-decoration: none; transition: background 0.2s; }
   .btn-primary:hover { background: var(--terracotta); }
-  .btn-secondary { display: inline-block; box-sizing: border-box; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); border: 1px solid var(--ink); padding: 0.9rem 2rem; text-decoration: none; transition: all 0.2s; }
+  .btn-secondary { display: inline-block; box-sizing: border-box; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); border: 1px solid var(--ink); border-radius: 4px; padding: 0.9rem 2rem; text-decoration: none; transition: all 0.2s; }
   .btn-secondary:hover { background: var(--ink); color: var(--warm-white); }
 
   section { padding: 6rem 2rem; }
@@ -561,13 +561,13 @@
   </div>
   <div class="cp-body">
     <div class="cp-grid" id="cpGrid">
-      <button type="button" class="cp-swatch active" style="background:#0D2A3F" data-bg="#0D2A3F" data-bg-rgb="13,42,63" data-surface="#14374F" title="Azzurro scuro (attuale)"></button>
+      <button type="button" class="cp-swatch" style="background:#0D2A3F" data-bg="#0D2A3F" data-bg-rgb="13,42,63" data-surface="#14374F" title="Azzurro scuro"></button>
       <button type="button" class="cp-swatch" style="background:#0E1A2E" data-bg="#0E1A2E" data-bg-rgb="14,26,46" data-surface="#16233B" title="Blu notte"></button>
       <button type="button" class="cp-swatch" style="background:#161A3A" data-bg="#161A3A" data-bg-rgb="22,26,58" data-surface="#21285A" title="Blu indaco"></button>
       <button type="button" class="cp-swatch" style="background:#0C2B2B" data-bg="#0C2B2B" data-bg-rgb="12,43,43" data-surface="#123B3B" title="Petrolio"></button>
       <button type="button" class="cp-swatch" style="background:#10241B" data-bg="#10241B" data-bg-rgb="16,36,27" data-surface="#1A3627" title="Verde bosco scuro"></button>
       <button type="button" class="cp-swatch" style="background:#2A1220" data-bg="#2A1220" data-bg-rgb="42,18,32" data-surface="#3A1B2E" title="Bordeaux scuro"></button>
-      <button type="button" class="cp-swatch" style="background:#241812" data-bg="#241812" data-bg-rgb="36,24,18" data-surface="#33221A" title="Marrone scuro"></button>
+      <button type="button" class="cp-swatch active" style="background:#241812" data-bg="#241812" data-bg-rgb="36,24,18" data-surface="#33221A" title="Marrone scuro (attuale)"></button>
       <button type="button" class="cp-swatch" style="background:#1C1F24" data-bg="#1C1F24" data-bg-rgb="28,31,36" data-surface="#262A31" title="Antracite"></button>
       <button type="button" class="cp-swatch" style="background:#1a1814" data-bg="#1a1814" data-bg-rgb="26,24,20" data-surface="#221f19" title="Nero caldo"></button>
       <button type="button" class="cp-swatch" style="background:#0A0A0A" data-bg="#0A0A0A" data-bg-rgb="10,10,10" data-surface="#171717" title="Nero puro"></button>
@@ -636,13 +636,13 @@
     <option value="en">EN — English</option>
     <option value="fr">FR — Fran&ccedil;ais</option>
   </select>
-  <a href="/prenota.html" style="font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-style:normal;background:var(--ink);color:var(--warm-white);padding:0.9rem 2.5rem;" data-i18n="nav_prenota">Prenota</a>
+  <a href="/prenota.html" style="font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-style:normal;background:var(--ink);color:var(--warm-white);padding:0.9rem 2.5rem;border-radius:4px;" data-i18n="nav_prenota">Prenota</a>
 </div>
 
 <section class="hero" style="padding:0;position:relative;">
   <div class="hero-text-panel">
     <p class="hero-eyebrow" data-i18n="hero_eyebrow">Ristorante &middot; Genova</p>
-    <h1 class="hero-title" data-i18n="hero_title">Ristorante sul mare:<br>Cucina <em>viva</em> a Genova</h1>
+    <h1 class="hero-title" data-i18n="hero_title">Ristorante sul mare</h1>
     <p class="hero-desc" data-i18n="hero_desc">Santamonica &egrave; un ristorante di pesce a Genova, sul Lungomare Lombardo, con la sala affacciata sul mare aperto. Un progetto in costante divenire, basato sull&rsquo;attenzione al gusto e sulla qualit&agrave; della materia prima. Pesce di Camogli, verdure dell&rsquo;orto genovese, pasta e pane di nostra produzione.</p>
     <div class="hero-actions">
       <a href="/prenota.html" class="btn-primary" data-i18n="hero_btn_prenota">Prenota un tavolo</a>
@@ -846,7 +846,7 @@
             <span style="font-size:0.72rem;color:var(--ink-soft);line-height:1.5;">Accetto di ricevere la newsletter e le comunicazioni di Santamonica. Puoi annullare l'iscrizione in qualsiasi momento.</span>
           </label>
           <button type="submit" id="brevo-btn"
-            style="width:100%;padding:0.9rem 2rem;background:var(--ink);border:none;color:var(--warm-white);font-family:'Jost',sans-serif;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;"
+            style="width:100%;padding:0.9rem 2rem;background:var(--ink);border:none;border-radius:4px;color:var(--warm-white);font-family:'Jost',sans-serif;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;"
             onmouseover="this.style.background='var(--terracotta)'" onmouseout="this.style.background='var(--ink)'">
             Iscriviti
           </button>

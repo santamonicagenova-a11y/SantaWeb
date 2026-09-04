@@ -373,9 +373,11 @@
        STAMPA
     ══════════════════════════════════════ */
     @media print {
+      :root { --cream: #fff; --ink: #1a1714; --stone: #8c7e6e; --rust: #9e4a2a; --rule: #d4c9b8; }
       @page { size: A4 portrait; margin: 8mm; }
       @page orarioPage { size: A4 portrait; margin: 0; }
       body { background: white; }
+      .pg { background: #fff; }
       .ctrl-bar { display: none; }
 
       /* carta: 3 pagine */

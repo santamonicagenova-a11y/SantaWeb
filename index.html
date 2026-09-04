@@ -307,6 +307,7 @@
        già pensati per leggersi su sfondo scuro (vedi footer/quote-section esistenti). */
     --sand: #f5f0e8;
     --warm-white: #0D2A3F;
+    --warm-white-rgb: 13,42,63; /* stessa tinta di --warm-white, in RGB: serve per gli overlay semi-trasparenti (nav a scroll, lightbox) */
     --ink: #faf8f4;
     --ink-soft: rgba(245,240,232,0.62);
     --terracotta: #C9962E;
@@ -320,7 +321,7 @@
   body { background: var(--warm-white); color: var(--ink); font-family: 'Jost', sans-serif; font-weight: 300; overflow-x: hidden; }
 
   nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 2rem; background: transparent; transition: background 0.4s, backdrop-filter 0.4s; }
-  nav.scrolled { background: rgba(13,42,63,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--divider); }
+  nav.scrolled { background: rgba(var(--warm-white-rgb),0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--divider); }
   .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
   .nav-logo .sub { font-size: 1rem; letter-spacing: 0.12em; opacity: 0.55; font-weight: 300; text-transform: lowercase; }
   .nav-links { display: flex; gap: 1.5rem; list-style: none; align-items: center; }
@@ -379,7 +380,7 @@
   .galleria-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s ease; }
   .galleria-item:hover img { transform: scale(1.04); }
 
-  #lightbox { position: fixed; inset: 0; z-index: 600; background: rgba(13,42,63,0.95); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 2rem; }
+  #lightbox { position: fixed; inset: 0; z-index: 600; background: rgba(var(--warm-white-rgb),0.95); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 2rem; }
   #lightbox.visible { opacity: 1; pointer-events: all; }
   #lightbox img { max-width: 90vw; max-height: 88vh; object-fit: contain; }
   #lightbox-close { position: absolute; top: 1.5rem; right: 2rem; background: none; border: none; color: var(--sand); font-size: 1.5rem; cursor: pointer; opacity: 0.7; }
@@ -530,10 +531,78 @@
     .galleria-grid { grid-template-columns: 1fr; }
     .galleria-item.grande { grid-column: span 1; aspect-ratio: 4/3; }
   }
+
+  /* ═══ Pannello prova-colori — SOLO branch di test, non toccare in produzione ═══ */
+  #colorpicker { position: fixed; right: 1.2rem; bottom: 1.2rem; z-index: 900; background: rgba(20,20,20,0.92); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 0.9rem; box-shadow: 0 10px 40px rgba(0,0,0,0.4); font-family: 'Jost', sans-serif; }
+  #colorpicker.collapsed .cp-body { display: none; }
+  #colorpicker .cp-head { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; cursor: pointer; user-select: none; }
+  #colorpicker .cp-title { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: #fff; opacity: 0.85; }
+  #colorpicker .cp-toggle { background: none; border: none; color: #fff; font-size: 0.9rem; cursor: pointer; opacity: 0.7; }
+  #colorpicker .cp-body { margin-top: 0.7rem; }
+  #colorpicker .cp-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.4rem; max-width: 220px; }
+  #colorpicker .cp-swatch { width: 32px; height: 32px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.25); cursor: pointer; padding: 0; transition: transform 0.15s, border-color 0.15s; }
+  #colorpicker .cp-swatch:hover { transform: scale(1.12); }
+  #colorpicker .cp-swatch.active { border-color: #fff; }
+  #colorpicker .cp-reset { margin-top: 0.6rem; width: 100%; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.6); background: none; border: 1px solid rgba(255,255,255,0.2); border-radius: 999px; padding: 0.4rem; cursor: pointer; }
+  #colorpicker .cp-reset:hover { color: #fff; border-color: rgba(255,255,255,0.5); }
+  @media (max-width: 600px) { #colorpicker { right: 0.6rem; bottom: 0.6rem; } #colorpicker .cp-grid { grid-template-columns: repeat(5, 1fr); max-width: 190px; } }
 </style>
 
 </head>
 <body>
+
+<!-- ═══ Pannello prova-colori — SOLO branch di test claude/sito-live-sfondo-nero,
+     non presente su main. Cambia --warm-white/--surface all'istante via JS,
+     senza toccare il file: ricaricando la pagina torna al colore committato. ═══ -->
+<div id="colorpicker" role="region" aria-label="Prova colori di sfondo">
+  <div class="cp-head" id="cpHead">
+    <span class="cp-title">Sfondo</span>
+    <button type="button" class="cp-toggle" id="cpToggle" aria-label="Mostra/nascondi pannello colori">▾</button>
+  </div>
+  <div class="cp-body">
+    <div class="cp-grid" id="cpGrid">
+      <button type="button" class="cp-swatch active" style="background:#0D2A3F" data-bg="#0D2A3F" data-bg-rgb="13,42,63" data-surface="#14374F" title="Azzurro scuro (attuale)"></button>
+      <button type="button" class="cp-swatch" style="background:#0E1A2E" data-bg="#0E1A2E" data-bg-rgb="14,26,46" data-surface="#16233B" title="Blu notte"></button>
+      <button type="button" class="cp-swatch" style="background:#161A3A" data-bg="#161A3A" data-bg-rgb="22,26,58" data-surface="#21285A" title="Blu indaco"></button>
+      <button type="button" class="cp-swatch" style="background:#0C2B2B" data-bg="#0C2B2B" data-bg-rgb="12,43,43" data-surface="#123B3B" title="Petrolio"></button>
+      <button type="button" class="cp-swatch" style="background:#10241B" data-bg="#10241B" data-bg-rgb="16,36,27" data-surface="#1A3627" title="Verde bosco scuro"></button>
+      <button type="button" class="cp-swatch" style="background:#2A1220" data-bg="#2A1220" data-bg-rgb="42,18,32" data-surface="#3A1B2E" title="Bordeaux scuro"></button>
+      <button type="button" class="cp-swatch" style="background:#241812" data-bg="#241812" data-bg-rgb="36,24,18" data-surface="#33221A" title="Marrone scuro"></button>
+      <button type="button" class="cp-swatch" style="background:#1C1F24" data-bg="#1C1F24" data-bg-rgb="28,31,36" data-surface="#262A31" title="Antracite"></button>
+      <button type="button" class="cp-swatch" style="background:#1a1814" data-bg="#1a1814" data-bg-rgb="26,24,20" data-surface="#221f19" title="Nero caldo"></button>
+      <button type="button" class="cp-swatch" style="background:#0A0A0A" data-bg="#0A0A0A" data-bg-rgb="10,10,10" data-surface="#171717" title="Nero puro"></button>
+    </div>
+    <button type="button" class="cp-reset" id="cpReset">Ripristina colore salvato</button>
+  </div>
+</div>
+<script>
+(function(){
+  var root = document.documentElement;
+  var defaults = { bg: getComputedStyle(root).getPropertyValue('--warm-white').trim(),
+                    bgRgb: getComputedStyle(root).getPropertyValue('--warm-white-rgb').trim(),
+                    surface: getComputedStyle(root).getPropertyValue('--surface').trim() };
+  document.getElementById('cpGrid').addEventListener('click', function(e){
+    var btn = e.target.closest('.cp-swatch');
+    if (!btn) return;
+    root.style.setProperty('--warm-white', btn.getAttribute('data-bg'));
+    root.style.setProperty('--warm-white-rgb', btn.getAttribute('data-bg-rgb'));
+    root.style.setProperty('--surface', btn.getAttribute('data-surface'));
+    document.querySelectorAll('.cp-swatch').forEach(function(s){ s.classList.remove('active'); });
+    btn.classList.add('active');
+  });
+  document.getElementById('cpReset').addEventListener('click', function(){
+    root.style.removeProperty('--warm-white');
+    root.style.removeProperty('--warm-white-rgb');
+    root.style.removeProperty('--surface');
+    document.querySelectorAll('.cp-swatch').forEach(function(s){ s.classList.remove('active'); });
+    var first = document.querySelector('.cp-swatch');
+    if (first) first.classList.add('active');
+  });
+  document.getElementById('cpHead').addEventListener('click', function(){
+    document.getElementById('colorpicker').classList.toggle('collapsed');
+  });
+})();
+</script>
 
 <nav id="main-nav">
   <a href="#" class="nav-logo">Santamonica <span class="sub">sul mare</span></a>

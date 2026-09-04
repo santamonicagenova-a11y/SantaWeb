@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<!--
+  PAGINA DI PROVA — non collegata al sito live, non linkata da nav/sitemap.
+  Propone un restyle a 3 card della sezione #info di index.html, con la
+  palette e i font reali già in produzione (Cormorant Garamond + Jost,
+  marrone scuro + azzurro). Contenuti reali (orari da FAQ live, indirizzo/
+  telefono reali, tagli voucher e validità da regala.html). Il riquadro
+  "Parcheggio" del riferimento è stato sostituito da un riquadro Voucher
+  su richiesta.
+  v 2026.09.04.01
+-->
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prova — sezione Info a 3 card</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sand: #f5f0e8;
+    --warm-white: #241812;
+    --ink: #faf8f4;
+    --ink-soft: rgba(245,240,232,0.62);
+    --terracotta: #4AA3D1;
+    --gold: #b89d6a;
+    --divider: rgba(245,240,232,0.14);
+    --surface: #33221A;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;font-size:16px;}
+  body{background:var(--warm-white);color:var(--ink);font-family:'Jost',sans-serif;font-weight:300;}
+  a{color:inherit;}
+  img{display:block;max-width:100%;}
+
+  #testbar{background:var(--gold);color:var(--warm-white);font-size:0.8rem;text-align:center;padding:0.6rem 1rem;font-weight:500;}
+
+  section{padding:5rem 1.5rem;}
+  .section-inner{max-width:1200px;margin:0 auto;}
+  .section-label{font-size:0.62rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--terracotta);margin-bottom:1rem;text-align:center;}
+  .section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:300;line-height:1.1;text-align:center;margin-bottom:3rem;}
+  .section-title em{font-style:italic;color:var(--terracotta);}
+
+  .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;}
+  @media (max-width:900px){ .info-grid{grid-template-columns:1fr;} }
+
+  .card{border-radius:20px;padding:2rem 1.75rem;}
+  .card.dark{background:var(--surface);}
+  .card.light{background:var(--sand);color:var(--warm-white);}
+  .card.accent{background:var(--terracotta);color:var(--warm-white);}
+
+  .card-label{display:flex;align-items:center;gap:0.5rem;font-size:0.68rem;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:1.4rem;}
+  .card.dark .card-label{color:var(--gold);}
+  .card.light .card-label{color:var(--terracotta);}
+  .card.accent .card-label{color:var(--warm-white);opacity:0.85;}
+
+  /* ── card Orari ── */
+  .orari-banner{background:var(--terracotta);color:var(--warm-white);font-size:0.82rem;font-weight:500;border-radius:10px;padding:0.7rem 1rem;margin-bottom:1rem;}
+  .orari-row{display:flex;justify-content:space-between;gap:1rem;font-size:0.9rem;padding:0.75rem 1rem;border-radius:10px;background:rgba(245,240,232,0.06);border:1px solid var(--divider);margin-bottom:0.5rem;}
+  .orari-row .g{color:var(--ink-soft);}
+  .orari-row strong{font-weight:500;}
+  .orari-note{margin-top:0.8rem;font-size:0.78rem;color:var(--ink-soft);line-height:1.6;}
+
+  /* ── card Dove siamo ── */
+  .card-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;line-height:1.25;margin-bottom:0.6rem;}
+  .card-text{font-size:0.85rem;line-height:1.7;color:rgba(36,24,18,0.7);margin-bottom:1rem;}
+  .card.light .photo{border-radius:14px;overflow:hidden;height:150px;margin-bottom:1.1rem;}
+  .card.light .photo img{width:100%;height:100%;object-fit:cover;}
+  .btn-row{display:flex;gap:0.6rem;flex-wrap:wrap;}
+  .btn-pill{flex:1;min-width:120px;text-align:center;font-size:0.72rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;padding:0.75rem 1rem;border-radius:999px;text-decoration:none;transition:opacity .2s;}
+  .btn-pill:hover{opacity:0.85;}
+  .btn-pill.outline{border:1px solid rgba(36,24,18,0.25);color:var(--warm-white);}
+  .btn-pill.solid-dark{background:var(--warm-white);color:var(--ink);}
+
+  /* ── card Voucher ── */
+  .card.accent .card-title{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:400;color:var(--warm-white);}
+  .card.accent .card-text{color:rgba(36,24,18,0.75);}
+  .tier-row{display:flex;gap:0.5rem;margin:1.1rem 0 1.3rem;flex-wrap:wrap;}
+  .tier-chip{background:rgba(36,24,18,0.14);border:1px solid rgba(36,24,18,0.22);border-radius:999px;padding:0.45rem 1rem;font-size:0.85rem;font-weight:500;}
+  .btn-voucher{display:block;text-align:center;background:var(--warm-white);color:var(--ink);font-size:0.75rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;padding:0.9rem 1rem;border-radius:999px;text-decoration:none;transition:opacity .2s;}
+  .btn-voucher:hover{opacity:0.85;}
+  .voucher-validity{margin-top:0.8rem;font-size:0.75rem;color:rgba(36,24,18,0.65);text-align:center;}
+</style>
+</head>
+<body>
+
+<div id="testbar">Anteprima — sezione Info a 3 card, non collegata al sito live</div>
+
+<section id="info">
+  <div class="section-inner">
+    <p class="section-label">Buono a sapersi &middot; orari veri</p>
+    <h2 class="section-title">Quando ci <em>trovi.</em></h2>
+
+    <div class="info-grid">
+
+      <!-- CARD 1 · ORARI (dati reali, testo identico a index.html FAQ live) -->
+      <div class="card dark">
+        <p class="card-label">&#9201; Orari</p>
+        <div class="orari-banner">Fino al 10 sett &middot; solo cena 20:00&ndash;22:30</div>
+        <div class="orari-row"><span class="g">Mar &mdash; Gio</span><strong>Cena 20:00&ndash;22:30</strong></div>
+        <div class="orari-row"><span class="g">Ven &mdash; Dom</span><strong>Cena 20:00&ndash;22:30</strong></div>
+        <div class="orari-row"><span class="g">Luned&igrave;</span><strong>Chiusi</strong></div>
+        <p class="orari-note">Dall&rsquo;11 sett: pranzo ven&ndash;dom 12:30&ndash;14:30 &middot; cena dalle 19:30.</p>
+      </div>
+
+      <!-- CARD 2 · DOVE SIAMO (indirizzo/telefono reali) -->
+      <div class="card light">
+        <p class="card-label">&#128205; Dove siamo</p>
+        <h3 class="card-title">Lungomare Lombardo 27,<br>Genova</h3>
+        <p class="card-text">Sala sulla spiaggia di San Giuliano, Corso Italia all&rsquo;altezza dell&rsquo;Abbazia. D&rsquo;estate: terrazza sul mare aperto.</p>
+        <div class="photo"><img src="img/sito/hero.webp" alt="Sala del ristorante Santamonica affacciata sul mare"></div>
+        <div class="btn-row">
+          <a href="https://www.google.com/maps/search/?api=1&query=Santamonica+Lungomare+Lombardo+27+Genova" target="_blank" rel="noreferrer" class="btn-pill outline">Apri in Maps</a>
+          <a href="tel:+390105533155" class="btn-pill solid-dark">010 5533155</a>
+        </div>
+      </div>
+
+      <!-- CARD 3 · VOUCHER (sostituisce Parcheggio; dati reali da regala.html) -->
+      <div class="card accent">
+        <p class="card-label">&#127873; Un dono speciale</p>
+        <h3 class="card-title">Regala una cena<br>al Santamonica.</h3>
+        <p class="card-text">Buono di valore libero, oppure uno dei due men&ugrave; degustazione per due persone.</p>
+        <div class="tier-row">
+          <span class="tier-chip">100&euro;</span>
+          <span class="tier-chip">150&euro;</span>
+          <span class="tier-chip">200&euro;</span>
+        </div>
+        <a href="/regala.html" class="btn-voucher">Scopri i buoni regalo</a>
+        <p class="voucher-validity">Validit&agrave; 12 mesi dall&rsquo;acquisto</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

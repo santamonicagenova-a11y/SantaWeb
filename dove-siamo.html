@@ -184,13 +184,15 @@
 
   <style>
     :root {
-      --bg: #faf8f4;
-      --surface: #ffffff;
-      --text: #2a2520;
-      --text-soft: #5a544c;
-      --accent: #8b3a2e;
-      --rule: #e6dfd4;
-      --summary-bg: #f3ede2;
+      /* v 2026.09.04 — tema scuro coerente con index.html (branch restyling): sfondo
+         marrone scuro, testo chiaro, accento azzurro. */
+      --bg: #241812;
+      --surface: #33221A;
+      --text: #faf8f4;
+      --text-soft: rgba(245,240,232,0.65);
+      --accent: #4AA3D1;
+      --rule: rgba(245,240,232,0.14);
+      --summary-bg: #2E1F17;
       --serif: "Cormorant Garamond", "Georgia", "Times New Roman", serif;
       --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
     }
@@ -304,7 +306,7 @@
     }
     .hours td.day { font-weight: 500; width: 38%; }
     .hours td.time { color: var(--text-soft); }
-    .hours tr.closed td.time { color: #aaa; font-style: italic; }
+    .hours tr.closed td.time { color: rgba(245,240,232,0.45); font-style: italic; }
     .hours tr.today td.day { color: var(--accent); }
     .hours tr.today td.day::after {
       content: "  oggi";
@@ -392,7 +394,7 @@
       text-decoration: none;
       transition: background .15s;
     }
-    .map-actions a:hover { background: #6d2c23; }
+    .map-actions a:hover { background: #2E6E93; }
     .map-actions a.secondary {
       background: var(--surface);
       color: var(--accent);

@@ -199,16 +199,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* ===== Palette progetto Santamonica (legal/landing pages) ===== */
+    /* ===== Palette progetto Santamonica (legal/landing pages) =====
+       v 2026.09.04 — tema scuro coerente con index.html (branch restyling):
+       sfondo marrone scuro, testo chiaro, accento azzurro. --sand era usato
+       solo come sfondo di pannelli chiari → ridefinito allo stesso bruno di
+       --paper (stesso pattern applicato in index.html per --sand/--warm-white). */
     :root {
-      --ink: #1a1814;
-      --sand: #f5f0e8;
-      --paper: #fbf8f3;
-      --terracotta: #c4734a;
-      --terracotta-dark: #8b3a2e;
+      --ink: #faf8f4;
+      --sand: #241812;
+      --paper: #241812;
+      --surface: #33221A;
+      --terracotta: #4AA3D1;
+      --terracotta-dark: #2E6E93;
       --gold: #b89d6a;
-      --rule: #e3d9c6;
-      --muted: #6b6358;
+      --rule: rgba(245,240,232,0.14);
+      --muted: rgba(245,240,232,0.62);
     }
 
     * { box-sizing: border-box; }
@@ -301,7 +306,7 @@
     }
 
     .voucher-card {
-      background: white;
+      background: var(--surface);
       border: 1px solid var(--rule);
       border-radius: 8px;
       padding: 32px 28px;
@@ -315,19 +320,19 @@
 
     .voucher-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 12px 28px rgba(26, 24, 20, 0.08);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
       border-color: var(--terracotta);
     }
 
     .voucher-card.featured {
       border-color: var(--gold);
-      background: linear-gradient(180deg, #fff 0%, #fdf9f1 100%);
+      background: linear-gradient(180deg, #33221A 0%, #3A281E 100%);
     }
 
     /* ===== Selezione del buono (un solo pulsante condiviso in fondo alla pagina) ===== */
     .voucher-card.selected {
       border-color: var(--terracotta-dark);
-      box-shadow: 0 0 0 3px rgba(139, 58, 46, 0.18);
+      box-shadow: 0 0 0 3px rgba(74, 163, 209, 0.35);
     }
 
     .voucher-card.selected::after {
@@ -506,7 +511,7 @@
       gap: 8px;
       width: 100%;
       padding: 14px 20px;
-      background: var(--ink);
+      background: var(--surface);
       color: white;
       text-decoration: none;
       border-radius: 4px;
@@ -590,7 +595,7 @@
       font-family: 'Inter', sans-serif;
       font-size: 14px;
       color: var(--ink);
-      background: #fff;
+      background: var(--surface);
       box-sizing: border-box;
     }
 
@@ -622,7 +627,7 @@
       gap: 10px;
       margin-top: 18px;
       padding: 12px 14px;
-      background: #fff;
+      background: var(--surface);
       border: 1px solid var(--rule);
       border-radius: 6px;
       font-size: 13px;

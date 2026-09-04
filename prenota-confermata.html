@@ -30,12 +30,15 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --sabbia:   #f7f5f0;
-    --crema:    #faf8f3;
+    /* v 2026.09.04 — tema scuro coerente con index.html (branch restyling):
+       sfondo marrone scuro, testo chiaro. --oro invariato: già leggibile su
+       sfondo scuro. */
+    --sabbia:   #241812;
+    --crema:    #33221A;
     --oro:      #c9a961;
-    --inchiostro: #2c2c2c;
-    --bordo:    #e0dcd0;
-    --secondario: #6b6560;
+    --inchiostro: #faf8f4;
+    --bordo:    rgba(245,240,232,0.14);
+    --secondario: rgba(245,240,232,0.62);
   }
 
   body {
@@ -52,7 +55,7 @@
   }
 
   .card {
-    background: #ffffff;
+    background: var(--crema);
     border: 1px solid var(--bordo);
     max-width: 560px;
     width: 100%;
@@ -129,7 +132,7 @@
   .cta {
     display: inline-block;
     padding: 13px 32px;
-    background: var(--inchiostro);
+    background: #14100C;
     color: #ffffff;
     text-decoration: none;
     font-family: 'Jost', Arial, sans-serif;
@@ -141,7 +144,7 @@
   }
 
   .cta:hover {
-    background: #444;
+    background: #2c231a;
   }
 
   footer {

@@ -1,6 +1,13 @@
 /* ═══════════════════════════════════════════════════════════════════════
    orari.js — FONTE UNICA orari di apertura · Santamonica Web
-   v 2026.08.31.01
+   v 2026.09.04.01
+   ───────────────────────────────────────────────────────────────────────
+   v 2026.09.04.01 — restyling #info (card scure): renderInfo() ora genera
+   righe <div class="orari-row"> (giorni aperti + giorni chiusi, uno per
+   riga) invece di testo continuo con <br>, per lo stile a riquadri della
+   nuova card Orari in index.html. Dati e logica invariati (buildGroups
+   resta l'unica fonte); cambia solo il markup HTML prodotto. renderTable()
+   (tabella dove-siamo.html) non toccata.
    ───────────────────────────────────────────────────────────────────────
    PER CAMBIARE GLI ORARI: aggiungi/modifica una voce nell'array PERIODS.
    Tutto il resto (display #info, tabella dove-siamo, Schema.org JSON-LD su
@@ -212,12 +219,12 @@
     var box = document.getElementById('orari-info'); if (!box) return;
     var lab = labels(lang), g = buildGroups(lang, ' / '), html = '';
     g.aperti.forEach(function (grp) {
-      html += '<span>' + grp.label + '</span><br><strong style="color:var(--ink);font-weight:400">' + grp.times + '</strong><br><br>';
+      html += '<div class="orari-row"><span class="g">' + grp.label + '</span><strong>' + grp.times + '</strong></div>';
     });
-    if (g.chiusi.length) {
-      var names = g.chiusi.map(function (key) { return lab[key]; }).join(', ');
-      html += '<em style="font-size:0.78rem">' + lab.chiusoLine.replace('%s', names) + '</em>';
-    }
+    g.chiusi.forEach(function (key) {
+      var chiusoCap = lab.chiuso.charAt(0).toUpperCase() + lab.chiuso.slice(1);
+      html += '<div class="orari-row"><span class="g">' + lab[key] + '</span><strong>' + chiusoCap + '</strong></div>';
+    });
     box.innerHTML = html;
   }
 

@@ -394,15 +394,33 @@
   .cantina-image img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
   .cantina-image::after { content: ''; position: absolute; top: -1.5rem; left: -1.5rem; right: 1.5rem; bottom: 1.5rem; border: 1px solid var(--gold); z-index: -1; pointer-events: none; }
 
-  .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; padding-top: 3rem; border-top: 1px solid var(--divider); }
-  .info-block-label { font-size: 0.62rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
-  .info-block-content { font-size: 0.88rem; line-height: 2; color: var(--ink-soft); }
-  .info-block-content a { color: var(--ink); text-decoration: none; }
-  .info-block-content a:hover { color: var(--terracotta); }
+  /* v 2026.09.04 — #info restyling a 3 card scure/chiare (branch restyling estetico) */
+  .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  .info-card { border-radius: 20px; padding: 2rem 1.75rem; text-align: center; display: flex; flex-direction: column; }
+  .info-card.dark { background: var(--surface); }
+  .info-card.light { background: var(--sand); color: var(--warm-white); }
+  .info-card.accent { background: var(--terracotta); color: var(--warm-white); }
+  .info-card-kicker { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.5rem; color: var(--terracotta); margin-bottom: 0.3rem; }
+  .info-card.accent .info-card-kicker { color: var(--ink); font-size: 1.7rem; }
+  .info-card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 400; line-height: 1.25; margin-bottom: 0.6rem; }
+  .info-card-title em { font-style: italic; color: var(--terracotta); }
+  .info-card.dark .info-card-title { color: var(--ink); }
+  .info-card.accent .info-card-title { font-size: 1.7rem; color: var(--warm-white); }
+  .info-card.accent .info-card-title em { color: #fff; }
+  .orari-row { display: flex; justify-content: center; gap: 0.4rem; font-size: 0.9rem; padding: 0.75rem 1rem; border-radius: 10px; background: rgba(245,240,232,0.06); border: 1px solid var(--divider); margin-bottom: 0.5rem; }
+  .orari-row .g { color: var(--ink-soft); }
+  .orari-row strong { font-weight: 500; }
+  .info-card-text { font-size: 0.85rem; line-height: 1.7; }
+  .info-card.light .info-card-text { color: rgba(36,24,18,0.7); }
+  .info-card.light .info-card-text a { color: var(--terracotta); text-decoration: none; font-weight: 500; }
+  .info-card.accent .info-card-text { color: rgba(36,24,18,0.75); margin: auto 0; background: rgba(36,24,18,0.08); border: 1px solid rgba(36,24,18,0.15); border-radius: 14px; padding: 1rem 1.1rem; }
+  .info-btn-row { display: flex; flex-direction: column; gap: 0.6rem; margin-top: auto; }
+  .info-btn-pill { display: block; text-align: center; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.9rem 1rem; border-radius: 4px; text-decoration: none; transition: opacity .2s; background: var(--warm-white); color: var(--ink); }
+  .info-btn-pill:hover { opacity: 0.85; }
+  .btn-voucher { display: block; text-align: center; background: var(--warm-white); color: var(--ink); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.9rem 1rem; border-radius: 4px; text-decoration: none; transition: opacity .2s; margin-top: auto; }
+  .btn-voucher:hover { opacity: 0.85; }
+  .newsletter-box { border-radius: 20px; display: grid; grid-template-columns: 1.3fr 1fr; gap: 2rem; align-items: center; }
 
-  .regalo-section { background: var(--warm-white); }
-  .regalo-inner { max-width: 700px; margin: 0 auto; text-align: center; }
-  .regalo-body { font-size: 0.9rem; line-height: 1.85; color: var(--ink-soft); margin-bottom: 2.5rem; }
 
 
   .prenota-section { background: var(--warm-white); padding: 6rem 2rem; }
@@ -448,17 +466,6 @@
   .form-status.success { display: block; background: #eaf3de; color: #3b6d11; }
   .form-status.error { display: block; background: #fcebeb; color: #a32d2d; }
 
-  .map-wrapper { width: 100%; }
-  /* F0.12: rimosso iframe OSM, sostituito con segnaposto SVG cliccabile */
-  .map-wrapper .map-cta-link { display: block; text-decoration: none; outline: none; }
-  .map-wrapper .map-cta-link:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 2px; }
-  .map-wrapper .map-cta-link img { display: block; width: 100%; height: auto; max-height: 380px; object-fit: cover; transition: opacity .15s; }
-  .map-wrapper .map-cta-link:hover img { opacity: 0.92; }
-  .map-bar { background: var(--warm-white); padding: 1rem 1.2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; border-top: 1px solid var(--divider); }
-  .map-bar-address { font-size: 0.82rem; line-height: 1.6; color: var(--ink-soft); }
-  .map-bar-label { display: block; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); font-weight: 400; margin-bottom: 0.2rem; }
-  .map-bar-link { font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--terracotta); text-decoration: none; }
-  .map-bar-link:hover { text-decoration: underline; }
 
   /* FAQ accordion — v 2026.06.11.01 (sessione 25 SEO) */
   .faq-section { background: var(--warm-white); }
@@ -516,6 +523,7 @@
     .cucina-images img:first-child { margin-top: 0; }
     .cantina-image::after { display: none; }
     .info-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .newsletter-box { grid-template-columns: 1fr; text-align: center; }
     section { padding: 4rem 1.5rem; }
     .form-row, .pf-row { grid-template-columns: 1fr; }
     .footer-inner { grid-template-columns: 1fr; text-align: center; }
@@ -523,7 +531,7 @@
     .galleria-grid { grid-template-columns: repeat(2, 1fr); }
     .galleria-item.grande { grid-column: span 2; aspect-ratio: 3/2; }
     /* v 2026.06.09.01 — mobile: testo centrato in tutte le sezioni + CTA a piena larghezza, uguali e impilati */
-    section, .hero-text-panel, .section-inner, .regalo-inner { text-align: center; }
+    section, .hero-text-panel, .section-inner { text-align: center; }
     input, textarea, select { text-align: left; }
     .hero-actions, .cucina-actions { flex-direction: column; align-items: stretch; }
     .hero-actions > a, .cucina-actions > a { width: 100%; }
@@ -647,74 +655,94 @@
   </div>
 </section>
 
-<section class="regalo-section">
-  <div class="section-inner">
-    <div class="regalo-inner reveal">
-      <p class="section-label" data-i18n="regalo_label">Un dono speciale</p>
-      <h2 class="section-title" data-i18n="regalo_title">Buoni <em>regalo</em></h2>
-      <p class="regalo-body" data-i18n="regalo_body">Regala un pranzo o una cena al Santamonica: buoni utilizzabili tutti i giorni, salvo disponibilit&agrave;, a pranzo o a cena, escluso Sabato, Domenica e festivi. Validit&agrave; 12 mesi dalla data di acquisto.</p>
-      <a href="/regala.html" class="btn-primary" data-i18n="regalo_btn">Richiedi un buono</a>
-    </div>
-  </div>
-</section>
+<!-- v 2026.09.04 — <section class="regalo-section"> standalone rimossa: il suo
+     contenuto (regalo_label/regalo_title/regalo_body/regalo_btn) ora vive nella
+     card Voucher dentro #info qui sotto, per evitare "Buoni regalo" ripetuto
+     due volte di fila. CSS .regalo-section/.regalo-inner/.regalo-body rimosse
+     di conseguenza. -->
 
 <!-- La sezione #prenota (form lungo embedded) è stata sostituita dal wizard dedicato
      /prenota.html (v 2026.07.22.01, DESIGN_wizard_prenotazioni_carta-obbligatoria) —
      carta di garanzia sempre obbligatoria + conferma automatica. Le CTA "Prenota"
      ora puntano a /prenota.html invece che a questa sezione. -->
 
+<!-- v 2026.09.04 — #info restyling a 3 card (branch restyling estetico): rimossi
+     l'eyebrow/titolo di sezione (info_label/info_title, ora orfani in
+     translations.json) e la 3ª colonna mappa/foto (F0.12, decisione confermata
+     in sessione: si perde l'anteprima mappa cliccabile in home, la
+     destinazione resta raggiungibile dal pulsante "Dettagli completi..." ora
+     dentro la card Dove siamo). info_orari_label/info_dove_label riproposte
+     come titoli delle card (non più semplici etichette); regalo_voucher_title
+     nuova chiave IT/EN/FR per il titolo della card Voucher. -->
 <section id="info">
   <div class="section-inner">
-    <p class="section-label reveal" data-i18n="info_label">Come raggiungerci</p>
-    <h2 class="section-title reveal" data-i18n="info_title">Orari &amp; <em>Contatti</em></h2>
     <div class="info-grid reveal" style="transition-delay:0.1s">
-      <div>
-        <p class="info-block-label" data-i18n="info_orari_label">Orari</p>
-        <div class="info-block-content" id="orari-info">
+
+      <div class="info-card dark">
+        <h3 class="info-card-title" data-i18n="info_orari_label">I nostri <em>orari</em></h3>
+        <div id="orari-info">
           <!-- generato da orari.js (fonte unica orari) -->
         </div>
       </div>
-      <div>
-        <p class="info-block-label" data-i18n="info_dove_label">Dove siamo</p>
-        <div class="info-block-content">
-          Lungomare Lombardo 27<br>16145 Genova &mdash; Italy<br><br>
+
+      <div class="info-card light">
+        <p class="info-card-kicker" data-i18n="info_dove_label">Dove siamo &amp; contatti</p>
+        <h3 class="info-card-title">Lungomare Lombardo 27, <em>Genova</em></h3>
+        <div class="info-card-text">
           <a href="tel:+390105533155">+39 010 553 31 55</a><br>
           <a href="/cdn-cgi/l/email-protection#d5bcbbb3ba95a6b4bba1b4b8babbbcb6b4b2b0bbbaa3b4fbbca1"><span class="__cf_email__" data-cfemail="b9d0d7dfd6f9cad8d7cdd8d4d6d7d0dad8dedcd7d6cfd897d0cd">[email&#160;protected]</span></a><br><br>
           <span data-i18n="info_note_text">Si prega di segnalare eventuali allergie o intolleranze al momento della prenotazione.</span><br><br>
           <span data-i18n="info_animali">&#x1F43E; Accettiamo animali di tutte le taglie.</span>
         </div>
+        <div class="info-btn-row">
+          <a href="/dove-siamo.html" target="_blank" rel="noopener noreferrer" class="info-btn-pill" data-i18n="info_dettagli_link">Dettagli completi e indicazioni stradali</a>
+        </div>
+      </div>
+
+      <div class="info-card accent">
+        <p class="info-card-kicker" data-i18n="regalo_title">Buoni <em>regalo</em></p>
+        <h3 class="info-card-title" data-i18n="regalo_voucher_title">Regala una cena al <em>Santamonica</em>.</h3>
+        <p class="info-card-text" data-i18n="regalo_body">Regala un pranzo o una cena al Santamonica: buoni utilizzabili tutti i giorni, salvo disponibilit&agrave;, a pranzo o a cena, escluso Sabato, Domenica e festivi. Validit&agrave; 12 mesi dalla data di acquisto, salvo accordi.</p>
+        <a href="/regala.html" class="btn-voucher" data-i18n="regalo_btn">Richiedi un buono</a>
+      </div>
+
+    </div>
+
+    <!-- v 2026.09.04 — newsletter attaccata alle 3 card (stesso section-inner,
+         niente più <section> separata con padding proprio), come nella pagina
+         di prova. ID e logica del form (brevo-form/brevo-email/brevo-consent/
+         brevo-btn/brevo-success/brevo-error) invariati, stesso script più
+         sotto nel file. -->
+    <div id="newsletter" class="reveal newsletter-box" style="margin-top:1.25rem; background:var(--surface); padding:2rem 2.25rem;">
+      <div>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;line-height:1.25;">La nostra <em style="font-style:italic;color:var(--terracotta);">newsletter</em></h2>
+        <p style="margin-top:0.4rem;font-size:0.85rem;color:var(--ink-soft);">Novità, menu stagionali e offerte speciali direttamente nella tua casella.</p>
       </div>
       <div>
-        <!--
-          F0.12 · D-F0.12-4 opt-b (semplificazione homepage):
-          Iframe OpenStreetMap rimosso. Segnaposto SVG statico (zero cookie,
-          zero rete) cliccabile come CTA verso la pagina dedicata
-          /dove-siamo.html#mappa dove la mappa Google Maps è gestita da
-          iframemanager con consent gate.
-          Motivazione (D-F0.12-4):
-          - Homepage più snella · migliore LCP mobile
-          - Cookie footprint zero su pagina più visitata
-          - Separazione responsabilità: homepage = panoramica, dove-siamo =
-            dettaglio operativo (mappa interattiva + indicazioni)
-          - Pattern conforme dec. #21 (no iframe terze parti hardcoded)
-        -->
-        <div class="map-wrapper">
-          <a href="/dove-siamo.html#mappa" class="map-cta-link"
-             aria-label="Vai alla pagina Dove siamo per mappa interattiva e indicazioni stradali">
-            <img src="/img/map-placeholder.svg"
-                 alt="Segnaposto della mappa: Ristorante Santamonica, Lungomare Lombardo 27, Genova. Clicca per vedere la mappa interattiva."
-                 loading="lazy" width="800" height="380" />
-          </a>
-          <div class="map-bar">
-            <div class="map-bar-address"><span class="map-bar-label">Santamonica</span>Lungomare Lombardo 27 &mdash; Genova</div>
-            <a href="/dove-siamo.html#mappa" class="map-bar-link" data-i18n="map_apri">Vedi dove siamo &rarr;</a>
+        <form id="brevo-form" style="display:flex;flex-direction:column;gap:0.6rem;">
+          <div style="display:flex;gap:0.6rem;">
+            <input type="email" id="brevo-email" placeholder="La tua email" required autocomplete="email"
+              style="flex:1;min-width:0;padding:0.9rem 1.2rem;border-radius:4px;border:1px solid var(--divider);background:var(--warm-white);color:var(--ink);font-family:'Jost',sans-serif;font-size:0.85rem;outline:none;letter-spacing:0.05em;">
+            <button type="submit" id="brevo-btn"
+              style="padding:0.9rem 1.4rem;border-radius:4px;border:none;background:var(--warm-white);color:var(--ink);font-family:'Jost',sans-serif;font-size:0.75rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:opacity 0.2s;"
+              onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+              Iscriviti
+            </button>
           </div>
+          <label style="display:flex;align-items:flex-start;gap:0.6rem;cursor:pointer;text-align:left;">
+            <input type="checkbox" id="brevo-consent" required style="margin-top:3px;accent-color:var(--terracotta);flex-shrink:0;">
+            <span style="font-size:0.72rem;color:var(--ink-soft);line-height:1.5;">Accetto di ricevere la newsletter e le comunicazioni di Santamonica. Puoi annullare l'iscrizione in qualsiasi momento.</span>
+          </label>
+        </form>
+        <div id="brevo-success" style="display:none;margin-top:0.75rem;padding:0.75rem 1rem;background:#e7faf0;color:#085229;font-size:0.82rem;font-family:'Jost',sans-serif;">
+          Iscrizione avvenuta correttamente. Controlla la tua email per confermare.
+        </div>
+        <div id="brevo-error" style="display:none;margin-top:0.75rem;padding:0.75rem 1rem;background:#ffeded;color:#661d1d;font-size:0.82rem;font-family:'Jost',sans-serif;">
+          Errore. Riprova o scrivici a <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ed84838b82ad9e8c83998c808283848e8c8a8883829b8cc38499">[email&#160;protected]</a>
         </div>
       </div>
     </div>
-    <p class="reveal" style="margin-top:2rem;text-align:center;font-family:'Jost',sans-serif;font-size:0.85rem;letter-spacing:0.05em;">
-      <a href="/dove-siamo.html" target="_blank" rel="noopener noreferrer" style="color:var(--terracotta);border-bottom:1px solid var(--terracotta);text-decoration:none;padding-bottom:2px;" data-i18n="info_dettagli_link">Dettagli completi e indicazioni stradali &rarr;</a>
-    </p>
+
   </div>
 </section>
 
@@ -764,36 +792,6 @@
   </div>
 </section>
 
-<section id="newsletter" style="background:var(--warm-white); padding:5rem 2rem;">
-  <div class="section-inner">
-    <div class="reveal" style="max-width:560px; margin:0 auto; text-align:center;">
-      <p class="section-label">Resta in contatto</p>
-      <h2 class="section-title">La nostra <em>newsletter</em></h2>
-      <p style="font-size:0.88rem;line-height:1.75;color:var(--ink-soft);margin-bottom:2rem;">Novità, menu stagionali e offerte speciali direttamente nella tua casella.</p>
-      <div style="max-width:420px;margin:0 auto;">
-        <form id="brevo-form" style="display:flex;flex-direction:column;gap:0.75rem;">
-          <input type="email" id="brevo-email" placeholder="La tua email" required autocomplete="email"
-            style="width:100%;padding:0.9rem 1rem;border:1px solid var(--divider);background:var(--warm-white);color:var(--ink);font-family:'Jost',sans-serif;font-size:0.85rem;outline:none;letter-spacing:0.05em;">
-          <label style="display:flex;align-items:flex-start;gap:0.6rem;cursor:pointer;text-align:left;">
-            <input type="checkbox" id="brevo-consent" required style="margin-top:3px;accent-color:var(--terracotta);flex-shrink:0;">
-            <span style="font-size:0.72rem;color:var(--ink-soft);line-height:1.5;">Accetto di ricevere la newsletter e le comunicazioni di Santamonica. Puoi annullare l'iscrizione in qualsiasi momento.</span>
-          </label>
-          <button type="submit" id="brevo-btn"
-            style="width:100%;padding:0.9rem 2rem;background:var(--ink);border:none;border-radius:4px;color:var(--warm-white);font-family:'Jost',sans-serif;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;"
-            onmouseover="this.style.background='var(--terracotta)'" onmouseout="this.style.background='var(--ink)'">
-            Iscriviti
-          </button>
-        </form>
-        <div id="brevo-success" style="display:none;margin-top:0.75rem;padding:0.75rem 1rem;background:#e7faf0;color:#085229;font-size:0.82rem;font-family:'Jost',sans-serif;">
-          Iscrizione avvenuta correttamente. Controlla la tua email per confermare.
-        </div>
-        <div id="brevo-error" style="display:none;margin-top:0.75rem;padding:0.75rem 1rem;background:#ffeded;color:#661d1d;font-size:0.82rem;font-family:'Jost',sans-serif;">
-          Errore. Riprova o scrivici a <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ed84838b82ad9e8c83998c808283848e8c8a8883829b8cc38499">[email&#160;protected]</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <footer>
   <div class="footer-inner">

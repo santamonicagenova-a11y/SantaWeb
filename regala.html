@@ -1,7 +1,18 @@
 <!DOCTYPE html>
 <!--
   regala.html
-  Versione: v 2026.07.21.02
+  Versione: v 2026.09.05.01
+  Cambio v.07.21.02 → v.09.05.01 (richiesta Andrea, 5/9): prezzo del voucher Degustazione
+  sei portate ricalcolato a 85 €/persona → 170 € per due (era 180 €), abbinamento vini
+  invariato a +120 € → 290 € totali (era 300 €). Aggiornato anche in voucher-config.json
+  (fonte unica), voucher-termini.html §3.A e menu-admin.html (VR_TIPO_LABELS, etichetta
+  admin). NOTA IMPORTANTE: il prezzo Stripe effettivamente addebitato è ricalcolato
+  lato server dall'Edge Function create-voucher-checkout (fuori da questo repository) —
+  se anche lì il prezzo del tipo "deg6" è hardcoded, va aggiornato separatamente prima
+  di considerare il nuovo prezzo davvero in vigore, altrimenti il cliente pagherebbe
+  ancora 180 € nonostante il sito mostri 170 €. GATE: correzione di un prezzo pubblico
+  reale → P1+P2 dovute, P3 non necessaria per un aggiornamento di solo valore numerico
+  (nessun nuovo obbligo legale, wording invariato).
   Pagina: Voucher regalo Santamonica — consegna elettronica ORA COMPLETAMENTE AUTOMATICA
           (Stripe Checkout mode='payment' → PDF+mail automatici, nessun intervento admin);
           il ritiro fisico resta sul flusso manuale via mail (richiedi-voucher).
@@ -898,7 +909,7 @@
       <article class="voucher-card" data-card="deg6">
         <div class="deg-portate">Menù Degustazione</div>
         <div class="deg-sub">Sei portate · per due</div>
-        <div class="voucher-amount"><span class="eur-num" data-base="180" data-vini="300">180</span><span class="currency">€</span></div>
+        <div class="voucher-amount"><span class="eur-num" data-base="170" data-vini="290">170</span><span class="currency">€</span></div>
         <p class="price-note">per due persone · bevande escluse</p>
         <p class="voucher-desc">Il menù degustazione fisso del ristorante, identico per i due ospiti: puoi vederne la composizione nella <a href="/menu.html" style="color:var(--terracotta-dark);">carta sul sito</a>. Le bevande si scelgono e si pagano al tavolo.</p>
         <label class="vini-toggle">
@@ -1165,7 +1176,7 @@
 
       <p style="margin: 0; font-size: 12px;">
         © 2026 Santamonica · Genova · Lungomare Lombardo 27, 16145 Genova<br>
-        <span class="version-tag">regala.html · v 2026.07.21.01</span>
+        <span class="version-tag">regala.html · v 2026.09.05.01</span>
       </p>
     </footer>
 

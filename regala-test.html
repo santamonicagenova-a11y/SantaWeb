@@ -614,8 +614,16 @@
     }
 
     function updateCard() {
-      document.getElementById('vh-card-title').textContent = 'Buono · ' + selected.title;
-      document.getElementById('vh-card-sub').textContent = (selected.sub ? selected.sub + ' · ' : '') + '€' + currentPrice();
+      var isLibero = selected.liberoIndex != null;
+      document.getElementById('vh-card-title').textContent = isLibero ? selected.title : ('Buono · ' + selected.title);
+      var subEl = document.getElementById('vh-card-sub');
+      if (isLibero) {
+        subEl.textContent = '';
+        subEl.style.display = 'none';
+      } else {
+        subEl.style.display = '';
+        subEl.textContent = (selected.sub ? selected.sub + ' · ' : '') + '€' + currentPrice();
+      }
       document.getElementById('vh-vini-block').style.display = selected.hasVini ? 'block' : 'none';
       if (selected.hasVini) {
         document.getElementById('vh-vini-supp').textContent = '(+' + selected.viniSupp + '€)';

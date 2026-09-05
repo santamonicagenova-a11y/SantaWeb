@@ -238,8 +238,9 @@
      submit-reservation v31 + create-reservation-checkout v8 (SafeTable). Gate: P1+P2 fatte;
      P3 (Revisione Oppositiva) debito dichiarato — tocca disponibilità/Stripe carta a garanzia.
      -->
-<!-- FAQPage JSON-LD · v 2026.08.27.01 — +2 Q&A IN CODA (8 totali, posizioni 7-8): "guide gastronomiche" e "Crudo". Testo voce "guide gastronomiche" sostituito VERBATIM da Andrea (27/8) — Gambero Rosso e Golosario confermati riconoscimenti reali (non erano hallucination GEO Monitor come ipotizzato in precedenza, erano dati veri mai dichiarati sul sito); Touring Club NON incluso, non menzionato da Andrea. Testo su richiesta esplicita "lascia il testo come l'ho scritto" — nessuna riscrittura P2 applicata a questa voce. Voce "Crudo" invariata (testo post P3). Le 6 Q&A originali (sotto, ordine invariato) restano quelle già gated (P1+P2+P3 + sign-off Andrea 11/6, fonte GBP_OPERATIVO §3); repurpose dalla funzione GBP "Domande e risposte" dismessa da Google (nov-dic 2025) a FAQ sul sito che alimenta SEO classica + AI di Google ("Ask Maps"/Gemini) + GEO. Il testo è allineato 1:1 con la sezione #faq visibile. IT-only (EN/FR = debito separato, coerente con multilingua). -->
-<script type="application/ld+json">
+<!-- FAQPage JSON-LD · v 2026.08.27.01 — +2 Q&A IN CODA (8 totali, posizioni 7-8): "guide gastronomiche" e "Crudo". Testo voce "guide gastronomiche" sostituito VERBATIM da Andrea (27/8) — Gambero Rosso e Golosario confermati riconoscimenti reali (non erano hallucination GEO Monitor come ipotizzato in precedenza, erano dati veri mai dichiarati sul sito); Touring Club NON incluso, non menzionato da Andrea. Testo su richiesta esplicita "lascia il testo come l'ho scritto" — nessuna riscrittura P2 applicata a questa voce. Voce "Crudo" invariata (testo post P3). Le 6 Q&A originali (sotto, ordine invariato) restano quelle già gated (P1+P2+P3 + sign-off Andrea 11/6, fonte GBP_OPERATIVO §3); repurpose dalla funzione GBP "Domande e risposte" dismessa da Google (nov-dic 2025) a FAQ sul sito che alimenta SEO classica + AI di Google ("Ask Maps"/Gemini) + GEO. Il testo è allineato 1:1 con la sezione #faq visibile.
+     v 2026.09.05.01 — reso multilingua: questo blocco resta il fallback IT statico (letto dai crawler senza JS), ma a runtime applyLang() lo riscrive in EN/FR leggendo le chiavi faq_q1..8/faq_a1..8 (+ faqld_a5/faqld_a6 per le 2 risposte con testo condensato ad hoc) da translations.json, vedi buildFaqJsonLd() più sotto nel file. -->
+<script type="application/ld+json" id="faq-jsonld">
 {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -753,44 +754,46 @@
 <!-- FAQ · v 2026.08.27.01 — +2 Q&A IN CODA (8 totali, posizioni 7-8): "guide gastronomiche" e "Crudo".
      Vedi commento JSON-LD sopra per dettagli (v.04: testo "guide gastronomiche" da Andrea verbatim).
      Le 6 Q&A originali restano quelle del gate completo 11/6 (sign-off Andrea), ordine invariato.
-     Allineata 1:1 col JSON-LD FAQPage nell'<head>. IT-only: EN/FR = debito separato
-     (le stringhe NON usano data-i18n, restano in italiano anche in vista EN/FR). -->
+     Allineata 1:1 col JSON-LD FAQPage nell'<head>.
+     v 2026.09.05.01 — resa multilingua via data-i18n (faq_label/faq_title/faq_q1..8/faq_a1..8),
+     traduzione libera EN/FR (nessun vincolo verbatim su queste stringhe, a differenza del JSON-LD
+     "guide gastronomiche" che resta testo di Andrea — qui traduco il senso, non stravolgo i fatti). -->
 <section id="faq" class="faq-section">
   <div class="section-inner">
-    <p class="section-label reveal">Buono a sapersi</p>
-    <h2 class="section-title reveal">Domande <em>frequenti</em></h2>
+    <p class="section-label reveal" data-i18n="faq_label">Buono a sapersi</p>
+    <h2 class="section-title reveal" data-i18n="faq_title">Domande <em>frequenti</em></h2>
     <div class="faq-list reveal" style="transition-delay:0.1s">
       <details class="faq-item">
-        <summary><h3 class="faq-q">Il ristorante ha la vista sul mare?</h3></summary>
-        <div class="faq-answer"><p>S&igrave;: la sala si affaccia sulla spiaggia di San Giuliano, in Corso Italia all&rsquo;altezza dell&rsquo;Abbazia di San Giuliano. D&rsquo;estate &egrave; aperta anche la terrazza.</p></div>
+        <summary><h3 class="faq-q" data-i18n="faq_q1">Il ristorante ha la vista sul mare?</h3></summary>
+        <div class="faq-answer" data-i18n="faq_a1"><p>S&igrave;: la sala si affaccia sulla spiaggia di San Giuliano, in Corso Italia all&rsquo;altezza dell&rsquo;Abbazia di San Giuliano. D&rsquo;estate &egrave; aperta anche la terrazza.</p></div>
       </details>
       <details class="faq-item">
-        <summary><h3 class="faq-q">Quali sono gli orari?</h3></summary>
-        <div class="faq-answer"><p>Fino al 10 settembre siamo aperti solo a cena, dalle 20:00 alle 22:30, da marted&igrave; a domenica; luned&igrave; chiusi. Dall&rsquo;11 settembre riapriamo anche a pranzo (12:30-14:30) venerd&igrave;, sabato e domenica, e la cena si sposta alle 19:30. Gli orari aggiornati sono sempre su questa pagina.</p></div>
+        <summary><h3 class="faq-q" data-i18n="faq_q2">Quali sono gli orari?</h3></summary>
+        <div class="faq-answer" data-i18n="faq_a2"><p>Fino al 10 settembre siamo aperti solo a cena, dalle 20:00 alle 22:30, da marted&igrave; a domenica; luned&igrave; chiusi. Dall&rsquo;11 settembre riapriamo anche a pranzo (12:30-14:30) venerd&igrave;, sabato e domenica, e la cena si sposta alle 19:30. Gli orari aggiornati sono sempre su questa pagina.</p></div>
       </details>
       <details class="faq-item">
-        <summary><h3 class="faq-q">C&rsquo;&egrave; un men&ugrave; degustazione?</h3></summary>
-        <div class="faq-answer"><p>S&igrave;, accanto alla carta proponiamo due men&ugrave; degustazione: un 6 portate ed uno di 7 a mano libera dello Chef. La versione aggiornata &egrave; sempre sul sito.</p></div>
+        <summary><h3 class="faq-q" data-i18n="faq_q3">C&rsquo;&egrave; un men&ugrave; degustazione?</h3></summary>
+        <div class="faq-answer" data-i18n="faq_a3"><p>S&igrave;, accanto alla carta proponiamo due men&ugrave; degustazione: un 6 portate ed uno di 7 a mano libera dello Chef. La versione aggiornata &egrave; sempre sul sito.</p></div>
       </details>
       <details class="faq-item">
-        <summary><h3 class="faq-q">Gestite allergie e intolleranze?</h3></summary>
-        <div class="faq-answer"><p>S&igrave;: sul sito &egrave; pubblicata la <a href="/menu-allergeni.html" target="_blank" rel="noopener">tabella allergeni completa</a>, piatto per piatto, e in sala il personale &egrave; preparato a consigliarvi.</p></div>
+        <summary><h3 class="faq-q" data-i18n="faq_q4">Gestite allergie e intolleranze?</h3></summary>
+        <div class="faq-answer" data-i18n="faq_a4"><p>S&igrave;: sul sito &egrave; pubblicata la <a href="/menu-allergeni.html" target="_blank" rel="noopener">tabella allergeni completa</a>, piatto per piatto, e in sala il personale &egrave; preparato a consigliarvi.</p></div>
       </details>
       <details class="faq-item">
-        <summary><h3 class="faq-q">Come si prenota?</h3></summary>
-        <div class="faq-answer"><p>In due modi:</p><ul><li>dal modulo sul sito santamonicagenova.it</li><li>per telefono allo <a href="tel:+390105533155">010 5533155</a></li></ul></div>
+        <summary><h3 class="faq-q" data-i18n="faq_q5">Come si prenota?</h3></summary>
+        <div class="faq-answer" data-i18n="faq_a5"><p>In due modi:</p><ul><li>dal modulo sul sito santamonicagenova.it</li><li>per telefono allo <a href="tel:+390105533155">010 5533155</a></li></ul></div>
       </details>
       <details class="faq-item">
-        <summary><h3 class="faq-q">C&rsquo;&egrave; parcheggio nelle vicinanze?</h3></summary>
-        <div class="faq-answer"><p>No, non ci sono parcheggi privati: il Lungomare Lombardo &egrave; pedonale. Nelle vie vicine si parcheggia in strada:</p><ul><li>righe blu: a pagamento</li><li>righe bianche: gratuite</li><li>righe bianche e blu: a pagamento solo in estate</li></ul></div>
+        <summary><h3 class="faq-q" data-i18n="faq_q6">C&rsquo;&egrave; parcheggio nelle vicinanze?</h3></summary>
+        <div class="faq-answer" data-i18n="faq_a6"><p>No, non ci sono parcheggi privati: il Lungomare Lombardo &egrave; pedonale. Nelle vie vicine si parcheggia in strada:</p><ul><li>righe blu: a pagamento</li><li>righe bianche: gratuite</li><li>righe bianche e blu: a pagamento solo in estate</li></ul></div>
       </details>
       <details class="faq-item">
-        <summary><h3 class="faq-q">Siete presenti in qualche guida gastronomica?</h3></summary>
-        <div class="faq-answer"><p>S&igrave;, siamo presenti nella Guida Michelin, nel Gambero Rosso e nel Golosario. Ma la guida pi&ugrave; importante restano sempre gli ospiti che tornano.</p></div>
+        <summary><h3 class="faq-q" data-i18n="faq_q7">Siete presenti in qualche guida gastronomica?</h3></summary>
+        <div class="faq-answer" data-i18n="faq_a7"><p>S&igrave;, siamo presenti nella Guida Michelin, nel Gambero Rosso e nel Golosario. Ma la guida pi&ugrave; importante restano sempre gli ospiti che tornano.</p></div>
       </details>
       <details class="faq-item">
-        <summary><h3 class="faq-q">Avete un crudo di pesce?</h3></summary>
-        <div class="faq-answer"><p>S&igrave;: proponiamo ostriche, scampi e gamberi viola nostrani a crudo, oltre a una selezione di pesce nostrano pescato ad amo e una degustazione di mare per chi desidera un assaggio pi&ugrave; completo.</p></div>
+        <summary><h3 class="faq-q" data-i18n="faq_q8">Avete un crudo di pesce?</h3></summary>
+        <div class="faq-answer" data-i18n="faq_a8"><p>S&igrave;: proponiamo ostriche, scampi e gamberi viola nostrani a crudo, oltre a una selezione di pesce nostrano pescato ad amo e una degustazione di mare per chi desidera un assaggio pi&ugrave; completo.</p></div>
       </details>
     </div>
   </div>
@@ -873,6 +876,41 @@
     document.getElementById('lang-select-nav').value = lang;
     document.getElementById('lang-select-mobile').value = lang;
     if (window.renderOrari) window.renderOrari(lang);
+    buildFaqJsonLd(lang, t);
+  }
+
+  // v 2026.09.05.01 — ricostruisce il FAQPage JSON-LD (#faq-jsonld) nella lingua attiva.
+  // "text"/"name" devono essere testo semplice: le risposte 5 e 6 nel markup visibile
+  // usano <ul><li> (elenco puntato), qui uso invece le versioni condensate in una frase
+  // sola (faqld_a5/faqld_a6), coerenti col fallback IT già pubblicato. Le altre risposte
+  // non hanno liste (solo eventuali <a>), quindi basta spogliarle dei tag HTML.
+  function stripHtml(html) {
+    var div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent.replace(/\s+/g, ' ').trim();
+  }
+  var FAQ_LOCALE = { it: 'it-IT', en: 'en-US', fr: 'fr-FR' };
+  function buildFaqJsonLd(lang, t) {
+    var script = document.getElementById('faq-jsonld');
+    if (!script || !t.faq_q1) return;
+    var mainEntity = [];
+    for (var i = 1; i <= 8; i++) {
+      var qKey = 'faq_q' + i, aKey = 'faq_a' + i, ldKey = 'faqld_a' + i;
+      if (t[qKey] === undefined || t[aKey] === undefined) continue;
+      mainEntity.push({
+        '@type': 'Question',
+        'name': stripHtml(t[qKey]),
+        'acceptedAnswer': { '@type': 'Answer', 'text': stripHtml(t[ldKey] !== undefined ? t[ldKey] : t[aKey]) }
+      });
+    }
+    var data = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      '@id': 'https://santamonicagenova.it/#faq',
+      'inLanguage': FAQ_LOCALE[lang] || 'it-IT',
+      'mainEntity': mainEntity
+    };
+    script.textContent = JSON.stringify(data, null, 2);
   }
 
   function setLang(lang) {

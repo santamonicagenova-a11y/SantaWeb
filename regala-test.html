@@ -584,7 +584,7 @@
       var rows = listEl.querySelectorAll('.vh-row');
       if (rows.length > 2) {
         var spacer = document.createElement('div');
-        spacer.style.height = rows[0].getBoundingClientRect().height + 'px';
+        spacer.style.height = (rows[0].getBoundingClientRect().height / 2) + 'px';
         listEl.insertBefore(spacer, rows[2]);
       }
     })();

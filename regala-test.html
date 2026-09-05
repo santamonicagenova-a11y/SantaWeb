@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<!--
+  regala-test.html — PAGINA DI PROVA, non collegata al sito e non indicizzata.
+  Obiettivo: semplificare la pagina reale /regala.html (v 2026.07.21.02), che oggi è
+  molto lunga (griglie di card, descrizioni estese, "Come funziona" a 4 step separato
+  dal modulo dati). Qui la stessa offerta (5 tipologie reali: 2 degustazione + 3 buono
+  libero, STESSI prezzi/testo legale) è impacchettata in un layout a 2 colonne ispirato
+  a un mockup fornito dall'utente: lista selezionabile a sinistra, card di riepilogo +
+  modulo compatto a destra. Descrizioni per riga ridotte a una riga (richiesta esplicita:
+  "spiegazioni più concise e semplici, più immediate visivamente").
+
+  NESSUNA funzionalità della pagina live è stata tolta (scelta esplicita dell'utente:
+  "mantengo tutto, più compatto"): abbinamento vini, scelta consegna fisico/elettronico,
+  scelta di chi paga l'eventuale eccedenza sul buono libero, checkbox termini (obbligatoria)
+  e newsletter (opzionale), honeypot anti-spam, redirect Stripe Checkout per la consegna
+  elettronica, banner di pagamento annullato, lettura prezzi buono libero da
+  /voucher-config.json, endpoint Supabase (richiedi-voucher / create-voucher-checkout)
+  — tutto invariato, stesso payload. Cambiano SOLO markup/CSS/organizzazione del testo.
+
+  Da fare prima di eventuale merge in regala.html live:
+  - revisione testi (P1+P2) sui nuovi one-liner delle 5 righe e sulla sezione Info condensata;
+  - verifica utente del flusso su mobile;
+  - decidere se "Come funziona" (qui ridotto a 3 righe sotto il lead) è sufficiente o va
+    ripristinato più esteso.
+-->
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>[PROVA] Buoni regalo · Ristorante Santamonica Genova</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --ink: #faf8f4;
+      --sand: #241812;
+      --paper: #241812;
+      --surface: #33221A;
+      --terracotta: #4AA3D1;
+      --terracotta-dark: #2E6E93;
+      --gold: #b89d6a;
+      --rule: rgba(245,240,232,0.14);
+      --muted: rgba(245,240,232,0.62);
+      --card-bg: #ddd4c4;
+      --card-ink: #241812;
+      --card-muted: rgba(36,24,18,0.65);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--ink);
+      background: var(--paper);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .dev-banner {
+      background: var(--gold);
+      color: #241812;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 12px;
+      letter-spacing: 0.02em;
+    }
+
+    .container { max-width: 1180px; margin: 0 auto; padding: 0 24px 80px; }
+
+    .payment-banner {
+      display: none;
+      max-width: 1180px;
+      margin: 24px auto 0;
+      padding: 14px 20px;
+      background: var(--surface);
+      border: 1px solid var(--gold);
+      border-radius: 6px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    /* ===== HERO / SELETTORE ===== */
+    .voucher-hero {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 3.5rem;
+      align-items: start;
+      padding: 4.5rem 0 2rem;
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      font-weight: 700;
+      margin: 0 0 18px;
+    }
+
+    .vh-left h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 600;
+      font-size: clamp(34px, 4.2vw, 52px);
+      line-height: 1.08;
+      margin: 0 0 18px;
+    }
+
+    .vh-left h1 em { font-style: italic; color: var(--terracotta); }
+
+    .vh-lead {
+      font-size: 15.5px;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 0 12px;
+    }
+
+    .vh-steps {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0 0 32px;
+      padding-left: 18px;
+    }
+    .vh-steps li { margin-bottom: 4px; }
+
+    /* ===== Lista voucher (sinistra) ===== */
+    .vh-list { display: flex; flex-direction: column; gap: 0.7rem; }
+
+    .vh-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      transition: background .2s ease, border-color .2s ease;
+    }
+    .vh-row:hover { border-color: var(--terracotta); }
+    .vh-row.selected {
+      background: var(--card-bg);
+      color: var(--card-ink);
+      border-color: var(--card-bg);
+    }
+
+    .vh-row-icon {
+      flex-shrink: 0;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(245,240,232,0.08);
+      color: var(--terracotta);
+    }
+    .vh-row.selected .vh-row-icon { background: var(--terracotta); color: #fff; }
+    .vh-row-icon svg { width: 17px; height: 17px; }
+
+    .vh-row-body { flex: 1; min-width: 0; }
+    .vh-row-title { font-weight: 600; font-size: 14.5px; margin: 0 0 2px; }
+    .vh-row-sub {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin: 0;
+    }
+    .vh-row.selected .vh-row-sub { color: var(--card-muted); }
+
+    .vh-row-price {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 22px;
+      font-weight: 700;
+      flex-shrink: 0;
+      color: var(--terracotta);
+    }
+    .vh-row.selected .vh-row-price { color: var(--terracotta-dark); }
+
+    /* ===== Card riepilogo + modulo (destra) ===== */
+    .vh-card {
+      background: var(--card-bg);
+      color: var(--card-ink);
+      border-radius: 20px;
+      padding: 2.25rem 2rem;
+      position: sticky;
+      top: 24px;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.28);
+    }
+
+    .vh-card h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0 0 4px;
+    }
+
+    .vh-card-sub { font-size: 13.5px; color: var(--card-muted); margin: 0 0 20px; }
+
+    .vh-option-block {
+      margin-bottom: 14px;
+    }
+    .vh-option-label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--terracotta-dark);
+      margin-bottom: 8px;
+    }
+    .vh-pill-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .vh-pill {
+      flex: 1;
+      min-width: 130px;
+      display: block;
+      position: relative;
+    }
+    .vh-pill input { position: absolute; opacity: 0; pointer-events: none; }
+    .vh-pill span {
+      display: block;
+      text-align: center;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 10px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(36,24,18,0.18);
+      background: rgba(255,255,255,0.5);
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease;
+    }
+    .vh-pill input:checked + span {
+      background: var(--terracotta-dark);
+      border-color: var(--terracotta-dark);
+      color: #fff;
+    }
+
+    .vh-vini-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+    .vh-vini-check input { margin-top: 3px; accent-color: var(--terracotta-dark); }
+    .vh-vini-supp { color: var(--terracotta-dark); font-weight: 700; white-space: nowrap; }
+
+    .vh-opt-error {
+      display: none;
+      color: #a13c1c;
+      font-size: 12px;
+      font-weight: 700;
+      margin: -8px 0 12px;
+    }
+
+    .vh-field { margin-bottom: 12px; }
+    .vh-field label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--terracotta-dark);
+      margin-bottom: 5px;
+    }
+    .vh-field input, .vh-field textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid rgba(36,24,18,0.18);
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: var(--card-ink);
+      background: #fff;
+    }
+    .vh-field input:focus, .vh-field textarea:focus { outline: none; border-color: var(--terracotta-dark); }
+    .vh-fields-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .vh-more { margin: 4px 0 14px; }
+    .vh-more summary {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--terracotta-dark);
+      cursor: pointer;
+      list-style: none;
+    }
+    .vh-more summary::-webkit-details-marker { display: none; }
+    .vh-more summary::before { content: '+ '; }
+    .vh-more[open] summary::before { content: '– '; }
+    .vh-more .vh-field { margin-top: 10px; }
+
+    .hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+    .vh-consent {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--card-muted);
+      cursor: pointer;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .vh-consent input { margin-top: 3px; accent-color: var(--terracotta-dark); flex-shrink: 0; }
+    .vh-consent a { color: var(--terracotta-dark); font-weight: 700; text-decoration: underline; }
+
+    .contatto-error {
+      display: none;
+      margin: 10px 0;
+      color: #a13c1c;
+      font-size: 12.5px;
+      font-weight: 700;
+    }
+
+    .btn-buy {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 15px 20px;
+      margin-top: 14px;
+      background: var(--terracotta);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14.5px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: background .2s ease;
+    }
+    .btn-buy:hover { background: var(--terracotta-dark); }
+    .btn-buy:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .vh-fineprint { text-align: center; font-size: 11.5px; color: var(--card-muted); margin: 10px 0 0; }
+
+    .richiesta-status { margin-top: 10px; font-size: 13px; text-align: center; min-height: 1px; }
+    .richiesta-status.ok { color: #2c6e49; font-weight: 700; }
+    .richiesta-status.err { color: #a13c1c; font-weight: 700; }
+
+    /* ===== Info essenziali (condensata) ===== */
+    section.info { margin: 2rem 0 3rem; }
+    section.info h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 24px;
+      margin: 0 0 18px;
+      text-align: center;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.1rem;
+    }
+    .info-item {
+      background: var(--surface);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .info-item h3 {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin: 0 0 6px;
+    }
+    .info-item p { margin: 0; font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+    .info-item a { color: var(--terracotta); font-weight: 600; }
+
+    footer.page-footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--rule);
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    footer.page-footer a { color: var(--muted); text-decoration: none; }
+    footer.page-footer a:hover { color: var(--terracotta); }
+
+    @media (max-width: 860px) {
+      .voucher-hero { grid-template-columns: 1fr; padding-top: 2.5rem; }
+      .vh-card { position: static; }
+      .vh-fields-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dev-banner">PAGINA DI PROVA — non collegata al sito, non ancora live</div>
+  <div class="payment-banner" id="payment-banner">Il pagamento è stato annullato: nessun addebito è stato effettuato. Puoi riprovare quando vuoi, i tuoi dati sono ancora qui sotto.</div>
+
+  <div class="container">
+
+    <section class="voucher-hero">
+      <div class="vh-left">
+        <p class="eyebrow">Un dono speciale · valido 12 mesi</p>
+        <h1>Regala una cena <em>sul mare</em>.</h1>
+        <p class="vh-lead">Buoni utilizzabili a pranzo o cena, salvo disponibilità. Ti mandiamo il buono personalizzato via email, pronto da stampare o inoltrare — oppure lo ritiri in ristorante.</p>
+        <ul class="vh-steps">
+          <li>Scegli il buono qui sotto e come vuoi riceverlo</li>
+          <li>Via email: paghi online e ricevi subito il PDF. Ritiro in ristorante: ti rispondiamo entro 24 ore</li>
+          <li>Il destinatario prenota segnalando il codice del voucher</li>
+        </ul>
+
+        <div class="vh-list" id="vh-list"><!-- righe generate da JS --></div>
+      </div>
+
+      <div class="vh-right">
+        <div class="vh-card" id="vh-card">
+          <h2 id="vh-card-title">Buono · Santamonica</h2>
+          <p class="vh-card-sub" id="vh-card-sub"></p>
+
+          <div class="vh-option-block" id="vh-vini-block" style="display:none;">
+            <label class="vh-vini-check">
+              <input type="checkbox" id="vh-vini-check">
+              <span>Aggiungi l'abbinamento vini di Monica <span class="vh-vini-supp" id="vh-vini-supp"></span></span>
+            </label>
+          </div>
+
+          <div class="vh-option-block">
+            <span class="vh-option-label">Come lo ricevi? *</span>
+            <div class="vh-pill-row">
+              <label class="vh-pill">
+                <input type="radio" name="vh-consegna" id="vh-consegna-fisico" value="fisico">
+                <span>Ritiro in ristorante</span>
+              </label>
+              <label class="vh-pill">
+                <input type="radio" name="vh-consegna" id="vh-consegna-elettronico" value="elettronico">
+                <span>Via email</span>
+              </label>
+            </div>
+            <div class="vh-opt-error" id="vh-consegna-error">Scegli come vuoi ricevere il buono.</div>
+          </div>
+
+          <div class="vh-option-block" id="vh-eccedenza-block" style="display:none;">
+            <span class="vh-option-label">Se si supera il valore, chi paga la differenza? *</span>
+            <div class="vh-pill-row">
+              <label class="vh-pill">
+                <input type="radio" name="vh-eccedenza" id="vh-eccedenza-destinatario" value="destinatario">
+                <span>Chi lo usa</span>
+              </label>
+              <label class="vh-pill">
+                <input type="radio" name="vh-eccedenza" id="vh-eccedenza-acquirente" value="acquirente">
+                <span>Io che lo regalo</span>
+              </label>
+            </div>
+            <div class="vh-opt-error" id="vh-eccedenza-error">Scegli chi paga l'eventuale differenza.</div>
+          </div>
+
+          <div class="vh-fields-2">
+            <div class="vh-field">
+              <label for="ct-nome">Da parte di</label>
+              <input type="text" id="ct-nome" autocomplete="name" placeholder="Il tuo nome">
+            </div>
+            <div class="vh-field">
+              <label for="ct-destinatario">Per (facoltativo)</label>
+              <input type="text" id="ct-destinatario" placeholder="Nome del destinatario">
+            </div>
+          </div>
+          <div class="vh-field">
+            <label for="ct-email">Email dove inviarlo</label>
+            <input type="email" id="ct-email" autocomplete="email" placeholder="nome@email.it">
+          </div>
+
+          <details class="vh-more">
+            <summary>Telefono e dedica (facoltativo)</summary>
+            <div class="vh-field">
+              <label for="ct-telefono">Telefono</label>
+              <input type="tel" id="ct-telefono" autocomplete="tel">
+            </div>
+            <div class="vh-field">
+              <label for="ct-dedica">Dedica</label>
+              <textarea id="ct-dedica" rows="2"></textarea>
+            </div>
+          </details>
+
+          <!-- honeypot anti-spam -->
+          <div class="hp-field" aria-hidden="true">
+            <label for="ct-hp">Non compilare questo campo</label>
+            <input type="text" id="ct-hp" tabindex="-1" autocomplete="off">
+          </div>
+
+          <label class="vh-consent">
+            <input type="checkbox" id="ct-termini">
+            <span>Ho letto e accetto i <a href="/voucher-termini.html" target="_blank" rel="noopener">Termini e condizioni dei buoni regalo</a>. *</span>
+          </label>
+          <label class="vh-consent">
+            <input type="checkbox" id="ct-marketing">
+            <span>Voglio ricevere novità dal ristorante (facoltativo, revocabile quando vuoi).</span>
+          </label>
+
+          <div id="contatto-error" class="contatto-error"></div>
+
+          <button type="button" class="btn-buy" id="btn-buy-shared" onclick="richiediBuono(this)">
+            <span id="btn-buy-label">Richiedi il buono</span>
+          </button>
+          <p class="vh-fineprint">Validità 12 mesi · escluso sab, dom e festivi salvo accordi.</p>
+          <div class="richiesta-status" id="rs-shared"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== INFO (condensata) ===== -->
+    <section class="info">
+      <h2>Informazioni essenziali</h2>
+      <div class="info-grid">
+        <div class="info-item"><h3>Validità</h3><p>12 mesi dalla data di acquisto.</p></div>
+        <div class="info-item"><h3>Bevande</h3><p>Escluse nei voucher degustazione (salvo abbinamento vini). Incluse nel buono libero.</p></div>
+        <div class="info-item"><h3>Trasferibilità</h3><p>Libera: chi presenta il codice valido può riscattare il buono.</p></div>
+        <div class="info-item"><h3>Uso parziale</h3><p>Il residuo del buono libero resta come credito entro la scadenza.</p></div>
+        <div class="info-item"><h3>Quando</h3><p>Tutti i giorni, salvo disponibilità, escluso sabato, domenica e festivi.</p></div>
+        <div class="info-item"><h3>Recesso</h3><p>14 giorni dall'acquisto, se il voucher non è ancora stato usato.</p></div>
+        <div class="info-item"><h3>Prenotazione</h3><p>Obbligatoria, segnalando il voucher. Disdetta oltre le 24h prima = voucher considerato usato.</p></div>
+        <div class="info-item"><h3>Condizioni d'uso</h3><p>Dettagli su recesso, smarrimento e rimborsi nei <a href="/voucher-termini.html">Termini e condizioni</a>.</p></div>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <div>
+        <a href="/">Home</a> · <a href="/voucher-termini.html">Termini voucher</a> · <a href="/privacy.html">Privacy</a> · <a href="/dove-siamo.html">Dove siamo</a>
+      </div>
+      <span>regala-test.html · v 2026.09.05.01 (pagina di prova)</span>
+    </footer>
+
+  </div>
+
+  <script>
+  (function() {
+    var RICHIEDI_VOUCHER_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/richiedi-voucher';
+    var CREATE_VOUCHER_CHECKOUT_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/create-voucher-checkout';
+
+    // Stessi 5 prodotti reali di regala.html (2 degustazione + 3 buono libero), stessi
+    // prezzi/supplementi. I valori "libero" vengono poi allineati a /voucher-config.json
+    // (fallback: quelli qui sotto), esattamente come sulla pagina live.
+    var VOUCHERS = [
+      { key: 'deg6', card: 'deg6', title: 'Degustazione 6 portate', sub: 'Per due persone · bevande escluse', base: 180, viniPrice: 300, viniSupp: 120, hasVini: true },
+      { key: 'deg7', card: 'deg7', title: 'Degustazione 7 portate', sub: 'A mano libera dello chef · per due', base: 220, viniPrice: 360, viniSupp: 140, hasVini: true, featured: true },
+      { key: 'libero0', liberoIndex: 0, title: 'Buono da 100€', sub: 'Valore libero su tutto il menù', base: 100 },
+      { key: 'libero1', liberoIndex: 1, title: 'Buono da 150€', sub: 'Valore libero su tutto il menù', base: 150, featured: true },
+      { key: 'libero2', liberoIndex: 2, title: 'Buono da 200€', sub: 'Valore libero su tutto il menù', base: 200 },
+    ];
+
+    var giftIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="11" rx="1"/><path d="M12 9v11M3 9h18M12 9c-1.5-4-6-5-6-2s3 2 6 2Zm0 0c1.5-4 6-5 6-2s-3 2-6 2Z"/></svg>';
+
+    var listEl = document.getElementById('vh-list');
+    VOUCHERS.forEach(function(v) {
+      var row = document.createElement('button');
+      row.type = 'button';
+      row.className = 'vh-row';
+      row.dataset.key = v.key;
+      row.innerHTML =
+        '<span class="vh-row-icon">' + giftIcon + '</span>' +
+        '<span class="vh-row-body"><p class="vh-row-title">' + v.title + '</p><p class="vh-row-sub">' + v.sub + '</p></span>' +
+        '<span class="vh-row-price eur-num" data-key="' + v.key + '">' + v.base + '€</span>';
+      row.addEventListener('click', function() { selectVoucher(v.key); });
+      listEl.appendChild(row);
+    });
+
+    // valori dei 3 buoni liberi da voucher-config.json (stesso file usato da regala.html)
+    fetch('/voucher-config.json', { cache: 'no-store' }).then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(cfg) {
+        if (!cfg || !Array.isArray(cfg.liberi)) return;
+        VOUCHERS.forEach(function(v) {
+          if (v.liberoIndex == null) return;
+          var val = cfg.liberi[v.liberoIndex];
+          if (val == null) return;
+          v.base = val;
+          var priceEl = document.querySelector('.vh-row-price[data-key="' + v.key + '"]');
+          if (priceEl) priceEl.textContent = val + '€';
+          if (selected && selected.key === v.key) updateCard();
+        });
+      }).catch(function(){ /* offline: restano i valori qui sopra */ });
+
+    var selected = null;
+    var viniChecked = false;
+
+    function byKey(key) { for (var i = 0; i < VOUCHERS.length; i++) if (VOUCHERS[i].key === key) return VOUCHERS[i]; return null; }
+
+    function currentPrice() {
+      if (!selected) return 0;
+      if (selected.hasVini && viniChecked) return selected.viniPrice;
+      return selected.base;
+    }
+
+    function currentConsegna() {
+      var r = document.querySelector('input[name="vh-consegna"]:checked');
+      return r ? r.value : null;
+    }
+    function currentEccedenza() {
+      var r = document.querySelector('input[name="vh-eccedenza"]:checked');
+      return r ? r.value : null;
+    }
+
+    function updateCard() {
+      document.getElementById('vh-card-title').textContent = 'Buono · ' + selected.title;
+      document.getElementById('vh-card-sub').textContent = selected.sub + ' · €' + currentPrice();
+      document.getElementById('vh-vini-block').style.display = selected.hasVini ? 'block' : 'none';
+      if (selected.hasVini) {
+        document.getElementById('vh-vini-supp').textContent = '(+' + selected.viniSupp + '€)';
+        document.getElementById('vh-vini-check').checked = viniChecked;
+      }
+      document.getElementById('vh-eccedenza-block').style.display = selected.liberoIndex != null ? 'block' : 'none';
+      updateButton();
+    }
+
+    function updateButton() {
+      var price = currentPrice();
+      var consegna = currentConsegna();
+      var label = (consegna === 'elettronico' ? 'Paga e ricevi il buono' : 'Richiedi il buono') + ' · €' + price;
+      document.getElementById('btn-buy-label').textContent = label;
+    }
+
+    function selectVoucher(key) {
+      selected = byKey(key);
+      viniChecked = false;
+      document.querySelectorAll('.vh-row').forEach(function(r) { r.classList.toggle('selected', r.dataset.key === key); });
+      document.querySelectorAll('input[name="vh-consegna"]').forEach(function(r) { r.checked = false; });
+      document.querySelectorAll('input[name="vh-eccedenza"]').forEach(function(r) { r.checked = false; });
+      document.getElementById('vh-consegna-error').style.display = 'none';
+      document.getElementById('vh-eccedenza-error').style.display = 'none';
+      updateCard();
+      document.getElementById('vh-card').scrollIntoView({ behavior: 'smooth', block: window.innerWidth < 860 ? 'start' : 'nearest' });
+    }
+
+    document.getElementById('vh-vini-check').addEventListener('change', function(e) {
+      viniChecked = e.target.checked;
+      updateCard();
+    });
+    document.querySelectorAll('input[name="vh-consegna"]').forEach(function(r) {
+      r.addEventListener('change', function() {
+        document.getElementById('vh-consegna-error').style.display = 'none';
+        updateButton();
+      });
+    });
+    document.querySelectorAll('input[name="vh-eccedenza"]').forEach(function(r) {
+      r.addEventListener('change', function() { document.getElementById('vh-eccedenza-error').style.display = 'none'; });
+    });
+
+    // preseleziona la degustazione 7 portate (già "featured" sulla pagina live), così la
+    // card di riepilogo non è mai vuota — l'utente può comunque cambiare scelta subito.
+    selectVoucher('deg7');
+
+    // Banner "pagamento annullato" — identico a regala.html
+    if (/(^|[?&])pagamento=annullato(&|$)/.test(window.location.search)) {
+      var banner = document.getElementById('payment-banner');
+      if (banner) banner.style.display = 'block';
+      if (window.history && window.history.replaceState) window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+    function setContattoError(msg) {
+      var err = document.getElementById('contatto-error');
+      if (msg) { err.textContent = msg; err.style.display = 'block'; } else { err.style.display = 'none'; }
+    }
+    function setStatus(msg, cls) {
+      var el = document.getElementById('rs-shared');
+      el.textContent = msg || '';
+      el.className = 'richiesta-status' + (cls ? ' ' + cls : '');
+    }
+
+    window.richiediBuono = function(btn) {
+      if (!selected) return;
+
+      var consegna = currentConsegna();
+      if (!consegna) { document.getElementById('vh-consegna-error').style.display = 'block'; return; }
+
+      var isLibero = selected.liberoIndex != null;
+      var eccedenza = isLibero ? currentEccedenza() : null;
+      if (isLibero && !eccedenza) { document.getElementById('vh-eccedenza-error').style.display = 'block'; return; }
+
+      var nome = document.getElementById('ct-nome').value.trim();
+      var email = document.getElementById('ct-email').value.trim();
+      var telefono = document.getElementById('ct-telefono').value.trim();
+      var destinatario = document.getElementById('ct-destinatario').value.trim();
+      var dedica = document.getElementById('ct-dedica').value.trim();
+      var hp = document.getElementById('ct-hp').value;
+      var termini = document.getElementById('ct-termini').checked;
+      var marketingConsent = document.getElementById('ct-marketing').checked;
+
+      if (nome.length < 2 || !isValidEmail(email)) {
+        setContattoError('Compila nome ed email (validi) prima di inviare la richiesta.');
+        return;
+      }
+      if (!termini) {
+        setContattoError('Devi accettare i Termini e condizioni dei buoni regalo.');
+        return;
+      }
+      setContattoError(null);
+
+      var tipo = isLibero ? 'valore' : selected.card;
+      var valoreEur = isLibero ? selected.base : null;
+      var abbinamentoVini = selected.hasVini ? viniChecked : false;
+
+      btn.disabled = true;
+
+      if (consegna === 'elettronico') {
+        setStatus('Ti stiamo portando al pagamento…', '');
+        fetch(CREATE_VOUCHER_CHECKOUT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tipo: tipo, abbinamento_vini: abbinamentoVini, valore_eur: valoreEur,
+            eccedenza_a_carico: eccedenza || undefined, nome: nome, email: email,
+            telefono: telefono || undefined, destinatario: destinatario || undefined,
+            dedica: dedica || undefined, termini_accettati: true,
+            marketing_consent: marketingConsent, _hp: hp,
+          }),
+        }).then(function(r) { return r.json().then(function(j) { return { status: r.status, body: j }; }); })
+          .then(function(res) {
+            if (res.status === 201 && res.body && res.body.ok && res.body.url) {
+              setStatus('Ti stiamo portando al pagamento…', 'ok');
+              window.location.href = res.body.url;
+            } else {
+              btn.disabled = false;
+              setStatus((res.body && res.body.error) || 'Errore nella creazione del pagamento, riprova o chiamaci al 010 5533155.', 'err');
+            }
+          }).catch(function() {
+            btn.disabled = false;
+            setStatus('Errore di rete: riprova o chiamaci al 010 5533155.', 'err');
+          });
+        return;
+      }
+
+      setStatus('Invio in corso…', '');
+      fetch(RICHIEDI_VOUCHER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'submit', tipo: tipo, abbinamento_vini: abbinamentoVini, valore_eur: valoreEur,
+          eccedenza_a_carico: eccedenza || undefined, consegna: consegna, nome: nome, email: email,
+          telefono: telefono || undefined, destinatario: destinatario || undefined,
+          dedica: dedica || undefined, termini_accettati: true, marketing_consent: marketingConsent,
+          _hp: hp, user_agent: navigator.userAgent,
+        }),
+      }).then(function(r) { return r.json().then(function(j) { return { status: r.status, body: j }; }); })
+        .then(function(res) {
+          if (res.status === 201 && res.body && res.body.ok) {
+            document.getElementById('btn-buy-label').textContent = '✓ Richiesta inviata';
+            setStatus('Ti risponderemo entro 24 ore con le modalità di pagamento.', 'ok');
+          } else {
+            btn.disabled = false;
+            setStatus((res.body && res.body.error) || 'Errore di invio, riprova o chiamaci al 010 5533155.', 'err');
+          }
+        }).catch(function() {
+          btn.disabled = false;
+          setStatus('Errore di rete: riprova o chiamaci al 010 5533155.', 'err');
+        });
+    };
+  })();
+  </script>
+
+</body>
+</html>

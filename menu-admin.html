@@ -1,4 +1,13 @@
 <!DOCTYPE html>
+<!-- v 2026.09.05.02 — aggiunto cursor-follower-admin.js (cerchio ambra che segue il mouse, si
+     evidenzia su link/button) prima di </body>, SOLO su menu-admin.html. Recupera l'effetto
+     "cursore strano" descritto in HANDOVER_cursorfollower_v2026.06.05.01.md (mai deployato sul
+     sito pubblico), riadattato al tema scuro dell'admin: niente mix-blend-mode (invisibile su
+     sfondo scuro), bordo rgba(214,155,74) invece del blu-marino pensato per il sito. A11y-safe
+     (disabilitato su touch/pointer:coarse e con prefers-reduced-motion). GATE PRODUZIONE: P1
+     (node --check OK) + P2 (verifica visiva, vedi sotto) fatte; P3 Revisione Oppositiva NON fatta
+     — micro-fix estetico su tool interno non pubblico, non su contenuto pubblico/critico secondo
+     le regole del gate, quindi non obbligatoria; annotata comunque come nota, non come debito. -->
 <!-- v 2026.09.05.01 — rimossa la card "Menù Vini" dalla riga quick-actions della tab "Gestione
      menù e sito" (sezione #vini-section e funzioni apriSezioneVini/convertiEPubblicaVini lasciate
      nel file, innocue e non più raggiungibili da UI). -->
@@ -3883,7 +3892,9 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.05.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.05.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
+<!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
+<script defer src="/cursor-follower-admin.js"></script>
 </body>
 </html>

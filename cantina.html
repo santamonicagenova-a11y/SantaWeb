@@ -1,4 +1,14 @@
 <!DOCTYPE html>
+<!-- v 2026.09.05.01 — fix raggruppamento sotto-capitolo per le categorie eterogenee (Bollicine,
+     Bollicine Rosé, Rosati): un vino con Regione=Liguria ma senza Zona impostata finiva sempre nel
+     bucket "Altre regioni" invece che sotto "Liguria" (es. "Janua" in Bollicine, e 3 dei 4 vini di
+     Rosati "Altre regioni" — "In Rosa"/Lappazzucche/Velia — erano tutti Liguria senza zona). Ora,
+     quando manca la Zona ma la Regione è Liguria, il vino va comunque sotto il sotto-titolo
+     "Liguria" (non più solo con Zona esplicita). Aggiornata di conseguenza anche la visualizzazione
+     inline della regione nella riga del vino: non ripete più "Liguria" quando è già il sotto-
+     titolo, resta visibile solo per le regioni davvero diverse (bucket "Altre regioni" genuino).
+     Nota: questa modifica era stata datata per errore "29 agosto" — corretto al giorno vero, 5
+     settembre (nel mezzo la sessione era rimasta ferma erroneamente anche su "1 settembre"). -->
 <!-- v 2026.08.29.04 — tolto il vincolo `.sottosez-gruppo{break-inside:avoid}` di v.29.02: forzava
      l'intero sotto-capitolo (titolo+tutti i vini) a saltare in blocco alla pagina successiva
      quando non ci stava nello spazio residuo, lasciando grosse zone bianche in fondo alla pagina
@@ -330,7 +340,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.08.29.04</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.05.01</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -1333,7 +1343,7 @@ function rigaVinoHtml(a) {
   // sottolineata perché lì sostituisce il sotto-titolo di sezione (le regioni sono mischiate).
   var capNome = a.tipologia ? a.tipologia.nome : '';
   var eterogenea = CARTA_CATEGORIE_ALTRE_REGIONI.indexOf(capNome) !== -1;
-  var nomeRegione = (!a.zona && eterogenea && a.regione) ? a.regione.nome : '';
+  var nomeRegione = (!a.zona && eterogenea && a.regione && a.regione.nome !== 'Liguria') ? a.regione.nome : '';
   var seg3Html = nomeRegione ? '<span class="vino-regione">' + escapeHtml(nomeRegione) + '</span>' : '';
 
   // Prezzo bottiglia con icona bottiglia, prezzo calice con icona calice — non passano da escapeHtml
@@ -1391,7 +1401,7 @@ function rigaGruppoAnnateHtml(gruppo) {
 
   var capNome = primo.tipologia ? primo.tipologia.nome : '';
   var eterogenea = CARTA_CATEGORIE_ALTRE_REGIONI.indexOf(capNome) !== -1;
-  var nomeRegione = (!primo.zona && eterogenea && primo.regione) ? primo.regione.nome : '';
+  var nomeRegione = (!primo.zona && eterogenea && primo.regione && primo.regione.nome !== 'Liguria') ? primo.regione.nome : '';
   var seg3Html = nomeRegione ? '<span class="vino-regione">' + escapeHtml(nomeRegione) + '</span>' : '';
 
   var segmenti = [];
@@ -1437,7 +1447,10 @@ function generaHtmlCartaVini(articoli) {
     if (!capitoli[cap]) { capitoli[cap] = { sotto: {}, ordineSotto: [], tipologiaId: a.tipologia_id }; ordineCapitoli.push(cap); }
     var c = capitoli[cap];
     var eterogenea = CARTA_CATEGORIE_ALTRE_REGIONI.indexOf(cap) !== -1;
-    var sub = (a.zona ? a.zona.nome : null) || (eterogenea ? 'Altre regioni' : (a.regione ? a.regione.nome : null)) || 'Altre regioni';
+    var regioneLiguria = a.regione && a.regione.nome === 'Liguria';
+    var sub = (a.zona ? a.zona.nome : null) ||
+      (eterogenea ? (regioneLiguria ? 'Liguria' : 'Altre regioni') : (a.regione ? a.regione.nome : null)) ||
+      'Altre regioni';
     if (!c.sotto[sub]) { c.sotto[sub] = []; c.ordineSotto.push(sub); }
     c.sotto[sub].push(a);
   });

@@ -54,6 +54,7 @@
 
   /* ── card Orari ── */
   .orari-banner{background:var(--terracotta);color:var(--warm-white);font-size:0.82rem;font-weight:500;border-radius:10px;padding:0.7rem 1rem;margin-bottom:1rem;}
+  .orari-rows{margin-top:auto;margin-bottom:auto;width:100%;}
   .orari-row{display:flex;justify-content:space-between;gap:1rem;font-size:0.9rem;padding:0.75rem 1rem;border-radius:10px;background:rgba(245,240,232,0.06);border:1px solid var(--divider);margin-bottom:0.5rem;}
   .orari-row .g{color:var(--ink-soft);}
   .orari-row strong{font-weight:500;}
@@ -75,10 +76,9 @@
   /* ── card Voucher ── */
   .card.accent .card-title{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:400;color:var(--warm-white);}
   .card.accent .card-title em{color:var(--warm-white);}
-  .card.accent .card-text{color:rgba(36,24,18,0.75);}
+  .card.accent .card-text{color:rgba(36,24,18,0.75);margin-top:auto;margin-bottom:auto;}
   .btn-voucher{display:block;text-align:center;background:var(--warm-white);color:var(--ink);font-size:0.75rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;padding:0.9rem 1rem;border-radius:999px;text-decoration:none;transition:opacity .2s;margin-top:auto;}
   .btn-voucher:hover{opacity:0.85;}
-  .voucher-validity{margin-top:0.8rem;font-size:0.75rem;color:rgba(36,24,18,0.65);text-align:center;}
 </style>
 </head>
 <body>
@@ -94,9 +94,11 @@
       <div class="card dark">
         <h3 class="card-title">I nostri <em>orari</em></h3>
         <div class="orari-banner">Fino al 10 sett &middot; solo cena 20:00&ndash;22:30</div>
-        <div class="orari-row"><span class="g">Mar &mdash; Gio</span><strong>Cena 20:00&ndash;22:30</strong></div>
-        <div class="orari-row"><span class="g">Ven &mdash; Dom</span><strong>Cena 20:00&ndash;22:30</strong></div>
-        <div class="orari-row"><span class="g">Luned&igrave;</span><strong>Chiusi</strong></div>
+        <div class="orari-rows">
+          <div class="orari-row"><span class="g">Mar &mdash; Gio</span><strong>Cena 20:00&ndash;22:30</strong></div>
+          <div class="orari-row"><span class="g">Ven &mdash; Dom</span><strong>Cena 20:00&ndash;22:30</strong></div>
+          <div class="orari-row"><span class="g">Luned&igrave;</span><strong>Chiusi</strong></div>
+        </div>
         <p class="orari-note">Dall&rsquo;11 sett: pranzo ven&ndash;dom 12:30&ndash;14:30 &middot; cena dalle 19:30.</p>
       </div>
 
@@ -116,7 +118,6 @@
         <h3 class="card-title">Regala una cena al <em>Santamonica</em>.</h3>
         <p class="card-text">Regala un pranzo o una cena al Santamonica: buoni utilizzabili tutti i giorni, salvo disponibilit&agrave;, a pranzo o a cena, escluso Sabato, Domenica e festivi. Validit&agrave; 12 mesi dalla data di acquisto salvo accordi.</p>
         <a href="/regala.html" class="btn-voucher">Scopri i buoni regalo</a>
-        <p class="voucher-validity">Validit&agrave; 12 mesi &middot; esclusi sab, dom e festivi salvo accordi</p>
       </div>
 
     </div>

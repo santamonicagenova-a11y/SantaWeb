@@ -61,6 +61,7 @@
   .orari-note{margin-top:0.8rem;font-size:0.78rem;color:var(--ink-soft);line-height:1.6;}
 
   /* ── card Dove siamo ── */
+  .card-kicker{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1rem;color:var(--terracotta);margin-bottom:0.3rem;}
   .card-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;line-height:1.25;margin-bottom:0.6rem;}
   .card-title em{font-style:italic;color:var(--terracotta);}
   .card.dark .card-title{color:var(--ink);}
@@ -74,8 +75,9 @@
   .btn-pill.solid-dark{background:var(--warm-white);color:var(--ink);}
 
   /* ── card Voucher ── */
+  .card.accent .card-kicker{color:var(--ink);}
   .card.accent .card-title{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:400;color:var(--warm-white);}
-  .card.accent .card-title em{color:var(--warm-white);}
+  .card.accent .card-title em{color:#fff;}
   .card.accent .card-text{color:rgba(36,24,18,0.75);margin:auto 0;background:rgba(36,24,18,0.08);border:1px solid rgba(36,24,18,0.15);border-radius:14px;padding:1rem 1.1rem;}
   .btn-voucher{display:block;text-align:center;background:var(--warm-white);color:var(--ink);font-size:0.75rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;padding:0.9rem 1rem;border-radius:999px;text-decoration:none;transition:opacity .2s;margin-top:auto;}
   .btn-voucher:hover{opacity:0.85;}
@@ -104,6 +106,7 @@
 
       <!-- CARD 2 · DOVE SIAMO (indirizzo/telefono reali) -->
       <div class="card light">
+        <p class="card-kicker">Dove siamo</p>
         <h3 class="card-title">Lungomare Lombardo 27, <em>Genova</em></h3>
         <p class="card-text">Sala sulla spiaggia di San Giuliano, Corso Italia all&rsquo;altezza dell&rsquo;Abbazia. D&rsquo;estate: terrazza sul mare aperto.</p>
         <div class="photo"><img src="img/sito/hero.webp" alt="Sala del ristorante Santamonica affacciata sul mare"></div>
@@ -115,6 +118,7 @@
 
       <!-- CARD 3 · VOUCHER (sostituisce Parcheggio; dati reali da regala.html) -->
       <div class="card accent">
+        <p class="card-kicker">Buono regalo</p>
         <h3 class="card-title">Regala una cena al <em>Santamonica</em>.</h3>
         <p class="card-text">Regala un pranzo o una cena al Santamonica: buoni utilizzabili tutti i giorni, salvo disponibilit&agrave;, a pranzo o a cena, escluso Sabato, Domenica e festivi. Validit&agrave; 12 mesi dalla data di acquisto salvo accordi.</p>
         <a href="/regala.html" class="btn-voucher">Scopri i buoni regalo</a>

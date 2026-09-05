@@ -102,7 +102,14 @@
     "map_apri": "Apri in Maps &rarr;",
     "footer_privacy": "Privacy",
     "footer_cookies": "Cookie Policy",
-    "footer_cc_manage": "Gestisci preferenze cookie"
+    "footer_cc_manage": "Gestisci preferenze cookie",
+    "newsletter_title": "La nostra <em>newsletter</em>",
+    "newsletter_subtitle": "Novità, menu stagionali e offerte speciali direttamente nella tua casella.",
+    "newsletter_placeholder": "La tua email",
+    "newsletter_btn": "Iscriviti",
+    "newsletter_consent": "Accetto di ricevere la newsletter e le comunicazioni di Santamonica. Puoi annullare l'iscrizione in qualsiasi momento.",
+    "newsletter_success": "Iscrizione avvenuta correttamente. Controlla la tua email per confermare.",
+    "newsletter_error": "Errore. Riprova o scrivici a"
   },
   "en": {
     "page_title": "Santamonica Restaurant Genoa | Fresh Seafood Gourmet on the Seafront",
@@ -197,7 +204,14 @@
     "map_apri": "Open in Maps &rarr;",
     "footer_privacy": "Privacy",
     "footer_cookies": "Cookie Policy",
-    "footer_cc_manage": "Manage cookie preferences"
+    "footer_cc_manage": "Manage cookie preferences",
+    "newsletter_title": "Our <em>newsletter</em>",
+    "newsletter_subtitle": "News, seasonal menus and special offers straight to your inbox.",
+    "newsletter_placeholder": "Your email",
+    "newsletter_btn": "Subscribe",
+    "newsletter_consent": "I agree to receive the newsletter and communications from Santamonica. You can unsubscribe at any time.",
+    "newsletter_success": "Subscription successful. Check your email to confirm.",
+    "newsletter_error": "Error. Please try again or write to us at"
   },
   "fr": {
     "page_title": "Restaurant Santamonica Gênes | Poisson Frais Gourmet sur le Front de Mer",
@@ -292,6 +306,13 @@
     "map_apri": "Ouvrir dans Maps →",
     "footer_privacy": "Confidentialité",
     "footer_cookies": "Cookies",
-    "footer_cc_manage": "Gérer les préférences cookies"
+    "footer_cc_manage": "Gérer les préférences cookies",
+    "newsletter_title": "Notre <em>newsletter</em>",
+    "newsletter_subtitle": "Actualités, menus de saison et offres spéciales directement dans votre boîte mail.",
+    "newsletter_placeholder": "Votre email",
+    "newsletter_btn": "S'inscrire",
+    "newsletter_consent": "J'accepte de recevoir la newsletter et les communications de Santamonica. Vous pouvez vous désinscrire à tout moment.",
+    "newsletter_success": "Inscription réussie. Vérifiez votre email pour confirmer.",
+    "newsletter_error": "Erreur. Veuillez réessayer ou nous écrire à"
   }
 }

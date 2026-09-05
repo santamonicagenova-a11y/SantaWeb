@@ -684,7 +684,7 @@
 
       <div class="info-card dark">
         <h3 class="info-card-title" data-i18n="info_orari_label">I nostri <em>orari</em></h3>
-        <div id="orari-info">
+        <div id="orari-info" style="flex:1;display:flex;flex-direction:column;justify-content:center;">
           <!-- generato da orari.js (fonte unica orari) -->
         </div>
       </div>
@@ -719,15 +719,15 @@
          sotto nel file. -->
     <div id="newsletter" class="reveal newsletter-box" style="margin-top:1.25rem; background:var(--surface); padding:2rem 2.25rem;">
       <div>
-        <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;line-height:1.25;">La nostra <em style="font-style:italic;color:var(--terracotta);">newsletter</em></h2>
-        <p style="margin-top:0.4rem;font-size:0.85rem;color:var(--ink-soft);">Novità, menu stagionali e offerte speciali direttamente nella tua casella.</p>
+        <h2 data-i18n="newsletter_title" style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;line-height:1.25;">La nostra <em style="font-style:italic;color:var(--terracotta);">newsletter</em></h2>
+        <p data-i18n="newsletter_subtitle" style="margin-top:0.4rem;font-size:0.85rem;color:var(--ink-soft);">Novità, menu stagionali e offerte speciali direttamente nella tua casella.</p>
       </div>
       <div>
         <form id="brevo-form" style="display:flex;flex-direction:column;gap:0.6rem;">
           <div style="display:flex;gap:0.6rem;">
-            <input type="email" id="brevo-email" placeholder="La tua email" required autocomplete="email"
+            <input type="email" id="brevo-email" data-i18n-placeholder="newsletter_placeholder" placeholder="La tua email" required autocomplete="email"
               style="flex:1;min-width:0;padding:0.9rem 1.2rem;border-radius:4px;border:1px solid var(--divider);background:var(--warm-white);color:var(--ink);font-family:'Jost',sans-serif;font-size:0.85rem;outline:none;letter-spacing:0.05em;">
-            <button type="submit" id="brevo-btn"
+            <button type="submit" id="brevo-btn" data-i18n="newsletter_btn"
               style="padding:0.9rem 1.4rem;border-radius:4px;border:none;background:var(--warm-white);color:var(--ink);font-family:'Jost',sans-serif;font-size:0.75rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:opacity 0.2s;"
               onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
               Iscriviti
@@ -735,14 +735,14 @@
           </div>
           <label style="display:flex;align-items:flex-start;gap:0.6rem;cursor:pointer;text-align:left;">
             <input type="checkbox" id="brevo-consent" required style="margin-top:3px;accent-color:var(--terracotta);flex-shrink:0;">
-            <span style="font-size:0.72rem;color:var(--ink-soft);line-height:1.5;">Accetto di ricevere la newsletter e le comunicazioni di Santamonica. Puoi annullare l'iscrizione in qualsiasi momento.</span>
+            <span data-i18n="newsletter_consent" style="font-size:0.72rem;color:var(--ink-soft);line-height:1.5;">Accetto di ricevere la newsletter e le comunicazioni di Santamonica. Puoi annullare l'iscrizione in qualsiasi momento.</span>
           </label>
         </form>
-        <div id="brevo-success" style="display:none;margin-top:0.75rem;padding:0.75rem 1rem;background:#e7faf0;color:#085229;font-size:0.82rem;font-family:'Jost',sans-serif;">
+        <div id="brevo-success" data-i18n="newsletter_success" style="display:none;margin-top:0.75rem;padding:0.75rem 1rem;background:#e7faf0;color:#085229;font-size:0.82rem;font-family:'Jost',sans-serif;">
           Iscrizione avvenuta correttamente. Controlla la tua email per confermare.
         </div>
         <div id="brevo-error" style="display:none;margin-top:0.75rem;padding:0.75rem 1rem;background:#ffeded;color:#661d1d;font-size:0.82rem;font-family:'Jost',sans-serif;">
-          Errore. Riprova o scrivici a <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ed84838b82ad9e8c83998c808283848e8c8a8883829b8cc38499">[email&#160;protected]</a>
+          <span data-i18n="newsletter_error">Errore. Riprova o scrivici a</span> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ed84838b82ad9e8c83998c808283848e8c8a8883829b8cc38499">[email&#160;protected]</a>
         </div>
       </div>
     </div>

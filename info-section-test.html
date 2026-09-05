@@ -66,9 +66,8 @@
   .card-title em{font-style:italic;color:var(--terracotta);}
   .card.dark .card-title{color:var(--ink);}
   .card-text{font-size:0.85rem;line-height:1.7;color:rgba(36,24,18,0.7);margin-bottom:1rem;}
-  .card.light .photo{border-radius:14px;overflow:hidden;height:150px;margin-bottom:1.1rem;}
-  .card.light .photo img{width:100%;height:100%;object-fit:cover;}
-  .btn-row{display:flex;flex-direction:column;gap:0.6rem;}
+  .btn-row{display:flex;flex-direction:column;gap:0.6rem;margin-top:auto;}
+  .card.light .card-text a{color:var(--terracotta);text-decoration:none;font-weight:500;}
   .btn-pill{display:block;text-align:center;font-size:0.72rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;padding:0.9rem 1rem;border-radius:999px;text-decoration:none;transition:opacity .2s;}
   .btn-pill:hover{opacity:0.85;}
   .btn-pill.outline{border:1px solid rgba(36,24,18,0.25);color:var(--warm-white);}
@@ -106,12 +105,15 @@
 
       <!-- CARD 2 · DOVE SIAMO (indirizzo/telefono reali) -->
       <div class="card light">
-        <p class="card-kicker">Dove siamo</p>
-        <h3 class="card-title">Lungomare Lombardo 27, <em>Genova</em></h3>
-        <p class="card-text">Sala sulla spiaggia di San Giuliano, Corso Italia all&rsquo;altezza dell&rsquo;Abbazia. D&rsquo;estate: terrazza sul mare aperto.</p>
-        <div class="photo"><img src="img/sito/hero.webp" alt="Sala del ristorante Santamonica affacciata sul mare"></div>
+        <p class="card-kicker">Dove siamo &amp; contatti</p>
+        <h3 class="card-title" style="margin-top:0.8rem;">Lungomare Lombardo 27, <em>Genova</em></h3>
+        <div class="card-text">
+          <a href="tel:+390105533155">+39 010 553 31 55</a><br>
+          <a href="mailto:info@santamonicagenova.it">info@santamonicagenova.it</a><br><br>
+          Si prega di segnalare eventuali allergie o intolleranze al momento della prenotazione.<br><br>
+          &#128062; Accettiamo animali di tutte le taglie.
+        </div>
         <div class="btn-row">
-          <a href="https://www.google.com/maps/search/?api=1&query=Santamonica+Lungomare+Lombardo+27+Genova" target="_blank" rel="noreferrer" class="btn-pill outline">Apri in Maps</a>
           <a href="/dove-siamo.html" target="_blank" rel="noopener noreferrer" class="btn-pill solid-dark">Dettagli completi e indicazioni stradali</a>
         </div>
       </div>

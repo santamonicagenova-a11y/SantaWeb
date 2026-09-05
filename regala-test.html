@@ -696,7 +696,7 @@
       document.getElementById('btn-buy-label').textContent = label;
     }
 
-    function selectVoucher(key) {
+    function selectVoucher(key, skipScroll) {
       selected = byKey(key);
       viniChecked = false;
       document.querySelectorAll('.vh-row').forEach(function(r) { r.classList.toggle('selected', r.dataset.key === key); });
@@ -705,7 +705,9 @@
       document.getElementById('vh-consegna-error').style.display = 'none';
       document.getElementById('vh-eccedenza-error').style.display = 'none';
       updateCard();
-      document.getElementById('vh-card').scrollIntoView({ behavior: 'smooth', block: window.innerWidth < 860 ? 'start' : 'nearest' });
+      if (!skipScroll) {
+        document.getElementById('vh-card').scrollIntoView({ behavior: 'smooth', block: window.innerWidth < 860 ? 'start' : 'nearest' });
+      }
     }
 
     document.getElementById('vh-vini-check').addEventListener('change', function(e) {
@@ -724,7 +726,7 @@
 
     // preseleziona la degustazione 7 portate (già "featured" sulla pagina live), così la
     // card di riepilogo non è mai vuota — l'utente può comunque cambiare scelta subito.
-    selectVoucher('deg7');
+    selectVoucher('deg7', true);
 
     // Banner "pagamento annullato" — identico a regala.html
     if (/(^|[?&])pagamento=annullato(&|$)/.test(window.location.search)) {

@@ -733,7 +733,7 @@
       document.getElementById('btn-buy-label').textContent = label;
     }
 
-    function selectVoucher(key) {
+    function selectVoucher(key, skipScroll) {
       selected = byKey(key);
       viniChecked = false;
       document.querySelectorAll('.vh-row').forEach(function(r) { r.classList.toggle('selected', r.dataset.key === key); });
@@ -742,7 +742,9 @@
       document.getElementById('vh-consegna-error').style.display = 'none';
       document.getElementById('vh-eccedenza-error').style.display = 'none';
       updateCard();
-      document.getElementById('vh-card').scrollIntoView({ behavior: 'smooth', block: window.innerWidth < 860 ? 'start' : 'nearest' });
+      if (!skipScroll) {
+        document.getElementById('vh-card').scrollIntoView({ behavior: 'smooth', block: window.innerWidth < 860 ? 'start' : 'nearest' });
+      }
     }
 
     document.getElementById('vh-vini-check').addEventListener('change', function(e) {
@@ -761,7 +763,9 @@
 
     // preseleziona la degustazione 7 portate (già "featured" nella versione precedente), così
     // la card di riepilogo non è mai vuota — l'utente può comunque cambiare scelta subito.
-    selectVoucher('deg7');
+    // skipScroll=true: altrimenti la pagina si apriva già scrollata sulla card invece di
+    // mostrare l'inizio della pagina.
+    selectVoucher('deg7', true);
 
     // Banner "pagamento annullato" — redirect di ritorno da Stripe Checkout se l'utente
     // annulla prima di pagare. Nessun dato è andato perso: i campi restano compilati.

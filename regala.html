@@ -1,25 +1,45 @@
 <!DOCTYPE html>
 <!--
   regala.html
-  Versione: v 2026.09.05.01
-  Cambio v.07.21.02 → v.09.05.01 (richiesta Andrea, 5/9): prezzo del voucher Degustazione
-  sei portate ricalcolato a 85 €/persona → 170 € per due (era 180 €), abbinamento vini
-  invariato a +120 € → 290 € totali (era 300 €). Aggiornato anche in voucher-config.json
-  (fonte unica), voucher-termini.html §3.A e menu-admin.html (VR_TIPO_LABELS, etichetta
-  admin). NOTA IMPORTANTE: il prezzo Stripe effettivamente addebitato è ricalcolato
-  lato server dall'Edge Function create-voucher-checkout (fuori da questo repository) —
-  se anche lì il prezzo del tipo "deg6" è hardcoded, va aggiornato separatamente prima
-  di considerare il nuovo prezzo davvero in vigore, altrimenti il cliente pagherebbe
-  ancora 180 € nonostante il sito mostri 170 €. GATE: correzione di un prezzo pubblico
-  reale → P1+P2 dovute, P3 non necessaria per un aggiornamento di solo valore numerico
-  (nessun nuovo obbligo legale, wording invariato).
-  Pagina: Voucher regalo Santamonica — consegna elettronica ORA COMPLETAMENTE AUTOMATICA
+  Versione: v 2026.09.05.02
+  Pagina: Voucher regalo Santamonica — consegna elettronica COMPLETAMENTE AUTOMATICA
           (Stripe Checkout mode='payment' → PDF+mail automatici, nessun intervento admin);
           il ritiro fisico resta sul flusso manuale via mail (richiedi-voucher).
+  Lingua: it (IT only, dec. F0.10 C1)
+
+  Cambio v.09.05.01 → v.09.05.02 (redesign completo, richiesto da Andrea: "voglio semplificare
+  la pagina dei voucher", ispirato a un mockup fornito): la vecchia pagina (griglie di card,
+  descrizioni estese, "Come funziona" a 4 step separato dal modulo dati — vedi changelog
+  storico sotto per l'evoluzione) è sostituita da un layout a 2 colonne — lista voucher
+  selezionabile a sinistra, card di riepilogo + modulo compatto a destra — con descrizioni
+  ridotte a un one-liner per voce ("spiegazioni più concise e semplici, più immediate
+  visivamente"). Costruita e validata su pagina di prova separata (regala-test.html, branch
+  claude/regala-voucher-semplificato) prima del merge, con verifica esplicita che nessuna
+  funzionalità della versione precedente andasse persa (richiesta esplicita di Andrea, regola
+  ormai standard per ogni merge su questo sito): confermate presenti e testate — abbinamento
+  vini (deg6/deg7), scelta consegna fisico/elettronico (obbligatoria), scelta di chi paga
+  l'eventuale eccedenza sul buono libero (obbligatoria), honeypot anti-spam, checkbox termini
+  (obbligatoria) e newsletter (opzionale), redirect Stripe Checkout per la consegna elettronica,
+  banner di pagamento annullato, lettura prezzi buono libero da /voucher-config.json, entrambi
+  gli endpoint Supabase (richiedi-voucher / create-voucher-checkout, stesso payload di prima),
+  script cookie consent (iframemanager + cookieconsent + config) e pulsante "Preferenze cookie"
+  in footer, meta description/og:*. Pulsante principale portato a border-radius 4px (coerente
+  con la convenzione già adottata sul resto del sito in questa stessa sessione, non più il
+  999px/pillola della bozza iniziale). "Come funziona" (4 step numerati) è stato condensato in
+  3 righe puntate sotto il paragrafo introduttivo — scelta esplicita di Andrea di privilegiare
+  sintesi visiva; il testo completo resta comunque disponibile nella cronologia del file.
+  Offerta/prezzi INVARIATI rispetto a v.09.05.01 (già aggiornati lo stesso giorno: degustazione
+  sei portate 85€/persona = 170€, era 180€; vini +120€ = 290€, era 300€).
+  GATE: redesign di pagina pubblica con pagamento reale (Stripe) → P1+P2 eseguite in sessione
+  (verifica funzionalità 1:1 col precedente, test locale del flusso completo su ogni tipologia
+  di voucher, desktop e mobile). P3 (Revisione Oppositiva, 3 vendor) NON ancora fatta = debito
+  dichiarato esplicitamente da chiudere prima del sign-off finale — stesso pattern già in uso
+  sul resto del pacchetto voucher (vedi debito storico sotto).
+
+  ═══ CHANGELOG STORICO (v.05.20.01 → v.07.21.02, pre-redesign) ═══
   Fase progetto: Sito — automazione richiesta→consegna voucher (2026-07-14) → acquisto online
           automatico (2026-07-20, richiesto da Andrea: "cliente seleziona paga e riceve pdf in
           autonomia, no mail che mi arriva per generare voucher")
-  Lingua: it (IT only, dec. F0.10 C1)
   Cambi v.07.21.01 → v.07.21.02 (allineamento testo validità/uso, richiesta esplicita Andrea, stesso
   wording da propagare in tutto il sistema voucher — vedi anche index.html/translations.json/
   voucher-termini.html/PDF/menu-admin.html):
@@ -29,169 +49,29 @@
       → "Utilizzabile tutti i giorni, salvo disponibilità, a pranzo o a cena, escluso Sabato,
       Domenica e festivi" (stesso significato, wording positivo richiesto da Andrea, coerente con
       voucher-termini.html §11 già in vigore dal 10/6).
-    - GATE: delta fattuale che recepisce una policy già in vigore su voucher-termini.html (§11
-      escludeva già weekend/festivi) → P1+P2, P3 non riaperta (stesso precedente v.07.14.01).
   Cambi v.07.20.05 → v.07.21.01 (su richiesta Andrea: "invece di avere un pulsante 'richiedi
   questo buono' per ogni tipologia metti solo 1 pulsante di richiesta dopo l'anagrafica del
-  cliente"):
-    - Consolidati i 5 pulsanti "Richiedi questo buono" (uno per scheda: deg6, deg7, libero
-      100/150/200) in UN pulsante condiviso, spostato dentro "I tuoi dati" subito dopo la
-      checkbox newsletter — quindi dopo l'anagrafica, come richiesto.
-    - Nuovo meccanismo di selezione: scegliere "Come lo ricevi?" (consegna) o l'abbinamento vini
-      o "chi paga la differenza" DENTRO una scheda la seleziona automaticamente come "il buono
-      che stai richiedendo" — bordo evidenziato + badge "✓ Selezionato" (.voucher-card.selected).
-      Scegliere gli stessi controlli in un'altra scheda sposta la selezione lì (un solo buono
-      alla volta, coerente con "un solo pulsante" = "una sola richiesta per volta").
-    - Il pulsante condiviso legge tipo/vini/consegna/eccedenza dalla scheda selezionata al
-      momento del click (non richiede una seconda conferma): se nessuna scheda è stata toccata,
-      mostra un avviso e riporta lo sguardo alle schede in alto; se manca consegna o eccedenza
-      sulla scheda scelta, mostra l'avviso già esistente in quella scheda (stessa UX di prima).
-      Etichetta dinamica invariata nel comportamento: "Paga e ricevi subito" per la consegna
-      elettronica, "Richiedi questo buono" per il ritiro fisico o nessuna scelta ancora fatta.
-    - Nessun cambiamento nella validazione lato server (richiedi-voucher/create-voucher-checkout
-      invariate): stesso payload di prima, solo l'interfaccia di scelta è cambiata.
-    - GATE: solo struttura/UX (consolidamento CTA), nessun contenuto pubblico nuovo → non
-      innesca una nuova P3, il debito complessivo della pagina resta quello già dichiarato sotto.
-  Cambi v.07.20.04 → v.07.20.05 (su richiesta Andrea: "aggiungere anche il check box x la
-  newsletter come quando si richiede prenotazione?"):
-    - Nuova checkbox condivisa "Acconsento a ricevere comunicazioni sul ristorante..." nel box
-      "I tuoi dati" (id="ct-marketing"), stessa formulazione della checkbox marketing del form
-      prenotazioni in index.html. Opzionale, sotto la checkbox termini.
-    - marketing_consent nel payload di ENTRAMBI gli endpoint (create-voucher-checkout per la
-      consegna elettronica, richiedi-voucher per il ritiro fisico).
-    - Backend coordinato in pari data: entrambe le Edge Function (SafeTable) ora salvano
-      marketing_consent/marketing_consent_at su voucher_richieste e, se true, avviano lo stesso
-      double opt-in Brevo già in uso per le prenotazioni (submit-reservation v15) — lista/template
-      Brevo condivisi, redirect su newsletter-confermata.html. Migrazione DB
-      voucher_richieste_marketing_consent (3 colonne nuove) applicata.
-  Cambi v.07.20.03 → v.07.20.04:
-    - Rimosso il sottotitolo sotto "I nostri menù degustazione, in regalo" ("Il percorso che lo
-      chef Nicolò Lazzaroni costruisce con il pescato del giorno. Per due persone, allo stesso
-      tavolo.") su richiesta Andrea. Micro-fix di copy, nessun contenuto legale/fattuale toccato.
-  Cambi v.07.20.02 → v.07.20.03 (riordino sezioni, su richiesta Andrea):
-    - "Come funziona" spostata all'inizio pagina, subito dopo l'header/banner, prima di
-      "I nostri menù degustazione, in regalo" (era dopo le griglie voucher, prima di "Info").
-    - "I tuoi dati" (contatto-box) spostata dove prima stava "Come funziona": dopo la griglia
-      del buono libero, prima di "Informazioni essenziali" (era subito dopo l'header/banner).
-    - Nessuna modifica funzionale: gli ID (#contatto-box, #ct-*) sono invariati, la logica JS
-      (validazione, scrollIntoView) non dipende dalla posizione nel DOM.
-    - Testo step 1 di "Come funziona" adeguato (non parla più di "in cima alla pagina", visto
-      che il modulo dati ora è più in basso).
-  Cambi v.07.20.01 → v.07.20.02:
-    - Info-item "Prenotazione" aggiornata: +"soggetta a disponibilità" + nota mancato
-      arrivo/disdetta tardiva entro 24h → voucher considerato utilizzato. Coordinato con
-      voucher-termini.html §8 (stessa versione, stesso confronto con T&C di due ristoranti terzi).
-  Cambi v.07.19.01 → v.07.20.01:
-    - NUOVA checkbox condivisa "Ho letto e accetto i Termini e condizioni dei buoni regalo"
-      dentro "I tuoi dati" (obbligatoria per ENTRAMBI i flussi, fisico ed elettronico) — prima
-      l'accettazione dei Termini era solo un link nella pagina, mai un consenso esplicito
-      raccolto; ora è richiesta lato client (blocca l'invio) e validata anche lato server sui
-      due endpoint (richiedi-voucher e create-voucher-checkout, entrambi salvano
-      termini_accettati_at).
-    - Consegna elettronica: il click su "Richiedi questo buono" (ora "Paga e ricevi subito" per
-      questa scelta) NON manda più una richiesta da evadere a mano — POSTa a una nuova Edge
-      Function pubblica create-voucher-checkout, che crea una Stripe Checkout Session
-      (mode='payment', stesso account Stripe LIVE già usato da SafeTable per le cauzioni dal
-      26/4/2026) e reindirizza subito il cliente al pagamento. Dopo il pagamento, il webhook
-      Stripe emette il voucher, genera il PDF del cartoncino lato server e manda la mail col
-      buono pronto — tutto senza intervento del ristorante. Prezzo sempre ricalcolato lato
-      server dal tipo scelto (mai dal client).
-    - Consegna fisica (ritiro in ristorante, pagamento in loco): INVARIATA, resta sul vecchio
-      flusso "richiesta → mail M1/M1bis → Andrea genera ed evade da menu-admin.html" (decisione
-      Andrea: la teniamo come opzione separata, il pagamento in loco non passa da Stripe qui).
-    - Testi "Come funziona" e i due bottoni degustazione/liberi aggiornati per riflettere
-      l'immediatezza della via elettronica ("paghi e ricevi il PDF subito", non più "ti
-      rispondiamo entro 24 ore" che resta vero solo per il ritiro fisico).
-    - Nuova gestione di ?pagamento=annullato (redirect di ritorno da Stripe se l'utente annulla
-      il checkout): banner in cima alla pagina, nessun dato perso (i campi restano compilati).
-    - GATE: contenuto pubblico + pagamento Stripe reale → P1+P2 eseguite in sessione; P3
-      (Revisione Oppositiva) NON ancora fatta su questo frammento = debito dichiarato, si
-      aggiunge al debito P3 già aperto sul resto della pagina (blocco eccedenza del 19/7).
-  Cambi v.07.14.03 → v.07.19.01 (segnalato da Andrea: "manca l'opzione di chi paga la differenza"):
-    - Le 3 schede del buono libero (100/150/200 €) avevano solo la scelta "come lo ricevi" ma non
-      chiedevano MAI chi paga l'eventuale differenza se la spesa supera il valore del buono — la
-      scelta esisteva già come campo admin-only (voucher-generator/menu-admin, colonna
-      vouchers.eccedenza_a_carico) ma il cliente non poteva mai esprimerla, e Andrea doveva
-      indovinarla o chiederla a voce. Nuovo blocco ".eccedenza-toggle" (stessa UX del blocco
-      consegna: radiogroup obbligatorio, 2 opzioni "chi lo usa"/"io che lo regalo", avviso inline +
-      scroll se non selezionato) dentro ognuna delle 3 schede buono libero SOLO (non si applica ai
-      due voucher degustazione, esperienza a prezzo fisso). La scelta viaggia nel payload
-      (eccedenza_a_carico) fino a richiedi-voucher → voucher_richieste (nuova colonna, stesso CHECK
-      di vouchers.eccedenza_a_carico) → mostrata nella mail admin (M1bis) e nel form di emissione
-      precompilato (menu-admin.html), così l'admin vede la scelta del cliente invece di indovinarla.
-    - "Uso parziale" nel blocco Informazioni essenziali ora menziona esplicitamente questo caso.
-  Cambi v.07.14.02 → v.07.14.03 (su richiesta Andrea — automatizzare tutto il processo
-  richiesta→consegna, sul modello già usato per le prenotazioni):
-    - Il mailto "Richiedi questo buono" è sostituito da un INVIO REALE: nuova sezione condivisa
-      "I tuoi dati" (nome*, email*, telefono/destinatario/dedica opzionali + honeypot anti-spam) in
-      cima alla pagina; i 5 bottoni sono ora <button> che POSTano a una nuova Edge Function pubblica
-      richiedi-voucher (azione 'submit') — non aprono più il client di posta del visitatore.
-    - richiedi-voucher fa: INSERT in una nuova tabella voucher_richieste (Supabase progetto SafeTable,
-      RLS on senza policy anon, accesso solo via funzione) + mail M1 al cliente ("richiesta ricevuta")
-      + mail M1bis a info@santamonicagenova.it con i dati e un link diretto al pannello
-      menu-admin.html?richiesta=ID già precompilato per generare il voucher.
-    - Nuova azione 'complete' (stesso secret VOUCHER_ADMIN_SECRET): quando Andrea emette il voucher dal
-      pannello collegandolo alla richiesta, il cliente riceve in automatico la mail "il tuo buono è
-      pronto" (codice + scadenza + istruzioni ritiro/invio). Il PDF per la consegna elettronica resta
-      da inviare a mano con voucher-generator.html — l'automazione qui è la conferma, non l'allegato.
-    - Il pulsante "Regala" in index.html è TORNATO al mailto generico su decisione esplicita di Andrea
-      (v 2026.07.14.02 di index.html): il CTA home resta semplice, il form completo vive su questa
-      pagina. Gate: nuovo endpoint pubblico + nuova tabella + comunicazioni automatiche reali al
-      cliente → P1+P2 eseguite; P3 (Revisione Oppositiva) NON ancora fatta = debito dichiarato prima
-      del go-live definitivo (pattern identico al debito aperto per submit-reservation il 4/7).
-  Cambi v.07.14.01 → v.07.14.02:
-    - La modalità di consegna (ritiro in ristorante / via email) era finora un'istruzione a testo libero
-      dentro la mail precompilata ("Indica se preferisci..."). Ora è una scelta esplicita OBBLIGATORIA
-      dentro ogni scheda voucher (nuovo blocco radio ".consegna-toggle", 2 opzioni: fisico/elettronico,
-      stessi termini di voucher-termini.html §4 e voucher-config).
-    - Il pulsante "Richiedi questo buono" resta cliccabile ma un click SENZA selezione non apre la mail:
-      compare un avviso inline ("Scegli come vuoi ricevere il buono...") e il focus va al blocco scelta.
-      Una volta scelta la modalità, il corpo della mail la riporta già scritta (non più da compilare).
-    - "Come funziona" step 2 riformulato di conseguenza. Applicato a tutte e 5 le schede (2 degustazione
-      + 3 buono libero). Gate: micro-fix funzionale che rende esplicito un passaggio già previsto/deciso
-      (dec. .06.10.03 "due modalità di consegna") — P1+P2, nessuna nuova P3 (nessun contenuto legale/fattuale
-      nuovo, stessa dicotomia fisico/elettronico già in voucher-termini.html).
-  Cambi v.06.10.04 → v.07.14.01:
-    - Lead riscritto su richiesta Andrea (micro-fix di copy, tono invariato): tolto "sederlo... sul Lungomare"
-      e "cucina di pesce" → "invitarlo alla nostra tavola" e "la nostra cucina sul mare".
-    - Descrizioni dei due Voucher Esperienza differenziate su richiesta Andrea: sei portate = menù fisso,
-      link a /menu.html; sette portate = "a mano libera", composto dallo chef sul pescato del giorno.
-      Coordinato con voucher-termini.html §3 (stessa versione).
-    - Rimosso il blocco ".request-note" (icona + testo dopo i buoni liberi): su segnalazione Andrea era
-      ridondante coi punti 2-3 di "Come funziona" subito sotto, e il layout flex spezzava male il testo.
-      Il numero di assistenza 010 5533155 spostato in fondo a "Come funziona". CSS .request-note rimosso.
-    - "Condizioni d'uso" (ex .terms-link-block, box separato sotto la griglia) spostato DENTRO la griglia
-      "Informazioni essenziali", subito dopo "Prenotazione", stessa tipografia delle altre card ma con
-      sfondo sabbia + bordo oro (.info-item-terms) per segnalare che è diverso dalle altre voci.
-  Cambi v.05.20.01 → v.06.10.01 → v.06.10.02:
-    - Offerta ristrutturata: 2 Voucher Esperienza sui due menù degustazione (6/7 portate, per DUE,
-      bevande escluse) con checkbox opzionale "abbinamento vini" + 3 tagli "buono libero" (100/150/200 €).
-    - Validità 6 → 12 mesi.
-    - .02: CTA cambiate da Stripe Payment Links (placeholder, non operativi) a "Richiedi questo buono"
-      via email precompilata a info@ → flusso manuale assistito (richiesta → modalità di pagamento → PDF).
-      Rimosso il noindex di pagina (decisione Andrea: pagina indicizzabile). Stripe si riaggancia poi.
-    - .03: due modalità di consegna — (a) pagamento in loco + ritiro voucher FISICO stampato in confezione;
-      (b) pagamento elettronico + PDF via email all'ACQUIRENTE (mai al destinatario), che lo dona.
-    - .04: Cumulabilità → +"non utilizzabile nei fine settimana e nelle festività"; i 3 valori dei buoni liberi
-      sono letti a runtime da /voucher-config.json (fallback ai valori in pagina). Coordinato con menu-admin.
-  GATE: contenuto pubblico → P1+P2 + P3 (3 vendor, 10/6) eseguite sui testi/Termini. IVA (ultimo bloccante)
-        confermata dal commercialista il 14/7, recepita in voucher-termini.html v 2026.07.14.01. Lead
-        riscritto il 14/7 = micro-fix di copy (P1+P2, no P3: tono/contenuto invariati). Blocco eccedenza
-        (19/7) = P1+P2 eseguite (nessun nuovo obbligo legale, il concetto "eccedenza a carico di" era
-        già nei Termini §10 dal 10/6 come principio, qui diventa scelta esplicita del cliente anziché
-        default admin); P3 (Revisione Oppositiva) NON ancora fatta su questo frammento = debito
-        dichiarato. Checkout automatico + checkbox termini (20/7.01) = P1+P2 eseguite, P3 NON ancora
-        fatta = stesso debito. Info-item Prenotazione (20/7.02, clausola no-show/disdetta tardiva) =
-        P1+P2 eseguite, P3 NON ancora fatta = si aggiunge allo stesso debito — da chiudere in un'unica
-        Revisione Oppositiva prima del sign-off finale di tutta la pagina e di voucher-termini.html.
-        Riordino sezioni (20/7.03) = solo struttura/UX, nessun contenuto nuovo → non innesca P3, debito
-        invariato rispetto a sopra. Rimozione sottotitolo (20/7.04) = micro-fix di copy, non
-        innesca P3. Checkbox newsletter + sync Brevo (20/7.05) = comunicazione automatica reale a
-        un nuovo pubblico (acquirenti voucher, non solo prenotanti) → P1+P2 eseguite (riuso 1:1 del
-        pattern già gated per submit-reservation v15), P3 NON ancora fatta = si aggiunge allo
-        stesso debito complessivo della pagina. Consolidamento pulsanti in 1 CTA condiviso
-        (21/7.01) = solo struttura/UX (meccanismo di selezione scheda + spostamento del pulsante),
-        nessun contenuto pubblico nuovo → non innesca P3, debito invariato rispetto a sopra.
+  cliente"): consolidati i 5 pulsanti in UN pulsante condiviso letto dalla scheda selezionata.
+  Cambi v.07.20.04 → v.07.20.05: nuova checkbox newsletter (id="ct-marketing"), doppio opt-in
+  Brevo condiviso col flusso prenotazioni.
+  Cambi v.07.19.01 → v.07.20.04: riordino sezioni; scelta "chi paga l'eccedenza" sul buono libero
+  (blocco ".eccedenza-toggle", payload eccedenza_a_carico).
+  Cambi v.07.14.03 → v.07.19.01: scelta consegna fisico/elettronico esplicita e obbligatoria per
+  scheda (".consegna-toggle").
+  Cambi v.07.14.02 → v.07.14.03: sostituito il mailto con invio reale (Edge Function pubblica
+  richiedi-voucher, tabella voucher_richieste, mail M1/M1bis, pannello admin precompilato).
+  Cambio v.07.14.01 → v.07.14.02: consegna elettronica → Stripe Checkout automatico
+  (create-voucher-checkout), PDF+mail via webhook, prezzo sempre ricalcolato lato server.
+  Cambi v.06.10.04 → v.07.14.01: lead riscritto; differenziazione 6/7 portate; rimosso
+  ".request-note"; "Condizioni d'uso" spostata dentro "Informazioni essenziali".
+  Cambi v.05.20.01 → v.06.10.02: offerta ristrutturata (2 Voucher Esperienza + 3 buono libero),
+  validità 6→12 mesi, due modalità di consegna (fisico/elettronico).
+  GATE storico: contenuto pubblico → P1+P2 + P3 (3 vendor, 10/6) eseguite sui testi/Termini. IVA
+        confermata dal commercialista il 14/7 (voucher-termini.html v.07.14.01). Checkout
+        automatico + checkbox termini (20/7.01), blocco eccedenza (19/7), clausola no-show
+        (20/7.02): P1+P2 eseguite, P3 NON ancora fatta su questi frammenti = debito accumulato,
+        MAI chiuso con un'unica Revisione Oppositiva finale — si somma al debito P3 dichiarato
+        sopra per il redesign 09/05.
 -->
 <html lang="it">
 <head>
@@ -210,11 +90,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* ===== Palette progetto Santamonica (legal/landing pages) =====
-       v 2026.09.04 — tema scuro coerente con index.html (branch restyling):
-       sfondo marrone scuro, testo chiaro, accento azzurro. --sand era usato
-       solo come sfondo di pannelli chiari → ridefinito allo stesso bruno di
-       --paper (stesso pattern applicato in index.html per --sand/--warm-white). */
     :root {
       --ink: #faf8f4;
       --sand: #241812;
@@ -225,6 +100,9 @@
       --gold: #b89d6a;
       --rule: rgba(245,240,232,0.14);
       --muted: rgba(245,240,232,0.62);
+      --card-bg: #ddd4c4;
+      --card-ink: #241812;
+      --card-muted: rgba(36,24,18,0.65);
     }
 
     * { box-sizing: border-box; }
@@ -234,608 +112,345 @@
       margin: 0;
       font-family: 'Inter', system-ui, sans-serif;
       font-size: 16px;
-      line-height: 1.65;
+      line-height: 1.6;
       color: var(--ink);
       background: var(--paper);
       -webkit-font-smoothing: antialiased;
     }
 
-    .container {
-      max-width: 920px;
-      margin: 0 auto;
-      padding: 48px 24px 80px;
+    .container { max-width: 1180px; margin: 0 auto; padding: 0 24px 80px; }
+
+    .payment-banner {
+      display: none;
+      max-width: 1180px;
+      margin: 24px auto 0;
+      padding: 14px 20px;
+      background: var(--surface);
+      border: 1px solid var(--gold);
+      border-radius: 6px;
+      font-size: 14px;
+      text-align: center;
     }
 
-    /* ===== Header ===== */
-    header.page-header {
-      text-align: center;
-      margin-bottom: 48px;
+    /* ===== HERO / SELETTORE ===== */
+    .voucher-hero {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      grid-template-areas:
+        "header header"
+        "list   card";
+      column-gap: 3.5rem;
+      row-gap: 1.75rem;
+      align-items: start;
+      padding: 4.5rem 0 2rem;
     }
+    .vh-header { grid-area: header; }
+    .vh-list { grid-area: list; }
+    .vh-right { grid-area: card; }
 
     .eyebrow {
       font-size: 12px;
       letter-spacing: 0.22em;
       text-transform: uppercase;
       color: var(--terracotta);
-      font-weight: 600;
-      margin-bottom: 16px;
+      font-weight: 700;
+      margin: 0 0 18px;
     }
 
-    h1 {
+    .vh-header h1 {
       font-family: 'Cormorant Garamond', Georgia, serif;
       font-weight: 600;
-      font-size: clamp(36px, 6vw, 54px);
-      line-height: 1.1;
-      margin: 0 0 20px;
-      color: var(--ink);
+      font-size: clamp(34px, 4.2vw, 52px);
+      line-height: 1.08;
+      margin: 0 0 18px;
     }
 
-    h1 em {
-      font-style: italic;
-      color: var(--terracotta-dark);
-    }
+    .vh-header h1 em { font-style: italic; color: var(--terracotta); }
 
-    .lead {
-      font-size: 18px;
+    .vh-lead {
+      font-size: 15.5px;
       color: var(--muted);
-      max-width: 640px;
-      margin: 0 auto;
-      line-height: 1.6;
+      max-width: none;
+      margin: 0 0 12px;
     }
 
-    /* ===== Section heading (categoria voucher) ===== */
-    .cat-head {
-      text-align: center;
-      margin: 8px 0 28px;
-    }
-
-    .cat-head h2 {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 32px;
-      font-weight: 600;
-      margin: 0 0 8px;
-      color: var(--ink);
-    }
-
-    .cat-head p {
-      margin: 0 auto;
-      max-width: 560px;
-      font-size: 15px;
+    .vh-steps {
+      font-size: 13px;
       color: var(--muted);
+      margin: 0 0 32px;
+      padding-left: 18px;
     }
+    .vh-steps li { margin-bottom: 4px; }
 
-    /* ===== Voucher cards ===== */
-    .voucher-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 24px;
-      margin-bottom: 28px;
-    }
+    /* ===== Lista voucher (sinistra) ===== */
+    .vh-list { display: flex; flex-direction: column; gap: 0.7rem; }
 
-    .voucher-grid.libero {
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    }
-
-    .voucher-card {
+    .vh-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
       background: var(--surface);
       border: 1px solid var(--rule);
-      border-radius: 8px;
-      padding: 32px 28px;
-      text-align: center;
-      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-    }
-
-    .voucher-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
-      border-color: var(--terracotta);
-    }
-
-    .voucher-card.featured {
-      border-color: var(--gold);
-      background: linear-gradient(180deg, #33221A 0%, #3A281E 100%);
-    }
-
-    /* ===== Selezione del buono (un solo pulsante condiviso in fondo alla pagina) ===== */
-    .voucher-card.selected {
-      border-color: var(--terracotta-dark);
-      box-shadow: 0 0 0 3px rgba(74, 163, 209, 0.35);
-    }
-
-    .voucher-card.selected::after {
-      content: "✓ Selezionato";
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      background: var(--terracotta-dark);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      padding: 4px 10px;
-      border-radius: 20px;
-    }
-
-    .deg-portate {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 26px;
-      font-weight: 600;
-      color: var(--ink);
-      line-height: 1.1;
-      margin-bottom: 4px;
-    }
-
-    .deg-sub {
-      font-size: 12.5px;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--terracotta);
-      font-weight: 600;
-      margin-bottom: 16px;
-    }
-
-    .voucher-amount {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 52px;
-      font-weight: 700;
-      color: var(--ink);
-      line-height: 1;
-      margin-bottom: 6px;
-      letter-spacing: -0.02em;
-    }
-
-    .voucher-amount .currency {
-      font-size: 0.45em;
-      vertical-align: super;
-      color: var(--terracotta);
-      margin-left: 4px;
-      font-weight: 500;
-    }
-
-    .price-note {
-      font-size: 12.5px;
-      color: var(--muted);
-      margin-bottom: 18px;
-      letter-spacing: 0.02em;
-    }
-
-    .voucher-desc {
-      font-size: 14px;
-      color: var(--muted);
-      margin-bottom: 20px;
-      line-height: 1.55;
-      flex-grow: 1;
-    }
-
-    /* ===== Checkbox abbinamento vini ===== */
-    .vini-toggle {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
+      border-radius: 10px;
+      cursor: pointer;
       text-align: left;
       width: 100%;
-      padding: 12px 14px;
-      margin-bottom: 18px;
-      background: var(--sand);
-      border-radius: 6px;
-      font-size: 13px;
-      color: var(--ink);
-      cursor: pointer;
-      line-height: 1.4;
+      transition: background .2s ease, border-color .2s ease;
+    }
+    .vh-row:hover { border-color: var(--terracotta); }
+    .vh-row.selected {
+      background: var(--card-bg);
+      color: var(--card-ink);
+      border-color: var(--card-bg);
     }
 
-    .vini-toggle input {
-      margin-top: 2px;
-      width: 16px;
-      height: 16px;
-      accent-color: var(--terracotta-dark);
+    .vh-row-icon {
       flex-shrink: 0;
-      cursor: pointer;
-    }
-
-    .vini-toggle .vini-supp {
-      color: var(--terracotta-dark);
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    /* ===== Scelta consegna (obbligatoria) ===== */
-    .consegna-toggle {
-      width: 100%;
-      text-align: left;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-      background: var(--sand);
-      border-radius: 6px;
-      font-size: 13px;
-      color: var(--ink);
-    }
-
-    .consegna-toggle .consegna-title {
-      display: block;
-      font-weight: 600;
-      font-size: 12.5px;
-      margin-bottom: 8px;
-    }
-
-    .consegna-toggle .req-star {
-      color: var(--terracotta-dark);
-    }
-
-    .consegna-option {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
       display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      cursor: pointer;
-      line-height: 1.4;
-      margin-bottom: 6px;
-    }
-
-    .consegna-option:last-child { margin-bottom: 0; }
-
-    .consegna-option input {
-      margin-top: 2px;
-      width: 15px;
-      height: 15px;
-      accent-color: var(--terracotta-dark);
-      flex-shrink: 0;
-      cursor: pointer;
-    }
-
-    .consegna-error, .eccedenza-error {
-      display: none;
-      color: var(--terracotta-dark);
-      font-size: 12px;
-      font-weight: 600;
-      margin: -6px 0 14px;
-      text-align: left;
-      width: 100%;
-    }
-
-    /* ===== Scelta eccedenza (solo buono libero, obbligatoria) ===== */
-    .eccedenza-toggle {
-      width: 100%;
-      text-align: left;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-      background: var(--sand);
-      border-radius: 6px;
-      font-size: 13px;
-      color: var(--ink);
-    }
-
-    .eccedenza-toggle .consegna-title {
-      display: block;
-      font-weight: 600;
-      font-size: 12.5px;
-      margin-bottom: 8px;
-    }
-
-    .btn-buy {
-      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 14px 20px;
-      background: var(--surface);
-      color: white;
-      text-decoration: none;
-      border-radius: 4px;
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      transition: background 0.2s ease;
+      background: rgba(245,240,232,0.08);
+      color: var(--terracotta);
     }
+    .vh-row.selected .vh-row-icon { background: var(--terracotta); color: #fff; }
+    .vh-row-icon svg { width: 17px; height: 17px; }
 
-    .btn-buy:hover { background: var(--terracotta-dark); }
-    .btn-buy.featured { background: var(--terracotta-dark); }
-    .btn-buy.featured:hover { background: var(--terracotta); }
-
-    .btn-buy svg { width: 14px; height: 14px; }
-
-    button.btn-buy {
-      border: none;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-    }
-
-    button.btn-buy:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .richiesta-status {
-      margin-top: 10px;
-      font-size: 13px;
-      text-align: center;
-      min-height: 1px;
-    }
-
-    .richiesta-status.ok { color: #2c6e49; font-weight: 600; }
-    .richiesta-status.err { color: var(--terracotta-dark); font-weight: 600; }
-
-    /* ===== "I tuoi dati" — box condivisa di contatto ===== */
-    .contatto-box {
-      background: var(--sand);
-      border-radius: 8px;
-      padding: 32px 28px;
-      margin: 0 0 40px;
-    }
-
-    .contatto-box h2 {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 26px;
-      margin: 0 0 6px;
-      color: var(--ink);
-    }
-
-    .contatto-intro {
-      margin: 0 0 20px;
-      font-size: 14px;
+    .vh-row-body { flex: 1; min-width: 0; }
+    .vh-row-title { font-weight: 600; font-size: 14.5px; margin: 0 0 2px; color: var(--ink); }
+    .vh-row.selected .vh-row-title { color: var(--card-ink); }
+    .vh-row-sub {
+      font-size: 12.5px;
       color: var(--muted);
+      margin: 0;
+    }
+    .vh-row.selected .vh-row-sub { color: var(--card-muted); }
+
+    .vh-row-price {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 22px;
+      font-weight: 700;
+      flex-shrink: 0;
+      color: var(--terracotta);
+    }
+    .vh-row.selected .vh-row-price { color: var(--terracotta-dark); }
+
+    /* ===== Card riepilogo + modulo (destra) ===== */
+    .vh-card {
+      background: var(--card-bg);
+      color: var(--card-ink);
+      border-radius: 20px;
+      padding: 2.25rem 2rem;
+      position: sticky;
+      top: 24px;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.28);
     }
 
-    .contatto-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-    }
-
-    .contatto-lbl {
-      display: block;
-      font-size: 12px;
+    .vh-card h2 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 24px;
       font-weight: 600;
+      margin: 0 0 4px;
+    }
+
+    .vh-card-sub { font-size: 13.5px; color: var(--card-muted); margin: 0 0 20px; }
+
+    .vh-option-block {
+      margin-bottom: 14px;
+    }
+    .vh-option-label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--terracotta-dark);
+      margin-bottom: 8px;
+    }
+    .vh-pill-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .vh-pill {
+      flex: 1;
+      min-width: 130px;
+      display: block;
+      position: relative;
+    }
+    .vh-pill input { position: absolute; opacity: 0; pointer-events: none; }
+    .vh-pill span {
+      display: block;
+      text-align: center;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 10px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(36,24,18,0.18);
+      background: rgba(255,255,255,0.5);
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease;
+    }
+    .vh-pill input:checked + span {
+      background: var(--terracotta-dark);
+      border-color: var(--terracotta-dark);
+      color: #fff;
+    }
+
+    .vh-vini-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+    .vh-vini-check input { margin-top: 3px; accent-color: var(--terracotta-dark); }
+    .vh-vini-supp { color: var(--terracotta-dark); font-weight: 700; white-space: nowrap; }
+
+    .vh-opt-error {
+      display: none;
+      color: #a13c1c;
+      font-size: 12px;
+      font-weight: 700;
+      margin: -8px 0 12px;
+    }
+
+    .vh-field { margin-bottom: 12px; }
+    .vh-field label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 700;
       letter-spacing: 0.04em;
       text-transform: uppercase;
       color: var(--terracotta-dark);
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
-
-    .contatto-input {
+    .vh-field input, .vh-field textarea {
       width: 100%;
       padding: 10px 12px;
-      border: 1px solid var(--rule);
-      border-radius: 4px;
+      border: 1px solid rgba(36,24,18,0.18);
+      border-radius: 8px;
       font-family: 'Inter', sans-serif;
       font-size: 14px;
-      color: var(--ink);
-      background: var(--surface);
-      box-sizing: border-box;
+      color: var(--card-ink);
+      background: #fff;
     }
+    .vh-field input:focus, .vh-field textarea:focus { outline: none; border-color: var(--terracotta-dark); }
+    .vh-fields-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-    .contatto-input:focus {
-      outline: none;
-      border-color: var(--terracotta);
+    .vh-more { margin: 4px 0 14px; }
+    .vh-more summary {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--terracotta-dark);
+      cursor: pointer;
+      list-style: none;
     }
+    .vh-more summary::-webkit-details-marker { display: none; }
+    .vh-more summary::before { content: '+ '; }
+    .vh-more[open] summary::before { content: '– '; }
+    .vh-more .vh-field { margin-top: 10px; }
+
+    .hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+    .vh-consent {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--card-muted);
+      cursor: pointer;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .vh-consent input { margin-top: 3px; accent-color: var(--terracotta-dark); flex-shrink: 0; }
+    .vh-consent a { color: var(--terracotta-dark); font-weight: 700; text-decoration: underline; }
 
     .contatto-error {
       display: none;
-      margin-top: 14px;
-      color: var(--terracotta-dark);
-      font-size: 13px;
-      font-weight: 600;
+      margin: 10px 0;
+      color: #a13c1c;
+      font-size: 12.5px;
+      font-weight: 700;
     }
 
-    .hp-field {
-      position: absolute;
-      left: -9999px;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-    }
-
-    /* ===== Checkbox termini (condivisa, obbligatoria per entrambi i flussi) ===== */
-    .termini-toggle {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      margin-top: 18px;
-      padding: 12px 14px;
-      background: var(--surface);
-      border: 1px solid var(--rule);
-      border-radius: 6px;
-      font-size: 13px;
-      color: var(--ink);
-      cursor: pointer;
-      line-height: 1.45;
-    }
-
-    .termini-toggle input {
-      margin-top: 2px;
-      width: 16px;
-      height: 16px;
-      accent-color: var(--terracotta-dark);
-      flex-shrink: 0;
-      cursor: pointer;
-    }
-
-    .termini-toggle a {
-      color: var(--terracotta-dark);
-      font-weight: 600;
-      text-decoration: underline;
-    }
-
-    /* ===== Banner pagamento annullato (redirect di ritorno da Stripe) ===== */
-    .payment-banner {
-      display: none;
-      max-width: 920px;
-      margin: 0 auto 24px;
-      padding: 14px 20px;
-      background: var(--sand);
-      border: 1px solid var(--gold);
-      border-radius: 6px;
-      font-size: 14px;
-      color: var(--ink);
-      text-align: center;
-    }
-
-    .cat-divider {
-      border: 0;
-      border-top: 1px solid var(--rule);
-      max-width: 120px;
-      margin: 56px auto 48px;
-    }
-
-    /* ===== How it works ===== */
-    section.how-it-works {
-      background: var(--sand);
-      border-radius: 8px;
-      padding: 40px 32px;
-      margin: 56px 0;
-    }
-
-    section.how-it-works h2 {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 28px;
-      margin: 0 0 24px;
-      text-align: center;
-      color: var(--ink);
-    }
-
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 24px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      counter-reset: step;
-    }
-
-    .steps li {
-      counter-increment: step;
-      position: relative;
-      padding-left: 0;
-    }
-
-    .steps li::before {
-      content: counter(step);
+    .btn-buy {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
+      gap: 8px;
+      width: 100%;
+      padding: 15px 20px;
+      margin-top: 14px;
       background: var(--terracotta);
-      color: white;
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 12px;
-    }
-
-    .steps li h3 {
+      color: #fff;
+      border: none;
+      border-radius: 4px;
       font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      margin: 0 0 6px;
-      color: var(--ink);
+      font-size: 14.5px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: background .2s ease;
     }
+    .btn-buy:hover { background: var(--terracotta-dark); }
+    .btn-buy:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    .steps li p {
-      margin: 0;
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.55;
-    }
+    .vh-fineprint { text-align: center; font-size: 11.5px; color: var(--card-muted); margin: 10px 0 0; }
 
-    /* ===== Info section ===== */
-    section.info {
-      margin-bottom: 56px;
-      padding: 0 8px;
-    }
+    .richiesta-status { margin-top: 10px; font-size: 13px; text-align: center; min-height: 1px; }
+    .richiesta-status.ok { color: #2c6e49; font-weight: 700; }
+    .richiesta-status.err { color: #a13c1c; font-weight: 700; }
 
+    /* ===== Info essenziali (condensata) ===== */
+    section.info { margin: 2rem 0 3rem; }
     section.info h2 {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 26px;
-      margin: 0 0 20px;
-      color: var(--ink);
+      font-size: 24px;
+      margin: 0 0 18px;
+      text-align: center;
     }
-
     .info-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 28px;
-      margin-bottom: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.1rem;
     }
-
+    .info-item {
+      background: var(--surface);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
     .info-item h3 {
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      color: var(--terracotta-dark);
-      margin: 0 0 8px;
+      color: var(--terracotta);
+      margin: 0 0 6px;
     }
+    .info-item p { margin: 0; font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+    .info-item a { color: var(--terracotta); font-weight: 600; }
 
-    .info-item p {
-      margin: 0;
-      font-size: 14.5px;
-      color: var(--ink);
-      line-height: 1.55;
-    }
-
-    .info-item-terms {
-      background: var(--sand);
-      border-left: 3px solid var(--gold);
-      border-radius: 0 4px 4px 0;
-      padding: 14px 18px;
-    }
-
-    .info-item-terms a {
-      color: var(--terracotta-dark);
-      font-weight: 600;
-      text-decoration: underline;
-    }
-
-    /* ===== Footer ===== */
     footer.page-footer {
-      margin-top: 64px;
-      padding-top: 32px;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
       border-top: 1px solid var(--rule);
       font-size: 13px;
       color: var(--muted);
     }
-
     footer.page-footer .footer-grid {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
       gap: 16px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
-
-    footer.page-footer .cross-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 18px;
-    }
-
-    footer.page-footer .cross-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    footer.page-footer .cross-links a:hover { color: var(--terracotta); }
-
-    .version-tag {
-      font-family: 'Inter', monospace;
-      font-size: 11px;
-      letter-spacing: 0.05em;
-      color: var(--gold);
-      font-variant-numeric: tabular-nums;
-    }
-
+    footer.page-footer .cross-links { display: flex; flex-wrap: wrap; gap: 14px; }
+    footer.page-footer a { color: var(--muted); text-decoration: none; }
+    footer.page-footer a:hover { color: var(--terracotta); }
+    .version-tag { font-family: 'Inter', monospace; font-size: 11px; letter-spacing: 0.05em; color: var(--gold); font-variant-numeric: tabular-nums; }
     .cc-manage {
       display: inline-flex;
       align-items: center;
@@ -850,316 +465,145 @@
       cursor: pointer;
       transition: background 0.2s ease, border-color 0.2s ease;
     }
+    .cc-manage:hover { background: var(--sand); border-color: var(--terracotta); }
 
-    .cc-manage:hover {
-      background: var(--sand);
-      border-color: var(--terracotta);
+    @media (max-width: 860px) {
+      .voucher-hero { grid-template-columns: 1fr; grid-template-areas: "header" "list" "card"; padding-top: 2.5rem; }
+      .vh-card { position: static; }
+      .vh-fields-2 { grid-template-columns: 1fr; }
     }
-
   </style>
 </head>
 <body>
 
+  <div class="payment-banner" id="payment-banner">Il pagamento è stato annullato: nessun addebito è stato effettuato. Puoi riprovare quando vuoi, i tuoi dati sono ancora qui sotto.</div>
+
   <div class="container">
 
-    <!-- ===== HEADER ===== -->
-    <header class="page-header">
-      <div class="eyebrow">Buoni regalo</div>
-      <h1>Regala <em>un'esperienza</em><br>al ristorante Santamonica</h1>
-      <p class="lead">
-        C'è un modo per dire a qualcuno che gli vuoi bene: invitarlo alla nostra tavola e lasciare che sia il mare a raccontare. Un buono regalo Santamonica è questo — la nostra cucina sul mare, da vivere con calma, quando preferisce. Scegli uno dei due menù degustazione per due persone, oppure un buono di valore libero da spendere come desidera.
-      </p>
-    </header>
+    <section class="voucher-hero">
+      <div class="vh-header">
+        <h1>Regala <em>un'esperienza</em><br>al ristorante Santamonica</h1>
+        <p class="vh-lead">C'è un modo per dire a qualcuno che gli vuoi bene: invitarlo alla nostra tavola e lasciare che sia il mare a raccontare. Un buono regalo Santamonica è questo — la nostra cucina sul mare, da vivere con calma, quando preferisce. Scegli uno dei due menù degustazione per due persone, oppure un buono di valore libero da spendere come desidera.</p>
+        <ul class="vh-steps">
+          <li>Scegli il buono qui sotto e come vuoi riceverlo</li>
+          <li>Via email: paghi online e ricevi subito il PDF. Ritiro in ristorante: ti rispondiamo entro 24 ore</li>
+          <li>Il destinatario prenota segnalando il codice del voucher</li>
+        </ul>
+      </div>
 
-    <!-- ===== Banner pagamento annullato (mostrato via JS se ?pagamento=annullato) ===== -->
-    <div class="payment-banner" id="payment-banner">Il pagamento è stato annullato: nessun addebito è stato effettuato. Puoi riprovare quando vuoi, i tuoi dati sono ancora qui sotto.</div>
+      <div class="vh-list" id="vh-list"><!-- righe generate da JS --></div>
 
-    <!-- ===== HOW IT WORKS ===== -->
-    <section class="how-it-works">
-      <h2>Come funziona</h2>
-      <ol class="steps">
-        <li>
-          <h3>Compila i tuoi dati</h3>
-          <p>Nome ed email nel modulo dei tuoi dati (lo trovi scorrendo la pagina). Poi scegli il regalo: un menù degustazione per due (con o senza abbinamento vini) oppure un buono di valore libero, e come preferisci riceverlo — ritiro in ristorante o via email.</p>
-        </li>
-        <li>
-          <h3>Paga o inviaci la richiesta</h3>
-          <p>Scegliendo "via email" paghi subito online, in sicurezza, e ricevi il PDF nello stesso momento. Scegliendo il ritiro in ristorante ci basta la richiesta: ti rispondiamo entro 24 ore con le modalità di pagamento in loco.</p>
-        </li>
-        <li>
-          <h3>Ritira o ricevi il buono</h3>
-          <p>Pagando online il PDF arriva subito via email, pronto da donare. Pagando in ristorante ritiri il voucher stampato in una confezione. In entrambi i casi con codice univoco e scadenza.</p>
-        </li>
-        <li>
-          <h3>Prenota e riscatta</h3>
-          <p>Il destinatario prenota segnalando il voucher e presenta il codice al tavolo.</p>
-        </li>
-      </ol>
-      <p style="text-align:center;font-size:13px;color:var(--muted);margin:24px 0 0;">Per assistenza: <a href="tel:+390105533155" style="color:var(--terracotta-dark);">010 5533155</a></p>
-    </section>
+      <div class="vh-right">
+        <div class="vh-card" id="vh-card">
+          <h2 id="vh-card-title">Buono · Santamonica</h2>
+          <p class="vh-card-sub" id="vh-card-sub"></p>
 
-    <!-- ===== CATEGORIA 1 · MENU DEGUSTAZIONE ===== -->
-    <div class="cat-head">
-      <h2>I nostri menù degustazione, in regalo</h2>
-    </div>
+          <div class="vh-option-block" id="vh-vini-block" style="display:none;">
+            <label class="vh-vini-check">
+              <input type="checkbox" id="vh-vini-check">
+              <span>Aggiungi l'abbinamento vini di Monica, due persone <span class="vh-vini-supp" id="vh-vini-supp"></span></span>
+            </label>
+          </div>
 
-    <section class="voucher-grid" aria-label="Voucher menù degustazione">
+          <div class="vh-option-block">
+            <span class="vh-option-label">Come lo ricevi? *</span>
+            <div class="vh-pill-row">
+              <label class="vh-pill">
+                <input type="radio" name="vh-consegna" id="vh-consegna-fisico" value="fisico">
+                <span>Ritiro in ristorante</span>
+              </label>
+              <label class="vh-pill">
+                <input type="radio" name="vh-consegna" id="vh-consegna-elettronico" value="elettronico">
+                <span>Via email</span>
+              </label>
+            </div>
+            <div class="vh-opt-error" id="vh-consegna-error">Scegli come vuoi ricevere il buono.</div>
+          </div>
 
-      <!-- DEGUSTAZIONE 6 PORTATE -->
-      <article class="voucher-card" data-card="deg6">
-        <div class="deg-portate">Menù Degustazione</div>
-        <div class="deg-sub">Sei portate · per due</div>
-        <div class="voucher-amount"><span class="eur-num" data-base="170" data-vini="290">170</span><span class="currency">€</span></div>
-        <p class="price-note">per due persone · bevande escluse</p>
-        <p class="voucher-desc">Il menù degustazione fisso del ristorante, identico per i due ospiti: puoi vederne la composizione nella <a href="/menu.html" style="color:var(--terracotta-dark);">carta sul sito</a>. Le bevande si scelgono e si pagano al tavolo.</p>
-        <label class="vini-toggle">
-          <input type="checkbox" class="vini-check" data-target="deg6" aria-label="Aggiungi l'abbinamento vini al voucher sei portate">
-          <span>Aggiungi l'abbinamento vini scelto da Monica per le sei portate <span class="vini-supp">+120 €</span></span>
-        </label>
-        <div class="consegna-toggle" role="radiogroup" aria-label="Modalità di consegna — Menù degustazione sei portate">
-          <span class="consegna-title">Come lo ricevi? <span class="req-star">*</span></span>
-          <label class="consegna-option">
-            <input type="radio" name="consegna-deg6" class="consegna-radio" value="fisico">
-            <span>Ritiro in ristorante — pagamento in loco, voucher stampato in confezione</span>
-          </label>
-          <label class="consegna-option">
-            <input type="radio" name="consegna-deg6" class="consegna-radio" value="elettronico">
-            <span>Via email — pagamento elettronico, PDF a te che lo doni</span>
-          </label>
-        </div>
-        <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
-      </article>
+          <div class="vh-option-block" id="vh-eccedenza-block" style="display:none;">
+            <span class="vh-option-label">Se si supera il valore, chi paga la differenza? *</span>
+            <div class="vh-pill-row">
+              <label class="vh-pill">
+                <input type="radio" name="vh-eccedenza" id="vh-eccedenza-destinatario" value="destinatario">
+                <span>Chi lo usa</span>
+              </label>
+              <label class="vh-pill">
+                <input type="radio" name="vh-eccedenza" id="vh-eccedenza-acquirente" value="acquirente">
+                <span>Io che lo regalo</span>
+              </label>
+            </div>
+            <div class="vh-opt-error" id="vh-eccedenza-error">Scegli chi paga l'eventuale differenza.</div>
+          </div>
 
-      <!-- DEGUSTAZIONE 7 PORTATE -->
-      <article class="voucher-card featured" data-card="deg7">
-        <div class="deg-portate">Menù Degustazione</div>
-        <div class="deg-sub">Sette portate · per due</div>
-        <div class="voucher-amount"><span class="eur-num" data-base="220" data-vini="360">220</span><span class="currency">€</span></div>
-        <p class="price-note">per due persone · bevande escluse</p>
-        <p class="voucher-desc">Il percorso più ampio, a mano libera: sette portate che lo chef costruisce sul pescato del giorno, non fisse in carta. Le bevande si scelgono e si pagano al tavolo.</p>
-        <label class="vini-toggle">
-          <input type="checkbox" class="vini-check" data-target="deg7" aria-label="Aggiungi l'abbinamento vini al voucher sette portate">
-          <span>Aggiungi l'abbinamento vini scelto da Monica per le sette portate <span class="vini-supp">+140 €</span></span>
-        </label>
-        <div class="consegna-toggle" role="radiogroup" aria-label="Modalità di consegna — Menù degustazione sette portate">
-          <span class="consegna-title">Come lo ricevi? <span class="req-star">*</span></span>
-          <label class="consegna-option">
-            <input type="radio" name="consegna-deg7" class="consegna-radio" value="fisico">
-            <span>Ritiro in ristorante — pagamento in loco, voucher stampato in confezione</span>
-          </label>
-          <label class="consegna-option">
-            <input type="radio" name="consegna-deg7" class="consegna-radio" value="elettronico">
-            <span>Via email — pagamento elettronico, PDF a te che lo doni</span>
-          </label>
-        </div>
-        <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
-      </article>
+          <div class="vh-fields-2">
+            <div class="vh-field">
+              <label for="ct-nome">Da parte di</label>
+              <input type="text" id="ct-nome" autocomplete="name" placeholder="Il tuo nome">
+            </div>
+            <div class="vh-field">
+              <label for="ct-destinatario">Per (facoltativo)</label>
+              <input type="text" id="ct-destinatario" placeholder="Nome del destinatario">
+            </div>
+          </div>
+          <div class="vh-field">
+            <label for="ct-email">Email dove inviarlo</label>
+            <input type="email" id="ct-email" autocomplete="email" placeholder="nome@email.it">
+          </div>
 
-    </section>
+          <details class="vh-more">
+            <summary>Telefono e dedica (facoltativo)</summary>
+            <div class="vh-field">
+              <label for="ct-telefono">Telefono</label>
+              <input type="tel" id="ct-telefono" autocomplete="tel">
+            </div>
+            <div class="vh-field">
+              <label for="ct-dedica">Dedica</label>
+              <textarea id="ct-dedica" rows="2"></textarea>
+            </div>
+          </details>
 
-    <p class="price-note" style="text-align:center;max-width:620px;margin:0 auto;">
-      L'abbinamento vini è il percorso di calici che la sommelier Monica Capurro accosta a ciascuna portata. Se non lo aggiungi, il destinatario potrà comunque scegliere vini e bevande al tavolo.
-    </p>
+          <!-- honeypot anti-spam -->
+          <div class="hp-field" aria-hidden="true">
+            <label for="ct-hp">Non compilare questo campo</label>
+            <input type="text" id="ct-hp" tabindex="-1" autocomplete="off">
+          </div>
 
-    <hr class="cat-divider">
+          <label class="vh-consent">
+            <input type="checkbox" id="ct-termini">
+            <span>Ho letto e accetto i <a href="/voucher-termini.html" target="_blank" rel="noopener">Termini e condizioni dei buoni regalo</a>. *</span>
+          </label>
+          <label class="vh-consent">
+            <input type="checkbox" id="ct-marketing">
+            <span>Voglio ricevere novità dal ristorante (facoltativo, revocabile quando vuoi).</span>
+          </label>
 
-    <!-- ===== CATEGORIA 2 · BUONO LIBERO ===== -->
-    <div class="cat-head">
-      <h2>Il buono di valore libero</h2>
-      <p>Un credito da spendere come si preferisce su tutto il menù — pesce, carta dei vini, dolci, caffetteria. Bevande comprese.</p>
-    </div>
+          <div id="contatto-error" class="contatto-error"></div>
 
-    <section class="voucher-grid libero" aria-label="Buoni regalo di valore libero">
-
-      <!-- 100 -->
-      <article class="voucher-card" data-libero-index="0">
-        <div class="voucher-amount"><span class="eur-num">100</span><span class="currency">€</span></div>
-        <p class="price-note">valore da spendere su tutto il menù</p>
-        <p class="voucher-desc">Un assaggio della nostra cucina, da comporre liberamente al tavolo.</p>
-        <div class="consegna-toggle" role="radiogroup" aria-label="Modalità di consegna — buono libero 100 euro">
-          <span class="consegna-title">Come lo ricevi? <span class="req-star">*</span></span>
-          <label class="consegna-option">
-            <input type="radio" name="consegna-libero-0" class="consegna-radio" value="fisico">
-            <span>Ritiro in ristorante — pagamento in loco, voucher stampato in confezione</span>
-          </label>
-          <label class="consegna-option">
-            <input type="radio" name="consegna-libero-0" class="consegna-radio" value="elettronico">
-            <span>Via email — pagamento elettronico, PDF a te che lo doni</span>
-          </label>
-        </div>
-        <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
-        <div class="eccedenza-toggle" role="radiogroup" aria-label="Chi paga l'eventuale differenza — buono libero 100 euro">
-          <span class="consegna-title">Se la spesa supera il valore, chi paga la differenza? <span class="req-star">*</span></span>
-          <label class="consegna-option">
-            <input type="radio" name="eccedenza-libero-0" class="eccedenza-radio" value="destinatario">
-            <span>Chi lo usa, al momento del conto</span>
-          </label>
-          <label class="consegna-option">
-            <input type="radio" name="eccedenza-libero-0" class="eccedenza-radio" value="acquirente">
-            <span>Io che lo regalo — ricontattatemi per il saldo</span>
-          </label>
-        </div>
-        <div class="eccedenza-error">Scegli chi paga l'eventuale differenza prima di inviare la richiesta.</div>
-      </article>
-
-      <!-- 150 -->
-      <article class="voucher-card featured" data-libero-index="1">
-        <div class="voucher-amount"><span class="eur-num">150</span><span class="currency">€</span></div>
-        <p class="price-note">valore da spendere su tutto il menù</p>
-        <p class="voucher-desc">Spazio per una cena intera in due, dall'antipasto al dolce.</p>
-        <div class="consegna-toggle" role="radiogroup" aria-label="Modalità di consegna — buono libero 150 euro">
-          <span class="consegna-title">Come lo ricevi? <span class="req-star">*</span></span>
-          <label class="consegna-option">
-            <input type="radio" name="consegna-libero-1" class="consegna-radio" value="fisico">
-            <span>Ritiro in ristorante — pagamento in loco, voucher stampato in confezione</span>
-          </label>
-          <label class="consegna-option">
-            <input type="radio" name="consegna-libero-1" class="consegna-radio" value="elettronico">
-            <span>Via email — pagamento elettronico, PDF a te che lo doni</span>
-          </label>
-        </div>
-        <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
-        <div class="eccedenza-toggle" role="radiogroup" aria-label="Chi paga l'eventuale differenza — buono libero 150 euro">
-          <span class="consegna-title">Se la spesa supera il valore, chi paga la differenza? <span class="req-star">*</span></span>
-          <label class="consegna-option">
-            <input type="radio" name="eccedenza-libero-1" class="eccedenza-radio" value="destinatario">
-            <span>Chi lo usa, al momento del conto</span>
-          </label>
-          <label class="consegna-option">
-            <input type="radio" name="eccedenza-libero-1" class="eccedenza-radio" value="acquirente">
-            <span>Io che lo regalo — ricontattatemi per il saldo</span>
-          </label>
-        </div>
-        <div class="eccedenza-error">Scegli chi paga l'eventuale differenza prima di inviare la richiesta.</div>
-      </article>
-
-      <!-- 200 -->
-      <article class="voucher-card" data-libero-index="2">
-        <div class="voucher-amount"><span class="eur-num">200</span><span class="currency">€</span></div>
-        <p class="price-note">valore da spendere su tutto il menù</p>
-        <p class="voucher-desc">Un'occasione senza pensieri, vini della carta inclusi.</p>
-        <div class="consegna-toggle" role="radiogroup" aria-label="Modalità di consegna — buono libero 200 euro">
-          <span class="consegna-title">Come lo ricevi? <span class="req-star">*</span></span>
-          <label class="consegna-option">
-            <input type="radio" name="consegna-libero-2" class="consegna-radio" value="fisico">
-            <span>Ritiro in ristorante — pagamento in loco, voucher stampato in confezione</span>
-          </label>
-          <label class="consegna-option">
-            <input type="radio" name="consegna-libero-2" class="consegna-radio" value="elettronico">
-            <span>Via email — pagamento elettronico, PDF a te che lo doni</span>
-          </label>
-        </div>
-        <div class="consegna-error">Scegli come vuoi ricevere il buono prima di inviare la richiesta.</div>
-        <div class="eccedenza-toggle" role="radiogroup" aria-label="Chi paga l'eventuale differenza — buono libero 200 euro">
-          <span class="consegna-title">Se la spesa supera il valore, chi paga la differenza? <span class="req-star">*</span></span>
-          <label class="consegna-option">
-            <input type="radio" name="eccedenza-libero-2" class="eccedenza-radio" value="destinatario">
-            <span>Chi lo usa, al momento del conto</span>
-          </label>
-          <label class="consegna-option">
-            <input type="radio" name="eccedenza-libero-2" class="eccedenza-radio" value="acquirente">
-            <span>Io che lo regalo — ricontattatemi per il saldo</span>
-          </label>
-        </div>
-        <div class="eccedenza-error">Scegli chi paga l'eventuale differenza prima di inviare la richiesta.</div>
-      </article>
-
-    </section>
-
-    <!-- ===== I TUOI DATI (condivisa da tutte le richieste) ===== -->
-    <section class="contatto-box" id="contatto-box">
-      <h2>I tuoi dati</h2>
-      <p class="contatto-intro">Li usiamo solo per rispondere alla tua richiesta di buono regalo. Scegli il buono qui sopra (basta indicare come vuoi riceverlo), poi completa qui i tuoi dati e invia la richiesta.</p>
-      <div class="contatto-grid">
-        <div>
-          <label class="contatto-lbl" for="ct-nome">Nome e cognome *</label>
-          <input type="text" id="ct-nome" class="contatto-input" autocomplete="name">
-        </div>
-        <div>
-          <label class="contatto-lbl" for="ct-email">Email *</label>
-          <input type="email" id="ct-email" class="contatto-input" autocomplete="email">
-        </div>
-        <div>
-          <label class="contatto-lbl" for="ct-telefono">Telefono (opzionale)</label>
-          <input type="tel" id="ct-telefono" class="contatto-input" autocomplete="tel">
-        </div>
-        <div>
-          <label class="contatto-lbl" for="ct-destinatario">Nome del destinatario (opzionale)</label>
-          <input type="text" id="ct-destinatario" class="contatto-input">
+          <button type="button" class="btn-buy" id="btn-buy-shared" onclick="richiediBuono(this)">
+            <span id="btn-buy-label">Richiedi il buono</span>
+          </button>
+          <p class="vh-fineprint">Validità 12 mesi · escluso sab, dom e festivi salvo accordi.</p>
+          <div class="richiesta-status" id="rs-shared"></div>
         </div>
       </div>
-      <div style="margin-top:16px;">
-        <label class="contatto-lbl" for="ct-dedica">Dedica (opzionale)</label>
-        <textarea id="ct-dedica" class="contatto-input" rows="2"></textarea>
-      </div>
-      <!-- honeypot anti-spam: campo invisibile, deve restare vuoto -->
-      <div class="hp-field" aria-hidden="true">
-        <label for="ct-hp">Non compilare questo campo</label>
-        <input type="text" id="ct-hp" tabindex="-1" autocomplete="off">
-      </div>
-      <label class="termini-toggle">
-        <input type="checkbox" id="ct-termini">
-        <span>Ho letto e accetto i <a href="/voucher-termini.html" target="_blank" rel="noopener">Termini e condizioni dei buoni regalo</a>. *</span>
-      </label>
-      <label class="termini-toggle">
-        <input type="checkbox" id="ct-marketing">
-        <span>Acconsento a ricevere comunicazioni sul ristorante (eventi, serate a tema, novità). Facoltativo, revocabile in qualsiasi momento.</span>
-      </label>
-      <div id="contatto-error" class="contatto-error"></div>
-
-      <!-- ===== Pulsante unico, condiviso da tutte le schede: agisce sul buono selezionato ===== -->
-      <button type="button" class="btn-buy" id="btn-buy-shared" onclick="richiediBuonoShared(this)"
-         aria-label="Invia la richiesta per il buono selezionato" style="margin-top:22px;">
-        <span class="btn-label">Richiedi questo buono</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 6l-10 7L2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-      </button>
-      <div class="richiesta-status" id="rs-shared"></div>
     </section>
 
-    <!-- ===== INFO ===== -->
+    <!-- ===== INFO (condensata) ===== -->
     <section class="info">
       <h2>Informazioni essenziali</h2>
       <div class="info-grid">
-        <div class="info-item">
-          <h3>Validità</h3>
-          <p>12 mesi dalla data di acquisto. Trascorso tale termine il Buono non sarà più utilizzabile.</p>
-        </div>
-        <div class="info-item">
-          <h3>Bevande</h3>
-          <p>Nei voucher degustazione le bevande sono escluse, salvo l'abbinamento vini se aggiunto. Il buono libero invece copre anche le bevande.</p>
-        </div>
-        <div class="info-item">
-          <h3>Come lo ricevi</h3>
-          <p>Due modi: ritiro in ristorante del voucher stampato in confezione (pagamento in loco), oppure PDF via email all'acquirente, che lo dona al destinatario.</p>
-        </div>
-        <div class="info-item">
-          <h3>Trasferibilità</h3>
-          <p>Trasferibile liberamente: chi presenta il codice valido può riscattare.</p>
-        </div>
-        <div class="info-item">
-          <h3>Uso parziale</h3>
-          <p>Per il buono libero, l'eventuale residuo resta come credito per visite successive entro la scadenza. Se invece la spesa supera il valore del buono, la differenza è a carico di chi hai indicato al momento della richiesta. I voucher degustazione valgono per l'esperienza indicata.</p>
-        </div>
-        <div class="info-item">
-          <h3>Cumulabilità e periodi</h3>
-          <p>Non cumulabile con promozioni, sconti, menu fissi o convenzioni in essere. Utilizzabile tutti i giorni, salvo disponibilità, a pranzo o a cena, escluso Sabato, Domenica e festivi.</p>
-        </div>
-        <div class="info-item">
-          <h3>Recesso</h3>
-          <p>14 giorni dall'acquisto, solo se il voucher non è ancora stato riscattato (Art. 52 D.Lgs. 206/2005).</p>
-        </div>
-        <div class="info-item">
-          <h3>Prenotazione</h3>
-          <p>Obbligatoria e soggetta a disponibilità: contatta il ristorante segnalando l'utilizzo del voucher al momento della prenotazione. Disdetta oltre le 24 ore prima, o mancata presentazione, rendono il voucher considerato utilizzato.</p>
-        </div>
-        <div class="info-item info-item-terms">
-          <h3>Condizioni d'uso</h3>
-          <p>Recesso, smarrimento, rimborsi e foro competente sono nei <a href="/voucher-termini.html">Termini e condizioni d'uso dei buoni regalo</a>. L'acquisto comporta accettazione integrale.</p>
-        </div>
+        <div class="info-item"><h3>Validità</h3><p>12 mesi dalla data di acquisto.</p></div>
+        <div class="info-item"><h3>Bevande</h3><p>Escluse nei voucher degustazione (salvo abbinamento vini). Incluse nel buono libero.</p></div>
+        <div class="info-item"><h3>Come lo ricevi</h3><p>Ritiro in ristorante (pagamento in loco) o PDF via email a chi acquista, che lo dona.</p></div>
+        <div class="info-item"><h3>Trasferibilità</h3><p>Libera: chi presenta il codice valido può riscattare il buono.</p></div>
+        <div class="info-item"><h3>Uso parziale</h3><p>Il residuo del buono libero resta come credito. L'eventuale eccedenza è a carico di chi indicato alla richiesta.</p></div>
+        <div class="info-item"><h3>Cumulabilità e periodi</h3><p>Non cumulabile con altre promozioni. Utilizzabile tutti i giorni, salvo disponibilità, escluso Sabato, Domenica e festivi.</p></div>
+        <div class="info-item"><h3>Recesso</h3><p>14 giorni dall'acquisto, se il voucher non è ancora stato usato.</p></div>
+        <div class="info-item"><h3>Prenotazione</h3><p>Obbligatoria e soggetta a disponibilità, segnalando il voucher. Disdetta oltre le 24h prima o mancata presentazione = voucher considerato usato.</p></div>
+        <div class="info-item"><h3>Condizioni d'uso</h3><p>Dettagli su recesso, smarrimento e rimborsi nei <a href="/voucher-termini.html">Termini e condizioni</a>.</p></div>
       </div>
     </section>
 
-    <!-- ===== FOOTER ===== -->
     <footer class="page-footer">
       <div class="footer-grid">
         <div class="cross-links">
@@ -1173,10 +617,9 @@
           ⚙ Preferenze cookie
         </button>
       </div>
-
       <p style="margin: 0; font-size: 12px;">
         © 2026 Santamonica · Genova · Lungomare Lombardo 27, 16145 Genova<br>
-        <span class="version-tag">regala.html · v 2026.09.05.01</span>
+        <span class="version-tag">regala.html · v 2026.09.05.02</span>
       </p>
     </footer>
 
@@ -1187,273 +630,252 @@
   <script defer src="/lib/cookieconsent/cookieconsent.umd.js"></script>
   <script defer src="/cookieconsent-config.js"></script>
 
-  <!-- Invio reale della richiesta (sostituisce il mailto): checkbox abbinamento vini,
-       scelta consegna obbligatoria, dati di contatto condivisi, POST a richiedi-voucher -->
   <script>
+  (function() {
+    var RICHIEDI_VOUCHER_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/richiedi-voucher';
+    var CREATE_VOUCHER_CHECKOUT_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/create-voucher-checkout';
+
+    // 5 tipologie reali: 2 degustazione + 3 buono libero. I valori "libero" vengono poi
+    // allineati a /voucher-config.json (fallback: quelli qui sotto).
+    var VOUCHERS = [
+      { key: 'deg6', card: 'deg6', title: 'Degustazione 6 portate', sub: 'Per due persone · bevande escluse', base: 170, viniPrice: 290, viniSupp: 120, hasVini: true },
+      { key: 'deg7', card: 'deg7', title: 'Degustazione 7 portate', sub: 'A mano libera dello chef · per due persone · bevande escluse', base: 220, viniPrice: 360, viniSupp: 140, hasVini: true, featured: true },
+      { key: 'libero0', liberoIndex: 0, title: 'Buono da 100€', sub: '', base: 100 },
+      { key: 'libero1', liberoIndex: 1, title: 'Buono da 150€', sub: '', base: 150, featured: true },
+      { key: 'libero2', liberoIndex: 2, title: 'Buono da 200€', sub: '', base: 200 },
+    ];
+
+    var giftIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="11" rx="1"/><path d="M12 9v11M3 9h18M12 9c-1.5-4-6-5-6-2s3 2 6 2Zm0 0c1.5-4 6-5 6-2s-3 2-6 2Z"/></svg>';
+
+    var listEl = document.getElementById('vh-list');
+    VOUCHERS.forEach(function(v) {
+      var row = document.createElement('button');
+      row.type = 'button';
+      row.className = 'vh-row';
+      row.dataset.key = v.key;
+      row.innerHTML =
+        '<span class="vh-row-icon">' + giftIcon + '</span>' +
+        '<span class="vh-row-body"><p class="vh-row-title">' + v.title + '</p>' + (v.sub ? '<p class="vh-row-sub">' + v.sub + '</p>' : '') + '</span>' +
+        '<span class="vh-row-price eur-num" data-key="' + v.key + '">' + v.base + '€</span>';
+      row.addEventListener('click', function() { selectVoucher(v.key); });
+      listEl.appendChild(row);
+    });
+
+    // spazio tra le 2 degustazioni e i 3 buoni liberi, alto quanto mezza riga
     (function() {
-      var RICHIEDI_VOUCHER_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/richiedi-voucher';
-      var CREATE_VOUCHER_CHECKOUT_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/create-voucher-checkout';
-
-      // Banner "pagamento annullato" — redirect di ritorno da Stripe Checkout se l'utente
-      // annulla prima di pagare. Nessun dato è andato perso: i campi restano compilati.
-      if (/(^|[?&])pagamento=annullato(&|$)/.test(window.location.search)) {
-        var banner = document.getElementById('payment-banner');
-        if (banner) banner.style.display = 'block';
-        if (window.history && window.history.replaceState) {
-          window.history.replaceState({}, document.title, window.location.pathname);
-        }
+      var rows = listEl.querySelectorAll('.vh-row');
+      if (rows.length > 2) {
+        var spacer = document.createElement('div');
+        spacer.style.height = (rows[0].getBoundingClientRect().height / 2) + 'px';
+        listEl.insertBefore(spacer, rows[2]);
       }
+    })();
 
-      function currentConsegna(card) {
-        var r = card.querySelector('.consegna-radio:checked');
-        return r ? r.value : null;
-      }
-
-      function currentEccedenza(card) {
-        var r = card.querySelector('.eccedenza-radio:checked');
-        return r ? r.value : null;
-      }
-
-      // ── Selezione del buono: un solo pulsante condiviso agisce sulla scheda selezionata.
-      // Toccare consegna/vini/eccedenza dentro una scheda la seleziona automaticamente
-      // (bordo evidenziato + badge "✓ Selezionato"); scegliere gli stessi controlli in
-      // un'altra scheda sposta la selezione lì (un solo buono alla volta). ──
-      var selectedCard = null;
-
-      function updateSharedButtonLabel() {
-        var label = document.querySelector('#btn-buy-shared .btn-label');
-        if (!label) return;
-        var consegna = selectedCard ? currentConsegna(selectedCard) : null;
-        label.textContent = (consegna === 'elettronico') ? 'Paga e ricevi subito' : 'Richiedi questo buono';
-      }
-
-      function selectCard(card) {
-        if (!card) return;
-        document.querySelectorAll('.voucher-card.selected').forEach(function(c) {
-          if (c !== card) c.classList.remove('selected');
-        });
-        card.classList.add('selected');
-        selectedCard = card;
-        updateSharedButtonLabel();
-      }
-
-      function isValidEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      }
-
-      function setContattoError(msg) {
-        var err = document.getElementById('contatto-error');
-        if (!err) return;
-        if (msg) { err.textContent = msg; err.style.display = 'block'; }
-        else { err.style.display = 'none'; }
-      }
-
-      function setRichiestaStatus(statusEl, msg, cls) {
-        if (!statusEl) return;
-        statusEl.textContent = msg || '';
-        statusEl.className = 'richiesta-status' + (cls ? ' ' + cls : '');
-      }
-
-      // checkbox abbinamento vini: aggiorna solo il prezzo mostrato + seleziona la scheda
-      document.querySelectorAll('.vini-check').forEach(function(chk) {
-        chk.addEventListener('change', function() {
-          var card = chk.closest('.voucher-card');
-          if (!card) return;
-          var num = card.querySelector('.eur-num');
-          if (num) {
-            var on = chk.checked;
-            num.textContent = on ? (num.getAttribute('data-vini') || num.textContent)
-                                 : (num.getAttribute('data-base') || num.textContent);
-          }
-          selectCard(card);
-        });
-      });
-
-      // scelta consegna: nasconde l'avviso, seleziona la scheda e aggiorna l'etichetta del
-      // pulsante condiviso (via email = pagamento immediato, ritiro fisico = richiesta da
-      // evadere a mano)
-      document.querySelectorAll('.consegna-radio').forEach(function(r) {
-        r.addEventListener('change', function() {
-          var card = r.closest('.voucher-card');
-          if (!card) return;
-          var err = card.querySelector('.consegna-error');
-          if (err) err.style.display = 'none';
-          selectCard(card);
-        });
-      });
-
-      // scelta eccedenza (solo buono libero): nasconde l'avviso e seleziona la scheda
-      document.querySelectorAll('.eccedenza-radio').forEach(function(r) {
-        r.addEventListener('change', function() {
-          var card = r.closest('.voucher-card');
-          if (!card) return;
-          var err = card.querySelector('.eccedenza-error');
-          if (err) err.style.display = 'none';
-          selectCard(card);
-        });
-      });
-
-      // valori dei 3 buoni liberi da voucher-config.json (fallback: valori già in pagina)
-      fetch('/voucher-config.json', { cache: 'no-store' }).then(function(r) {
-        return r.ok ? r.json() : null;
-      }).then(function(cfg) {
+    // valori dei 3 buoni liberi da voucher-config.json (fonte unica, condivisa con menu-admin)
+    fetch('/voucher-config.json', { cache: 'no-store' }).then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(cfg) {
         if (!cfg || !Array.isArray(cfg.liberi)) return;
-        document.querySelectorAll('[data-libero-index]').forEach(function(card) {
-          var i = parseInt(card.getAttribute('data-libero-index'), 10);
-          var val = cfg.liberi[i];
+        VOUCHERS.forEach(function(v) {
+          if (v.liberoIndex == null) return;
+          var val = cfg.liberi[v.liberoIndex];
           if (val == null) return;
-          var num = card.querySelector('.eur-num');
-          if (num) num.textContent = val;
+          v.base = val;
+          var priceEl = document.querySelector('.vh-row-price[data-key="' + v.key + '"]');
+          if (priceEl) priceEl.textContent = val + '€';
+          if (selected && selected.key === v.key) updateCard();
         });
-      }).catch(function(){ /* offline o file assente: restano i valori in pagina */ });
+      }).catch(function(){ /* offline o file assente: restano i valori qui sopra */ });
 
-      // ── Invio della richiesta al click sul pulsante unico condiviso ──
-      window.richiediBuonoShared = function(btn) {
-        var card = selectedCard;
-        if (!card) {
-          setContattoError('Scegli uno dei buoni qui sopra (basta indicare come vuoi riceverlo) prima di inviare la richiesta.');
-          var grid = document.querySelector('.voucher-grid');
-          if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          return;
-        }
+    var selected = null;
+    var viniChecked = false;
 
-        // 1) consegna obbligatoria per scheda
-        var consegna = currentConsegna(card);
-        if (!consegna) {
-          var err = card.querySelector('.consegna-error');
-          if (err) err.style.display = 'block';
-          var grp = card.querySelector('.consegna-toggle');
-          if (grp) grp.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          return;
-        }
+    function byKey(key) { for (var i = 0; i < VOUCHERS.length; i++) if (VOUCHERS[i].key === key) return VOUCHERS[i]; return null; }
 
-        // 1b) per il buono libero, chi paga l'eventuale differenza è obbligatorio
-        var isLibero = card.hasAttribute('data-libero-index');
-        var eccedenza = isLibero ? currentEccedenza(card) : null;
-        if (isLibero && !eccedenza) {
-          var eccErr = card.querySelector('.eccedenza-error');
-          if (eccErr) eccErr.style.display = 'block';
-          var eccGrp = card.querySelector('.eccedenza-toggle');
-          if (eccGrp) eccGrp.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          return;
-        }
+    function currentPrice() {
+      if (!selected) return 0;
+      if (selected.hasVini && viniChecked) return selected.viniPrice;
+      return selected.base;
+    }
 
-        // 2) dati di contatto condivisi, obbligatori nome+email+accettazione termini
-        var nome = document.getElementById('ct-nome').value.trim();
-        var email = document.getElementById('ct-email').value.trim();
-        var telefono = document.getElementById('ct-telefono').value.trim();
-        var destinatario = document.getElementById('ct-destinatario').value.trim();
-        var dedica = document.getElementById('ct-dedica').value.trim();
-        var hp = document.getElementById('ct-hp').value;
-        var terminiCheck = document.getElementById('ct-termini');
-        var termini = terminiCheck ? !!terminiCheck.checked : false;
-        var marketingCheck = document.getElementById('ct-marketing');
-        var marketingConsent = marketingCheck ? !!marketingCheck.checked : false;
+    function currentConsegna() {
+      var r = document.querySelector('input[name="vh-consegna"]:checked');
+      return r ? r.value : null;
+    }
+    function currentEccedenza() {
+      var r = document.querySelector('input[name="vh-eccedenza"]:checked');
+      return r ? r.value : null;
+    }
 
-        if (nome.length < 2 || !isValidEmail(email)) {
-          setContattoError('Compila nome ed email (validi) qui sopra prima di inviare la richiesta.');
-          document.getElementById('contatto-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
-          return;
-        }
-        if (!termini) {
-          setContattoError('Devi accettare i Termini e condizioni dei buoni regalo prima di inviare la richiesta.');
-          document.getElementById('contatto-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
-          return;
-        }
-        setContattoError(null);
+    function updateCard() {
+      var isLibero = selected.liberoIndex != null;
+      document.getElementById('vh-card-title').textContent = isLibero ? selected.title : ('Buono · ' + selected.title);
+      var subEl = document.getElementById('vh-card-sub');
+      if (isLibero) {
+        subEl.textContent = '';
+        subEl.style.display = 'none';
+      } else {
+        subEl.style.display = '';
+        subEl.textContent = (selected.sub ? selected.sub + ' · ' : '') + '€' + currentPrice();
+      }
+      document.getElementById('vh-vini-block').style.display = selected.hasVini ? 'block' : 'none';
+      if (selected.hasVini) {
+        document.getElementById('vh-vini-supp').textContent = '(+' + selected.viniSupp + '€)';
+        document.getElementById('vh-vini-check').checked = viniChecked;
+      }
+      document.getElementById('vh-eccedenza-block').style.display = selected.liberoIndex != null ? 'block' : 'none';
+      updateButton();
+    }
 
-        // 3) tipo prodotto: deg6/deg7 dal data-card della scheda, valore dal buono libero
-        var tipo = card.getAttribute('data-card') || 'valore';
-        var vini = card.querySelector('.vini-check');
-        var abbinamentoVini = vini ? !!vini.checked : false;
-        var valoreEur = null;
-        if (tipo !== 'deg6' && tipo !== 'deg7') {
-          tipo = 'valore';
-          var num = card.querySelector('.eur-num');
-          valoreEur = num ? parseFloat(num.textContent) : null;
-        }
+    function updateButton() {
+      var price = currentPrice();
+      var consegna = currentConsegna();
+      var label = (consegna === 'elettronico' ? 'Paga e ricevi il buono' : 'Richiedi il buono') + ' · €' + price;
+      document.getElementById('btn-buy-label').textContent = label;
+    }
 
-        var statusEl = document.getElementById('rs-shared');
-        btn.disabled = true;
+    function selectVoucher(key) {
+      selected = byKey(key);
+      viniChecked = false;
+      document.querySelectorAll('.vh-row').forEach(function(r) { r.classList.toggle('selected', r.dataset.key === key); });
+      document.querySelectorAll('input[name="vh-consegna"]').forEach(function(r) { r.checked = false; });
+      document.querySelectorAll('input[name="vh-eccedenza"]').forEach(function(r) { r.checked = false; });
+      document.getElementById('vh-consegna-error').style.display = 'none';
+      document.getElementById('vh-eccedenza-error').style.display = 'none';
+      updateCard();
+      document.getElementById('vh-card').scrollIntoView({ behavior: 'smooth', block: window.innerWidth < 860 ? 'start' : 'nearest' });
+    }
 
-        // Consegna elettronica → pagamento online automatico: crea la sessione Stripe e
-        // reindirizza subito, nessuna mail di richiesta da evadere a mano.
-        if (consegna === 'elettronico') {
-          setRichiestaStatus(statusEl, 'Ti stiamo portando al pagamento…', '');
-          fetch(CREATE_VOUCHER_CHECKOUT_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              tipo: tipo,
-              abbinamento_vini: abbinamentoVini,
-              valore_eur: valoreEur,
-              eccedenza_a_carico: eccedenza || undefined,
-              nome: nome,
-              email: email,
-              telefono: telefono || undefined,
-              destinatario: destinatario || undefined,
-              dedica: dedica || undefined,
-              termini_accettati: true,
-              marketing_consent: marketingConsent,
-              _hp: hp,
-            }),
-          }).then(function(r) { return r.json().then(function(j) { return { status: r.status, body: j }; }); })
-            .then(function(res) {
-              if (res.status === 201 && res.body && res.body.ok && res.body.url) {
-                setRichiestaStatus(statusEl, 'Ti stiamo portando al pagamento…', 'ok');
-                window.location.href = res.body.url;
-              } else {
-                btn.disabled = false;
-                setRichiestaStatus(statusEl, (res.body && res.body.error) || 'Errore nella creazione del pagamento, riprova o chiamaci al 010 5533155.', 'err');
-              }
-            })
-            .catch(function() {
-              btn.disabled = false;
-              setRichiestaStatus(statusEl, 'Errore di rete: riprova o chiamaci al 010 5533155.', 'err');
-            });
-          return;
-        }
+    document.getElementById('vh-vini-check').addEventListener('change', function(e) {
+      viniChecked = e.target.checked;
+      updateCard();
+    });
+    document.querySelectorAll('input[name="vh-consegna"]').forEach(function(r) {
+      r.addEventListener('change', function() {
+        document.getElementById('vh-consegna-error').style.display = 'none';
+        updateButton();
+      });
+    });
+    document.querySelectorAll('input[name="vh-eccedenza"]').forEach(function(r) {
+      r.addEventListener('change', function() { document.getElementById('vh-eccedenza-error').style.display = 'none'; });
+    });
 
-        // Consegna fisica (ritiro in ristorante, pagamento in loco): invariato, richiesta da
-        // evadere a mano da menu-admin.html.
-        setRichiestaStatus(statusEl, 'Invio in corso…', '');
+    // preseleziona la degustazione 7 portate (già "featured" nella versione precedente), così
+    // la card di riepilogo non è mai vuota — l'utente può comunque cambiare scelta subito.
+    selectVoucher('deg7');
 
-        fetch(RICHIEDI_VOUCHER_URL, {
+    // Banner "pagamento annullato" — redirect di ritorno da Stripe Checkout se l'utente
+    // annulla prima di pagare. Nessun dato è andato perso: i campi restano compilati.
+    if (/(^|[?&])pagamento=annullato(&|$)/.test(window.location.search)) {
+      var banner = document.getElementById('payment-banner');
+      if (banner) banner.style.display = 'block';
+      if (window.history && window.history.replaceState) window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+    function setContattoError(msg) {
+      var err = document.getElementById('contatto-error');
+      if (msg) { err.textContent = msg; err.style.display = 'block'; } else { err.style.display = 'none'; }
+    }
+    function setStatus(msg, cls) {
+      var el = document.getElementById('rs-shared');
+      el.textContent = msg || '';
+      el.className = 'richiesta-status' + (cls ? ' ' + cls : '');
+    }
+
+    // Invio della richiesta al click sul pulsante unico condiviso: legge tipo/vini/consegna/
+    // eccedenza dal buono selezionato al momento del click. Consegna elettronica → crea la
+    // sessione Stripe Checkout e reindirizza subito (prezzo sempre ricalcolato lato server dal
+    // tipo scelto, mai dal client). Consegna fisica → richiesta da evadere a mano da
+    // menu-admin.html (invariato rispetto a prima del redesign).
+    window.richiediBuono = function(btn) {
+      if (!selected) return;
+
+      var consegna = currentConsegna();
+      if (!consegna) { document.getElementById('vh-consegna-error').style.display = 'block'; return; }
+
+      var isLibero = selected.liberoIndex != null;
+      var eccedenza = isLibero ? currentEccedenza() : null;
+      if (isLibero && !eccedenza) { document.getElementById('vh-eccedenza-error').style.display = 'block'; return; }
+
+      var nome = document.getElementById('ct-nome').value.trim();
+      var email = document.getElementById('ct-email').value.trim();
+      var telefono = document.getElementById('ct-telefono').value.trim();
+      var destinatario = document.getElementById('ct-destinatario').value.trim();
+      var dedica = document.getElementById('ct-dedica').value.trim();
+      var hp = document.getElementById('ct-hp').value;
+      var termini = document.getElementById('ct-termini').checked;
+      var marketingConsent = document.getElementById('ct-marketing').checked;
+
+      if (nome.length < 2 || !isValidEmail(email)) {
+        setContattoError('Compila nome ed email (validi) prima di inviare la richiesta.');
+        return;
+      }
+      if (!termini) {
+        setContattoError('Devi accettare i Termini e condizioni dei buoni regalo.');
+        return;
+      }
+      setContattoError(null);
+
+      var tipo = isLibero ? 'valore' : selected.card;
+      var valoreEur = isLibero ? selected.base : null;
+      var abbinamentoVini = selected.hasVini ? viniChecked : false;
+
+      btn.disabled = true;
+
+      if (consegna === 'elettronico') {
+        setStatus('Ti stiamo portando al pagamento…', '');
+        fetch(CREATE_VOUCHER_CHECKOUT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            action: 'submit',
-            tipo: tipo,
-            abbinamento_vini: abbinamentoVini,
-            valore_eur: valoreEur,
-            eccedenza_a_carico: eccedenza || undefined,
-            consegna: consegna,
-            nome: nome,
-            email: email,
-            telefono: telefono || undefined,
-            destinatario: destinatario || undefined,
-            dedica: dedica || undefined,
-            termini_accettati: true,
-            marketing_consent: marketingConsent,
-            _hp: hp,
-            user_agent: navigator.userAgent,
+            tipo: tipo, abbinamento_vini: abbinamentoVini, valore_eur: valoreEur,
+            eccedenza_a_carico: eccedenza || undefined, nome: nome, email: email,
+            telefono: telefono || undefined, destinatario: destinatario || undefined,
+            dedica: dedica || undefined, termini_accettati: true,
+            marketing_consent: marketingConsent, _hp: hp,
           }),
         }).then(function(r) { return r.json().then(function(j) { return { status: r.status, body: j }; }); })
           .then(function(res) {
-            if (res.status === 201 && res.body && res.body.ok) {
-              btn.textContent = '✓ Richiesta inviata';
-              setRichiestaStatus(statusEl, 'Ti risponderemo entro 24 ore con le modalità di pagamento.', 'ok');
+            if (res.status === 201 && res.body && res.body.ok && res.body.url) {
+              setStatus('Ti stiamo portando al pagamento…', 'ok');
+              window.location.href = res.body.url;
             } else {
               btn.disabled = false;
-              setRichiestaStatus(statusEl, (res.body && res.body.error) || 'Errore di invio, riprova o chiamaci al 010 5533155.', 'err');
+              setStatus((res.body && res.body.error) || 'Errore nella creazione del pagamento, riprova o chiamaci al 010 5533155.', 'err');
             }
-          })
-          .catch(function() {
+          }).catch(function() {
             btn.disabled = false;
-            setRichiestaStatus(statusEl, 'Errore di rete: riprova o chiamaci al 010 5533155.', 'err');
+            setStatus('Errore di rete: riprova o chiamaci al 010 5533155.', 'err');
           });
-      };
-    })();
+        return;
+      }
+
+      setStatus('Invio in corso…', '');
+      fetch(RICHIEDI_VOUCHER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'submit', tipo: tipo, abbinamento_vini: abbinamentoVini, valore_eur: valoreEur,
+          eccedenza_a_carico: eccedenza || undefined, consegna: consegna, nome: nome, email: email,
+          telefono: telefono || undefined, destinatario: destinatario || undefined,
+          dedica: dedica || undefined, termini_accettati: true, marketing_consent: marketingConsent,
+          _hp: hp, user_agent: navigator.userAgent,
+        }),
+      }).then(function(r) { return r.json().then(function(j) { return { status: r.status, body: j }; }); })
+        .then(function(res) {
+          if (res.status === 201 && res.body && res.body.ok) {
+            document.getElementById('btn-buy-label').textContent = '✓ Richiesta inviata';
+            setStatus('Ti risponderemo entro 24 ore con le modalità di pagamento.', 'ok');
+          } else {
+            btn.disabled = false;
+            setStatus((res.body && res.body.error) || 'Errore di invio, riprova o chiamaci al 010 5533155.', 'err');
+          }
+        }).catch(function() {
+          btn.disabled = false;
+          setStatus('Errore di rete: riprova o chiamaci al 010 5533155.', 'err');
+        });
+    };
+  })();
   </script>
 
 </body>

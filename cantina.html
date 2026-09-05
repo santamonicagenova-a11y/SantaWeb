@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- v 2026.09.05.03 — sotto-titolo regione (.sottosez-titolo, "Liguria"/"Altre regioni"/ecc.)
+     portato da peso 400 a peso 250, su richiesta di Andrea che lo percepiva "in grassetto" per
+     contrasto col resto del testo a peso 300. Nota tecnica: il font Jost è caricato da Google
+     Fonts con solo i pesi statici 300 e 400 (`family=Jost:wght@300;400`), non come variabile a
+     range libero — il browser potrebbe quindi visualizzare 250 arrotondato al peso 300 più vicino
+     effettivamente disponibile, invece di un peso realmente più sottile del 300 stesso. -->
 <!-- v 2026.09.05.02 — TEST: tolto il grassetto dal nome del vino (.vino-nome), resta solo la
      sottolineatura — su richiesta di Andrea per vedere l'effetto in stampa. Facilmente
      reversibile (basta rimettere font-weight:600) se il risultato stampato non convince. -->
@@ -343,7 +349,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.05.02</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.05.03</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -1525,7 +1531,7 @@ function generaHtmlCartaVini(articoli) {
     'body{background:var(--cream);color:var(--ink);font-family:"Jost",sans-serif;font-weight:300;padding:2rem 1rem;}' +
     '.pg{max-width:700px;margin:0 auto;}' +
     '.sez-titolo{font-family:"Jost",sans-serif;font-weight:300;font-size:24pt;margin:2.8rem 0 .8rem;text-align:center;text-transform:uppercase;letter-spacing:.06em;}' +
-    '.sottosez-titolo{font-family:"Jost",sans-serif;font-weight:400;font-size:20pt;margin:1.8rem 0 .4rem;text-transform:uppercase;letter-spacing:.1em;color:var(--stone);}' +
+    '.sottosez-titolo{font-family:"Jost",sans-serif;font-weight:250;font-size:20pt;margin:1.8rem 0 .4rem;text-transform:uppercase;letter-spacing:.1em;color:var(--stone);}' +
     '.vino{font-size:12pt;line-height:1.55;margin:0 0 .6rem;text-align:justify;}' +
     '.vino-nome{text-decoration:underline;}' +
     '.vino-nome em{font-style:italic;}' +

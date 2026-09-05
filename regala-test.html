@@ -91,10 +91,17 @@
     .voucher-hero {
       display: grid;
       grid-template-columns: 1.05fr 0.95fr;
-      gap: 3.5rem;
+      grid-template-areas:
+        "header ."
+        "list   card";
+      column-gap: 3.5rem;
+      row-gap: 1.75rem;
       align-items: start;
       padding: 4.5rem 0 2rem;
     }
+    .vh-header { grid-area: header; }
+    .vh-list { grid-area: list; }
+    .vh-right { grid-area: card; }
 
     .eyebrow {
       font-size: 12px;
@@ -394,7 +401,7 @@
     footer.page-footer a:hover { color: var(--terracotta); }
 
     @media (max-width: 860px) {
-      .voucher-hero { grid-template-columns: 1fr; padding-top: 2.5rem; }
+      .voucher-hero { grid-template-columns: 1fr; grid-template-areas: "header" "list" "card"; padding-top: 2.5rem; }
       .vh-card { position: static; }
       .vh-fields-2 { grid-template-columns: 1fr; }
     }
@@ -408,7 +415,7 @@
   <div class="container">
 
     <section class="voucher-hero">
-      <div class="vh-left">
+      <div class="vh-header">
         <p class="eyebrow">Un dono speciale · valido 12 mesi</p>
         <h1>Regala una cena <em>sul mare</em>.</h1>
         <p class="vh-lead">Buoni utilizzabili a pranzo o cena, salvo disponibilità. Ti mandiamo il buono personalizzato via email, pronto da stampare o inoltrare — oppure lo ritiri in ristorante.</p>
@@ -417,9 +424,9 @@
           <li>Via email: paghi online e ricevi subito il PDF. Ritiro in ristorante: ti rispondiamo entro 24 ore</li>
           <li>Il destinatario prenota segnalando il codice del voucher</li>
         </ul>
-
-        <div class="vh-list" id="vh-list"><!-- righe generate da JS --></div>
       </div>
+
+      <div class="vh-list" id="vh-list"><!-- righe generate da JS --></div>
 
       <div class="vh-right">
         <div class="vh-card" id="vh-card">

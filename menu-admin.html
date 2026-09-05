@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<!-- v 2026.09.05.01 — rimossa la card "Menù Vini" dalla riga quick-actions della tab "Gestione
+     menù e sito" (sezione #vini-section e funzioni apriSezioneVini/convertiEPubblicaVini lasciate
+     nel file, innocue e non più raggiungibili da UI). -->
 <!-- v 2026.09.02.09 — fix cambio tab (segnalato da Andrea): passando da una tab all'altra (Gestione
      menù / Prenotazioni e voucher / Setup) quello che era caricato sotto (es. la carta) restava
      visibile invece di sparire. setQaTab() ora chiama _pulisciViste() (admin-core.js) a ogni
@@ -3880,7 +3883,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.02.09</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.05.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 </body>
 </html>

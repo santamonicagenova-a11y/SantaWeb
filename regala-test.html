@@ -175,7 +175,8 @@
     .vh-row-icon svg { width: 17px; height: 17px; }
 
     .vh-row-body { flex: 1; min-width: 0; }
-    .vh-row-title { font-weight: 600; font-size: 14.5px; margin: 0 0 2px; }
+    .vh-row-title { font-weight: 600; font-size: 14.5px; margin: 0 0 2px; color: var(--ink); }
+    .vh-row.selected .vh-row-title { color: var(--card-ink); }
     .vh-row-sub {
       font-size: 12.5px;
       color: var(--muted);
@@ -577,6 +578,16 @@
       row.addEventListener('click', function() { selectVoucher(v.key); });
       listEl.appendChild(row);
     });
+
+    // spazio tra le 2 degustazioni e i 3 buoni liberi, alto quanto una riga
+    (function() {
+      var rows = listEl.querySelectorAll('.vh-row');
+      if (rows.length > 2) {
+        var spacer = document.createElement('div');
+        spacer.style.height = rows[0].getBoundingClientRect().height + 'px';
+        listEl.insertBefore(spacer, rows[2]);
+      }
+    })();
 
     // valori dei 3 buoni liberi da voucher-config.json (stesso file usato da regala.html)
     fetch('/voucher-config.json', { cache: 'no-store' }).then(function(r) { return r.ok ? r.json() : null; })

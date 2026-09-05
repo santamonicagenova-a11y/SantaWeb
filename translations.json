@@ -129,7 +129,8 @@
     "faq_q7": "Siete presenti in qualche guida gastronomica?",
     "faq_a7": "<p>Sì, siamo presenti nella Guida Michelin, nel Gambero Rosso e nel Golosario. Ma la guida più importante restano sempre gli ospiti che tornano.</p>",
     "faq_q8": "Avete un crudo di pesce?",
-    "faq_a8": "<p>Sì: proponiamo ostriche, scampi e gamberi viola nostrani a crudo, oltre a una selezione di pesce nostrano pescato ad amo e una degustazione di mare per chi desidera un assaggio più completo.</p>"
+    "faq_a8": "<p>Sì: proponiamo ostriche, scampi e gamberi viola nostrani a crudo, oltre a una selezione di pesce nostrano pescato ad amo e una degustazione di mare per chi desidera un assaggio più completo.</p>",
+    "info_dettagli_link": "Dettagli completi e indicazioni stradali"
   },
   "en": {
     "page_title": "Santamonica Restaurant Genoa | Fresh Seafood Gourmet on the Seafront",
@@ -251,7 +252,8 @@
     "faq_q7": "Are you featured in any food guide?",
     "faq_a7": "<p>Yes, we are featured in the Michelin Guide, Gambero Rosso and Golosario. But the guide that matters most is always our returning guests.</p>",
     "faq_q8": "Do you serve raw fish?",
-    "faq_a8": "<p>Yes: we offer oysters, scampi and local purple prawns raw, along with a selection of local line-caught fish and a sea tasting for those who'd like a fuller taste.</p>"
+    "faq_a8": "<p>Yes: we offer oysters, scampi and local purple prawns raw, along with a selection of local line-caught fish and a sea tasting for those who'd like a fuller taste.</p>",
+    "info_dettagli_link": "Full details and directions"
   },
   "fr": {
     "page_title": "Restaurant Santamonica Gênes | Poisson Frais Gourmet sur le Front de Mer",
@@ -373,6 +375,7 @@
     "faq_q7": "Figurez-vous dans un guide gastronomique ?",
     "faq_a7": "<p>Oui, nous figurons dans le Guide Michelin, le Gambero Rosso et le Golosario. Mais le guide le plus important reste toujours nos clients qui reviennent.</p>",
     "faq_q8": "Proposez-vous du poisson cru ?",
-    "faq_a8": "<p>Oui : nous proposons des huîtres, des langoustines et des crevettes violettes locales crues, ainsi qu'une sélection de poisson local pêché à la ligne et une dégustation de la mer pour qui souhaite un aperçu plus complet.</p>"
+    "faq_a8": "<p>Oui : nous proposons des huîtres, des langoustines et des crevettes violettes locales crues, ainsi qu'une sélection de poisson local pêché à la ligne et une dégustation de la mer pour qui souhaite un aperçu plus complet.</p>",
+    "info_dettagli_link": "Détails complets et itinéraire"
   }
 }

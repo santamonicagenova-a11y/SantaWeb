@@ -1,6 +1,19 @@
 /* ═══════════════════════════════════════════════════════════════════════
    orari.js — FONTE UNICA orari di apertura · Santamonica Web
-   v 2026.08.31.01
+   v 2026.09.04.02
+   ───────────────────────────────────────────────────────────────────────
+   v 2026.09.04.02 — renderInfo() aggiunge una nota "Dal [data]: ..." quando
+   PERIODS ha già un periodo successivo definito (prossimo cambio orario
+   stagionale deciso in anticipo, es. 11 settembre): generata da PERIODS via
+   buildGroups(), stessa fonte dati, nessuna data hardcoded — sparisce/si
+   aggiorna da sola quando PERIODS cambia. Aggiunte MONTHS (nomi mese IT/EN/
+   FR) e dalLine (IT/EN/FR) a supporto.
+   v 2026.09.04.01 — restyling #info (card scure): renderInfo() ora genera
+   righe <div class="orari-row"> (giorni aperti + giorni chiusi, uno per
+   riga) invece di testo continuo con <br>, per lo stile a riquadri della
+   nuova card Orari in index.html. Dati e logica invariati (buildGroups
+   resta l'unica fonte); cambia solo il markup HTML prodotto. renderTable()
+   (tabella dove-siamo.html) non toccata.
    ───────────────────────────────────────────────────────────────────────
    PER CAMBIARE GLI ORARI: aggiungi/modifica una voce nell'array PERIODS.
    Tutto il resto (display #info, tabella dove-siamo, Schema.org JSON-LD su
@@ -147,9 +160,14 @@
   }
 
   var L = {
-    it: { lun: 'Lunedì', mar: 'Martedì', mer: 'Mercoledì', gio: 'Giovedì', ven: 'Venerdì', sab: 'Sabato', dom: 'Domenica', chiuso: 'chiuso', chiusoLine: '%s chiuso' },
-    en: { lun: 'Monday', mar: 'Tuesday', mer: 'Wednesday', gio: 'Thursday', ven: 'Friday', sab: 'Saturday', dom: 'Sunday', chiuso: 'closed', chiusoLine: 'Closed %s' },
-    fr: { lun: 'Lundi', mar: 'Mardi', mer: 'Mercredi', gio: 'Jeudi', ven: 'Vendredi', sab: 'Samedi', dom: 'Dimanche', chiuso: 'fermé', chiusoLine: 'Fermé %s' }
+    it: { lun: 'Lunedì', mar: 'Martedì', mer: 'Mercoledì', gio: 'Giovedì', ven: 'Venerdì', sab: 'Sabato', dom: 'Domenica', chiuso: 'chiuso', chiusoLine: '%s chiuso', dalLine: 'Dal %s:' },
+    en: { lun: 'Monday', mar: 'Tuesday', mer: 'Wednesday', gio: 'Thursday', ven: 'Friday', sab: 'Saturday', dom: 'Sunday', chiuso: 'closed', chiusoLine: 'Closed %s', dalLine: 'From %s:' },
+    fr: { lun: 'Lundi', mar: 'Mardi', mer: 'Mercredi', gio: 'Jeudi', ven: 'Vendredi', sab: 'Samedi', dom: 'Dimanche', chiuso: 'fermé', chiusoLine: 'Fermé %s', dalLine: 'À partir du %s :' }
+  };
+  var MONTHS = {
+    it: ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'],
+    en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    fr: ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
   };
   var EN_DAY = { lun: 'Monday', mar: 'Tuesday', mer: 'Wednesday', gio: 'Thursday', ven: 'Friday', sab: 'Saturday', dom: 'Sunday' };
   var NDASH = ' – ';
@@ -157,6 +175,10 @@
   function fmt(servizi, s) { return servizi[s].opens + NDASH + servizi[s].closes; }
   function sig(services) { return services.join('|'); }
   function labels(lang) { return L[lang] || L.it; }
+  function formatDayMonth(dateStr, lang) {
+    var p = dateStr.split('-'), months = MONTHS[lang] || MONTHS.it;
+    return parseInt(p[2], 10) + ' ' + months[parseInt(p[1], 10) - 1];
+  }
 
   function buildJsonLd(period) {
     period = period || resolvePeriod(todayStr());
@@ -210,13 +232,22 @@
   function renderInfo(lang) {
     if (typeof document === 'undefined') return;
     var box = document.getElementById('orari-info'); if (!box) return;
-    var lab = labels(lang), g = buildGroups(lang, ' / '), html = '';
+    var lab = labels(lang), period = resolvePeriod(todayStr()), g = buildGroups(lang, ' / ', period), html = '';
     g.aperti.forEach(function (grp) {
-      html += '<span>' + grp.label + '</span><br><strong style="color:var(--ink);font-weight:400">' + grp.times + '</strong><br><br>';
+      html += '<div class="orari-row"><span class="g">' + grp.label + '</span><strong>' + grp.times + '</strong></div>';
     });
-    if (g.chiusi.length) {
-      var names = g.chiusi.map(function (key) { return lab[key]; }).join(', ');
-      html += '<em style="font-size:0.78rem">' + lab.chiusoLine.replace('%s', names) + '</em>';
+    g.chiusi.forEach(function (key) {
+      var chiusoCap = lab.chiuso.charAt(0).toUpperCase() + lab.chiuso.slice(1);
+      html += '<div class="orari-row"><span class="g">' + lab[key] + '</span><strong>' + chiusoCap + '</strong></div>';
+    });
+    // Se è già definito il periodo successivo (prossimo cambio orario stagionale
+    // già deciso), avvisa in anticipo — stessa fonte dati (PERIODS), niente data
+    // hardcoded: la nota sparisce/si aggiorna da sola quando PERIODS cambia.
+    var idx = PERIODS.indexOf(period), next = PERIODS[idx + 1];
+    if (next) {
+      var ng = buildGroups(lang, ' / ', next), parts = ng.aperti.map(function (grp) { return grp.label + ' ' + grp.times; });
+      if (ng.chiusi.length) parts.push(lab.chiusoLine.replace('%s', ng.chiusi.map(function (k) { return lab[k]; }).join(', ')));
+      html += '<p class="orari-note">' + lab.dalLine.replace('%s', formatDayMonth(next.from, lang)) + ' ' + parts.join(' · ') + '.</p>';
     }
     box.innerHTML = html;
   }

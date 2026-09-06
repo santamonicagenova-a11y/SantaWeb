@@ -1,4 +1,103 @@
 <!DOCTYPE html>
+<!-- v 2026.09.05.02 — aggiunto cursor-follower-admin.js (cerchio ambra che segue il mouse, si
+     evidenzia su link/button) prima di </body>, SOLO su menu-admin.html. Recupera l'effetto
+     "cursore strano" descritto in HANDOVER_cursorfollower_v2026.06.05.01.md (mai deployato sul
+     sito pubblico), riadattato al tema scuro dell'admin: niente mix-blend-mode (invisibile su
+     sfondo scuro), bordo rgba(214,155,74) invece del blu-marino pensato per il sito. A11y-safe
+     (disabilitato su touch/pointer:coarse e con prefers-reduced-motion). GATE PRODUZIONE: P1
+     (node --check OK) + P2 (verifica visiva, vedi sotto) fatte; P3 Revisione Oppositiva NON fatta
+     — micro-fix estetico su tool interno non pubblico, non su contenuto pubblico/critico secondo
+     le regole del gate, quindi non obbligatoria; annotata comunque come nota, non come debito. -->
+<!-- v 2026.09.05.01 — rimossa la card "Menù Vini" dalla riga quick-actions della tab "Gestione
+     menù e sito" (sezione #vini-section e funzioni apriSezioneVini/convertiEPubblicaVini lasciate
+     nel file, innocue e non più raggiungibili da UI). -->
+<!-- v 2026.09.02.09 — fix cambio tab (segnalato da Andrea): passando da una tab all'altra (Gestione
+     menù / Prenotazioni e voucher / Setup) quello che era caricato sotto (es. la carta) restava
+     visibile invece di sparire. setQaTab() ora chiama _pulisciViste() (admin-core.js) a ogni
+     cambio tab. Inoltre "📖 Procedure di aggiornamento e traduzione" (#intro/#procedure, riguarda
+     solo carta/dolci/allergeni/vini) ora è visibile SOLO sulla tab "Gestione menù e sito",
+     nascosta nelle altre 2. Guardia typeof su _pulisciViste per il primo setQaTab() al
+     caricamento pagina, che scatta PRIMA che admin-core.js sia parsato (script in fondo alla
+     pagina) — nessun crash, semplicemente skip alla prima chiamata. -->
+<!-- v 2026.09.02.08 — fix layout checkbox "Invio attivo" (M4): la regola CSS globale
+     input[type=checkbox]{margin:auto} (pensata per centrare i checkbox in altri contesti, es.
+     tabelle) dentro la label flex spingeva checkbox e testo agli estremi opposti — segnalato da
+     Andrea con screenshot. Override mirato margin:0;flex:none; sul solo checkbox di questa
+     label. Nessuna modifica ad altri checkbox della pagina. -->
+<!-- v 2026.09.02.07 — aggiunto M4 al titolo "Ringraziamento post-visita" (stesso trattamento di
+     M1/M2/M3: colore --violet, .85rem → .95rem). Solo estetico. -->
+<!-- v 2026.09.02.06 — titoli M1/M2/M3 nei 3 sotto-blocchi "Testi delle mail ai clienti" in
+     "Prenotazioni — Setup": aggiunto il prefisso M1/M2/M3 (prima solo M1 lo aveva), colore
+     diverso per ciascuno (--rust/--green/--blue, già usati altrove nella pagina) e dimensione
+     aumentata (.85rem → .95rem). Solo estetico, nessuna modifica funzionale. -->
+<!-- v 2026.09.02.05 — CORREZIONE tempistica mail di RINGRAZIAMENTO (richiesta Andrea, stesso
+     giorno della v.04): non parte più all'istante in cui segni "Arrivato" nel gestionale, ma
+     il GIORNO DOPO la visita alle 11:00 (fuso Europe/Rome) — nuovo job pg_cron
+     "thankyou-mails-tick" (ogni 15 min, migration add_thankyou_mails_cron_job) che chiama la
+     nuova Edge Function dedicata send-thankyou-mails (v1); set-reminder-settings torna v19
+     (rimosso l'invio sincrono introdotto in v18, ora superato). Testo del pannello aggiornato
+     di conseguenza. IMPORTANTE: durante il deploy la query ha trovato 2 prenotazioni reali già
+     "Arrivato" di ieri (source sito) → per non mandare mail col testo di default mai rivisto da
+     Andrea, l'interruttore "Invio attivo" è stato spento server-side (thankyou_enabled=false):
+     va riacceso da questo pannello dopo aver controllato/personalizzato i testi. -->
+<!-- v 2026.09.02.04 — nuova mail di RINGRAZIAMENTO post-visita (richiesta Andrea): quando dal
+     gestionale segni un cliente "Arrivato", se ha prenotato dal sito (mai per prenotazioni
+     manuali) e ha un'email, parte in automatico una mail di ringraziamento (al massimo una
+     volta a prenotazione, mai per cancellati/no-show). Nuovo 4° blocco "Ringraziamento
+     post-visita" in "Prenotazioni — Setup" (Setup): interruttore on/off (azione dedicata
+     set_thankyou_enabled, scatta subito) + oggetto/apertura/chiusura (dentro saveMailTexts()
+     esistente). Invio vero in set-reminder-settings v18 (sendThankYouIfNeeded, agganciato a
+     set_arrivo_status); testi salvati/letti da set-reservations-config v21/v9 (nuove colonne
+     reservation_settings.thankyou_enabled/.thankyou_subject/.thankyou_intro/.thankyou_closing +
+     reservations.thankyou_sent_at come guard anti-doppio-invio). Nessuna modifica alle mail
+     M1/conferma/reply esistenti. -->
+<!-- v 2026.09.02.03 — Preview/Traduci e Pubblica/🔑 spostati dalla top-bar (dove restavano visibili
+     su ogni tab, senza senso su Prenotazioni/Setup) a sotto gli 8 pulsanti di "Gestione menù e
+     sito" (nuovo div .menu-top-btns dentro .qa-group[data-group=menu], riga divisoria sopra).
+     top-bar semplificata a solo logo (grid 3 colonne → flex). Nessuna funzione toccata (stessi
+     onclick), solo markup+CSS. Verificato in browser: pulsanti spariti dalle altre 2 tab. -->
+<!-- v 2026.09.02.02 — spostati in Setup: "Reminder prenotazioni" (tutto, era in "Prenotazioni e
+     voucher"), la parte "Garanzia — penale e disdetta" + "Testi delle mail ai clienti" di
+     "Prenotazioni online" (nuovo pannello #prenotazioni-setup-section, "Prenotazioni — Setup"),
+     e la parte "+ Setup" (importi buoni + reset contatore) di "Voucher — Gestione" (nuovo
+     pannello #voucher-setup-section, "Voucher — Setup"). Nessuna funzione di salvataggio/
+     caricamento toccata, solo spostamento di markup (stessi ID campo) + 2 nuove coppie
+     apri/chiudi sezione + _prenSetStatus() ora scrive su entrambi gli span di stato.
+     Bump ?v= admin-core.js a 2026.09.02.02 (_pulisciViste estesa) + footer. -->
+<!-- v 2026.09.02.01 — riordino della barra pulsanti in 3 tab colorate (richiesta Andrea del
+     15/8, rimasta in sospeso in gantt-data.js come 'future' fino ad oggi): i 16 pulsanti
+     quadrati, prima tutti in un'unica fila piatta, sono raggruppati in "Gestione menù e sito"
+     (8: carta/dolci/allergeni/foto cucina+sito/vini/documento generico/Gestionale Cantina),
+     "Prenotazioni e voucher" (7: prenotazioni online/gestionale/gestione clienti/reminder/
+     cauzioni/voucher/pacchi No-show), "Setup" (1: rubrica professionisti) — i 2 pulsanti nuovi
+     dal disegno originale (Gestione Clienti, Gestionale Cantina) non esistevano ancora quando
+     il design fu abbozzato e poi annullato in una sessione precedente. Bordo superiore 3px
+     colorato per gruppo (ambra --rust/blu --blue nuovo/viola --violet nuovo) + tab pill sopra
+     la griglia, tab attiva ricordata in localStorage (qaTab, default "menu"). Nessuna funzione
+     dei pulsanti toccata, solo raggruppamento visivo — tutti gli onclick sono identici a prima. -->
+<!-- v 2026.09.01.03 — nuovo pulsante "Gestione Clienti" → link a clienti.html (pagina admin
+     standalone nuova, ramo CRM ospiti / Gestionale Fase 2, pianificato 5/7/2026, costruito ora):
+     elenco clienti aggregato dalle prenotazioni per telefono, con note libere/tag editabili e
+     possibilità di aggiungere clienti manuali. Backend: tabella `clienti` + Edge Function
+     `clienti-crm` su SafeTable. Nessuna modifica ad altre parti di questo file. -->
+<!-- v 2026.09.01.02 — pulsante "Importa da NoShowApp": tolto il filtro per ristorante (richiesta
+     esplicita Andrea, "vorrei copiare tutto") — ora import_from_nsa (rubrica-professionisti v4)
+     copia TUTTE le voci della rubrica condivisa NSA, non solo quelle di Santamonica; il ristorante
+     di provenienza resta comunque tracciato nel campo segnalato_da ("Importato da NoShowApp
+     (Nome ristorante)"). Dedup per nome+telefono invariata. Solo testo aggiornato qui, nessuna
+     modifica di codice in questo file (il filtro viveva lato Edge Function). -->
+<!-- v 2026.09.01.01 — Rubrica professionisti: ri-separata da NoShowApp (richiesta Andrea).
+     Il 25/7/2026 era stata unificata in un'unica tabella condivisa su NoShowApp (progetto
+     ltgvyanqzkpulocypsve); ora Santamonica torna ad avere una tabella propria e privata su
+     SafeTable (`professionisti`/`professionisti_note_uso`, ricreate — erano state droppate
+     quel giorno), NoShowApp mantiene la sua (`professionals`/`professional_uses`) invariata.
+     RUB_URL ripuntato da NSA a `rubrica-professionisti` (ST, deployata v2, verify_jwt=false).
+     Aggiunto pulsante "⇩ Importa da NoShowApp" (azione import_from_nsa sulla stessa funzione):
+     copia una tantum, sola lettura verso NSA, deduplica per nome+telefono — richiede che il
+     progetto NoShowApp sia attivo (oggi è in pausa). Le due rubriche NON sono più sincronizzate
+     automaticamente: ogni futura modifica da qui resta solo su ST. Prossimo passo (non fatto
+     ora): in NoShowApp, un setup di visibilità dati per-cliente (privato/condiviso, deciso da
+     Andrea come titolare, eventuale feature a pagamento). -->
 <!-- v 2026.08.15.01 — nuovo pulsante "Gestionale Cantina" → link a cantina.html (pagina admin
      standalone, nuovo ramo: anagrafica vini/bevande + magazzino su progetto Supabase dedicato
      "SantaCantina", vedi CLAUDE.md progetto-sito). Nessuna altra modifica. -->
@@ -375,13 +474,16 @@
       --surface:#12151b;  /* sfondo card e barra */
       --field:#1b202a;    /* sfondo input/select/textarea (più chiaro della card) */
       --green:#22c55e;    /* azioni pubblica/salva */
+      --blue:#3b82f6;      /* categoria: prenotazioni e voucher */
+      --violet:#a78bfa;    /* categoria: setup */
       --radius:10px;
       --radius-lg:16px;
     }
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     body { background:var(--cream); color:var(--ink); font-family:'Inter',sans-serif; font-weight:400; font-size:14px; padding-bottom:5rem; }
 
-    .top-bar { background:var(--surface); color:var(--ink); border-bottom:1px solid var(--rule); padding:1rem 2rem; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:1rem; position:sticky; top:0; z-index:100; }
+    .top-bar { background:var(--surface); color:var(--ink); border-bottom:1px solid var(--rule); padding:1rem 2rem; display:flex; align-items:center; position:sticky; top:0; z-index:100; }
+    .menu-top-btns { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; margin:.75rem 0 1.25rem; padding-top:.75rem; border-top:1px solid var(--rule); }
     .top-bar h1 { font-size:.8rem; font-weight:600; letter-spacing:.18em; text-transform:uppercase; }
     .logo-sm { font-size:.7rem; letter-spacing:.2em; color:var(--stone); text-transform:uppercase; }
     .top-btns { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; }
@@ -398,9 +500,23 @@
     .preview-menu a:hover { background:var(--sand); }
     .preview-menu.open { display:block; }
     .btn-publish:hover { opacity:.9; }
-    .quick-actions { max-width:900px; margin:1.2rem auto 0; padding:0 1rem; display:flex; flex-wrap:wrap; gap:.6rem; justify-content:center; }
-    .qa-btn { width:104px; height:104px; flex-shrink:0; border:1px solid var(--rule); border-radius:var(--radius-lg); background:var(--surface); font-family:'Inter',sans-serif; font-weight:600; font-size:.7rem; line-height:1.25; letter-spacing:.03em; text-transform:uppercase; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; text-align:center; padding:.45rem; overflow-wrap:break-word; box-shadow:0 1px 0 rgba(255,255,255,.03) inset; transition:background .15s,border-color .15s; }
-    .qa-btn:hover { background:var(--sand); border-color:var(--rust); }
+    .quick-actions { max-width:900px; margin:1.2rem auto 0; padding:0 1rem; }
+    .qa-tabs { display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center; margin-bottom:1rem; }
+    .qa-tab { padding:.5rem 1.15rem; border:1px solid var(--rule); border-radius:999px; background:var(--surface); color:var(--stone); font-family:'Inter',sans-serif; font-weight:600; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; transition:background .15s,border-color .15s,color .15s; }
+    .qa-tab:hover { color:var(--ink); border-color:var(--stone); }
+    .qa-tab.active[data-group="menu"] { background:var(--rust); border-color:var(--rust); color:#1a1208; }
+    .qa-tab.active[data-group="pren"] { background:var(--blue); border-color:var(--blue); color:#08131f; }
+    .qa-tab.active[data-group="setup"] { background:var(--violet); border-color:var(--violet); color:#1c1533; }
+    .qa-group { display:none; flex-wrap:wrap; gap:.6rem; justify-content:center; }
+    .qa-group.active { display:flex; }
+    .qa-btn { width:104px; height:104px; flex-shrink:0; border:1px solid var(--rule); border-top-width:3px; border-radius:var(--radius-lg); background:var(--surface); font-family:'Inter',sans-serif; font-weight:600; font-size:.7rem; line-height:1.25; letter-spacing:.03em; text-transform:uppercase; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; text-align:center; padding:.45rem; overflow-wrap:break-word; box-shadow:0 1px 0 rgba(255,255,255,.03) inset; transition:background .15s,border-color .15s; }
+    .qa-btn:hover { background:var(--sand); }
+    .qa-btn.qa-menu { border-top-color:var(--rust); }
+    .qa-btn.qa-menu:hover { border-color:var(--rust); }
+    .qa-btn.qa-pren { border-top-color:var(--blue); }
+    .qa-btn.qa-pren:hover { border-color:var(--blue); }
+    .qa-btn.qa-setup { border-top-color:var(--violet); }
+    .qa-btn.qa-setup:hover { border-color:var(--violet); }
     .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:200; align-items:center; justify-content:center; }
     .modal-overlay.on { display:flex; }
     .modal { background:var(--surface); padding:2rem; max-width:440px; width:90%; border:1px solid var(--rule); border-radius:var(--radius-lg); box-shadow:0 24px 60px rgba(0,0,0,.55); }
@@ -470,37 +586,76 @@
     <div class="logo-sm">Santamonica</div>
     <h1>Admin Menù</h1>
   </div>
-  <div class="top-btns">
-    <div class="preview-wrap">
-      <button class="btn btn-save" onclick="togglePreviewMenu(event)">⧉ Preview ▾</button>
-      <div class="preview-menu" id="preview-menu">
-        <a onclick="apriPreview('it')">🇮🇹 Italiano</a>
-        <a onclick="apriPreview('en')">🇬🇧 English</a>
-        <a onclick="apriPreview('fr')">🇫🇷 Français</a>
-      </div>
-    </div>
-    <button class="btn btn-publish" id="btn-pubblica" onclick="traduciEPubblica()">✦ Traduci e Pubblica</button>
-    <button class="btn btn-load" onclick="resetToken()" title="Cambia token GitHub" style="font-size:.6rem;padding:.45rem .7rem;opacity:.7">🔑</button>
-  </div>
 </div>
 
 <div class="quick-actions" id="carica-menu">
-  <button class="qa-btn" onclick="caricaDalSito('carta')">Menù alla carta</button>
-  <button class="qa-btn" onclick="caricaDalSito('dolci')">Menù dolci</button>
-  <button class="qa-btn" onclick="caricaDalSito('allergeni')">Allergeni carta</button>
-  <button class="qa-btn" onclick="apriGestoreFoto()">Foto cucina</button>
-  <button class="qa-btn" onclick="apriGestoreFotoSito()">Foto sito</button>
-  <button class="qa-btn" onclick="apriSezioneVini()">Menù Vini</button>
-  <button class="qa-btn" onclick="apriSezioneDocGenerico()">Documento generico</button>
-  <button class="qa-btn" onclick="apriSezionePrenotazioni()">Prenotazioni online</button>
-  <button class="qa-btn" onclick="apriSezioneVoucher()">Voucher — Gestione</button>
-  <button class="qa-btn" onclick="apriSezioneReminder()">Reminder prenotazioni</button>
-  <button class="qa-btn" onclick="location.href='gestionale.html'">Gestionale</button>
-  <button class="qa-btn" onclick="location.href='cantina.html'">Gestionale Cantina</button>
-  <button class="qa-btn" onclick="apriSezioneCauzioni()">Cauzioni (storico)</button>
-  <button class="qa-btn" onclick="apriSezioneRubrica()">Rubrica professionisti</button>
-  <button class="qa-btn" onclick="apriSezionePacchi()">Pacchi No-show (NoShowApp)</button>
+  <div class="qa-tabs" id="qa-tabs">
+    <button type="button" class="qa-tab" data-group="menu" onclick="setQaTab('menu')">Gestione menù e sito</button>
+    <button type="button" class="qa-tab" data-group="pren" onclick="setQaTab('pren')">Prenotazioni e voucher</button>
+    <button type="button" class="qa-tab" data-group="setup" onclick="setQaTab('setup')">Setup</button>
+  </div>
+
+  <div class="qa-group" data-group="menu">
+    <button class="qa-btn qa-menu" onclick="caricaDalSito('carta')">Menù alla carta</button>
+    <button class="qa-btn qa-menu" onclick="caricaDalSito('dolci')">Menù dolci</button>
+    <button class="qa-btn qa-menu" onclick="caricaDalSito('allergeni')">Allergeni carta</button>
+    <button class="qa-btn qa-menu" onclick="apriGestoreFoto()">Foto cucina</button>
+    <button class="qa-btn qa-menu" onclick="apriGestoreFotoSito()">Foto sito</button>
+    <button class="qa-btn qa-menu" onclick="apriSezioneDocGenerico()">Documento generico</button>
+    <button class="qa-btn qa-menu" onclick="location.href='cantina.html'">Gestionale Cantina</button>
+    <div class="menu-top-btns" style="width:100%">
+      <div class="preview-wrap">
+        <button class="btn btn-save" onclick="togglePreviewMenu(event)">⧉ Preview ▾</button>
+        <div class="preview-menu" id="preview-menu">
+          <a onclick="apriPreview('it')">🇮🇹 Italiano</a>
+          <a onclick="apriPreview('en')">🇬🇧 English</a>
+          <a onclick="apriPreview('fr')">🇫🇷 Français</a>
+        </div>
+      </div>
+      <button class="btn btn-publish" id="btn-pubblica" onclick="traduciEPubblica()">✦ Traduci e Pubblica</button>
+      <button class="btn btn-load" onclick="resetToken()" title="Cambia token GitHub" style="font-size:.6rem;padding:.45rem .7rem;opacity:.7">🔑</button>
+    </div>
+  </div>
+
+  <div class="qa-group" data-group="pren">
+    <button class="qa-btn qa-pren" onclick="apriSezionePrenotazioni()">Prenotazioni online</button>
+    <button class="qa-btn qa-pren" onclick="location.href='gestionale.html'">Gestionale</button>
+    <button class="qa-btn qa-pren" onclick="location.href='clienti.html'">Gestione Clienti</button>
+    <button class="qa-btn qa-pren" onclick="apriSezioneCauzioni()">Cauzioni (storico)</button>
+    <button class="qa-btn qa-pren" onclick="apriSezioneVoucher()">Voucher — Gestione</button>
+    <button class="qa-btn qa-pren" onclick="apriSezionePacchi()">Pacchi No-show (NoShowApp)</button>
+  </div>
+
+  <div class="qa-group" data-group="setup">
+    <button class="qa-btn qa-setup" onclick="apriSezioneReminder()">Reminder prenotazioni</button>
+    <button class="qa-btn qa-setup" onclick="apriSezionePrenotazioniSetup()">Prenotazioni — Setup</button>
+    <button class="qa-btn qa-setup" onclick="apriSezioneVoucherSetup()">Voucher — Setup</button>
+    <button class="qa-btn qa-setup" onclick="apriSezioneRubrica()">Rubrica professionisti</button>
+  </div>
 </div>
+<script>
+  (function(){
+    function setQaTab(g){
+      document.querySelectorAll('.qa-tab').forEach(function(b){ b.classList.toggle('active', b.dataset.group===g); });
+      document.querySelectorAll('.qa-group').forEach(function(el){ el.classList.toggle('active', el.dataset.group===g); });
+      try{ localStorage.setItem('qaTab', g); }catch(e){}
+      // Cambiando tab si pulisce quello che era aperto sotto (carta caricata, pannello
+      // prenotazioni/voucher/ecc.) — altrimenti restava visibile passando a un'altra tab
+      // (segnalato da Andrea). _pulisciViste() è in admin-core.js, caricato prima che l'utente
+      // possa cliccare (script a fine pagina, ma il DOM è già pronto all'interazione).
+      if (typeof _pulisciViste === 'function') _pulisciViste();
+      // "Procedure di aggiornamento e traduzione" ha senso solo con "Gestione menù e sito"
+      // aperta (riguarda solo carta/dolci/allergeni/vini) — nascosta nelle altre 2 tab.
+      var introEl = document.getElementById('intro');
+      if (introEl) introEl.style.display = (g === 'menu') ? '' : 'none';
+    }
+    window.setQaTab = setQaTab;
+    var saved = 'menu';
+    try{ saved = localStorage.getItem('qaTab') || 'menu'; }catch(e){}
+    if (!document.querySelector('.qa-group[data-group="'+saved+'"]')) saved = 'menu';
+    setQaTab(saved);
+  })();
+</script>
 
 <div id="intro">
   <details id="procedure" style="max-width:1000px;margin:1.1rem auto 0;background:var(--sand);border:1px solid var(--rule);border-radius:var(--radius-lg);font-size:.82rem;line-height:1.55;color:var(--ink)">
@@ -813,8 +968,23 @@
       </div>
       <button class="btn btn-publish" onclick="saveCardRequiredDays()">💾 Salva giorni carta</button>
 
-      <hr style="border:none;border-top:1px solid var(--rule);margin:1.6rem 0 0;">
-      <div class="sub" style="margin-top:1rem;">Garanzia — penale e disdetta</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
+        <button class="btn btn-load" onclick="chiudiSezionePrenotazioni()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
+        <span id="pren-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Prenotazioni — Setup (spostato da "Prenotazioni online" su richiesta Andrea: qui vivono i
+     valori di configurazione — garanzia e testi mail — separati dall'operatività quotidiana
+     (blocco/aperture/limiti posti) che resta in "Prenotazioni online"). Stessi campi/ID/funzioni
+     di prima (saveGuaranteeDefaults/saveMailTexts), stesso caricamento dati via loadPrenStatus(). -->
+<div id="prenotazioni-setup-section" style="max-width:700px;margin:1.5rem auto;padding:0 1rem;display:none;">
+  <div class="fs">
+    <div class="fs-head">Prenotazioni — Setup (garanzia e testi mail)</div>
+    <div class="fs-body">
+      <div class="sub" style="margin-top:0;">Garanzia — penale e disdetta</div>
       <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
         Questi due valori sono i default usati ovunque si parli di garanzia: nel passo 5 del wizard
         <code>/prenota.html</code> (giorni con carta obbligatoria), nella Stripe Checkout Session e nella riga
@@ -845,21 +1015,21 @@
         al testo predefinito.
       </p>
 
-      <div class="sub" style="margin-top:1rem;font-size:.85rem;">M1 — "Richiesta ricevuta" (giorni senza carta automatica)</div>
+      <div class="sub" style="margin-top:1rem;font-size:.95rem;color:var(--rust);">M1 — "Richiesta ricevuta" (giorni senza carta automatica)</div>
       <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem;">
         <div><span class="opt-lbl">Oggetto</span><input type="text" id="pren-mail-m1-subject" placeholder="Richiesta ricevuta — Ristorante Santamonica" style="width:100%;" /></div>
         <div><span class="opt-lbl">Apertura (dopo "Buongiorno {nome},")</span><textarea id="pren-mail-m1-intro" rows="2" placeholder="grazie per la sua richiesta di prenotazione:" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
         <div><span class="opt-lbl">Chiusura (dopo la tabella dati)</span><textarea id="pren-mail-m1-closing" rows="2" placeholder="Abbiamo ricevuto la sua richiesta e la contatteremo a breve per conferma." style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
       </div>
 
-      <div class="sub" style="margin-top:1rem;font-size:.85rem;">Conferma automatica (wizard con carta a garanzia)</div>
+      <div class="sub" style="margin-top:1rem;font-size:.95rem;color:var(--green);">M2 — Conferma automatica (wizard con carta a garanzia)</div>
       <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem;">
         <div><span class="opt-lbl">Oggetto</span><input type="text" id="pren-mail-confirm-subject" placeholder="La sua prenotazione è confermata — Ristorante Santamonica" style="width:100%;" /></div>
         <div><span class="opt-lbl">Apertura (dopo "Buongiorno {nome},")</span><textarea id="pren-mail-confirm-intro" rows="2" placeholder="la sua prenotazione è confermata:" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
         <div><span class="opt-lbl">Chiusura extra (facoltativa, prima di "A presto,")</span><textarea id="pren-mail-confirm-closing" rows="2" placeholder="(vuoto = nessuna riga aggiuntiva)" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
       </div>
 
-      <div class="sub" style="margin-top:1rem;font-size:.85rem;">La tua risposta di conferma (manuale)</div>
+      <div class="sub" style="margin-top:1rem;font-size:.95rem;color:var(--blue);">M3 — La tua risposta di conferma (manuale)</div>
       <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
         Non è una mail automatica: è il testo già pronto dietro al bottone <strong>"✉ Rispondi al cliente"</strong> nella
         mail di notifica che ricevi tu — lo controlli e invii a mano quando confermi. Segnaposto disponibili:
@@ -870,11 +1040,28 @@
         <div><span class="opt-lbl">Apertura (dopo "Buongiorno {nome},")</span><textarea id="pren-mail-reply-intro" rows="2" placeholder="grazie per la sua richiesta di prenotazione:" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
         <div><span class="opt-lbl">Chiusura (dopo la tabella dati, include la firma)</span><textarea id="pren-mail-reply-closing" rows="3" placeholder="Prenotazione confermata, vi aspettiamo&#10;&#10;Andrea Giachino" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
       </div>
+      <div class="sub" style="margin-top:1.6rem;font-size:.95rem;color:var(--violet);">M4 — Ringraziamento post-visita (cliente segnato "Arrivato")</div>
+      <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
+        Parte in automatico <strong>il giorno dopo la visita alle 11:00</strong> (non subito quando clicchi
+        "Arrivato" nel gestionale) — SOLO per chi ha prenotato dal sito (mai per prenotazioni
+        telefoniche/manuali inserite da te) e ha un'email. Niente invio per cancellati o no-show. Al massimo
+        una volta per prenotazione. Segnaposto disponibili: <code>{nome}</code> <code>{data}</code>
+        <code>{persone}</code>.
+      </p>
+      <label style="display:flex;align-items:center;gap:.5rem;margin-bottom:.8rem;font-size:.85rem;">
+        <input type="checkbox" id="pren-thankyou-enabled" checked onchange="toggleThankyouEnabled()" style="margin:0;flex:none;" /> Invio attivo
+      </label>
+      <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem;">
+        <div><span class="opt-lbl">Oggetto</span><input type="text" id="pren-mail-thankyou-subject" placeholder="Grazie per essere stati nostri ospiti — Ristorante Santamonica" style="width:100%;" /></div>
+        <div><span class="opt-lbl">Apertura (dopo "Buongiorno {nome},")</span><textarea id="pren-mail-thankyou-intro" rows="2" placeholder="grazie per aver scelto il Ristorante Santamonica." style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
+        <div><span class="opt-lbl">Chiusura (prima di "A presto,")</span><textarea id="pren-mail-thankyou-closing" rows="2" placeholder="È stato un piacere avervi con noi: speriamo di potervi accogliere di nuovo presto." style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
+      </div>
+
       <button class="btn btn-publish" onclick="saveMailTexts()">💾 Salva testi mail</button>
 
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
-        <button class="btn btn-load" onclick="chiudiSezionePrenotazioni()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
-        <span id="pren-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
+        <button class="btn btn-load" onclick="chiudiSezionePrenotazioniSetup()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
+        <span id="pren-setup-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
       </div>
     </div>
   </div>
@@ -915,6 +1102,13 @@
       <div style="display:flex;gap:.6rem;margin-bottom:1.2rem;">
         <button class="btn btn-publish" id="rub-submit-btn" onclick="salvaProfessionista()">+ Aggiungi</button>
         <button class="btn btn-load" id="rub-cancel-edit-btn" style="display:none;border:1px solid var(--ink);color:var(--ink)" onclick="annullaModificaProfessionista()">Annulla modifica</button>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--rule);margin:0 0 1.2rem;">
+
+      <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:1.2rem;">
+        <button class="btn btn-load" id="rub-import-nsa-btn" style="border:1px solid var(--rule);color:var(--ink);font-size:.68rem;" onclick="importaRubricaDaNSA()">⇩ Importa da NoShowApp</button>
+        <span style="font-size:.72rem;color:var(--stone);">Copia una tantum TUTTI i professionisti già presenti su NoShowApp, di qualunque ristorante (richiede che quel progetto sia attivo, non in pausa). Non duplica chi è già qui.</span>
       </div>
 
       <hr style="border:none;border-top:1px solid var(--rule);margin:0 0 1.2rem;">
@@ -1155,53 +1349,6 @@
         </div>
       </details>
 
-      <details id="vc-valori-details" style="margin-bottom:1rem;border:1px solid var(--rule);padding:.8rem 1rem;">
-        <summary style="cursor:pointer;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);">+ Setup</summary>
-        <div style="margin-top:1rem;">
-          <p style="font-size:.82rem;color:var(--stone);margin-bottom:1rem;line-height:1.6;">
-            Imposta i tre importi dei <strong>buoni liberi</strong> mostrati sulla pagina dei voucher.
-            Premendo "Pubblica" vengono salvati in <code>voucher-config.json</code> e la pagina
-            <strong>regala</strong> li legge in automatico. Usa il tuo token GitHub (lo stesso della pubblicazione).
-          </p>
-          <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
-            <div>
-              <span class="opt-lbl">Buono 1 (€)</span>
-              <input type="number" id="vb-1" min="1" step="1" value="100" style="width:90px;" />
-            </div>
-            <div>
-              <span class="opt-lbl">Buono 2 (€)</span>
-              <input type="number" id="vb-2" min="1" step="1" value="150" style="width:90px;" />
-            </div>
-            <div>
-              <span class="opt-lbl">Buono 3 (€)</span>
-              <input type="number" id="vb-3" min="1" step="1" value="200" style="width:90px;" />
-            </div>
-            <button class="btn btn-publish" onclick="pubblicaVoucherBuoni()">✦ Pubblica valori</button>
-          </div>
-          <div id="vb-status" style="font-size:.82rem;color:var(--stone);margin-bottom:1.4rem;">&hellip;</div>
-
-          <div style="border-top:1px dotted var(--rule);padding-top:1rem;">
-            <p style="font-size:.82rem;color:var(--stone);margin-bottom:.8rem;line-height:1.6;">
-              <strong>Azzera contatore codici voucher</strong> — usalo dopo delle prove, per far ripartire i
-              voucher veri da un codice pulito (es. <code>SM-2026-001</code>) invece di continuare da dove
-              sono arrivati i test. Non cancella i voucher già emessi: quelli si eliminano a mano dall'elenco
-              qui sotto (pulsante "Elimina", solo se ancora in stato "emesso").
-            </p>
-            <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:end;margin-bottom:.8rem;">
-              <div>
-                <span class="opt-lbl">Anno</span>
-                <input type="number" id="vs-anno" min="2020" max="2100" step="1" style="width:90px;" />
-              </div>
-              <div>
-                <span class="opt-lbl">Riparti da (codice)</span>
-                <input type="number" id="vs-ultimo" min="0" step="1" value="0" style="width:90px;" />
-              </div>
-              <button class="btn btn-load" style="border:1px solid var(--rust);color:var(--rust)" onclick="azzeraContatoreVoucher()">↺ Azzera contatore</button>
-            </div>
-            <div id="vs-status" style="font-size:.82rem;color:var(--stone);"></div>
-          </div>
-        </div>
-      </details>
 
       <div style="margin-bottom:.8rem;">
         <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:.6rem;">
@@ -1220,11 +1367,68 @@
   </div>
 </div>
 
+<!-- Voucher — Setup (spostato da "Voucher — Gestione" su richiesta Andrea: qui vivono i valori
+     di configurazione — importi dei buoni liberi + reset contatore codici — separati
+     dall'operatività quotidiana (emissione/riscatto/elenco) che resta in "Voucher — Gestione").
+     Stessi campi/ID/funzioni di prima (pubblicaVoucherBuoni/azzeraContatoreVoucher/caricaVoucherBuoni). -->
+<div id="voucher-setup-section" style="max-width:700px;margin:1.5rem auto;padding:0 1rem;display:none;">
+  <div class="fs">
+    <div class="fs-head">Voucher — Setup</div>
+    <div class="fs-body">
+      <p style="font-size:.82rem;color:var(--stone);margin-bottom:1rem;line-height:1.6;">
+        Imposta i tre importi dei <strong>buoni liberi</strong> mostrati sulla pagina dei voucher.
+        Premendo "Pubblica" vengono salvati in <code>voucher-config.json</code> e la pagina
+        <strong>regala</strong> li legge in automatico. Usa il tuo token GitHub (lo stesso della pubblicazione).
+      </p>
+      <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
+        <div>
+          <span class="opt-lbl">Buono 1 (€)</span>
+          <input type="number" id="vb-1" min="1" step="1" value="100" style="width:90px;" />
+        </div>
+        <div>
+          <span class="opt-lbl">Buono 2 (€)</span>
+          <input type="number" id="vb-2" min="1" step="1" value="150" style="width:90px;" />
+        </div>
+        <div>
+          <span class="opt-lbl">Buono 3 (€)</span>
+          <input type="number" id="vb-3" min="1" step="1" value="200" style="width:90px;" />
+        </div>
+        <button class="btn btn-publish" onclick="pubblicaVoucherBuoni()">✦ Pubblica valori</button>
+      </div>
+      <div id="vb-status" style="font-size:.82rem;color:var(--stone);margin-bottom:1.4rem;">&hellip;</div>
+
+      <hr style="border:none;border-top:1px solid var(--rule);margin:0 0 1rem;">
+      <p style="font-size:.82rem;color:var(--stone);margin-bottom:.8rem;line-height:1.6;">
+        <strong>Azzera contatore codici voucher</strong> — usalo dopo delle prove, per far ripartire i
+        voucher veri da un codice pulito (es. <code>SM-2026-001</code>) invece di continuare da dove
+        sono arrivati i test. Non cancella i voucher già emessi: quelli si eliminano a mano dall'elenco
+        di "Voucher — Gestione" (pulsante "Elimina", solo se ancora in stato "emesso").
+      </p>
+      <div style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:end;margin-bottom:.8rem;">
+        <div>
+          <span class="opt-lbl">Anno</span>
+          <input type="number" id="vs-anno" min="2020" max="2100" step="1" style="width:90px;" />
+        </div>
+        <div>
+          <span class="opt-lbl">Riparti da (codice)</span>
+          <input type="number" id="vs-ultimo" min="0" step="1" value="0" style="width:90px;" />
+        </div>
+        <button class="btn btn-load" style="border:1px solid var(--rust);color:var(--rust)" onclick="azzeraContatoreVoucher()">↺ Azzera contatore</button>
+      </div>
+      <div id="vs-status" style="font-size:.82rem;color:var(--stone);"></div>
+
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
+        <button class="btn btn-load" onclick="chiudiSezioneVoucherSetup()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast">✓ Scaricato!</div>
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.07.28.03"></script>
-<script src="admin-core.js?v=2026.08.08.04"></script>
+<script src="admin-core.js?v=2026.09.02.02"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -1259,11 +1463,35 @@ function chiudiSezionePrenotazioni() {
     document.getElementById('intro').style.display = '';
 }
 
+// "Prenotazioni — Setup" (garanzia + testi mail) — sezione separata da "Prenotazioni online",
+// spostata in Setup su richiesta Andrea. Stessi dati/funzioni di salvataggio di prima, stesso
+// caricamento via loadPrenStatus() (che popola anche questi campi tramite renderPrenUI, già
+// null-safe sull'ID dell'elemento — non importa in quale sezione vive).
+function apriSezionePrenotazioniSetup() {
+  document.getElementById('carica-menu').classList.remove('open');
+  document.getElementById('intro').style.display = 'none';
+  _pulisciViste();
+  document.getElementById('prenotazioni-setup-section').style.display = 'block';
+  loadPrenStatus();
+}
+
+function chiudiSezionePrenotazioniSetup() {
+  document.getElementById('prenotazioni-setup-section').style.display = 'none';
+  if (!document.getElementById('wrap').classList.contains('on'))
+    document.getElementById('intro').style.display = '';
+}
+
 function _prenSetStatus(msg, isErr) {
-  var el = document.getElementById('pren-status');
-  if (!el) return;
-  el.textContent = msg || '';
-  el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
+  // Aggiorna ENTRAMBI gli status ("Prenotazioni online" + "Prenotazioni — Setup", spostata in
+  // Setup): sono due sezioni separate ma condividono le stesse funzioni di salvataggio
+  // (_prenConfig/saveGuaranteeDefaults/saveMailTexts), quindi non sappiamo qui quale delle due
+  // è visibile in quel momento — scrivere su entrambe è innocuo (l'elemento nascosto non si vede).
+  ['pren-status', 'pren-setup-status'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = msg || '';
+    el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
+  });
 }
 
 function _prenServiceLabel(s) {
@@ -1381,6 +1609,11 @@ function renderPrenUI() {
   _prenFillMailTextField('pren-mail-reply-subject', prenState.reply_subject);
   _prenFillMailTextField('pren-mail-reply-intro', prenState.reply_intro);
   _prenFillMailTextField('pren-mail-reply-closing', prenState.reply_closing);
+  _prenFillMailTextField('pren-mail-thankyou-subject', prenState.thankyou_subject);
+  _prenFillMailTextField('pren-mail-thankyou-intro', prenState.thankyou_intro);
+  _prenFillMailTextField('pren-mail-thankyou-closing', prenState.thankyou_closing);
+  var thankyouCb = document.getElementById('pren-thankyou-enabled');
+  if (thankyouCb) thankyouCb.checked = prenState.thankyou_enabled !== false;
   _prenRenderList('pren-closures-list', prenState.closures || [], 'Nessuna chiusura attiva.', 'var(--rust)', removePrenClosure);
   _prenRenderList('pren-openings-list', prenState.openings || [], 'Nessuna apertura straordinaria attiva.', 'var(--green)', removePrenOpening);
   _prenRenderSlotList('pren-slot-closures-list', prenState.slot_closures || [], 'Nessun orario chiuso singolarmente.', 'var(--rust)', removePrenSlotClosure);
@@ -1419,6 +1652,10 @@ function loadPrenStatus() {
       prenState.reply_subject = (d && d.reply_subject) || '';
       prenState.reply_intro = (d && d.reply_intro) || '';
       prenState.reply_closing = (d && d.reply_closing) || '';
+      prenState.thankyou_enabled = !(d && d.thankyou_enabled === false);
+      prenState.thankyou_subject = (d && d.thankyou_subject) || '';
+      prenState.thankyou_intro = (d && d.thankyou_intro) || '';
+      prenState.thankyou_closing = (d && d.thankyou_closing) || '';
       prenState.closures = (d && d.closures) || [];
       prenState.openings = (d && d.openings) || [];
       prenState.slot_closures = (d && d.slot_closures) || [];
@@ -1463,6 +1700,10 @@ function _prenApply(res, okMsg) {
     prenState.reply_subject = res.body.reply_subject != null ? res.body.reply_subject : prenState.reply_subject;
     prenState.reply_intro = res.body.reply_intro != null ? res.body.reply_intro : prenState.reply_intro;
     prenState.reply_closing = res.body.reply_closing != null ? res.body.reply_closing : prenState.reply_closing;
+    prenState.thankyou_enabled = res.body.thankyou_enabled != null ? res.body.thankyou_enabled !== false : prenState.thankyou_enabled;
+    prenState.thankyou_subject = res.body.thankyou_subject != null ? res.body.thankyou_subject : prenState.thankyou_subject;
+    prenState.thankyou_intro = res.body.thankyou_intro != null ? res.body.thankyou_intro : prenState.thankyou_intro;
+    prenState.thankyou_closing = res.body.thankyou_closing != null ? res.body.thankyou_closing : prenState.thankyou_closing;
     prenState.closures = res.body.closures || [];
     prenState.openings = res.body.openings || [];
     prenState.slot_closures = res.body.slot_closures || [];
@@ -1541,7 +1782,18 @@ function saveMailTexts() {
     reply_subject: val('pren-mail-reply-subject'),
     reply_intro: val('pren-mail-reply-intro'),
     reply_closing: val('pren-mail-reply-closing'),
+    thankyou_subject: val('pren-mail-thankyou-subject'),
+    thankyou_intro: val('pren-mail-thankyou-intro'),
+    thankyou_closing: val('pren-mail-thankyou-closing'),
   }, 'Testi mail salvati.');
+}
+
+// Interruttore separato (azione dedicata set_thankyou_enabled): scatta subito al cambio
+// checkbox, senza dover premere "Salva testi mail".
+function toggleThankyouEnabled() {
+  var cb = document.getElementById('pren-thankyou-enabled');
+  var enabled = cb ? cb.checked : true;
+  _prenConfig({ action: 'set_thankyou_enabled', enabled: enabled }, enabled ? 'Ringraziamento attivato.' : 'Ringraziamento disattivato.');
 }
 
 function addPrenClosure() {
@@ -1657,10 +1909,14 @@ function removePrenSlotCap(date, time) {
 // ══ RUBRICA PROFESSIONISTI (privata, non condivisa con altri ristoranti) ════
 // CRUD via Edge Function rubrica-professionisti (auth col token GitHub gh_token,
 // stesso meccanismo/token di prenotazioni online e reminder — riusa _prenGhToken()).
-// A differenza della rubrica condivisa costruita in NoShowApp, qui sia lettura sia
-// scrittura passano dal token: è un elenco interno di Santamonica, non un database
-// tra ristoratori. Vedi progetto-sito CLAUDE.md, sessione 25/7.
-var RUB_URL = 'https://ltgvyanqzkpulocypsve.supabase.co/functions/v1/rubrica-professionisti-admin';
+// A differenza della rubrica di NoShowApp, qui sia lettura sia scrittura passano
+// dal token: è un elenco interno di Santamonica, non un database tra ristoratori.
+// v 2026.09.01 — tornata alla tabella LOCALE su SafeTable (era stata unificata con
+// NoShowApp il 25/7/2026, poi ri-separata su decisione di Andrea: le due rubriche
+// (Santamonica su ST, NoShowApp su NSA) restano ora due tabelle fisicamente distinte
+// su due progetti diversi — nessun dato condiviso tra le due finché non si costruisce
+// l'apposito setup di visibilità in NoShowApp. Vedi progetto-sito CLAUDE.md.
+var RUB_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/rubrica-professionisti';
 var RUB_CATEGORIE = [
   ['elettricista', 'Elettricista'], ['idraulico', 'Idraulico'], ['muratore', 'Muratore / edile'],
   ['fabbro', 'Fabbro'], ['imbianchino', 'Imbianchino'], ['falegname', 'Falegname'], ['vetraio', 'Vetraio'],
@@ -1744,6 +2000,25 @@ function loadRubricaProfessionisti() {
   _rubFetch({ action: 'list' })
     .then(function (res) { _rubApply(res, ''); })
     .catch(function (e) { _rubErr(e, 'Errore di connessione.'); });
+}
+
+function importaRubricaDaNSA() {
+  var btn = document.getElementById('rub-import-nsa-btn');
+  btn.disabled = true;
+  _rubSetStatus('Importazione da NoShowApp…');
+  _rubFetch({ action: 'import_from_nsa' })
+    .then(function (res) {
+      if (res.status === 200 && res.body && res.body.ok) {
+        rubState.professionisti = res.body.professionisti || [];
+        rubState.note_uso = res.body.note_uso || [];
+        renderRubricaProfessionisti();
+        _rubSetStatus('Importati ' + res.body.imported + ', già presenti ' + res.body.skipped + '.');
+      } else {
+        _rubSetStatus((res.body && res.body.error) || 'Errore durante l\'importazione.', true);
+      }
+    })
+    .catch(function (e) { _rubErr(e, 'Errore di connessione.'); })
+    .then(function () { btn.disabled = false; });
 }
 
 function _rubClearForm() {
@@ -2350,13 +2625,29 @@ function apriSezioneVoucher() {
   _pulisciViste();
   document.getElementById('voucher-section').style.display = 'block';
   var d = document.getElementById('vc-e-data'); if (d && !d.value) d.value = new Date().toISOString().slice(0,10);
-  var vsAnno = document.getElementById('vs-anno'); if (vsAnno && !vsAnno.value) vsAnno.value = new Date().getFullYear();
   _vcEmitToggle();
   caricaVoucherUnificato();
-  caricaVoucherBuoni();
 }
 function chiudiSezioneVoucher() {
   document.getElementById('voucher-section').style.display = 'none';
+  if (!document.getElementById('wrap').classList.contains('on'))
+    document.getElementById('intro').style.display = '';
+}
+
+// "Voucher — Setup" (importi buoni + reset contatore) — sezione separata da "Voucher —
+// Gestione", spostata in Setup su richiesta Andrea. vb-1/2/3 e vs-anno/vs-ultimo vivono SOLO
+// qui ora: caricaVoucherBuoni()/pubblicaVoucherBuoni()/azzeraContatoreVoucher() non sono
+// null-safe su quegli ID, quindi vanno chiamati/popolati solo quando questa sezione è aperta.
+function apriSezioneVoucherSetup() {
+  document.getElementById('carica-menu').classList.remove('open');
+  document.getElementById('intro').style.display = 'none';
+  _pulisciViste();
+  document.getElementById('voucher-setup-section').style.display = 'block';
+  var vsAnno = document.getElementById('vs-anno'); if (vsAnno && !vsAnno.value) vsAnno.value = new Date().getFullYear();
+  caricaVoucherBuoni();
+}
+function chiudiSezioneVoucherSetup() {
+  document.getElementById('voucher-setup-section').style.display = 'none';
   if (!document.getElementById('wrap').classList.contains('on'))
     document.getElementById('intro').style.display = '';
 }
@@ -2885,7 +3176,7 @@ function _vrCall(action, extra) {
 // Stessa logica di descrizioneRichiesta() lato server (richiedi-voucher), per mostrare
 // un'etichetta leggibile senza dover richiamare il server.
 var VR_TIPO_LABELS = {
-  deg6: { base: 'Menù Degustazione Sei portate, per due persone', vini: 'con abbinamento vini', prezzoBase: 180, prezzoVini: 300 },
+  deg6: { base: 'Menù Degustazione Sei portate, per due persone', vini: 'con abbinamento vini', prezzoBase: 170, prezzoVini: 290 },
   deg7: { base: 'Menù Degustazione Sette portate, per due persone', vini: 'con abbinamento vini', prezzoBase: 220, prezzoVini: 360 }
 };
 function _vrEccedenzaLabel(v) {
@@ -3601,7 +3892,9 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.08.15.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.05.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
+<!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
+<script defer src="/cursor-follower-admin.js"></script>
 </body>
 </html>

@@ -27,11 +27,13 @@
 
   <style>
     :root {
-      --cream: #faf7f2;
-      --ink:   #1a1714;
-      --stone: #8c7e6e;
-      --rust:  #9e4a2a;
-      --rule:  #d4c9b8;
+      /* v 2026.09.04 -- tema scuro coerente col resto del sito (branch restyling):
+         sfondo marrone scuro, testo chiaro, accento azzurro. */
+      --cream: #241812;
+      --ink:   #faf8f4;
+      --stone: rgba(245,240,232,0.62);
+      --rust:  #4AA3D1;
+      --rule:  rgba(245,240,232,0.14);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -98,8 +100,8 @@
       min-height: 297mm;
       margin: 2rem auto;
       padding: 18mm 24mm 16mm;
-      background: #fff;
-      box-shadow: 0 2px 24px rgba(0,0,0,.10);
+      background: #33221A;
+      box-shadow: 0 2px 24px rgba(0,0,0,.35);
       display: flex;
       flex-direction: column;
     }
@@ -371,9 +373,11 @@
        STAMPA
     ══════════════════════════════════════ */
     @media print {
+      :root { --cream: #fff; --ink: #1a1714; --stone: #8c7e6e; --rust: #9e4a2a; --rule: #d4c9b8; }
       @page { size: A4 portrait; margin: 8mm; }
       @page orarioPage { size: A4 portrait; margin: 0; }
       body { background: white; }
+      .pg { background: #fff; }
       .ctrl-bar { display: none; }
 
       /* carta: 3 pagine */

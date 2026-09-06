@@ -1,4 +1,33 @@
 <!DOCTYPE html>
+<!-- v 2026.09.05.05 — passato da elenco pesi statici (300;400 poi 200;300;400) a font Jost
+     VARIABILE (`family=Jost:wght@100..900`): qualunque valore di font-weight tra 100 e 900 ora
+     interpola davvero un tratto proprio, senza doverlo aggiungere esplicitamente al link ogni
+     volta che se ne prova uno nuovo. `.sottosez-titolo` riportato a font-weight:250 (stavolta
+     con un file font che lo sa disegnare per davvero). -->
+<!-- v 2026.09.05.04 — confermato che il peso 250 in stampa risultava ancora 400: il font Jost nel
+     link Google Fonts della carta era caricato solo nei pesi statici 300/400, quindi qualunque
+     valore intermedio si agganciava al più vicino REALMENTE scaricato. Aggiunto il peso 200 al
+     link (`family=Jost:wght@200;300;400`) e portato `.sottosez-titolo` a font-weight:200 — ora il
+     browser ha davvero un tratto più sottile da usare, non solo un numero CSS senza effetto. -->
+<!-- v 2026.09.05.03 — sotto-titolo regione (.sottosez-titolo, "Liguria"/"Altre regioni"/ecc.)
+     portato da peso 400 a peso 250, su richiesta di Andrea che lo percepiva "in grassetto" per
+     contrasto col resto del testo a peso 300. Nota tecnica: il font Jost è caricato da Google
+     Fonts con solo i pesi statici 300 e 400 (`family=Jost:wght@300;400`), non come variabile a
+     range libero — il browser potrebbe quindi visualizzare 250 arrotondato al peso 300 più vicino
+     effettivamente disponibile, invece di un peso realmente più sottile del 300 stesso. -->
+<!-- v 2026.09.05.02 — TEST: tolto il grassetto dal nome del vino (.vino-nome), resta solo la
+     sottolineatura — su richiesta di Andrea per vedere l'effetto in stampa. Facilmente
+     reversibile (basta rimettere font-weight:600) se il risultato stampato non convince. -->
+<!-- v 2026.09.05.01 — fix raggruppamento sotto-capitolo per le categorie eterogenee (Bollicine,
+     Bollicine Rosé, Rosati): un vino con Regione=Liguria ma senza Zona impostata finiva sempre nel
+     bucket "Altre regioni" invece che sotto "Liguria" (es. "Janua" in Bollicine, e 3 dei 4 vini di
+     Rosati "Altre regioni" — "In Rosa"/Lappazzucche/Velia — erano tutti Liguria senza zona). Ora,
+     quando manca la Zona ma la Regione è Liguria, il vino va comunque sotto il sotto-titolo
+     "Liguria" (non più solo con Zona esplicita). Aggiornata di conseguenza anche la visualizzazione
+     inline della regione nella riga del vino: non ripete più "Liguria" quando è già il sotto-
+     titolo, resta visibile solo per le regioni davvero diverse (bucket "Altre regioni" genuino).
+     Nota: questa modifica era stata datata per errore "29 agosto" — corretto al giorno vero, 5
+     settembre (nel mezzo la sessione era rimasta ferma erroneamente anche su "1 settembre"). -->
 <!-- v 2026.08.29.04 — tolto il vincolo `.sottosez-gruppo{break-inside:avoid}` di v.29.02: forzava
      l'intero sotto-capitolo (titolo+tutti i vini) a saltare in blocco alla pagina successiva
      quando non ci stava nello spazio residuo, lasciando grosse zone bianche in fondo alla pagina
@@ -330,7 +359,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.08.29.04</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.05.05</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -1333,7 +1362,7 @@ function rigaVinoHtml(a) {
   // sottolineata perché lì sostituisce il sotto-titolo di sezione (le regioni sono mischiate).
   var capNome = a.tipologia ? a.tipologia.nome : '';
   var eterogenea = CARTA_CATEGORIE_ALTRE_REGIONI.indexOf(capNome) !== -1;
-  var nomeRegione = (!a.zona && eterogenea && a.regione) ? a.regione.nome : '';
+  var nomeRegione = (!a.zona && eterogenea && a.regione && a.regione.nome !== 'Liguria') ? a.regione.nome : '';
   var seg3Html = nomeRegione ? '<span class="vino-regione">' + escapeHtml(nomeRegione) + '</span>' : '';
 
   // Prezzo bottiglia con icona bottiglia, prezzo calice con icona calice — non passano da escapeHtml
@@ -1391,7 +1420,7 @@ function rigaGruppoAnnateHtml(gruppo) {
 
   var capNome = primo.tipologia ? primo.tipologia.nome : '';
   var eterogenea = CARTA_CATEGORIE_ALTRE_REGIONI.indexOf(capNome) !== -1;
-  var nomeRegione = (!primo.zona && eterogenea && primo.regione) ? primo.regione.nome : '';
+  var nomeRegione = (!primo.zona && eterogenea && primo.regione && primo.regione.nome !== 'Liguria') ? primo.regione.nome : '';
   var seg3Html = nomeRegione ? '<span class="vino-regione">' + escapeHtml(nomeRegione) + '</span>' : '';
 
   var segmenti = [];
@@ -1437,7 +1466,10 @@ function generaHtmlCartaVini(articoli) {
     if (!capitoli[cap]) { capitoli[cap] = { sotto: {}, ordineSotto: [], tipologiaId: a.tipologia_id }; ordineCapitoli.push(cap); }
     var c = capitoli[cap];
     var eterogenea = CARTA_CATEGORIE_ALTRE_REGIONI.indexOf(cap) !== -1;
-    var sub = (a.zona ? a.zona.nome : null) || (eterogenea ? 'Altre regioni' : (a.regione ? a.regione.nome : null)) || 'Altre regioni';
+    var regioneLiguria = a.regione && a.regione.nome === 'Liguria';
+    var sub = (a.zona ? a.zona.nome : null) ||
+      (eterogenea ? (regioneLiguria ? 'Liguria' : 'Altre regioni') : (a.regione ? a.regione.nome : null)) ||
+      'Altre regioni';
     if (!c.sotto[sub]) { c.sotto[sub] = []; c.ordineSotto.push(sub); }
     c.sotto[sub].push(a);
   });
@@ -1502,16 +1534,16 @@ function generaHtmlCartaVini(articoli) {
     '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
     '<title>Carta dei Vini — Ristorante Santamonica</title>' +
     '<meta name="description" content="Carta dei vini del Ristorante Santamonica, Genova.">' +
-    '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Jost:wght@300;400&display=swap" rel="stylesheet">' +
+    '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Jost:wght@100..900&display=swap" rel="stylesheet">' +
     '<style>' +
     ':root{--cream:#faf7f2;--ink:#1a1714;--stone:#8c7e6e;--rule:#d4c9b8;}' +
     '*{box-sizing:border-box;margin:0;padding:0;}' +
     'body{background:var(--cream);color:var(--ink);font-family:"Jost",sans-serif;font-weight:300;padding:2rem 1rem;}' +
     '.pg{max-width:700px;margin:0 auto;}' +
     '.sez-titolo{font-family:"Jost",sans-serif;font-weight:300;font-size:24pt;margin:2.8rem 0 .8rem;text-align:center;text-transform:uppercase;letter-spacing:.06em;}' +
-    '.sottosez-titolo{font-family:"Jost",sans-serif;font-weight:400;font-size:20pt;margin:1.8rem 0 .4rem;text-transform:uppercase;letter-spacing:.1em;color:var(--stone);}' +
+    '.sottosez-titolo{font-family:"Jost",sans-serif;font-weight:250;font-size:20pt;margin:1.8rem 0 .4rem;text-transform:uppercase;letter-spacing:.1em;color:var(--stone);}' +
     '.vino{font-size:12pt;line-height:1.55;margin:0 0 .6rem;text-align:justify;}' +
-    '.vino-nome{font-weight:600;text-decoration:underline;}' +
+    '.vino-nome{text-decoration:underline;}' +
     '.vino-nome em{font-style:italic;}' +
     '.vino-annate-lista{margin:-.35rem 0 .6rem 1.2rem;font-size:.85rem;line-height:1.5;}' +
     '.ic-prezzo{vertical-align:-1px;margin:0 1px 0 0;opacity:.8;}' +

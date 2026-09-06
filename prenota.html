@@ -58,12 +58,15 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --sabbia:     #f7f5f0;
-    --crema:      #faf8f3;
+    /* v 2026.09.04 — tema scuro coerente con index.html (branch restyling):
+       sfondo marrone scuro, testo chiaro. --oro invariato: già leggibile su
+       sfondo scuro. */
+    --sabbia:     #241812;
+    --crema:      #33221A;
     --oro:        #c9a961;
-    --inchiostro: #2c2c2c;
-    --bordo:      #e0dcd0;
-    --secondario: #6b6560;
+    --inchiostro: #faf8f4;
+    --bordo:      rgba(245,240,232,0.14);
+    --secondario: rgba(245,240,232,0.62);
     --errore:     #9e4a2a;
     --ok:         #2c6e49;
   }
@@ -84,7 +87,7 @@
     display: flex; align-items: center; justify-content: space-between;
     padding: 1.2rem 1.5rem;
     border-bottom: 1px solid var(--bordo);
-    background: #fff;
+    background: var(--crema);
   }
   .topbar-logo {
     font-family: 'Cormorant', Georgia, serif;
@@ -113,7 +116,7 @@
   .stepper-dot {
     width: 28px; height: 28px; border-radius: 50%; margin: 0 auto 0.4rem;
     display: flex; align-items: center; justify-content: center;
-    background: #fff; border: 1.5px solid var(--bordo); color: var(--secondario);
+    background: var(--crema); border: 1.5px solid var(--bordo); color: var(--secondario);
     font-family: 'Jost', sans-serif; font-size: 0.85rem; transition: all .2s;
   }
   .stepper-item.done .stepper-dot { background: var(--oro); border-color: var(--oro); color: #fff; }
@@ -122,7 +125,7 @@
 
   /* ── Card / step container ── */
   .card {
-    background: #fff; border: 1px solid var(--bordo); padding: 1.8rem 1.6rem;
+    background: var(--crema); border: 1px solid var(--bordo); padding: 1.8rem 1.6rem;
   }
   .step { display: none; }
   .step.active { display: block; animation: fadein .25s ease; }
@@ -147,12 +150,12 @@
     background: var(--crema); position: relative;
   }
   .cal-day.empty { visibility: hidden; }
-  .cal-day.closed, .cal-day.full, .cal-day.past { background: none; color: #c7c2b8; cursor: default; }
+  .cal-day.closed, .cal-day.full, .cal-day.past { background: none; color: rgba(245,240,232,0.28); cursor: default; }
   .cal-day.closed::after, .cal-day.full::after {
-    content: ''; position: absolute; bottom: 4px; width: 3px; height: 3px; border-radius: 50%; background: #c7c2b8;
+    content: ''; position: absolute; bottom: 4px; width: 3px; height: 3px; border-radius: 50%; background: rgba(245,240,232,0.28);
   }
   .cal-day.selectable:hover { border-color: var(--oro); }
-  .cal-day.selected { background: var(--inchiostro); color: #fff; }
+  .cal-day.selected { background: #14100C; color: #fff; }
   .cal-legend { margin-top: 1rem; font-size: 0.78rem; color: var(--secondario); }
 
   /* ── Persone ── */
@@ -162,16 +165,18 @@
     cursor: pointer; font-family: 'Jost', sans-serif; font-size: 1.1rem; border-radius: 4px;
   }
   .persona-btn:hover { border-color: var(--oro); }
-  .persona-btn.selected { background: var(--inchiostro); color: #fff; border-color: var(--inchiostro); }
+  .persona-btn.selected { background: #14100C; color: #fff; border-color: #14100C; }
 
   /* ── Orario ── */
+  .orario-period-label { font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--oro); margin: 1.2rem 0 0.6rem; }
+  .orario-period-label:first-child { margin-top: 0; }
   .orario-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; }
   .orario-btn {
     padding: 0.9rem 0.4rem; text-align: center; border: 1px solid var(--bordo); background: var(--crema);
     cursor: pointer; font-family: 'Jost', sans-serif; font-size: 1rem; border-radius: 4px;
   }
   .orario-btn:hover:not(:disabled) { border-color: var(--oro); }
-  .orario-btn.selected { background: var(--inchiostro); color: #fff; border-color: var(--inchiostro); }
+  .orario-btn.selected { background: #14100C; color: #fff; border-color: #14100C; }
   .orario-btn:disabled { opacity: 0.35; cursor: default; text-decoration: line-through; }
   .orario-cap { display: block; font-size: 0.65rem; margin-top: 2px; opacity: 0.75; }
   .orario-empty { color: var(--secondario); font-size: 0.9rem; }
@@ -199,7 +204,7 @@
   .riepilogo-val { font-weight: 500; text-align: right; }
 
   .rules { display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 1.6rem; }
-  .rule { display: flex; gap: 0.7rem; font-size: 0.86rem; line-height: 1.5; color: #444; }
+  .rule { display: flex; gap: 0.7rem; font-size: 0.86rem; line-height: 1.5; color: rgba(245,240,232,0.7); }
   .rule .dot { flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--oro); margin-top: 0.5rem; }
   .rule b { color: var(--inchiostro); }
 
@@ -210,7 +215,7 @@
     font-family: 'Jost', sans-serif; font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase;
     border-radius: 4px; transition: opacity .15s;
   }
-  .btn-primary { background: var(--inchiostro); color: #fff; }
+  .btn-primary { background: #14100C; color: #fff; }
   .btn-primary:hover { opacity: 0.88; }
   .btn-primary:disabled { opacity: 0.5; cursor: default; }
   .btn-ghost { background: none; border: 1px solid var(--bordo); color: var(--inchiostro); flex: 0 0 auto; padding-left: 1.4rem; padding-right: 1.4rem; }
@@ -218,7 +223,7 @@
 
   .status-msg { margin-top: 1rem; font-size: 0.85rem; padding: 0.8rem 1rem; border-radius: 4px; display: none; }
   .status-msg.show { display: block; }
-  .status-msg.error { background: #fbeae3; color: var(--errore); border: 1px solid #eecbb9; }
+  .status-msg.error { background: rgba(158,74,42,0.2); color: #E08A5F; border: 1px solid rgba(158,74,42,0.4); }
 
   .spinner {
     display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4);
@@ -226,7 +231,7 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  .closed-banner, .resume-card { background: #fff; border: 1px solid var(--bordo); padding: 2rem 1.6rem; text-align: center; }
+  .closed-banner, .resume-card { background: var(--crema); border: 1px solid var(--bordo); padding: 2rem 1.6rem; text-align: center; }
   .closed-banner .icon, .resume-card .icon { font-size: 2.4rem; margin-bottom: 0.8rem; }
   .closed-banner h2, .resume-card h2 { font-family: 'Cormorant', Georgia, serif; font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; }
   .closed-banner p, .resume-card p { color: var(--secondario); font-size: 0.92rem; line-height: 1.6; margin-bottom: 1rem; }
@@ -309,7 +314,7 @@
       <section class="step" id="step-3">
         <p class="step-label">Passo 3 di 5</p>
         <h2 class="step-title">A che ora?</h2>
-        <div class="orario-grid" id="orario-grid"></div>
+        <div id="orario-grid"></div>
         <div class="btn-row">
           <button type="button" class="btn btn-ghost" data-back="2">Indietro</button>
         </div>
@@ -476,6 +481,12 @@
   function capForSlot(dateStr, time) {
     return state.slot_caps.find(function(c){ return c.date===dateStr && c.time===time; }) || null;
   }
+  function periodForTime(t) {
+    // Euristica pranzo/cena sull'orario (hh:mm): prima delle 17:00 = pranzo, altrimenti cena.
+    // Usata solo per raggruppare visivamente gli slot nello step 3 (nessun impatto su
+    // apertura/chiusura, già decisa altrove da servicesForDate/getPeriodSlots).
+    return parseInt(t.split(':')[0], 10) < 17 ? 'pranzo' : 'cena';
+  }
   function getSlotsForDate(dateStr) {
     var svc = servicesForDate(dateStr);
     var periodSlots = (typeof window.getPeriodSlots === 'function') ? window.getPeriodSlots(dateStr) : { pranzo: [], cena: [] };
@@ -489,7 +500,7 @@
     times.sort();
     return times.map(function(t){
       var cap = capForSlot(dateStr,t);
-      return { time: t, capMax: cap ? cap.max_covers : null, capUsed: cap ? cap.current_covers : 0 };
+      return { time: t, period: periodForTime(t), capMax: cap ? cap.max_covers : null, capUsed: cap ? cap.current_covers : 0 };
     });
   }
   function dayStatus(dateStr) {
@@ -604,15 +615,15 @@
 
   /* ── STEP 3: orario ── */
   function renderOrario() {
-    var grid = document.getElementById('orario-grid');
-    grid.innerHTML = '';
+    var container = document.getElementById('orario-grid');
+    container.innerHTML = '';
     if (!state.selectedDate) return;
     var slots = getSlotsForDate(state.selectedDate);
     if (!slots.length) {
-      grid.innerHTML = '<p class="orario-empty">Nessun orario disponibile per questa data. Chiamaci al 010 5533155.</p>';
+      container.innerHTML = '<p class="orario-empty">Nessun orario disponibile per questa data. Chiamaci al 010 5533155.</p>';
       return;
     }
-    slots.forEach(function(s){
+    function buildBtn(s) {
       var remaining = s.capMax !== null ? Math.max(0, s.capMax - s.capUsed) : null;
       var disabled = remaining !== null && remaining < (state.selectedPersone || 1);
       var btn = document.createElement('button');
@@ -621,7 +632,22 @@
       if (disabled) btn.disabled = true;
       if (state.selectedOrario === s.time) btn.classList.add('selected');
       if (!disabled) btn.addEventListener('click', function(t){ return function(){ selectOrario(t); }; }(s.time));
-      grid.appendChild(btn);
+      return btn;
+    }
+    [['pranzo','Pranzo'], ['cena','Cena']].forEach(function(pair){
+      var period = pair[0], label = pair[1];
+      var periodSlots = slots.filter(function(s){ return s.period === period; });
+      if (!periodSlots.length) return;
+      if (slots.some(function(s){ return s.period !== period; })) {
+        var lbl = document.createElement('p');
+        lbl.className = 'orario-period-label';
+        lbl.textContent = label;
+        container.appendChild(lbl);
+      }
+      var grid = document.createElement('div');
+      grid.className = 'orario-grid';
+      periodSlots.forEach(function(s){ grid.appendChild(buildBtn(s)); });
+      container.appendChild(grid);
     });
   }
   function selectOrario(t) {

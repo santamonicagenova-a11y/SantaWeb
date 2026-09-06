@@ -1,4 +1,7 @@
 // Core functions per menu-admin Santamonica
+// v 2026.09.02.02 — _pulisciViste() estesa con 'prenotazioni-setup-section' e 'voucher-setup-section'
+//   (nuovi pannelli Setup, vedi menu-admin.html): senza questo fix i due pannelli non venivano
+//   nascosti passando ad altre sezioni admin.
 // v 2026.08.08.04 — Riquadro laterale dolci: aggiunta riga con testo sottolineato "Dalla Preview
 //   puoi stampare direttamente, senza salvare prima in PDF" (_SIDE_NOTE_HTML.dolci).
 // v 2026.08.08.03 — Carta (solo carta, non dolci): colonna "Nome piatto" allargata a 3fr,
@@ -259,7 +262,7 @@ function _setCartaSideNote(tipo) {
 // Va chiamata a ogni caricamento (carta, dolci, allergeni, vini, foto, documento generico,
 // prenotazioni) così la pagina non trascina la vista precedente in fondo.
 function _pulisciViste() {
-  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section','reminder-section','cauzioni-section','voucher-section','rubrica-section','pacchi-section'].forEach(function(id){
+  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section','prenotazioni-setup-section','reminder-section','cauzioni-section','voucher-section','voucher-setup-section','rubrica-section','pacchi-section'].forEach(function(id){
     var e = document.getElementById(id); if (e) e.style.display = 'none';
   });
   var w = document.getElementById('wrap');

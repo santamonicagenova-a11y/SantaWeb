@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<!-- v 2026.09.02.01 — 4 funzionalità CRM aggiunte dopo ricerca su SevenRooms/OpenTable/Resy/Brevo
+     (richiesta Andrea: "cerca in rete altri esempi... vedi se ci sono altre funzionalità").
+     (1) Compleanno/anniversario: 2 nuovi campi data nella scheda cliente (colonne
+     clienti.data_nascita/.data_anniversario, clienti-crm v5) + pannello "🎂 Prossime ricorrenze
+     (30 giorni)" sopra la tabella, calcolato lato client su tutta la lista — un promemoria per
+     un gesto personale, NON una campagna automatica (coerente col tono brand). (2) Filtro
+     "Non viene da 3+/6+/12+ mesi" nella toolbar (win-back manuale, basato su
+     ultima_prenotazione). (3) Badge milestone "★ Abituale" (3+ visite arrivate) / "★★
+     Fedelissimo" (10+) nella tabella e nella scheda cliente. (4) Mini-dashboard KPI (clienti
+     totali / % con consenso newsletter / attivi negli ultimi 90gg) sopra la tabella. Tutto sola
+     lettura tranne il salvataggio delle 2 nuove date (stesso upsert già esistente). -->
+<!-- v 2026.09.01.06 — "modalità scheda diretta" per il deep-link da gestionale.html (richiesta
+     Andrea: "si deve aprire direttamente l'anagrafica cliente, non un'altra pagina con la
+     tabella clienti"). Con ?tel=... la toolbar e la tabella restano nascoste, la scheda cliente
+     non è più un modal sopra una tabella dimmerata ma diventa il contenuto diretto della pagina
+     (classe .embedded: niente overlay/sfondo scurito). Pulsante "Annulla" diventa "← Vedi tutti
+     i clienti" in questa modalità: chiudendolo si esce e riappare l'elenco completo (rimuove
+     anche ?tel dalla URL). -->
+<!-- v 2026.09.01.05 — deep-link da gestionale.html: `clienti.html?tel=<telefono_norm>` apre
+     subito la scheda del cliente giusto dopo il caricamento della lista (invece di dover
+     cercare a mano). Parte dell'integrazione CRM↔gestionale richiesta da Andrea. Refactor
+     interno: apriScheda(i) ora e' un wrapper su apriSchedaCliente(c), condiviso con la nuova
+     apriSchedaPerTelefono(telNorm). -->
+<!-- v 2026.09.01.04 — verifica REALE dell'iscrizione Brevo (richiesta Andrea: "non puoi
+     comunicare con Brevo e vedere che ha dato il consenso?"). Nuovo pulsante "🔍 Verifica su
+     Brevo" nella scheda cliente (visibile solo se c'è un'email): chiama la nuova azione
+     check_brevo su clienti-crm v3, che fa GET /v3/contacts/{email} su Brevo — con Double Opt-in
+     un contatto entra nella lista Newsletter (ID 2) SOLO dopo aver cliccato il link di conferma,
+     quindi trovarlo in listIds è la prova vera di iscrizione, non solo "richiesta inviata"
+     (stesso controllo già usato da submit-reservation per evitare doppie richieste DOI). 3 esiti
+     mostrati: iscritto confermato / presente ma non confermato / non trovato su Brevo. Chiamata
+     solo su richiesta esplicita (bottone), mai automatica su tutta la lista — un giro Brevo per
+     cliente, non serve/non è pensata per verifiche di massa. -->
+<!-- v 2026.09.01.03 — dati CRM utilizzabili per newsletter/marketing (richiesta Andrea). Nuova
+     colonna "Newsletter" in elenco (Sì/No, badge colorato) + filtro "Consenso: tutti/solo
+     consenzienti/solo non consenzienti" + pulsante "⇩ Esporta CSV" (esporta la lista filtrata
+     corrente: nome/telefono/email/prenotazioni/ultima visita/no-show/consenso/tag — per campagne
+     mirate, es. import in Brevo). Scheda cliente mostra "Consenso newsletter: Sì, dal gg-mm-aaaa /
+     No" in sola lettura (è un dato legale che arriva dal checkbox di prenotazione, non editabile
+     da qui). Regola di aggregazione (decisione Andrea): un cliente risulta consenziente se
+     ALMENO UNA delle sue prenotazioni ha marketing_consent=true ("basta un sì"). Backend:
+     clienti-crm v2 espone consenso_marketing/consenso_marketing_at/brevo_doi_requested_at
+     (quest'ultimo = richiesta DOI inviata, NON conferma di iscrizione effettiva — non abbiamo
+     visibilità su Brevo da qui). -->
+<!-- v 2026.09.01.02 — stato di arrivo nello storico prenotazioni ora mostrato come badge colorato
+     (In attesa/Arrivato/No-show), stessa palette già in uso in gestionale.html (.badge-wait/-ok/-no)
+     invece del valore grezzo del database (es. "in_attesa"). Richiesta Andrea dopo aver visto lo
+     stato illeggibile nella scheda cliente. -->
+<!-- v 2026.09.01.01 — NUOVO: CRM ospiti (Gestionale Fase 2, pianificato 5/7/2026, costruito
+     1/9/2026). Pagina admin standalone (stesso stile/pattern di gestionale.html/cantina.html:
+     tema chiaro cream/ink/rust, auth _ghToken() con gh_token in localStorage), collegata da un
+     nuovo pulsante "Gestione clienti" in menu-admin.html. Backend: tabella `clienti` (SafeTable,
+     solo arricchimento manuale — nome override/note/tag/clienti puramente manuali) + Edge
+     Function `clienti-crm` (azioni list/detail/upsert/delete). Lo storico visite NON è
+     duplicato: si calcola al volo raggruppando `reservations` per telefono normalizzato (ultime
+     9 cifre, stessa convenzione già in uso per il matching dei pacchi No-show) — ogni nuova
+     prenotazione aggiorna automaticamente le statistiche del cliente, zero sincronizzazione da
+     mantenere. Elenco cercabile/filtrabile per tag, scheda cliente con storico prenotazioni +
+     note libere + tag editabili, pulsante "+ Cliente manuale" per chi non ha mai prenotato dal
+     sito. Vedi progetto-sito/CLAUDE.md. -->
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Gestione Clienti — Santamonica</title>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root { --cream:#faf7f2; --ink:#1a1714; --stone:#8c7e6e; --rust:#9e4a2a; --rule:#d4c9b8; --sand:#f0ebe0; --ok:#2d6a4f; --warn:#a35b1c; }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--cream); color:var(--ink); font-family:'Jost',sans-serif; font-weight:300; font-size:14px; padding-bottom:4rem; }
+
+    .top-bar { background:var(--ink); color:var(--cream); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; position:sticky; top:0; z-index:50; }
+    .top-bar h1 { font-size:.8rem; font-weight:400; letter-spacing:.18em; text-transform:uppercase; }
+    .top-bar h1 .ver { font-size:.6rem; letter-spacing:.08em; text-transform:none; color:var(--stone); margin-left:.6rem; font-weight:300; vertical-align:middle; }
+    .logo-sm { font-size:.7rem; letter-spacing:.2em; color:var(--stone); text-transform:uppercase; }
+    .top-bar a.back { color:var(--cream); opacity:.75; font-size:.7rem; letter-spacing:.08em; text-decoration:none; }
+    .top-bar a.back:hover { opacity:1; }
+
+    .btn { padding:.45rem 1.1rem; border:1px solid var(--rule); background:#fff; font-family:'Jost',sans-serif; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; color:var(--ink); }
+    .btn:hover { background:var(--sand); }
+    .btn-ok { background:var(--ok); border-color:var(--ok); color:#fff; }
+    .btn-ok:hover { opacity:.88; }
+    .btn-rust { background:var(--rust); border-color:var(--rust); color:#fff; }
+    .btn-rust:hover { opacity:.88; }
+    .btn-sm { padding:.3rem .7rem; font-size:.66rem; }
+
+    .toolbar { max-width:1100px; margin:1.4rem auto .8rem; padding:0 1rem; display:flex; align-items:center; gap:.7rem; flex-wrap:wrap; }
+    .toolbar input[type=text] { padding:.45rem .7rem; border:1px solid var(--rule); background:#fff; font-family:'Jost',sans-serif; font-size:.82rem; color:var(--ink); flex:1; min-width:12rem; }
+    .toolbar select { padding:.45rem .5rem; border:1px solid var(--rule); background:#fff; font-family:'Jost',sans-serif; font-size:.78rem; color:var(--ink); }
+    .toolbar .counts { font-size:.72rem; color:var(--stone); letter-spacing:.04em; margin-left:auto; }
+
+    .wrap { max-width:1100px; margin:0 auto 2rem; padding:0 1rem; }
+    table { width:100%; border-collapse:collapse; background:#fff; font-size:.8rem; }
+    th, td { text-align:left; padding:.55rem .7rem; border-bottom:1px solid var(--rule); }
+    th { font-size:.65rem; letter-spacing:.08em; text-transform:uppercase; color:var(--stone); background:var(--sand); }
+    tr.clickable { cursor:pointer; }
+    tr.clickable:hover { background:var(--sand); }
+    .tag { display:inline-block; padding:.12rem .55rem; border-radius:999px; background:var(--sand); border:1px solid var(--rule); font-size:.66rem; letter-spacing:.03em; color:var(--ink); margin:0 .25rem .15rem 0; }
+    .tag.suggest { cursor:pointer; background:#fff; }
+    .tag.suggest:hover { background:var(--sand); }
+    .manuale-badge { font-size:.62rem; color:var(--warn); letter-spacing:.06em; text-transform:uppercase; }
+    .empty { padding:2rem; text-align:center; color:var(--stone); font-size:.85rem; }
+
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(26,23,20,.55); z-index:200; align-items:flex-start; justify-content:center; padding:3rem 1rem; overflow-y:auto; }
+    /* Modalità "scheda diretta" (deep-link da gestionale.html ?tel=...): niente overlay/sfondo
+       scurito sopra una tabella nascosta dietro — la scheda È il contenuto della pagina. */
+    .modal-overlay.embedded { position:static; background:none; padding:1.4rem 1rem; }
+    .modal-overlay.embedded .modal { max-width:640px; margin:0 auto; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+    .modal-overlay.on { display:flex; }
+    .modal { background:#fff; padding:1.6rem; max-width:640px; width:100%; border:1px solid var(--rule); }
+    .modal h3 { font-size:.78rem; font-weight:400; letter-spacing:.1em; text-transform:uppercase; color:var(--stone); margin-bottom:1rem; }
+    .field { margin-bottom:.9rem; }
+    .field label { display:block; font-size:.65rem; letter-spacing:.08em; text-transform:uppercase; color:var(--stone); margin-bottom:.3rem; }
+    .field input[type=text], .field input[type=date], .field textarea { width:100%; padding:.5rem .6rem; border:1px solid var(--rule); font-family:'Jost',sans-serif; font-size:.85rem; color:var(--ink); }
+    .field textarea { min-height:5rem; resize:vertical; }
+    .modal .actions { display:flex; gap:.6rem; margin-top:1.2rem; flex-wrap:wrap; }
+    .storia-tbl { font-size:.75rem; margin-top:.4rem; max-height:240px; overflow-y:auto; display:block; }
+    .badge { font-size:.6rem; letter-spacing:.06em; text-transform:uppercase; padding:.15rem .5rem; border-radius:2px; white-space:nowrap; }
+    .badge-wait { background:var(--sand); color:var(--stone); border:1px solid var(--rule); }
+    .badge-ok { background:#e6f0ea; color:var(--ok); border:1px solid #bcd9c9; }
+    .badge-no { background:#f6e7e2; color:var(--rust); border:1px solid #e3bcac; }
+    .stat-row { display:flex; gap:1.4rem; flex-wrap:wrap; margin-bottom:1rem; font-size:.78rem; }
+    .stat-row b { display:block; font-size:1.1rem; font-weight:400; }
+    .status { font-size:.75rem; color:var(--stone); margin-top:.6rem; }
+    .status.err { color:var(--rust); }
+
+    .kpi-row { max-width:1100px; margin:0 auto .8rem; padding:0 1rem; display:flex; gap:.8rem; flex-wrap:wrap; }
+    .kpi-card { background:#fff; border:1px solid var(--rule); padding:.7rem 1rem; flex:1; min-width:9rem; }
+    .kpi-card b { display:block; font-size:1.3rem; font-weight:400; }
+    .kpi-card span { font-size:.62rem; letter-spacing:.06em; text-transform:uppercase; color:var(--stone); }
+
+    .ricorrenze-wrap { max-width:1100px; margin:0 auto .8rem; padding:0 1rem; }
+    .ricorrenze-box { background:#fff8ee; border:1px solid #e8d9b8; padding:.7rem 1rem; font-size:.78rem; }
+    .ricorrenze-box h4 { font-size:.62rem; letter-spacing:.08em; text-transform:uppercase; color:var(--warn); margin-bottom:.4rem; }
+    .ricorrenza-item { display:flex; justify-content:space-between; gap:1rem; padding:.25rem 0; border-bottom:1px dashed #e8d9b8; }
+    .ricorrenza-item:last-child { border-bottom:none; }
+    .badge-milestone { background:#fdf0d5; color:var(--warn); border:1px solid #e8d9b8; }
+    .badge-milestone-top { background:#f3e6d8; color:var(--rust); border:1px solid #e0c4a8; }
+
+    .field-row2 { display:flex; gap:.8rem; }
+    .field-row2 .field { flex:1; }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div>
+      <div class="logo-sm">Santamonica</div>
+      <h1>Gestione Clienti <span class="ver">v 2026.09.02.01</span></h1>
+    </div>
+    <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" id="cli-search" placeholder="Cerca per nome, telefono o email…" oninput="renderClienti()" />
+    <select id="cli-filtro-tag" onchange="renderClienti()">
+      <option value="">Tutti i tag</option>
+    </select>
+    <select id="cli-filtro-consenso" onchange="renderClienti()">
+      <option value="">Consenso: tutti</option>
+      <option value="si">Solo consenzienti</option>
+      <option value="no">Solo NON consenzienti</option>
+    </select>
+    <select id="cli-filtro-inattivo" onchange="renderClienti()">
+      <option value="">Attività: tutti</option>
+      <option value="3">Non viene da 3+ mesi</option>
+      <option value="6">Non viene da 6+ mesi</option>
+      <option value="12">Non viene da 12+ mesi</option>
+    </select>
+    <button class="btn" onclick="loadClienti()">↻ Aggiorna</button>
+    <button class="btn" onclick="esportaCSV()">⇩ Esporta CSV</button>
+    <button class="btn btn-ok" onclick="apriModalNuovo()">+ Cliente manuale</button>
+    <span class="counts" id="cli-counts"></span>
+  </div>
+
+  <div class="kpi-row" id="cli-kpi"></div>
+  <div class="ricorrenze-wrap" id="cli-ricorrenze"></div>
+
+  <div class="wrap">
+    <table>
+      <thead>
+        <tr><th>Nome</th><th>Telefono</th><th>Prenotazioni</th><th>Ultima visita</th><th>No-show</th><th>Newsletter</th><th>Tag</th></tr>
+      </thead>
+      <tbody id="cli-tbody"></tbody>
+    </table>
+    <div class="empty" id="cli-empty" style="display:none;">Nessun cliente trovato.</div>
+  </div>
+  <div class="status" id="cli-status" style="text-align:center;"></div>
+
+  <!-- Scheda cliente -->
+  <div class="modal-overlay" id="cli-modal">
+    <div class="modal">
+      <h3 id="cli-modal-title">Scheda cliente</h3>
+
+      <div class="stat-row" id="cli-stats"></div>
+      <div class="field" id="cli-brevo-wrap" style="display:none;">
+        <button class="btn btn-sm" onclick="verificaBrevo()">🔍 Verifica su Brevo</button>
+        <span id="cli-brevo-esito" style="font-size:.78rem;color:var(--stone);margin-left:.5rem;"></span>
+      </div>
+
+      <div class="field">
+        <label>Nome</label>
+        <input type="text" id="cli-f-nome" />
+      </div>
+      <div class="field">
+        <label>Telefono</label>
+        <input type="text" id="cli-f-telefono" />
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="text" id="cli-f-email" />
+      </div>
+      <div class="field-row2">
+        <div class="field">
+          <label>Compleanno</label>
+          <input type="date" id="cli-f-nascita" />
+        </div>
+        <div class="field">
+          <label>Anniversario</label>
+          <input type="date" id="cli-f-anniversario" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Tag</label>
+        <div id="cli-tags-attivi" style="margin-bottom:.4rem;"></div>
+        <div id="cli-tags-suggeriti"></div>
+        <input type="text" id="cli-f-tag-nuovo" placeholder="Aggiungi un tag e premi Invio…" style="margin-top:.4rem;" onkeydown="if(event.key==='Enter'){event.preventDefault();aggiungiTagLibero();}" />
+      </div>
+      <div class="field">
+        <label>Note</label>
+        <textarea id="cli-f-note" placeholder="Preferenze, allergie ricorrenti, aneddoti…"></textarea>
+      </div>
+
+      <div class="field" id="cli-storia-wrap">
+        <label>Storico prenotazioni</label>
+        <table class="storia-tbl">
+          <thead><tr><th>Data</th><th>Orario</th><th>Persone</th><th>Stato</th><th>Occasione</th></tr></thead>
+          <tbody id="cli-storia-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-ok" onclick="salvaCliente()">💾 Salva</button>
+        <button class="btn" id="cli-annulla-btn" onclick="chiudiModal()">Annulla</button>
+        <button class="btn btn-rust" id="cli-elimina-btn" style="display:none;margin-left:auto;" onclick="eliminaCliente()">🗑 Elimina scheda</button>
+      </div>
+      <div class="status" id="cli-modal-status"></div>
+    </div>
+  </div>
+
+<script>
+var URL_CRM = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/clienti-crm';
+var TAG_SUGGERITI = ['VIP', 'Habitué', 'Wine lover', 'Vegetariano', 'Vegano', 'Allergie'];
+var cliState = { clienti: [] };
+var cliEdit = { id: null, telefono_norm: null, tags: [], manuale: false };
+
+function _ghToken() {
+  var t = localStorage.getItem('gh_token') || '';
+  if (!t) {
+    t = (window.prompt('Incolla il tuo token GitHub (lo stesso della pubblicazione):') || '').trim();
+    if (t) localStorage.setItem('gh_token', t);
+  }
+  return t;
+}
+
+var STATO_LABEL = { in_attesa: ['In attesa', 'badge-wait'], arrivato: ['Arrivato', 'badge-ok'], no_show: ['No-show', 'badge-no'] };
+function badgeStato(s) {
+  var def = STATO_LABEL[s] || [s || '—', 'badge-wait'];
+  return '<span class="badge ' + def[1] + '">' + _escHtml(def[0]) + '</span>';
+}
+
+// Milestone "cliente abituale" (richiesta Andrea dopo ricerca su CRM di settore: SevenRooms
+// auto-etichetta i clienti a soglie di visite). Basato su n_arrivato (visite ONORATE), non sul
+// totale prenotazioni (che include cancellate/no-show).
+function milestoneBadge(nArrivato) {
+  var n = nArrivato || 0;
+  if (n >= 10) return '<span class="badge badge-milestone-top" title="10+ visite onorate">★★ Fedelissimo</span>';
+  if (n >= 3) return '<span class="badge badge-milestone" title="3+ visite onorate">★ Abituale</span>';
+  return '';
+}
+
+// Mesi trascorsi dalla data (stringa YYYY-MM-DD) a oggi. null se la data manca.
+function monthsAgo(dateStr) {
+  if (!dateStr) return null;
+  var d = new Date(dateStr + 'T00:00:00');
+  var now = new Date();
+  var months = (now.getFullYear() - d.getFullYear()) * 12 + (now.getMonth() - d.getMonth());
+  if (now.getDate() < d.getDate()) months--;
+  return months;
+}
+
+// Prossima occorrenza annuale di una data (compleanno/anniversario) rispetto a oggi — ignora
+// l'anno della data salvata, guarda solo mese/giorno. Ritorna null se la data manca/non valida.
+function nextOccurrenceDays(dateStr) {
+  if (!dateStr) return null;
+  var parts = String(dateStr).split('-');
+  if (parts.length !== 3) return null;
+  var mm = parseInt(parts[1], 10), dd = parseInt(parts[2], 10);
+  if (!mm || !dd) return null;
+  var today = new Date(); today.setHours(0, 0, 0, 0);
+  var year = today.getFullYear();
+  var next = new Date(year, mm - 1, dd);
+  if (next < today) next = new Date(year + 1, mm - 1, dd);
+  var days = Math.round((next - today) / 86400000);
+  return { days: days, date: next };
+}
+
+// Mini-dashboard KPI (richiesta Andrea dopo ricerca CRM: quasi tutti mostrano un riepilogo in
+// cima). Calcolato sull'INTERA lista (non filtrata) a ogni caricamento/salvataggio.
+function renderKpi() {
+  var list = cliState.clienti;
+  var totale = list.length;
+  var conConsenso = list.filter(function (c) { return c.consenso_marketing; }).length;
+  var attivi90 = list.filter(function (c) { var m = monthsAgo(c.ultima_prenotazione); return m !== null && m <= 3; }).length;
+  var pct = totale ? Math.round(conConsenso / totale * 100) : 0;
+  document.getElementById('cli-kpi').innerHTML =
+    '<div class="kpi-card"><b>' + totale + '</b><span>Clienti totali</span></div>' +
+    '<div class="kpi-card"><b>' + pct + '%</b><span>Con consenso newsletter</span></div>' +
+    '<div class="kpi-card"><b>' + attivi90 + '</b><span>Attivi negli ultimi 90gg</span></div>';
+}
+
+// "Prossime ricorrenze" (30 giorni) — richiesta Andrea dopo ricerca CRM: compleanni/anniversari
+// come dato di base del profilo cliente per un piccolo gesto personale, non per campagne
+// automatiche (coerente col tono brand). Calcolato sull'INTERA lista, non filtrata.
+function renderRicorrenze() {
+  var items = [];
+  cliState.clienti.forEach(function (c) {
+    var b = nextOccurrenceDays(c.data_nascita);
+    if (b && b.days <= 30) items.push({ nome: c.nome, tipo: 'Compleanno', days: b.days, date: b.date });
+    var a = nextOccurrenceDays(c.data_anniversario);
+    if (a && a.days <= 30) items.push({ nome: c.nome, tipo: 'Anniversario', days: a.days, date: a.date });
+  });
+  items.sort(function (x, y) { return x.days - y.days; });
+  var box = document.getElementById('cli-ricorrenze');
+  var header = '<h4>🎂 Prossime ricorrenze (30 giorni)</h4>';
+  if (!items.length) {
+    box.innerHTML = '<div class="ricorrenze-box">' + header + '<div style="color:var(--stone);">Nessuna ricorrenza segnata nei prossimi 30 giorni.</div></div>';
+    return;
+  }
+  box.innerHTML = '<div class="ricorrenze-box">' + header + items.map(function (it) {
+    var quando = it.days === 0 ? 'oggi' : (it.days === 1 ? 'domani' : 'tra ' + it.days + ' giorni');
+    var gg = String(it.date.getDate()).padStart(2, '0') + '/' + String(it.date.getMonth() + 1).padStart(2, '0');
+    return '<div class="ricorrenza-item"><span>' + _escHtml(it.tipo) + ' — ' + _escHtml(it.nome || '(senza nome)') + '</span><span>' + quando + ' (' + gg + ')</span></div>';
+  }).join('') + '</div>';
+}
+
+function _escHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function _cliFetch(payload) {
+  var token = _ghToken();
+  if (!token) return Promise.reject(new Error('no-token'));
+  payload.github_token = token;
+  return fetch(URL_CRM, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+  }).then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); });
+}
+
+function _setStatus(msg, isErr) {
+  var el = document.getElementById('cli-status');
+  el.textContent = msg || '';
+  el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
+}
+function _setModalStatus(msg, isErr) {
+  var el = document.getElementById('cli-modal-status');
+  el.textContent = msg || '';
+  el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
+}
+
+function loadClienti() {
+  _setStatus('Caricamento…');
+  _cliFetch({ action: 'list' }).then(function (res) {
+    if (res.status === 200 && res.body && res.body.ok) {
+      cliState.clienti = res.body.clienti || [];
+      popolaFiltroTag();
+      renderClienti();
+      renderKpi();
+      renderRicorrenze();
+      _setStatus('');
+      // Deep-link da gestionale.html (?tel=<telefono_norm>): apre subito la scheda giusta.
+      var telParam = new URLSearchParams(window.location.search).get('tel');
+      if (telParam) apriSchedaPerTelefono(telParam);
+    } else if (res.status === 401) {
+      _setStatus('Token GitHub non valido o senza permessi. Ricarica la pagina per reinserirlo.', true);
+    } else {
+      _setStatus((res.body && res.body.error) || 'Errore.', true);
+    }
+  }).catch(function (e) {
+    if (e && e.message === 'no-token') _setStatus('Operazione annullata: serve il token GitHub.', true);
+    else _setStatus('Errore di connessione.', true);
+  });
+}
+
+function popolaFiltroTag() {
+  var sel = document.getElementById('cli-filtro-tag');
+  var current = sel.value;
+  var tagsSet = {};
+  cliState.clienti.forEach(function (c) { (c.tags || []).forEach(function (t) { tagsSet[t] = true; }); });
+  var tags = Object.keys(tagsSet).sort();
+  sel.innerHTML = '<option value="">Tutti i tag</option>' + tags.map(function (t) {
+    return '<option value="' + _escHtml(t) + '">' + _escHtml(t) + '</option>';
+  }).join('');
+  sel.value = current;
+}
+
+function renderClienti() {
+  var q = (document.getElementById('cli-search').value || '').trim().toLowerCase();
+  var tagFiltro = document.getElementById('cli-filtro-tag').value;
+  var consensoFiltro = document.getElementById('cli-filtro-consenso').value;
+  var inattivoFiltro = document.getElementById('cli-filtro-inattivo').value;
+  var list = cliState.clienti.filter(function (c) {
+    if (tagFiltro && (c.tags || []).indexOf(tagFiltro) === -1) return false;
+    if (consensoFiltro === 'si' && !c.consenso_marketing) return false;
+    if (consensoFiltro === 'no' && c.consenso_marketing) return false;
+    if (inattivoFiltro) {
+      var m = monthsAgo(c.ultima_prenotazione);
+      if (m === null || m < parseInt(inattivoFiltro, 10)) return false;
+    }
+    if (!q) return true;
+    var hay = [(c.nome || ''), (c.telefono || ''), (c.email || '')].join(' ').toLowerCase();
+    return hay.indexOf(q) !== -1;
+  });
+
+  var tbody = document.getElementById('cli-tbody');
+  document.getElementById('cli-empty').style.display = list.length ? 'none' : 'block';
+  document.getElementById('cli-counts').textContent = list.length + ' / ' + cliState.clienti.length + ' clienti';
+
+  tbody.innerHTML = list.map(function (c, i) {
+    var tagsHtml = (c.tags || []).map(function (t) { return '<span class="tag">' + _escHtml(t) + '</span>'; }).join('');
+    var manuale = c.manuale ? ' <span class="manuale-badge">manuale</span>' : '';
+    var newsletterHtml = c.consenso_marketing
+      ? '<span class="badge badge-ok">Sì</span>'
+      : '<span class="badge badge-wait">No</span>';
+    return '<tr class="clickable" onclick="apriScheda(' + i + ')">' +
+      '<td>' + _escHtml(c.nome || '(senza nome)') + manuale + ' ' + milestoneBadge(c.n_arrivato) + '</td>' +
+      '<td>' + _escHtml(c.telefono || '—') + '</td>' +
+      '<td>' + (c.n_prenotazioni || 0) + '</td>' +
+      '<td>' + _escHtml(c.ultima_prenotazione || '—') + '</td>' +
+      '<td>' + (c.n_no_show ? c.n_no_show : '—') + '</td>' +
+      '<td>' + newsletterHtml + '</td>' +
+      '<td>' + (tagsHtml || '—') + '</td>' +
+      '</tr>';
+  }).join('');
+
+  // indice per apriScheda() sulla lista filtrata corrente
+  renderClienti._current = list;
+}
+
+function _csvCell(s) {
+  var v = String(s == null ? '' : s);
+  if (/[",\n;]/.test(v)) v = '"' + v.replace(/"/g, '""') + '"';
+  return v;
+}
+
+// Esporta la lista attualmente filtrata (ricerca + tag + consenso) in CSV — utile per
+// costruire liste su misura da caricare in Brevo o altri strumenti di campagna.
+function esportaCSV() {
+  var list = renderClienti._current || [];
+  if (!list.length) { _setStatus('Nessun cliente da esportare con i filtri attuali.', true); return; }
+  var header = ['Nome', 'Telefono', 'Email', 'Prenotazioni', 'Ultima visita', 'No-show', 'Consenso newsletter', 'Tag'];
+  var rows = list.map(function (c) {
+    return [
+      c.nome || '', c.telefono || '', c.email || '', c.n_prenotazioni || 0,
+      c.ultima_prenotazione || '', c.n_no_show || 0, c.consenso_marketing ? 'Sì' : 'No',
+      (c.tags || []).join('; '),
+    ].map(_csvCell).join(',');
+  });
+  var csv = '﻿' + header.join(',') + '\n' + rows.join('\n');
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'clienti-santamonica-' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  _setStatus('Esportati ' + list.length + ' clienti.');
+}
+
+function apriModalNuovo() {
+  cliEdit = { id: null, telefono_norm: null, tags: [], manuale: true };
+  document.getElementById('cli-modal-title').textContent = 'Nuovo cliente manuale';
+  document.getElementById('cli-f-nome').value = '';
+  document.getElementById('cli-f-telefono').value = '';
+  document.getElementById('cli-f-email').value = '';
+  document.getElementById('cli-f-nascita').value = '';
+  document.getElementById('cli-f-anniversario').value = '';
+  document.getElementById('cli-f-note').value = '';
+  document.getElementById('cli-stats').innerHTML = '';
+  document.getElementById('cli-storia-wrap').style.display = 'none';
+  document.getElementById('cli-elimina-btn').style.display = 'none';
+  document.getElementById('cli-brevo-wrap').style.display = 'none';
+  renderTagsModal();
+  _setModalStatus('');
+  document.getElementById('cli-modal').classList.add('on');
+}
+
+function apriScheda(i) {
+  var c = renderClienti._current[i];
+  if (!c) return;
+  apriSchedaCliente(c);
+}
+
+// Apre la scheda partendo da un telefono normalizzato (deep-link da gestionale.html, es.
+// clienti.html?tel=3331234567) invece che dall'indice della lista filtrata a video. Entra in
+// "modalità scheda diretta": niente tabella/toolbar dietro, la scheda È la pagina (richiesta
+// Andrea: "si deve aprire una finestra direttamente dell'anagrafica cliente, non un'altra
+// pagina con la tabella clienti").
+var focusMode = false;
+function apriSchedaPerTelefono(telNorm) {
+  var c = cliState.clienti.filter(function (x) { return x.telefono_norm === telNorm; })[0];
+  focusMode = true;
+  document.querySelector('.toolbar').style.display = 'none';
+  document.querySelector('.wrap').style.display = 'none';
+  document.getElementById('cli-kpi').style.display = 'none';
+  document.getElementById('cli-ricorrenze').style.display = 'none';
+  document.getElementById('cli-empty').style.display = 'none';
+  if (!c) { _setStatus('Cliente non trovato (telefono ' + telNorm + ').', true); return; }
+  apriSchedaCliente(c);
+}
+
+function apriSchedaCliente(c) {
+  cliEdit = { id: c.id, telefono_norm: c.telefono_norm, tags: (c.tags || []).slice(), manuale: c.manuale, email: c.email || '' };
+  document.getElementById('cli-brevo-wrap').style.display = c.email ? '' : 'none';
+  document.getElementById('cli-brevo-esito').textContent = '';
+  document.getElementById('cli-modal-title').textContent = c.nome || '(senza nome)';
+  document.getElementById('cli-f-nome').value = c.nome || '';
+  document.getElementById('cli-f-telefono').value = c.telefono || '';
+  document.getElementById('cli-f-email').value = c.email || '';
+  document.getElementById('cli-f-nascita').value = c.data_nascita || '';
+  document.getElementById('cli-f-anniversario').value = c.data_anniversario || '';
+  document.getElementById('cli-f-note').value = c.note || '';
+  document.getElementById('cli-elimina-btn').style.display = c.id ? '' : 'none';
+  renderTagsModal();
+  _setModalStatus('');
+
+  if (c.telefono_norm) {
+    document.getElementById('cli-storia-wrap').style.display = '';
+    var consensoLabel = c.consenso_marketing
+      ? 'Sì, dal ' + _escHtml((c.consenso_marketing_at || '').slice(0, 10) || '—')
+      : 'No';
+    document.getElementById('cli-stats').innerHTML =
+      '<div><b>' + (c.n_prenotazioni || 0) + '</b>prenotazioni</div>' +
+      '<div><b>' + (c.n_arrivato || 0) + '</b>arrivate</div>' +
+      '<div><b>' + (c.n_no_show || 0) + '</b>no-show</div>' +
+      '<div><b>' + _escHtml(c.prima_prenotazione || '—') + '</b>prima visita</div>' +
+      '<div><b>' + consensoLabel + '</b>consenso newsletter</div>' +
+      (milestoneBadge(c.n_arrivato) ? '<div>' + milestoneBadge(c.n_arrivato) + '</div>' : '');
+    document.getElementById('cli-storia-tbody').innerHTML = '<tr><td colspan="5" style="color:var(--stone);">Caricamento storico…</td></tr>';
+    _cliFetch({ action: 'detail', telefono_norm: c.telefono_norm }).then(function (res) {
+      if (res.status === 200 && res.body && res.body.ok) {
+        document.getElementById('cli-storia-tbody').innerHTML = (res.body.storia || []).map(function (r) {
+          return '<tr><td>' + _escHtml(r.data) + '</td><td>' + _escHtml(r.orario) + '</td><td>' + (r.persone || '') +
+            '</td><td>' + badgeStato(r.arrivo_status || r.status) + '</td><td>' + _escHtml(r.occasione || '—') + '</td></tr>';
+        }).join('');
+      }
+    });
+  } else {
+    document.getElementById('cli-storia-wrap').style.display = 'none';
+    document.getElementById('cli-stats').innerHTML = '<div><b>—</b>nessuna prenotazione collegata</div>';
+  }
+
+  document.getElementById('cli-modal').classList.add('on');
+  document.getElementById('cli-modal').classList.toggle('embedded', focusMode);
+  var annullaBtn = document.getElementById('cli-annulla-btn');
+  annullaBtn.textContent = focusMode ? '← Vedi tutti i clienti' : 'Annulla';
+}
+
+function renderTagsModal() {
+  document.getElementById('cli-tags-attivi').innerHTML = cliEdit.tags.map(function (t) {
+    return '<span class="tag">' + _escHtml(t) + ' <a href="javascript:void(0)" onclick="rimuoviTag(\'' + _escHtml(t).replace(/'/g, "\\'") + '\')" style="color:var(--rust);text-decoration:none;">✕</a></span>';
+  }).join('') || '<span style="color:var(--stone);font-size:.75rem;">Nessun tag.</span>';
+  document.getElementById('cli-tags-suggeriti').innerHTML = TAG_SUGGERITI
+    .filter(function (t) { return cliEdit.tags.indexOf(t) === -1; })
+    .map(function (t) { return '<span class="tag suggest" onclick="aggiungiTag(\'' + t + '\')">+ ' + t + '</span>'; })
+    .join('');
+}
+function aggiungiTag(t) {
+  if (cliEdit.tags.indexOf(t) === -1) cliEdit.tags.push(t);
+  renderTagsModal();
+}
+function aggiungiTagLibero() {
+  var input = document.getElementById('cli-f-tag-nuovo');
+  var t = (input.value || '').trim();
+  if (t) { aggiungiTag(t); input.value = ''; }
+}
+function rimuoviTag(t) {
+  cliEdit.tags = cliEdit.tags.filter(function (x) { return x !== t; });
+  renderTagsModal();
+}
+
+function chiudiModal() {
+  document.getElementById('cli-modal').classList.remove('on');
+  document.getElementById('cli-modal').classList.remove('embedded');
+  if (focusMode) {
+    // "← Vedi tutti i clienti": esce dalla modalità scheda diretta, torna all'elenco completo.
+    focusMode = false;
+    document.querySelector('.toolbar').style.display = '';
+    document.querySelector('.wrap').style.display = '';
+    document.getElementById('cli-kpi').style.display = '';
+    document.getElementById('cli-ricorrenze').style.display = '';
+    history.replaceState(null, '', window.location.pathname);
+  }
+}
+
+function salvaCliente() {
+  var nome = document.getElementById('cli-f-nome').value.trim();
+  var telefono = document.getElementById('cli-f-telefono').value.trim();
+  var email = document.getElementById('cli-f-email').value.trim();
+  var dataNascita = document.getElementById('cli-f-nascita').value;
+  var dataAnniversario = document.getElementById('cli-f-anniversario').value;
+  var note = document.getElementById('cli-f-note').value.trim();
+  if (!cliEdit.id && !cliEdit.telefono_norm && !telefono && !nome) {
+    _setModalStatus('Inserisci almeno un nome o un telefono.', true); return;
+  }
+  var payload = {
+    action: 'upsert', id: cliEdit.id, nome: nome, telefono: telefono || null, email: email,
+    data_nascita: dataNascita, data_anniversario: dataAnniversario,
+    note: note, tags: cliEdit.tags, manuale: cliEdit.manuale && !cliEdit.telefono_norm && !telefono,
+  };
+  _setModalStatus('Salvataggio…');
+  _cliFetch(payload).then(function (res) {
+    if (res.status === 200 && res.body && res.body.ok) {
+      cliState.clienti = res.body.clienti || [];
+      popolaFiltroTag();
+      renderClienti();
+      renderKpi();
+      renderRicorrenze();
+      _setModalStatus('Salvato.');
+      setTimeout(chiudiModal, 500);
+    } else {
+      _setModalStatus((res.body && res.body.error) || 'Errore.', true);
+    }
+  }).catch(function () { _setModalStatus('Errore di connessione.', true); });
+}
+
+function eliminaCliente() {
+  if (!cliEdit.id) return;
+  if (!window.confirm('Eliminare la scheda? (lo storico prenotazioni resta, si perdono solo note/tag/nome personalizzato)')) return;
+  _setModalStatus('Eliminazione…');
+  _cliFetch({ action: 'delete', id: cliEdit.id }).then(function (res) {
+    if (res.status === 200 && res.body && res.body.ok) {
+      cliState.clienti = res.body.clienti || [];
+      popolaFiltroTag();
+      renderClienti();
+      renderKpi();
+      renderRicorrenze();
+      chiudiModal();
+    } else {
+      _setModalStatus((res.body && res.body.error) || 'Errore.', true);
+    }
+  }).catch(function () { _setModalStatus('Errore di connessione.', true); });
+}
+
+// Verifica reale su Brevo: iscritto CONFERMATO solo se presente nella lista Newsletter
+// (Double Opt-in — Brevo lo aggiunge alla lista solo dopo il click di conferma). Legge
+// l'email direttamente dal campo del form (non da cliEdit) così riflette eventuali modifiche
+// non ancora salvate.
+function verificaBrevo() {
+  var email = document.getElementById('cli-f-email').value.trim();
+  var esito = document.getElementById('cli-brevo-esito');
+  if (!email) { esito.textContent = 'Nessuna email.'; esito.style.color = 'var(--rust)'; return; }
+  esito.textContent = 'Verifica in corso…';
+  esito.style.color = 'var(--stone)';
+  _cliFetch({ action: 'check_brevo', email: email }).then(function (res) {
+    if (res.status === 200 && res.body && res.body.ok) {
+      if (res.body.subscribed) { esito.textContent = '✓ Iscritto confermato a Brevo.'; esito.style.color = 'var(--ok)'; }
+      else if (res.body.found) { esito.textContent = 'Presente su Brevo ma non confermato (DOI in sospeso o non completato).'; esito.style.color = 'var(--warn)'; }
+      else { esito.textContent = 'Non trovato su Brevo.'; esito.style.color = 'var(--stone)'; }
+    } else {
+      esito.textContent = (res.body && res.body.error) || 'Errore nella verifica.';
+      esito.style.color = 'var(--rust)';
+    }
+  }).catch(function () { esito.textContent = 'Errore di connessione.'; esito.style.color = 'var(--rust)'; });
+}
+
+loadClienti();
+</script>
+</body>
+</html>

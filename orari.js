@@ -1,7 +1,15 @@
 /* ═══════════════════════════════════════════════════════════════════════
    orari.js — FONTE UNICA orari di apertura · Santamonica Web
-   v 2026.09.04.02
+   v 2026.09.06.01
    ───────────────────────────────────────────────────────────────────────
+   v 2026.09.06.01 — ECCEZIONE_TEMP: nota temporanea in renderInfo() per i due
+   venerdì di riapertura pranzo (11/9 e 18/9) rimasti chiusi tutto il giorno
+   (Andrea, decisione post-riapertura). Il bug segnalato: quella card mostra
+   SOLO lo schema RICORRENTE letto da PERIODS, non ha modo di rappresentare
+   un'eccezione su una data singola — la FAQ orari (aggiornata separatamente
+   in index.html/translations.json lo stesso giorno) l'aveva già, questa card
+   no. Nota autolimitata per data (from/to), sparisce da sola dopo il 18/9 —
+   se in futuro serve un'eccezione diversa, editare l'oggetto ECCEZIONE_TEMP.
    v 2026.09.04.02 — renderInfo() aggiunge una nota "Dal [data]: ..." quando
    PERIODS ha già un periodo successivo definito (prossimo cambio orario
    stagionale deciso in anticipo, es. 11 settembre): generata da PERIODS via
@@ -164,6 +172,18 @@
     en: { lun: 'Monday', mar: 'Tuesday', mer: 'Wednesday', gio: 'Thursday', ven: 'Friday', sab: 'Saturday', dom: 'Sunday', chiuso: 'closed', chiusoLine: 'Closed %s', dalLine: 'From %s:' },
     fr: { lun: 'Lundi', mar: 'Mardi', mer: 'Mercredi', gio: 'Jeudi', ven: 'Vendredi', sab: 'Samedi', dom: 'Dimanche', chiuso: 'fermé', chiusoLine: 'Fermé %s', dalLine: 'À partir du %s :' }
   };
+  // Eccezione temporanea (Andrea, 6/9/2026): i primi due venerdì di riapertura pranzo (11/9 e
+  // 18/9) restano chiusi TUTTO IL GIORNO — un'eccezione puntuale che PERIODS non può
+  // rappresentare (descrive lo schema RICORRENTE, non le date singole) e che il client statico
+  // non legge da reservation_closures (quella tabella la interroga solo il motore di
+  // prenotazione). Nota autolimitata per data: appare solo nella finestra `from`-`to`, sparisce
+  // da sola dopo — rimuovere questo blocco a mano se non serve più tenerlo.
+  var ECCEZIONE_TEMP = {
+    from: '2026-09-01', to: '2026-09-18',
+    it: 'Eccezione: chiuso tutto il giorno venerdì 11 e venerdì 18 settembre.',
+    en: 'Exception: closed all day on Friday 11 and Friday 18 September.',
+    fr: 'Exception : fermé toute la journée les vendredis 11 et 18 septembre.'
+  };
   var MONTHS = {
     it: ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'],
     en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
@@ -248,6 +268,10 @@
       var ng = buildGroups(lang, ' / ', next), parts = ng.aperti.map(function (grp) { return grp.label + ' ' + grp.times; });
       if (ng.chiusi.length) parts.push(lab.chiusoLine.replace('%s', ng.chiusi.map(function (k) { return lab[k]; }).join(', ')));
       html += '<p class="orari-note">' + lab.dalLine.replace('%s', formatDayMonth(next.from, lang)) + ' ' + parts.join(' · ') + '.</p>';
+    }
+    var today = todayStr();
+    if (today >= ECCEZIONE_TEMP.from && today <= ECCEZIONE_TEMP.to) {
+      html += '<p class="orari-note">' + (ECCEZIONE_TEMP[lang] || ECCEZIONE_TEMP.it) + '</p>';
     }
     box.innerHTML = html;
   }

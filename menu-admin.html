@@ -1,4 +1,45 @@
 <!DOCTYPE html>
+<!-- v 2026.09.08.02 — nuovo pannello "Dettagli piatti (allergeni)" (#piatti-dettagli-section,
+     tab "Gestione menù e sito", dopo "Allergeni carta"): scheda di sicurezza alimentare per
+     ogni piatto (carta + dolci) — Sezione/Piatto/Descrizione/Allergeni/Allergeni per
+     contaminazione/Allergeni eliminabili/In gravidanza/Modifiche consentite/Stato/Fonte —
+     modellata sul documento di riferimento fornito da Andrea ("Dettagli piatti 2026.pdf").
+     A differenza di Carta/Dolci/Allergeni NON pubblica nulla sul sito: i dati vivono su un
+     DATABASE dedicato (tabella piatti_dettagli, nuova, su SafeTable xbksultfskvzgncncada),
+     così l'unico posto dove inserirli è anche l'unico che alimenta la stampa — nessun rischio
+     di due file che divergono, a differenza del rischio storico su menu.html/menu-it.html
+     (vedi PROCEDURA_menu_modifiche_v2026.08.08.01.md). CRUD (list/create/update/delete/
+     move_up/move_down) via nuova Edge Function piatti-dettagli-admin, stesso auth
+     github_token di rubrica-professionisti/set-reservations-config (nessun secret nuovo).
+     Ogni piatto è una card con tutti i campi editabili + "💾 Salva" individuale (come
+     Rubrica professionisti); "+ Aggiungi piatto" inserisce in coda alla sezione scelta
+     (datalist con le sezioni già esistenti, o testo libero per una sezione nuova) così i
+     piatti restano raggruppati; ↑/↓ per riordinare. Pulsante "🖨 Stampa" genera al volo, in
+     una nuova scheda, UNA PAGINA A4 ORIZZONTALE PER PIATTO (tabella a 7 colonne con
+     un'unica riga che riempie tutta la pagina, come nel PDF di riferimento — non più un
+     elenco compatto multi-riga) dai dati correnti — nessuna pubblicazione, solo stampa/
+     salva PDF locale.
+     Seed iniziale: i 25 piatti live sul sito l'8/9/2026 (menu-it.html + menu-dolci-it.html),
+     allergeni pre-compilati dove già pubblicati su menu-allergeni.html/menu-dolci-it.html; i
+     7 piatti della sezione "Crudi" non hanno allergeni pubblicati da nessuna parte del sito e
+     restano vuoti apposta (dato di sicurezza alimentare, mai indovinato dal nome del piatto —
+     da compilare a mano). Bump ?v= admin-core.js a 2026.09.08.01 (_pulisciViste estesa con
+     'piatti-dettagli-section'). GATE: tooling admin interno, riusa pattern di sicurezza già
+     in produzione (auth github_token, RLS+service-role) → P1+P2 fatte (verifica funzione via
+     curl: token invalido → 401 confermato), P3 non dovuta (stesso precedente di rubrica
+     professionisti/pacchi No-show/cauzioni: strumento interno non pubblico). -->
+<!-- v 2026.09.05.02 — aggiunto cursor-follower-admin.js (cerchio ambra che segue il mouse, si
+     evidenzia su link/button) prima di </body>, SOLO su menu-admin.html. Recupera l'effetto
+     "cursore strano" descritto in HANDOVER_cursorfollower_v2026.06.05.01.md (mai deployato sul
+     sito pubblico), riadattato al tema scuro dell'admin: niente mix-blend-mode (invisibile su
+     sfondo scuro), bordo rgba(214,155,74) invece del blu-marino pensato per il sito. A11y-safe
+     (disabilitato su touch/pointer:coarse e con prefers-reduced-motion). GATE PRODUZIONE: P1
+     (node --check OK) + P2 (verifica visiva, vedi sotto) fatte; P3 Revisione Oppositiva NON fatta
+     — micro-fix estetico su tool interno non pubblico, non su contenuto pubblico/critico secondo
+     le regole del gate, quindi non obbligatoria; annotata comunque come nota, non come debito. -->
+<!-- v 2026.09.05.01 — rimossa la card "Menù Vini" dalla riga quick-actions della tab "Gestione
+     menù e sito" (sezione #vini-section e funzioni apriSezioneVini/convertiEPubblicaVini lasciate
+     nel file, innocue e non più raggiungibili da UI). -->
 <!-- v 2026.09.02.09 — fix cambio tab (segnalato da Andrea): passando da una tab all'altra (Gestione
      menù / Prenotazioni e voucher / Setup) quello che era caricato sotto (es. la carta) restava
      visibile invece di sparire. setQaTab() ora chiama _pulisciViste() (admin-core.js) a ogni
@@ -587,9 +628,9 @@
     <button class="qa-btn qa-menu" onclick="caricaDalSito('carta')">Menù alla carta</button>
     <button class="qa-btn qa-menu" onclick="caricaDalSito('dolci')">Menù dolci</button>
     <button class="qa-btn qa-menu" onclick="caricaDalSito('allergeni')">Allergeni carta</button>
+    <button class="qa-btn qa-menu" onclick="apriSezionePiattiDettagli()">Dettagli piatti (allergeni)</button>
     <button class="qa-btn qa-menu" onclick="apriGestoreFoto()">Foto cucina</button>
     <button class="qa-btn qa-menu" onclick="apriGestoreFotoSito()">Foto sito</button>
-    <button class="qa-btn qa-menu" onclick="apriSezioneVini()">Menù Vini</button>
     <button class="qa-btn qa-menu" onclick="apriSezioneDocGenerico()">Documento generico</button>
     <button class="qa-btn qa-menu" onclick="location.href='cantina.html'">Gestionale Cantina</button>
     <div class="menu-top-btns" style="width:100%">
@@ -802,6 +843,51 @@
         <button class="btn btn-publish" onclick="convertiDocGenerico()">✦ Converti e Apri Preview</button>
         <button class="btn btn-load" onclick="chiudiSezioneDocGenerico()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
         <span id="doc-generico-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="piatti-dettagli-section" style="max-width:900px;margin:1.5rem auto;padding:0 1rem;display:none;">
+  <div class="fs">
+    <div class="fs-head">Dettagli piatti — Allergeni &amp; info cucina</div>
+    <div class="fs-body">
+      <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">
+        Scheda di sicurezza alimentare per ogni piatto (carta + dolci): allergeni, allergeni da possibile
+        contaminazione, allergeni eliminabili su richiesta, indicazioni in gravidanza, modifiche consentite.
+        Salvato qui su un database dedicato — <strong>non</strong> sul sito pubblico. Usa "🖨 Stampa" per il
+        foglio da tenere in cucina/sala, sempre aggiornato con l'ultimo salvato.
+      </p>
+
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:1.2rem;">
+        <button class="btn btn-publish" onclick="stampaPiattiDettagli()">🖨 Stampa</button>
+        <button class="btn btn-load" style="border:1px solid var(--rule);color:var(--ink);" onclick="loadPiattiDettagli()">🔄 Ricarica</button>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--rule);margin:0 0 1.2rem;">
+
+      <div class="sub" style="margin-top:0;">Nuovo piatto</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1.2rem;">
+        <div>
+          <span class="opt-lbl">Sezione</span>
+          <input type="text" id="pd-new-sezione" list="pd-sezioni-list" placeholder="Es: Crudi" style="width:12rem;padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);" />
+          <datalist id="pd-sezioni-list"></datalist>
+        </div>
+        <div style="flex:1;min-width:14rem;">
+          <span class="opt-lbl">Nome piatto</span>
+          <input type="text" id="pd-new-piatto" placeholder="Es: Ostriche Gillardeau" style="width:100%;padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);" />
+        </div>
+        <button class="btn btn-publish" onclick="aggiungiPiattoDettaglio()">+ Aggiungi</button>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--rule);margin:0 0 1.2rem;">
+
+      <div class="sub" style="margin-top:0;">Piatti (<span id="pd-count">0</span>)</div>
+      <div id="pd-list" style="font-size:.85rem;">…</div>
+
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
+        <button class="btn btn-load" onclick="chiudiSezionePiattiDettagli()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
+        <span id="pd-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
       </div>
     </div>
   </div>
@@ -1417,7 +1503,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.07.28.03"></script>
-<script src="admin-core.js?v=2026.09.02.02"></script>
+<script src="admin-core.js?v=2026.09.08.02"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -2154,6 +2240,268 @@ function eliminaNotaUsoProfessionista(id) {
   _rubFetch({ action: 'delete_use', id: id })
     .then(function (res) { _rubApply(res, 'Nota eliminata.'); })
     .catch(function (e) { _rubErr(e, 'Errore di connessione.'); });
+}
+
+// ══ DETTAGLI PIATTI (allergeni + info cucina, database dedicato) ════
+// CRUD via Edge Function piatti-dettagli-admin (auth col token GitHub gh_token,
+// stesso meccanismo di rubrica/prenotazioni/reminder — riusa _prenGhToken()).
+// Dato di sicurezza alimentare: SEMPRE compilato/verificato a mano qui, mai
+// dedotto o indovinato dal nome del piatto. Non pubblica nulla sul sito: è un
+// database interno, con un foglio di stampa generato al volo dallo stato corrente.
+var PD_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/piatti-dettagli-admin';
+var PD_STATI = [['da_compilare', 'Da compilare'], ['in_revisione', 'In revisione'], ['completo', 'Completo']];
+var PD_STATI_MAP = {}; PD_STATI.forEach(function (s) { PD_STATI_MAP[s[0]] = s[1]; });
+var PD_STATI_COLOR = { da_compilare: 'var(--rust)', in_revisione: 'var(--blue)', completo: 'var(--green)' };
+var pdState = { piatti: [] };
+
+function _pdEsc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function _pdSetStatus(msg, isErr) {
+  var el = document.getElementById('pd-status');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
+}
+
+function apriSezionePiattiDettagli() {
+  document.getElementById('carica-menu').classList.remove('open');
+  document.getElementById('intro').style.display = 'none';
+  _pulisciViste();
+  document.getElementById('piatti-dettagli-section').style.display = 'block';
+  loadPiattiDettagli();
+}
+
+function chiudiSezionePiattiDettagli() {
+  document.getElementById('piatti-dettagli-section').style.display = 'none';
+  if (!document.getElementById('wrap').classList.contains('on'))
+    document.getElementById('intro').style.display = '';
+}
+
+function _pdFetch(payload) {
+  var token = _prenGhToken();
+  if (!token) return Promise.reject(new Error('no-token'));
+  payload.github_token = token;
+  return fetch(PD_URL, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+  }).then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); });
+}
+
+function _pdApply(res, okMsg) {
+  if (res.status === 200 && res.body && res.body.ok) {
+    pdState.piatti = res.body.piatti || [];
+    renderPiattiDettagli();
+    _pdSetStatus(okMsg || 'Fatto.');
+  } else if (res.status === 401) {
+    _pdSetStatus('Token GitHub non valido o senza permessi. Reimpostalo col tasto 🔑.', true);
+  } else {
+    _pdSetStatus((res.body && res.body.error) || 'Errore.', true);
+  }
+}
+
+function _pdErr(e, fallback) {
+  if (e && e.message === 'no-token') _pdSetStatus('Operazione annullata: serve il token GitHub.', true);
+  else _pdSetStatus(fallback, true);
+}
+
+function loadPiattiDettagli() {
+  _pdSetStatus('Caricamento…');
+  _pdFetch({ action: 'list' })
+    .then(function (res) { _pdApply(res, ''); })
+    .catch(function (e) { _pdErr(e, 'Errore di connessione.'); });
+}
+
+function _pdPopolaSezioniDatalist() {
+  var dl = document.getElementById('pd-sezioni-list');
+  if (!dl) return;
+  var viste = {};
+  var sezioni = [];
+  pdState.piatti.forEach(function (p) { if (!viste[p.sezione]) { viste[p.sezione] = true; sezioni.push(p.sezione); } });
+  dl.innerHTML = sezioni.map(function (s) { return '<option value="' + _pdEsc(s) + '">'; }).join('');
+}
+
+function aggiungiPiattoDettaglio() {
+  var sezione = document.getElementById('pd-new-sezione').value.trim();
+  var piatto = document.getElementById('pd-new-piatto').value.trim();
+  if (!sezione) { _pdSetStatus('Indica la sezione (es. Crudi, Antipasti…).', true); return; }
+  if (!piatto) { _pdSetStatus('Indica il nome del piatto.', true); return; }
+  // Se la sezione esiste già, inserisce subito dopo l'ultimo piatto di quella sezione
+  // (mantiene i piatti raggruppati); se è una sezione nuova, va in fondo a tutto.
+  var lastOfSection = null;
+  pdState.piatti.forEach(function (p) { if (p.sezione === sezione) lastOfSection = p; });
+  var payload = { action: 'create', sezione: sezione, piatto: piatto };
+  if (lastOfSection) payload.after_id = lastOfSection.id;
+  _pdSetStatus('Aggiunta…');
+  _pdFetch(payload)
+    .then(function (res) {
+      var ok = res.status === 200 && res.body && res.body.ok;
+      _pdApply(res, 'Piatto aggiunto.');
+      if (ok) { document.getElementById('pd-new-piatto').value = ''; }
+    })
+    .catch(function (e) { _pdErr(e, 'Errore di connessione.'); });
+}
+
+function salvaPiattoDettaglio(id) {
+  function v(field) { var el = document.getElementById('pd-f-' + field + '-' + id); return el ? el.value.trim() : ''; }
+  var payload = {
+    action: 'update', id: id,
+    sezione: v('sezione'), piatto: v('piatto'),
+    descrizione: v('descrizione'), allergeni: v('allergeni'),
+    allergeni_contaminazione: v('allergeni_contaminazione'),
+    allergeni_eliminabili: v('allergeni_eliminabili'),
+    gravidanza: v('gravidanza'), modifiche: v('modifiche'),
+    stato: v('stato'), fonte: v('fonte'),
+  };
+  if (!payload.sezione) { _pdSetStatus('La sezione non può essere vuota.', true); return; }
+  if (!payload.piatto) { _pdSetStatus('Il nome piatto non può essere vuoto.', true); return; }
+  _pdSetStatus('Salvataggio…');
+  _pdFetch(payload)
+    .then(function (res) { _pdApply(res, 'Piatto aggiornato.'); })
+    .catch(function (e) { _pdErr(e, 'Errore di connessione.'); });
+}
+
+function eliminaPiattoDettaglio(id, nome) {
+  if (!window.confirm('Eliminare "' + nome + '" dalla scheda allergeni/dettagli?')) return;
+  _pdSetStatus('Eliminazione…');
+  _pdFetch({ action: 'delete', id: id })
+    .then(function (res) { _pdApply(res, 'Piatto eliminato.'); })
+    .catch(function (e) { _pdErr(e, 'Errore di connessione.'); });
+}
+
+function spostaPiattoDettaglio(id, direzione) {
+  _pdSetStatus('Spostamento…');
+  _pdFetch({ action: direzione === 'up' ? 'move_up' : 'move_down', id: id })
+    .then(function (res) { _pdApply(res, ''); })
+    .catch(function (e) { _pdErr(e, 'Errore di connessione.'); });
+}
+
+var PD_FIELD_STYLE = 'width:100%;padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.8rem;color:var(--ink);';
+
+function _pdFieldRow(label, id, field, value, isTextarea) {
+  var val = _pdEsc(value || '');
+  var fieldId = 'pd-f-' + field + '-' + id;
+  var input = isTextarea
+    ? '<textarea id="' + fieldId + '" rows="2" style="' + PD_FIELD_STYLE + 'resize:vertical;line-height:1.4;">' + val + '</textarea>'
+    : '<input type="text" id="' + fieldId + '" value="' + val + '" style="' + PD_FIELD_STYLE + '" />';
+  return '<div style="' + (isTextarea ? 'flex:1 1 100%;' : 'flex:1 1 13rem;') + 'min-width:11rem;margin-bottom:.5rem;">' +
+    '<span class="opt-lbl">' + label + '</span>' + input + '</div>';
+}
+
+function _pdFieldSelect(label, id, field, statoCorrente) {
+  var fieldId = 'pd-f-' + field + '-' + id;
+  var opts = PD_STATI.map(function (s) {
+    return '<option value="' + s[0] + '"' + (s[0] === statoCorrente ? ' selected' : '') + '>' + s[1] + '</option>';
+  }).join('');
+  return '<div style="flex:1 1 13rem;min-width:11rem;margin-bottom:.5rem;">' +
+    '<span class="opt-lbl">' + label + '</span>' +
+    '<select id="' + fieldId + '" style="' + PD_FIELD_STYLE + '">' + opts + '</select></div>';
+}
+
+function renderPiattiDettagli() {
+  _pdPopolaSezioniDatalist();
+  var list = document.getElementById('pd-list');
+  document.getElementById('pd-count').textContent = pdState.piatti.length;
+  if (!pdState.piatti.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun piatto ancora. Aggiungilo dal modulo qui sopra.</p>'; return; }
+
+  var html = '';
+  var sezioneCorrente = null;
+  pdState.piatti.forEach(function (p, idx) {
+    if (p.sezione !== sezioneCorrente) {
+      sezioneCorrente = p.sezione;
+      html += '<div class="sub" style="margin-top:1.2rem;">' + _pdEsc(sezioneCorrente) + '</div>';
+    }
+    var statoLabel = PD_STATI_MAP[p.stato] || p.stato;
+    var statoColor = PD_STATI_COLOR[p.stato] || 'var(--stone)';
+    html += '<div class="fs" style="margin-bottom:.8rem;">' +
+      '<div class="fs-head" style="display:flex;justify-content:space-between;align-items:center;gap:.6rem;">' +
+      '<span>' + _pdEsc(p.piatto) + '</span>' +
+      '<span style="display:flex;gap:.3rem;align-items:center;">' +
+      '<span style="color:' + statoColor + ';font-size:.65rem;letter-spacing:.06em;">' + _pdEsc(statoLabel) + '</span>' +
+      '<button class="btn btn-load" title="Sposta su" style="padding:.15rem .5rem;font-size:.7rem;" onclick="spostaPiattoDettaglio(\'' + p.id + '\',\'up\')">↑</button>' +
+      '<button class="btn btn-load" title="Sposta giù" style="padding:.15rem .5rem;font-size:.7rem;" onclick="spostaPiattoDettaglio(\'' + p.id + '\',\'down\')">↓</button>' +
+      '</span>' +
+      '</div>' +
+      '<div class="fs-body">' +
+      '<div style="display:flex;flex-wrap:wrap;gap:.6rem;">' +
+      _pdFieldRow('Sezione', p.id, 'sezione', p.sezione, false) +
+      _pdFieldRow('Nome piatto', p.id, 'piatto', p.piatto, false) +
+      _pdFieldSelect('Stato compilazione', p.id, 'stato', p.stato) +
+      _pdFieldRow('Descrizione piatto', p.id, 'descrizione', p.descrizione, true) +
+      _pdFieldRow('Allergeni', p.id, 'allergeni', p.allergeni, false) +
+      _pdFieldRow('Allergeni per contaminazione', p.id, 'allergeni_contaminazione', p.allergeni_contaminazione, false) +
+      _pdFieldRow('Allergeni eliminabili', p.id, 'allergeni_eliminabili', p.allergeni_eliminabili, false) +
+      _pdFieldRow('In gravidanza', p.id, 'gravidanza', p.gravidanza, false) +
+      _pdFieldRow('Modifiche consentite', p.id, 'modifiche', p.modifiche, true) +
+      _pdFieldRow('Fonte allergeni', p.id, 'fonte', p.fonte, false) +
+      '</div>' +
+      '<div style="display:flex;gap:.6rem;margin-top:.4rem;">' +
+      '<button class="btn btn-publish" style="font-size:.72rem;padding:.35rem .8rem;" onclick="salvaPiattoDettaglio(\'' + p.id + '\')">💾 Salva</button>' +
+      '<button class="btn btn-load" style="font-size:.72rem;padding:.35rem .8rem;border:1px solid var(--rust);color:var(--rust);" onclick="eliminaPiattoDettaglio(\'' + p.id + '\',' + JSON.stringify(p.piatto) + ')">🗑 Elimina</button>' +
+      '</div>' +
+      '</div>' +
+      '</div>';
+  });
+  list.innerHTML = html;
+}
+
+function stampaPiattiDettagli() {
+  if (!pdState.piatti.length) { _pdSetStatus('Nessun piatto da stampare — carica prima i dati.', true); return; }
+  var COLS = ['Piatto', 'Descrizione piatto', 'Allergeni', 'Allergeni per contaminazione', 'Allergeni Eliminabili', 'In Gravidanza', 'Modifiche consentite'];
+  var oggi = new Date().toLocaleDateString('it-IT');
+  var tot = pdState.piatti.length;
+  function cell(v) { return v ? '<td>' + _pdEsc(v) + '</td>' : '<td class="vuoto"></td>'; }
+  var pagesHtml = pdState.piatti.map(function (p, i) {
+    var rowHtml = '<tr><td class="piatto-cell">' + _pdEsc(p.piatto) + '</td>' +
+      cell(p.descrizione) + cell(p.allergeni) + cell(p.allergeni_contaminazione) +
+      cell(p.allergeni_eliminabili) + cell(p.gravidanza) + cell(p.modifiche) + '</tr>';
+    return '<div class="piatto-page">' +
+      '<div class="page-head">' +
+      '<span class="ph-doc">SANTAMONICA — Dettagli piatti, allergeni e info cucina</span>' +
+      '<span class="ph-sez">' + _pdEsc(p.sezione) + '</span>' +
+      '<span class="ph-count">' + (i + 1) + ' / ' + tot + '</span>' +
+      '</div>' +
+      '<table class="piatti-full"><col class="c-piatto"><col class="c-descr"><col class="c-all"><col class="c-cont"><col class="c-elim"><col class="c-grav"><col class="c-mod">' +
+      '<thead><tr>' + COLS.map(function (c) { return '<th>' + c + '</th>'; }).join('') + '</tr></thead>' +
+      '<tbody>' + rowHtml + '</tbody></table>' +
+      '<div class="footer-print">Ristorante Santamonica — documento interno, non per il pubblico · generato il ' + oggi + '</div>' +
+      '</div>';
+  }).join('');
+  var doc = '<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8">' +
+    '<title>Dettagli piatti — Allergeni e info cucina</title>' +
+    '<meta name="robots" content="noindex,nofollow"><style>' +
+    ':root{--ink:#1a1a1a;--line:#444;--sezione-bg:#e9e9e9;}' +
+    '*{box-sizing:border-box;}' +
+    'html,body{background:#79766e;}' +
+    'body{font-family:"Georgia","Times New Roman",serif;color:var(--ink);margin:0;padding:24px 0;}' +
+    '.toolbar{max-width:297mm;margin:0 auto 16px auto;display:flex;align-items:center;justify-content:space-between;gap:12px;font-family:Arial,Helvetica,sans-serif;font-size:13px;padding:0 8px;}' +
+    '.toolbar .note{color:#eee;max-width:640px;}' +
+    '.toolbar button{font-family:Arial,Helvetica,sans-serif;font-size:13px;padding:8px 16px;background:#1f1f1f;color:#fff;border:none;border-radius:4px;cursor:pointer;flex:0 0 auto;}' +
+    '.piatto-page{width:297mm;height:210mm;margin:0 auto 18px auto;background:#fff;padding:12mm;box-shadow:0 0 8px rgba(0,0,0,.25);display:flex;flex-direction:column;}' +
+    '.page-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:6px;margin-bottom:10mm;font-family:Arial,Helvetica,sans-serif;}' +
+    '.ph-doc{font-size:12px;color:#555;}' +
+    '.ph-sez{font-size:16px;font-weight:bold;text-transform:uppercase;letter-spacing:.04em;}' +
+    '.ph-count{font-size:12px;color:#555;}' +
+    'table.piatti-full{width:100%;flex:1 1 auto;border-collapse:collapse;table-layout:fixed;}' +
+    'table.piatti-full th,table.piatti-full td{border:1px solid var(--line);padding:14px 12px;vertical-align:top;font-size:15px;line-height:1.55;word-wrap:break-word;}' +
+    'table.piatti-full thead th{font-style:italic;font-weight:bold;text-align:center;background:#fff;font-size:13px;height:1px;}' +
+    'table.piatti-full td.piatto-cell{font-weight:bold;font-size:18px;}' +
+    'td.vuoto{color:#bbb;}' +
+    'col.c-piatto{width:15%;}col.c-descr{width:24%;}col.c-all{width:12%;}col.c-cont{width:12%;}col.c-elim{width:12%;}col.c-grav{width:9%;}col.c-mod{width:16%;}' +
+    '.footer-print{font-family:Arial,Helvetica,sans-serif;font-size:9px;color:#777;text-align:center;margin-top:6mm;}' +
+    '@media print{@page{size:A4 landscape;margin:0;}html,body{background:#fff;padding:0;}.toolbar{display:none;}' +
+    '.piatto-page{width:auto;height:auto;min-height:100vh;margin:0;box-shadow:none;padding:12mm;page-break-after:always;}' +
+    '.piatto-page:last-child{page-break-after:auto;}}' +
+    '</style></head><body>' +
+    '<div class="toolbar"><div class="note">Stampa "una pagina, un piatto": ' + tot + ' pagine generate dai dati salvati in questo momento. Per stampare: pulsante a destra o Ctrl/Cmd+P — orientamento Orizzontale, formato A4.</div>' +
+    '<button onclick="window.print()">⚡ Stampa / Salva PDF</button></div>' +
+    pagesHtml +
+    '</body></html>';
+  var w = window.open('', '_blank');
+  if (!w) { _pdSetStatus('Il browser ha bloccato la nuova finestra: consenti i popup per questo sito.', true); return; }
+  w.document.open(); w.document.write(doc); w.document.close();
 }
 
 // ══ REMINDER PRENOTAZIONI (setup messaggio + tempistiche) ════
@@ -3165,7 +3513,7 @@ function _vrCall(action, extra) {
 // Stessa logica di descrizioneRichiesta() lato server (richiedi-voucher), per mostrare
 // un'etichetta leggibile senza dover richiamare il server.
 var VR_TIPO_LABELS = {
-  deg6: { base: 'Menù Degustazione Sei portate, per due persone', vini: 'con abbinamento vini', prezzoBase: 180, prezzoVini: 300 },
+  deg6: { base: 'Menù Degustazione Sei portate, per due persone', vini: 'con abbinamento vini', prezzoBase: 170, prezzoVini: 290 },
   deg7: { base: 'Menù Degustazione Sette portate, per due persone', vini: 'con abbinamento vini', prezzoBase: 220, prezzoVini: 360 }
 };
 function _vrEccedenzaLabel(v) {
@@ -3881,7 +4229,9 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.02.09</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.05.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
+<!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
+<script defer src="/cursor-follower-admin.js"></script>
 </body>
 </html>

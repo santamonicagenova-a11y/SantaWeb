@@ -1,4 +1,18 @@
 // Core functions per menu-admin Santamonica
+// v 2026.09.08.02 — Pulsante "🖨 Stampa" del pannello "Dettagli piatti (allergeni)" (logica in
+//   menu-admin.html) riscritto: UNA PAGINA A4 ORIZZONTALE PER PIATTO, tabella a 7 colonne con
+//   un'unica riga che riempie tutta la pagina (come nel PDF di riferimento fornito da Andrea) —
+//   prima era un elenco compatto multi-riga per pagina, non fedele al layout originale.
+// v 2026.09.08.01 — _pulisciViste() estesa con 'piatti-dettagli-section' (nuovo pannello
+//   "Dettagli piatti (allergeni)" in menu-admin.html: scheda di sicurezza alimentare per ogni
+//   piatto — allergeni, contaminazione, eliminabili, gravidanza, modifiche — su un DATABASE
+//   dedicato, non sul sito pubblico. Tabella piatti_dettagli + Edge Function
+//   piatti-dettagli-admin su SafeTable (xbksultfskvzgncncada), stesso auth github_token di
+//   rubrica-professionisti/set-reservations-config. Seed iniziale: i 25 piatti live l'8/9/2026
+//   (carta + dolci), allergeni pre-compilati dove già pubblicati su menu-allergeni.html/
+//   menu-dolci-it.html; i 7 "Crudi" restano vuoti (nessuna fonte pubblicata, dato di sicurezza
+//   alimentare mai indovinato). Logica tutta inline in menu-admin.html, come gli altri
+//   pannelli (rubrica/reminder/voucher/pacchi).
 // v 2026.09.02.02 — _pulisciViste() estesa con 'prenotazioni-setup-section' e 'voucher-setup-section'
 //   (nuovi pannelli Setup, vedi menu-admin.html): senza questo fix i due pannelli non venivano
 //   nascosti passando ad altre sezioni admin.
@@ -262,7 +276,7 @@ function _setCartaSideNote(tipo) {
 // Va chiamata a ogni caricamento (carta, dolci, allergeni, vini, foto, documento generico,
 // prenotazioni) così la pagina non trascina la vista precedente in fondo.
 function _pulisciViste() {
-  ['foto-section','foto-sito-section','vini-section','doc-section','prenotazioni-section','prenotazioni-setup-section','reminder-section','cauzioni-section','voucher-section','voucher-setup-section','rubrica-section','pacchi-section'].forEach(function(id){
+  ['foto-section','foto-sito-section','vini-section','doc-section','piatti-dettagli-section','prenotazioni-section','prenotazioni-setup-section','reminder-section','cauzioni-section','voucher-section','voucher-setup-section','rubrica-section','pacchi-section'].forEach(function(id){
     var e = document.getElementById(id); if (e) e.style.display = 'none';
   });
   var w = document.getElementById('wrap');

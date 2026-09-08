@@ -1,16 +1,4 @@
 <!DOCTYPE html>
-<!-- v 2026.09.05.02 — aggiunto cursor-follower-admin.js (cerchio ambra che segue il mouse, si
-     evidenzia su link/button) prima di </body>, SOLO su menu-admin.html. Recupera l'effetto
-     "cursore strano" descritto in HANDOVER_cursorfollower_v2026.06.05.01.md (mai deployato sul
-     sito pubblico), riadattato al tema scuro dell'admin: niente mix-blend-mode (invisibile su
-     sfondo scuro), bordo rgba(214,155,74) invece del blu-marino pensato per il sito. A11y-safe
-     (disabilitato su touch/pointer:coarse e con prefers-reduced-motion). GATE PRODUZIONE: P1
-     (node --check OK) + P2 (verifica visiva, vedi sotto) fatte; P3 Revisione Oppositiva NON fatta
-     — micro-fix estetico su tool interno non pubblico, non su contenuto pubblico/critico secondo
-     le regole del gate, quindi non obbligatoria; annotata comunque come nota, non come debito. -->
-<!-- v 2026.09.05.01 — rimossa la card "Menù Vini" dalla riga quick-actions della tab "Gestione
-     menù e sito" (sezione #vini-section e funzioni apriSezioneVini/convertiEPubblicaVini lasciate
-     nel file, innocue e non più raggiungibili da UI). -->
 <!-- v 2026.09.02.09 — fix cambio tab (segnalato da Andrea): passando da una tab all'altra (Gestione
      menù / Prenotazioni e voucher / Setup) quello che era caricato sotto (es. la carta) restava
      visibile invece di sparire. setQaTab() ora chiama _pulisciViste() (admin-core.js) a ogni
@@ -601,6 +589,7 @@
     <button class="qa-btn qa-menu" onclick="caricaDalSito('allergeni')">Allergeni carta</button>
     <button class="qa-btn qa-menu" onclick="apriGestoreFoto()">Foto cucina</button>
     <button class="qa-btn qa-menu" onclick="apriGestoreFotoSito()">Foto sito</button>
+    <button class="qa-btn qa-menu" onclick="apriSezioneVini()">Menù Vini</button>
     <button class="qa-btn qa-menu" onclick="apriSezioneDocGenerico()">Documento generico</button>
     <button class="qa-btn qa-menu" onclick="location.href='cantina.html'">Gestionale Cantina</button>
     <div class="menu-top-btns" style="width:100%">
@@ -3176,7 +3165,7 @@ function _vrCall(action, extra) {
 // Stessa logica di descrizioneRichiesta() lato server (richiedi-voucher), per mostrare
 // un'etichetta leggibile senza dover richiamare il server.
 var VR_TIPO_LABELS = {
-  deg6: { base: 'Menù Degustazione Sei portate, per due persone', vini: 'con abbinamento vini', prezzoBase: 170, prezzoVini: 290 },
+  deg6: { base: 'Menù Degustazione Sei portate, per due persone', vini: 'con abbinamento vini', prezzoBase: 180, prezzoVini: 300 },
   deg7: { base: 'Menù Degustazione Sette portate, per due persone', vini: 'con abbinamento vini', prezzoBase: 220, prezzoVini: 360 }
 };
 function _vrEccedenzaLabel(v) {
@@ -3892,9 +3881,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.05.02</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.02.09</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
-<!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
-<script defer src="/cursor-follower-admin.js"></script>
 </body>
 </html>

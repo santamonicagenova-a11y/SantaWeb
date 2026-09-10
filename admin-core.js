@@ -1,4 +1,9 @@
 // Core functions per menu-admin Santamonica
+// v 2026.09.09.01 — Pulsante "🖨 Stampa" del pannello "Dettagli piatti (allergeni)" (logica in
+//   menu-admin.html) CORRETTO su indicazione di Andrea: la v.08.02 (un piatto per pagina, riga
+//   unica a tutta pagina) non era il layout giusto — riportato a tabella multi-riga (PIÙ
+//   piatti per pagina, quanti ce ne stanno, come nel PDF di riferimento), intestazione
+//   colonne ripetuta a ogni foglio via interruzione pagina automatica del browser.
 // v 2026.09.08.02 — Pulsante "🖨 Stampa" del pannello "Dettagli piatti (allergeni)" (logica in
 //   menu-admin.html) riscritto: UNA PAGINA A4 ORIZZONTALE PER PIATTO, tabella a 7 colonne con
 //   un'unica riga che riempie tutta la pagina (come nel PDF di riferimento fornito da Andrea) —

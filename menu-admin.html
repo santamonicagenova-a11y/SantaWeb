@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v 2026.09.08.02 — nuovo pannello "Dettagli piatti (allergeni)" (#piatti-dettagli-section,
+<!-- v 2026.09.09.01 — nuovo pannello "Dettagli piatti (allergeni)" (#piatti-dettagli-section,
      tab "Gestione menù e sito", dopo "Allergeni carta"): scheda di sicurezza alimentare per
      ogni piatto (carta + dolci) — Sezione/Piatto/Descrizione/Allergeni/Allergeni per
      contaminazione/Allergeni eliminabili/In gravidanza/Modifiche consentite/Stato/Fonte —
@@ -15,10 +15,10 @@
      Rubrica professionisti); "+ Aggiungi piatto" inserisce in coda alla sezione scelta
      (datalist con le sezioni già esistenti, o testo libero per una sezione nuova) così i
      piatti restano raggruppati; ↑/↓ per riordinare. Pulsante "🖨 Stampa" genera al volo, in
-     una nuova scheda, UNA PAGINA A4 ORIZZONTALE PER PIATTO (tabella a 7 colonne con
-     un'unica riga che riempie tutta la pagina, come nel PDF di riferimento — non più un
-     elenco compatto multi-riga) dai dati correnti — nessuna pubblicazione, solo stampa/
-     salva PDF locale.
+     una nuova scheda, un foglio A4 orizzontale a tabella (7 colonne, PIÙ PIATTI PER PAGINA
+     — la pagina si riempie con quanti piatti ci stanno, come nel PDF di riferimento;
+     interruzione pagina automatica del browser, intestazione colonne ripetuta a ogni foglio)
+     dai dati correnti — nessuna pubblicazione, solo stampa/salva PDF locale.
      Seed iniziale: i 25 piatti live sul sito l'8/9/2026 (menu-it.html + menu-dolci-it.html),
      allergeni pre-compilati dove già pubblicati su menu-allergeni.html/menu-dolci-it.html; i
      7 piatti della sezione "Crudi" non hanno allergeni pubblicati da nessuna parte del sito e
@@ -1503,7 +1503,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.07.28.03"></script>
-<script src="admin-core.js?v=2026.09.08.02"></script>
+<script src="admin-core.js?v=2026.09.09.01"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -2451,54 +2451,49 @@ function stampaPiattiDettagli() {
   if (!pdState.piatti.length) { _pdSetStatus('Nessun piatto da stampare — carica prima i dati.', true); return; }
   var COLS = ['Piatto', 'Descrizione piatto', 'Allergeni', 'Allergeni per contaminazione', 'Allergeni Eliminabili', 'In Gravidanza', 'Modifiche consentite'];
   var oggi = new Date().toLocaleDateString('it-IT');
-  var tot = pdState.piatti.length;
-  function cell(v) { return v ? '<td>' + _pdEsc(v) + '</td>' : '<td class="vuoto"></td>'; }
-  var pagesHtml = pdState.piatti.map(function (p, i) {
-    var rowHtml = '<tr><td class="piatto-cell">' + _pdEsc(p.piatto) + '</td>' +
+  var rowsHtml = '';
+  var sezioneCorrente = null;
+  pdState.piatti.forEach(function (p) {
+    if (p.sezione !== sezioneCorrente) {
+      sezioneCorrente = p.sezione;
+      rowsHtml += '<tr class="sezione-row"><td colspan="7">' + _pdEsc(sezioneCorrente) + '</td></tr>';
+    }
+    function cell(v) { return v ? '<td>' + _pdEsc(v) + '</td>' : '<td class="vuoto"></td>'; }
+    rowsHtml += '<tr><td class="piatto-cell">' + _pdEsc(p.piatto) + '</td>' +
       cell(p.descrizione) + cell(p.allergeni) + cell(p.allergeni_contaminazione) +
       cell(p.allergeni_eliminabili) + cell(p.gravidanza) + cell(p.modifiche) + '</tr>';
-    return '<div class="piatto-page">' +
-      '<div class="page-head">' +
-      '<span class="ph-doc">SANTAMONICA — Dettagli piatti, allergeni e info cucina</span>' +
-      '<span class="ph-sez">' + _pdEsc(p.sezione) + '</span>' +
-      '<span class="ph-count">' + (i + 1) + ' / ' + tot + '</span>' +
-      '</div>' +
-      '<table class="piatti-full"><col class="c-piatto"><col class="c-descr"><col class="c-all"><col class="c-cont"><col class="c-elim"><col class="c-grav"><col class="c-mod">' +
-      '<thead><tr>' + COLS.map(function (c) { return '<th>' + c + '</th>'; }).join('') + '</tr></thead>' +
-      '<tbody>' + rowHtml + '</tbody></table>' +
-      '<div class="footer-print">Ristorante Santamonica — documento interno, non per il pubblico · generato il ' + oggi + '</div>' +
-      '</div>';
-  }).join('');
+  });
   var doc = '<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8">' +
     '<title>Dettagli piatti — Allergeni e info cucina</title>' +
     '<meta name="robots" content="noindex,nofollow"><style>' +
     ':root{--ink:#1a1a1a;--line:#444;--sezione-bg:#e9e9e9;}' +
     '*{box-sizing:border-box;}' +
-    'html,body{background:#79766e;}' +
-    'body{font-family:"Georgia","Times New Roman",serif;color:var(--ink);margin:0;padding:24px 0;}' +
-    '.toolbar{max-width:297mm;margin:0 auto 16px auto;display:flex;align-items:center;justify-content:space-between;gap:12px;font-family:Arial,Helvetica,sans-serif;font-size:13px;padding:0 8px;}' +
-    '.toolbar .note{color:#eee;max-width:640px;}' +
-    '.toolbar button{font-family:Arial,Helvetica,sans-serif;font-size:13px;padding:8px 16px;background:#1f1f1f;color:#fff;border:none;border-radius:4px;cursor:pointer;flex:0 0 auto;}' +
-    '.piatto-page{width:297mm;height:210mm;margin:0 auto 18px auto;background:#fff;padding:12mm;box-shadow:0 0 8px rgba(0,0,0,.25);display:flex;flex-direction:column;}' +
-    '.page-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:6px;margin-bottom:10mm;font-family:Arial,Helvetica,sans-serif;}' +
-    '.ph-doc{font-size:12px;color:#555;}' +
-    '.ph-sez{font-size:16px;font-weight:bold;text-transform:uppercase;letter-spacing:.04em;}' +
-    '.ph-count{font-size:12px;color:#555;}' +
-    'table.piatti-full{width:100%;flex:1 1 auto;border-collapse:collapse;table-layout:fixed;}' +
-    'table.piatti-full th,table.piatti-full td{border:1px solid var(--line);padding:14px 12px;vertical-align:top;font-size:15px;line-height:1.55;word-wrap:break-word;}' +
-    'table.piatti-full thead th{font-style:italic;font-weight:bold;text-align:center;background:#fff;font-size:13px;height:1px;}' +
-    'table.piatti-full td.piatto-cell{font-weight:bold;font-size:18px;}' +
+    'body{font-family:"Georgia","Times New Roman",serif;color:var(--ink);margin:0;padding:24px;background:#f2f2f0;}' +
+    '.toolbar{max-width:1500px;margin:0 auto 16px auto;display:flex;align-items:center;justify-content:space-between;gap:12px;font-family:Arial,Helvetica,sans-serif;font-size:13px;}' +
+    '.toolbar .note{color:#555;max-width:640px;}' +
+    '.toolbar button{font-family:Arial,Helvetica,sans-serif;font-size:13px;padding:8px 16px;background:#1f1f1f;color:#fff;border:none;border-radius:4px;cursor:pointer;}' +
+    '.sheet{max-width:1500px;margin:0 auto 40px auto;background:#fff;padding:14mm;box-shadow:0 0 8px rgba(0,0,0,.15);}' +
+    '.doc-title{font-size:20px;font-weight:bold;text-align:center;margin:0 0 2px 0;}' +
+    '.doc-sub{text-align:center;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#555;margin:0 0 14px 0;}' +
+    'table.piatti{width:100%;border-collapse:collapse;table-layout:fixed;margin-bottom:10px;}' +
+    'table.piatti th,table.piatti td{border:1px solid var(--line);padding:9px 8px;vertical-align:top;font-size:12.5px;line-height:1.4;word-wrap:break-word;}' +
+    'table.piatti thead th{font-style:italic;font-weight:bold;text-align:center;background:#fff;font-size:12.5px;}' +
+    'table.piatti td.piatto-cell{font-weight:bold;text-align:left;}' +
+    'tr.sezione-row td{background:var(--sezione-bg);font-weight:bold;font-family:Arial,Helvetica,sans-serif;letter-spacing:.03em;text-transform:uppercase;font-size:11.5px;padding:6px 8px;border:1px solid var(--line);}' +
     'td.vuoto{color:#bbb;}' +
     'col.c-piatto{width:15%;}col.c-descr{width:24%;}col.c-all{width:12%;}col.c-cont{width:12%;}col.c-elim{width:12%;}col.c-grav{width:9%;}col.c-mod{width:16%;}' +
-    '.footer-print{font-family:Arial,Helvetica,sans-serif;font-size:9px;color:#777;text-align:center;margin-top:6mm;}' +
-    '@media print{@page{size:A4 landscape;margin:0;}html,body{background:#fff;padding:0;}.toolbar{display:none;}' +
-    '.piatto-page{width:auto;height:auto;min-height:100vh;margin:0;box-shadow:none;padding:12mm;page-break-after:always;}' +
-    '.piatto-page:last-child{page-break-after:auto;}}' +
+    '.footer-print{font-family:Arial,Helvetica,sans-serif;font-size:9px;color:#777;text-align:center;margin-top:10px;}' +
+    '@media print{@page{size:A4 landscape;margin:10mm;}body{background:#fff;padding:0;}.toolbar{display:none;}.sheet{box-shadow:none;padding:0;max-width:none;margin:0;}table.piatti{page-break-inside:auto;}tr{page-break-inside:avoid;page-break-after:auto;}thead{display:table-header-group;}}' +
     '</style></head><body>' +
-    '<div class="toolbar"><div class="note">Stampa "una pagina, un piatto": ' + tot + ' pagine generate dai dati salvati in questo momento. Per stampare: pulsante a destra o Ctrl/Cmd+P — orientamento Orizzontale, formato A4.</div>' +
+    '<div class="toolbar"><div class="note">Stampa in formato tabella (7 colonne, più piatti per pagina), generata dai dati salvati in questo momento. Per stampare: pulsante a destra o Ctrl/Cmd+P — orientamento Orizzontale, formato A4.</div>' +
     '<button onclick="window.print()">⚡ Stampa / Salva PDF</button></div>' +
-    pagesHtml +
-    '</body></html>';
+    '<div class="sheet"><p class="doc-title">SANTAMONICA — Dettagli piatti, allergeni e info cucina</p>' +
+    '<p class="doc-sub">Generato il ' + oggi + ' dai dati correnti del pannello admin — verificare sempre coi dati di cucina prima dell\'uso.</p>' +
+    '<table class="piatti"><col class="c-piatto"><col class="c-descr"><col class="c-all"><col class="c-cont"><col class="c-elim"><col class="c-grav"><col class="c-mod">' +
+    '<thead><tr>' + COLS.map(function (c) { return '<th>' + c + '</th>'; }).join('') + '</tr></thead>' +
+    '<tbody>' + rowsHtml + '</tbody></table>' +
+    '<div class="footer-print">Ristorante Santamonica — documento interno, non per il pubblico.</div>' +
+    '</div></body></html>';
   var w = window.open('', '_blank');
   if (!w) { _pdSetStatus('Il browser ha bloccato la nuova finestra: consenti i popup per questo sito.', true); return; }
   w.document.open(); w.document.write(doc); w.document.close();

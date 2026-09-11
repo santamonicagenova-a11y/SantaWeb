@@ -1,4 +1,10 @@
 // Core functions per menu-admin Santamonica
+// v 2026.09.11.04 — _pulisciViste() estesa con 'foodcost-section' (nuovo modulo Food
+//   Cost in menu-admin.html: spese/incassi giornalieri per reparto, inventario di periodo,
+//   costo piatti, vendite, dashboard — CRUD via Edge Function foodcost-admin, stesso auth
+//   github_token di piatti-dettagli-admin). Nessun'altra modifica a questo file: tutta la
+//   logica del nuovo modulo vive in menu-admin.html (pattern identico al pannello Dettagli
+//   piatti). Vedi DESIGN_foodcost-giornaliero_v2026.09.11.01.md (progetto-sito).
 // v 2026.09.11.03 — Campo escludi_stampa (v. commento esteso in cima a menu-admin.html): in
 //   _pdEseguiPiano, l'azione "update" per un piatto rinominato dalla sync ora porta con sé anche
 //   escludi_stampa (prima veniva perso: un rename automatico riattivava la stampa su un piatto
@@ -299,7 +305,7 @@ function _setCartaSideNote(tipo) {
 // Va chiamata a ogni caricamento (carta, dolci, allergeni, vini, foto, documento generico,
 // prenotazioni) così la pagina non trascina la vista precedente in fondo.
 function _pulisciViste() {
-  ['foto-section','foto-sito-section','vini-section','doc-section','piatti-dettagli-section','prenotazioni-section','prenotazioni-setup-section','reminder-section','cauzioni-section','voucher-section','voucher-setup-section','rubrica-section','pacchi-section'].forEach(function(id){
+  ['foto-section','foto-sito-section','vini-section','doc-section','piatti-dettagli-section','prenotazioni-section','prenotazioni-setup-section','reminder-section','cauzioni-section','voucher-section','voucher-setup-section','rubrica-section','pacchi-section','foodcost-section'].forEach(function(id){
     var e = document.getElementById(id); if (e) e.style.display = 'none';
   });
   var w = document.getElementById('wrap');

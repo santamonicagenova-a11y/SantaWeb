@@ -1,4 +1,28 @@
 <!DOCTYPE html>
+<!-- v 2026.09.11.05 — Nuovo modulo "Food Cost" (menu-admin, tab Setup): sezione
+     #foodcost-section con 7 sotto-schede (Reparti, Spese, Incassi, Inventario, Costo
+     piatti, Vendite, Dashboard) per calcolare Food Cost Reale, Teorico vs Reale (GAP) e
+     Menu Engineering (STAR/PLOWHORSE/PUZZLE/DOG) senza passare per l'Excel. Backend nuovo
+     su SafeTable (xbksultfskvzgncncada): tabelle fc_reparti/fc_spese_giornaliere/
+     fc_incassi_giornalieri/fc_inventario_periodi/fc_piatti_costo (FK a piatti_dettagli —
+     quel piatto non ha un prezzo di vendita, catturato qui)/fc_vendite_periodo (RLS ON,
+     nessuna policy pubblica — stesso pattern di piatti_dettagli), Edge Function
+     foodcost-admin (stesso auth github_token di piatti-dettagli-admin, nessun secret
+     nuovo). Riferimento: DESIGN_foodcost-giornaliero_v2026.09.11.01.md (progetto-sito).
+     Passata P2: corretto il default data (spesa/incasso) da new Date().toISOString() —
+     in UTC, avrebbe mostrato "ieri" per un paio d'ore dopo mezzanotte locale — a
+     _fcOggiLocale() (getFullYear/getMonth/getDate, fuso del browser).
+     GATE: tooling admin interno, riusa pattern di sicurezza già in produzione (auth
+     github_token, RLS+service-role) → P1+P2 fatte; smoke test dati contro lo schema reale
+     via Supabase MCP (inserimento/upsert/aggregazione poi rimossi) prima del deploy della
+     Edge Function. NOTA: fc_piatti_costo.piatto_id → piatti_dettagli(id) senza ON DELETE:
+     eliminare un piatto da "Dettagli piatti" che ha già una scheda costo qui darà errore
+     finché non si rimuove prima quella scheda (protezione voluta contro perdita dati
+     storici, ma il messaggio d'errore lato Dettagli piatti resta generico "Errore
+     interno" — annotato come debito). Revisione Oppositiva NON ancora fatta — debito
+     annotato in P3_PACCHETTO_foodcost-giornaliero_v2026.09.11.01.md.
+     Bump ?v= admin-core.js a 2026.09.11.04 (_pulisciViste estesa con 'foodcost-section')
+     + footer-version. -->
 <!-- v 2026.09.11.04 — Stampa "Dettagli piatti": ogni sezione ora sta tutta su una pagina, mai
      spezzata a metà tra due fogli, su richiesta di Andrea. stampaPiattiDettagli() genera un
      <tbody class="sez-group"> per ogni sezione (intestazione-sezione + tutte le sue righe)
@@ -728,6 +752,7 @@
     <button class="qa-btn qa-setup" onclick="apriSezionePrenotazioniSetup()">Prenotazioni — Setup</button>
     <button class="qa-btn qa-setup" onclick="apriSezioneVoucherSetup()">Voucher — Setup</button>
     <button class="qa-btn qa-setup" onclick="apriSezioneRubrica()">Rubrica professionisti</button>
+    <button class="qa-btn qa-setup" onclick="apriSezioneFoodCost()">Food Cost</button>
   </div>
 </div>
 <script>
@@ -959,6 +984,122 @@
     </div>
   </div>
 </div>
+
+<div id="foodcost-section" style="max-width:1100px;margin:1.5rem auto;padding:0 1rem;display:none;">
+  <div class="fs">
+    <div class="fs-head">Food Cost — Spese, Incassi &amp; Menu Engineering</div>
+    <div class="fs-body">
+      <p style="font-size:.82rem;color:var(--stone);margin-bottom:1rem;line-height:1.6;">
+        Spese per reparto e incasso food (parziali, sempre IVA esclusa) inseriti giorno per giorno;
+        inventario fisico per reparto e vendite per piatto inseriti a fine mese. Il Food Cost Reale,
+        il confronto Teorico vs Reale e il Menu Engineering si calcolano automaticamente qui sotto —
+        database dedicato, indipendente da Libro Cassa.
+      </p>
+
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
+        <div>
+          <span class="opt-lbl">Periodo</span>
+          <input type="month" id="fc-periodo" style="width:10rem;padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);" onchange="fcCambiaPeriodo()" />
+        </div>
+      </div>
+
+      <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1.2rem;">
+        <button class="btn btn-load" id="fc-tab-btn-reparti" onclick="fcSetTab('reparti')">Reparti</button>
+        <button class="btn btn-load" id="fc-tab-btn-spese" onclick="fcSetTab('spese')">Spese</button>
+        <button class="btn btn-load" id="fc-tab-btn-incassi" onclick="fcSetTab('incassi')">Incassi</button>
+        <button class="btn btn-load" id="fc-tab-btn-inventario" onclick="fcSetTab('inventario')">Inventario</button>
+        <button class="btn btn-load" id="fc-tab-btn-costi" onclick="fcSetTab('costi')">Costo piatti</button>
+        <button class="btn btn-load" id="fc-tab-btn-vendite" onclick="fcSetTab('vendite')">Vendite</button>
+        <button class="btn btn-load" id="fc-tab-btn-dashboard" onclick="fcSetTab('dashboard')">Dashboard</button>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--rule);margin:0 0 1.2rem;">
+
+      <div id="fc-view-reparti" style="display:none;">
+        <div class="sub" style="margin-top:0;">Nuovo reparto</div>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1.2rem;">
+          <div style="flex:1;min-width:14rem;">
+            <span class="opt-lbl">Nome reparto</span>
+            <input type="text" id="fc-new-reparto" placeholder="Es: Carne e Salumi" />
+          </div>
+          <button class="btn btn-publish" onclick="fcAggiungiReparto()">+ Aggiungi</button>
+        </div>
+        <div id="fc-reparti-list" style="font-size:.85rem;">…</div>
+      </div>
+
+      <div id="fc-view-spese" style="display:none;">
+        <div class="sub" style="margin-top:0;">Nuova spesa</div>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1.2rem;">
+          <div>
+            <span class="opt-lbl">Data</span>
+            <input type="date" id="fc-spesa-data" style="width:9.5rem;" />
+          </div>
+          <div>
+            <span class="opt-lbl">Reparto</span>
+            <select id="fc-spesa-reparto" style="width:11rem;padding:.35rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);"></select>
+          </div>
+          <div>
+            <span class="opt-lbl">Importo € (no IVA)</span>
+            <input type="number" id="fc-spesa-importo" min="0" step="0.01" style="width:8rem;" />
+          </div>
+          <button class="btn btn-publish" onclick="fcAggiungiSpesa()">+ Aggiungi</button>
+        </div>
+        <div id="fc-spese-list" style="font-size:.85rem;">…</div>
+      </div>
+
+      <div id="fc-view-incassi" style="display:none;">
+        <div class="sub" style="margin-top:0;">Incasso del giorno (food, no IVA)</div>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1.2rem;">
+          <div>
+            <span class="opt-lbl">Data</span>
+            <input type="date" id="fc-incasso-data" style="width:9.5rem;" />
+          </div>
+          <div>
+            <span class="opt-lbl">Importo € (no IVA)</span>
+            <input type="number" id="fc-incasso-importo" min="0" step="0.01" style="width:8rem;" />
+          </div>
+          <button class="btn btn-publish" onclick="fcSalvaIncasso()">💾 Salva</button>
+        </div>
+        <p style="font-size:.72rem;color:var(--stone);margin:-.6rem 0 1rem;">Un solo incasso per giorno — salvare di nuovo sulla stessa data lo sovrascrive.</p>
+        <div id="fc-incassi-list" style="font-size:.85rem;">…</div>
+      </div>
+
+      <div id="fc-view-inventario" style="display:none;">
+        <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Conteggio fisico di inizio/fine mese, per reparto — sempre in €, no IVA.</p>
+        <div id="fc-inventario-list" style="font-size:.85rem;">…</div>
+        <div style="margin-top:1rem;">
+          <button class="btn btn-publish" onclick="fcSalvaInventario()">💾 Salva inventario</button>
+        </div>
+      </div>
+
+      <div id="fc-view-costi" style="display:none;">
+        <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Costo ricetta e prezzo di vendita per ogni piatto già presente in "Dettagli piatti (allergeni)". Aggiorna quando cambia un costo ingrediente.</p>
+        <div id="fc-costi-list" style="font-size:.85rem;">…</div>
+        <div style="margin-top:1rem;">
+          <button class="btn btn-publish" onclick="fcSalvaCosti()">💾 Salva costi</button>
+        </div>
+      </div>
+
+      <div id="fc-view-vendite" style="display:none;">
+        <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Quantità vendute nel periodo per ogni piatto con un costo impostato — da inserire a fine mese.</p>
+        <div id="fc-vendite-list" style="font-size:.85rem;">…</div>
+        <div style="margin-top:1rem;">
+          <button class="btn btn-publish" onclick="fcSalvaVendite()">💾 Salva vendite</button>
+        </div>
+      </div>
+
+      <div id="fc-view-dashboard" style="display:none;">
+        <div id="fc-dashboard-body" style="font-size:.85rem;">…</div>
+      </div>
+
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
+        <button class="btn btn-load" onclick="chiudiSezioneFoodCost()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
+        <span id="fc-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <div id="prenotazioni-section" style="max-width:700px;margin:1.5rem auto;padding:0 1rem;display:none;">
   <div class="fs">
@@ -1570,7 +1711,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.07.28.03"></script>
-<script src="admin-core.js?v=2026.09.11.03"></script>
+<script src="admin-core.js?v=2026.09.11.04"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -2595,6 +2736,525 @@ function stampaPiattiDettagli() {
   if (!w) { _pdSetStatus('Il browser ha bloccato la nuova finestra: consenti i popup per questo sito.', true); return; }
   w.document.open(); w.document.write(doc); w.document.close();
   _pdSetStatus(esclusi ? 'Foglio generato (' + esclusi + ' piatt' + (esclusi === 1 ? 'o escluso' : 'i esclusi') + ' dalla stampa).' : 'Foglio generato.');
+}
+
+// ══ FOOD COST GIORNALIERO (spese/incassi per reparto, inventario di periodo, ═══
+//    costo piatti agganciato a piatti_dettagli, vendite di periodo, dashboard) ═
+// CRUD + calcoli via Edge Function foodcost-admin (auth col token GitHub gh_token,
+// stesso meccanismo di rubrica/prenotazioni/reminder/dettagli piatti — riusa
+// _prenGhToken()). Database dedicato (SafeTable), indipendente da Libro Cassa.
+// Riferimento di progettazione: DESIGN_foodcost-giornaliero_v2026.09.11.01.md
+// (progetto-sito). "Periodo" viaggia sempre come "YYYY-MM-01" (primo del mese).
+var FC_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/foodcost-admin';
+var fcState = { reparti: [], tab: 'reparti', periodo: '', spese: [], incassi: [], inventario: [], costi: [], vendite: [], dashboard: null };
+
+function _fcEsc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function _fcSetStatus(msg, isErr) {
+  var el = document.getElementById('fc-status');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.style.color = isErr ? 'var(--rust)' : 'var(--stone)';
+}
+
+function _fcFetch(payload) {
+  var token = _prenGhToken();
+  if (!token) return Promise.reject(new Error('no-token'));
+  payload.github_token = token;
+  return fetch(FC_URL, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+  }).then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); });
+}
+
+function _fcErr(e, fallback) {
+  if (e && e.message === 'no-token') _fcSetStatus('Operazione annullata: serve il token GitHub.', true);
+  else _fcSetStatus(fallback, true);
+}
+
+function _fcErrMsg(res) {
+  if (res.status === 401) return 'Token GitHub non valido o senza permessi. Reimpostalo col tasto 🔑.';
+  return (res.body && res.body.error) || 'Errore.';
+}
+
+function _fcEur(x) { return '€ ' + (Number(x) || 0).toFixed(2); }
+function _fcPct(x) { return ((Number(x) || 0) * 100).toFixed(1) + '%'; }
+
+function _fcPeriodoCorrente() {
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+
+// NB: niente toISOString() qui — è in UTC, e per chi lavora da un fuso avanti su UTC
+// (Europe/Rome) restituirebbe "ieri" per un paio d'ore dopo la mezzanotte locale
+// (es. servizio finito e chiusura fatta a inizio nuovo giorno). getFullYear/getMonth/
+// getDate usano invece il fuso locale del browser.
+function _fcOggiLocale() {
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function fcPeriodoValue() {
+  var el = document.getElementById('fc-periodo');
+  var v = el && el.value ? el.value : _fcPeriodoCorrente();
+  return v + '-01';
+}
+
+function apriSezioneFoodCost() {
+  document.getElementById('carica-menu').classList.remove('open');
+  document.getElementById('intro').style.display = 'none';
+  _pulisciViste();
+  document.getElementById('foodcost-section').style.display = 'block';
+  var pEl = document.getElementById('fc-periodo');
+  if (pEl && !pEl.value) pEl.value = _fcPeriodoCorrente();
+  var dSpesa = document.getElementById('fc-spesa-data'), dInc = document.getElementById('fc-incasso-data');
+  var oggi = _fcOggiLocale();
+  if (dSpesa && !dSpesa.value) dSpesa.value = oggi;
+  if (dInc && !dInc.value) dInc.value = oggi;
+  fcLoadReparti(function () { fcSetTab(fcState.tab || 'reparti'); });
+}
+
+function chiudiSezioneFoodCost() {
+  document.getElementById('foodcost-section').style.display = 'none';
+  if (!document.getElementById('wrap').classList.contains('on'))
+    document.getElementById('intro').style.display = '';
+}
+
+function fcCambiaPeriodo() {
+  fcLoadTab(fcState.tab);
+}
+
+function fcSetTab(t) {
+  fcState.tab = t;
+  ['reparti', 'spese', 'incassi', 'inventario', 'costi', 'vendite', 'dashboard'].forEach(function (k) {
+    var v = document.getElementById('fc-view-' + k), b = document.getElementById('fc-tab-btn-' + k);
+    if (v) v.style.display = (k === t) ? '' : 'none';
+    if (b) { b.style.borderColor = (k === t) ? 'var(--rust)' : ''; b.style.color = (k === t) ? 'var(--rust)' : ''; }
+  });
+  fcLoadTab(t);
+}
+
+function fcLoadTab(t) {
+  if (t === 'reparti') fcLoadReparti();
+  else if (t === 'spese') fcLoadSpese();
+  else if (t === 'incassi') fcLoadIncassi();
+  else if (t === 'inventario') fcLoadInventario();
+  else if (t === 'costi') fcLoadCosti();
+  else if (t === 'vendite') fcLoadVendite();
+  else if (t === 'dashboard') fcLoadDashboard();
+}
+
+// ---- Reparti ----
+
+function fcLoadReparti(callback) {
+  _fcSetStatus('Caricamento reparti…');
+  _fcFetch({ action: 'reparti_list' })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcState.reparti = res.body.reparti || [];
+      fcRenderReparti();
+      fcPopolaSelectReparti();
+      _fcSetStatus('');
+      if (callback) callback();
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function _fcOk(res) { return res.status === 200 && res.body && res.body.ok; }
+
+function fcRenderReparti() {
+  var list = document.getElementById('fc-reparti-list');
+  if (!list) return;
+  if (!fcState.reparti.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun reparto ancora. Aggiungilo dal modulo qui sopra.</p>'; return; }
+  list.innerHTML = fcState.reparti.map(function (r) {
+    return '<div class="fs" style="margin-bottom:.6rem;">' +
+      '<div class="fs-body" style="padding:.6rem 1rem;display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;' + (r.attivo ? '' : 'opacity:.5;') + '">' +
+      '<input type="text" id="fc-rep-nome-' + r.id + '" value="' + _fcEsc(r.nome) + '" style="flex:1;min-width:10rem;" />' +
+      '<label style="font-size:.75rem;color:var(--stone);display:flex;gap:.3rem;align-items:center;"><input type="checkbox" id="fc-rep-attivo-' + r.id + '" ' + (r.attivo ? 'checked' : '') + ' /> attivo</label>' +
+      '<button class="btn btn-load" style="font-size:.72rem;padding:.25rem .6rem;" onclick="fcSalvaReparto(\'' + r.id + '\')">💾 Salva</button>' +
+      '</div></div>';
+  }).join('');
+}
+
+function fcPopolaSelectReparti() {
+  var sel = document.getElementById('fc-spesa-reparto');
+  if (!sel) return;
+  var attuale = sel.value;
+  sel.innerHTML = fcState.reparti.filter(function (r) { return r.attivo; }).map(function (r) {
+    return '<option value="' + r.id + '">' + _fcEsc(r.nome) + '</option>';
+  }).join('');
+  if (attuale) sel.value = attuale;
+}
+
+function fcAggiungiReparto() {
+  var nomeEl = document.getElementById('fc-new-reparto');
+  var nome = nomeEl.value.trim();
+  if (!nome) { _fcSetStatus('Indica il nome del reparto.', true); return; }
+  _fcSetStatus('Aggiunta…');
+  _fcFetch({ action: 'reparti_create', nome: nome })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcState.reparti = res.body.reparti || [];
+      fcRenderReparti(); fcPopolaSelectReparti();
+      nomeEl.value = '';
+      _fcSetStatus('Reparto aggiunto.');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function fcSalvaReparto(id) {
+  var nome = document.getElementById('fc-rep-nome-' + id).value.trim();
+  var attivo = document.getElementById('fc-rep-attivo-' + id).checked;
+  if (!nome) { _fcSetStatus('Il nome del reparto non può essere vuoto.', true); return; }
+  _fcSetStatus('Salvataggio…');
+  _fcFetch({ action: 'reparti_update', id: id, nome: nome, attivo: attivo })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcState.reparti = res.body.reparti || [];
+      fcRenderReparti(); fcPopolaSelectReparti();
+      _fcSetStatus('Reparto salvato.');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+// ---- Spese giornaliere ----
+
+function fcLoadSpese() {
+  _fcSetStatus('Caricamento spese…');
+  _fcFetch({ action: 'spese_list', periodo: fcPeriodoValue() })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcState.spese = res.body.spese || [];
+      fcRenderSpese();
+      _fcSetStatus('');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function fcRenderSpese() {
+  var list = document.getElementById('fc-spese-list');
+  if (!list) return;
+  if (!fcState.spese.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessuna spesa in questo periodo.</p>'; return; }
+  var tot = fcState.spese.reduce(function (a, r) { return a + Number(r.importo); }, 0);
+  list.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;">' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Data</th><th>Reparto</th><th>Importo</th><th>Note</th><th></th></tr>' +
+    fcState.spese.map(function (r) {
+      return '<tr style="border-top:1px solid var(--rule);">' +
+        '<td style="padding:.35rem 0;">' + r.data + '</td>' +
+        '<td>' + _fcEsc(r.fc_reparti ? r.fc_reparti.nome : '—') + '</td>' +
+        '<td>' + _fcEur(r.importo) + '</td>' +
+        '<td style="color:var(--stone);font-size:.78rem;">' + _fcEsc(r.note || '') + '</td>' +
+        '<td><span onclick="fcEliminaSpesa(\'' + r.id + '\')" style="color:var(--rust);cursor:pointer;font-size:.78rem;">elimina</span></td>' +
+        '</tr>';
+    }).join('') +
+    '<tr style="border-top:2px solid var(--rule);font-weight:600;"><td style="padding:.35rem 0;">Totale</td><td></td><td>' + _fcEur(tot) + '</td><td></td><td></td></tr>' +
+    '</table>';
+}
+
+function fcAggiungiSpesa() {
+  var data_ = document.getElementById('fc-spesa-data').value;
+  var reparto_id = document.getElementById('fc-spesa-reparto').value;
+  var importo = document.getElementById('fc-spesa-importo').value;
+  if (!data_) { _fcSetStatus('Indica la data.', true); return; }
+  if (!reparto_id) { _fcSetStatus('Indica il reparto (creane uno se la lista è vuota).', true); return; }
+  if (importo === '' || Number(importo) < 0) { _fcSetStatus('Indica un importo valido.', true); return; }
+  _fcSetStatus('Aggiunta…');
+  _fcFetch({ action: 'spese_create', data: data_, reparto_id: reparto_id, importo: Number(importo) })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      document.getElementById('fc-spesa-importo').value = '';
+      fcLoadSpese();
+      _fcSetStatus('Spesa aggiunta.');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function fcEliminaSpesa(id) {
+  if (!window.confirm('Eliminare questa spesa?')) return;
+  _fcSetStatus('Eliminazione…');
+  _fcFetch({ action: 'spese_delete', id: id })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcLoadSpese();
+      _fcSetStatus('Spesa eliminata.');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+// ---- Incassi giornalieri (un solo record per data: upsert) ----
+
+function fcLoadIncassi() {
+  _fcSetStatus('Caricamento incassi…');
+  _fcFetch({ action: 'incassi_list', periodo: fcPeriodoValue() })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcState.incassi = res.body.incassi || [];
+      fcRenderIncassi();
+      _fcSetStatus('');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function fcRenderIncassi() {
+  var list = document.getElementById('fc-incassi-list');
+  if (!list) return;
+  if (!fcState.incassi.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun incasso in questo periodo.</p>'; return; }
+  var tot = fcState.incassi.reduce(function (a, r) { return a + Number(r.importo); }, 0);
+  list.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;">' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Data</th><th>Importo</th><th></th></tr>' +
+    fcState.incassi.map(function (r) {
+      return '<tr style="border-top:1px solid var(--rule);">' +
+        '<td style="padding:.35rem 0;">' + r.data + '</td>' +
+        '<td>' + _fcEur(r.importo) + '</td>' +
+        '<td><span onclick="fcEliminaIncasso(\'' + r.id + '\')" style="color:var(--rust);cursor:pointer;font-size:.78rem;">elimina</span></td>' +
+        '</tr>';
+    }).join('') +
+    '<tr style="border-top:2px solid var(--rule);font-weight:600;"><td style="padding:.35rem 0;">Totale</td><td>' + _fcEur(tot) + '</td><td></td></tr>' +
+    '</table>';
+}
+
+function fcSalvaIncasso() {
+  var data_ = document.getElementById('fc-incasso-data').value;
+  var importo = document.getElementById('fc-incasso-importo').value;
+  if (!data_) { _fcSetStatus('Indica la data.', true); return; }
+  if (importo === '' || Number(importo) < 0) { _fcSetStatus('Indica un importo valido.', true); return; }
+  _fcSetStatus('Salvataggio…');
+  _fcFetch({ action: 'incassi_upsert', data: data_, importo: Number(importo) })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      document.getElementById('fc-incasso-importo').value = '';
+      fcLoadIncassi();
+      _fcSetStatus('Incasso salvato.');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function fcEliminaIncasso(id) {
+  if (!window.confirm('Eliminare questo incasso?')) return;
+  _fcSetStatus('Eliminazione…');
+  _fcFetch({ action: 'incassi_delete', id: id })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcLoadIncassi();
+      _fcSetStatus('Incasso eliminato.');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+// ---- Inventario di periodo (per reparto) ----
+
+function fcLoadInventario() {
+  _fcSetStatus('Caricamento inventario…');
+  _fcFetch({ action: 'inventario_get', periodo: fcPeriodoValue() })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcState.inventario = res.body.righe || [];
+      fcRenderInventario();
+      _fcSetStatus('');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function fcRenderInventario() {
+  var list = document.getElementById('fc-inventario-list');
+  if (!list) return;
+  if (!fcState.inventario.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun reparto attivo — crealo dalla scheda "Reparti".</p>'; return; }
+  list.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;">' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Reparto</th><th>Inventario iniziale (€)</th><th>Inventario finale (€)</th></tr>' +
+    fcState.inventario.map(function (r) {
+      return '<tr style="border-top:1px solid var(--rule);">' +
+        '<td style="padding:.35rem 0;">' + _fcEsc(r.nome) + '</td>' +
+        '<td><input type="number" min="0" step="0.01" id="fc-inv-ini-' + r.reparto_id + '" value="' + (r.inventario_iniziale == null ? '' : r.inventario_iniziale) + '" style="width:8rem;" /></td>' +
+        '<td><input type="number" min="0" step="0.01" id="fc-inv-fin-' + r.reparto_id + '" value="' + (r.inventario_finale == null ? '' : r.inventario_finale) + '" style="width:8rem;" /></td>' +
+        '</tr>';
+    }).join('') +
+    '</table>';
+}
+
+function fcSalvaInventario() {
+  var periodo = fcPeriodoValue();
+  var chiamate = fcState.inventario.map(function (r) {
+    var ini = document.getElementById('fc-inv-ini-' + r.reparto_id).value;
+    var fin = document.getElementById('fc-inv-fin-' + r.reparto_id).value;
+    return _fcFetch({
+      action: 'inventario_upsert', periodo: periodo, reparto_id: r.reparto_id,
+      inventario_iniziale: ini === '' ? 0 : Number(ini),
+      inventario_finale: fin === '' ? null : Number(fin),
+    });
+  });
+  _fcSetStatus('Salvataggio…');
+  Promise.all(chiamate).then(function (risultati) {
+    var errore = risultati.find(function (res) { return !_fcOk(res); });
+    if (errore) { _fcSetStatus(_fcErrMsg(errore), true); return; }
+    fcLoadInventario();
+    _fcSetStatus('Inventario salvato.');
+  }).catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+// ---- Schede Costo Piatto (agganciate a piatti_dettagli) ----
+
+function fcLoadCosti() {
+  _fcSetStatus('Caricamento costo piatti…');
+  _fcFetch({ action: 'piatti_costo_list' })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcState.costi = res.body.righe || [];
+      fcRenderCosti();
+      _fcSetStatus('');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function fcRenderCosti() {
+  var list = document.getElementById('fc-costi-list');
+  if (!list) return;
+  if (!fcState.costi.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun piatto in "Dettagli piatti (allergeni)" — crealo prima da lì.</p>'; return; }
+  list.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;">' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Piatto</th><th>Costo ricetta (€)</th><th>Prezzo vendita (€)</th></tr>' +
+    fcState.costi.map(function (r) {
+      return '<tr style="border-top:1px solid var(--rule);">' +
+        '<td style="padding:.35rem 0;">' + _fcEsc(r.piatto) + '<div style="font-size:.7rem;color:var(--stone);">' + _fcEsc(r.sezione || '') + '</div></td>' +
+        '<td><input type="number" min="0" step="0.01" id="fc-costo-' + r.piatto_id + '" value="' + (r.costo_piatto == null ? '' : r.costo_piatto) + '" style="width:8rem;" /></td>' +
+        '<td><input type="number" min="0" step="0.01" id="fc-prezzo-' + r.piatto_id + '" value="' + (r.prezzo_vendita == null ? '' : r.prezzo_vendita) + '" style="width:8rem;" /></td>' +
+        '</tr>';
+    }).join('') +
+    '</table>';
+}
+
+function fcSalvaCosti() {
+  var chiamate = [];
+  fcState.costi.forEach(function (r) {
+    var costoEl = document.getElementById('fc-costo-' + r.piatto_id), prezzoEl = document.getElementById('fc-prezzo-' + r.piatto_id);
+    var costo = costoEl.value, prezzo = prezzoEl.value;
+    if (costo === '' && prezzo === '' && !r.piatto_costo_id) return; // riga mai compilata: salta
+    chiamate.push(_fcFetch({
+      action: 'piatti_costo_upsert', piatto_id: r.piatto_id,
+      costo_piatto: costo === '' ? 0 : Number(costo),
+      prezzo_vendita: prezzo === '' ? 0 : Number(prezzo),
+    }));
+  });
+  if (!chiamate.length) { _fcSetStatus('Nessuna scheda da salvare.', true); return; }
+  _fcSetStatus('Salvataggio…');
+  Promise.all(chiamate).then(function (risultati) {
+    var errore = risultati.find(function (res) { return !_fcOk(res); });
+    if (errore) { _fcSetStatus(_fcErrMsg(errore), true); return; }
+    fcLoadCosti();
+    _fcSetStatus('Costo piatti salvato.');
+  }).catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+// ---- Vendite di periodo (bulk, a fine mese) ----
+
+function fcLoadVendite() {
+  _fcSetStatus('Caricamento vendite…');
+  _fcFetch({ action: 'vendite_get', periodo: fcPeriodoValue() })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcState.vendite = res.body.righe || [];
+      fcRenderVendite();
+      _fcSetStatus('');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function fcRenderVendite() {
+  var list = document.getElementById('fc-vendite-list');
+  if (!list) return;
+  if (!fcState.vendite.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun piatto con un costo impostato — vai prima su "Costo piatti".</p>'; return; }
+  list.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;">' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Piatto</th><th>Costo (€)</th><th>Prezzo (€)</th><th>Qtà venduta</th></tr>' +
+    fcState.vendite.map(function (r) {
+      return '<tr style="border-top:1px solid var(--rule);">' +
+        '<td style="padding:.35rem 0;">' + _fcEsc(r.piatto) + '</td>' +
+        '<td>' + _fcEur(r.costo_piatto) + '</td>' +
+        '<td>' + _fcEur(r.prezzo_vendita) + '</td>' +
+        '<td><input type="number" min="0" step="1" id="fc-qty-' + r.piatto_costo_id + '" value="' + r.quantita_venduta + '" style="width:6rem;" /></td>' +
+        '</tr>';
+    }).join('') +
+    '</table>';
+}
+
+function fcSalvaVendite() {
+  var periodo = fcPeriodoValue();
+  var righe = fcState.vendite.map(function (r) {
+    var el = document.getElementById('fc-qty-' + r.piatto_costo_id);
+    return { piatto_costo_id: r.piatto_costo_id, quantita_venduta: el ? Number(el.value || 0) : 0 };
+  });
+  _fcSetStatus('Salvataggio…');
+  _fcFetch({ action: 'vendite_bulk_upsert', periodo: periodo, righe: righe })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcLoadVendite();
+      _fcSetStatus('Vendite salvate.');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+// ---- Dashboard: i 3 calcoli + trend ultimi 6 periodi ----
+
+function fcLoadDashboard() {
+  _fcSetStatus('Calcolo…');
+  _fcFetch({ action: 'dashboard', periodo: fcPeriodoValue() })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcState.dashboard = res.body;
+      fcRenderDashboard();
+      _fcSetStatus('');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function _fcGapColore(gap) {
+  var a = Math.abs(gap);
+  if (a <= 0.02) return 'var(--green)';
+  if (a <= 0.04) return 'var(--ink)';
+  if (a <= 0.07) return 'var(--rust)';
+  return '#b91c1c';
+}
+
+function fcRenderDashboard() {
+  var el = document.getElementById('fc-dashboard-body');
+  if (!el || !fcState.dashboard) return;
+  var d = fcState.dashboard;
+
+  var cards = '<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.4rem;">' +
+    '<div class="fs" style="flex:1;min-width:11rem;"><div class="fs-body" style="padding:.8rem 1rem;">' +
+    '<div class="opt-lbl">Food Cost Reale</div><div style="font-size:1.4rem;font-weight:600;">' + _fcPct(d.food_cost_reale_pct) + '</div></div></div>' +
+    '<div class="fs" style="flex:1;min-width:11rem;"><div class="fs-body" style="padding:.8rem 1rem;">' +
+    '<div class="opt-lbl">Food Cost Teorico</div><div style="font-size:1.4rem;font-weight:600;">' + _fcPct(d.food_cost_teorico_pct) + '</div></div></div>' +
+    '<div class="fs" style="flex:1;min-width:11rem;"><div class="fs-body" style="padding:.8rem 1rem;">' +
+    '<div class="opt-lbl">GAP (Reale − Teorico)</div><div style="font-size:1.4rem;font-weight:600;color:' + _fcGapColore(d.gap_pct) + ';">' + _fcPct(d.gap_pct) + '</div></div></div>' +
+    '</div>';
+
+  var reparti = '<div class="sub">Consumi per reparto</div>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:.8rem;margin-bottom:1.2rem;">' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.68rem;text-transform:uppercase;"><th>Reparto</th><th>Iniziale</th><th>Spese</th><th>Finale</th><th>Consumi</th></tr>' +
+    d.reparti.map(function (r) {
+      return '<tr style="border-top:1px solid var(--rule);"><td style="padding:.3rem 0;">' + _fcEsc(r.nome) + '</td><td>' + _fcEur(r.inventario_iniziale) + '</td><td>' + _fcEur(r.spese_periodo) + '</td><td>' + _fcEur(r.inventario_finale) + '</td><td>' + _fcEur(r.consumi) + '</td></tr>';
+    }).join('') +
+    '</table>';
+
+  var me = '<div class="sub">Menu Engineering</div>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:.8rem;margin-bottom:1.2rem;">' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.68rem;text-transform:uppercase;"><th>Piatto</th><th>Qtà</th><th>Margine unit.</th><th>Mix %</th><th>Classe</th></tr>' +
+    d.menu_engineering.map(function (p) {
+      var col = { STAR: 'var(--green)', PLOWHORSE: 'var(--ink)', PUZZLE: 'var(--blue)', DOG: 'var(--rust)' }[p.classificazione] || 'var(--ink)';
+      return '<tr style="border-top:1px solid var(--rule);"><td style="padding:.3rem 0;">' + _fcEsc(p.nome) + '</td><td>' + p.qty_venduta + '</td><td>' + _fcEur(p.margine_unitario) + '</td><td>' + _fcPct(p.mix_pct) + '</td><td style="color:' + col + ';font-weight:600;">' + p.classificazione + '</td></tr>';
+    }).join('') +
+    '</table>';
+
+  var trend = '<div class="sub">Andamento Food Cost Reale — ultimi 6 mesi</div>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:.8rem;">' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.68rem;text-transform:uppercase;"><th>Periodo</th><th>Reale</th><th>Teorico</th></tr>' +
+    (d.trend || []).map(function (t) {
+      return '<tr style="border-top:1px solid var(--rule);"><td style="padding:.3rem 0;">' + t.periodo.slice(0, 7) + '</td><td>' + _fcPct(t.food_cost_reale_pct) + '</td><td>' + _fcPct(t.food_cost_teorico_pct) + '</td></tr>';
+    }).join('') +
+    '</table>';
+
+  el.innerHTML = cards + reparti + me + trend;
 }
 
 // ══ REMINDER PRENOTAZIONI (setup messaggio + tempistiche) ════
@@ -4330,7 +4990,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.11.04</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.11.05</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

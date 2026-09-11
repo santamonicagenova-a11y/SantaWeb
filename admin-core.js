@@ -1,4 +1,22 @@
 // Core functions per menu-admin Santamonica
+// v 2026.09.11.03 — Campo escludi_stampa (v. commento esteso in cima a menu-admin.html): in
+//   _pdEseguiPiano, l'azione "update" per un piatto rinominato dalla sync ora porta con sé anche
+//   escludi_stampa (prima veniva perso: un rename automatico riattivava la stampa su un piatto
+//   che Andrea aveva escluso). Nessun'altra modifica funzionale in questo file.
+// v 2026.09.11.02 — NUOVO: sincronizzazione "Dettagli piatti" (allergeni) con Traduci e
+//   Pubblica di Carta/Dolci (funzioni _pdNorm/_pdLevenshtein/_pdNomiSimili/_pdCalcolaPiano/
+//   _pdRiepilogoPiano/_pdEseguiPiano/_pdSincronizzaEProsegui/_pdAllergeniDaCartaPerNome/
+//   _pdAssicuraAllergeniCartaLive, agganciate in traduciEPubblica e nell'override di
+//   confermaPubblica in menu-admin.html). Vedi commento esteso in cima a menu-admin.html per
+//   comportamento, scelte di Andrea e limiti noti. GATE: P1+P2 fatti (vedi commento
+//   menu-admin.html), Revisione Oppositiva NON ancora fatta — pacchetto preparato, da passare a
+//   un'altra IA prima di considerare la funzione definitiva.
+// v 2026.09.11.01 — FIX pulsante "🗑 Elimina" del pannello "Dettagli piatti (allergeni)"
+//   (logica in menu-admin.html): onclick incorporava JSON.stringify(p.piatto) dentro
+//   l'attributo onclick="..." (entrambi delimitati da virgolette doppie) → attributo
+//   spezzato, bottone non funzionante su nessuna riga. Ora l'onclick passa solo l'id e
+//   eliminaPiattoDettaglio(id) recupera il nome da pdState.piatti. Nessuna modifica ad
+//   admin-core.js: la funzione vive in menu-admin.html, changelog qui per continuità.
 // v 2026.09.10.01 — Pulsante "🖨 Stampa" del pannello "Dettagli piatti (allergeni)" (logica in
 //   menu-admin.html) CORRETTO su indicazione di Andrea: la v.08.02 (un piatto per pagina, riga
 //   unica a tutta pagina) non era il layout giusto — riportato a tabella multi-riga (PIÙ
@@ -1334,16 +1352,21 @@ function traduciEPubblica() {
           return;
         }
       }
-      btn.textContent = '⏳ Pubblicazione…';
       var token = localStorage.getItem('gh_token') || '';
       if (token) {
-        eseguiPubblicazione(token);
+        btn.textContent = '⏳ Controllo Dettagli piatti…';
+        _pdSincronizzaEProsegui(m, token, function () {
+          btn.textContent = '⏳ Pubblicazione…';
+          eseguiPubblicazione(token);
+          btn.textContent = '✶ Traduci e Pubblica';
+          btn.disabled = false;
+        });
       } else {
         document.getElementById('token-input').value = '';
         document.getElementById('modal-token').classList.add('on');
+        btn.textContent = '✶ Traduci e Pubblica';
+        btn.disabled = false;
       }
-      btn.textContent = '✶ Traduci e Pubblica';
-      btn.disabled = false;
       return;
     }
     var item = coda[i];
@@ -1406,6 +1429,235 @@ function traduciEPubblica() {
   } else {
     _avvia();
   }
+}
+
+// ═══════════════════════════════════════════════════════
+// SYNC "Dettagli piatti" (allergeni) su Traduci e Pubblica di Carta/Dolci
+// ═══════════════════════════════════════════════════════
+// Prima di pubblicare Carta o Dolci, confronta i piatti che stanno per essere pubblicati con
+// lo stato attuale del database Dettagli piatti (piatti_dettagli, pannello omonimo) e propone
+// (con un confirm, MAI in automatico senza avviso) di allinearlo: piatti nuovi vengono creati
+// (allergeni precompilati da "Allergeni carta" se il nome coincide, resto da compilare a mano),
+// piatti spariti dalla carta vengono cancellati, piatti rinominati (euristica per somiglianza
+// del nome nella stessa sezione) mantengono TUTTI i campi di sicurezza alimentare già compilati
+// — solo nome/sezione vengono aggiornati. Annullando il confirm si pubblica comunque il menù,
+// Dettagli piatti resta invariato (ripropone la stessa differenza alla pubblicazione successiva).
+// Il confronto è limitato alle sole sezioni presenti nella pubblicazione in corso: le sezioni
+// dell'altro menu (es. i dolci quando si pubblica la carta) non vengono mai toccate.
+
+// Normalizza un nome/sezione per il confronto: minuscolo, accenti rimossi, punteggiatura ridotta.
+function _pdNorm(s) {
+  return String(s || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/[^a-z0-9 ]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Distanza di Levenshtein — stringhe brevi (nomi piatto), nessun bisogno di ottimizzare.
+function _pdLevenshtein(a, b) {
+  var m = a.length, n = b.length;
+  if (!m) return n; if (!n) return m;
+  var prev = []; for (var j = 0; j <= n; j++) prev[j] = j;
+  for (var i = 1; i <= m; i++) {
+    var cur = [i];
+    for (var j2 = 1; j2 <= n; j2++) {
+      var cost = a[i - 1] === b[j2 - 1] ? 0 : 1;
+      cur[j2] = Math.min(prev[j2] + 1, cur[j2 - 1] + 1, prev[j2 - 1] + cost);
+    }
+    prev = cur;
+  }
+  return prev[n];
+}
+
+// "Assomigliano abbastanza da essere lo stesso piatto rinominato"? Soglia prudente.
+function _pdNomiSimili(nomeA, nomeB) {
+  var a = _pdNorm(nomeA), b = _pdNorm(nomeB);
+  if (!a || !b) return false;
+  if (a === b) return true;
+  if (a.indexOf(b) >= 0 || b.indexOf(a) >= 0) return true;
+  var maxLen = Math.max(a.length, b.length);
+  return (_pdLevenshtein(a, b) / maxLen) <= 0.22;
+}
+
+// Assicura _allergeniCartaLive popolato (per Dolci non viene già recuperato da traduciEPubblica
+// come avviene per Carta) — fetch live best-effort, non blocca mai la sincronizzazione.
+function _pdAssicuraAllergeniCartaLive() {
+  if (_allergeniCartaLive) return Promise.resolve();
+  var nc = '?nocache=' + Date.now() + '_' + Math.random().toString(36).slice(2);
+  return fetch(ALLERGENI_URL + nc, { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.text() : Promise.reject(new Error('HTTP ' + r.status)); })
+    .then(function (src) {
+      var START = 'const ALLERGENI_DATA = ';
+      var SEP = '/* ' + '═'.repeat(57) + ' */';
+      var i1 = src.indexOf(START), i2 = src.indexOf(SEP, i1);
+      if (i1 >= 0 && i2 > i1) _allergeniCartaLive = _parseDataBlock(src.slice(i1, i2).trim(), 'ALLERGENI_DATA');
+    })
+    .catch(function (e) { console.warn('[Dettagli piatti sync] fetch Allergeni carta fallito: ' + e.message); });
+}
+
+// Allergeni precompilati da "Allergeni carta" per un piatto NUOVO, se il nome coincide (stringa
+// "Glutine, Pesce" pronta per il campo libero di Dettagli piatti). '' se non trovato/disponibile.
+function _pdAllergeniDaCartaPerNome(nome) {
+  if (!_allergeniCartaLive || !_allergeniCartaLive.sezioni) return '';
+  var target = _pdNorm(nome);
+  var trovato = null;
+  _allergeniCartaLive.sezioni.forEach(function (sez) {
+    (sez.piatti || []).forEach(function (p) {
+      if (p && p.nome && _pdNorm(p.nome) === target) trovato = p;
+    });
+  });
+  if (!trovato || !trovato.allergeni || !trovato.allergeni.length) return '';
+  return _normAllergeni(trovato.allergeni).map(function (k) {
+    return k.charAt(0).toUpperCase() + k.slice(1);
+  }).join(', ');
+}
+
+// Confronta i piatti in pubblicazione (mSezioni, da leggi()) con lo stato attuale di Dettagli
+// piatti e calcola il piano: { nuovi:[{sezione,nome}], rimossi:[rigaDettagliPiatti],
+// rinominati:[{vecchia:rigaDettagliPiatti, nuovoNome}] }.
+function _pdCalcolaPiano(mSezioni, piattiDettagliAttuali) {
+  var sezioniPubblicateNorm = {};
+  var pubblicati = [];
+  (mSezioni || []).forEach(function (sez) {
+    var sezNome = String(sez.titolo_display || sez.titolo || '').trim();
+    if (!sezNome) return;
+    sezioniPubblicateNorm[_pdNorm(sezNome)] = true;
+    (sez.piatti || []).forEach(function (p) {
+      if (p && p.nome && String(p.nome).trim()) pubblicati.push({ sezione: sezNome, nome: String(p.nome).trim() });
+    });
+  });
+
+  var attualiInUniverso = (piattiDettagliAttuali || []).filter(function (p) {
+    return sezioniPubblicateNorm[_pdNorm(p.sezione)];
+  });
+
+  function chiave(sezione, nome) { return _pdNorm(sezione) + '' + _pdNorm(nome); }
+  var attualiMap = {};
+  attualiInUniverso.forEach(function (p) { attualiMap[chiave(p.sezione, p.piatto)] = true; });
+  var pubblicatiMap = {};
+  pubblicati.forEach(function (pub) { pubblicatiMap[chiave(pub.sezione, pub.nome)] = true; });
+
+  var rimasti_pubblicati = pubblicati.filter(function (pub) { return !attualiMap[chiave(pub.sezione, pub.nome)]; });
+  var pool = attualiInUniverso.filter(function (p) { return !pubblicatiMap[chiave(p.sezione, p.piatto)]; });
+
+  var rinominati = [], nuovi = [];
+  rimasti_pubblicati.forEach(function (pub) {
+    var miglior = null, migliorDist = Infinity;
+    pool.forEach(function (old) {
+      if (_pdNorm(old.sezione) !== _pdNorm(pub.sezione)) return;
+      if (!_pdNomiSimili(old.piatto, pub.nome)) return;
+      var d = _pdLevenshtein(_pdNorm(old.piatto), _pdNorm(pub.nome));
+      if (d < migliorDist) { migliorDist = d; miglior = old; }
+    });
+    if (miglior) {
+      rinominati.push({ vecchia: miglior, nuovoNome: pub.nome });
+      pool = pool.filter(function (o) { return o !== miglior; });
+    } else {
+      nuovi.push(pub);
+    }
+  });
+
+  return { nuovi: nuovi, rimossi: pool, rinominati: rinominati };
+}
+
+function _pdRiepilogoPiano(piano) {
+  var righe = [];
+  if (piano.nuovi.length) {
+    righe.push('NUOVI, riga vuota da compilare (' + piano.nuovi.length + '):');
+    piano.nuovi.forEach(function (p) { righe.push('  + ' + p.sezione + ' — ' + p.nome); });
+  }
+  if (piano.rimossi.length) {
+    righe.push('RIMOSSI dalla carta — verranno CANCELLATI con i loro dati di sicurezza alimentare (' + piano.rimossi.length + '):');
+    piano.rimossi.forEach(function (p) { righe.push('  − ' + p.sezione + ' — ' + p.piatto); });
+  }
+  if (piano.rinominati.length) {
+    righe.push('PROBABILE RINOMINA — dati di sicurezza alimentare mantenuti (' + piano.rinominati.length + '):');
+    piano.rinominati.forEach(function (r) { righe.push('  ~ ' + r.vecchia.sezione + ' — "' + r.vecchia.piatto + '" → "' + r.nuovoNome + '"'); });
+  }
+  return righe.join('\n');
+}
+
+// Applica il piano al database (sequenziale, un'azione alla volta — nessun endpoint batch).
+// piattiAttualiCompleti serve solo a calcolare after_id per i nuovi piatti, cosi restano
+// raggruppati per sezione invece di finire tutti in fondo alla lista.
+function _pdEseguiPiano(piano, token, piattiAttualiCompleti, callback) {
+  var working = (piattiAttualiCompleti || []).slice();
+  var azioni = [];
+  piano.rimossi.forEach(function (p) { azioni.push({ tipo: 'delete', id: p.id }); });
+  piano.rinominati.forEach(function (r) {
+    var old = r.vecchia;
+    azioni.push({
+      tipo: 'update', id: old.id, sezione: old.sezione, piatto: r.nuovoNome,
+      descrizione: old.descrizione, allergeni: old.allergeni,
+      allergeni_contaminazione: old.allergeni_contaminazione,
+      allergeni_eliminabili: old.allergeni_eliminabili,
+      gravidanza: old.gravidanza, modifiche: old.modifiche,
+      stato: old.stato, fonte: old.fonte, escludi_stampa: old.escludi_stampa
+    });
+  });
+  piano.nuovi.forEach(function (p) { azioni.push({ tipo: 'create', sezione: p.sezione, piatto: p.nome }); });
+
+  var i = 0;
+  function next() {
+    if (i >= azioni.length) { callback(true); return; }
+    var a = azioni[i++];
+    var payload;
+    if (a.tipo === 'delete') {
+      payload = { action: 'delete', id: a.id };
+    } else if (a.tipo === 'update') {
+      payload = {
+        action: 'update', id: a.id, sezione: a.sezione, piatto: a.piatto,
+        descrizione: a.descrizione, allergeni: a.allergeni,
+        allergeni_contaminazione: a.allergeni_contaminazione,
+        allergeni_eliminabili: a.allergeni_eliminabili,
+        gravidanza: a.gravidanza, modifiche: a.modifiche,
+        stato: a.stato, fonte: a.fonte, escludi_stampa: a.escludi_stampa
+      };
+    } else {
+      var lastSameSez = null, sezN = _pdNorm(a.sezione);
+      working.forEach(function (w) { if (_pdNorm(w.sezione) === sezN) lastSameSez = w; });
+      payload = { action: 'create', sezione: a.sezione, piatto: a.piatto };
+      var pref = _pdAllergeniDaCartaPerNome(a.piatto);
+      if (pref) payload.allergeni = pref;
+      if (lastSameSez) payload.after_id = lastSameSez.id;
+    }
+    payload.github_token = token;
+    fetch(PD_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      .then(function (r) { return r.json(); })
+      .then(function (res) { if (res && res.ok && Array.isArray(res.piatti)) working = res.piatti; })
+      .catch(function (e) { console.warn('[Dettagli piatti sync] azione fallita: ' + e.message); })
+      .then(function () { setTimeout(next, 150); });
+  }
+  next();
+}
+
+// Punto d'ingresso: mDaPubblicare = leggi() del menu (Carta o Dolci) che sta per essere
+// pubblicato. Chiama SEMPRE callback() alla fine (che pubblica il menù) — un errore di rete
+// verso Dettagli piatti non blocca mai la pubblicazione del menù stesso.
+function _pdSincronizzaEProsegui(mDaPubblicare, token, callback) {
+  if (!mDaPubblicare || !Array.isArray(mDaPubblicare.sezioni)) { callback(); return; }
+  Promise.all([
+    fetch(PD_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'list', github_token: token }) })
+      .then(function (r) { return r.json(); })
+      .catch(function (e) { return { ok: false, _err: e }; }),
+    _pdAssicuraAllergeniCartaLive()
+  ]).then(function (results) {
+    var res = results[0];
+    if (!res || !res.ok) { callback(); return; }
+    var piano = _pdCalcolaPiano(mDaPubblicare.sezioni, res.piatti || []);
+    if (!(piano.nuovi.length || piano.rimossi.length || piano.rinominati.length)) { callback(); return; }
+    var msg = 'Dettagli piatti (allergeni) — la pubblicazione porta questi cambiamenti:\n\n' +
+      _pdRiepilogoPiano(piano) +
+      '\n\nApplicarli anche al database Dettagli piatti?\nOK = applica e pubblica — Annulla = pubblica solo il menù, Dettagli piatti resta invariato.';
+    if (window.confirm(msg)) {
+      _pdEseguiPiano(piano, token, res.piatti || [], function () { callback(); });
+    } else {
+      callback();
+    }
+  }).catch(function () { callback(); });
 }
 
 

@@ -1,4 +1,63 @@
 <!DOCTYPE html>
+<!-- v 2026.09.11.03 — NUOVO: campo "Escludi dalla stampa" per ogni piatto nel pannello "Dettagli
+     piatti (allergeni)", su richiesta di Andrea (checkbox accanto a Stato compilazione, salvata
+     sul database — permanente finché non la riattivi, non solo per la stampa del momento).
+     "🖨 Stampa" ora filtra i piatti con escludi_stampa=true prima di generare il foglio (se
+     l'intera sezione risulta esclusa, la sua intestazione non compare nemmeno); l'elenco
+     compatto mostra un badge "🚫 non in stampa" accanto al nome per i piatti esclusi, così si
+     vede senza dover aprire ogni scheda. DB: nuova colonna piatti_dettagli.escludi_stampa
+     (boolean, default false — backfill verificato: 25/25 righe esistenti a false, 0 NULL).
+     Edge Function piatti-dettagli-admin → v4: create/update accettano e salvano il campo.
+     La sincronizzazione automatica con Carta/Dolci (v.11.02) ora preserva escludi_stampa sui
+     piatti rinominati (altrimenti un rename automatico avrebbe silenziosamente riattivato la
+     stampa su un piatto che Andrea aveva escluso — corretto in questa stessa consegna, prima
+     di essere mai pubblicato).
+     Bump ?v= admin-core.js a 2026.09.11.03. -->
+<!-- v 2026.09.11.02 — NUOVO: sincronizzazione "Dettagli piatti" (allergeni) con la pubblicazione
+     di Menù alla carta/Dolci, su richiesta di Andrea (i due elenchi erano indipendenti: un piatto
+     aggiunto/tolto/rinominato in carta non si rifletteva mai in Dettagli piatti). Logica in
+     admin-core.js (funzioni _pd*), agganciata a "Traduci e Pubblica" in entrambi i punti in cui
+     può finire (token già salvato dentro traduciEPubblica, e il fallback via modale token in
+     confermaPubblica qui in fondo al file). Comportamento: prima di pubblicare, confronta i
+     piatti in uscita con lo stato attuale di Dettagli piatti (solo le sezioni presenti nella
+     pubblicazione in corso — mai le sezioni dell'altro menu, es. i dolci quando si pubblica la
+     carta) e, SE ci sono differenze, mostra un confirm col riepilogo (nuovi / rimossi / probabile
+     rinomina) prima di scrivere: OK applica anche a Dettagli piatti, Annulla pubblica solo il
+     menù (Dettagli piatti resta invariato, la differenza si ripropone alla pubblicazione
+     successiva). Piatti nuovi: riga vuota, allergeni precompilati da "Allergeni carta" (fetch
+     live) se il nome coincide, resto da compilare a mano. Piatti spariti dalla carta: cancellati
+     insieme ai loro dati di sicurezza alimentare — SCELTA ESPLICITA di Andrea, consapevole del
+     rischio (nessun cestino/backup). Piatti rinominati: euristica per somiglianza del nome
+     (entro la stessa sezione, soglia tarata a mano su una decina di casi realistici dopo un
+     falso positivo trovato in test — "Crudo misto"~"Cotto misto" — per NON confondere piatti
+     diversi con nomi simili) — se riconosciuti, la riga esistente viene aggiornata (solo
+     nome/sezione), tutti i campi di sicurezza alimentare restano intatti.
+     LIMITI noti (documentati anche nel pacchetto Revisione Oppositiva): (1) se un'INTERA sezione
+     sparisce/viene rinominata in carta, i suoi piatti in Dettagli piatti restano orfani e non
+     vengono ripuliti automaticamente — vanno sistemati a mano; (2) l'euristica di rinomina è
+     probabilistica, non infallibile; (3) il confronto per sezione richiede che il nome sezione in
+     Dettagli piatti corrisponda (a meno di maiuscole/accenti/spazi) a quello pubblicato — una
+     sezione rinominata a mano solo in Dettagli piatti può generare falsi "nuovi"; (4) nessuna
+     transazione: se la rete cade a metà sincronizzazione, alcune azioni possono essere applicate
+     e altre no. GATE: P1 (sintassi, scoping, nomi campi vs Edge Function) + P2 (test mirati via
+     node su tutte le funzioni pure: match esatto, nuovo, rimozione vera, rinomina con dati
+     mantenuti, sezioni diverse stesso nome, case/accenti, universo dolci non toccato durante
+     pubblicazione carta, prefill allergeni con nomi HTML-sporchi) fatte, un bug reale trovato e
+     corretto in test (prefill allergeni non normalizzava il nome sorgente). Revisione Oppositiva
+     NON ancora fatta — pacchetto preparato per Andrea, da passare a un'altra IA prima di
+     considerare la funzione definitiva.
+     Bump ?v= admin-core.js a 2026.09.11.02. -->
+<!-- v 2026.09.11.01 — FIX pulsante "🗑 Elimina" nel pannello "Dettagli piatti (allergeni)":
+     non funzionava su NESSUNA riga (bug sistemico, non legato a caratteri speciali nel nome).
+     Causa: l'onclick del bottone incorporava JSON.stringify(p.piatto) — stringa delimitata da
+     virgolette doppie — dentro l'attributo HTML onclick="...", anch'esso delimitato da
+     virgolette doppie: la prima virgoletta della stringa JSON chiudeva prematuramente
+     l'attributo, corrompendo l'handler su ogni riga. Fix: onclick passa solo l'id (già il
+     pattern sicuro usato da spostaPiattoDettaglio/salvaPiattoDettaglio); eliminaPiattoDettaglio
+     ora prende solo (id) e recupera il nome del piatto da pdState.piatti per il testo del
+     confirm(), eliminando ogni interpolazione di stringa dentro attributo HTML. GATE: fix
+     puntuale su tooling admin interno già in produzione, stesso pattern sicuro riusato da
+     funzioni gemelle → P3 non dovuta (precedente invariato, vedi entry 2026.09.10.01). -->
 <!-- v 2026.09.10.01 — nuovo pannello "Dettagli piatti (allergeni)" (#piatti-dettagli-section,
      tab "Gestione menù e sito", dopo "Allergeni carta"): scheda di sicurezza alimentare per
      ogni piatto (carta + dolci) — Sezione/Piatto/Descrizione/Allergeni/Allergeni per
@@ -1503,7 +1562,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.07.28.03"></script>
-<script src="admin-core.js?v=2026.09.10.01"></script>
+<script src="admin-core.js?v=2026.09.11.03"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -2346,6 +2405,7 @@ function aggiungiPiattoDettaglio() {
 
 function salvaPiattoDettaglio(id) {
   function v(field) { var el = document.getElementById('pd-f-' + field + '-' + id); return el ? el.value.trim() : ''; }
+  function vc(field) { var el = document.getElementById('pd-f-' + field + '-' + id); return !!(el && el.checked); }
   var payload = {
     action: 'update', id: id,
     sezione: v('sezione'), piatto: v('piatto'),
@@ -2354,6 +2414,7 @@ function salvaPiattoDettaglio(id) {
     allergeni_eliminabili: v('allergeni_eliminabili'),
     gravidanza: v('gravidanza'), modifiche: v('modifiche'),
     stato: v('stato'), fonte: v('fonte'),
+    escludi_stampa: vc('escludi_stampa'),
   };
   if (!payload.sezione) { _pdSetStatus('La sezione non può essere vuota.', true); return; }
   if (!payload.piatto) { _pdSetStatus('Il nome piatto non può essere vuoto.', true); return; }
@@ -2363,7 +2424,9 @@ function salvaPiattoDettaglio(id) {
     .catch(function (e) { _pdErr(e, 'Errore di connessione.'); });
 }
 
-function eliminaPiattoDettaglio(id, nome) {
+function eliminaPiattoDettaglio(id) {
+  var p = (pdState.piatti || []).find(function (x) { return x.id === id; });
+  var nome = p ? p.piatto : '';
   if (!window.confirm('Eliminare "' + nome + '" dalla scheda allergeni/dettagli?')) return;
   _pdSetStatus('Eliminazione…');
   _pdFetch({ action: 'delete', id: id })
@@ -2400,6 +2463,14 @@ function _pdFieldSelect(label, id, field, statoCorrente) {
     '<select id="' + fieldId + '" style="' + PD_FIELD_STYLE + '">' + opts + '</select></div>';
 }
 
+function _pdFieldCheckbox(label, id, field, checked) {
+  var fieldId = 'pd-f-' + field + '-' + id;
+  return '<div style="flex:1 1 13rem;min-width:11rem;margin-bottom:.5rem;display:flex;align-items:center;">' +
+    '<label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;font-family:Inter,sans-serif;font-size:.8rem;color:var(--ink);">' +
+    '<input type="checkbox" id="' + fieldId + '"' + (checked ? ' checked' : '') + ' style="width:auto;" />' +
+    label + '</label></div>';
+}
+
 function renderPiattiDettagli() {
   _pdPopolaSezioniDatalist();
   var list = document.getElementById('pd-list');
@@ -2415,9 +2486,10 @@ function renderPiattiDettagli() {
     }
     var statoLabel = PD_STATI_MAP[p.stato] || p.stato;
     var statoColor = PD_STATI_COLOR[p.stato] || 'var(--stone)';
+    var escluso = !!p.escludi_stampa;
     html += '<div class="fs" style="margin-bottom:.8rem;">' +
       '<div class="fs-head" style="display:flex;justify-content:space-between;align-items:center;gap:.6rem;">' +
-      '<span>' + _pdEsc(p.piatto) + '</span>' +
+      '<span>' + _pdEsc(p.piatto) + (escluso ? ' <span title="Escluso dalla stampa" style="color:var(--rust);font-size:.68rem;letter-spacing:.04em;">🚫 non in stampa</span>' : '') + '</span>' +
       '<span style="display:flex;gap:.3rem;align-items:center;">' +
       '<span style="color:' + statoColor + ';font-size:.65rem;letter-spacing:.06em;">' + _pdEsc(statoLabel) + '</span>' +
       '<button class="btn btn-load" title="Sposta su" style="padding:.15rem .5rem;font-size:.7rem;" onclick="spostaPiattoDettaglio(\'' + p.id + '\',\'up\')">↑</button>' +
@@ -2429,6 +2501,7 @@ function renderPiattiDettagli() {
       _pdFieldRow('Sezione', p.id, 'sezione', p.sezione, false) +
       _pdFieldRow('Nome piatto', p.id, 'piatto', p.piatto, false) +
       _pdFieldSelect('Stato compilazione', p.id, 'stato', p.stato) +
+      _pdFieldCheckbox('Escludi dalla stampa', p.id, 'escludi_stampa', escluso) +
       _pdFieldRow('Descrizione piatto', p.id, 'descrizione', p.descrizione, true) +
       _pdFieldRow('Allergeni', p.id, 'allergeni', p.allergeni, false) +
       _pdFieldRow('Allergeni per contaminazione', p.id, 'allergeni_contaminazione', p.allergeni_contaminazione, false) +
@@ -2439,7 +2512,7 @@ function renderPiattiDettagli() {
       '</div>' +
       '<div style="display:flex;gap:.6rem;margin-top:.4rem;">' +
       '<button class="btn btn-publish" style="font-size:.72rem;padding:.35rem .8rem;" onclick="salvaPiattoDettaglio(\'' + p.id + '\')">💾 Salva</button>' +
-      '<button class="btn btn-load" style="font-size:.72rem;padding:.35rem .8rem;border:1px solid var(--rust);color:var(--rust);" onclick="eliminaPiattoDettaglio(\'' + p.id + '\',' + JSON.stringify(p.piatto) + ')">🗑 Elimina</button>' +
+      '<button class="btn btn-load" style="font-size:.72rem;padding:.35rem .8rem;border:1px solid var(--rust);color:var(--rust);" onclick="eliminaPiattoDettaglio(\'' + p.id + '\')">🗑 Elimina</button>' +
       '</div>' +
       '</div>' +
       '</div>';
@@ -2449,11 +2522,14 @@ function renderPiattiDettagli() {
 
 function stampaPiattiDettagli() {
   if (!pdState.piatti.length) { _pdSetStatus('Nessun piatto da stampare — carica prima i dati.', true); return; }
+  var piattiDaStampare = pdState.piatti.filter(function (p) { return !p.escludi_stampa; });
+  var esclusi = pdState.piatti.length - piattiDaStampare.length;
+  if (!piattiDaStampare.length) { _pdSetStatus('Tutti i piatti sono esclusi dalla stampa — nulla da generare.', true); return; }
   var COLS = ['Piatto', 'Descrizione piatto', 'Allergeni', 'Allergeni per contaminazione', 'Allergeni Eliminabili', 'In Gravidanza', 'Modifiche consentite'];
   var oggi = new Date().toLocaleDateString('it-IT');
   var rowsHtml = '';
   var sezioneCorrente = null;
-  pdState.piatti.forEach(function (p) {
+  piattiDaStampare.forEach(function (p) {
     if (p.sezione !== sezioneCorrente) {
       sezioneCorrente = p.sezione;
       rowsHtml += '<tr class="sezione-row"><td colspan="7">' + _pdEsc(sezioneCorrente) + '</td></tr>';
@@ -2497,6 +2573,7 @@ function stampaPiattiDettagli() {
   var w = window.open('', '_blank');
   if (!w) { _pdSetStatus('Il browser ha bloccato la nuova finestra: consenti i popup per questo sito.', true); return; }
   w.document.open(); w.document.write(doc); w.document.close();
+  _pdSetStatus(esclusi ? 'Foglio generato (' + esclusi + ' piatt' + (esclusi === 1 ? 'o escluso' : 'i esclusi') + ' dalla stampa).' : 'Foglio generato.');
 }
 
 // ══ REMINDER PRENOTAZIONI (setup messaggio + tempistiche) ════
@@ -4002,9 +4079,17 @@ async function _eseguiPubblicaFotoSito(token) {
     if (window._pendingFotoSitoPublish) { window._pendingFotoSitoPublish=false; _eseguiPubblicaFotoSito(token); return; }
     if (window._pendingViniPublish && window._pendingViniHtml) { window._pendingViniPublish=false; var vh=window._pendingViniHtml; window._pendingViniHtml=null; _pubblicaMenuVini(token, vh, document.getElementById('vini-status')); return; }
     if (window._pendingAllergeniPublish) { window._pendingAllergeniPublish=false; pubblicaAllergeni(token); return; }
-    eseguiPubblicazione(token);
     var btn=document.getElementById('btn-pubblica');
-    if(btn){btn.textContent='✦ Traduci e Pubblica';btn.disabled=false;}
+    if (dati) {
+      if (btn) btn.textContent = '⏳ Controllo Dettagli piatti…';
+      _pdSincronizzaEProsegui(leggi(), token, function () {
+        eseguiPubblicazione(token);
+        if (btn) { btn.textContent = '✦ Traduci e Pubblica'; btn.disabled = false; }
+      });
+    } else {
+      eseguiPubblicazione(token);
+      if(btn){btn.textContent='✦ Traduci e Pubblica';btn.disabled=false;}
+    }
   };
 })();
 </script>
@@ -4224,7 +4309,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.10.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.11.03</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

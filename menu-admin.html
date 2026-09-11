@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- v 2026.09.11.04 — Stampa "Dettagli piatti": ogni sezione ora sta tutta su una pagina, mai
+     spezzata a metà tra due fogli, su richiesta di Andrea. stampaPiattiDettagli() genera un
+     <tbody class="sez-group"> per ogni sezione (intestazione-sezione + tutte le sue righe)
+     invece di un unico <tbody> per tutta la tabella; in stampa "page-break-inside:avoid" su
+     quel <tbody> tiene il gruppo insieme, mandandolo a capo pagina intera se non ci sta più
+     nello spazio residuo (si spezza solo se da sola una sezione supera un'intera pagina, caso
+     limite inevitabile). L'intestazione colonne continua a ripetersi ad ogni pagina come prima.
+     Nessuna modifica ai dati o ai controlli di esclusione (v.11.03), solo al layout di stampa. -->
 <!-- v 2026.09.11.03 — NUOVO: campo "Escludi dalla stampa" per ogni piatto nel pannello "Dettagli
      piatti (allergeni)", su richiesta di Andrea (checkbox accanto a Stato compilazione, salvata
      sul database — permanente finché non la riattivi, non solo per la stampa del momento).
@@ -2527,18 +2535,31 @@ function stampaPiattiDettagli() {
   if (!piattiDaStampare.length) { _pdSetStatus('Tutti i piatti sono esclusi dalla stampa — nulla da generare.', true); return; }
   var COLS = ['Piatto', 'Descrizione piatto', 'Allergeni', 'Allergeni per contaminazione', 'Allergeni Eliminabili', 'In Gravidanza', 'Modifiche consentite'];
   var oggi = new Date().toLocaleDateString('it-IT');
-  var rowsHtml = '';
+  // Un <tbody> per sezione (invece di un unico <tbody> per tutta la tabella): in stampa
+  // "page-break-inside:avoid" su <tbody> tiene insieme intestazione-sezione + tutte le sue
+  // righe, così una sezione non si spezza mai a metà tra due pagine — va a capo pagina intera
+  // se non ci sta più nello spazio residuo. Si spezza solo se da sola supera un'intera pagina
+  // (caso limite inevitabile). L'intestazione colonne (<thead>) continua a ripetersi ad ogni
+  // pagina come prima.
+  var gruppiSezione = [];
   var sezioneCorrente = null;
+  var rowsSezioneCorrente = '';
+  function chiudiGruppo() {
+    if (sezioneCorrente !== null) gruppiSezione.push('<tbody class="sez-group">' + rowsSezioneCorrente + '</tbody>');
+  }
   piattiDaStampare.forEach(function (p) {
     if (p.sezione !== sezioneCorrente) {
+      chiudiGruppo();
       sezioneCorrente = p.sezione;
-      rowsHtml += '<tr class="sezione-row"><td colspan="7">' + _pdEsc(sezioneCorrente) + '</td></tr>';
+      rowsSezioneCorrente = '<tr class="sezione-row"><td colspan="7">' + _pdEsc(sezioneCorrente) + '</td></tr>';
     }
     function cell(v) { return v ? '<td>' + _pdEsc(v) + '</td>' : '<td class="vuoto"></td>'; }
-    rowsHtml += '<tr><td class="piatto-cell">' + _pdEsc(p.piatto) + '</td>' +
+    rowsSezioneCorrente += '<tr><td class="piatto-cell">' + _pdEsc(p.piatto) + '</td>' +
       cell(p.descrizione) + cell(p.allergeni) + cell(p.allergeni_contaminazione) +
       cell(p.allergeni_eliminabili) + cell(p.gravidanza) + cell(p.modifiche) + '</tr>';
   });
+  chiudiGruppo();
+  var rowsHtml = gruppiSezione.join('');
   var doc = '<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8">' +
     '<title>Dettagli piatti — Allergeni e info cucina</title>' +
     '<meta name="robots" content="noindex,nofollow"><style>' +
@@ -2559,7 +2580,7 @@ function stampaPiattiDettagli() {
     'td.vuoto{color:#bbb;}' +
     'col.c-piatto{width:15%;}col.c-descr{width:24%;}col.c-all{width:12%;}col.c-cont{width:12%;}col.c-elim{width:12%;}col.c-grav{width:9%;}col.c-mod{width:16%;}' +
     '.footer-print{font-family:Arial,Helvetica,sans-serif;font-size:9px;color:#777;text-align:center;margin-top:10px;}' +
-    '@media print{@page{size:A4 landscape;margin:10mm;}body{background:#fff;padding:0;}.toolbar{display:none;}.sheet{box-shadow:none;padding:0;max-width:none;margin:0;}table.piatti{page-break-inside:auto;}tr{page-break-inside:avoid;page-break-after:auto;}thead{display:table-header-group;}}' +
+    '@media print{@page{size:A4 landscape;margin:10mm;}body{background:#fff;padding:0;}.toolbar{display:none;}.sheet{box-shadow:none;padding:0;max-width:none;margin:0;}table.piatti{page-break-inside:auto;}tr{page-break-inside:avoid;page-break-after:auto;}thead{display:table-header-group;}tbody.sez-group{page-break-inside:avoid;break-inside:avoid;}}' +
     '</style></head><body>' +
     '<div class="toolbar"><div class="note">Stampa in formato tabella (7 colonne, più piatti per pagina), generata dai dati salvati in questo momento. Per stampare: pulsante a destra o Ctrl/Cmd+P — orientamento Orizzontale, formato A4.</div>' +
     '<button onclick="window.print()">⚡ Stampa / Salva PDF</button></div>' +
@@ -2567,7 +2588,7 @@ function stampaPiattiDettagli() {
     '<p class="doc-sub">Generato il ' + oggi + ' dai dati correnti del pannello admin — verificare sempre coi dati di cucina prima dell\'uso.</p>' +
     '<table class="piatti"><col class="c-piatto"><col class="c-descr"><col class="c-all"><col class="c-cont"><col class="c-elim"><col class="c-grav"><col class="c-mod">' +
     '<thead><tr>' + COLS.map(function (c) { return '<th>' + c + '</th>'; }).join('') + '</tr></thead>' +
-    '<tbody>' + rowsHtml + '</tbody></table>' +
+    rowsHtml + '</table>' +
     '<div class="footer-print">Ristorante Santamonica — documento interno, non per il pubblico.</div>' +
     '</div></body></html>';
   var w = window.open('', '_blank');
@@ -4309,7 +4330,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.11.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.11.04</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

@@ -1,7 +1,26 @@
 /* ═══════════════════════════════════════════════════════════════════════
    orari.js — FONTE UNICA orari di apertura · Santamonica Web
-   v 2026.09.06.01
+   v 2026.09.12.01
    ───────────────────────────────────────────────────────────────────────
+   v 2026.09.12.01 — CENTRALIZZAZIONE "Orari di Apertura": i periodi non sono più
+   hardcoded qui. L'array PERIODS sotto resta come FALLBACK sincrono (per un primo
+   render immediato, prima che risponda la rete, e per il caso in cui la Edge
+   Function non sia raggiungibile) — appena la pagina carica, loadPeriodsFromServer()
+   chiama GET get-opening-hours (Supabase, project SafeTable xbksultfskvzgncncada),
+   che legge reservation_settings.opening_periods: la STESSA colonna che
+   _shared/periods.ts usa lato server in submit-reservation e
+   create-reservation-checkout, e che il pannello admin "Orari di Apertura" (tab
+   Setup di menu-admin.html) scrive tramite set-reservations-config azione
+   set_periods. Quando la risposta arriva, mapDbPeriods() converte il formato DB
+   (pranzo_slots/cena_slots/day_services/pranzo_opens+closes/cena_opens+closes) nel
+   formato interno di questo file (servizi/slots/settimana) e PERIODS viene
+   sostituito + tutto il display si ri-renderizza (injectJsonLd/renderInfo/
+   renderTable) — quindi un cambio orari fatto dal pannello admin appare sul sito
+   al refresh successivo della pagina, SENZA deploy di codice. Se il fetch fallisce
+   (rete, funzione giù), resta silenziosamente il fallback qui sotto: mai un errore
+   visibile, mai una pagina senza orari. getServicesForDate/getPeriodSlots leggono
+   sempre la var PERIODS corrente (fallback finché la rete non risponde, poi i dati
+   reali) — nessuna modifica richiesta a prenota.html.
    v 2026.09.06.01 — ECCEZIONE_TEMP: nota temporanea in renderInfo() per i due
    venerdì di riapertura pranzo (11/9 e 18/9) rimasti chiusi tutto il giorno
    (Andrea, decisione post-riapertura). Il bug segnalato: quella card mostra
@@ -23,10 +42,14 @@
    resta l'unica fonte); cambia solo il markup HTML prodotto. renderTable()
    (tabella dove-siamo.html) non toccata.
    ───────────────────────────────────────────────────────────────────────
-   PER CAMBIARE GLI ORARI: aggiungi/modifica una voce nell'array PERIODS.
-   Tutto il resto (display #info, tabella dove-siamo, Schema.org JSON-LD su
-   index.html e dove-siamo.html, disponibilità del wizard /prenota.html)
-   viene generato da qui → niente desync.
+   PER CAMBIARE GLI ORARI: usa il pannello admin "Orari di Apertura" (menu-admin.html,
+   tab Setup) — scrive reservation_settings.opening_periods via set-reservations-config
+   (azione set_periods), letto qui via get-opening-hours. L'array PERIODS qui sotto è
+   SOLO IL FALLBACK per quando la rete non risponde: tienilo ragionevolmente aggiornato,
+   ma non è più necessario editarlo a ogni cambio orario "normale" (l'admin panel basta).
+   Tutto il resto (display #info, tabella dove-siamo, Schema.org JSON-LD su index.html e
+   dove-siamo.html, disponibilità del wizard /prenota.html) viene generato da qui →
+   niente desync.
 
    PERCHÉ "PERIODS" E NON UN UNICO ORARIO CORRENTE (refactor 25/7/2026):
    fino a v 2026.06.21.01 c'era un solo SERVIZI/SETTIMANA "attivo", cambiato
@@ -62,6 +85,11 @@
    ═══════════════════════════════════════════════════════════════════════
 
    STORICO
+   - v 2026.09.12.01 (centralizzazione Orari di Apertura, vedi sopra): PERIODS
+     hardcoded → fallback; fonte reale = reservation_settings.opening_periods via
+     get-opening-hours. SPECULARE lato server: stessa colonna letta da
+     _shared/periods.ts (submit-reservation, create-reservation-checkout) e scritta
+     da set-reservations-config (azione set_periods, pannello admin unificato).
    - v 2026.08.31.01 (spostamento pranzo ven/sab/dom): Andrea conferma l'11/9 come data di
      partenza, non l'1/9 come inizialmente deciso il 25/7. Periodo 1 esteso a to:'2026-09-10',
      Periodo 2 accorciato in testa a from:'2026-09-11'. Cena confermata 19:30 dall'11/9
@@ -96,7 +124,9 @@
 (function (global) {
   'use strict';
 
-  // ════════════ FONTE UNICA — MODIFICA QUI ════════════
+  // ════════════ FALLBACK — usato solo prima che risponda get-opening-hours, o se
+  // la rete/la funzione non è raggiungibile. La fonte vera è il pannello admin
+  // "Orari di Apertura" → reservation_settings.opening_periods. ════════════
   // Ogni periodo: from/to (YYYY-MM-DD, to=null → nessuna fine pianificata),
   // servizi (opens/closes per pranzo/cena, per il display "12:30 – 14:30"),
   // slots (elenco discreto degli orari prenotabili per servizio, usato dal
@@ -108,7 +138,7 @@
   var PERIODS = [
     { // Orario estivo temporaneo
       from: '2026-06-21', to: '2026-09-10',
-      servizi: { pranzo: { opens: '12:30', closes: '14:30' }, cena: { opens: '20:00', closes: '22:30' } },
+      servizi: { cena: { opens: '20:00', closes: '22:30' } },
       slots: { pranzo: [], cena: CENA_ESTATE },
       settimana: [
         { day: 'lun', services: [] },
@@ -151,6 +181,60 @@
   ];
   // ═════════════════════════════════════════════════════
 
+  var GET_OPENING_HOURS_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/get-opening-hours';
+  var DAY_KEY_TO_JSIDX = { lun: 1, mar: 2, mer: 3, gio: 4, ven: 5, sab: 6, dom: 0 };
+  var DAY_ORDER = ['lun', 'mar', 'mer', 'gio', 'ven', 'sab', 'dom'];
+
+  // Converte un periodo nel formato DB (reservation_settings.opening_periods, stesso
+  // formato di OpeningPeriod in _shared/periods.ts) nel formato interno usato da questo
+  // file (servizi/slots/settimana). pranzo_opens/closes e cena_opens/closes null/mancanti
+  // → il servizio non compare in `servizi` (stesso comportamento dell'orario estivo nel
+  // fallback sopra, dove period.servizi non ha la chiave "pranzo").
+  function mapDbPeriod(p) {
+    var servizi = {};
+    if (p.pranzo_opens && p.pranzo_closes) servizi.pranzo = { opens: p.pranzo_opens, closes: p.pranzo_closes };
+    if (p.cena_opens && p.cena_closes) servizi.cena = { opens: p.cena_opens, closes: p.cena_closes };
+    var settimana = DAY_ORDER.map(function (day) {
+      var key = String(DAY_KEY_TO_JSIDX[day]);
+      var services = (p.day_services && p.day_services[key]) || [];
+      return { day: day, services: services.slice() };
+    });
+    return {
+      from: p.from,
+      to: p.to === undefined ? null : p.to,
+      servizi: servizi,
+      slots: { pranzo: (p.pranzo_slots || []).slice(), cena: (p.cena_slots || []).slice() },
+      settimana: settimana
+    };
+  }
+
+  function mapDbPeriods(list) {
+    return (list || []).map(mapDbPeriod).sort(function (a, b) { return a.from < b.from ? -1 : a.from > b.from ? 1 : 0; });
+  }
+
+  var lastLang = 'it';
+
+  // Chiamato una volta al caricamento della pagina: legge i periodi reali dal pannello
+  // admin (get-opening-hours → reservation_settings.opening_periods) e, se la risposta è
+  // valida, sostituisce PERIODS e ri-renderizza tutto ciò che ne dipende. Silenzioso su
+  // qualunque errore (rete, funzione giù, risposta vuota): resta il fallback qui sopra,
+  // mai una pagina rotta o senza orari.
+  function loadPeriodsFromServer() {
+    if (typeof fetch !== 'function') return;
+    fetch(GET_OPENING_HOURS_URL)
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data || !Array.isArray(data.periods) || data.periods.length === 0) return;
+        var mapped = mapDbPeriods(data.periods);
+        if (!mapped.length) return;
+        PERIODS = mapped;
+        injectJsonLd();
+        renderInfo(lastLang);
+        renderTable(lastLang);
+      })
+      .catch(function () { /* rete assente/funzione giù: resta il fallback hardcoded */ });
+  }
+
   function todayStr() {
     var d = new Date();
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -182,7 +266,7 @@
     from: '2026-09-01', to: '2026-09-18',
     it: 'Eccezione: chiuso tutto il giorno venerdì 11 e venerdì 18 settembre.',
     en: 'Exception: closed all day on Friday 11 and Friday 18 September.',
-    fr: 'Exception : fermé toute la journée les vendredis 11 et 18 septembre.'
+    fr: 'Exception : fermé toute la journée les vendredis 11 et 18 septembre.'
   };
   var MONTHS = {
     it: ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'],
@@ -250,6 +334,7 @@
   }
 
   function renderInfo(lang) {
+    lastLang = lang || lastLang;
     if (typeof document === 'undefined') return;
     var box = document.getElementById('orari-info'); if (!box) return;
     var lab = labels(lang), period = resolvePeriod(todayStr()), g = buildGroups(lang, ' / ', period), html = '';
@@ -277,6 +362,7 @@
   }
 
   function renderTable(lang) {
+    lastLang = lang || lastLang;
     if (typeof document === 'undefined') return;
     var tb = document.getElementById('orari-tbody'); if (!tb) return;
     var rows = buildTableRows(lang || 'it', ' · ');
@@ -314,7 +400,8 @@
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { renderInfo('it'); renderTable('it'); });
     else { renderInfo('it'); renderTable('it'); }
   }
+  loadPeriodsFromServer();
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { buildJsonLd: buildJsonLd, buildGroups: buildGroups, buildTableRows: buildTableRows, resolvePeriod: resolvePeriod, PERIODS: PERIODS };
+    module.exports = { buildJsonLd: buildJsonLd, buildGroups: buildGroups, buildTableRows: buildTableRows, resolvePeriod: resolvePeriod, PERIODS: PERIODS, mapDbPeriod: mapDbPeriod, mapDbPeriods: mapDbPeriods };
   }
 })(typeof window !== 'undefined' ? window : this);

@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!-- v 2026.09.12.03 — body riportato al peso originale 350→300 su richiesta di Andrea (resta
+     invariato tutto ciò che eredita dal body: .vino/.vino-nome/.vino-annate-lista/.annata-label/
+     .prezzo-nowrap/.num-inline/.vino-regione, ora di nuovo a 300). .sez-titolo (400) e
+     .sottosez-titolo (350) restano come in v.12.02. -->
 <!-- v 2026.09.12.02 — corretti su richiesta di Andrea due dei tre pesi appena alzati in v.12.01:
      titolo categoria (.sez-titolo) 500→400, sotto-titolo regione (.sottosez-titolo) 400→350.
      Corpo del testo (body, 350) invariato. -->
@@ -370,7 +374,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.12.02</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.12.03</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -1549,7 +1553,7 @@ function generaHtmlCartaVini(articoli) {
     '<style>' +
     ':root{--cream:#faf7f2;--ink:#1a1714;--stone:#8c7e6e;--rule:#d4c9b8;}' +
     '*{box-sizing:border-box;margin:0;padding:0;}' +
-    'body{background:var(--cream);color:var(--ink);font-family:"Jost",sans-serif;font-weight:350;padding:2rem 1rem;}' +
+    'body{background:var(--cream);color:var(--ink);font-family:"Jost",sans-serif;font-weight:300;padding:2rem 1rem;}' +
     '.pg{max-width:700px;margin:0 auto;}' +
     '.sez-titolo{font-family:"Jost",sans-serif;font-weight:400;font-size:24pt;margin:2.8rem 0 .8rem;text-align:center;text-transform:uppercase;letter-spacing:.06em;}' +
     '.sottosez-titolo{font-family:"Jost",sans-serif;font-weight:350;font-size:20pt;margin:1.8rem 0 .4rem;text-transform:uppercase;letter-spacing:.1em;color:var(--stone);}' +

@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- v 2026.09.12.01 — pesi tipografici stampa carta vini alzati su richiesta esplicita di Andrea,
+     ora che il font è variabile (100..900, v.09.05.05) e ogni peso interpola davvero: titolo
+     categoria (.sez-titolo) 300→500, sotto-titolo regione (.sottosez-titolo) 250→400, corpo del
+     testo (body, da cui ereditano .vino/.vino-nome/.vino-annate-lista/.annata-label/
+     .prezzo-nowrap/.num-inline/.vino-regione) 300→350. Nessun elemento portato a grassetto vero
+     (600+): l'obiettivo è "più pesante" senza "in grassetto". Micro-fix di stile, reversibile
+     rimettendo i tre valori precedenti — non passato dal gate produzione (P1/P2/Revisione
+     Oppositiva) per questo motivo. -->
 <!-- v 2026.09.05.05 — passato da elenco pesi statici (300;400 poi 200;300;400) a font Jost
      VARIABILE (`family=Jost:wght@100..900`): qualunque valore di font-weight tra 100 e 900 ora
      interpola davvero un tratto proprio, senza doverlo aggiungere esplicitamente al link ogni
@@ -359,7 +367,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.05.05</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.12.01</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -1538,10 +1546,10 @@ function generaHtmlCartaVini(articoli) {
     '<style>' +
     ':root{--cream:#faf7f2;--ink:#1a1714;--stone:#8c7e6e;--rule:#d4c9b8;}' +
     '*{box-sizing:border-box;margin:0;padding:0;}' +
-    'body{background:var(--cream);color:var(--ink);font-family:"Jost",sans-serif;font-weight:300;padding:2rem 1rem;}' +
+    'body{background:var(--cream);color:var(--ink);font-family:"Jost",sans-serif;font-weight:350;padding:2rem 1rem;}' +
     '.pg{max-width:700px;margin:0 auto;}' +
-    '.sez-titolo{font-family:"Jost",sans-serif;font-weight:300;font-size:24pt;margin:2.8rem 0 .8rem;text-align:center;text-transform:uppercase;letter-spacing:.06em;}' +
-    '.sottosez-titolo{font-family:"Jost",sans-serif;font-weight:250;font-size:20pt;margin:1.8rem 0 .4rem;text-transform:uppercase;letter-spacing:.1em;color:var(--stone);}' +
+    '.sez-titolo{font-family:"Jost",sans-serif;font-weight:500;font-size:24pt;margin:2.8rem 0 .8rem;text-align:center;text-transform:uppercase;letter-spacing:.06em;}' +
+    '.sottosez-titolo{font-family:"Jost",sans-serif;font-weight:400;font-size:20pt;margin:1.8rem 0 .4rem;text-transform:uppercase;letter-spacing:.1em;color:var(--stone);}' +
     '.vino{font-size:12pt;line-height:1.55;margin:0 0 .6rem;text-align:justify;}' +
     '.vino-nome{text-decoration:underline;}' +
     '.vino-nome em{font-style:italic;}' +

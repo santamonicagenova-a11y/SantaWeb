@@ -1,4 +1,13 @@
 <!DOCTYPE html>
+<!-- v 2026.09.12.04 — (1) Fix layout box orari home (#orari-info, .orari-row): riga giorni "Sabato–
+     Domenica" andava a capo in modo brutto (spezzata su 2 righe) mentre gli orari restavano
+     affiancati a fianco. .orari-row ora è flex-direction:column (giorno sopra su una riga sola,
+     orari sotto), non più row affiancata; aggiunto white-space:nowrap sull'etichetta giorni.
+     (2) Allineata la FAQ "Quali sono gli orari?" (JSON-LD + visibile) al testo pubblicato in
+     translations.json dal pannello "Genera bozza FAQ" (commit 169f143): quella pubblicazione
+     aveva scritto solo translations.json, il PUT su index.html non era andato a segno (i due
+     file restavano disallineati) — allineati qui a mano. -->
+
 <!-- v 2026.09.12.03 — FAQ "Quali sono gli orari?" aggiornata (JSON-LD statico + FAQ visibile;
      translations.json IT/EN/FR): tolto il riferimento all'orario estivo ormai superato ("Fino
      al 10 settembre..."), il testo ora descrive lo schema in vigore dall'11/9 (pranzo ven/sab/
@@ -264,7 +273,7 @@
     {
       "@type": "Question",
       "name": "Quali sono gli orari?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Dall'11 settembre siamo aperti a pranzo (12:30-14:30) venerdì, sabato e domenica, e a cena (19:30-22:30) da martedì a domenica; lunedì chiusi — eccezione: venerdì 18 settembre chiuso tutto il giorno. Dal 1° ottobre la domenica sarà aperta solo a pranzo. Gli orari aggiornati sono sempre su questa pagina." }
+      "acceptedAnswer": { "@type": "Answer", "text": "Il lunedì siamo chiusi. Da martedì a venerdì apriamo solo a cena, dalle 19:30 alle 22:30. Sabato e domenica serviamo anche il pranzo, dalle 12:30 alle 14:30. Dal 1° ottobre gli orari cambiano: cena da martedì a giovedì, pranzo e cena venerdì e sabato, solo pranzo la domenica. Gli orari aggiornati sono sempre su questa pagina." }
     },
     {
       "@type": "Question",
@@ -417,8 +426,8 @@
   .info-card.dark .info-card-title { color: var(--ink); }
   .info-card.accent .info-card-title { font-size: 1.7rem; color: var(--warm-white); }
   .info-card.accent .info-card-title em { color: #fff; }
-  .orari-row { display: flex; justify-content: center; gap: 0.4rem; font-size: 0.9rem; padding: 0.75rem 1rem; border-radius: 10px; background: rgba(245,240,232,0.06); border: 1px solid var(--divider); margin-bottom: 0.5rem; }
-  .orari-row .g { color: var(--ink-soft); }
+  .orari-row { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; text-align: center; font-size: 0.9rem; padding: 0.75rem 1rem; border-radius: 10px; background: rgba(245,240,232,0.06); border: 1px solid var(--divider); margin-bottom: 0.5rem; }
+  .orari-row .g { color: var(--ink-soft); white-space: nowrap; }
   .orari-row strong { font-weight: 500; }
   .orari-note { margin-top: 0.8rem; font-size: 0.78rem; color: var(--ink-soft); line-height: 1.6; }
   .info-card-text { font-size: 0.85rem; line-height: 1.7; }
@@ -778,7 +787,7 @@
       </details>
       <details class="faq-item">
         <summary><h3 class="faq-q" data-i18n="faq_q2">Quali sono gli orari?</h3></summary>
-        <div class="faq-answer" data-i18n="faq_a2"><p>Dall&rsquo;11 settembre siamo aperti a pranzo (12:30-14:30) venerd&igrave;, sabato e domenica, e a cena (19:30-22:30) da marted&igrave; a domenica; luned&igrave; chiusi &mdash; eccezione: venerd&igrave; 18 settembre chiuso tutto il giorno. Dal 1&deg; ottobre la domenica sar&agrave; aperta solo a pranzo. Gli orari aggiornati sono sempre su questa pagina.</p></div>
+        <div class="faq-answer" data-i18n="faq_a2"><p>Il luned&igrave; siamo chiusi. Da marted&igrave; a venerd&igrave; apriamo solo a cena, dalle 19:30 alle 22:30. Sabato e domenica serviamo anche il pranzo, dalle 12:30 alle 14:30. Dal 1&deg; ottobre gli orari cambiano: cena da marted&igrave; a gioved&igrave;, pranzo e cena venerd&igrave; e sabato, solo pranzo la domenica. Gli orari aggiornati sono sempre su questa pagina.</p></div>
       </details>
       <details class="faq-item">
         <summary><h3 class="faq-q" data-i18n="faq_q3">C&rsquo;&egrave; un men&ugrave; degustazione?</h3></summary>
@@ -816,7 +825,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.09.12.03</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.09.12.04</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>

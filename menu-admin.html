@@ -1,4 +1,17 @@
 <!DOCTYPE html>
+<!-- v 2026.09.12.03 — NUOVO in "Orari di Apertura": generazione bozza AI della FAQ orari +
+     pubblicazione diretta. Pulsante "🪄 Genera bozza FAQ" chiama la nuova Edge Function
+     generate-faq-orari (Anthropic/Claude, modello claude-opus-5, legge i periodi correnti +
+     l'eventuale periodo successivo già pianificato, applica le regole di tono del brand, NON
+     conosce le eccezioni scritte a mano in orari.js) e mostra il risultato IT/EN/FR in 3
+     caselle modificabili — mai pubblicato senza revisione. Pulsante "📤 Pubblica FAQ" scrive
+     il testo (eventualmente corretto) direttamente su translations.json (3 chiavi faq_a2) +
+     index.html (FAQ visibile + JSON-LD statico #faq-jsonld, trovata per nome domanda) via
+     GitHub Contents API col token già usato per "Traduci e Pubblica" — nessun endpoint server
+     nuovo per la scrittura, stesso pattern di pubblicaFile() in admin-core.js. Richiede il
+     secret ANTHROPIC_API_KEY sul progetto Supabase (aggiunto da Andrea).
+     Bump ?v= admin-core.js invariato (nessuna modifica a quel file per questa feature).
+-->
 <!-- v 2026.09.12.02 — 2 fix minori alla sezione "Orari di Apertura" (v.12.01) segnalati da
      Andrea: (1) checkbox P/C per giorno ora impilate verticalmente con stacco (box giorno
      display:flex column + gap, prima si toccavano perché il contenitore non aveva un
@@ -1310,6 +1323,23 @@
 
       <hr style="border:none;border-top:1px solid var(--rule);margin:0 0 1.4rem;">
 
+      <div class="sub" style="margin-top:0;">Aggiorna FAQ orari (bozza AI)</div>
+      <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
+        Genera una bozza del testo "Quali sono gli orari?" (IT/EN/FR) a partire dai periodi qui sopra —
+        rivedila sempre prima di pubblicare. Non copre eccezioni scritte a mano in <code>orari.js</code>
+        (es. chiusure straordinarie temporanee). La pubblicazione scrive direttamente su
+        <code>translations.json</code> + <code>index.html</code> con il tuo token GitHub.
+      </p>
+      <button class="btn btn-load" style="border:1px solid var(--violet);color:var(--violet);" onclick="generaFaqOrari()">🪄 Genera bozza FAQ</button>
+      <div id="faq-orari-draft" style="display:none;margin-top:1rem;">
+        <div><span class="opt-lbl">Italiano</span><textarea id="faq-orari-it" rows="4" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
+        <div style="margin-top:.6rem;"><span class="opt-lbl">English</span><textarea id="faq-orari-en" rows="4" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
+        <div style="margin-top:.6rem;"><span class="opt-lbl">Français</span><textarea id="faq-orari-fr" rows="4" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
+        <button class="btn btn-publish" style="margin-top:.8rem;" onclick="pubblicaFaqOrari()">📤 Pubblica FAQ</button>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--rule);margin:1.6rem 0 1.4rem;">
+
       <div class="sub" style="margin-top:0;">Chiudi un giorno specifico</div>
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
         <div>
@@ -2480,6 +2510,141 @@ function saveOrariPeriodi() {
     .catch(function () {
       if (st) { st.textContent = 'Errore di connessione.'; st.style.color = 'var(--rust)'; }
     });
+}
+
+// ══ FAQ ORARI — bozza AI + pubblicazione diretta su GitHub (v 2026.09.12.03) ════════════
+// Genera: chiama la Edge Function generate-faq-orari (Anthropic, legge i periodi correnti dal
+// DB) e mostra la bozza IT/EN/FR in 3 caselle modificabili. Pubblica: NON passa da un endpoint
+// server — scrive direttamente translations.json + index.html via GitHub Contents API con lo
+// stesso token già usato per "Traduci e Pubblica" (stesso pattern di pubblicaFile in questo
+// file), così il testo (eventualmente corretto a mano prima di premere Pubblica) diventa
+// definitivo solo quando l'admin lo conferma esplicitamente.
+var FAQ_ORARI_GENERATE_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/generate-faq-orari';
+
+function generaFaqOrari() {
+  var st = document.getElementById('orari-status');
+  var token = _prenGhToken();
+  if (!token) { if (st) { st.textContent = 'Operazione annullata: serve il token GitHub.'; st.style.color = 'var(--rust)'; } return; }
+  if (st) { st.textContent = 'Generazione bozza FAQ in corso (10-20 secondi)…'; st.style.color = 'var(--stone)'; }
+  fetch(FAQ_ORARI_GENERATE_URL, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ github_token: token })
+  })
+    .then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); })
+    .then(function (res) {
+      if (res.status === 200 && res.body && res.body.ok) {
+        document.getElementById('faq-orari-it').value = res.body.draft.it;
+        document.getElementById('faq-orari-en').value = res.body.draft.en;
+        document.getElementById('faq-orari-fr').value = res.body.draft.fr;
+        document.getElementById('faq-orari-draft').style.display = 'block';
+        if (st) { st.textContent = 'Bozza generata — rivedila prima di pubblicare.'; st.style.color = 'var(--stone)'; }
+      } else {
+        if (st) { st.textContent = (res.body && res.body.error) || 'Errore nella generazione.'; st.style.color = 'var(--rust)'; }
+      }
+    })
+    .catch(function () {
+      if (st) { st.textContent = 'Errore di connessione alla generazione FAQ.'; st.style.color = 'var(--rust)'; }
+    });
+}
+
+// Decode/encode UTF-8-safe per il Contents API di GitHub (i file contengono testo con accenti,
+// em-dash, ecc. — un atob/btoa nudo li corromperebbe).
+function _b64DecodeUtf8(b64) {
+  var binary = atob(b64.replace(/\n/g, ''));
+  var bytes = new Uint8Array(binary.length);
+  for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new TextDecoder('utf-8').decode(bytes);
+}
+function _b64EncodeUtf8(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+function _ghFetchFile(path, token) {
+  var url = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + path;
+  return fetch(url, { headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' } })
+    .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, sha: j.sha, content: j.content ? _b64DecodeUtf8(j.content) : null }; }); });
+}
+
+function _ghPutFile(path, token, content, sha, message) {
+  var url = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + path;
+  var body = { message: message, content: _b64EncodeUtf8(content) };
+  if (sha) body.sha = sha;
+  return fetch(url, {
+    method: 'PUT',
+    headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }); });
+}
+
+function _faqStripHtml(html) {
+  var div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent.replace(/\s+/g, ' ').trim();
+}
+
+function pubblicaFaqOrari() {
+  var st = document.getElementById('orari-status');
+  var token = _prenGhToken();
+  if (!token) { if (st) { st.textContent = 'Operazione annullata: serve il token GitHub.'; st.style.color = 'var(--rust)'; } return; }
+  var it = (document.getElementById('faq-orari-it').value || '').trim();
+  var en = (document.getElementById('faq-orari-en').value || '').trim();
+  var fr = (document.getElementById('faq-orari-fr').value || '').trim();
+  if (!it || !en || !fr) { if (st) { st.textContent = 'Compila tutte e 3 le lingue prima di pubblicare.'; st.style.color = 'var(--rust)'; } return; }
+  if (!window.confirm('Pubblicare questo testo come nuova FAQ "Quali sono gli orari?" su index.html + translations.json (IT/EN/FR)? Il commit va subito su GitHub.')) return;
+
+  if (st) { st.textContent = 'Pubblicazione FAQ in corso…'; st.style.color = 'var(--stone)'; }
+
+  Promise.all([
+    _ghFetchFile('translations.json', token),
+    _ghFetchFile('index.html', token),
+  ]).then(function (results) {
+    var trFile = results[0], htmlFile = results[1];
+    if (!trFile.ok || !htmlFile.ok || !trFile.content || !htmlFile.content) throw new Error('Lettura file GitHub fallita.');
+
+    // 1) translations.json — 3 chiavi faq_a2
+    var tr = JSON.parse(trFile.content);
+    if (!tr.it || !tr.en || !tr.fr) throw new Error('translations.json non ha la struttura attesa.');
+    tr.it.faq_a2 = it;
+    tr.en.faq_a2 = en;
+    tr.fr.faq_a2 = fr;
+    var trNew = JSON.stringify(tr, null, 2) + '\n';
+
+    // 2) index.html — FAQ visibile (IT). Testo già in HTML (<p>...</p>) come le altre voci.
+    var htmlContent = htmlFile.content;
+    var faqDivRe = /(<div class="faq-answer" data-i18n="faq_a2">)[\s\S]*?(<\/div>)/;
+    if (!faqDivRe.test(htmlContent)) throw new Error('Blocco FAQ visibile (faq_a2) non trovato in index.html.');
+    htmlContent = htmlContent.replace(faqDivRe, function (_m, open, close) { return open + it + close; });
+
+    // 3) index.html — JSON-LD statico #faq-jsonld: aggiorna SOLO l'answer della domanda
+    // "Quali sono gli orari?" (trovata per nome, non per posizione — più robusto se l'ordine
+    // delle domande cambia in futuro). Testo plain (senza tag), come le altre voci del JSON-LD.
+    var jsonLdRe = /(<script type="application\/ld\+json" id="faq-jsonld">)([\s\S]*?)(<\/script>)/;
+    var m = htmlContent.match(jsonLdRe);
+    if (!m) throw new Error('Blocco JSON-LD #faq-jsonld non trovato in index.html.');
+    var ld;
+    try { ld = JSON.parse(m[2]); } catch (e) { throw new Error('JSON-LD #faq-jsonld non parsabile: ' + e.message); }
+    var found = false;
+    (ld.mainEntity || []).forEach(function (q) {
+      if (q.name === 'Quali sono gli orari?') { q.acceptedAnswer.text = _faqStripHtml(it); found = true; }
+    });
+    if (!found) throw new Error('Domanda "Quali sono gli orari?" non trovata nel JSON-LD.');
+    var ldNew = JSON.stringify(ld, null, 2);
+    htmlContent = htmlContent.replace(jsonLdRe, function (_m, open, _mid, close) { return open + '\n' + ldNew + '\n' + close; });
+
+    return Promise.all([
+      _ghPutFile('translations.json', token, trNew, trFile.sha, 'FAQ orari: bozza AI pubblicata (translations.json)'),
+      _ghPutFile('index.html', token, htmlContent, htmlFile.sha, 'FAQ orari: bozza AI pubblicata (index.html)'),
+    ]);
+  }).then(function (putResults) {
+    var allOk = putResults.every(function (r) { return r.ok; });
+    if (allOk) {
+      if (st) { st.textContent = 'FAQ pubblicata su GitHub (translations.json + index.html).'; st.style.color = 'var(--stone)'; }
+    } else {
+      if (st) { st.textContent = 'Pubblicazione parziale/fallita — controlla GitHub.'; st.style.color = 'var(--rust)'; }
+    }
+  }).catch(function (err) {
+    if (st) { st.textContent = 'Errore pubblicazione: ' + err.message; st.style.color = 'var(--rust)'; }
+  });
 }
 
 // ══ RUBRICA PROFESSIONISTI (privata, non condivisa con altri ristoranti) ════
@@ -5283,7 +5448,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.12.02</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.12.03</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

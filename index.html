@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- v 2026.09.12.05 — Fix openingHoursSpecification STATICO (JSON-LD nel <head>): era ancora
+     sull'orario ESTIVO (cena 20:00-22:30 mar-dom, pranzo chiuso), stantio da quando il pannello
+     admin ha centralizzato i periodi (orari.js lo ri-inietta corretto solo a runtime, la copia
+     visibile ai crawler che non eseguono JS restava indietro). Ora riflette il periodo in vigore
+     11/9-30/9: pranzo sabato+domenica 12:30-14:30, cena martedì-domenica 19:30-22:30. Da questa
+     sessione in poi il pulsante "📤 Pubblica FAQ" nel pannello admin (Orari di Apertura) riscrive
+     anche questo blocco (oltre a dove-siamo.html e al foglio menù stampabile) dai periodi
+     correnti, non va più aggiornato a mano. -->
 <!-- v 2026.09.12.04 — (1) Fix layout box orari home (#orari-info, .orari-row): riga giorni "Sabato–
      Domenica" andava a capo in modo brutto (spezzata su 2 righe) mentre gli orari restavano
      affiancati a fianco. .orari-row ora è flex-direction:column (giorno sopra su una riga sola,
@@ -199,7 +207,8 @@
   "menu": "https://santamonicagenova.it/menu.html",
   "acceptsReservations": "True",
   "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "20:00", "closes": "22:30" }
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday", "Sunday"], "opens": "12:30", "closes": "14:30" },
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "19:30", "closes": "22:30" }
   ],
   "award": ["Guida Michelin - Good Cooking", "Gambero Rosso", "Golosario"],
   "address": {
@@ -825,7 +834,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.09.12.04</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.09.12.05</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>

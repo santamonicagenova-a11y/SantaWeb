@@ -1,4 +1,23 @@
 <!DOCTYPE html>
+<!-- v 2026.09.12.05 — "📤 Pubblica FAQ" ora scrive anche i punti 2 e 3 del Promemoria fisso, non
+     solo la FAQ (Andrea: "metti tutto nel pulsante già esistente" — nessun pulsante nuovo).
+     Aggiunte ~15 funzioni helper (_orariResolveCurrentPeriod, _orariBuildJsonLdSpecs/
+     _orariBuildOrarioServizio, _orariDayRuns/_orariPhraseRun/_orariPhraseDays per il testo
+     italiano "Sabato e domenica"/"Dal martedì alla domenica", _findBracketBlock/_lineIndent
+     per localizzare "chiave": [...] con parentesi annidate senza un regex non-greedy che si
+     fermerebbe alla prima "]" interna, _orariSerializeJsonLd/_orariSerializeOrarioServizio +
+     _orariPatchOpeningHoursSpec/_orariPatchOrarioServizio). Nessuna chiamata AI per questi due:
+     dati strutturati derivati dal periodo corrente (fetch pubblica a get-opening-hours, la
+     stessa che usa orari.js), stessa identica logica di raggruppamento giorni di
+     orari.js#buildJsonLd. pubblicaFaqOrari() ora legge/scrive 7 file in un solo giro
+     (translations.json, index.html, dove-siamo.html, menu.html, menu-it/en/fr.html) invece di
+     2; conferma e messaggi di stato aggiornati di conseguenza. Promemoria fisso riformulato:
+     i punti 2/3 non sono più "da editare a mano" ma restano da "ripubblicare col pulsante"
+     dopo un cambio periodi (non è automatico-automatico). Verificato con dati reali del
+     periodo in vigore (11/9-30/9): output byte-identico al contenuto già presente nei 4 file
+     menu stampabile. Contestualmente FIX del debito scoperto: index.html + dove-siamo.html
+     avevano il JSON-LD statico ancora sull'orario estivo (mai allineato dal refactor
+     "Orari di Apertura" del mattino) — corretto in questa stessa sessione. -->
 <!-- v 2026.09.12.04 — Promemoria fisso esteso (Orari di Apertura): elencava solo la FAQ tra i
      testi "non si aggiornano da soli" — Andrea ha chiesto conferma su cosa altro legge/non
      legge i periodi centralizzati. Aggiunte le altre due copie manuali scoperte nell'audit:
@@ -1316,20 +1335,22 @@
 
       <div style="background:rgba(167,139,250,.12);border:1px solid var(--violet);border-radius:var(--radius);padding:.8rem 1rem;margin-bottom:1.4rem;font-size:.8rem;line-height:1.5;color:var(--ink);">
         <strong style="color:var(--violet);">⚠ Promemoria fisso:</strong> tre cose NON si aggiornano da sole
-        quando modifichi i periodi qui sotto — restano testo/dati scritti a mano da controllare e aggiornare
-        separatamente (committando su GitHub come sempre):
+        quando modifichi i periodi qui sotto — non serve più editarle a mano, ma vanno comunque
+        ripubblicate col pulsante "📤 Pubblica FAQ" qui sotto (che ora scrive tutt'e tre insieme):
         <ol style="margin:.5rem 0 0;padding-left:1.2rem;">
           <li>la FAQ orari sul sito (<code>index.html</code> + <code>translations.json</code>, sezione
-            "Domande frequenti") — usa il pulsante "🪄 Genera bozza FAQ" qui sotto per farti aiutare;</li>
+            "Domande frequenti") — testo libero, serve prima "🪄 Genera bozza FAQ" per scriverlo/rivederlo;</li>
           <li>il blocco <code>openingHoursSpecification</code> STATICO nel JSON-LD di <code>index.html</code>
             e <code>dove-siamo.html</code> — è una copia visibile ai crawler che non eseguono JavaScript
             (motori IA come Perplexity/Gemini/Grok); a runtime <code>orari.js</code> lo ri-inietta con i dati
-            veri, ma la copia statica va allineata a mano perché i crawler la leggano corretta;</li>
+            veri, ma la copia statica serve comunque allineata perché i crawler la leggano corretta —
+            ricalcolata automaticamente dai periodi correnti, nessuna revisione necessaria;</li>
           <li>l'"ORARIO DI SERVIZIO" del foglio menù stampabile a 1 pagina (blocco <code>orarioServizio</code>
             in <code>menu.html</code>/<code>menu-it.html</code>/<code>menu-en.html</code>/<code>menu-fr.html</code>) —
-            dato completamente separato, mai collegato ai periodi.
+            stessa cosa, ricalcolato automaticamente.
         </ol>
-        Te lo ricordiamo di nuovo appena salvi i periodi.
+        Quindi: dopo aver salvato i periodi, apri comunque "🪄 Genera bozza FAQ" → rivedi/correggi il
+        testo → "📤 Pubblica FAQ" — quel click aggiorna tutti e 7 i file in un colpo solo.
       </div>
 
       <div class="sub" style="margin-top:0;">Periodi ricorrenti</div>
@@ -1341,12 +1362,16 @@
 
       <hr style="border:none;border-top:1px solid var(--rule);margin:0 0 1.4rem;">
 
-      <div class="sub" style="margin-top:0;">Aggiorna FAQ orari (bozza AI)</div>
+      <div class="sub" style="margin-top:0;">Aggiorna FAQ orari + JSON-LD + menu stampabile</div>
       <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
         Genera una bozza del testo "Quali sono gli orari?" (IT/EN/FR) a partire dai periodi qui sopra —
         rivedila sempre prima di pubblicare. Non copre eccezioni scritte a mano in <code>orari.js</code>
-        (es. chiusure straordinarie temporanee). La pubblicazione scrive direttamente su
-        <code>translations.json</code> + <code>index.html</code> con il tuo token GitHub.
+        (es. chiusure straordinarie temporanee). La pubblicazione scrive: la FAQ su
+        <code>translations.json</code> + <code>index.html</code>; e — ricalcolati direttamente dai
+        periodi correnti, senza bisogno di rivederli — il JSON-LD statico su <code>index.html</code>
+        + <code>dove-siamo.html</code> e l'"ORARIO DI SERVIZIO" del foglio menù stampabile su
+        <code>menu.html</code>/<code>menu-it/en/fr.html</code>. Tutto con il tuo token GitHub, 7 file
+        in un solo commit ciascuno.
       </p>
       <button class="btn btn-load" style="border:1px solid var(--violet);color:var(--violet);" onclick="generaFaqOrari()">🪄 Genera bozza FAQ</button>
       <div id="faq-orari-draft" style="display:none;margin-top:1rem;">
@@ -2600,6 +2625,136 @@ function _faqStripHtml(html) {
   return div.textContent.replace(/\s+/g, ' ').trim();
 }
 
+// ── Helpers per derivare JSON-LD orari + foglio menù stampabile dal periodo
+// corrente (reservation_settings.opening_periods, stessa lettura pubblica
+// get-opening-hours di orari.js) — dati strutturati, nessuna AI coinvolta,
+// stessa identica logica di raggruppamento giorni di orari.js#buildJsonLd e
+// del testo italiano già presente in menu*.html (fasi "Sabato e domenica" /
+// "Dal martedì alla domenica"). Usati da pubblicaFaqOrari() per allineare
+// anche i punti 2 e 3 del Promemoria fisso, non solo la FAQ (v 2026.09.12.05).
+var _ORARI_DAY_KEYS = ['1', '2', '3', '4', '5', '6', '0']; // Lun..Dom, chiavi day_services (JS getDay)
+var _EN_DAY_BY_KEY = { '1': 'Monday', '2': 'Tuesday', '3': 'Wednesday', '4': 'Thursday', '5': 'Friday', '6': 'Saturday', '0': 'Sunday' };
+var _IT_DAY_LOWER_BY_KEY = { '1': 'lunedì', '2': 'martedì', '3': 'mercoledì', '4': 'giovedì', '5': 'venerdì', '6': 'sabato', '0': 'domenica' };
+var _IT_DAY_FEMININE_BY_KEY = { '0': true }; // solo domenica → "alla domenica" invece di "al ..."
+
+function _orariResolveCurrentPeriod(periods, todayStr) {
+  var sorted = periods.slice().sort(function (a, b) { return a.from < b.from ? -1 : a.from > b.from ? 1 : 0; });
+  var current = sorted[sorted.length - 1];
+  for (var i = sorted.length - 1; i >= 0; i--) {
+    var p = sorted[i];
+    if (todayStr >= p.from && (p.to == null || todayStr <= p.to)) { current = p; break; }
+  }
+  return current;
+}
+
+function _orariActiveDays(period, svc) {
+  return _ORARI_DAY_KEYS.filter(function (k) { return ((period.day_services || {})[k] || []).indexOf(svc) !== -1; });
+}
+
+function _orariBuildJsonLdSpecs(period) {
+  var specs = [];
+  ['pranzo', 'cena'].forEach(function (svc) {
+    var opens = period[svc + '_opens'], closes = period[svc + '_closes'];
+    if (!opens || !closes) return;
+    var days = _orariActiveDays(period, svc);
+    if (!days.length) return;
+    specs.push({ dayOfWeek: days.map(function (k) { return _EN_DAY_BY_KEY[k]; }), opens: opens, closes: closes });
+  });
+  return specs;
+}
+
+function _cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function _orariDayRuns(days) {
+  var runs = [], i = 0;
+  while (i < days.length) {
+    var j = i;
+    while (j + 1 < days.length && _ORARI_DAY_KEYS.indexOf(days[j + 1]) === _ORARI_DAY_KEYS.indexOf(days[j]) + 1) j++;
+    runs.push(days.slice(i, j + 1));
+    i = j + 1;
+  }
+  return runs;
+}
+
+function _orariPhraseRun(run) {
+  if (run.length === 1) return _cap(_IT_DAY_LOWER_BY_KEY[run[0]]);
+  if (run.length === 2) return _cap(_IT_DAY_LOWER_BY_KEY[run[0]]) + ' e ' + _IT_DAY_LOWER_BY_KEY[run[1]];
+  var last = run[run.length - 1];
+  var art = _IT_DAY_FEMININE_BY_KEY[last] ? 'alla' : 'al';
+  return 'Dal ' + _IT_DAY_LOWER_BY_KEY[run[0]] + ' ' + art + ' ' + _IT_DAY_LOWER_BY_KEY[last];
+}
+
+function _orariPhraseDays(days) {
+  return _orariDayRuns(days).map(_orariPhraseRun).join(' + ');
+}
+
+function _orariBuildOrarioServizio(period) {
+  var out = [];
+  ['pranzo', 'cena'].forEach(function (svc) {
+    var opens = period[svc + '_opens'], closes = period[svc + '_closes'];
+    if (!opens || !closes) return;
+    var days = _orariActiveDays(period, svc);
+    if (!days.length) return;
+    out.push({ giorno: _orariPhraseDays(days), fasce: [opens + ' – ' + closes] });
+  });
+  return out;
+}
+
+// Trova "marker[...]" tenendo conto delle parentesi quadre annidate (es. "fasce": [...]
+// dentro "orarioServizio": [...]) — un regex non-greedy si fermerebbe alla prima "]" interna.
+function _findBracketBlock(content, marker) {
+  var markerIdx = content.indexOf(marker);
+  if (markerIdx === -1) return null;
+  var openIdx = content.indexOf('[', markerIdx);
+  if (openIdx === -1) return null;
+  var depth = 0, closeIdx = -1;
+  for (var i = openIdx; i < content.length; i++) {
+    if (content[i] === '[') depth++;
+    else if (content[i] === ']') { depth--; if (depth === 0) { closeIdx = i + 1; break; } }
+  }
+  if (closeIdx === -1) return null;
+  return { markerIdx: markerIdx, openIdx: openIdx, closeIdx: closeIdx };
+}
+
+function _lineIndent(content, idx) {
+  var lineStart = content.lastIndexOf('\n', idx) + 1;
+  var m = content.slice(lineStart, idx).match(/^[ \t]*/);
+  return m ? m[0] : '';
+}
+
+function _orariSerializeJsonLd(baseIndent, specs) {
+  var itemIndent = baseIndent + '  ';
+  var lines = specs.map(function (s) {
+    return itemIndent + '{ "@type": "OpeningHoursSpecification", "dayOfWeek": [' +
+      s.dayOfWeek.map(function (d) { return '"' + d + '"'; }).join(', ') +
+      '], "opens": "' + s.opens + '", "closes": "' + s.closes + '" }';
+  });
+  return '[\n' + lines.join(',\n') + '\n' + baseIndent + ']';
+}
+
+function _orariSerializeOrarioServizio(baseIndent, entries) {
+  var b1 = baseIndent + '  ', b2 = baseIndent + '    ', b3 = baseIndent + '      ';
+  var items = entries.map(function (e) {
+    var fasceLines = e.fasce.map(function (f) { return b3 + '"' + f + '"'; }).join(',\n');
+    return b1 + '{\n' + b2 + '"giorno": "' + e.giorno + '",\n' + b2 + '"fasce": [\n' + fasceLines + '\n' + b2 + ']\n' + b1 + '}';
+  });
+  return '[\n' + items.join(',\n') + '\n' + baseIndent + ']';
+}
+
+function _orariPatchOpeningHoursSpec(content, specs, filename) {
+  var block = _findBracketBlock(content, '"openingHoursSpecification":');
+  if (!block) throw new Error('Blocco openingHoursSpecification non trovato in ' + filename + '.');
+  var indent = _lineIndent(content, block.markerIdx);
+  return content.slice(0, block.openIdx) + _orariSerializeJsonLd(indent, specs) + content.slice(block.closeIdx);
+}
+
+function _orariPatchOrarioServizio(content, entries, filename) {
+  var block = _findBracketBlock(content, '"orarioServizio":');
+  if (!block) throw new Error('Blocco orarioServizio non trovato in ' + filename + '.');
+  var indent = _lineIndent(content, block.markerIdx);
+  return content.slice(0, block.openIdx) + _orariSerializeOrarioServizio(indent, entries) + content.slice(block.closeIdx);
+}
+
 function pubblicaFaqOrari() {
   var st = document.getElementById('orari-status');
   var token = _prenGhToken();
@@ -2608,36 +2763,46 @@ function pubblicaFaqOrari() {
   var en = (document.getElementById('faq-orari-en').value || '').trim();
   var fr = (document.getElementById('faq-orari-fr').value || '').trim();
   if (!it || !en || !fr) { if (st) { st.textContent = 'Compila tutte e 3 le lingue prima di pubblicare.'; st.style.color = 'var(--rust)'; } return; }
-  if (!window.confirm('Pubblicare questo testo come nuova FAQ "Quali sono gli orari?" su index.html + translations.json (IT/EN/FR)? Il commit va subito su GitHub.')) return;
+  if (!window.confirm('Pubblicare questo testo come nuova FAQ "Quali sono gli orari?" e allineare ai periodi correnti anche il JSON-LD statico e il foglio menù stampabile?\n\nFile toccati: translations.json, index.html, dove-siamo.html, menu.html, menu-it.html, menu-en.html, menu-fr.html.\nIl commit va subito su GitHub.')) return;
 
-  if (st) { st.textContent = 'Pubblicazione FAQ in corso…'; st.style.color = 'var(--stone)'; }
+  if (st) { st.textContent = 'Pubblicazione in corso…'; st.style.color = 'var(--stone)'; }
 
-  Promise.all([
-    _ghFetchFile('translations.json', token),
-    _ghFetchFile('index.html', token),
-  ]).then(function (results) {
-    var trFile = results[0], htmlFile = results[1];
-    if (!trFile.ok || !htmlFile.ok || !trFile.content || !htmlFile.content) throw new Error('Lettura file GitHub fallita.');
+  var FILES = ['translations.json', 'index.html', 'dove-siamo.html', 'menu.html', 'menu-it.html', 'menu-en.html', 'menu-fr.html'];
+
+  Promise.all(
+    [fetch('https://xbksultfskvzgncncada.supabase.co/functions/v1/get-opening-hours', { cache: 'no-store' }).then(function (r) { return r.json(); })]
+      .concat(FILES.map(function (f) { return _ghFetchFile(f, token); }))
+  ).then(function (results) {
+    var ohData = results[0];
+    var files = {};
+    FILES.forEach(function (name, idx) { files[name] = results[idx + 1]; });
+    var missing = FILES.filter(function (name) { return !files[name].ok || !files[name].content; });
+    if (missing.length) throw new Error('Lettura file GitHub fallita: ' + missing.join(', '));
+
+    var periods = (ohData && Array.isArray(ohData.periods)) ? ohData.periods : [];
+    if (!periods.length) throw new Error('Periodi non disponibili da get-opening-hours.');
+    var current = _orariResolveCurrentPeriod(periods, new Date().toISOString().slice(0, 10));
+    var jsonLdSpecs = _orariBuildJsonLdSpecs(current);
+    var orarioServizio = _orariBuildOrarioServizio(current);
+    if (!jsonLdSpecs.length || !orarioServizio.length) throw new Error('Periodo corrente senza servizi attivi: controlla i periodi in "Orari di Apertura".');
 
     // 1) translations.json — 3 chiavi faq_a2
-    var tr = JSON.parse(trFile.content);
+    var tr = JSON.parse(files['translations.json'].content);
     if (!tr.it || !tr.en || !tr.fr) throw new Error('translations.json non ha la struttura attesa.');
     tr.it.faq_a2 = it;
     tr.en.faq_a2 = en;
     tr.fr.faq_a2 = fr;
     var trNew = JSON.stringify(tr, null, 2) + '\n';
 
-    // 2) index.html — FAQ visibile (IT). Testo già in HTML (<p>...</p>) come le altre voci.
-    var htmlContent = htmlFile.content;
+    // 2) index.html — FAQ visibile (IT), JSON-LD FAQPage (per nome domanda, robusto a
+    // riordini) + JSON-LD orari statico (openingHoursSpecification, derivato dal periodo).
+    var idx = files['index.html'].content;
     var faqDivRe = /(<div class="faq-answer" data-i18n="faq_a2">)[\s\S]*?(<\/div>)/;
-    if (!faqDivRe.test(htmlContent)) throw new Error('Blocco FAQ visibile (faq_a2) non trovato in index.html.');
-    htmlContent = htmlContent.replace(faqDivRe, function (_m, open, close) { return open + it + close; });
+    if (!faqDivRe.test(idx)) throw new Error('Blocco FAQ visibile (faq_a2) non trovato in index.html.');
+    idx = idx.replace(faqDivRe, function (_m, open, close) { return open + it + close; });
 
-    // 3) index.html — JSON-LD statico #faq-jsonld: aggiorna SOLO l'answer della domanda
-    // "Quali sono gli orari?" (trovata per nome, non per posizione — più robusto se l'ordine
-    // delle domande cambia in futuro). Testo plain (senza tag), come le altre voci del JSON-LD.
     var jsonLdRe = /(<script type="application\/ld\+json" id="faq-jsonld">)([\s\S]*?)(<\/script>)/;
-    var m = htmlContent.match(jsonLdRe);
+    var m = idx.match(jsonLdRe);
     if (!m) throw new Error('Blocco JSON-LD #faq-jsonld non trovato in index.html.');
     var ld;
     try { ld = JSON.parse(m[2]); } catch (e) { throw new Error('JSON-LD #faq-jsonld non parsabile: ' + e.message); }
@@ -2646,17 +2811,33 @@ function pubblicaFaqOrari() {
       if (q.name === 'Quali sono gli orari?') { q.acceptedAnswer.text = _faqStripHtml(it); found = true; }
     });
     if (!found) throw new Error('Domanda "Quali sono gli orari?" non trovata nel JSON-LD.');
-    var ldNew = JSON.stringify(ld, null, 2);
-    htmlContent = htmlContent.replace(jsonLdRe, function (_m, open, _mid, close) { return open + '\n' + ldNew + '\n' + close; });
+    idx = idx.replace(jsonLdRe, function (_m, open, _mid, close) { return open + '\n' + JSON.stringify(ld, null, 2) + '\n' + close; });
+
+    idx = _orariPatchOpeningHoursSpec(idx, jsonLdSpecs, 'index.html');
+
+    // 3) dove-siamo.html — solo il JSON-LD orari statico (niente FAQ lì).
+    var dove = _orariPatchOpeningHoursSpec(files['dove-siamo.html'].content, jsonLdSpecs, 'dove-siamo.html');
+
+    // 4) i 4 file del foglio menù stampabile — blocco orarioServizio (testo IT anche nelle
+    // versioni EN/FR, coerente con come è oggi: il foglio stampabile resta in italiano).
+    var menuNew = {};
+    ['menu.html', 'menu-it.html', 'menu-en.html', 'menu-fr.html'].forEach(function (name) {
+      menuNew[name] = _orariPatchOrarioServizio(files[name].content, orarioServizio, name);
+    });
 
     return Promise.all([
-      _ghPutFile('translations.json', token, trNew, trFile.sha, 'FAQ orari: bozza AI pubblicata (translations.json)'),
-      _ghPutFile('index.html', token, htmlContent, htmlFile.sha, 'FAQ orari: bozza AI pubblicata (index.html)'),
+      _ghPutFile('translations.json', token, trNew, files['translations.json'].sha, 'FAQ orari: bozza AI pubblicata (translations.json)'),
+      _ghPutFile('index.html', token, idx, files['index.html'].sha, 'FAQ + JSON-LD orari allineati ai periodi (index.html)'),
+      _ghPutFile('dove-siamo.html', token, dove, files['dove-siamo.html'].sha, 'JSON-LD orari allineato ai periodi (dove-siamo.html)'),
+      _ghPutFile('menu.html', token, menuNew['menu.html'], files['menu.html'].sha, 'Foglio orario stampabile allineato ai periodi (menu.html)'),
+      _ghPutFile('menu-it.html', token, menuNew['menu-it.html'], files['menu-it.html'].sha, 'Foglio orario stampabile allineato ai periodi (menu-it.html)'),
+      _ghPutFile('menu-en.html', token, menuNew['menu-en.html'], files['menu-en.html'].sha, 'Foglio orario stampabile allineato ai periodi (menu-en.html)'),
+      _ghPutFile('menu-fr.html', token, menuNew['menu-fr.html'], files['menu-fr.html'].sha, 'Foglio orario stampabile allineato ai periodi (menu-fr.html)'),
     ]);
   }).then(function (putResults) {
     var allOk = putResults.every(function (r) { return r.ok; });
     if (allOk) {
-      if (st) { st.textContent = 'FAQ pubblicata su GitHub (translations.json + index.html).'; st.style.color = 'var(--stone)'; }
+      if (st) { st.textContent = 'Pubblicato su GitHub: FAQ + JSON-LD orari + foglio menù (7 file).'; st.style.color = 'var(--stone)'; }
     } else {
       if (st) { st.textContent = 'Pubblicazione parziale/fallita — controlla GitHub.'; st.style.color = 'var(--rust)'; }
     }
@@ -5466,7 +5647,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.12.04</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.12.05</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

@@ -2,10 +2,23 @@
   ─────────────────────────────────────────────────────────────────────────
   dove-siamo.html — Dove siamo / Contatti
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.08.31.01
-  Ultimo aggiornamento: 2026-08-31
+  Versione: v 2026.09.12.01
+  Ultimo aggiornamento: 2026-09-12
   Lingua: IT (versione ufficiale)
   Stato: BOZZA INFORMATIVA · F0.12 chiusa (hotfix layout)
+
+  Modifiche v 2026.09.12.01 (allineamento JSON-LD statico al periodo 11/9-30/9):
+  - openingHoursSpecification statico era ancora sull'orario ESTIVO (cena
+    20:00-22:30 mar-dom, pranzo chiuso), stantio da quando il pannello admin
+    "Orari di Apertura" ha centralizzato i periodi (v 2026.09.12.01 di
+    orari.js/menu-admin.html) — il blocco statico va aggiornato a mano e non
+    era stato toccato in quel refactor. Ora riflette il periodo in vigore:
+    pranzo sabato+domenica 12:30-14:30, cena martedì-domenica 19:30-22:30.
+  - Da questa sessione in poi, il pulsante "📤 Pubblica FAQ" nel pannello
+    admin (Orari di Apertura) ricalcola e riscrive anche questo blocco
+    (oltre a index.html e al foglio menù stampabile) direttamente dai
+    periodi correnti — non serve più editarlo qui a mano.
+  - _comment_orari riscritto per riflettere il nuovo meccanismo.
 
   Modifiche v 2026.08.31.01 (spostamento pranzo ven/sab/dom):
   - Aggiornato solo il commento "_comment_orari" (cosmetico, il blocco
@@ -155,9 +168,10 @@
     },
     "hasMap": "https://www.google.com/maps/place/?q=place_id:ChIJGzMzZqlD0xIRKRomfkk1F2c",
     "openingHoursSpecification": [
-      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "20:00", "closes": "22:30" }
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday", "Sunday"], "opens": "12:30", "closes": "14:30" },
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], "opens": "19:30", "closes": "22:30" }
     ],
-    "_comment_orari": "openingHoursSpecification STATICO crawler-safe (ORARIO ESTIVO 21/6→11/9: chiuso a pranzo, cena 20:00-22:30 mar→dom, lun chiuso — v 2026.08.31.01, esteso dal 31/8 all'11/9 su conferma Andrea, orari.js Periodo 1 to:'2026-09-10'); /orari.js lo ri-inietta identico a runtime. Ripristino previsto l'11/9 allo schedule 7/6 (pranzo ven/sab/dom + cena 19:30). Se cambi orari: aggiorna orari.js E questo blocco statico (index.html + dove-siamo.html).",
+    "_comment_orari": "openingHoursSpecification STATICO crawler-safe, allineato al periodo 11/9-30/9 in vigore (reservation_settings.opening_periods): pranzo sabato e domenica 12:30-14:30, cena da martedì a domenica 19:30-22:30 (lunedì chiuso, venerdì solo cena). /orari.js lo ri-inietta identico a runtime. Se cambi i periodi dal pannello Orari di Apertura, aggiorna qui col pulsante \\\"Pubblica FAQ\\\" (ora patcha anche questo blocco + index.html + il foglio menù stampabile, non serve più editarlo a mano).",
     "sameAs": [
       "https://www.instagram.com/ristorantesantamonica/",
       "https://www.facebook.com/santamonicage",

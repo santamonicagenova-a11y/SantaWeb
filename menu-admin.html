@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!-- v 2026.09.12.02 — 2 fix minori alla sezione "Orari di Apertura" (v.12.01) segnalati da
+     Andrea: (1) checkbox P/C per giorno ora impilate verticalmente con stacco (box giorno
+     display:flex column + gap, prima si toccavano perché il contenitore non aveva un
+     flex-direction esplicito); (2) banner "Promemoria fisso" (FAQ orari da aggiornare a mano)
+     aveva uno sfondo chiaro hardcoded (#fff4e5) che stonava col tema scuro del pannello — ora
+     tinta viola coerente col tema scuro e con --violet (colore di categoria "Setup"), al posto
+     di --rust (già usato per errori/azioni primarie, dava un falso allarme). -->
 <!-- v 2026.09.12.01 — Centralizzazione "Orari di Apertura" (nuova sezione unificata, tab
      Setup): i periodi ricorrenti (reservation_settings.opening_periods) sono ora editabili da
      qui — set-reservations-config azione set_periods, letti da get-opening-hours — invece di
@@ -1286,8 +1293,8 @@
         pubblicazione).
       </p>
 
-      <div style="background:#fff4e5;border:1px solid var(--rust);border-radius:var(--radius);padding:.8rem 1rem;margin-bottom:1.4rem;font-size:.8rem;line-height:1.5;color:var(--ink);">
-        <strong style="color:var(--rust);">⚠ Promemoria fisso:</strong> il testo della FAQ orari sul sito
+      <div style="background:rgba(167,139,250,.12);border:1px solid var(--violet);border-radius:var(--radius);padding:.8rem 1rem;margin-bottom:1.4rem;font-size:.8rem;line-height:1.5;color:var(--ink);">
+        <strong style="color:var(--violet);">⚠ Promemoria fisso:</strong> il testo della FAQ orari sul sito
         (<code>index.html</code> + <code>translations.json</code>, sezione "Domande frequenti") è scritto a
         mano e <strong>NON si aggiorna da solo</strong> quando modifichi i periodi qui sotto. Se il cambio
         orari lo riguarda, ricordati di controllarlo e aggiornarlo separatamente (committandolo su GitHub
@@ -2398,7 +2405,7 @@ function renderOrariPeriodiList() {
     ORARI_DAY_ORDER.forEach(function (d) {
       var svc = (p.day_services && p.day_services[d.key]) || [];
       var box = document.createElement('div');
-      box.style.cssText = 'text-align:center;';
+      box.style.cssText = 'text-align:center;display:flex;flex-direction:column;align-items:center;gap:.3rem;';
       box.innerHTML =
         '<div style="font-size:.68rem;color:var(--stone);margin-bottom:.2rem;">' + d.label + '</div>' +
         '<label style="display:flex;align-items:center;gap:.25rem;font-size:.68rem;"><input type="checkbox" data-op="' + idx + '" data-day="' + d.key + '" data-svc="pranzo" ' + (svc.indexOf('pranzo') !== -1 ? 'checked' : '') + ' /> P</label>' +
@@ -5276,7 +5283,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.12.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.12.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

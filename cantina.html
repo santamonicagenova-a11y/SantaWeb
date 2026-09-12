@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<!-- v 2026.09.12.04 — nome vino (.vino-nome) portato a font-weight:350 esplicito su richiesta di
+     Andrea (prima ereditava 300 dal body, invariato): resta solo sottolineato (niente grassetto
+     vero, 600+), ma leggermente più pesante del resto del testo per risaltare nella riga. -->
 <!-- v 2026.09.12.03 — body riportato al peso originale 350→300 su richiesta di Andrea (resta
      invariato tutto ciò che eredita dal body: .vino/.vino-nome/.vino-annate-lista/.annata-label/
      .prezzo-nowrap/.num-inline/.vino-regione, ora di nuovo a 300). .sez-titolo (400) e
@@ -374,7 +377,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.12.03</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.12.04</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -1558,7 +1561,7 @@ function generaHtmlCartaVini(articoli) {
     '.sez-titolo{font-family:"Jost",sans-serif;font-weight:400;font-size:24pt;margin:2.8rem 0 .8rem;text-align:center;text-transform:uppercase;letter-spacing:.06em;}' +
     '.sottosez-titolo{font-family:"Jost",sans-serif;font-weight:350;font-size:20pt;margin:1.8rem 0 .4rem;text-transform:uppercase;letter-spacing:.1em;color:var(--stone);}' +
     '.vino{font-size:12pt;line-height:1.55;margin:0 0 .6rem;text-align:justify;}' +
-    '.vino-nome{text-decoration:underline;}' +
+    '.vino-nome{text-decoration:underline;font-weight:350;}' +
     '.vino-nome em{font-style:italic;}' +
     '.vino-annate-lista{margin:-.35rem 0 .6rem 1.2rem;font-size:.85rem;line-height:1.5;}' +
     '.ic-prezzo{vertical-align:-1px;margin:0 1px 0 0;opacity:.8;}' +

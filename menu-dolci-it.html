@@ -655,7 +655,7 @@ function renderOrario() {
   const cfg = MENU.orario;
 
   const orarioHtml = cfg.orarioServizio.map(o =>
-    `<div><em>${o.giorno}</em></div>` + o.fasce.map(f => `<div>${f}</div>`).join('')
+    o.fasce.map(f => `<div>${f}</div>`).join('') + `<div><em>${o.giorno}</em></div>`
   ).join('');
 
   const pg = document.createElement('div');

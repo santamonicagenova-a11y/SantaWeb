@@ -1,4 +1,19 @@
 <!DOCTYPE html>
+<!-- v 2026.09.12.03 — Allineamento centrato in orizzontale su richiesta di Andrea: titoli
+     sezione e le due colonne di ogni riga piatto (nome piatto, allergeni) ora con text-align:
+     center invece di sinistra; larghezze di colonna (38%/auto) e spaziature invariate. Nessuna
+     modifica ai dati allergeni. -->
+<!-- v 2026.09.12.02 — Correzione su richiesta di Andrea: la v.12.01 centrava solo intestazione+
+     sezioni e ancorava la legenda al bordo inferiore, creando un vuoto innaturale sopra la
+     legenda (contenuto non più compatto). Ripristinato il blocco unico compatto (intestazione+
+     sezioni+legenda, spaziatura interna invariata) e centrato per intero verticalmente nella
+     pagina con justify-content:center su .pg; rimosso il wrapper .pg-content introdotto in
+     v.12.01. Nessuna modifica ai dati allergeni. -->
+<!-- v 2026.09.12.01 — Layout pagina stampabile: contenuto (intestazione + sezioni) ora centrato
+     verticalmente nello spazio sopra la legenda, mentre la legenda con l'Informativa ai sensi
+     del Reg. UE 1169/2011 resta ancorata il più in basso possibile (bordo inferiore del foglio
+     A4), su richiesta di Andrea. Aggiunto wrapper .pg-content (flex:1, justify-content:center)
+     attorno a intestazione+sezioni in render(); nessuna modifica ai dati allergeni. -->
 <!-- v 2026.08.26.01 — RECUPERO DATI: la tabella allergeni della carta (Antipasti/Amidi e Carboidrati/Non Solo Mare) era stata sostituita per errore dai soli allergeni dei dolci ("Golosità") nel commit GitHub 98c285c del 8/8/2026 (root cause rintracciata confrontando lo storico commit del file: ultimo buono 8903505, stesso giorno, poche ore prima). Ripristinati i 13 piatti/allergeni dell'ultima versione buona (sezione "Antipasti" rinominata "Sfiziosi" per allinearsi al nome attuale della sezione in menu.html — solo il titolo, nessun dato allergeni toccato). ATTENZIONE Andrea: 4 piatti sono cambiati sul menù dal 8/8 a oggi e i loro allergeni NON sono stati riverificati da Claude (dato non disponibile) — vedi nota a parte in chat. -->
 <!-- v 2026.08.23.01 — Fix mobile: .pg sganciato da larghezza A4 fissa, righe piatto/allergeni in colonna sotto 640px (overflow orizzontale su smartphone). Precedente v 2026.06.14.01 — Intestazione pagina stampabile: rimossi sottotitolo indirizzo "Santamonica — Lungomare Lombardo 27, Genova" + separatore sotto l'header (border-bottom .pg-header) e il blocco .nota-legale "Informativa ai sensi del Reg. UE 1169/2011…"; quel testo dell'informativa è ora il titolo della legenda in fondo (sostituisce "Allergeni regolamentati (Reg. UE 1169/2011):"). Solo testo IT spostato/rimosso, nessun contenuto legale nuovo. -->
 <!-- v 2026.05.22.01 — F0.21-e: allineamento vocabolario allergeni: "latte" -> "latticini" (coerenza con menu-dolci e output EN/FR). -->
@@ -72,6 +87,7 @@ background: #fff;
 box-shadow: 0 2px 24px rgba(0,0,0,.10);
 display: flex;
 flex-direction: column;
+justify-content: center;
 }
 
 /* ── intestazione ── */
@@ -116,6 +132,7 @@ font-size: 1.1rem;
 font-weight: 600;
 letter-spacing: .14em;
 text-transform: uppercase;
+text-align: center;
 margin-bottom: 3mm;
 padding-bottom: 1.5mm;
 border-bottom: 1px solid var(--rule);
@@ -137,6 +154,7 @@ font-size: .9rem;
 font-weight: 400;
 flex: 0 0 38%;
 line-height: 1.3;
+text-align: center;
 }
 .piatto-allergeni {
 font-style: italic;
@@ -144,16 +162,17 @@ font-size: .82rem;
 color: var(--ink);
 flex: 1;
 line-height: 1.4;
+text-align: center;
 }
 .piatto-allergeni-vuoti {
 font-style: italic;
 font-size: .78rem;
 color: var(--stone);
+text-align: center;
 }
 
 /* ── legenda in fondo ── */
 .legenda {
-margin-top: auto;
 padding-top: 5mm;
 border-top: 1px solid var(--rule);
 font-size: .67rem;
@@ -212,14 +231,15 @@ ALLERGENI — modifica solo qui per aggiornare tutto
 const ALLERGENI_DATA = {
   "sezioni": [
     {
-      "titolo": "Antipasti",
+      "titolo": "Sfiziosi",
       "piatti": [
         {
-          "nome": "Dentice reale nostrano crudo, ricci di mare, limone, mandorle",
+          "nome": "Calamaro nostrano, piselli freschi, bagna cauda, kefir",
           "allergeni": [
-            "glutine",
             "pesce",
-            "frutta a guscio"
+            "latte",
+            "solfiti",
+            "molluschi"
           ]
         },
         {
@@ -229,20 +249,19 @@ const ALLERGENI_DATA = {
           ]
         },
         {
-          "nome": "Calamaro nostrano, bagna cauda, kefir",
-          "allergeni": [
-            "pesce",
-            "latte",
-            "solfiti",
-            "molluschi"
-          ]
-        },
-        {
           "nome": "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce",
           "allergeni": [
             "pesce",
             "frutta a guscio",
             "solfiti"
+          ]
+        },
+        {
+          "nome": "Dentice reale nostrano crudo, ricci di mare, limone, mandorle",
+          "allergeni": [
+            "glutine",
+            "pesce",
+            "frutta a guscio"
           ]
         },
         {
@@ -265,7 +284,7 @@ const ALLERGENI_DATA = {
           ]
         },
         {
-          "nome": "Cappellacci di cinghiale, galletti, rucola, mirtilli",
+          "nome": "Cappellacci di cinghiale, cardoncelli, ortica, mirtilli",
           "allergeni": [
             "glutine",
             "uova",
@@ -299,7 +318,7 @@ const ALLERGENI_DATA = {
       "titolo": "Non Solo Mare",
       "piatti": [
         {
-          "nome": "Ricciola nostrana, melanzane, umami di pomodoro e peperone, tahina",
+          "nome": "Ricciola nostrana, crema di peperonata, purea di melanzane BBQ, tahina",
           "allergeni": [
             "pesce",
             "sesamo",
@@ -307,11 +326,14 @@ const ALLERGENI_DATA = {
           ]
         },
         {
-          "nome": "Porro arrostito, noci macadamia, fondo di verdure e pesche",
-          "allergeni": []
+          "nome": "Porro arrosto, noci macadamia, fondo di verdure e pesche",
+          "allergeni": [
+            "frutta a guscio",
+            "solfiti"
+          ]
         },
         {
-          "nome": "Ombrina nostrana, scarola, foglie di fico",
+          "nome": "Merluzzo selvaggio, scarola, foglie di fico",
           "allergeni": [
             "uova",
             "pesce",
@@ -321,12 +343,14 @@ const ALLERGENI_DATA = {
           ]
         },
         {
-          "nome": "Agnello, pak choi, fondo",
+          "nome": "\"Tournedos alla Rossini\"?",
           "allergeni": [
-            "soia",
+            "crostacei",
+            "pesce",
             "latte",
             "sedano",
-            "solfiti"
+            "solfiti",
+            "molluschi"
           ]
         }
       ]
@@ -388,7 +412,7 @@ sezDiv.appendChild(row);
 pg.appendChild(sezDiv);
 });
 
-// Legenda allergeni
+// Legenda allergeni — resta subito dopo l'ultima sezione, blocco compatto
 var legenda = document.createElement('div');
 legenda.className = 'legenda';
 legenda.innerHTML = '<strong>Informativa ai sensi del Reg. UE 1169/2011. Per ulteriori informazioni sugli allergeni presenti nei nostri piatti si prega di rivolgersi al personale di sala.</strong><br>' +
@@ -400,7 +424,7 @@ root.appendChild(pg);
 
 render();
 
-/* versione v 2026.08.26.01 */
+/* versione v 2026.09.12.03 */
 </script>
 </body>
 </html>

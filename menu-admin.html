@@ -1,4 +1,16 @@
 <!DOCTYPE html>
+<!-- v 2026.09.12.01 — Centralizzazione "Orari di Apertura" (nuova sezione unificata, tab
+     Setup): i periodi ricorrenti (reservation_settings.opening_periods) sono ora editabili da
+     qui — set-reservations-config azione set_periods, letti da get-opening-hours — invece di
+     vivere hardcoded e duplicati in orari.js + submit-reservation + create-reservation-checkout
+     (già centralizzati lato server in sessione precedente su _shared/periods.ts). Le eccezioni
+     puntuali (chiusure/aperture giorno/servizio, chiusure/aperture di singolo orario, limiti
+     posti) sono spostate qui da "Prenotazioni online", che resta solo con l'interruttore di
+     emergenza + "carta a garanzia: giorni della settimana". La FAQ orari del sito resta testo
+     libero (decisione Andrea): banner fisso + alert al salvataggio per ricordare di aggiornarla
+     a mano. orari.js: PERIODS hardcoded ora è solo fallback, fetch a get-opening-hours
+     all'avvio. Bump ?v= admin-core.js a 2026.09.12.01 (_pulisciViste estesa con
+     'orari-apertura-section') + footer-version. -->
 <!-- v 2026.09.11.06 — Su richiesta di Andrea: "Food Cost" tolto dal tab "Setup" e
      spostato, insieme a "Rubrica professionisti" (anche lei tolta da Setup), in un nuovo
      4° tab "Utilities" (data-group="util"). Nuova variabile colore --teal (categoria
@@ -5264,7 +5276,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.11.06</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.12.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

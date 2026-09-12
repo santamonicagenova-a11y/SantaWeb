@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- v 2026.09.12.04 — Promemoria fisso esteso (Orari di Apertura): elencava solo la FAQ tra i
+     testi "non si aggiornano da soli" — Andrea ha chiesto conferma su cosa altro legge/non
+     legge i periodi centralizzati. Aggiunte le altre due copie manuali scoperte nell'audit:
+     (1) il blocco openingHoursSpecification STATICO nel JSON-LD di index.html/dove-siamo.html
+     (copia crawler-safe per motori IA che non eseguono JS; orari.js la ri-inietta corretta solo
+     a runtime); (2) l'"ORARIO DI SERVIZIO" del foglio menù stampabile 1 pagina (blocco
+     orarioServizio in menu.html/menu-it/menu-en/menu-fr.html), dato del tutto separato mai
+     collegato ai periodi. Solo testo del promemoria, nessuna logica toccata. -->
 <!-- v 2026.09.12.03 — NUOVO in "Orari di Apertura": generazione bozza AI della FAQ orari +
      pubblicazione diretta. Pulsante "🪄 Genera bozza FAQ" chiama la nuova Edge Function
      generate-faq-orari (Anthropic/Claude, modello claude-opus-5, legge i periodi correnti +
@@ -1307,11 +1315,21 @@
       </p>
 
       <div style="background:rgba(167,139,250,.12);border:1px solid var(--violet);border-radius:var(--radius);padding:.8rem 1rem;margin-bottom:1.4rem;font-size:.8rem;line-height:1.5;color:var(--ink);">
-        <strong style="color:var(--violet);">⚠ Promemoria fisso:</strong> il testo della FAQ orari sul sito
-        (<code>index.html</code> + <code>translations.json</code>, sezione "Domande frequenti") è scritto a
-        mano e <strong>NON si aggiorna da solo</strong> quando modifichi i periodi qui sotto. Se il cambio
-        orari lo riguarda, ricordati di controllarlo e aggiornarlo separatamente (committandolo su GitHub
-        come sempre). Te lo ricordiamo di nuovo appena salvi i periodi.
+        <strong style="color:var(--violet);">⚠ Promemoria fisso:</strong> tre cose NON si aggiornano da sole
+        quando modifichi i periodi qui sotto — restano testo/dati scritti a mano da controllare e aggiornare
+        separatamente (committando su GitHub come sempre):
+        <ol style="margin:.5rem 0 0;padding-left:1.2rem;">
+          <li>la FAQ orari sul sito (<code>index.html</code> + <code>translations.json</code>, sezione
+            "Domande frequenti") — usa il pulsante "🪄 Genera bozza FAQ" qui sotto per farti aiutare;</li>
+          <li>il blocco <code>openingHoursSpecification</code> STATICO nel JSON-LD di <code>index.html</code>
+            e <code>dove-siamo.html</code> — è una copia visibile ai crawler che non eseguono JavaScript
+            (motori IA come Perplexity/Gemini/Grok); a runtime <code>orari.js</code> lo ri-inietta con i dati
+            veri, ma la copia statica va allineata a mano perché i crawler la leggano corretta;</li>
+          <li>l'"ORARIO DI SERVIZIO" del foglio menù stampabile a 1 pagina (blocco <code>orarioServizio</code>
+            in <code>menu.html</code>/<code>menu-it.html</code>/<code>menu-en.html</code>/<code>menu-fr.html</code>) —
+            dato completamente separato, mai collegato ai periodi.
+        </ol>
+        Te lo ricordiamo di nuovo appena salvi i periodi.
       </div>
 
       <div class="sub" style="margin-top:0;">Periodi ricorrenti</div>
@@ -5448,7 +5466,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.12.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.12.04</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

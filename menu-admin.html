@@ -1,4 +1,23 @@
 <!DOCTYPE html>
+<!-- v 2026.09.12.06 — Feedback visivo sui pulsanti "🪄 Genera bozza FAQ" / "📤 Pubblica FAQ"
+     (Andrea: durante la chiamata non si capiva se stesse lavorando, e a fine pubblicazione il
+     messaggio non si notava). Aggiunta una clessidra CSS (.spinner, keyframe spin) dentro il
+     bottone stesso mentre l'operazione è in corso — bottone disabilitato, testo sostituito da
+     "Generazione in corso… (10-20 secondi)" / "Pubblicazione in corso…", ripristinato al
+     termine da _faqSetBusy() (nuovo helper, salva l'HTML originale in dataset._label la prima
+     volta). Aggiunto uno stato dedicato #faq-orari-status sotto i due pulsanti (prima
+     riusavano il generico #orari-status, lontano nel markup e condiviso con "Salva periodi" —
+     facile non accorgersene): a fine pubblicazione riuscita mostra "✅ Pubblicato su GitHub"
+     in verde (--green) invece del testo grigio di prima, che si perdeva nel resto.
+     BUG TROVATO controllando il log del primo test reale di Andrea (v.05): i 7 commit finali
+     erano lanciati in Promise.all (parallelo) — GitHub Contents API crea un commit per PUT
+     partendo dal HEAD del branch, e 7 richieste quasi simultanee corrono sullo stesso HEAD:
+     solo la prima ad aggiornare il ref va a buon fine, le altre falliscono "non fast-forward"
+     (fallimento silenzioso, _ghPutFile ritorna {ok:false} senza throw). Risultato osservato:
+     1 solo commit per tentativo invece di 7. FIX: i 7 PUT ora vanno in sequenza (reduce su
+     Promise, un file alla volta, ognuno riparte dal HEAD appena avanzato dal precedente) —
+     più lento (~7× il tempo di un singolo commit) ma affidabile; le 7 letture GitHub restano
+     in Promise.all (i read non corrono su un ref condiviso). -->
 <!-- v 2026.09.12.05 — "📤 Pubblica FAQ" ora scrive anche i punti 2 e 3 del Promemoria fisso, non
      solo la FAQ (Andrea: "metti tutto nel pulsante già esistente" — nessun pulsante nuovo).
      Aggiunte ~15 funzioni helper (_orariResolveCurrentPeriod, _orariBuildJsonLdSpecs/
@@ -676,6 +695,9 @@
     .top-btns { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; }
     .btn { padding:.55rem 1.3rem; border:1px solid var(--rule); background:var(--surface); color:var(--ink); border-radius:var(--radius); font-family:'Inter',sans-serif; font-weight:600; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; transition:background .15s,border-color .15s; }
     .btn:hover { background:var(--sand); border-color:var(--stone); }
+    .btn[disabled] { opacity:.55; cursor:not-allowed; }
+    .spinner { display:inline-block; width:.85em; height:.85em; border:2px solid currentColor; border-right-color:transparent; border-radius:50%; animation:spin .7s linear infinite; vertical-align:-.15em; margin-right:.4em; }
+    @keyframes spin { to { transform:rotate(360deg); } }
     .btn-save { background:var(--rust); border-color:var(--rust); color:#1a1208; }
     .btn-save:hover { opacity:.9; }
     .btn-load { background:transparent; border:1px solid var(--rule); color:var(--ink); }
@@ -1373,13 +1395,14 @@
         <code>menu.html</code>/<code>menu-it/en/fr.html</code>. Tutto con il tuo token GitHub, 7 file
         in un solo commit ciascuno.
       </p>
-      <button class="btn btn-load" style="border:1px solid var(--violet);color:var(--violet);" onclick="generaFaqOrari()">🪄 Genera bozza FAQ</button>
+      <button id="faq-orari-genera-btn" class="btn btn-load" style="border:1px solid var(--violet);color:var(--violet);" onclick="generaFaqOrari()">🪄 Genera bozza FAQ</button>
       <div id="faq-orari-draft" style="display:none;margin-top:1rem;">
         <div><span class="opt-lbl">Italiano</span><textarea id="faq-orari-it" rows="4" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
         <div style="margin-top:.6rem;"><span class="opt-lbl">English</span><textarea id="faq-orari-en" rows="4" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
         <div style="margin-top:.6rem;"><span class="opt-lbl">Français</span><textarea id="faq-orari-fr" rows="4" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
-        <button class="btn btn-publish" style="margin-top:.8rem;" onclick="pubblicaFaqOrari()">📤 Pubblica FAQ</button>
+        <button id="faq-orari-pubblica-btn" class="btn btn-publish" style="margin-top:.8rem;" onclick="pubblicaFaqOrari()">📤 Pubblica FAQ</button>
       </div>
+      <div id="faq-orari-status" style="margin-top:.6rem;font-size:.78rem;color:var(--stone);min-height:1.2em;"></div>
 
       <hr style="border:none;border-top:1px solid var(--rule);margin:1.6rem 0 1.4rem;">
 
@@ -2564,28 +2587,47 @@ function saveOrariPeriodi() {
 // definitivo solo quando l'admin lo conferma esplicitamente.
 var FAQ_ORARI_GENERATE_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/generate-faq-orari';
 
+// Spinner + disabilitazione bottone durante un'operazione async (Genera/Pubblica FAQ):
+// salva l'HTML originale del bottone in dataset._label la prima volta, lo rimette al
+// termine — busyLabel resta visibile finché non si richiama con busy=false.
+function _faqSetBusy(btnId, busy, busyLabel) {
+  var btn = document.getElementById(btnId);
+  if (!btn) return;
+  if (busy) {
+    if (btn.dataset._label === undefined) btn.dataset._label = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>' + busyLabel;
+  } else {
+    btn.disabled = false;
+    if (btn.dataset._label !== undefined) btn.innerHTML = btn.dataset._label;
+  }
+}
+
 function generaFaqOrari() {
-  var st = document.getElementById('orari-status');
+  var st = document.getElementById('faq-orari-status');
   var token = _prenGhToken();
   if (!token) { if (st) { st.textContent = 'Operazione annullata: serve il token GitHub.'; st.style.color = 'var(--rust)'; } return; }
-  if (st) { st.textContent = 'Generazione bozza FAQ in corso (10-20 secondi)…'; st.style.color = 'var(--stone)'; }
+  _faqSetBusy('faq-orari-genera-btn', true, 'Generazione in corso… (10-20 secondi)');
+  if (st) { st.textContent = ''; }
   fetch(FAQ_ORARI_GENERATE_URL, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ github_token: token })
   })
     .then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); })
     .then(function (res) {
+      _faqSetBusy('faq-orari-genera-btn', false);
       if (res.status === 200 && res.body && res.body.ok) {
         document.getElementById('faq-orari-it').value = res.body.draft.it;
         document.getElementById('faq-orari-en').value = res.body.draft.en;
         document.getElementById('faq-orari-fr').value = res.body.draft.fr;
         document.getElementById('faq-orari-draft').style.display = 'block';
-        if (st) { st.textContent = 'Bozza generata — rivedila prima di pubblicare.'; st.style.color = 'var(--stone)'; }
+        if (st) { st.textContent = '✓ Bozza generata — rivedila prima di pubblicare.'; st.style.color = 'var(--stone)'; }
       } else {
         if (st) { st.textContent = (res.body && res.body.error) || 'Errore nella generazione.'; st.style.color = 'var(--rust)'; }
       }
     })
     .catch(function () {
+      _faqSetBusy('faq-orari-genera-btn', false);
       if (st) { st.textContent = 'Errore di connessione alla generazione FAQ.'; st.style.color = 'var(--rust)'; }
     });
 }
@@ -2756,7 +2798,7 @@ function _orariPatchOrarioServizio(content, entries, filename) {
 }
 
 function pubblicaFaqOrari() {
-  var st = document.getElementById('orari-status');
+  var st = document.getElementById('faq-orari-status');
   var token = _prenGhToken();
   if (!token) { if (st) { st.textContent = 'Operazione annullata: serve il token GitHub.'; st.style.color = 'var(--rust)'; } return; }
   var it = (document.getElementById('faq-orari-it').value || '').trim();
@@ -2765,7 +2807,8 @@ function pubblicaFaqOrari() {
   if (!it || !en || !fr) { if (st) { st.textContent = 'Compila tutte e 3 le lingue prima di pubblicare.'; st.style.color = 'var(--rust)'; } return; }
   if (!window.confirm('Pubblicare questo testo come nuova FAQ "Quali sono gli orari?" e allineare ai periodi correnti anche il JSON-LD statico e il foglio menù stampabile?\n\nFile toccati: translations.json, index.html, dove-siamo.html, menu.html, menu-it.html, menu-en.html, menu-fr.html.\nIl commit va subito su GitHub.')) return;
 
-  if (st) { st.textContent = 'Pubblicazione in corso…'; st.style.color = 'var(--stone)'; }
+  _faqSetBusy('faq-orari-pubblica-btn', true, 'Pubblicazione in corso… (7 file, uno alla volta)');
+  if (st) { st.textContent = ''; }
 
   var FILES = ['translations.json', 'index.html', 'dove-siamo.html', 'menu.html', 'menu-it.html', 'menu-en.html', 'menu-fr.html'];
 
@@ -2825,23 +2868,37 @@ function pubblicaFaqOrari() {
       menuNew[name] = _orariPatchOrarioServizio(files[name].content, orarioServizio, name);
     });
 
-    return Promise.all([
-      _ghPutFile('translations.json', token, trNew, files['translations.json'].sha, 'FAQ orari: bozza AI pubblicata (translations.json)'),
-      _ghPutFile('index.html', token, idx, files['index.html'].sha, 'FAQ + JSON-LD orari allineati ai periodi (index.html)'),
-      _ghPutFile('dove-siamo.html', token, dove, files['dove-siamo.html'].sha, 'JSON-LD orari allineato ai periodi (dove-siamo.html)'),
-      _ghPutFile('menu.html', token, menuNew['menu.html'], files['menu.html'].sha, 'Foglio orario stampabile allineato ai periodi (menu.html)'),
-      _ghPutFile('menu-it.html', token, menuNew['menu-it.html'], files['menu-it.html'].sha, 'Foglio orario stampabile allineato ai periodi (menu-it.html)'),
-      _ghPutFile('menu-en.html', token, menuNew['menu-en.html'], files['menu-en.html'].sha, 'Foglio orario stampabile allineato ai periodi (menu-en.html)'),
-      _ghPutFile('menu-fr.html', token, menuNew['menu-fr.html'], files['menu-fr.html'].sha, 'Foglio orario stampabile allineato ai periodi (menu-fr.html)'),
-    ]);
+    // SEQUENZIALE, non Promise.all: 7 commit paralleli sullo stesso branch corrono sullo
+    // stesso HEAD e GitHub ne accetta uno solo (gli altri falliscono "not a fast forward") —
+    // scoperto il 12/9 sera: un primo test reale ha prodotto solo 1 commit su 7 per tentativo.
+    // Un PUT per volta = ognuno riparte dal HEAD appena aggiornato dal precedente.
+    var puts = [
+      { path: 'translations.json', content: trNew, sha: files['translations.json'].sha, msg: 'FAQ orari: bozza AI pubblicata (translations.json)' },
+      { path: 'index.html', content: idx, sha: files['index.html'].sha, msg: 'FAQ + JSON-LD orari allineati ai periodi (index.html)' },
+      { path: 'dove-siamo.html', content: dove, sha: files['dove-siamo.html'].sha, msg: 'JSON-LD orari allineato ai periodi (dove-siamo.html)' },
+      { path: 'menu.html', content: menuNew['menu.html'], sha: files['menu.html'].sha, msg: 'Foglio orario stampabile allineato ai periodi (menu.html)' },
+      { path: 'menu-it.html', content: menuNew['menu-it.html'], sha: files['menu-it.html'].sha, msg: 'Foglio orario stampabile allineato ai periodi (menu-it.html)' },
+      { path: 'menu-en.html', content: menuNew['menu-en.html'], sha: files['menu-en.html'].sha, msg: 'Foglio orario stampabile allineato ai periodi (menu-en.html)' },
+      { path: 'menu-fr.html', content: menuNew['menu-fr.html'], sha: files['menu-fr.html'].sha, msg: 'Foglio orario stampabile allineato ai periodi (menu-fr.html)' },
+    ];
+    return puts.reduce(function (chain, p) {
+      return chain.then(function (results) {
+        return _ghPutFile(p.path, token, p.content, p.sha, p.msg).then(function (r) {
+          results.push(r);
+          return results;
+        });
+      });
+    }, Promise.resolve([]));
   }).then(function (putResults) {
+    _faqSetBusy('faq-orari-pubblica-btn', false);
     var allOk = putResults.every(function (r) { return r.ok; });
     if (allOk) {
-      if (st) { st.textContent = 'Pubblicato su GitHub: FAQ + JSON-LD orari + foglio menù (7 file).'; st.style.color = 'var(--stone)'; }
+      if (st) { st.innerHTML = '<strong style="color:var(--green);">✅ Pubblicato su GitHub</strong> — FAQ + JSON-LD orari + foglio menù allineati (7 file).'; }
     } else {
-      if (st) { st.textContent = 'Pubblicazione parziale/fallita — controlla GitHub.'; st.style.color = 'var(--rust)'; }
+      if (st) { st.textContent = '⚠ Pubblicazione parziale/fallita — controlla GitHub.'; st.style.color = 'var(--rust)'; }
     }
   }).catch(function (err) {
+    _faqSetBusy('faq-orari-pubblica-btn', false);
     if (st) { st.textContent = 'Errore pubblicazione: ' + err.message; st.style.color = 'var(--rust)'; }
   });
 }
@@ -5647,7 +5704,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.12.05</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.12.06</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

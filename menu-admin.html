@@ -1,4 +1,34 @@
 <!DOCTYPE html>
+<!-- v 2026.09.13.09 — Inventario: nuovo pannello "Periodi chiusi" nel tab
+     Inventario, su richiesta di Andrea ("potresti già tu segnalare i periodi in cui
+     ci sono inventario iniziale e finale"). Elenca i periodi per cui esiste già un
+     conteggio completo (tutti i reparti del tipo) sia all'inizio sia alla fine —
+     quindi affidabili per il Food/Beverage Cost Reale — con un pulsante per caricarli
+     direttamente nel range Dal/Al. Usa la nuova azione backend
+     inventario_periodi_disponibili (edge function v6, deploy versione 13).
+     Indipendente dal range selezionato: si aggiorna col tipo Food/Beverage. -->
+<!-- v 2026.09.13.08 — Dashboard: badge "periodo non chiuso" sui KPI che dipendono
+     dall'inventario reale, quando manca il conteggio iniziale e/o finale per almeno
+     un reparto nel range selezionato (Andrea: "quando inserisco inventario finale si
+     crea un periodo su cui calcolare il food cost reale" — se manca un conteggio, il
+     periodo non è chiuso e il numero mostrato può essere fuorviante, perché il backend
+     tratta il conteggio mancante come 0 nel calcolo del consumo). Usa i due flag già
+     esposti dall'edge function v5/deploy 12: inventario_incompleto (food) e
+     inventario_incompleto_beverage. _fcKpiTile() accetta ora un 4° parametro opzionale
+     "warning". -->
+<!-- v 2026.09.13.07 — Inventario: ridisegnato il modello dati su richiesta di Andrea.
+     Prima l'inventario iniziale/finale era legato al range "da/a" scelto per il
+     periodo (una riga per range), costringendo a ridigitare lo stesso conteggio
+     fisico due volte tra periodi consecutivi (finale di un mese = iniziale del mese
+     dopo, ma erano 2 campi indipendenti). Ora il conteggio è per (data, reparto):
+     l'iniziale di un periodo è il conteggio alla data "Dal", il finale è il conteggio
+     al giorno dopo la data "Al" — che coincide automaticamente con l'iniziale del
+     periodo successivo se questo comincia il giorno dopo. fcSalvaInventario() ora
+     manda 0-2 chiamate per reparto (inventario_conteggio_upsert) invece di una,
+     stesso pattern già usato per Incassi Food/Beverage. Backend: nuova tabella
+     fc_inventario_conteggi al posto di fc_inventario_periodi (vuota alla migrazione,
+     nessuna conversione dati), edge function foodcost-admin v4 (deploy versione 11).
+     -->
 <!-- v 2026.09.13.06 — Fix bug segnalato da Andrea: chiudendo Food Cost o Rubrica
      professionisti (tab Utilities), riappariva il pulsante "Procedure di aggiornamento
      e traduzione" (#intro), pensato per essere visibile SOLO nel tab Gestione Menu
@@ -1246,7 +1276,8 @@
           <button class="btn btn-load" id="fc-inv-tipo-food" onclick="fcInventarioSetTipo('food')">Food</button>
           <button class="btn btn-load" id="fc-inv-tipo-beverage" onclick="fcInventarioSetTipo('beverage')">Beverage</button>
         </div>
-        <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Conteggio fisico di inizio/fine periodo, per reparto — sempre in €, no IVA.</p>
+        <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Conteggio fisico di inizio/fine periodo, per reparto — sempre in €, no IVA. Il finale di un periodo diventa automaticamente l'iniziale del periodo successivo (stesso conteggio fisico) se il nuovo periodo inizia il giorno dopo la fine di questo.</p>
+        <div id="fc-periodi-list" style="margin-bottom:1rem;">…</div>
         <div id="fc-inventario-list" style="font-size:.85rem;">…</div>
         <div style="margin-top:1rem;">
           <button class="btn btn-publish" onclick="fcSalvaInventario()">💾 Salva inventario</button>
@@ -3957,6 +3988,47 @@ function fcLoadInventario() {
       _fcSetStatus('');
     })
     .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+  fcLoadPeriodiDisponibili();
+}
+
+// Elenca i periodi per cui esiste già un conteggio completo (tutti i reparti del
+// tipo) sia all'inizio sia alla fine — quindi "chiusi" e affidabili per il calcolo
+// del Food/Beverage Cost Reale (richiesto da Andrea, v 2026.09.13.09). Indipendente
+// dal range Dal/Al selezionato: dipende solo dal tipo (food/beverage) attivo.
+function fcLoadPeriodiDisponibili() {
+  var el = document.getElementById('fc-periodi-list');
+  if (!el) return;
+  _fcFetch({ action: 'inventario_periodi_disponibili', tipo: fcState.inventarioTipo })
+    .then(function (res) {
+      if (!_fcOk(res)) { el.innerHTML = ''; return; }
+      fcRenderPeriodiDisponibili(res.body);
+    })
+    .catch(function () { el.innerHTML = ''; });
+}
+
+function fcRenderPeriodiDisponibili(payload) {
+  var el = document.getElementById('fc-periodi-list');
+  if (!el) return;
+  var periodi = payload.periodi || [];
+  var dateComplete = payload.date_complete || [];
+  if (!periodi.length) {
+    el.innerHTML = '<p style="font-size:.75rem;color:var(--stone);">' + (dateComplete.length
+      ? 'Conteggio completo registrato al ' + _fcEsc(dateComplete[dateComplete.length - 1]) + ': diventerà l\'inizio del prossimo periodo quando inserirai il conteggio finale per tutti i reparti.'
+      : 'Nessun periodo chiuso ancora: inserisci il conteggio per tutti i reparti in almeno due date per avere un primo periodo su cui calcolare il Food/Beverage Cost Reale.') + '</p>';
+    return;
+  }
+  el.innerHTML = '<p style="font-size:.7rem;color:var(--stone);text-transform:uppercase;margin-bottom:.3rem;">Periodi chiusi (inventario completo iniziale + finale)</p>' +
+    '<div style="display:flex;gap:.4rem;flex-wrap:wrap;">' +
+    periodi.map(function (p) {
+      return '<button class="btn btn-load" style="font-size:.72rem;padding:.3rem .6rem;" onclick="fcUsaPeriodo(\'' + p.da + '\',\'' + p.a + '\')">' + _fcEsc(p.da) + ' → ' + _fcEsc(p.a) + '</button>';
+    }).join('') +
+    '</div>';
+}
+
+function fcUsaPeriodo(da, a) {
+  document.getElementById('fc-periodo-da').value = da;
+  document.getElementById('fc-periodo-a').value = a;
+  fcLoadInventario();
 }
 
 function fcRenderInventario() {
@@ -3975,18 +4047,29 @@ function fcRenderInventario() {
     '</table>';
 }
 
+// L'inventario iniziale di un periodo è il conteggio alla data "Dal"; il finale è il
+// conteggio al giorno dopo la data "Al" (stesso conteggio fisico dell'iniziale del
+// periodo successivo, se questo comincia il giorno dopo — vedi commento di Andrea
+// sul vecchio modello a "riga per range", v 2026.09.13.07). addGiorni locale, UTC-safe
+// come l'omonima funzione nell'Edge Function.
+function _fcAddGiorni(iso, delta) {
+  var d = new Date(iso + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() + delta);
+  return d.toISOString().slice(0, 10);
+}
+
 function fcSalvaInventario() {
   var range = fcRangeValido();
   if (!range) { _fcSetStatus('Imposta un intervallo di date valido (Dal/Al).', true); return; }
-  var chiamate = fcState.inventario.map(function (r) {
+  var dataFinale = _fcAddGiorni(range.a, 1);
+  var chiamate = [];
+  fcState.inventario.forEach(function (r) {
     var ini = document.getElementById('fc-inv-ini-' + r.reparto_id).value;
     var fin = document.getElementById('fc-inv-fin-' + r.reparto_id).value;
-    return _fcFetch({
-      action: 'inventario_upsert', da: range.da, a: range.a, reparto_id: r.reparto_id,
-      inventario_iniziale: ini === '' ? 0 : Number(ini),
-      inventario_finale: fin === '' ? null : Number(fin),
-    });
+    if (ini !== '') chiamate.push(_fcFetch({ action: 'inventario_conteggio_upsert', data: range.da, reparto_id: r.reparto_id, valore: Number(ini) }));
+    if (fin !== '') chiamate.push(_fcFetch({ action: 'inventario_conteggio_upsert', data: dataFinale, reparto_id: r.reparto_id, valore: Number(fin) }));
   });
+  if (!chiamate.length) { _fcSetStatus('Nessun valore da salvare.', true); return; }
   _fcSetStatus('Salvataggio…');
   Promise.all(chiamate).then(function (risultati) {
     var errore = risultati.find(function (res) { return !_fcOk(res); });
@@ -4122,11 +4205,15 @@ function _fcGapColore(gap) {
   return '#b91c1c';
 }
 
-function _fcKpiTile(etichetta, valore, colore) {
+function _fcKpiTile(etichetta, valore, colore, warning) {
+  var badge = warning
+    ? '<div style="font-size:.62rem;color:#f59e0b;margin-top:.15rem;font-weight:600;" title="Manca il conteggio di inventario iniziale e/o finale per almeno un reparto nel periodo selezionato: il periodo non è ancora chiuso e questo numero può essere fuorviante.">⚠️ periodo non chiuso</div>'
+    : '';
   return '<div class="fs" style="flex:1;min-width:9.5rem;border-left:3px solid ' + colore + ';">' +
     '<div class="fs-body" style="padding:.7rem .9rem;">' +
     '<div class="opt-lbl">' + _fcEsc(etichetta) + '</div>' +
     '<div style="font-size:1.3rem;font-weight:700;color:' + colore + ';">' + valore + '</div>' +
+    badge +
     '</div></div>';
 }
 
@@ -4140,16 +4227,16 @@ function fcRenderDashboard() {
   var d = fcState.dashboard;
 
   var kpi = '<div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:.6rem;">' +
-    _fcKpiTile('Food Cost Reale', _fcPct(d.food_cost_reale_pct), '#3987e5') +
+    _fcKpiTile('Food Cost Reale', _fcPct(d.food_cost_reale_pct), '#3987e5', d.inventario_incompleto) +
     _fcKpiTile('Food Cost Teorico', _fcPct(d.food_cost_teorico_pct), '#9085e9') +
-    _fcKpiTile('GAP (Reale − Teorico)', _fcPct(d.gap_pct), _fcGapColore(d.gap_pct)) +
+    _fcKpiTile('GAP (Reale − Teorico)', _fcPct(d.gap_pct), _fcGapColore(d.gap_pct), d.inventario_incompleto) +
     _fcKpiTile('Incassi food', _fcEur(d.totale_incassi), '#199e70') +
     _fcKpiTile('Spese materie prime', _fcEur(d.totale_spese), '#d95926') +
     '</div>';
 
   var kpiBev = '<div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:1rem;">' +
-    _fcKpiTile('Beverage Cost %', _fcPct(d.beverage_cost_reale_pct), '#d55181') +
-    _fcKpiTile('Food + Beverage Cost combinato', _fcPct(d.cost_pct_combinato), '#c98500') +
+    _fcKpiTile('Beverage Cost %', _fcPct(d.beverage_cost_reale_pct), '#d55181', d.inventario_incompleto_beverage) +
+    _fcKpiTile('Food + Beverage Cost combinato', _fcPct(d.cost_pct_combinato), '#c98500', d.inventario_incompleto || d.inventario_incompleto_beverage) +
     _fcKpiTile('Incasso totale (food+bev.)', _fcEur(d.incasso_totale), '#008300') +
     _fcKpiTile('Incidenza beverage sull\'incasso', _fcPct(d.incidenza_beverage_pct), '#9085e9') +
     '</div>';
@@ -6010,7 +6097,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.13.06</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.13.09</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

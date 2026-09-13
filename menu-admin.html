@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!-- v 2026.09.13.11 — Ordine dei tab Food Cost: Spese e Incassi spostati subito
+     dopo Dashboard (richiesto da Andrea). Nuovo ordine: Dashboard, Spese, Incassi,
+     Vendite, Inventario, Costo piatti, Reparti. Solo ordine dei pulsanti — colori
+     per gruppo (FC_TAB_GRUPPI) e tab di default (Dashboard) invariati. -->
 <!-- v 2026.09.13.10 — 3 richieste di Andrea insieme, cadenza di conteggio
      inventario prevista irregolare:
      1) Tab Inventario ridisegnato da "iniziale+finale sullo stesso range Dal/Al"
@@ -1213,11 +1217,11 @@
 
       <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1.2rem;">
         <button class="btn btn-load" id="fc-tab-btn-dashboard" onclick="fcSetTab('dashboard')">Dashboard</button>
+        <button class="btn btn-load" id="fc-tab-btn-spese" onclick="fcSetTab('spese')">Spese</button>
+        <button class="btn btn-load" id="fc-tab-btn-incassi" onclick="fcSetTab('incassi')">Incassi</button>
         <button class="btn btn-load" id="fc-tab-btn-vendite" onclick="fcSetTab('vendite')">Vendite</button>
         <button class="btn btn-load" id="fc-tab-btn-inventario" onclick="fcSetTab('inventario')">Inventario</button>
         <button class="btn btn-load" id="fc-tab-btn-costi" onclick="fcSetTab('costi')">Costo piatti</button>
-        <button class="btn btn-load" id="fc-tab-btn-spese" onclick="fcSetTab('spese')">Spese</button>
-        <button class="btn btn-load" id="fc-tab-btn-incassi" onclick="fcSetTab('incassi')">Incassi</button>
         <button class="btn btn-load" id="fc-tab-btn-reparti" onclick="fcSetTab('reparti')">Reparti</button>
       </div>
 
@@ -3744,7 +3748,7 @@ var FC_TAB_GRUPPI = {
 
 function fcSetTab(t) {
   fcState.tab = t;
-  ['dashboard', 'vendite', 'inventario', 'costi', 'spese', 'incassi', 'reparti'].forEach(function (k) {
+  ['dashboard', 'spese', 'incassi', 'vendite', 'inventario', 'costi', 'reparti'].forEach(function (k) {
     var v = document.getElementById('fc-view-' + k), b = document.getElementById('fc-tab-btn-' + k);
     if (v) v.style.display = (k === t) ? '' : 'none';
     if (b) {
@@ -6153,7 +6157,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.13.10</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.13.11</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

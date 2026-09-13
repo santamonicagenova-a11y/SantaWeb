@@ -1,4 +1,16 @@
 <!DOCTYPE html>
+<!-- v 2026.09.13.06 — Fix bug segnalato da Andrea: chiudendo Food Cost o Rubrica
+     professionisti (tab Utilities), riappariva il pulsante "Procedure di aggiornamento
+     e traduzione" (#intro), pensato per essere visibile SOLO nel tab Gestione Menu
+     (vedi commento riga ~915). Causa: ogni funzione chiudiSezioneX() richiudeva la
+     sezione e riapriva #intro incondizionatamente (controllando solo se 'wrap' non è
+     aperto), ignorando quale tab superiore (menu/pren/setup/util) fosse attivo — stesso
+     bug presente, anche se non ancora segnalato, in tutte le altre sezioni di
+     Prenotazioni/Setup (Cauzioni, Voucher, Pacchi, Orari di Apertura, Reminder, ecc.).
+     Fix centralizzato: nuova funzione condivisa _riapriIntroSeAppropriato() che replica
+     la stessa logica già usata da setQaTab() (mostra #intro solo se il tab attivo è
+     'menu'), usata al posto del controllo incondizionato in tutte le 13 funzioni
+     chiudiSezioneX()/chiudiFoto()/chiudiFotoSito() che lo contenevano. -->
 <!-- v 2026.09.13.05 — Food Cost: colore del tab Reparti cambiato da rosso corallo
      (#e66767, troppo simile all'arancio di Spese/Incassi) a giallo (#eab308) — su
      richiesta di Andrea. Nessun altro cambiamento. -->
@@ -1981,10 +1993,22 @@ function apriSezionePrenotazioni() {
   loadPrenStatus();
 }
 
+// Riapre #intro (col pulsante "Procedure di aggiornamento e traduzione") solo se il
+// tab superiore attivo è "Gestione menu e sito" — stessa regola di setQaTab() (riga
+// ~915): quel pulsante ha senso solo li, va tenuto nascosto per Prenotazioni/Setup/
+// Utilities. Usata da tutte le funzioni chiudiSezioneX() invece del vecchio controllo
+// incondizionato (bug segnalato da Andrea: v 2026.09.13.06).
+function _riapriIntroSeAppropriato() {
+  if (document.getElementById('wrap').classList.contains('on')) return;
+  var introEl = document.getElementById('intro');
+  if (!introEl) return;
+  var tabAttiva = document.querySelector('.qa-tab.active');
+  introEl.style.display = (!tabAttiva || tabAttiva.dataset.group === 'menu') ? '' : 'none';
+}
+
 function chiudiSezionePrenotazioni() {
   document.getElementById('prenotazioni-section').style.display = 'none';
-  if (!document.getElementById('wrap').classList.contains('on'))
-    document.getElementById('intro').style.display = '';
+  _riapriIntroSeAppropriato();
 }
 
 // "Orari di Apertura" (v 2026.09.12.01, centralizzazione): periodi ricorrenti (nuovo, via
@@ -2008,8 +2032,7 @@ function apriSezioneOrariApertura() {
 
 function chiudiSezioneOrariApertura() {
   document.getElementById('orari-apertura-section').style.display = 'none';
-  if (!document.getElementById('wrap').classList.contains('on'))
-    document.getElementById('intro').style.display = '';
+  _riapriIntroSeAppropriato();
 }
 
 // "Prenotazioni — Setup" (garanzia + testi mail) — sezione separata da "Prenotazioni online",
@@ -2026,8 +2049,7 @@ function apriSezionePrenotazioniSetup() {
 
 function chiudiSezionePrenotazioniSetup() {
   document.getElementById('prenotazioni-setup-section').style.display = 'none';
-  if (!document.getElementById('wrap').classList.contains('on'))
-    document.getElementById('intro').style.display = '';
+  _riapriIntroSeAppropriato();
 }
 
 function _prenSetStatus(msg, isErr) {
@@ -3034,8 +3056,7 @@ function apriSezioneRubrica() {
 
 function chiudiSezioneRubrica() {
   document.getElementById('rubrica-section').style.display = 'none';
-  if (!document.getElementById('wrap').classList.contains('on'))
-    document.getElementById('intro').style.display = '';
+  _riapriIntroSeAppropriato();
 }
 
 function _rubFetch(payload) {
@@ -3272,8 +3293,7 @@ function apriSezionePiattiDettagli() {
 
 function chiudiSezionePiattiDettagli() {
   document.getElementById('piatti-dettagli-section').style.display = 'none';
-  if (!document.getElementById('wrap').classList.contains('on'))
-    document.getElementById('intro').style.display = '';
+  _riapriIntroSeAppropriato();
 }
 
 function _pdFetch(payload) {
@@ -3649,8 +3669,7 @@ function apriSezioneFoodCost() {
 
 function chiudiSezioneFoodCost() {
   document.getElementById('foodcost-section').style.display = 'none';
-  if (!document.getElementById('wrap').classList.contains('on'))
-    document.getElementById('intro').style.display = '';
+  _riapriIntroSeAppropriato();
 }
 
 function fcCambiaPeriodo() {
@@ -4296,8 +4315,7 @@ function apriSezionePacchi() {
 
 function chiudiSezionePacchi() {
   document.getElementById('pacchi-section').style.display = 'none';
-  if (!document.getElementById('wrap').classList.contains('on'))
-    document.getElementById('intro').style.display = '';
+  _riapriIntroSeAppropriato();
 }
 
 function _pacchiSetStatus(msg, isErr) {
@@ -4354,8 +4372,7 @@ function renderPacchiNoShow(list) {
 
 function chiudiSezioneReminder() {
   document.getElementById('reminder-section').style.display = 'none';
-  if (!document.getElementById('wrap').classList.contains('on'))
-    document.getElementById('intro').style.display = '';
+  _riapriIntroSeAppropriato();
 }
 
 function _remSetStatus(msg, isErr) {
@@ -4508,8 +4525,7 @@ function apriSezioneCauzioni() {
 
 function chiudiSezioneCauzioni() {
   document.getElementById('cauzioni-section').style.display = 'none';
-  if (!document.getElementById('wrap').classList.contains('on'))
-    document.getElementById('intro').style.display = '';
+  _riapriIntroSeAppropriato();
 }
 
 function _czSetStatus(msg, isErr) {
@@ -4728,8 +4744,7 @@ function apriSezioneVoucher() {
 }
 function chiudiSezioneVoucher() {
   document.getElementById('voucher-section').style.display = 'none';
-  if (!document.getElementById('wrap').classList.contains('on'))
-    document.getElementById('intro').style.display = '';
+  _riapriIntroSeAppropriato();
 }
 
 // "Voucher — Setup" (importi buoni + reset contatore) — sezione separata da "Voucher —
@@ -4746,8 +4761,7 @@ function apriSezioneVoucherSetup() {
 }
 function chiudiSezioneVoucherSetup() {
   document.getElementById('voucher-setup-section').style.display = 'none';
-  if (!document.getElementById('wrap').classList.contains('on'))
-    document.getElementById('intro').style.display = '';
+  _riapriIntroSeAppropriato();
 }
 
 function _vcEmitToggle() {
@@ -5389,8 +5403,7 @@ function apriGestoreFoto() {
 
 function chiudiFoto() {
   document.getElementById('foto-section').style.display = 'none';
-  if (!document.getElementById('wrap').classList.contains('on'))
-    document.getElementById('intro').style.display = '';
+  _riapriIntroSeAppropriato();
 }
 
 function _renderSlots() {
@@ -5594,8 +5607,7 @@ function apriGestoreFotoSito() {
 
 function chiudiFotoSito() {
   document.getElementById('foto-sito-section').style.display = 'none';
-  if (!document.getElementById('wrap').classList.contains('on'))
-    document.getElementById('intro').style.display = '';
+  _riapriIntroSeAppropriato();
 }
 
 function _renderSlotsSito() {
@@ -5998,7 +6010,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.13.05</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.13.06</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

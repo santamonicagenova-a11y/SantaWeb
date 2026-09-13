@@ -1,4 +1,20 @@
 <!DOCTYPE html>
+<!-- v 2026.09.13.10 — 3 richieste di Andrea insieme, cadenza di conteggio
+     inventario prevista irregolare:
+     1) Tab Inventario ridisegnato da "iniziale+finale sullo stesso range Dal/Al"
+        a conteggio puntuale: un selettore "Data conteggio" (default oggi) + un
+        solo valore per reparto, salvato con inventario_conteggio_data/
+        inventario_conteggio_upsert. Il range Dal/Al resta solo per Dashboard/
+        Spese/Incassi/Vendite — l'inserimento inventario non ne ha più bisogno.
+     2) Pannello "Periodi chiusi" sostituito da uno storico con heatmap per mese
+        (verde = tutti i reparti contati, giallo = parziale) — usa il nuovo
+        date_dettaglio dell'edge function v7 — più i periodi chiusi come chip
+        cliccabili per caricarli in Dashboard.
+     3) Dashboard: alla prima apertura della sezione Food Cost, invece del mese
+        corrente di default prova a caricare l'ultimo periodo chiuso disponibile
+        (food) — il mese corrente spesso non è un periodo chiuso con cadenza
+        irregolare. Un clic manuale su Dal/Al o su un chip periodo prevale sempre.
+     -->
 <!-- v 2026.09.13.09 — Inventario: nuovo pannello "Periodi chiusi" nel tab
      Inventario, su richiesta di Andrea ("potresti già tu segnalare i periodi in cui
      ci sono inventario iniziale e finale"). Elenca i periodi per cui esiste già un
@@ -1276,11 +1292,15 @@
           <button class="btn btn-load" id="fc-inv-tipo-food" onclick="fcInventarioSetTipo('food')">Food</button>
           <button class="btn btn-load" id="fc-inv-tipo-beverage" onclick="fcInventarioSetTipo('beverage')">Beverage</button>
         </div>
-        <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Conteggio fisico di inizio/fine periodo, per reparto — sempre in €, no IVA. Il finale di un periodo diventa automaticamente l'iniziale del periodo successivo (stesso conteggio fisico) se il nuovo periodo inizia il giorno dopo la fine di questo.</p>
-        <div id="fc-periodi-list" style="margin-bottom:1rem;">…</div>
+        <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Conteggio fisico puntuale, per reparto e per data — sempre in €, no IVA. Non serve pensare a un range: conta quando vuoi, un valore per reparto in quella data. Il Food/Beverage Cost Reale si calcola da solo tra due conteggi consecutivi (vedi storico sotto).</p>
+        <div id="fc-periodi-list" style="margin-bottom:1.2rem;">…</div>
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem;">
+          <span class="opt-lbl">Data conteggio</span>
+          <input type="date" id="fc-inv-data" style="width:9.5rem;padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);" onchange="fcLoadInventario()" />
+        </div>
         <div id="fc-inventario-list" style="font-size:.85rem;">…</div>
         <div style="margin-top:1rem;">
-          <button class="btn btn-publish" onclick="fcSalvaInventario()">💾 Salva inventario</button>
+          <button class="btn btn-publish" onclick="fcSalvaInventario()">💾 Salva conteggio</button>
         </div>
       </div>
 
@@ -3588,7 +3608,7 @@ var FC_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/foodcost-adm
 var FC_CAT = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'];
 var FC_ME_COLORE = { STAR: '#22c55e', PLOWHORSE: '#3b82f6', PUZZLE: '#f59e0b', DOG: '#e34948' };
 var fcCharts = {};
-var fcState = { reparti: [], tab: 'dashboard', speseTipo: 'food', inventarioTipo: 'food', spese: [], incassi: [], inventario: [], costi: [], vendite: [], dashboard: null };
+var fcState = { reparti: [], tab: 'dashboard', speseTipo: 'food', inventarioTipo: 'food', spese: [], incassi: [], inventario: [], costi: [], vendite: [], dashboard: null, dashboardAutoloadFatto: false };
 
 // Accende/spegne lo stato "attivo" di un gruppo di pulsanti a interruttore (Food/Beverage),
 // stesso stile del tab attivo in fcSetTab (bordo+testo ambra + sfondo più chiaro).
@@ -3691,10 +3711,12 @@ function apriSezioneFoodCost() {
   if (aEl && !aEl.value) aEl.value = _fcUltimoGiornoMeseCorrente();
   _fcSetPillAttiva('fc-spese-tipo-' + fcState.speseTipo, ['fc-spese-tipo-food', 'fc-spese-tipo-beverage']);
   _fcSetPillAttiva('fc-inv-tipo-' + fcState.inventarioTipo, ['fc-inv-tipo-food', 'fc-inv-tipo-beverage']);
-  var dSpesa = document.getElementById('fc-spesa-data'), dInc = document.getElementById('fc-incasso-data');
+  var dSpesa = document.getElementById('fc-spesa-data'), dInc = document.getElementById('fc-incasso-data'), dInv = document.getElementById('fc-inv-data');
   var oggi = _fcOggiLocale();
   if (dSpesa && !dSpesa.value) dSpesa.value = oggi;
   if (dInc && !dInc.value) dInc.value = oggi;
+  if (dInv && !dInv.value) dInv.value = oggi;
+  fcState.dashboardAutoloadFatto = false;
   fcLoadReparti(function () { fcSetTab(fcState.tab || 'dashboard'); });
 }
 
@@ -3742,7 +3764,30 @@ function fcLoadTab(t) {
   else if (t === 'inventario') fcLoadInventario();
   else if (t === 'costi') fcLoadCosti();
   else if (t === 'vendite') fcLoadVendite();
-  else if (t === 'dashboard') fcLoadDashboard();
+  else if (t === 'dashboard') {
+    if (!fcState.dashboardAutoloadFatto) { fcState.dashboardAutoloadFatto = true; fcAutoCaricaUltimoPeriodo(); }
+    else fcLoadDashboard();
+  }
+}
+
+// Alla prima apertura della Dashboard in questa sessione della sezione Food Cost,
+// prova a caricare l'ultimo periodo chiuso disponibile (Food) invece del mese
+// corrente di default — richiesto da Andrea: con una cadenza di conteggio
+// irregolare il mese corrente spesso non è un periodo chiuso. Se non c'è nessun
+// periodo chiuso, resta il default già impostato da apriSezioneFoodCost(). Un
+// cambio manuale di Dal/Al o un clic su un chip periodo (fcUsaPeriodo) prevalgono
+// sempre, perché il flag è già marcato "fatto" a quel punto.
+function fcAutoCaricaUltimoPeriodo() {
+  _fcFetch({ action: 'inventario_periodi_disponibili', tipo: 'food' })
+    .then(function (res) {
+      if (_fcOk(res) && res.body.periodi && res.body.periodi.length) {
+        var ultimo = res.body.periodi[res.body.periodi.length - 1];
+        document.getElementById('fc-periodo-da').value = ultimo.da;
+        document.getElementById('fc-periodo-a').value = ultimo.a;
+      }
+      fcLoadDashboard();
+    })
+    .catch(function () { fcLoadDashboard(); });
 }
 
 // ---- Reparti ----
@@ -3976,11 +4021,16 @@ function fcEliminaIncasso(id) {
 
 // ---- Inventario di periodo (per reparto) ----
 
+// Il tab Inventario legge/scrive il conteggio di UNA data (selettore "Data
+// conteggio", default oggi) — non più un range Dal/Al: un conteggio è sempre un
+// gesto puntuale (v 2026.09.13.10, cadenza di conteggio prevista irregolare da
+// Andrea). Il range Dal/Al resta solo per Dashboard/Spese/Incassi/Vendite.
 function fcLoadInventario() {
-  var r = fcRangeValido();
-  if (!r) { _fcSetStatus('Imposta un intervallo di date valido (Dal/Al).', true); return; }
+  var dataEl = document.getElementById('fc-inv-data');
+  var data_ = dataEl && dataEl.value;
+  if (!data_) { _fcSetStatus('Imposta la data del conteggio.', true); return; }
   _fcSetStatus('Caricamento inventario…');
-  _fcFetch({ action: 'inventario_get', da: r.da, a: r.a, tipo: fcState.inventarioTipo })
+  _fcFetch({ action: 'inventario_conteggio_data', data: data_, tipo: fcState.inventarioTipo })
     .then(function (res) {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcState.inventario = res.body.righe || [];
@@ -3991,10 +4041,10 @@ function fcLoadInventario() {
   fcLoadPeriodiDisponibili();
 }
 
-// Elenca i periodi per cui esiste già un conteggio completo (tutti i reparti del
-// tipo) sia all'inizio sia alla fine — quindi "chiusi" e affidabili per il calcolo
-// del Food/Beverage Cost Reale (richiesto da Andrea, v 2026.09.13.09). Indipendente
-// dal range Dal/Al selezionato: dipende solo dal tipo (food/beverage) attivo.
+// Storico conteggi: heatmap per mese (verde = tutti i reparti contati in quella
+// data, giallo = parziale) + i periodi già "chiusi" (conteggio completo a inizio
+// e fine) come chip cliccabili per caricarli in Dashboard. Indipendente dalla
+// data selezionata sopra: dipende solo dal tipo (food/beverage) attivo.
 function fcLoadPeriodiDisponibili() {
   var el = document.getElementById('fc-periodi-list');
   if (!el) return;
@@ -4009,26 +4059,46 @@ function fcLoadPeriodiDisponibili() {
 function fcRenderPeriodiDisponibili(payload) {
   var el = document.getElementById('fc-periodi-list');
   if (!el) return;
+  var dettaglio = payload.date_dettaglio || [];
   var periodi = payload.periodi || [];
-  var dateComplete = payload.date_complete || [];
-  if (!periodi.length) {
-    el.innerHTML = '<p style="font-size:.75rem;color:var(--stone);">' + (dateComplete.length
-      ? 'Conteggio completo registrato al ' + _fcEsc(dateComplete[dateComplete.length - 1]) + ': diventerà l\'inizio del prossimo periodo quando inserirai il conteggio finale per tutti i reparti.'
-      : 'Nessun periodo chiuso ancora: inserisci il conteggio per tutti i reparti in almeno due date per avere un primo periodo su cui calcolare il Food/Beverage Cost Reale.') + '</p>';
+  if (!dettaglio.length) {
+    el.innerHTML = '<p style="font-size:.75rem;color:var(--stone);">Nessun conteggio registrato ancora per questo tipo.</p>';
     return;
   }
-  el.innerHTML = '<p style="font-size:.7rem;color:var(--stone);text-transform:uppercase;margin-bottom:.3rem;">Periodi chiusi (inventario completo iniziale + finale)</p>' +
-    '<div style="display:flex;gap:.4rem;flex-wrap:wrap;">' +
-    periodi.map(function (p) {
-      return '<button class="btn btn-load" style="font-size:.72rem;padding:.3rem .6rem;" onclick="fcUsaPeriodo(\'' + p.da + '\',\'' + p.a + '\')">' + _fcEsc(p.da) + ' → ' + _fcEsc(p.a) + '</button>';
-    }).join('') +
-    '</div>';
+  var mesi = {};
+  dettaglio.forEach(function (d) {
+    var mese = d.data.slice(0, 7);
+    (mesi[mese] = mesi[mese] || []).push(d);
+  });
+  var heatmap = Object.keys(mesi).sort().map(function (mese) {
+    var celle = mesi[mese].map(function (d) {
+      var completo = d.contati === d.totale;
+      var colore = completo ? '#199e70' : '#eab308';
+      var giorno = d.data.slice(8, 10);
+      return '<div title="' + _fcEsc(d.data) + ': ' + d.contati + '/' + d.totale + ' reparti contati" style="width:1.6rem;height:1.6rem;border-radius:4px;background:' + colore + ';color:#fff;font-size:.62rem;display:flex;align-items:center;justify-content:center;font-weight:600;">' + _fcEsc(giorno) + '</div>';
+    }).join('');
+    return '<div style="margin-bottom:.4rem;">' +
+      '<div style="font-size:.68rem;color:var(--stone);margin-bottom:.2rem;">' + _fcEsc(mese) + '</div>' +
+      '<div style="display:flex;gap:.25rem;flex-wrap:wrap;">' + celle + '</div>' +
+      '</div>';
+  }).join('');
+  var periodiHtml = periodi.length
+    ? '<p style="font-size:.7rem;color:var(--stone);text-transform:uppercase;margin:.6rem 0 .3rem;">Periodi chiusi — carica in Dashboard</p>' +
+      '<div style="display:flex;gap:.4rem;flex-wrap:wrap;">' +
+      periodi.map(function (p) {
+        return '<button class="btn btn-load" style="font-size:.72rem;padding:.3rem .6rem;" onclick="fcUsaPeriodo(\'' + p.da + '\',\'' + p.a + '\')">' + _fcEsc(p.da) + ' → ' + _fcEsc(p.a) + '</button>';
+      }).join('') + '</div>'
+    : '<p style="font-size:.75rem;color:var(--stone);margin-top:.5rem;">Nessun periodo chiuso ancora — servono almeno due date con conteggio completo (verde) su tutti i reparti.</p>';
+  el.innerHTML =
+    '<p style="font-size:.7rem;color:var(--stone);text-transform:uppercase;margin-bottom:.3rem;">Storico conteggi — verde = tutti i reparti contati, giallo = parziale</p>' +
+    heatmap + periodiHtml;
 }
 
 function fcUsaPeriodo(da, a) {
   document.getElementById('fc-periodo-da').value = da;
   document.getElementById('fc-periodo-a').value = a;
-  fcLoadInventario();
+  fcState.dashboardAutoloadFatto = true;
+  fcSetTab('dashboard');
 }
 
 function fcRenderInventario() {
@@ -4036,38 +4106,24 @@ function fcRenderInventario() {
   if (!list) return;
   if (!fcState.inventario.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun reparto attivo — crealo dalla scheda "Reparti".</p>'; return; }
   list.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;">' +
-    '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Reparto</th><th>Inventario iniziale (€)</th><th>Inventario finale (€)</th></tr>' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Reparto</th><th>Conteggio (€)</th></tr>' +
     fcState.inventario.map(function (r) {
       return '<tr style="border-top:1px solid var(--rule);">' +
         '<td style="padding:.35rem 0;">' + _fcEsc(r.nome) + '</td>' +
-        '<td><input type="number" min="0" step="0.01" id="fc-inv-ini-' + r.reparto_id + '" value="' + (r.inventario_iniziale == null ? '' : r.inventario_iniziale) + '" style="width:8rem;" /></td>' +
-        '<td><input type="number" min="0" step="0.01" id="fc-inv-fin-' + r.reparto_id + '" value="' + (r.inventario_finale == null ? '' : r.inventario_finale) + '" style="width:8rem;" /></td>' +
+        '<td><input type="number" min="0" step="0.01" id="fc-inv-val-' + r.reparto_id + '" value="' + (r.valore == null ? '' : r.valore) + '" style="width:8rem;" /></td>' +
         '</tr>';
     }).join('') +
     '</table>';
 }
 
-// L'inventario iniziale di un periodo è il conteggio alla data "Dal"; il finale è il
-// conteggio al giorno dopo la data "Al" (stesso conteggio fisico dell'iniziale del
-// periodo successivo, se questo comincia il giorno dopo — vedi commento di Andrea
-// sul vecchio modello a "riga per range", v 2026.09.13.07). addGiorni locale, UTC-safe
-// come l'omonima funzione nell'Edge Function.
-function _fcAddGiorni(iso, delta) {
-  var d = new Date(iso + 'T00:00:00Z');
-  d.setUTCDate(d.getUTCDate() + delta);
-  return d.toISOString().slice(0, 10);
-}
-
 function fcSalvaInventario() {
-  var range = fcRangeValido();
-  if (!range) { _fcSetStatus('Imposta un intervallo di date valido (Dal/Al).', true); return; }
-  var dataFinale = _fcAddGiorni(range.a, 1);
+  var dataEl = document.getElementById('fc-inv-data');
+  var data_ = dataEl && dataEl.value;
+  if (!data_) { _fcSetStatus('Imposta la data del conteggio.', true); return; }
   var chiamate = [];
   fcState.inventario.forEach(function (r) {
-    var ini = document.getElementById('fc-inv-ini-' + r.reparto_id).value;
-    var fin = document.getElementById('fc-inv-fin-' + r.reparto_id).value;
-    if (ini !== '') chiamate.push(_fcFetch({ action: 'inventario_conteggio_upsert', data: range.da, reparto_id: r.reparto_id, valore: Number(ini) }));
-    if (fin !== '') chiamate.push(_fcFetch({ action: 'inventario_conteggio_upsert', data: dataFinale, reparto_id: r.reparto_id, valore: Number(fin) }));
+    var val = document.getElementById('fc-inv-val-' + r.reparto_id).value;
+    if (val !== '') chiamate.push(_fcFetch({ action: 'inventario_conteggio_upsert', data: data_, reparto_id: r.reparto_id, valore: Number(val) }));
   });
   if (!chiamate.length) { _fcSetStatus('Nessun valore da salvare.', true); return; }
   _fcSetStatus('Salvataggio…');
@@ -4075,7 +4131,7 @@ function fcSalvaInventario() {
     var errore = risultati.find(function (res) { return !_fcOk(res); });
     if (errore) { _fcSetStatus(_fcErrMsg(errore), true); return; }
     fcLoadInventario();
-    _fcSetStatus('Inventario salvato.');
+    _fcSetStatus('Conteggio salvato.');
   }).catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
 }
 
@@ -6097,7 +6153,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.13.09</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.13.10</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

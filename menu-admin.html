@@ -1,4 +1,23 @@
 <!DOCTYPE html>
+<!-- v 2026.09.13.01 — Food Cost (Utilities): il selettore "Periodo" passa da mese fisso a
+     intervallo libero (2 box data "Dal"/"Al"), applicato a tutte le schede che ne hanno
+     bisogno (Spese, Incassi, Inventario, Vendite, Dashboard). Inventario e Vendite ora
+     si agganciano alla coppia (data_da, data_a) invece che al vecchio "periodo" mensile
+     (fc_inventario_periodi e fc_vendite_periodo: colonna periodo sostituita da data_da/
+     data_a, tabelle vuote all'atto della migrazione — nessun dato storico da convertire).
+     Il trend in Dashboard mostra ora gli N intervalli precedenti della STESSA DURATA di
+     quello selezionato (non più fissi "ultimi 6 mesi"). Tab attivo (Spese/Incassi/ecc.)
+     ora ha anche uno sfondo più chiaro, non solo bordo/testo colorati (era poco leggibile).
+     Dashboard Food Cost riprogettata con grafici Chart.js (CDN cdnjs, già in CSP): KPI
+     colorate, donut spese per reparto, linea trend Reale/Teorico, barre top piatti per
+     margine, chip conteggio Menu Engineering. Corretta anche la mappa colori Menu
+     Engineering nella tabella dettaglio: DOG ora rosso (critico) invece di ambra, PUZZLE
+     ambra (attenzione) invece di blu — semantica STAR/PLOWHORSE/PUZZLE/DOG allineata a
+     good/neutro/attenzione/critico. Bump edge function foodcost-admin (v2, azioni
+     accettano da/a invece di periodo) + footer-version. Riferimento: DESIGN_foodcost-
+     giornaliero_v2026.09.11.01.md, P3_PACCHETTO_foodcost-giornaliero_v2026.09.11.01.md
+     (progetto-sito) — questo giro non ha ancora una propria Revisione Oppositiva: debito
+     dichiarato, vedi handover di sessione. -->
 <!-- v 2026.09.12.06 — Feedback visivo sui pulsanti "🪄 Genera bozza FAQ" / "📤 Pubblica FAQ"
      (Andrea: durante la chiamata non si capiva se stesse lavorando, e a fine pubblicazione il
      messaggio non si notava). Aggiunta una clessidra CSS (.spinner, keyframe spin) dentro il
@@ -1095,8 +1114,12 @@
 
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
         <div>
-          <span class="opt-lbl">Periodo</span>
-          <input type="month" id="fc-periodo" style="width:10rem;padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);" onchange="fcCambiaPeriodo()" />
+          <span class="opt-lbl">Dal</span>
+          <input type="date" id="fc-periodo-da" style="width:9.5rem;padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);" onchange="fcCambiaPeriodo()" />
+        </div>
+        <div>
+          <span class="opt-lbl">Al</span>
+          <input type="date" id="fc-periodo-a" style="width:9.5rem;padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);" onchange="fcCambiaPeriodo()" />
         </div>
       </div>
 
@@ -1891,6 +1914,7 @@
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.07.28.03"></script>
 <script src="admin-core.js?v=2026.09.12.01"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
 // Stato letto da Edge Function reservations-status; modifiche via
@@ -3453,14 +3477,18 @@ function stampaPiattiDettagli() {
 }
 
 // ══ FOOD COST GIORNALIERO (spese/incassi per reparto, inventario di periodo, ═══
-//    costo piatti agganciato a piatti_dettagli, vendite di periodo, dashboard) ═
+//    costo piatti agganciato a piatti_dettagli, vendite di periodo, dashboard) ═══
 // CRUD + calcoli via Edge Function foodcost-admin (auth col token GitHub gh_token,
 // stesso meccanismo di rubrica/prenotazioni/reminder/dettagli piatti — riusa
 // _prenGhToken()). Database dedicato (SafeTable), indipendente da Libro Cassa.
 // Riferimento di progettazione: DESIGN_foodcost-giornaliero_v2026.09.11.01.md
-// (progetto-sito). "Periodo" viaggia sempre come "YYYY-MM-01" (primo del mese).
+// (progetto-sito). Dal v 2026.09.13.01 il periodo è un intervallo libero "da/a"
+// (2 date picker "Dal"/"Al"), non più un mese fisso — vedi fcRangeValido().
 var FC_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/foodcost-admin';
-var fcState = { reparti: [], tab: 'reparti', periodo: '', spese: [], incassi: [], inventario: [], costi: [], vendite: [], dashboard: null };
+var FC_CAT = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'];
+var FC_ME_COLORE = { STAR: '#22c55e', PLOWHORSE: '#3b82f6', PUZZLE: '#f59e0b', DOG: '#e34948' };
+var fcCharts = {};
+var fcState = { reparti: [], tab: 'reparti', spese: [], incassi: [], inventario: [], costi: [], vendite: [], dashboard: null };
 
 function _fcEsc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -3497,9 +3525,15 @@ function _fcErrMsg(res) {
 function _fcEur(x) { return '€ ' + (Number(x) || 0).toFixed(2); }
 function _fcPct(x) { return ((Number(x) || 0) * 100).toFixed(1) + '%'; }
 
-function _fcPeriodoCorrente() {
+function _fcPrimoGiornoMeseCorrente() {
   var d = new Date();
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-01';
+}
+
+function _fcUltimoGiornoMeseCorrente() {
+  var d = new Date();
+  var ultimo = new Date(d.getFullYear(), d.getMonth() + 1, 0); // giorno 0 del mese succ. = ultimo del mese corrente (fuso locale)
+  return ultimo.getFullYear() + '-' + String(ultimo.getMonth() + 1).padStart(2, '0') + '-' + String(ultimo.getDate()).padStart(2, '0');
 }
 
 // NB: niente toISOString() qui — è in UTC, e per chi lavora da un fuso avanti su UTC
@@ -3511,10 +3545,14 @@ function _fcOggiLocale() {
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
-function fcPeriodoValue() {
-  var el = document.getElementById('fc-periodo');
-  var v = el && el.value ? el.value : _fcPeriodoCorrente();
-  return v + '-01';
+// Ritorna { da, a } se l'intervallo nei 2 date picker è valido (entrambi compilati,
+// "Al" non precedente a "Dal" — il confronto stringa YYYY-MM-DD funziona lessicograficamente),
+// altrimenti null.
+function fcRangeValido() {
+  var daEl = document.getElementById('fc-periodo-da'), aEl = document.getElementById('fc-periodo-a');
+  var da = daEl && daEl.value, a = aEl && aEl.value;
+  if (!da || !a || da > a) return null;
+  return { da: da, a: a };
 }
 
 function apriSezioneFoodCost() {
@@ -3522,8 +3560,9 @@ function apriSezioneFoodCost() {
   document.getElementById('intro').style.display = 'none';
   _pulisciViste();
   document.getElementById('foodcost-section').style.display = 'block';
-  var pEl = document.getElementById('fc-periodo');
-  if (pEl && !pEl.value) pEl.value = _fcPeriodoCorrente();
+  var daEl = document.getElementById('fc-periodo-da'), aEl = document.getElementById('fc-periodo-a');
+  if (daEl && !daEl.value) daEl.value = _fcPrimoGiornoMeseCorrente();
+  if (aEl && !aEl.value) aEl.value = _fcUltimoGiornoMeseCorrente();
   var dSpesa = document.getElementById('fc-spesa-data'), dInc = document.getElementById('fc-incasso-data');
   var oggi = _fcOggiLocale();
   if (dSpesa && !dSpesa.value) dSpesa.value = oggi;
@@ -3538,6 +3577,7 @@ function chiudiSezioneFoodCost() {
 }
 
 function fcCambiaPeriodo() {
+  if (!fcRangeValido()) { _fcSetStatus('Intervallo non valido: la data "Al" deve essere uguale o successiva a "Dal".', true); return; }
   fcLoadTab(fcState.tab);
 }
 
@@ -3546,7 +3586,7 @@ function fcSetTab(t) {
   ['reparti', 'spese', 'incassi', 'inventario', 'costi', 'vendite', 'dashboard'].forEach(function (k) {
     var v = document.getElementById('fc-view-' + k), b = document.getElementById('fc-tab-btn-' + k);
     if (v) v.style.display = (k === t) ? '' : 'none';
-    if (b) { b.style.borderColor = (k === t) ? 'var(--rust)' : ''; b.style.color = (k === t) ? 'var(--rust)' : ''; }
+    if (b) { b.style.borderColor = (k === t) ? 'var(--rust)' : ''; b.style.color = (k === t) ? 'var(--rust)' : ''; b.style.background = (k === t) ? 'rgba(245,158,11,.16)' : ''; }
   });
   fcLoadTab(t);
 }
@@ -3637,8 +3677,10 @@ function fcSalvaReparto(id) {
 // ---- Spese giornaliere ----
 
 function fcLoadSpese() {
+  var r = fcRangeValido();
+  if (!r) { _fcSetStatus('Imposta un intervallo di date valido (Dal/Al).', true); return; }
   _fcSetStatus('Caricamento spese…');
-  _fcFetch({ action: 'spese_list', periodo: fcPeriodoValue() })
+  _fcFetch({ action: 'spese_list', da: r.da, a: r.a })
     .then(function (res) {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcState.spese = res.body.spese || [];
@@ -3701,8 +3743,10 @@ function fcEliminaSpesa(id) {
 // ---- Incassi giornalieri (un solo record per data: upsert) ----
 
 function fcLoadIncassi() {
+  var r = fcRangeValido();
+  if (!r) { _fcSetStatus('Imposta un intervallo di date valido (Dal/Al).', true); return; }
   _fcSetStatus('Caricamento incassi…');
-  _fcFetch({ action: 'incassi_list', periodo: fcPeriodoValue() })
+  _fcFetch({ action: 'incassi_list', da: r.da, a: r.a })
     .then(function (res) {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcState.incassi = res.body.incassi || [];
@@ -3761,8 +3805,10 @@ function fcEliminaIncasso(id) {
 // ---- Inventario di periodo (per reparto) ----
 
 function fcLoadInventario() {
+  var r = fcRangeValido();
+  if (!r) { _fcSetStatus('Imposta un intervallo di date valido (Dal/Al).', true); return; }
   _fcSetStatus('Caricamento inventario…');
-  _fcFetch({ action: 'inventario_get', periodo: fcPeriodoValue() })
+  _fcFetch({ action: 'inventario_get', da: r.da, a: r.a })
     .then(function (res) {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcState.inventario = res.body.righe || [];
@@ -3789,12 +3835,13 @@ function fcRenderInventario() {
 }
 
 function fcSalvaInventario() {
-  var periodo = fcPeriodoValue();
+  var range = fcRangeValido();
+  if (!range) { _fcSetStatus('Imposta un intervallo di date valido (Dal/Al).', true); return; }
   var chiamate = fcState.inventario.map(function (r) {
     var ini = document.getElementById('fc-inv-ini-' + r.reparto_id).value;
     var fin = document.getElementById('fc-inv-fin-' + r.reparto_id).value;
     return _fcFetch({
-      action: 'inventario_upsert', periodo: periodo, reparto_id: r.reparto_id,
+      action: 'inventario_upsert', da: range.da, a: range.a, reparto_id: r.reparto_id,
       inventario_iniziale: ini === '' ? 0 : Number(ini),
       inventario_finale: fin === '' ? null : Number(fin),
     });
@@ -3863,8 +3910,10 @@ function fcSalvaCosti() {
 // ---- Vendite di periodo (bulk, a fine mese) ----
 
 function fcLoadVendite() {
+  var r = fcRangeValido();
+  if (!r) { _fcSetStatus('Imposta un intervallo di date valido (Dal/Al).', true); return; }
   _fcSetStatus('Caricamento vendite…');
-  _fcFetch({ action: 'vendite_get', periodo: fcPeriodoValue() })
+  _fcFetch({ action: 'vendite_get', da: r.da, a: r.a })
     .then(function (res) {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcState.vendite = res.body.righe || [];
@@ -3892,13 +3941,14 @@ function fcRenderVendite() {
 }
 
 function fcSalvaVendite() {
-  var periodo = fcPeriodoValue();
+  var range = fcRangeValido();
+  if (!range) { _fcSetStatus('Imposta un intervallo di date valido (Dal/Al).', true); return; }
   var righe = fcState.vendite.map(function (r) {
     var el = document.getElementById('fc-qty-' + r.piatto_costo_id);
     return { piatto_costo_id: r.piatto_costo_id, quantita_venduta: el ? Number(el.value || 0) : 0 };
   });
   _fcSetStatus('Salvataggio…');
-  _fcFetch({ action: 'vendite_bulk_upsert', periodo: periodo, righe: righe })
+  _fcFetch({ action: 'vendite_bulk_upsert', da: range.da, a: range.a, righe: righe })
     .then(function (res) {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcLoadVendite();
@@ -3910,8 +3960,10 @@ function fcSalvaVendite() {
 // ---- Dashboard: i 3 calcoli + trend ultimi 6 periodi ----
 
 function fcLoadDashboard() {
+  var r = fcRangeValido();
+  if (!r) { _fcSetStatus('Imposta un intervallo di date valido (Dal/Al).', true); return; }
   _fcSetStatus('Calcolo…');
-  _fcFetch({ action: 'dashboard', periodo: fcPeriodoValue() })
+  _fcFetch({ action: 'dashboard', da: r.da, a: r.a })
     .then(function (res) {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcState.dashboard = res.body;
@@ -3929,19 +3981,55 @@ function _fcGapColore(gap) {
   return '#b91c1c';
 }
 
+function _fcKpiTile(etichetta, valore, colore) {
+  return '<div class="fs" style="flex:1;min-width:9.5rem;border-left:3px solid ' + colore + ';">' +
+    '<div class="fs-body" style="padding:.7rem .9rem;">' +
+    '<div class="opt-lbl">' + _fcEsc(etichetta) + '</div>' +
+    '<div style="font-size:1.3rem;font-weight:700;color:' + colore + ';">' + valore + '</div>' +
+    '</div></div>';
+}
+
+function _fcDestroyChart(key) {
+  if (fcCharts[key]) { fcCharts[key].destroy(); delete fcCharts[key]; }
+}
+
 function fcRenderDashboard() {
   var el = document.getElementById('fc-dashboard-body');
   if (!el || !fcState.dashboard) return;
   var d = fcState.dashboard;
 
-  var cards = '<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.4rem;">' +
-    '<div class="fs" style="flex:1;min-width:11rem;"><div class="fs-body" style="padding:.8rem 1rem;">' +
-    '<div class="opt-lbl">Food Cost Reale</div><div style="font-size:1.4rem;font-weight:600;">' + _fcPct(d.food_cost_reale_pct) + '</div></div></div>' +
-    '<div class="fs" style="flex:1;min-width:11rem;"><div class="fs-body" style="padding:.8rem 1rem;">' +
-    '<div class="opt-lbl">Food Cost Teorico</div><div style="font-size:1.4rem;font-weight:600;">' + _fcPct(d.food_cost_teorico_pct) + '</div></div></div>' +
-    '<div class="fs" style="flex:1;min-width:11rem;"><div class="fs-body" style="padding:.8rem 1rem;">' +
-    '<div class="opt-lbl">GAP (Reale − Teorico)</div><div style="font-size:1.4rem;font-weight:600;color:' + _fcGapColore(d.gap_pct) + ';">' + _fcPct(d.gap_pct) + '</div></div></div>' +
+  var kpi = '<div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:1rem;">' +
+    _fcKpiTile('Food Cost Reale', _fcPct(d.food_cost_reale_pct), '#3987e5') +
+    _fcKpiTile('Food Cost Teorico', _fcPct(d.food_cost_teorico_pct), '#9085e9') +
+    _fcKpiTile('GAP (Reale − Teorico)', _fcPct(d.gap_pct), _fcGapColore(d.gap_pct)) +
+    _fcKpiTile('Incassi food', _fcEur(d.totale_incassi), '#199e70') +
+    _fcKpiTile('Spese materie prime', _fcEur(d.totale_spese), '#d95926') +
     '</div>';
+
+  var contaME = { STAR: 0, PLOWHORSE: 0, PUZZLE: 0, DOG: 0 };
+  d.menu_engineering.forEach(function (p) { contaME[p.classificazione] = (contaME[p.classificazione] || 0) + 1; });
+  var chipME = '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.4rem;">' +
+    ['STAR', 'PLOWHORSE', 'PUZZLE', 'DOG'].map(function (k) {
+      return '<span style="background:' + FC_ME_COLORE[k] + '22;color:' + FC_ME_COLORE[k] + ';border:1px solid ' + FC_ME_COLORE[k] + ';border-radius:999px;padding:.2rem .75rem;font-size:.72rem;font-weight:700;letter-spacing:.03em;">' + k + ' · ' + contaME[k] + '</span>';
+    }).join('') +
+    '</div>';
+
+  var grafici = '<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.2rem;">' +
+    '<div class="fs" style="flex:1;min-width:15rem;"><div class="fs-body" style="padding:.9rem;">' +
+    '<div class="sub" style="margin-top:0;">Spese per reparto</div>' +
+    '<div style="position:relative;height:14rem;"><canvas id="fc-chart-spese"></canvas></div>' +
+    '</div></div>' +
+    '<div class="fs" style="flex:1.4;min-width:17rem;"><div class="fs-body" style="padding:.9rem;">' +
+    '<div class="sub" style="margin-top:0;">Food Cost Reale vs Teorico — ' + ((d.trend || []).length) + ' intervalli (stessa durata di quello selezionato)</div>' +
+    '<div style="position:relative;height:14rem;"><canvas id="fc-chart-trend"></canvas></div>' +
+    '</div></div>' +
+    '</div>';
+
+  var top8 = d.menu_engineering.slice().sort(function (a, b) { return b.margine_totale - a.margine_totale; }).slice(0, 8);
+  var graficoPiatti = '<div class="fs" style="margin-bottom:1.2rem;"><div class="fs-body" style="padding:.9rem;">' +
+    '<div class="sub" style="margin-top:0;">Top piatti per margine totale</div>' +
+    (top8.length ? '<div style="position:relative;height:' + Math.max(10, top8.length * 2) + 'rem;"><canvas id="fc-chart-piatti"></canvas></div>' : '<p style="color:var(--stone);font-size:.82rem;">Nessun piatto venduto in questo intervallo.</p>') +
+    '</div></div>';
 
   var reparti = '<div class="sub">Consumi per reparto</div>' +
     '<table style="width:100%;border-collapse:collapse;font-size:.8rem;margin-bottom:1.2rem;">' +
@@ -3955,20 +4043,93 @@ function fcRenderDashboard() {
     '<table style="width:100%;border-collapse:collapse;font-size:.8rem;margin-bottom:1.2rem;">' +
     '<tr style="text-align:left;color:var(--stone);font-size:.68rem;text-transform:uppercase;"><th>Piatto</th><th>Qtà</th><th>Margine unit.</th><th>Mix %</th><th>Classe</th></tr>' +
     d.menu_engineering.map(function (p) {
-      var col = { STAR: 'var(--green)', PLOWHORSE: 'var(--ink)', PUZZLE: 'var(--blue)', DOG: 'var(--rust)' }[p.classificazione] || 'var(--ink)';
+      var col = FC_ME_COLORE[p.classificazione] || 'var(--ink)';
       return '<tr style="border-top:1px solid var(--rule);"><td style="padding:.3rem 0;">' + _fcEsc(p.nome) + '</td><td>' + p.qty_venduta + '</td><td>' + _fcEur(p.margine_unitario) + '</td><td>' + _fcPct(p.mix_pct) + '</td><td style="color:' + col + ';font-weight:600;">' + p.classificazione + '</td></tr>';
     }).join('') +
     '</table>';
 
-  var trend = '<div class="sub">Andamento Food Cost Reale — ultimi 6 mesi</div>' +
+  var trend = '<div class="sub">Andamento — intervalli precedenti (stessa durata)</div>' +
     '<table style="width:100%;border-collapse:collapse;font-size:.8rem;">' +
-    '<tr style="text-align:left;color:var(--stone);font-size:.68rem;text-transform:uppercase;"><th>Periodo</th><th>Reale</th><th>Teorico</th></tr>' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.68rem;text-transform:uppercase;"><th>Intervallo</th><th>Reale</th><th>Teorico</th></tr>' +
     (d.trend || []).map(function (t) {
-      return '<tr style="border-top:1px solid var(--rule);"><td style="padding:.3rem 0;">' + t.periodo.slice(0, 7) + '</td><td>' + _fcPct(t.food_cost_reale_pct) + '</td><td>' + _fcPct(t.food_cost_teorico_pct) + '</td></tr>';
+      return '<tr style="border-top:1px solid var(--rule);"><td style="padding:.3rem 0;">' + t.da + ' → ' + t.a + '</td><td>' + _fcPct(t.food_cost_reale_pct) + '</td><td>' + _fcPct(t.food_cost_teorico_pct) + '</td></tr>';
     }).join('') +
     '</table>';
 
-  el.innerHTML = cards + reparti + me + trend;
+  el.innerHTML = kpi + chipME + grafici + graficoPiatti + reparti + me + trend;
+
+  _fcDisegnaGrafici(d, top8);
+}
+
+// Grafici Chart.js (CDN cdnjs, già in CSP per PDF.js/Mammoth). Se il CDN non ha caricato
+// (rete assente) window.Chart non esiste: restano solo le tabelle sopra, niente di rotto.
+function _fcDisegnaGrafici(d, top8) {
+  if (typeof Chart === 'undefined') return;
+  Chart.defaults.color = '#9aa3b5';
+  Chart.defaults.borderColor = '#262b34';
+  Chart.defaults.font.family = 'Inter, sans-serif';
+
+  _fcDestroyChart('spese');
+  var ctxSpese = document.getElementById('fc-chart-spese');
+  if (ctxSpese) {
+    fcCharts.spese = new Chart(ctxSpese, {
+      type: 'doughnut',
+      data: {
+        labels: d.reparti.map(function (r) { return r.nome; }),
+        datasets: [{ data: d.reparti.map(function (r) { return r.spese_periodo; }), backgroundColor: FC_CAT, borderColor: '#12161d', borderWidth: 2 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { boxWidth: 10, padding: 8, font: { size: 10 } } },
+          tooltip: { callbacks: { label: function (ctx) { return ctx.label + ': ' + _fcEur(ctx.parsed); } } }
+        }
+      }
+    });
+  }
+
+  _fcDestroyChart('trend');
+  var ctxTrend = document.getElementById('fc-chart-trend');
+  if (ctxTrend) {
+    fcCharts.trend = new Chart(ctxTrend, {
+      type: 'line',
+      data: {
+        labels: (d.trend || []).map(function (t) { return t.a; }),
+        datasets: [
+          { label: 'Reale', data: (d.trend || []).map(function (t) { return t.food_cost_reale_pct * 100; }), borderColor: '#d95926', backgroundColor: '#d9592633', tension: .3, pointRadius: 3 },
+          { label: 'Teorico', data: (d.trend || []).map(function (t) { return t.food_cost_teorico_pct * 100; }), borderColor: '#3987e5', backgroundColor: '#3987e533', tension: .3, pointRadius: 3 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: { y: { ticks: { callback: function (v) { return v + '%'; } } } },
+        plugins: {
+          legend: { position: 'bottom', labels: { boxWidth: 10, padding: 8, font: { size: 10 } } },
+          tooltip: { callbacks: { label: function (ctx) { return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%'; } } }
+        }
+      }
+    });
+  }
+
+  _fcDestroyChart('piatti');
+  var ctxPiatti = document.getElementById('fc-chart-piatti');
+  if (ctxPiatti && top8.length) {
+    fcCharts.piatti = new Chart(ctxPiatti, {
+      type: 'bar',
+      data: {
+        labels: top8.map(function (p) { return p.nome; }),
+        datasets: [{ label: 'Margine totale (€)', data: top8.map(function (p) { return p.margine_totale; }), backgroundColor: top8.map(function (p) { return FC_ME_COLORE[p.classificazione] || '#3987e5'; }), borderRadius: 4 }]
+      },
+      options: {
+        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: function (ctx) { return _fcEur(ctx.parsed.x); } } }
+        },
+        scales: { x: { ticks: { callback: function (v) { return '€' + v; } } } }
+      }
+    });
+  }
 }
 
 // ══ REMINDER PRENOTAZIONI (setup messaggio + tempistiche) ════
@@ -5704,7 +5865,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.12.06</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.13.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

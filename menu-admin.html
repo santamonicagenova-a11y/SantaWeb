@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<!-- v 2026.09.13.05 — Food Cost: colore del tab Reparti cambiato da rosso corallo
+     (#e66767, troppo simile all'arancio di Spese/Incassi) a giallo (#eab308) — su
+     richiesta di Andrea. Nessun altro cambiamento. -->
 <!-- v 2026.09.13.04 — Food Cost: tab di apertura predefinito cambiato da Reparti a
      Dashboard (su richiesta di Andrea, coerente col nuovo ordine dove Dashboard è il
      primo tab). Nessun altro cambiamento. -->
@@ -3664,7 +3667,7 @@ var FC_TAB_GRUPPI = {
   costi:      { colore: '#199e70', bg: 'rgba(25,158,112,.10)',  bgAttivo: 'rgba(25,158,112,.22)' },
   spese:      { colore: '#d95926', bg: 'rgba(217,89,38,.10)',   bgAttivo: 'rgba(217,89,38,.22)' },
   incassi:    { colore: '#d95926', bg: 'rgba(217,89,38,.10)',   bgAttivo: 'rgba(217,89,38,.22)' },
-  reparti:    { colore: '#e66767', bg: 'rgba(230,103,103,.10)', bgAttivo: 'rgba(230,103,103,.22)' }
+  reparti:    { colore: '#eab308', bg: 'rgba(234,179,8,.10)',   bgAttivo: 'rgba(234,179,8,.22)' }
 };
 
 function fcSetTab(t) {
@@ -5995,7 +5998,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.13.04</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.13.05</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

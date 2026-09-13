@@ -1,4 +1,16 @@
 <!DOCTYPE html>
+<!-- v 2026.09.13.04 — Food Cost: tab di apertura predefinito cambiato da Reparti a
+     Dashboard (su richiesta di Andrea, coerente col nuovo ordine dove Dashboard è il
+     primo tab). Nessun altro cambiamento. -->
+<!-- v 2026.09.13.03 — Food Cost: riordinati i tab e raggruppati per colore (su richiesta
+     di Andrea). Nuovo ordine: Dashboard (blu #3987e5, tab d'ingresso) | Vendite, Inventario,
+     Costo piatti (verde #199e70, gruppo "dati operativi") | Spese, Incassi (arancio
+     #d95926, gruppo "movimenti") | Reparti (rosso corallo #e66767, configurazione).
+     Colori presi dalla palette dataviz già in uso nei grafici dashboard (FC_CAT), nessun
+     colore nuovo introdotto. Ogni tab ora ha un colore di riposo (bordo/testo/sfondo
+     tenue) anche da inattivo, non solo quando selezionato — prima solo il tab attivo
+     aveva colore (ambra). Solo modifica visiva: nessun cambio ai dati/azioni delle
+     singole schede, tab di apertura predefinito invariato (Reparti). -->
 <!-- v 2026.09.13.02 — Food Cost: aggiunta la parte Beverage (su richiesta di Andrea),
      speculare al Food — reparti propri (nuovo campo "tipo" food/beverage in fc_reparti),
      spese e incasso beverage separati (fc_incassi_giornalieri ora ha "tipo" + chiave unica
@@ -1139,13 +1151,13 @@
       </div>
 
       <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1.2rem;">
-        <button class="btn btn-load" id="fc-tab-btn-reparti" onclick="fcSetTab('reparti')">Reparti</button>
-        <button class="btn btn-load" id="fc-tab-btn-spese" onclick="fcSetTab('spese')">Spese</button>
-        <button class="btn btn-load" id="fc-tab-btn-incassi" onclick="fcSetTab('incassi')">Incassi</button>
+        <button class="btn btn-load" id="fc-tab-btn-dashboard" onclick="fcSetTab('dashboard')">Dashboard</button>
+        <button class="btn btn-load" id="fc-tab-btn-vendite" onclick="fcSetTab('vendite')">Vendite</button>
         <button class="btn btn-load" id="fc-tab-btn-inventario" onclick="fcSetTab('inventario')">Inventario</button>
         <button class="btn btn-load" id="fc-tab-btn-costi" onclick="fcSetTab('costi')">Costo piatti</button>
-        <button class="btn btn-load" id="fc-tab-btn-vendite" onclick="fcSetTab('vendite')">Vendite</button>
-        <button class="btn btn-load" id="fc-tab-btn-dashboard" onclick="fcSetTab('dashboard')">Dashboard</button>
+        <button class="btn btn-load" id="fc-tab-btn-spese" onclick="fcSetTab('spese')">Spese</button>
+        <button class="btn btn-load" id="fc-tab-btn-incassi" onclick="fcSetTab('incassi')">Incassi</button>
+        <button class="btn btn-load" id="fc-tab-btn-reparti" onclick="fcSetTab('reparti')">Reparti</button>
       </div>
 
       <hr style="border:none;border-top:1px solid var(--rule);margin:0 0 1.2rem;">
@@ -3522,7 +3534,7 @@ var FC_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/foodcost-adm
 var FC_CAT = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'];
 var FC_ME_COLORE = { STAR: '#22c55e', PLOWHORSE: '#3b82f6', PUZZLE: '#f59e0b', DOG: '#e34948' };
 var fcCharts = {};
-var fcState = { reparti: [], tab: 'reparti', speseTipo: 'food', inventarioTipo: 'food', spese: [], incassi: [], inventario: [], costi: [], vendite: [], dashboard: null };
+var fcState = { reparti: [], tab: 'dashboard', speseTipo: 'food', inventarioTipo: 'food', spese: [], incassi: [], inventario: [], costi: [], vendite: [], dashboard: null };
 
 // Accende/spegne lo stato "attivo" di un gruppo di pulsanti a interruttore (Food/Beverage),
 // stesso stile del tab attivo in fcSetTab (bordo+testo ambra + sfondo più chiaro).
@@ -3629,7 +3641,7 @@ function apriSezioneFoodCost() {
   var oggi = _fcOggiLocale();
   if (dSpesa && !dSpesa.value) dSpesa.value = oggi;
   if (dInc && !dInc.value) dInc.value = oggi;
-  fcLoadReparti(function () { fcSetTab(fcState.tab || 'reparti'); });
+  fcLoadReparti(function () { fcSetTab(fcState.tab || 'dashboard'); });
 }
 
 function chiudiSezioneFoodCost() {
@@ -3643,12 +3655,29 @@ function fcCambiaPeriodo() {
   fcLoadTab(fcState.tab);
 }
 
+// Gruppi di tab con colore proprio (palette dataviz FC_CAT, stessa dei grafici dashboard):
+// Dashboard da sola, Vendite/Inventario/Costo piatti insieme, Spese/Incassi insieme, Reparti da solo.
+var FC_TAB_GRUPPI = {
+  dashboard:  { colore: '#3987e5', bg: 'rgba(57,135,229,.10)',  bgAttivo: 'rgba(57,135,229,.22)' },
+  vendite:    { colore: '#199e70', bg: 'rgba(25,158,112,.10)',  bgAttivo: 'rgba(25,158,112,.22)' },
+  inventario: { colore: '#199e70', bg: 'rgba(25,158,112,.10)',  bgAttivo: 'rgba(25,158,112,.22)' },
+  costi:      { colore: '#199e70', bg: 'rgba(25,158,112,.10)',  bgAttivo: 'rgba(25,158,112,.22)' },
+  spese:      { colore: '#d95926', bg: 'rgba(217,89,38,.10)',   bgAttivo: 'rgba(217,89,38,.22)' },
+  incassi:    { colore: '#d95926', bg: 'rgba(217,89,38,.10)',   bgAttivo: 'rgba(217,89,38,.22)' },
+  reparti:    { colore: '#e66767', bg: 'rgba(230,103,103,.10)', bgAttivo: 'rgba(230,103,103,.22)' }
+};
+
 function fcSetTab(t) {
   fcState.tab = t;
-  ['reparti', 'spese', 'incassi', 'inventario', 'costi', 'vendite', 'dashboard'].forEach(function (k) {
+  ['dashboard', 'vendite', 'inventario', 'costi', 'spese', 'incassi', 'reparti'].forEach(function (k) {
     var v = document.getElementById('fc-view-' + k), b = document.getElementById('fc-tab-btn-' + k);
     if (v) v.style.display = (k === t) ? '' : 'none';
-    if (b) { b.style.borderColor = (k === t) ? 'var(--rust)' : ''; b.style.color = (k === t) ? 'var(--rust)' : ''; b.style.background = (k === t) ? 'rgba(245,158,11,.16)' : ''; }
+    if (b) {
+      var g = FC_TAB_GRUPPI[k];
+      b.style.borderColor = g.colore;
+      b.style.color = g.colore;
+      b.style.background = (k === t) ? g.bgAttivo : g.bg;
+    }
   });
   fcLoadTab(t);
 }
@@ -5966,7 +5995,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.13.02</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.13.04</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

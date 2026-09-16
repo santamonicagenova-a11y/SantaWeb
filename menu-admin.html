@@ -4017,10 +4017,11 @@ function fcEliminaSpesa(id) {
 // Un carico = una fattura fornitore, una riga per prodotto. Il salvataggio di ogni
 // riga (azione tracciabilita_carico_create) popola in un solo colpo sia la lista
 // Spese sia lo storico di tracciabilità, con codice univoco NN-MMAA generato lato
-// server. L'anagrafica fornitori è quella di Cantina (progetto Supabase separato,
-// SantaCantina): letta qui in sola lettura dall'endpoint pubblico cantina-anagrafiche
-// (nessuna FK cross-database — il fornitore viene salvato come testo libero).
-var CANTINA_ANAGRAFICHE_URL = 'https://wpsghmmvlwkyqiholfzx.supabase.co/functions/v1/cantina-anagrafiche';
+// server. L'anagrafica fornitori è quella di Cantina (tabelle cantina_* dentro il progetto
+// Supabase SafeTable, accorpate da SantaCantina il 16/9/2026): letta qui in sola lettura
+// dall'endpoint pubblico cantina-anagrafiche (nessuna FK cross-tabella — il fornitore viene
+// salvato come testo libero).
+var CANTINA_ANAGRAFICHE_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/cantina-anagrafiche';
 var fcTraccSeq = 0;
 
 function fcTraccInizializza() {

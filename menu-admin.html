@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- v 2026.09.16.02 — Tracciabilità: tolto il campo Categoria dalla riga prodotto (non
+     serve, richiesto da Andrea) — la scadenza si autocompila sempre dalla prima
+     categoria attiva della mini-anagrafica (es. "Pesce abbattuto" = 30gg), ricalcolata
+     al cambio della data di ricezione, sempre modificabile a mano riga per riga. Reparto
+     del carico preselezionato di default su "Pesce e crostacei" quando presente tra i
+     reparti attivi. Nessuna modifica all'edge function (il campo categoria_id in
+     tracciabilita_carico_create resta supportato ma ora sempre inviato null dal
+     frontend). -->
 <!-- v 2026.09.16.01 — Nuovo sotto-tab Food Cost "Tracciabilità": carico di una
      fornitura (pesce/crostacei in primis) con un inserimento per riga di fattura
      che popola in automatico sia Spese sia lo storico di tracciabilità, con codice
@@ -1311,7 +1319,7 @@
         <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
           <div>
             <span class="opt-lbl">Data ricezione</span>
-            <input type="date" id="fc-tracc-data" style="width:9.5rem;" />
+            <input type="date" id="fc-tracc-data" style="width:9.5rem;" onchange="fcTraccDataRicezioneCambiata()" />
           </div>
           <div>
             <span class="opt-lbl">N. fattura/bolla</span>
@@ -4036,14 +4044,24 @@ function fcTraccInizializza() {
   fcLoadTracciabilita();
 }
 
+// Reparto di default "Pesce e crostacei" (il caso d'uso principale di Tracciabilità):
+// preselezionato se esiste tra i reparti attivi, altrimenti resta il primo della lista.
+var FC_TRACC_REPARTO_DEFAULT_NOME = 'Pesce e crostacei';
+
 function fcPopolaSelectRepartoTracc() {
   var sel = document.getElementById('fc-tracc-reparto');
   if (!sel) return;
   var attuale = sel.value;
-  sel.innerHTML = fcState.reparti.filter(function (r) { return r.attivo && (r.tipo || 'food') === 'food'; }).map(function (r) {
+  var repartiFood = fcState.reparti.filter(function (r) { return r.attivo && (r.tipo || 'food') === 'food'; });
+  sel.innerHTML = repartiFood.map(function (r) {
     return '<option value="' + r.id + '">' + _fcEsc(r.nome) + '</option>';
   }).join('');
-  if (attuale) sel.value = attuale;
+  if (attuale) {
+    sel.value = attuale;
+  } else {
+    var def = repartiFood.find(function (r) { return r.nome === FC_TRACC_REPARTO_DEFAULT_NOME; });
+    if (def) sel.value = def.id;
+  }
 }
 
 function fcLoadFornitoriCantina() {
@@ -4068,7 +4086,7 @@ function fcLoadCategorieTracc() {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcState.categorieTracc = res.body.categorie || [];
       fcRenderCategorieTracc();
-      fcTraccPopolaSelectCategorieTutte();
+      fcTraccDataRicezioneCambiata();
     })
     .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
 }
@@ -4103,7 +4121,7 @@ function fcAggiungiCategoriaTracc() {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcState.categorieTracc = res.body.categorie || [];
       fcRenderCategorieTracc();
-      fcTraccPopolaSelectCategorieTutte();
+      fcTraccDataRicezioneCambiata();
       nomeEl.value = ''; giorniEl.value = '';
       _fcSetStatus('Categoria aggiunta.');
     })
@@ -4122,7 +4140,7 @@ function fcSalvaCategoriaTracc(id) {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcState.categorieTracc = res.body.categorie || [];
       fcRenderCategorieTracc();
-      fcTraccPopolaSelectCategorieTutte();
+      fcTraccDataRicezioneCambiata();
       _fcSetStatus('Categoria salvata.');
     })
     .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
@@ -4131,13 +4149,9 @@ function fcSalvaCategoriaTracc(id) {
 // ---- Righe del carico in lavorazione (repeater) ----
 
 function fcTraccRigaHtml(seq) {
-  var opzioniCategorie = (fcState.categorieTracc || []).filter(function (c) { return c.attivo; }).map(function (c) {
-    return '<option value="' + c.id + '">' + _fcEsc(c.nome) + ' (' + c.giorni_scadenza + 'gg)</option>';
-  }).join('');
   return '<div class="fs" id="fc-tracc-riga-' + seq + '" style="margin-bottom:.6rem;">' +
     '<div class="fs-body" style="padding:.6rem 1rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:end;">' +
     '<div style="flex:1;min-width:10rem;"><span class="opt-lbl">Prodotto</span><input type="text" id="fc-tracc-riga-' + seq + '-prodotto" placeholder="Es: Ricciola" /></div>' +
-    '<div><span class="opt-lbl">Categoria</span><select id="fc-tracc-riga-' + seq + '-categoria" style="width:11rem;padding:.35rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);" onchange="fcTraccCategoriaCambiata(' + seq + ')"><option value="">—</option>' + opzioniCategorie + '</select></div>' +
     '<div><span class="opt-lbl">Peso</span><input type="number" id="fc-tracc-riga-' + seq + '-peso" min="0" step="0.001" style="width:6rem;" /></div>' +
     '<div><span class="opt-lbl">U.M.</span><select id="fc-tracc-riga-' + seq + '-um" style="width:5rem;padding:.35rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);"><option value="kg">kg</option><option value="g">g</option><option value="pz">pz</option><option value="lt">lt</option></select></div>' +
     '<div><span class="opt-lbl">Prezzo/u.m. €</span><input type="number" id="fc-tracc-riga-' + seq + '-prezzo" min="0" step="0.01" style="width:7rem;" /></div>' +
@@ -4155,6 +4169,7 @@ function fcTraccAggiungiRiga() {
   var div = document.createElement('div');
   div.innerHTML = fcTraccRigaHtml(seq);
   cont.appendChild(div.firstChild);
+  fcTraccImpostaScadenzaDefault(seq);
 }
 
 function fcTraccRimuoviRiga(seq) {
@@ -4163,31 +4178,27 @@ function fcTraccRimuoviRiga(seq) {
   if (el) el.remove();
 }
 
-function fcTraccPopolaSelectCategorieTutte() {
-  (fcState.traccRigheSeq || []).forEach(function (seq) {
-    var sel = document.getElementById('fc-tracc-riga-' + seq + '-categoria');
-    if (!sel) return;
-    var attuale = sel.value;
-    var opzioni = (fcState.categorieTracc || []).filter(function (c) { return c.attivo; }).map(function (c) {
-      return '<option value="' + c.id + '">' + _fcEsc(c.nome) + ' (' + c.giorni_scadenza + 'gg)</option>';
-    }).join('');
-    sel.innerHTML = '<option value="">—</option>' + opzioni;
-    if (attuale) sel.value = attuale;
-  });
+// Categoria di default per il calcolo automatico della scadenza: niente più scelta per
+// riga (tolta su richiesta di Andrea), si usa sempre la prima categoria attiva della
+// mini-anagrafica "Categorie e giorni di scadenza" (es. "Pesce abbattuto" = 30gg).
+function fcTraccCategoriaDefault() {
+  return (fcState.categorieTracc || []).find(function (c) { return c.attivo; }) || null;
 }
 
-// Alla scelta di una categoria, propone la data di scadenza (data ricezione + giorni
-// configurati) — resta comunque un campo modificabile a mano.
-function fcTraccCategoriaCambiata(seq) {
-  var catId = document.getElementById('fc-tracc-riga-' + seq + '-categoria').value;
+function fcTraccImpostaScadenzaDefault(seq) {
   var dataRicezione = document.getElementById('fc-tracc-data').value;
   var scadenzaEl = document.getElementById('fc-tracc-riga-' + seq + '-scadenza');
-  if (!catId || !dataRicezione || !scadenzaEl) return;
-  var cat = (fcState.categorieTracc || []).find(function (c) { return c.id === catId; });
-  if (!cat) return;
+  var cat = fcTraccCategoriaDefault();
+  if (!dataRicezione || !scadenzaEl || !cat) return;
   var d = new Date(dataRicezione + 'T00:00:00Z');
   d.setUTCDate(d.getUTCDate() + cat.giorni_scadenza);
   scadenzaEl.value = d.toISOString().slice(0, 10);
+}
+
+// Al cambio della data di ricezione, ricalcola la scadenza proposta su tutte le righe
+// del carico in lavorazione — resta comunque un campo modificabile a mano riga per riga.
+function fcTraccDataRicezioneCambiata() {
+  (fcState.traccRigheSeq || []).forEach(function (seq) { fcTraccImpostaScadenzaDefault(seq); });
 }
 
 function fcSalvaCarico() {
@@ -4206,7 +4217,7 @@ function fcSalvaCarico() {
     if (!prodotto) continue;
     righe.push({
       prodotto: prodotto,
-      categoria_id: document.getElementById('fc-tracc-riga-' + seq + '-categoria').value || null,
+      categoria_id: null,
       peso: document.getElementById('fc-tracc-riga-' + seq + '-peso').value,
       unita_misura: document.getElementById('fc-tracc-riga-' + seq + '-um').value,
       prezzo_unitario: document.getElementById('fc-tracc-riga-' + seq + '-prezzo').value,
@@ -6497,7 +6508,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.16.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.16.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

@@ -1,9 +1,29 @@
 # CHANGELOG — Santamonica Web
 
-**Versione documento:** v 2026.05.19.04
-**Aggiornato:** 2026-05-19 (sera tardi)
+**Versione documento:** v 2026.09.16.01
+**Aggiornato:** 2026-09-16
 
 > Voci ordinate dal più recente al più vecchio. Appendere in cima a ogni sessione.
+
+---
+
+### 2026-09-16 — Nuovo modulo Tracciabilità in Food Cost (menu-admin) · campo Settore su fornitori Cantina
+
+**Versioni rilasciate:**
+- `menu-admin.html` v 2026.09.16.01 (Vercel) — nuovo sotto-tab "Tracciabilità" in Food Cost
+- Edge function `foodcost-admin` (Supabase SafeTable) → v8, deploy diretto in sessione (nessun file nel repo)
+- Migrazioni Supabase applicate direttamente in sessione (SafeTable: `fc_categorie_tracciabilita`, `fc_tracciabilita_prodotti`; SantaCantina: colonna `settore` su `fornitori`)
+- `HANDOVER_Santamonica_Web_v2026.09.16.01.md`
+- `CHANGELOG_Santamonica_Web_v2026.09.16.01.md` (questo)
+
+**Sintesi:**
+Su richiesta di Andrea, il carico di una fornitura (soprattutto pesce/crostacei) ora popola in un solo inserimento sia la lista Spese del Food Cost sia uno storico di tracciabilità dedicato, con codice univoco `NN-MMAA` generato lato server (stessa logica della procedura cartacea in uso) e data di scadenza calcolata automaticamente per categoria (es. "Pesce abbattuto" = 30gg, configurabile, sempre modificabile a mano). L'anagrafica fornitori resta quella già in uso nel modulo Cantina (progetto Supabase separato, letta in sola lettura via l'endpoint pubblico esistente `cantina-anagrafiche` — nessuna FK cross-database, il fornitore è salvato come testo libero). Aggiunto anche il campo `settore` a `fornitori` su richiesta dell'utente, utile a distinguere in futuro i fornitori pesce dagli altri.
+
+**Loop di revisione (GATE PRODUZIONE):** P1 (formale) e P2 (sostanziale, 1 bug trovato e corretto) applicati dal modello in sessione. **Revisione Oppositiva (3ª passata) non eseguita — debito aperto**, da chiudere prima di considerare il modulo definitivo. Nessun test in browser eseguito in questa sessione (ambiente senza interfaccia grafica): da verificare sul sito reale.
+
+**Nota di disallineamento CHANGELOG:** questo documento riprende la linea dell'ultimo CHANGELOG tracciato (v 2026.05.19.04). Tra quella sessione e questa, `menu-admin.html` è stato aggiornato più volte fino a v 2026.09.13.11 (modulo Food Cost/Dashboard/Inventario/Reparti, evidente dall'header del file) senza che le relative sessioni risultino in questo documento — probabile gap di continuità documentale da colmare in una sessione dedicata, non ricostruito qui per non fabricare cronologia non verificata.
+
+**Handover dettagliato:** `HANDOVER_Santamonica_Web_v2026.09.16.01.md`
 
 ---
 
@@ -17,7 +37,7 @@
 - `index.html` v 2026.05.19.04 (refactor Schema.org JSON-LD da Restaurant a ItalianRestaurant + @id + dati TARGET + #info aggiornamenti)
 - `dove-siamo.html` v 2026.05.19.04 (NUOVO · mobile-first · Schema.org ItalianRestaurant duplicato · OSM iframe transitorio fino a F0.12 · click-to-action + highlight giorno corrente)
 - `HANDOVER_Santamonica_Web_v2026.05.19.04.md`
-- `CHANGELOG_Santamonica_Web_v2026.05.19.04.md` (questo)
+- `CHANGELOG_Santamonica_Web_v2026.05.19.04.md`
 - `ROADMAP_Santamonica_Web_v2026.05.19.04.md` (bump v.13 → v.14)
 
 **File deploy modificati/creati:** 6 (1 JS config + 5 HTML — di cui 2 NUOVI)
@@ -212,23 +232,23 @@
 
 ---
 
-## STATO PROGETTO CONSOLIDATO (post 2026-05-19 sera tardi)
+## STATO PROGETTO CONSOLIDATO (post 2026-09-16)
 
 ### File deploy correnti
 
 | File | Versione | Hosting |
 |---|---|---|
-| **`index.html`** | **v 2026.05.19.04** ⭐ | GH Pages + CF Pages |
-| **`dove-siamo.html`** | **v 2026.05.19.04** ⭐ NUOVO | GH Pages + CF Pages |
-| **`regala.html`** | **v 2026.05.19.03** ⭐ NUOVO | GH Pages + CF Pages |
-| **`privacy.html`** | **v 2026.05.19.02** ⭐ | GH Pages + CF Pages |
-| **`cookies.html`** | **v 2026.05.19.02** ⭐ | GH Pages + CF Pages |
-| **`cookieconsent-config.js`** | **v 2026.05.19.02** ⭐ | GH Pages + CF Pages |
+| **`menu-admin.html`** | **v 2026.09.16.01** ⭐ | Vercel |
+| `index.html` | v 2026.05.19.04 | GH Pages + CF Pages |
+| `dove-siamo.html` | v 2026.05.19.04 | GH Pages + CF Pages |
+| `regala.html` | v 2026.05.19.03 | GH Pages + CF Pages |
+| `privacy.html` | v 2026.05.19.02 | GH Pages + CF Pages |
+| `cookies.html` | v 2026.05.19.02 | GH Pages + CF Pages |
+| `cookieconsent-config.js` | v 2026.05.19.02 | GH Pages + CF Pages |
 | `lib/cookieconsent/cookieconsent.umd.js` | v3.1.0 upstream | GH Pages + CF Pages |
 | `lib/cookieconsent/cookieconsent.css` | v3.1.0 upstream | GH Pages + CF Pages |
 | `translations.json` | v 2026.05.17.02 (chiave `info_dettagli_link` mancante — check pre-F0.21) | GH Pages |
-| `menu-admin.html` | v 2026.05.17.03 | Vercel |
-| `admin-core.js` | v 2026.05.17.04 | Vercel |
+| `admin-core.js` | v 2026.05.17.04 (da verificare: possibili bump non tracciati — vedi nota disallineamento sopra) | Vercel |
 | `admin-templates-shared.js` | v 2026.05.17.02 | Vercel |
 | `foto-optimizer.js` | v 2026.05.09.02 | Vercel |
 | `api/translate.js` (legacy) | v 2026.05.14.01 | Vercel |
@@ -237,6 +257,15 @@
 | `_redirects` | v 2026.05.17.01 | Cloudflare Pages |
 
 ⭐ = rilasciato/aggiornato in questa sessione
+
+**Nota**: le versioni non marcate ⭐ sono quelle risultanti dall'ultimo CHANGELOG tracciato (05-19); per `menu-admin.html` e possibilmente altri file collegati al modulo Food Cost, l'header del file in repo indica versioni più recenti (fino a v 2026.09.13.11) non documentate in questa linea — vedi nota di disallineamento nella voce di sessione odierna.
+
+### Backend Supabase (nuovo in questa sessione — non tracciato prima in questo CHANGELOG)
+
+| Progetto | Ref | Uso |
+|---|---|---|
+| SafeTable | `xbksultfskvzgncncada` | Food Cost (tabelle `fc_*`), edge function `foodcost-admin` (v8) |
+| SantaCantina | `wpsghmmvlwkyqiholfzx` | Anagrafica Cantina/vini (tabelle lookup incl. `fornitori`), edge functions `cantina-*` |
 
 ### Sistema auth/credenziali
 
@@ -250,8 +279,9 @@
 | Wix account | ⚠️ pannello DNS authoritative | — |
 | Formspree | ✅ account attivo (prenotazioni + voucher F0.10) · endpoint voucher dedicato da configurare | — |
 | Email `info@santamonicagenova.it` | ✅ GIÀ ATTIVA (precisazione utente 19-05) · altre @ alias a F0.21 con Email Routing | — |
+| Supabase (SafeTable, SantaCantina) | ✅ attivo, gestito via MCP in sessione | — |
 
-### Convenzioni progetto (aggiornate 19-05 sera tardi)
+### Convenzioni progetto (aggiornate 19-05 sera tardi, integrate 16-09)
 
 | Aspetto | Convenzione |
 |---|---|
@@ -275,11 +305,13 @@
 | Schema.org Restaurant | `@type: ItalianRestaurant` · `@id: https://santamonicagenova.it/#restaurant` duplicato in index.html + dove-siamo.html per SEO (dec. #24) |
 | Pagine mobile-first | dove-siamo.html prima pagina con approccio mobile-first esplicito (default mobile + breakpoint min-width: 640px). Pattern riusabile per future pagine |
 | `_meta` in JSON | chiave `_meta` come prima entry |
-| URL fetch admin | costante `BASE_FETCH_URL` in `admin-core.js` |
+| URL fetch admin | costante `BASE_FETCH_URL` in `admin-core.js` (pattern esteso: ogni modulo admin ha una costante `<MODULO>_URL` dedicata, es. `FC_URL`, `CANTINA_ANAGRAFICHE_URL`) |
 | Stampa carta | html font-size 20px in @media print |
 | Stampa orario | scoped override `#layout-orario` (font −22%) |
 | Coordinate GPS canoniche progetto | `44.3913353, 8.9646575` (estratte da Google Maps Place ID URL via web search 19-05) |
 | Place ID Google canonico | `ChIJGzMzZqlD0xIRKRomfkk1F2c` (dec. #8) |
+| Backend moduli admin | Ogni modulo (Food Cost, Cantina) ha edge function Supabase dedicata con azioni multiple via campo `action`, auth via `github_token` (permesso push sul repo) — nessuna migration SQL nel repo, schema vive solo lato Supabase remoto |
+| Dati cross-progetto Supabase (es. fornitori Cantina usati in Food Cost) | Nessuna FK reale tra progetti Supabase distinti: si legge in sola lettura l'endpoint pubblico dell'altro modulo e si salva uno snapshot testuale, mai un id con vincolo di integrità cross-database |
 
 ### REGOLA OPERATIVA FISSA (versionamento)
 
@@ -299,4 +331,4 @@
 
 ---
 
-**Fine CHANGELOG · v 2026.05.19.04**
+**Fine CHANGELOG · v 2026.09.16.01**

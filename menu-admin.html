@@ -1,4 +1,19 @@
 <!DOCTYPE html>
+<!-- v 2026.09.16.01 — Nuovo sotto-tab Food Cost "Tracciabilità": carico di una
+     fornitura (pesce/crostacei in primis) con un inserimento per riga di fattura
+     che popola in automatico sia Spese sia lo storico di tracciabilità, con codice
+     univoco generato lato server (formato NN-MMAA, come da procedura cartacea in
+     uso) e data di scadenza calcolata dai giorni configurati per categoria (mini
+     anagrafica "Categorie e giorni di scadenza", es. "Pesce abbattuto" = 30gg,
+     editabile). Fornitore inserito come testo libero con suggerimenti dall'anagrafica
+     di Cantina (progetto Supabase separato, letta in sola lettura via endpoint
+     pubblico cantina-anagrafiche — nessuna FK cross-database). Backend: edge
+     function foodcost-admin v8 (nuove azioni tracciabilita_*), nuove tabelle
+     fc_categorie_tracciabilita/fc_tracciabilita_prodotti su SafeTable. Aggiunto
+     anche il campo "settore" alla tabella fornitori di Cantina (SantaCantina).
+     Non testato in browser in questa sessione (nessun ambiente grafico disponibile):
+     verificare il flusso reale prima di considerarlo definitivo — vedi handover.
+-->
 <!-- v 2026.09.13.11 — Ordine dei tab Food Cost: Spese e Incassi spostati subito
      dopo Dashboard (richiesto da Andrea). Nuovo ordine: Dashboard, Spese, Incassi,
      Vendite, Inventario, Costo piatti, Reparti. Solo ordine dei pulsanti — colori
@@ -1218,6 +1233,7 @@
       <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1.2rem;">
         <button class="btn btn-load" id="fc-tab-btn-dashboard" onclick="fcSetTab('dashboard')">Dashboard</button>
         <button class="btn btn-load" id="fc-tab-btn-spese" onclick="fcSetTab('spese')">Spese</button>
+        <button class="btn btn-load" id="fc-tab-btn-tracciabilita" onclick="fcSetTab('tracciabilita')">Tracciabilità</button>
         <button class="btn btn-load" id="fc-tab-btn-incassi" onclick="fcSetTab('incassi')">Incassi</button>
         <button class="btn btn-load" id="fc-tab-btn-vendite" onclick="fcSetTab('vendite')">Vendite</button>
         <button class="btn btn-load" id="fc-tab-btn-inventario" onclick="fcSetTab('inventario')">Inventario</button>
@@ -1268,6 +1284,59 @@
           <button class="btn btn-publish" onclick="fcAggiungiSpesa()">+ Aggiungi</button>
         </div>
         <div id="fc-spese-list" style="font-size:.85rem;">…</div>
+      </div>
+
+      <div id="fc-view-tracciabilita" style="display:none;">
+        <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Carico di una fornitura (soprattutto pesce/crostacei): una riga per prodotto di fattura. Ogni riga genera un codice univoco di rintracciabilità e popola automaticamente anche le Spese del reparto scelto — un solo inserimento per entrambe le tabelle.</p>
+
+        <details style="margin-bottom:1.2rem;">
+          <summary style="cursor:pointer;font-size:.8rem;color:var(--stone);font-weight:600;">Categorie e giorni di scadenza</summary>
+          <div style="margin-top:.8rem;">
+            <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
+              <div style="flex:1;min-width:12rem;">
+                <span class="opt-lbl">Nome categoria</span>
+                <input type="text" id="fc-new-cattracc-nome" placeholder="Es: Pesce abbattuto" />
+              </div>
+              <div>
+                <span class="opt-lbl">Giorni scadenza</span>
+                <input type="number" id="fc-new-cattracc-giorni" min="1" step="1" style="width:6rem;" />
+              </div>
+              <button class="btn btn-publish" onclick="fcAggiungiCategoriaTracc()">+ Aggiungi</button>
+            </div>
+            <div id="fc-cattracc-list" style="font-size:.85rem;">…</div>
+          </div>
+        </details>
+
+        <div class="sub" style="margin-top:0;">Nuovo carico</div>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
+          <div>
+            <span class="opt-lbl">Data ricezione</span>
+            <input type="date" id="fc-tracc-data" style="width:9.5rem;" />
+          </div>
+          <div>
+            <span class="opt-lbl">N. fattura/bolla</span>
+            <input type="text" id="fc-tracc-fattura" style="width:9rem;" />
+          </div>
+          <div style="flex:1;min-width:14rem;">
+            <span class="opt-lbl">Fornitore</span>
+            <input type="text" id="fc-tracc-fornitore" list="fc-tracc-fornitori-list" placeholder="Ragione sociale" />
+            <datalist id="fc-tracc-fornitori-list"></datalist>
+          </div>
+          <div>
+            <span class="opt-lbl">Reparto (Spese)</span>
+            <select id="fc-tracc-reparto" style="width:11rem;padding:.35rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);"></select>
+          </div>
+        </div>
+
+        <div id="fc-tracc-righe" style="margin-bottom:.8rem;"></div>
+        <div style="display:flex;gap:.6rem;margin-bottom:1.2rem;">
+          <button class="btn btn-load" onclick="fcTraccAggiungiRiga()">+ Riga prodotto</button>
+          <button class="btn btn-publish" onclick="fcSalvaCarico()">💾 Salva carico</button>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--rule);margin:0 0 1.2rem;">
+        <div class="sub" style="margin-top:0;">Storico tracciabilità</div>
+        <div id="fc-tracc-list" style="font-size:.85rem;">…</div>
       </div>
 
       <div id="fc-view-incassi" style="display:none;">
@@ -3612,7 +3681,7 @@ var FC_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/foodcost-adm
 var FC_CAT = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'];
 var FC_ME_COLORE = { STAR: '#22c55e', PLOWHORSE: '#3b82f6', PUZZLE: '#f59e0b', DOG: '#e34948' };
 var fcCharts = {};
-var fcState = { reparti: [], tab: 'dashboard', speseTipo: 'food', inventarioTipo: 'food', spese: [], incassi: [], inventario: [], costi: [], vendite: [], dashboard: null, dashboardAutoloadFatto: false };
+var fcState = { reparti: [], tab: 'dashboard', speseTipo: 'food', inventarioTipo: 'food', spese: [], incassi: [], inventario: [], costi: [], vendite: [], dashboard: null, dashboardAutoloadFatto: false, categorieTracc: [], tracciabilita: [], traccRigheSeq: [], traccInizializzato: false };
 
 // Accende/spegne lo stato "attivo" di un gruppo di pulsanti a interruttore (Food/Beverage),
 // stesso stile del tab attivo in fcSetTab (bordo+testo ambra + sfondo più chiaro).
@@ -3715,11 +3784,12 @@ function apriSezioneFoodCost() {
   if (aEl && !aEl.value) aEl.value = _fcUltimoGiornoMeseCorrente();
   _fcSetPillAttiva('fc-spese-tipo-' + fcState.speseTipo, ['fc-spese-tipo-food', 'fc-spese-tipo-beverage']);
   _fcSetPillAttiva('fc-inv-tipo-' + fcState.inventarioTipo, ['fc-inv-tipo-food', 'fc-inv-tipo-beverage']);
-  var dSpesa = document.getElementById('fc-spesa-data'), dInc = document.getElementById('fc-incasso-data'), dInv = document.getElementById('fc-inv-data');
+  var dSpesa = document.getElementById('fc-spesa-data'), dInc = document.getElementById('fc-incasso-data'), dInv = document.getElementById('fc-inv-data'), dTracc = document.getElementById('fc-tracc-data');
   var oggi = _fcOggiLocale();
   if (dSpesa && !dSpesa.value) dSpesa.value = oggi;
   if (dInc && !dInc.value) dInc.value = oggi;
   if (dInv && !dInv.value) dInv.value = oggi;
+  if (dTracc && !dTracc.value) dTracc.value = oggi;
   fcState.dashboardAutoloadFatto = false;
   fcLoadReparti(function () { fcSetTab(fcState.tab || 'dashboard'); });
 }
@@ -3743,12 +3813,13 @@ var FC_TAB_GRUPPI = {
   costi:      { colore: '#199e70', bg: 'rgba(25,158,112,.10)',  bgAttivo: 'rgba(25,158,112,.22)' },
   spese:      { colore: '#d95926', bg: 'rgba(217,89,38,.10)',   bgAttivo: 'rgba(217,89,38,.22)' },
   incassi:    { colore: '#d95926', bg: 'rgba(217,89,38,.10)',   bgAttivo: 'rgba(217,89,38,.22)' },
+  tracciabilita: { colore: '#9085e9', bg: 'rgba(144,133,233,.10)', bgAttivo: 'rgba(144,133,233,.22)' },
   reparti:    { colore: '#eab308', bg: 'rgba(234,179,8,.10)',   bgAttivo: 'rgba(234,179,8,.22)' }
 };
 
 function fcSetTab(t) {
   fcState.tab = t;
-  ['dashboard', 'spese', 'incassi', 'vendite', 'inventario', 'costi', 'reparti'].forEach(function (k) {
+  ['dashboard', 'spese', 'incassi', 'vendite', 'inventario', 'costi', 'reparti', 'tracciabilita'].forEach(function (k) {
     var v = document.getElementById('fc-view-' + k), b = document.getElementById('fc-tab-btn-' + k);
     if (v) v.style.display = (k === t) ? '' : 'none';
     if (b) {
@@ -3764,6 +3835,7 @@ function fcSetTab(t) {
 function fcLoadTab(t) {
   if (t === 'reparti') fcLoadReparti();
   else if (t === 'spese') fcLoadSpese();
+  else if (t === 'tracciabilita') fcTraccInizializza();
   else if (t === 'incassi') fcLoadIncassi();
   else if (t === 'inventario') fcLoadInventario();
   else if (t === 'costi') fcLoadCosti();
@@ -3856,7 +3928,7 @@ function fcAggiungiReparto() {
     .then(function (res) {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcState.reparti = res.body.reparti || [];
-      fcRenderReparti(); fcPopolaSelectReparti();
+      fcRenderReparti(); fcPopolaSelectReparti(); fcPopolaSelectRepartoTracc();
       nomeEl.value = '';
       _fcSetStatus('Reparto aggiunto.');
     })
@@ -3872,7 +3944,7 @@ function fcSalvaReparto(id) {
     .then(function (res) {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcState.reparti = res.body.reparti || [];
-      fcRenderReparti(); fcPopolaSelectReparti();
+      fcRenderReparti(); fcPopolaSelectReparti(); fcPopolaSelectRepartoTracc();
       _fcSetStatus('Reparto salvato.');
     })
     .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
@@ -3940,6 +4012,274 @@ function fcEliminaSpesa(id) {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcLoadSpese();
       _fcSetStatus('Spesa eliminata.');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+// ---- Tracciabilità carichi (pesce/crostacei ecc.) — v 2026.09.16.01 ----
+// Un carico = una fattura fornitore, una riga per prodotto. Il salvataggio di ogni
+// riga (azione tracciabilita_carico_create) popola in un solo colpo sia la lista
+// Spese sia lo storico di tracciabilità, con codice univoco NN-MMAA generato lato
+// server. L'anagrafica fornitori è quella di Cantina (progetto Supabase separato,
+// SantaCantina): letta qui in sola lettura dall'endpoint pubblico cantina-anagrafiche
+// (nessuna FK cross-database — il fornitore viene salvato come testo libero).
+var CANTINA_ANAGRAFICHE_URL = 'https://wpsghmmvlwkyqiholfzx.supabase.co/functions/v1/cantina-anagrafiche';
+var fcTraccSeq = 0;
+
+function fcTraccInizializza() {
+  if (fcState.traccInizializzato) { fcLoadTracciabilita(); return; }
+  fcState.traccInizializzato = true;
+  fcLoadCategorieTracc();
+  fcLoadFornitoriCantina();
+  fcPopolaSelectRepartoTracc();
+  if (!fcState.traccRigheSeq || !fcState.traccRigheSeq.length) fcTraccAggiungiRiga();
+  fcLoadTracciabilita();
+}
+
+function fcPopolaSelectRepartoTracc() {
+  var sel = document.getElementById('fc-tracc-reparto');
+  if (!sel) return;
+  var attuale = sel.value;
+  sel.innerHTML = fcState.reparti.filter(function (r) { return r.attivo && (r.tipo || 'food') === 'food'; }).map(function (r) {
+    return '<option value="' + r.id + '">' + _fcEsc(r.nome) + '</option>';
+  }).join('');
+  if (attuale) sel.value = attuale;
+}
+
+function fcLoadFornitoriCantina() {
+  fetch(CANTINA_ANAGRAFICHE_URL)
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      var list = document.getElementById('fc-tracc-fornitori-list');
+      if (!list || !data || !data.fornitori) return;
+      var fornitori = data.fornitori.slice().sort(function (a, b) { return (a.ragione_sociale || '').localeCompare(b.ragione_sociale || ''); });
+      list.innerHTML = fornitori.filter(function (f) { return f.ragione_sociale; }).map(function (f) {
+        return '<option value="' + _fcEsc(f.ragione_sociale) + '">' + (f.settore ? _fcEsc(f.settore) : '') + '</option>';
+      }).join('');
+    })
+    .catch(function () { /* anagrafica fornitori non disponibile: il campo resta testo libero */ });
+}
+
+// ---- Categorie/giorni scadenza ----
+
+function fcLoadCategorieTracc() {
+  _fcFetch({ action: 'tracciabilita_categorie_list' })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcState.categorieTracc = res.body.categorie || [];
+      fcRenderCategorieTracc();
+      fcTraccPopolaSelectCategorieTutte();
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function fcRenderCategorieTracc() {
+  var list = document.getElementById('fc-cattracc-list');
+  if (!list) return;
+  var cat = fcState.categorieTracc || [];
+  if (!cat.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessuna categoria ancora.</p>'; return; }
+  list.innerHTML = cat.map(function (c) {
+    return '<div class="fs" style="margin-bottom:.6rem;">' +
+      '<div class="fs-body" style="padding:.6rem 1rem;display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;' + (c.attivo ? '' : 'opacity:.5;') + '">' +
+      '<input type="text" id="fc-cattracc-nome-' + c.id + '" value="' + _fcEsc(c.nome) + '" style="flex:1;min-width:10rem;" />' +
+      '<span class="opt-lbl" style="margin:0;">Giorni</span>' +
+      '<input type="number" id="fc-cattracc-giorni-' + c.id + '" value="' + c.giorni_scadenza + '" min="1" step="1" style="width:5rem;" />' +
+      '<label style="font-size:.75rem;color:var(--stone);display:flex;gap:.3rem;align-items:center;"><input type="checkbox" id="fc-cattracc-attivo-' + c.id + '" ' + (c.attivo ? 'checked' : '') + ' /> attiva</label>' +
+      '<button class="btn btn-load" style="font-size:.72rem;padding:.25rem .6rem;" onclick="fcSalvaCategoriaTracc(\'' + c.id + '\')">💾 Salva</button>' +
+      '</div></div>';
+  }).join('');
+}
+
+function fcAggiungiCategoriaTracc() {
+  var nomeEl = document.getElementById('fc-new-cattracc-nome');
+  var giorniEl = document.getElementById('fc-new-cattracc-giorni');
+  var nome = nomeEl.value.trim();
+  var giorni = giorniEl.value;
+  if (!nome) { _fcSetStatus('Indica il nome della categoria.', true); return; }
+  if (giorni === '' || Number(giorni) <= 0) { _fcSetStatus('Indica i giorni di scadenza.', true); return; }
+  _fcSetStatus('Aggiunta…');
+  _fcFetch({ action: 'tracciabilita_categorie_create', nome: nome, giorni_scadenza: Number(giorni) })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcState.categorieTracc = res.body.categorie || [];
+      fcRenderCategorieTracc();
+      fcTraccPopolaSelectCategorieTutte();
+      nomeEl.value = ''; giorniEl.value = '';
+      _fcSetStatus('Categoria aggiunta.');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function fcSalvaCategoriaTracc(id) {
+  var nome = document.getElementById('fc-cattracc-nome-' + id).value.trim();
+  var giorni = document.getElementById('fc-cattracc-giorni-' + id).value;
+  var attivo = document.getElementById('fc-cattracc-attivo-' + id).checked;
+  if (!nome) { _fcSetStatus('Il nome della categoria non può essere vuoto.', true); return; }
+  if (giorni === '' || Number(giorni) <= 0) { _fcSetStatus('Giorni di scadenza non validi.', true); return; }
+  _fcSetStatus('Salvataggio…');
+  _fcFetch({ action: 'tracciabilita_categorie_update', id: id, nome: nome, giorni_scadenza: Number(giorni), attivo: attivo })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcState.categorieTracc = res.body.categorie || [];
+      fcRenderCategorieTracc();
+      fcTraccPopolaSelectCategorieTutte();
+      _fcSetStatus('Categoria salvata.');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+// ---- Righe del carico in lavorazione (repeater) ----
+
+function fcTraccRigaHtml(seq) {
+  var opzioniCategorie = (fcState.categorieTracc || []).filter(function (c) { return c.attivo; }).map(function (c) {
+    return '<option value="' + c.id + '">' + _fcEsc(c.nome) + ' (' + c.giorni_scadenza + 'gg)</option>';
+  }).join('');
+  return '<div class="fs" id="fc-tracc-riga-' + seq + '" style="margin-bottom:.6rem;">' +
+    '<div class="fs-body" style="padding:.6rem 1rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:end;">' +
+    '<div style="flex:1;min-width:10rem;"><span class="opt-lbl">Prodotto</span><input type="text" id="fc-tracc-riga-' + seq + '-prodotto" placeholder="Es: Ricciola" /></div>' +
+    '<div><span class="opt-lbl">Categoria</span><select id="fc-tracc-riga-' + seq + '-categoria" style="width:11rem;padding:.35rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);" onchange="fcTraccCategoriaCambiata(' + seq + ')"><option value="">—</option>' + opzioniCategorie + '</select></div>' +
+    '<div><span class="opt-lbl">Peso</span><input type="number" id="fc-tracc-riga-' + seq + '-peso" min="0" step="0.001" style="width:6rem;" /></div>' +
+    '<div><span class="opt-lbl">U.M.</span><select id="fc-tracc-riga-' + seq + '-um" style="width:5rem;padding:.35rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);"><option value="kg">kg</option><option value="g">g</option><option value="pz">pz</option><option value="lt">lt</option></select></div>' +
+    '<div><span class="opt-lbl">Prezzo/u.m. €</span><input type="number" id="fc-tracc-riga-' + seq + '-prezzo" min="0" step="0.01" style="width:7rem;" /></div>' +
+    '<div><span class="opt-lbl">Lotto</span><input type="text" id="fc-tracc-riga-' + seq + '-lotto" style="width:7rem;" /></div>' +
+    '<div><span class="opt-lbl">Scadenza</span><input type="date" id="fc-tracc-riga-' + seq + '-scadenza" style="width:9.5rem;" /></div>' +
+    '<button class="btn btn-load" style="font-size:.72rem;padding:.25rem .6rem;color:var(--rust);border-color:var(--rust);" onclick="fcTraccRimuoviRiga(' + seq + ')">✕</button>' +
+    '</div></div>';
+}
+
+function fcTraccAggiungiRiga() {
+  if (!fcState.traccRigheSeq) fcState.traccRigheSeq = [];
+  var seq = ++fcTraccSeq;
+  fcState.traccRigheSeq.push(seq);
+  var cont = document.getElementById('fc-tracc-righe');
+  var div = document.createElement('div');
+  div.innerHTML = fcTraccRigaHtml(seq);
+  cont.appendChild(div.firstChild);
+}
+
+function fcTraccRimuoviRiga(seq) {
+  fcState.traccRigheSeq = (fcState.traccRigheSeq || []).filter(function (x) { return x !== seq; });
+  var el = document.getElementById('fc-tracc-riga-' + seq);
+  if (el) el.remove();
+}
+
+function fcTraccPopolaSelectCategorieTutte() {
+  (fcState.traccRigheSeq || []).forEach(function (seq) {
+    var sel = document.getElementById('fc-tracc-riga-' + seq + '-categoria');
+    if (!sel) return;
+    var attuale = sel.value;
+    var opzioni = (fcState.categorieTracc || []).filter(function (c) { return c.attivo; }).map(function (c) {
+      return '<option value="' + c.id + '">' + _fcEsc(c.nome) + ' (' + c.giorni_scadenza + 'gg)</option>';
+    }).join('');
+    sel.innerHTML = '<option value="">—</option>' + opzioni;
+    if (attuale) sel.value = attuale;
+  });
+}
+
+// Alla scelta di una categoria, propone la data di scadenza (data ricezione + giorni
+// configurati) — resta comunque un campo modificabile a mano.
+function fcTraccCategoriaCambiata(seq) {
+  var catId = document.getElementById('fc-tracc-riga-' + seq + '-categoria').value;
+  var dataRicezione = document.getElementById('fc-tracc-data').value;
+  var scadenzaEl = document.getElementById('fc-tracc-riga-' + seq + '-scadenza');
+  if (!catId || !dataRicezione || !scadenzaEl) return;
+  var cat = (fcState.categorieTracc || []).find(function (c) { return c.id === catId; });
+  if (!cat) return;
+  var d = new Date(dataRicezione + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() + cat.giorni_scadenza);
+  scadenzaEl.value = d.toISOString().slice(0, 10);
+}
+
+function fcSalvaCarico() {
+  var data_ricezione = document.getElementById('fc-tracc-data').value;
+  var numero_fattura = document.getElementById('fc-tracc-fattura').value.trim();
+  var fornitore_nome = document.getElementById('fc-tracc-fornitore').value.trim();
+  var reparto_id = document.getElementById('fc-tracc-reparto').value;
+  if (!data_ricezione) { _fcSetStatus('Indica la data di ricezione.', true); return; }
+  if (!reparto_id) { _fcSetStatus('Indica il reparto (creane uno in Spese se la lista è vuota).', true); return; }
+  var seqs = fcState.traccRigheSeq || [];
+  if (!seqs.length) { _fcSetStatus('Aggiungi almeno una riga prodotto.', true); return; }
+  var righe = [];
+  for (var i = 0; i < seqs.length; i++) {
+    var seq = seqs[i];
+    var prodotto = document.getElementById('fc-tracc-riga-' + seq + '-prodotto').value.trim();
+    if (!prodotto) continue;
+    righe.push({
+      prodotto: prodotto,
+      categoria_id: document.getElementById('fc-tracc-riga-' + seq + '-categoria').value || null,
+      peso: document.getElementById('fc-tracc-riga-' + seq + '-peso').value,
+      unita_misura: document.getElementById('fc-tracc-riga-' + seq + '-um').value,
+      prezzo_unitario: document.getElementById('fc-tracc-riga-' + seq + '-prezzo').value,
+      lotto: document.getElementById('fc-tracc-riga-' + seq + '-lotto').value.trim(),
+      data_scadenza: document.getElementById('fc-tracc-riga-' + seq + '-scadenza').value || null,
+    });
+  }
+  if (!righe.length) { _fcSetStatus('Indica almeno un prodotto (nome obbligatorio in ogni riga).', true); return; }
+  _fcSetStatus('Salvataggio carico…');
+  _fcFetch({
+    action: 'tracciabilita_carico_create',
+    numero_fattura: numero_fattura, fornitore_nome: fornitore_nome,
+    data_ricezione: data_ricezione, reparto_id: reparto_id, righe: righe,
+  })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      document.getElementById('fc-tracc-righe').innerHTML = '';
+      fcState.traccRigheSeq = [];
+      fcTraccAggiungiRiga();
+      document.getElementById('fc-tracc-fattura').value = '';
+      fcLoadTracciabilita();
+      _fcSetStatus(res.body.inserite + ' riga/e salvate (Spese + Tracciabilità).');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+// ---- Storico tracciabilità ----
+
+function fcLoadTracciabilita() {
+  var r = fcRangeValido();
+  if (!r) { _fcSetStatus('Imposta un intervallo di date valido (Dal/Al).', true); return; }
+  _fcSetStatus('Caricamento tracciabilità…');
+  _fcFetch({ action: 'tracciabilita_list', da: r.da, a: r.a })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcState.tracciabilita = res.body.righe || [];
+      fcRenderTracciabilita();
+      _fcSetStatus('');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function fcRenderTracciabilita() {
+  var list = document.getElementById('fc-tracc-list');
+  if (!list) return;
+  var righe = fcState.tracciabilita || [];
+  if (!righe.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun carico in questo periodo.</p>'; return; }
+  list.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:.8rem;">' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.68rem;text-transform:uppercase;"><th>Rif. Interno</th><th>Prodotto</th><th>Peso</th><th>Ricezione</th><th>Fattura/Bolla</th><th>Lotto</th><th>Fornitore</th><th>Scadenza</th><th></th></tr>' +
+    righe.map(function (r) {
+      return '<tr style="border-top:1px solid var(--rule);">' +
+        '<td style="padding:.35rem 0;font-weight:600;">' + _fcEsc(r.rif_interno) + '</td>' +
+        '<td>' + _fcEsc(r.prodotto) + '</td>' +
+        '<td>' + (r.peso != null ? r.peso + ' ' + _fcEsc(r.unita_misura || '') : '—') + '</td>' +
+        '<td>' + r.data_ricezione + '</td>' +
+        '<td>' + _fcEsc(r.numero_fattura || '—') + '</td>' +
+        '<td>' + _fcEsc(r.lotto || '—') + '</td>' +
+        '<td>' + _fcEsc(r.fornitore_nome || '—') + '</td>' +
+        '<td>' + (r.data_scadenza || '—') + '</td>' +
+        '<td><span onclick="fcEliminaTracciabilita(\'' + r.id + '\')" style="color:var(--rust);cursor:pointer;font-size:.75rem;">elimina</span></td>' +
+        '</tr>';
+    }).join('') +
+    '</table>';
+}
+
+function fcEliminaTracciabilita(id) {
+  if (!window.confirm('Eliminare questa riga di tracciabilità? Verrà eliminata anche la spesa collegata.')) return;
+  _fcSetStatus('Eliminazione…');
+  _fcFetch({ action: 'tracciabilita_delete', id: id })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcLoadTracciabilita();
+      _fcSetStatus('Riga eliminata.');
     })
     .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
 }

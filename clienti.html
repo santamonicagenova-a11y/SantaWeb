@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!-- v 2026.09.18.01 — nuova colonna "Richieste particolari" nello storico prenotazioni della
+     scheda cliente (richiesta Andrea: vedere il contenuto del campo "Richieste particolari" del
+     form di prenotazione direttamente dall'anagrafica cliente in Gestionale, senza dover aprire
+     ogni prenotazione singolarmente). Nessuna modifica al backend: clienti-crm (azione detail)
+     seleziona già `note` per ogni riga di reservations, mancava solo la colonna in tabella. -->
 <!-- v 2026.09.02.01 — 4 funzionalità CRM aggiunte dopo ricerca su SevenRooms/OpenTable/Resy/Brevo
      (richiesta Andrea: "cerca in rete altri esempi... vedi se ci sono altre funzionalità").
      (1) Compleanno/anniversario: 2 nuovi campi data nella scheda cliente (colonne
@@ -235,7 +240,7 @@
       <div class="field" id="cli-storia-wrap">
         <label>Storico prenotazioni</label>
         <table class="storia-tbl">
-          <thead><tr><th>Data</th><th>Orario</th><th>Persone</th><th>Stato</th><th>Occasione</th></tr></thead>
+          <thead><tr><th>Data</th><th>Orario</th><th>Persone</th><th>Stato</th><th>Occasione</th><th>Richieste particolari</th></tr></thead>
           <tbody id="cli-storia-tbody"></tbody>
         </table>
       </div>
@@ -551,12 +556,13 @@ function apriSchedaCliente(c) {
       '<div><b>' + _escHtml(c.prima_prenotazione || '—') + '</b>prima visita</div>' +
       '<div><b>' + consensoLabel + '</b>consenso newsletter</div>' +
       (milestoneBadge(c.n_arrivato) ? '<div>' + milestoneBadge(c.n_arrivato) + '</div>' : '');
-    document.getElementById('cli-storia-tbody').innerHTML = '<tr><td colspan="5" style="color:var(--stone);">Caricamento storico…</td></tr>';
+    document.getElementById('cli-storia-tbody').innerHTML = '<tr><td colspan="6" style="color:var(--stone);">Caricamento storico…</td></tr>';
     _cliFetch({ action: 'detail', telefono_norm: c.telefono_norm }).then(function (res) {
       if (res.status === 200 && res.body && res.body.ok) {
         document.getElementById('cli-storia-tbody').innerHTML = (res.body.storia || []).map(function (r) {
           return '<tr><td>' + _escHtml(r.data) + '</td><td>' + _escHtml(r.orario) + '</td><td>' + (r.persone || '') +
-            '</td><td>' + badgeStato(r.arrivo_status || r.status) + '</td><td>' + _escHtml(r.occasione || '—') + '</td></tr>';
+            '</td><td>' + badgeStato(r.arrivo_status || r.status) + '</td><td>' + _escHtml(r.occasione || '—') +
+            '</td><td>' + _escHtml(r.note || '—') + '</td></tr>';
         }).join('');
       }
     });

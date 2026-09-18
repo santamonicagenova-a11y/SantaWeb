@@ -40,7 +40,7 @@ Nessuna modifica all'edge function per questi punti (il campo `categoria_id` in 
 
 ### Limiti noti / assunzioni da verificare
 
-- Un giorno con **incasso realmente zero** (es. locale chiuso) non verrebbe importato, perché il parser scarta le righe con FOOD/BEVERG ≤ 0 per non confondere "non ancora compilato" con "zero vero" — nel foglio osservato i placeholder non compilati risultano proprio a 0 tramite formula. Se in pratica serve distinguere i due casi, va rivista la logica (es. leggere anche la formula/colore della cella, non solo il valore).
+- Un giorno con **incasso realmente zero** (es. locale chiuso) non genera una riga in `fc_incassi_giornalieri` in fase di import (il parser scarta FOOD/BEVERG ≤ 0 per non confondere "non ancora compilato" con "zero vero" — nel foglio osservato i placeholder non compilati risultano proprio a 0 tramite formula). **Verificato con Andrea (2026-09-18) che questo non è un problema per il calcolo del food cost**: `calcolaRange` nell'edge function somma semplicemente `importo` su tutte le righe del range (`totaleIncassi = incassi.reduce(...)`), senza dividere per numero di giorni — un giorno senza riga contribuisce 0 al totale, esattamente come contribuirebbe una riga esplicita con `importo: 0`. L'unico effetto è cosmetico: nella lista giornaliera del tab Incassi il giorno saltato mostra "—" invece di "€ 0,00". Nessuna modifica necessaria.
 - Aliquota IVA 10% fissa in codice (`FC_IMP_ALIQUOTA_IVA`), uguale per food e beverage, come confermato da Andrea. Se in futuro cambia o serve differenziarla, va aggiornata lì.
 - **Non testato in browser** in questa sessione (ambiente senza interfaccia grafica): il flusso di lettura file → scelta scheda → anteprima → import va verificato da Andrea su un mese reale con dati, in particolare la corretta associazione giorno→data e lo scorporo IVA.
 
@@ -51,7 +51,7 @@ Durante questa sessione una **sessione Cowork separata** ha pushato su `main` (P
 ## Loop di revisione (GATE PRODUZIONE)
 
 - **P1 (formale)**: sintassi JS verificata (`node --check` sui blocchi nuovi, anche dopo il merge), tutte le funzioni richiamate da `onclick`/`onchange` risultano definite, id HTML coerenti tra markup e JS.
-- **P2 (sostanziale)**: rivista la logica di scorporo IVA, il criterio per distinguere "giorno non compilato" da "incasso zero reale" (vedi limite sopra, accettato consapevolmente), il mapping mese/anno dal nome scheda Excel, e la gestione delle schede pre-ottobre 2026 (segnalate come non importabili invece di essere lette in modo scorretto).
+- **P2 (sostanziale)**: rivista la logica di scorporo IVA, il criterio per distinguere "giorno non compilato" da "incasso zero reale" (vedi nota sopra — verificato con l'utente che non impatta il calcolo del food cost), il mapping mese/anno dal nome scheda Excel, e la gestione delle schede pre-ottobre 2026 (segnalate come non importabili invece di essere lette in modo scorretto).
 - **Revisione Oppositiva (3ª passata)**: **non tentata in questa sessione** (nessuna richiesta esplicita dell'utente). Si somma al debito già aperto in v2026.09.16.01 per il modulo Tracciabilità — entrambi da chiudere prima di considerare i due moduli definitivi.
 
 ## File consegnati

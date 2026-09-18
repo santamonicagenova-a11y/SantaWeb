@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v 2026.09.18.01 — Food Cost → Incassi: nuovo import da Excel (foglio "Budget"
+<!-- v 2026.09.18.02 — Food Cost → Incassi: nuovo import da Excel (foglio "Budget"
      giornaliero dell'utente, una scheda per mese, da cui derivava anche LibroCassa).
      Il file si carica in pagina (SheetJS via CDN, lazy-load al primo uso), si sceglie
      la scheda mese, si leggono le colonne FOOD/BEVERG (IVA inclusa, disponibili da
@@ -8,6 +8,18 @@
      salvare con la nuova azione incassi_bulk_upsert (edge function foodcost-admin v9).
      Le schede mensili precedenti a ottobre 2026 non hanno le colonne giuste e vengono
      segnalate come non importabili invece di essere lette in modo scorretto. -->
+<!-- v 2026.09.18.01 — Rubrica professionisti: sincro manuale a due vie con NoShowApp (richiesta
+     Andrea). Colonna-gemella nsa_professional_id (professionisti) / santamonica_professionista_id
+     (professionals su NoShowApp), edge function rubrica-professionisti v3 + rubrica-professionisti-
+     admin v2. Nuovo pulsante "⇧ Pubblica/Aggiorna su NoShowApp" per contatto (azione push_to_nsa:
+     crea il gemello la prima volta e salva il link, poi aggiorna in place); "🗑 Elimina" ora
+     cancella anche il gemello se collegato (best-effort); "⇩ Importa da NoShowApp" non duplica più
+     chi è già collegato (update in place), dedup nome+telefono resta solo per le voci mai
+     collegate. Nessuna sincronizzazione automatica: sempre e solo su pulsante, come da scelta
+     esistente (rubrica ri-separata da NoShowApp il 2/9, richiesta esplicita di non riunificarle).
+     Testo introduttivo della sezione corretto (era rimasto quello della vecchia rubrica unificata,
+     mai aggiornato dopo la ri-separazione — dava per scontata una sincro automatica inesistente). +
+     footer-version. -->
 <!-- v 2026.09.16.03 — Tracciabilità: tolta anche la sezione UI "Categorie e giorni di
      scadenza" (richiesto da Andrea, non serve più in pagina). La categoria di default
      resta in DB (fc_categorie_tracciabilita, "Pesce abbattuto" = 30gg) e viene ancora
@@ -1762,10 +1774,13 @@
     <div class="fs-head">Rubrica professionisti — elettricista, idraulico, ecc.</div>
     <div class="fs-body">
       <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">
-        Stessa rubrica <strong>condivisa</strong> dell'app NoShowApp (elettricista, idraulico, ecc.): aggiungi,
-        modifica o elimina qui e la vedi anche da lì, e viceversa. Ogni contatto può avere più
-        <strong>note d'uso</strong> (com'è andata una volta chiamato). Le modifiche usano il tuo token GitHub
-        (lo stesso della pubblicazione).
+        Rubrica <strong>privata</strong> di Santamonica (elettricista, idraulico, ecc.), separata dalla rubrica
+        condivisa di NoShowApp — nessun ristorante ci vede dentro. Puoi collegarla a NoShowApp a mano: il
+        pulsante <strong>⇧ Pubblica su NoShowApp</strong> su ogni contatto lo copia (o aggiorna) là, e
+        <strong>⇩ Importa da NoShowApp</strong> qui sotto porta dentro le voci condivise. Nessuna sincronizzazione
+        automatica: succede solo quando premi un pulsante. Ogni contatto può avere più <strong>note d'uso</strong>
+        (com'è andata una volta chiamato) — quelle restano sempre private, non vengono mai pubblicate. Le
+        modifiche usano il tuo token GitHub (lo stesso della pubblicazione del sito).
       </p>
 
       <div class="sub" style="margin-top:0;">Nuovo contatto</div>
@@ -1798,7 +1813,7 @@
 
       <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:1.2rem;">
         <button class="btn btn-load" id="rub-import-nsa-btn" style="border:1px solid var(--rule);color:var(--ink);font-size:.68rem;" onclick="importaRubricaDaNSA()">⇩ Importa da NoShowApp</button>
-        <span style="font-size:.72rem;color:var(--stone);">Copia una tantum TUTTI i professionisti già presenti su NoShowApp, di qualunque ristorante (richiede che quel progetto sia attivo, non in pausa). Non duplica chi è già qui.</span>
+        <span style="font-size:.72rem;color:var(--stone);">Copia TUTTI i professionisti già presenti su NoShowApp, di qualunque ristorante (richiede che quel progetto sia attivo, non in pausa). Chi è già collegato viene aggiornato, non duplicato.</span>
       </div>
 
       <hr style="border:none;border-top:1px solid var(--rule);margin:0 0 1.2rem;">
@@ -3247,7 +3262,7 @@ function importaRubricaDaNSA() {
         rubState.professionisti = res.body.professionisti || [];
         rubState.note_uso = res.body.note_uso || [];
         renderRubricaProfessionisti();
-        _rubSetStatus('Importati ' + res.body.imported + ', già presenti ' + res.body.skipped + '.');
+        _rubSetStatus('Importati ' + res.body.imported + ', aggiornati ' + res.body.updated + ', già presenti ' + res.body.skipped + '.');
       } else {
         _rubSetStatus((res.body && res.body.error) || 'Errore durante l\'importazione.', true);
       }
@@ -3313,10 +3328,23 @@ function modificaProfessionista(id) {
 function annullaModificaProfessionista() { _rubClearForm(); }
 
 function eliminaProfessionista(id) {
-  if (!window.confirm('Eliminare questo professionista? Vengono eliminate anche le note d\'uso collegate.')) return;
+  if (!window.confirm('Eliminare questo professionista? Vengono eliminate anche le note d\'uso collegate e, se pubblicato, la voce gemella su NoShowApp.')) return;
   _rubSetStatus('Eliminazione…');
   _rubFetch({ action: 'delete', id: id })
     .then(function (res) { _rubApply(res, 'Contatto eliminato.'); })
+    .catch(function (e) { _rubErr(e, 'Errore di connessione.'); });
+}
+
+function pubblicaProfessionista(id) {
+  _rubSetStatus('Pubblicazione su NoShowApp…');
+  _rubFetch({ action: 'push_to_nsa', id: id })
+    .then(function (res) {
+      if (res.status === 200 && res.body && res.body.ok) {
+        _rubApply(res, res.body.mode === 'create' ? 'Pubblicato su NoShowApp.' : 'Aggiornato su NoShowApp.');
+      } else {
+        _rubSetStatus((res.body && res.body.error) || 'Errore nella pubblicazione.', true);
+      }
+    })
     .catch(function (e) { _rubErr(e, 'Errore di connessione.'); });
 }
 
@@ -3357,10 +3385,12 @@ function renderRubricaProfessionisti() {
       (r.phone ? '<div style="font-size:.8rem;margin-top:.2rem;"><a href="tel:' + _rubEscHtml(r.phone) + '" style="color:var(--ink);">📞 ' + _rubEscHtml(r.phone) + '</a></div>' : '') +
       (r.email ? '<div style="font-size:.8rem;"><a href="mailto:' + _rubEscHtml(r.email) + '" style="color:var(--ink);">✉ ' + _rubEscHtml(r.email) + '</a></div>' : '') +
       (r.note ? '<div style="font-size:.8rem;margin-top:.3rem;">' + _rubEscHtml(r.note) + '</div>' : '') +
-      '<div style="font-size:.72rem;color:var(--stone);margin-top:.3rem;">Segnalato da ' + _rubEscHtml(r.ristorante || '—') + ' · ' + d + '</div>' +
+      '<div style="font-size:.72rem;color:var(--stone);margin-top:.3rem;">Segnalato da ' + _rubEscHtml(r.ristorante || '—') + ' · ' + d +
+      (r.nsa_professional_id ? ' · <span style="color:var(--green);">✓ pubblicato su NoShowApp</span>' : '') + '</div>' +
       '</div>' +
       '<div style="display:flex;flex-direction:column;gap:.3rem;">' +
       '<button class="btn btn-load" style="font-size:.72rem;padding:.25rem .6rem;" onclick="modificaProfessionista(\'' + r.id + '\')">✎ Modifica</button>' +
+      '<button class="btn btn-load" style="font-size:.72rem;padding:.25rem .6rem;" onclick="pubblicaProfessionista(\'' + r.id + '\')">' + (r.nsa_professional_id ? '⇧ Aggiorna su NoShowApp' : '⇧ Pubblica su NoShowApp') + '</button>' +
       '<button class="btn btn-load" style="font-size:.72rem;padding:.25rem .6rem;border:1px solid var(--rust);color:var(--rust);" onclick="eliminaProfessionista(\'' + r.id + '\')">🗑 Elimina</button>' +
       '</div>' +
       '</div>' +
@@ -4040,10 +4070,11 @@ function fcEliminaSpesa(id) {
 // Un carico = una fattura fornitore, una riga per prodotto. Il salvataggio di ogni
 // riga (azione tracciabilita_carico_create) popola in un solo colpo sia la lista
 // Spese sia lo storico di tracciabilità, con codice univoco NN-MMAA generato lato
-// server. L'anagrafica fornitori è quella di Cantina (progetto Supabase separato,
-// SantaCantina): letta qui in sola lettura dall'endpoint pubblico cantina-anagrafiche
-// (nessuna FK cross-database — il fornitore viene salvato come testo libero).
-var CANTINA_ANAGRAFICHE_URL = 'https://wpsghmmvlwkyqiholfzx.supabase.co/functions/v1/cantina-anagrafiche';
+// server. L'anagrafica fornitori è quella di Cantina (tabelle cantina_* dentro il progetto
+// Supabase SafeTable, accorpate da SantaCantina il 16/9/2026): letta qui in sola lettura
+// dall'endpoint pubblico cantina-anagrafiche (nessuna FK cross-tabella — il fornitore viene
+// salvato come testo libero).
+var CANTINA_ANAGRAFICHE_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/cantina-anagrafiche';
 var fcTraccSeq = 0;
 
 function fcTraccInizializza() {
@@ -6597,7 +6628,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.18.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.18.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

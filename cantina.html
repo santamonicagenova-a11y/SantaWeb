@@ -295,9 +295,12 @@
      (sotto-capitolo), replicando la struttura della carta stampata invece del semplice elenco
      piatto precedente. -->
 <!-- v 2026.08.15.01 — Gestionale cantina (NUOVO ramo, sessione 15/8/2026): anagrafica vini/bevande
-     (578 articoli) migrata da Access a un progetto Supabase dedicato "SantaCantina"
-     (wpsghmmvlwkyqiholfzx, separato da SafeTable), con vero magazzino (carichi/scarichi/
-     rettifiche + giacenze) — l'Access di partenza aveva quelle tabelle sostanzialmente vuote.
+     (578 articoli) migrata da Access a un progetto Supabase dedicato "SantaCantina", con vero
+     magazzino (carichi/scarichi/rettifiche + giacenze) — l'Access di partenza aveva quelle
+     tabelle sostanzialmente vuote.
+     v 2026.09.16.01 — SantaCantina accorpata dentro il progetto Supabase "SafeTable"
+     (xbksultfskvzgncncada), tabelle con prefisso cantina_, per liberare uno slot del piano
+     gratuito Supabase (max 2 progetti) e permettere la riattivazione di NoShowApp.
      Pagina admin standalone (come gestionale.html — feature grande = pagina propria), 4 sezioni:
      Catalogo (CRUD articoli + toggle Nascosto), Anagrafiche (CRUD tipologie/produttori/regioni/
      agenti/distributori/fornitori/categorie fornitori/ubicazioni/unità di misura), Magazzino
@@ -615,7 +618,7 @@
 
 <script>
 // ============ CONFIG ============
-var EDGE_BASE = 'https://wpsghmmvlwkyqiholfzx.supabase.co/functions/v1';
+var EDGE_BASE = 'https://xbksultfskvzgncncada.supabase.co/functions/v1';
 var URL_CATALOGO = EDGE_BASE + '/cantina-catalogo';
 var URL_ANAGRAFICHE = EDGE_BASE + '/cantina-anagrafiche';
 var URL_MAGAZZINO = EDGE_BASE + '/cantina-magazzino';

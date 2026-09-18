@@ -1,5 +1,5 @@
 # METODO — Continuità documentale per progetti di lavoro con Claude
-**Versione:** v 2026.05.15.01
+**Versione:** v 2026.09.18.01
 **Versione storica:** v 1.0 (2026-05-13) · **Autore:** definito per uso personale, riutilizzabile su qualsiasi progetto Claude
 
 ---
@@ -272,8 +272,15 @@ Esempi: `v 2026.05.13.01`, `v 2026.05.13.02`, `v 2026.05.14.01`, `v 2026.05.15.0
 |---|---|---|
 | v1 | 2026-05-13 | Versione in header + footer/UI (solo file deploy menzionati esplicitamente) |
 | v2 | 2026-05-15 | Esteso a documenti di continuità (handover/changelog/roadmap/manuali) + naming file con versione + comportamento sostituzione + propagazione esplicita |
+| v3 | 2026-09-18 | Aggiunta §6.7 — regola Git: push diretto su main, no feature branch/PR salvo richiesta esplicita |
 
 ---
+
+## 6.7 REGOLA OPERATIVA FISSA — Git: push diretto su main
+
+> Salvo diversa istruzione esplicita dell'utente per una singola sessione, **il lavoro va portato direttamente su `main`**, senza flusso feature-branch + Pull Request. Se l'ambiente di lavoro crea comunque un branch di sessione separato, va riportato su `main` (push/fast-forward) a fine sessione. Aprire una PR solo su richiesta esplicita dell'utente.
+
+Questa regola va riportata in ogni futuro documento di continuità/handover (sezione "Contesto essenziale"), così da propagarsi attraverso sessioni future indipendentemente dalla memoria persistente caricata — introdotta dopo che in una sessione il lavoro era stato lasciato su un branch secondario invece che su main senza che fosse stato richiesto.
 
 ## 7. RECOVERY — se manca qualcosa
 
@@ -335,4 +342,4 @@ In caso estremo (handover perso, no Git backup):
 
 ---
 
-*Versione documento: v 2026.05.15.01 — aggiornamento sostanziale §6 con estensione regola versioning a documenti di continuità + naming file + propagazione esplicita. Sostituisce v 2026.05.13.01.*
+*Versione documento: v 2026.09.18.01 — aggiunta §6.7, regola Git push diretto su main. Sostituisce v 2026.05.15.01.*

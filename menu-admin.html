@@ -1,4 +1,13 @@
 <!DOCTYPE html>
+<!-- v 2026.09.18.01 — Food Cost → Incassi: nuovo import da Excel (foglio "Budget"
+     giornaliero dell'utente, una scheda per mese, da cui derivava anche LibroCassa).
+     Il file si carica in pagina (SheetJS via CDN, lazy-load al primo uso), si sceglie
+     la scheda mese, si leggono le colonne FOOD/BEVERG (IVA inclusa, disponibili da
+     ottobre 2026 in poi — prima erano FT/POS, non affidabili come split), si scorpora
+     l'IVA al 10% (aliquota confermata da Andrea) e si mostra un'anteprima prima di
+     salvare con la nuova azione incassi_bulk_upsert (edge function foodcost-admin v9).
+     Le schede mensili precedenti a ottobre 2026 non hanno le colonne giuste e vengono
+     segnalate come non importabili invece di essere lette in modo scorretto. -->
 <!-- v 2026.09.16.03 — Tracciabilità: tolta anche la sezione UI "Categorie e giorni di
      scadenza" (richiesto da Andrea, non serve più in pagina). La categoria di default
      resta in DB (fc_categorie_tracciabilita, "Pesce abbattuto" = 30gg) e viene ancora
@@ -1354,6 +1363,20 @@
           <button class="btn btn-publish" onclick="fcSalvaIncasso()">💾 Salva</button>
         </div>
         <p style="font-size:.72rem;color:var(--stone);margin:-.6rem 0 1rem;">Un solo incasso per giorno e tipo — salvare di nuovo sulla stessa data lo sovrascrive. Puoi compilare solo Food, solo Beverage, o entrambi.</p>
+
+        <details style="margin-bottom:1.2rem;">
+          <summary style="cursor:pointer;font-size:.8rem;color:var(--stone);font-weight:600;">📥 Importa da Excel (Budget)</summary>
+          <div style="margin-top:.8rem;">
+            <p style="font-size:.78rem;color:var(--stone);margin-bottom:.8rem;">Carica il foglio Excel "Budget" (una scheda per mese, colonne FOOD/BEVERG — disponibili da ottobre 2026). Gli importi vengono letti IVA inclusa e scorporati al 10% prima di essere salvati.</p>
+            <input type="file" id="fc-imp-file" accept=".xlsx,.xls" onchange="fcImportIncassiFile(this)" style="font-size:.8rem;margin-bottom:.8rem;" />
+            <div id="fc-imp-sheet-wrap" style="display:none;margin-bottom:.8rem;">
+              <span class="opt-lbl">Scheda (mese)</span>
+              <select id="fc-imp-sheet" style="width:11rem;padding:.35rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);" onchange="fcImportIncassiScegliSheet()"></select>
+            </div>
+            <div id="fc-imp-preview" style="font-size:.82rem;"></div>
+          </div>
+        </details>
+
         <div id="fc-incassi-list" style="font-size:.85rem;">…</div>
       </div>
 
@@ -4307,6 +4330,139 @@ function fcEliminaIncasso(id) {
     .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
 }
 
+// ---- Import Incassi da Excel (foglio "Budget", una scheda per mese) — v 2026.09.18.01.
+// Il foglio ha una riga per giorno con colonne FOOD/BEVERG (IVA inclusa, disponibili da
+// ottobre 2026 — prima erano FT/POS, non affidabili come split food/beverage). Il parsing
+// avviene tutto lato browser con SheetJS (CDN, caricata solo al primo utilizzo per non
+// appesantire il caricamento della pagina); l'edge function riceve solo righe già pronte
+// {data, tipo, importo} — vedi incassi_bulk_upsert.
+var FC_IMP_ALIQUOTA_IVA = 0.10;
+var FC_IMP_MESI = { gen: 1, feb: 2, mar: 3, apr: 4, mag: 5, giu: 6, lug: 7, ago: 8, sett: 9, set: 9, ott: 10, nov: 11, dic: 12 };
+var fcImpState = { workbook: null, righe: [] };
+
+function _fcImpCaricaLibreria(callback) {
+  if (window.XLSX) { callback(); return; }
+  var s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  s.onload = callback;
+  s.onerror = function () { _fcSetStatus('Impossibile caricare la libreria di lettura Excel (rete/CDN).', true); };
+  document.head.appendChild(s);
+}
+
+// Interpreta un nome di scheda tipo "Ott 26" → { mese: 10, anno: 2026 }, o null se non riconosciuto.
+function _fcImpParseSheetName(nome) {
+  var m = /^([A-Za-zàèéìòù]+)\s+(\d{2})$/.exec((nome || '').trim());
+  if (!m) return null;
+  var mese = FC_IMP_MESI[m[1].toLowerCase()];
+  if (!mese) return null;
+  return { mese: mese, anno: 2000 + Number(m[2]) };
+}
+
+function fcImportIncassiFile(inputEl) {
+  var file = inputEl.files && inputEl.files[0];
+  if (!file) return;
+  _fcSetStatus('Lettura file…');
+  _fcImpCaricaLibreria(function () {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      try {
+        fcImpState.workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array', cellDates: false });
+      } catch (err) {
+        _fcSetStatus('File non leggibile: ' + err.message, true);
+        return;
+      }
+      var sheetNames = fcImpState.workbook.SheetNames.filter(function (n) { return _fcImpParseSheetName(n); });
+      var sel = document.getElementById('fc-imp-sheet');
+      sel.innerHTML = sheetNames.map(function (n) { return '<option value="' + _fcEsc(n) + '">' + _fcEsc(n) + '</option>'; }).join('');
+      document.getElementById('fc-imp-sheet-wrap').style.display = sheetNames.length ? '' : 'none';
+      if (!sheetNames.length) { _fcSetStatus('Nessuna scheda mensile riconosciuta in questo file.', true); return; }
+      // Preseleziona la scheda del mese/anno corrente, se presente.
+      var oggi = new Date();
+      var mese = oggi.getMonth() + 1, anno = oggi.getFullYear();
+      var corrente = sheetNames.find(function (n) { var p = _fcImpParseSheetName(n); return p.mese === mese && p.anno === anno; });
+      if (corrente) sel.value = corrente;
+      _fcSetStatus('');
+      fcImportIncassiScegliSheet();
+    };
+    reader.onerror = function () { _fcSetStatus('Errore di lettura del file.', true); };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function fcImportIncassiScegliSheet() {
+  var sel = document.getElementById('fc-imp-sheet');
+  var nome = sel && sel.value;
+  var preview = document.getElementById('fc-imp-preview');
+  if (!nome || !fcImpState.workbook) { preview.innerHTML = ''; return; }
+  var info = _fcImpParseSheetName(nome);
+  var ws = fcImpState.workbook.Sheets[nome];
+  var righe = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null });
+  var intestazione = righe[0] || [];
+  var colFood = intestazione.findIndex(function (h) { return String(h || '').trim().toUpperCase() === 'FOOD'; });
+  var colBev = intestazione.findIndex(function (h) { return String(h || '').trim().toUpperCase() === 'BEVERG'; });
+  if (colFood < 0 || colBev < 0) {
+    preview.innerHTML = '<p style="color:var(--rust);font-size:.82rem;">Questa scheda non ha le colonne FOOD/BEVERG (disponibili da ottobre 2026 in poi) — impossibile importare in automatico. Le colonne precedenti (FT/POS) hanno un significato diverso e non vanno usate come incasso food/beverage.</p>';
+    fcImpState.righe = [];
+    return;
+  }
+  var parse = [];
+  for (var i = 1; i < righe.length; i++) {
+    var riga = righe[i] || [];
+    var giorno = riga[0];
+    if (typeof giorno !== 'number' || giorno < 1 || giorno > 31) continue;
+    var foodLordo = riga[colFood], bevLordo = riga[colBev];
+    var haFood = typeof foodLordo === 'number' && foodLordo > 0;
+    var haBev = typeof bevLordo === 'number' && bevLordo > 0;
+    if (!haFood && !haBev) continue; // giorno non ancora compilato nel foglio
+    var data_ = info.anno + '-' + String(info.mese).padStart(2, '0') + '-' + String(giorno).padStart(2, '0');
+    parse.push({
+      data: data_, giorno: giorno,
+      foodLordo: haFood ? foodLordo : null, foodNetto: haFood ? Math.round(foodLordo / (1 + FC_IMP_ALIQUOTA_IVA) * 100) / 100 : null,
+      bevLordo: haBev ? bevLordo : null, bevNetto: haBev ? Math.round(bevLordo / (1 + FC_IMP_ALIQUOTA_IVA) * 100) / 100 : null,
+    });
+  }
+  fcImpState.righe = parse;
+  if (!parse.length) {
+    preview.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun giorno compilato in questa scheda.</p>';
+    return;
+  }
+  preview.innerHTML =
+    '<table style="width:100%;border-collapse:collapse;font-size:.8rem;margin-bottom:.8rem;">' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.68rem;text-transform:uppercase;"><th>Data</th><th>Food (IVA inclusa → netto)</th><th>Beverage (IVA inclusa → netto)</th></tr>' +
+    parse.map(function (r) {
+      return '<tr style="border-top:1px solid var(--rule);">' +
+        '<td style="padding:.3rem 0;">' + r.data + '</td>' +
+        '<td>' + (r.foodLordo != null ? _fcEur(r.foodLordo) + ' → ' + _fcEur(r.foodNetto) : '—') + '</td>' +
+        '<td>' + (r.bevLordo != null ? _fcEur(r.bevLordo) + ' → ' + _fcEur(r.bevNetto) : '—') + '</td>' +
+        '</tr>';
+    }).join('') +
+    '</table>' +
+    '<button class="btn btn-publish" onclick="fcImportIncassiConferma()">💾 Importa ' + parse.length + ' giorno/i in Incassi</button>';
+}
+
+function fcImportIncassiConferma() {
+  var righeSorgente = fcImpState.righe || [];
+  if (!righeSorgente.length) return;
+  var righe = [];
+  righeSorgente.forEach(function (r) {
+    if (r.foodNetto != null) righe.push({ data: r.data, tipo: 'food', importo: r.foodNetto, note: 'Import Excel Budget' });
+    if (r.bevNetto != null) righe.push({ data: r.data, tipo: 'beverage', importo: r.bevNetto, note: 'Import Excel Budget' });
+  });
+  if (!window.confirm('Importare ' + righeSorgente.length + ' giorno/i in Incassi? Le date già presenti verranno sovrascritte.')) return;
+  _fcSetStatus('Import in corso…');
+  _fcFetch({ action: 'incassi_bulk_upsert', righe: righe })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      document.getElementById('fc-imp-preview').innerHTML = '';
+      document.getElementById('fc-imp-file').value = '';
+      document.getElementById('fc-imp-sheet-wrap').style.display = 'none';
+      fcImpState.workbook = null; fcImpState.righe = [];
+      fcLoadIncassi();
+      _fcSetStatus(res.body.inserite + ' righe importate in Incassi.');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
 // ---- Inventario di periodo (per reparto) ----
 
 // Il tab Inventario legge/scrive il conteggio di UNA data (selettore "Data
@@ -6441,7 +6597,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.16.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.18.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

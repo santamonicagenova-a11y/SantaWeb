@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- v 2026.09.18.03 — Food Cost → Incassi: anche l'inserimento manuale del giorno singolo
+     ora scorpora l'IVA al 10% (richiesto da Andrea: gli importi digitati sono quelli letti
+     in cassa, IVA inclusa, come per l'import da Excel). Estratta la costante condivisa
+     FC_ALIQUOTA_IVA (prima duplicata come FC_IMP_ALIQUOTA_IVA solo nel blocco import) e la
+     funzione _fcScorporaIva(), usate sia dal form manuale sia dall'import. Etichette dei
+     campi Food/Beverage aggiornate in "(IVA inclusa)" e testo esplicativo aggiornato. -->
 <!-- v 2026.09.18.02 — Food Cost → Incassi: nuovo import da Excel (foglio "Budget"
      giornaliero dell'utente, una scheda per mese, da cui derivava anche LibroCassa).
      Il file si carica in pagina (SheetJS via CDN, lazy-load al primo uso), si sceglie
@@ -1358,23 +1364,23 @@
       </div>
 
       <div id="fc-view-incassi" style="display:none;">
-        <div class="sub" style="margin-top:0;">Incasso del giorno (no IVA)</div>
+        <div class="sub" style="margin-top:0;">Incasso del giorno (IVA inclusa)</div>
         <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1.2rem;">
           <div>
             <span class="opt-lbl">Data</span>
             <input type="date" id="fc-incasso-data" style="width:9.5rem;" />
           </div>
           <div>
-            <span class="opt-lbl">Food €</span>
+            <span class="opt-lbl">Food € (IVA inclusa)</span>
             <input type="number" id="fc-incasso-importo" min="0" step="0.01" style="width:8rem;" />
           </div>
           <div>
-            <span class="opt-lbl">Beverage €</span>
+            <span class="opt-lbl">Beverage € (IVA inclusa)</span>
             <input type="number" id="fc-incasso-importo-bev" min="0" step="0.01" style="width:8rem;" />
           </div>
           <button class="btn btn-publish" onclick="fcSalvaIncasso()">💾 Salva</button>
         </div>
-        <p style="font-size:.72rem;color:var(--stone);margin:-.6rem 0 1rem;">Un solo incasso per giorno e tipo — salvare di nuovo sulla stessa data lo sovrascrive. Puoi compilare solo Food, solo Beverage, o entrambi.</p>
+        <p style="font-size:.72rem;color:var(--stone);margin:-.6rem 0 1rem;">Inserisci gli importi come li leggi in cassa (IVA inclusa): vengono scorporati al 10% in automatico prima di essere salvati — il Food Cost lavora sempre su importi IVA esclusa. Un solo incasso per giorno e tipo — salvare di nuovo sulla stessa data lo sovrascrive. Puoi compilare solo Food, solo Beverage, o entrambi.</p>
 
         <details style="margin-bottom:1.2rem;">
           <summary style="cursor:pointer;font-size:.8rem;color:var(--stone);font-weight:600;">📥 Importa da Excel (Budget)</summary>
@@ -3728,6 +3734,10 @@ function stampaPiattiDettagli() {
 // (progetto-sito). Dal v 2026.09.13.01 il periodo è un intervallo libero "da/a"
 // (2 date picker "Dal"/"Al"), non più un mese fisso — vedi fcRangeValido().
 var FC_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/foodcost-admin';
+// Aliquota IVA ristorazione (food e beverage), confermata da Andrea — usata per scorporare
+// gli importi Incassi inseriti IVA inclusa, sia a mano (fcSalvaIncasso) sia importati da
+// Excel (fcImportIncassiScegliSheet): il Food Cost lavora sempre su importi IVA esclusa.
+var FC_ALIQUOTA_IVA = 0.10;
 var FC_CAT = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'];
 var FC_ME_COLORE = { STAR: '#22c55e', PLOWHORSE: '#3b82f6', PUZZLE: '#f59e0b', DOG: '#e34948' };
 var fcCharts = {};
@@ -4328,6 +4338,12 @@ function fcRenderIncassi() {
     '</table>';
 }
 
+// Scorpora l'IVA da un importo inserito a mano (letto in cassa, quindi IVA inclusa) —
+// stessa aliquota e stessa logica dell'import da Excel, vedi FC_ALIQUOTA_IVA.
+function _fcScorporaIva(lordo) {
+  return Math.round(lordo / (1 + FC_ALIQUOTA_IVA) * 100) / 100;
+}
+
 function fcSalvaIncasso() {
   var data_ = document.getElementById('fc-incasso-data').value;
   var impFood = document.getElementById('fc-incasso-importo').value;
@@ -4337,8 +4353,8 @@ function fcSalvaIncasso() {
   if ((impFood !== '' && Number(impFood) < 0) || (impBev !== '' && Number(impBev) < 0)) { _fcSetStatus('Indica importi validi.', true); return; }
   _fcSetStatus('Salvataggio…');
   var chiamate = [];
-  if (impFood !== '') chiamate.push(_fcFetch({ action: 'incassi_upsert', data: data_, tipo: 'food', importo: Number(impFood) }));
-  if (impBev !== '') chiamate.push(_fcFetch({ action: 'incassi_upsert', data: data_, tipo: 'beverage', importo: Number(impBev) }));
+  if (impFood !== '') chiamate.push(_fcFetch({ action: 'incassi_upsert', data: data_, tipo: 'food', importo: _fcScorporaIva(Number(impFood)) }));
+  if (impBev !== '') chiamate.push(_fcFetch({ action: 'incassi_upsert', data: data_, tipo: 'beverage', importo: _fcScorporaIva(Number(impBev)) }));
   Promise.all(chiamate).then(function (risultati) {
     var errore = risultati.find(function (res) { return !_fcOk(res); });
     if (errore) { _fcSetStatus(_fcErrMsg(errore), true); return; }
@@ -4366,8 +4382,8 @@ function fcEliminaIncasso(id) {
 // ottobre 2026 — prima erano FT/POS, non affidabili come split food/beverage). Il parsing
 // avviene tutto lato browser con SheetJS (CDN, caricata solo al primo utilizzo per non
 // appesantire il caricamento della pagina); l'edge function riceve solo righe già pronte
-// {data, tipo, importo} — vedi incassi_bulk_upsert.
-var FC_IMP_ALIQUOTA_IVA = 0.10;
+// {data, tipo, importo} — vedi incassi_bulk_upsert. Aliquota IVA condivisa con l'inserimento
+// manuale: vedi FC_ALIQUOTA_IVA.
 var FC_IMP_MESI = { gen: 1, feb: 2, mar: 3, apr: 4, mag: 5, giu: 6, lug: 7, ago: 8, sett: 9, set: 9, ott: 10, nov: 11, dic: 12 };
 var fcImpState = { workbook: null, righe: [] };
 
@@ -4448,8 +4464,8 @@ function fcImportIncassiScegliSheet() {
     var data_ = info.anno + '-' + String(info.mese).padStart(2, '0') + '-' + String(giorno).padStart(2, '0');
     parse.push({
       data: data_, giorno: giorno,
-      foodLordo: haFood ? foodLordo : null, foodNetto: haFood ? Math.round(foodLordo / (1 + FC_IMP_ALIQUOTA_IVA) * 100) / 100 : null,
-      bevLordo: haBev ? bevLordo : null, bevNetto: haBev ? Math.round(bevLordo / (1 + FC_IMP_ALIQUOTA_IVA) * 100) / 100 : null,
+      foodLordo: haFood ? foodLordo : null, foodNetto: haFood ? _fcScorporaIva(foodLordo) : null,
+      bevLordo: haBev ? bevLordo : null, bevNetto: haBev ? _fcScorporaIva(bevLordo) : null,
     });
   }
   fcImpState.righe = parse;
@@ -6628,7 +6644,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.18.02</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.18.03</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

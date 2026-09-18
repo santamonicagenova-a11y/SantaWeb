@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!-- v 2026.09.18.01 — nuova colonna "Richieste particolari" nello storico prenotazioni del modal
+     Anagrafica (richiesta Andrea: vederle anche qui, non solo in clienti.html). `s.note` era già
+     selezionato dal backend clienti-crm (azione detail), mancava solo la colonna in tabella —
+     stessa modifica già applicata a clienti.html v 2026.09.18.01. -->
 <!-- v 2026.09.02.02 — compleanno/anniversario + milestone "Fedelissimo" (2 delle 4 funzionalità
      CRM aggiunte dopo ricerca su SevenRooms/OpenTable/Resy/Brevo, richiesta Andrea "falle
      tutte 4" — le altre 2, filtro inattività e mini-dashboard KPI, sono solo in clienti.html
@@ -382,7 +386,7 @@
     <div id="an-storia-wrap">
       <label style="display:block;font-size:.62rem;color:var(--stone);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.3rem;">Storico prenotazioni</label>
       <table style="width:100%;font-size:.75rem;max-height:220px;overflow-y:auto;display:block;">
-        <thead><tr><th style="text-align:left;">Data</th><th style="text-align:left;">Orario</th><th style="text-align:left;">Persone</th><th style="text-align:left;">Stato</th><th style="text-align:left;">Mail</th></tr></thead>
+        <thead><tr><th style="text-align:left;">Data</th><th style="text-align:left;">Orario</th><th style="text-align:left;">Persone</th><th style="text-align:left;">Stato</th><th style="text-align:left;">Mail</th><th style="text-align:left;">Richieste particolari</th></tr></thead>
         <tbody id="an-storia-tbody"></tbody>
       </table>
     </div>
@@ -424,7 +428,7 @@
   <div class="status-line" id="garanzie-status"></div>
 </div>
 
-<footer class="ver">v 2026.09.02.02</footer>
+<footer class="ver">v 2026.09.18.01</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';
@@ -825,7 +829,7 @@ function apriAnagrafica(telNorm) {
   document.getElementById('an-nascita').value = '';
   document.getElementById('an-anniversario').value = '';
   document.getElementById('an-note').value = '';
-  document.getElementById('an-storia-tbody').innerHTML = '<tr><td colspan="5" style="color:var(--stone);">Caricamento…</td></tr>';
+  document.getElementById('an-storia-tbody').innerHTML = '<tr><td colspan="6" style="color:var(--stone);">Caricamento…</td></tr>';
   renderAnagraficaTags();
   document.getElementById('an-status').textContent = '';
   document.getElementById('anagrafica-modal').classList.add('on');
@@ -865,9 +869,10 @@ function apriAnagrafica(telNorm) {
       document.getElementById('an-storia-tbody').innerHTML = storia.length
         ? storia.map(function (s) {
             return '<tr><td>' + escapeHtml(s.data) + '</td><td>' + escapeHtml(s.orario) + '</td><td>' + (s.persone || '') +
-              '</td><td>' + escapeHtml(s.arrivo_status || s.status || '') + '</td><td>' + mailRingraziamentoBadge(s) + '</td></tr>';
+              '</td><td>' + escapeHtml(s.arrivo_status || s.status || '') + '</td><td>' + mailRingraziamentoBadge(s) +
+              '</td><td>' + escapeHtml(s.note || '—') + '</td></tr>';
           }).join('')
-        : '<tr><td colspan="5" style="color:var(--stone);">Nessuna prenotazione trovata.</td></tr>';
+        : '<tr><td colspan="6" style="color:var(--stone);">Nessuna prenotazione trovata.</td></tr>';
     })
     .catch(function (e) {
       if (e && e.message === 'no-token') { document.getElementById('an-status').textContent = 'Operazione annullata: serve il token GitHub.'; }

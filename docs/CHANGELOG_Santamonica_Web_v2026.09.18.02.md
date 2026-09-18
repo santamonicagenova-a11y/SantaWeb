@@ -1,9 +1,32 @@
 # CHANGELOG — Santamonica Web
 
-**Versione documento:** v 2026.09.18.01
+**Versione documento:** v 2026.09.18.02
 **Aggiornato:** 2026-09-18
 
 > Voci ordinate dal più recente al più vecchio. Appendere in cima a ogni sessione.
+
+---
+
+### 2026-09-18 (sessione Food Cost/Cowork parallela) — Food Cost → Incassi: import da Excel Budget + modifiche Tracciabilità
+
+**Versioni rilasciate:**
+- `menu-admin.html` v 2026.09.18.02 (Vercel) — import Incassi da Excel + modifiche al modulo Tracciabilità
+- Edge function `foodcost-admin` (Supabase SafeTable) → v9, deploy diretto in sessione
+- `HANDOVER_Santamonica_Web_v2026.09.18.02.md`
+- `CHANGELOG_Santamonica_Web_v2026.09.18.02.md` (questo)
+
+**Sintesi:**
+Sessione in continuazione della v2026.09.16.01 (modulo Tracciabilità), con due filoni:
+
+1. **Rifiniture Tracciabilità** (richieste dirette di Andrea): tolto il campo Categoria dalla riga prodotto — la scadenza ora si autocompila sempre dalla prima categoria attiva (default "Pesce abbattuto" = 30gg), niente più scelta manuale per riga; reparto del carico preselezionato di default su "Pesce e crostacei"; rimossa anche la sezione UI "Categorie e giorni di scadenza" (la regola resta in DB, solo il pannello CRUD è sparito dalla pagina — per cambiare i giorni serve un intervento diretto sul dato).
+
+2. **Import Incassi da Excel**: nuovo pannello "📥 Importa da Excel" nel tab Incassi di Food Cost. Andrea aggiorna giorno per giorno un foglio Excel "Budget" (una scheda per mese, lo stesso file da cui derivava il vecchio "LibroCassa") con colonne FOOD/BEVERG (disponibili da ottobre 2026 in poi, IVA inclusa — prima erano FT/POS, non un vero split food/beverage). Il file si carica in pagina, si sceglie la scheda mese, si scorpora l'IVA al 10% (confermato da Andrea) e si mostra un'anteprima prima di salvare in blocco con la nuova azione `incassi_bulk_upsert`. Le schede precedenti a ottobre 2026 vengono segnalate come non importabili invece di essere lette in modo scorretto. Parsing xlsx interamente client-side (libreria SheetJS via CDN cdnjs, lazy-load al primo uso, coerente con jsPDF/html2canvas/Chart.js già caricate così in questo file — non vendorizzata in `/lib/`, convenzione "mai CDN" applicata finora solo alle pagine pubbliche).
+
+**Nota di processo — sessione parallela**: durante il lavoro è stato rilevato un push concorrente su `main` da una sessione Cowork (PR #4, "Rubrica professionisti: sincro NoShowApp" + altri fix), con conflitto di merge nell'header-comment di `menu-admin.html` (stesso timestamp di versione `v 2026.09.18.01` usato da entrambe le sessioni per coincidenza). Risolto con merge (non rebase): la versione Rubrica resta `v 2026.09.18.01`, questa sessione diventa `v 2026.09.18.02`. Nessuna perdita di codice da nessuna delle due parti.
+
+**Loop di revisione (GATE PRODUZIONE):** P1 (formale: sintassi JS verificata, riferimenti `onclick`/`onchange` risolti) e P2 (sostanziale: revisione della logica di scorporo IVA, gestione righe con incasso zero vs non compilato, mapping mese/anno da nome scheda) applicati dal modello in sessione. **Revisione Oppositiva (3ª passata)**: non tentata in questa sessione (nessuna richiesta esplicita dell'utente di eseguirla) — **debito aperto**, si somma al debito già dichiarato in v2026.09.16.01 per il modulo Tracciabilità. Nessun test in browser eseguito (ambiente senza interfaccia grafica): da verificare sul sito reale, in particolare il flusso di lettura del file Excel e lo scorporo IVA su un mese reale.
+
+**Handover dettagliato:** `HANDOVER_Santamonica_Web_v2026.09.18.02.md`
 
 ---
 
@@ -248,13 +271,14 @@ Su richiesta di Andrea, il carico di una fornitura (soprattutto pesce/crostacei)
 
 ---
 
-## STATO PROGETTO CONSOLIDATO (post 2026-09-16)
+## STATO PROGETTO CONSOLIDATO (post 2026-09-18)
 
 ### File deploy correnti
 
 | File | Versione | Hosting |
 |---|---|---|
-| **`menu-admin.html`** | **v 2026.09.16.01** ⭐ | Vercel |
+| **`menu-admin.html`** | **v 2026.09.18.02** ⭐ | Vercel |
+| `clienti.html` | v 2026.09.18.01 (sessione Cowork parallela) | Vercel |
 | `index.html` | v 2026.05.19.04 | GH Pages + CF Pages |
 | `dove-siamo.html` | v 2026.05.19.04 | GH Pages + CF Pages |
 | `regala.html` | v 2026.05.19.03 | GH Pages + CF Pages |
@@ -280,7 +304,7 @@ Su richiesta di Andrea, il carico di una fornitura (soprattutto pesce/crostacei)
 
 | Progetto | Ref | Uso |
 |---|---|---|
-| SafeTable | `xbksultfskvzgncncada` | Food Cost (tabelle `fc_*`), edge function `foodcost-admin` (v8) |
+| SafeTable | `xbksultfskvzgncncada` | Food Cost (tabelle `fc_*`), edge function `foodcost-admin` (v9) |
 | SantaCantina | `wpsghmmvlwkyqiholfzx` | Anagrafica Cantina/vini (tabelle lookup incl. `fornitori`), edge functions `cantina-*` |
 
 ### Sistema auth/credenziali
@@ -347,4 +371,4 @@ Su richiesta di Andrea, il carico di una fornitura (soprattutto pesce/crostacei)
 
 ---
 
-**Fine CHANGELOG · v 2026.09.16.01**
+**Fine CHANGELOG · v 2026.09.18.02**

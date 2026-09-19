@@ -1,4 +1,20 @@
 <!DOCTYPE html>
+<!-- v 2026.09.19.11 — nuovo campo "Paese" per gli articoli, indipendente dal produttore (non più
+     derivato come la Regione, che resta una select disabilitata legata al produttore selezionato).
+     Nuova anagrafica "Paesi" (tabella cantina_paesi + colonna cantina_articoli.paese_id, migrazione
+     su Supabase; cantina-anagrafiche v2 la espone come tabella gestibile generica come
+     Regioni/Zone/Denominazioni; cantina-catalogo v3 la include nella select e nell'upsert). Motivo:
+     la Regione era pensata per i vini (derivata dal produttore, che per un vino ha senso — un
+     produttore ligure implica una regione ligure), ma per gli spiriti di Fine Pasto la provenienza
+     non dipende affatto dal produttore selezionato (es. "Norvegia" per un gin non è un produttore),
+     quindi serviva un campo libero e svincolato. In Fine Pasto (rigaFinePastoHtml) la riga mostra
+     ora il Paese quando compilato, altrimenti ricade sulla Regione (serve ancora per i Passiti, veri
+     vini con denominazioni italiane reali derivate dal produttore — Sicilia/Toscana/Piemonte/Friuli/
+     Emilia nel PDF di riferimento, la cui granularità andrebbe persa se si obbligasse tutto su
+     Paese). La sezione "Selezione 'Genova'" ora si basa solo sulla Zona (già indipendente dal
+     produttore), non più anche sulla Regione. Aggiunta colonna "Paese" all'elenco Catalogo (unita a
+     Zona/Regione) e nuova voce "Paesi" nella scheda Anagrafiche (AN_TABLES.paesi, CRUD generico già
+     esistente per Regioni/Zone/Denominazioni — nessun codice nuovo necessario). -->
 <!-- v 2026.09.19.10 — righe Fine Pasto senza prezzo: rigaFinePastoHtml leggeva solo prezzo_sala, ma
      nel catalogo reale la stragrande maggioranza degli articoli Fine Pasto ha il prezzo compilato
      in prezzo_calice (venduti a bicchierino), non in prezzo_sala — verificato via query diretta sul
@@ -461,7 +477,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.10</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.11</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -507,7 +523,7 @@
       </div>
       <div id="cat-status" class="status"></div>
       <table>
-        <thead><tr><th>Codice</th><th>Tipologia</th><th>Produttore</th><th>Zona / Regione</th><th>Sala</th><th>Calice</th><th>Annata</th><th></th></tr></thead>
+        <thead><tr><th>Codice</th><th>Tipologia</th><th>Produttore</th><th>Zona / Regione / Paese</th><th>Sala</th><th>Calice</th><th>Annata</th><th></th></tr></thead>
         <tbody id="cat-tbody"></tbody>
       </table>
 
@@ -521,10 +537,11 @@
           <label>Descrizione <span style="font-weight:400;color:var(--stone);">(obbligatoria solo per le categorie assegnate a "Vini")</span></label>
           <textarea id="f-descrizione" rows="5" style="width:100%;font:inherit;padding:.5rem;border:1px solid var(--rule);border-radius:4px;resize:vertical;"></textarea>
         </div>
-        <div class="grid3">
+        <div class="grid3" style="grid-template-columns:1fr 1fr 1fr 1fr;">
           <div class="field"><label>Tipologia</label><select id="f-tipologia"></select></div>
           <div class="field"><label>Produttore</label><select id="f-produttore"></select></div>
-          <div class="field"><label>Regione <span style="font-weight:400;color:var(--stone);">(dal produttore)</span></label><select id="f-regione" disabled></select></div>
+          <div class="field"><label>Regione <span style="font-weight:400;color:var(--stone);">(dal produttore, vini)</span></label><select id="f-regione" disabled></select></div>
+          <div class="field"><label>Paese <span style="font-weight:400;color:var(--stone);">(libero, Fine Pasto)</span></label><select id="f-paese"></select></div>
         </div>
         <div class="grid3">
           <div class="field"><label>Agente</label><select id="f-agente"></select></div>
@@ -811,6 +828,7 @@ function loadLookupSelects() {
     fillSelect(document.getElementById('f-agente'), data.agenti, function (a) { return (a.cognome || '') + ' ' + (a.nome || ''); });
     fillSelect(document.getElementById('f-denominazione'), data.denominazioni, 'nome');
     fillSelect(document.getElementById('f-zona'), data.zone, 'nome');
+    fillSelect(document.getElementById('f-paese'), data.paesi, 'nome');
     fillSelect(document.getElementById('carico-fornitore'), data.fornitori, 'ragione_sociale');
     if (!window._fProduttoreRegioneBound) {
       window._fProduttoreRegioneBound = true;
@@ -924,7 +942,7 @@ function renderCatalogo(rows) {
       '<td>' + (a.codice || '') + (a.nascosto ? ' <span class="badge warn">nascosto</span>' : '') + '</td>' +
       '<td>' + (a.tipologia ? a.tipologia.nome : '') + '</td>' +
       '<td>' + (a.produttore ? (a.produttore.codice || a.produttore.cognome || a.produttore.nome || '') : '') + '</td>' +
-      '<td>' + [a.zona ? a.zona.nome : '', a.regione ? a.regione.nome : ''].filter(Boolean).join(' — ') + '</td>' +
+      '<td>' + [a.zona ? a.zona.nome : '', a.regione ? a.regione.nome : '', a.paese ? a.paese.nome : ''].filter(Boolean).join(' — ') + '</td>' +
       '<td>' + eur(a.prezzo_sala) + '</td>' +
       '<td>' + eur(a.prezzo_calice) + '</td>' +
       '<td>' + fmt(a.anno) + '</td>' +
@@ -963,6 +981,7 @@ function openCatForm(a) {
   document.getElementById('f-percentuale').value = a.percentuale_enoteca || '';
   document.getElementById('f-denominazione').value = a.denominazione ? a.denominazione.id : '';
   document.getElementById('f-zona').value = a.zona ? a.zona.id : '';
+  document.getElementById('f-paese').value = a.paese ? a.paese.id : '';
   document.getElementById('f-sboccatura').value = a.sboccatura || '';
   document.getElementById('f-nascosto').checked = !!a.nascosto;
   document.getElementById('f-coravin').checked = !!a.coravin;
@@ -995,6 +1014,7 @@ document.getElementById('cat-save').addEventListener('click', function () {
     percentuale_enoteca: numOrNull(document.getElementById('f-percentuale').value),
     denominazione_id: numOrNull(document.getElementById('f-denominazione').value),
     zona_id: numOrNull(document.getElementById('f-zona').value),
+    paese_id: numOrNull(document.getElementById('f-paese').value),
     sboccatura: document.getElementById('f-sboccatura').value || null,
     nascosto: document.getElementById('f-nascosto').checked,
     coravin: document.getElementById('f-coravin').checked,
@@ -1054,6 +1074,7 @@ var AN_TABLES = {
   categorie_fornitori: { label: 'Categorie fornitori', fields: [{ k: 'nome', l: 'Nome', req: true }] },
   denominazioni: { label: 'Denominazioni', fields: [{ k: 'nome', l: 'Nome', req: true }] },
   zone: { label: 'Zone', fields: [{ k: 'nome', l: 'Nome', req: true }] },
+  paesi: { label: 'Paesi', fields: [{ k: 'nome', l: 'Nome', req: true }] },
   distributori: { label: 'Distributori', fields: [{ k: 'codice', l: 'Codice' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'telefono_cel', l: 'Cellulare' }, { k: 'email', l: 'Email' }, { k: 'note', l: 'Note' }] },
   agenti: { label: 'Agenti', fields: [{ k: 'codice', l: 'Codice' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'telefono_cel', l: 'Cellulare' }, { k: 'email', l: 'Email' }, { k: 'note', l: 'Note' }] },
   produttori: { label: 'Produttori', fields: [{ k: 'codice', l: 'Nome produttore' }, { k: 'cognome', l: 'Cognome' }, { k: 'nome', l: 'Nome' }, { k: 'regione_id', l: 'Regione', type: 'select', optionsTable: 'regioni', labelKey: 'nome' }, { k: 'zona_id', l: 'Zona', type: 'select', optionsTable: 'zone', labelKey: 'nome' }, { k: 'note', l: 'Note' }] },
@@ -1463,27 +1484,31 @@ function chiaveAlfabeticaArticolo(a) {
 // anche il produttore] - [Uve: ...] - [nota libera dal campo Descrizione] - prezzo/i. Ricalca gli
 // schemi osservati nel PDF di riferimento (es. "Grappa di Amarone - Allegrini 43% - Uve: Amarone
 // 100% - € 11" quando c'è il produttore; "Bareksten - Norvegia 46% - morbido e speziato - € 10"
-// quando c'è solo il paese). "Liguria" non si scrive mai in riga (è la provenienza "di casa",
-// implicita — stessa convenzione già in uso per i vini in rigaVinoHtml). Prezzo: come i vini, si
-// mostrano ENTRAMBI prezzo_sala (bottiglia) e prezzo_calice quando presenti — nel catalogo reale la
-// maggior parte degli spiriti Fine Pasto ha il prezzo compilato solo in prezzo_calice (venduti a
-// bicchierino), ma alcuni articoli (es. Passiti/Fine pasto venduti anche a bottiglia intera, come
-// "Malvasia Kaseki" o "Picolit ZORZ") hanno entrambi i prezzi.
+// quando c'è solo il paese). Il "paese" qui è il campo indipendente `paese_id` (nuova anagrafica
+// "Paesi"), non più la Regione: la Regione restava legata al produttore (select disabilitata) ed
+// era poco sensata per spiriti/liquori la cui provenienza non dipende dal produttore selezionato
+// (es. "Norvegia" per un gin non è un produttore). Prezzo: come i vini, si mostrano ENTRAMBI
+// prezzo_sala (bottiglia) e prezzo_calice quando presenti — nel catalogo reale la maggior parte
+// degli spiriti Fine Pasto ha il prezzo compilato solo in prezzo_calice (venduti a bicchierino), ma
+// alcuni articoli (es. "Malvasia Kaseki", "Picolit ZORZ") hanno entrambi i prezzi.
 function rigaFinePastoHtml(a) {
   var nome = a.codice || a.descrizione || '';
   var prod = a.produttore ? (a.produttore.codice || a.produttore.cognome || a.produttore.nome || '') : '';
   var grado = a.gradi ? (Number(a.gradi) + '%') : '';
   var gradoHtml = grado ? '<span class="num-inline">' + escapeHtml(grado) + '</span>' : '';
-  var regioneNome = (a.regione && a.regione.nome !== 'Liguria') ? a.regione.nome : '';
+  // Provenienza mostrata in riga: il nuovo campo Paese (spiriti/liquori, provenienza libera) se
+  // compilato, altrimenti la Regione (Passiti, veri vini con denominazione italiana reale —
+  // "Liguria" non si scrive mai, implicita, v. sotto-titolo di sezione).
+  var paeseNome = (a.paese && a.paese.nome) || ((a.regione && a.regione.nome !== 'Liguria') ? a.regione.nome : '') || '';
 
   var segPrimario = '';
   if (prod) segPrimario = escapeHtml(prod);
-  else if (regioneNome) segPrimario = escapeHtml(regioneNome);
+  else if (paeseNome) segPrimario = escapeHtml(paeseNome);
   if (gradoHtml) segPrimario = segPrimario ? (segPrimario + ' ' + gradoHtml) : gradoHtml;
 
   // Il paese/regione diventa un segmento a parte solo quando c'è ANCHE il produttore (altrimenti è
   // già dentro segPrimario sopra).
-  var segRegioneSeparata = (prod && regioneNome) ? escapeHtml(regioneNome) : '';
+  var segRegioneSeparata = (prod && paeseNome) ? escapeHtml(paeseNome) : '';
 
   var segUve = a.uve ? evidenziaPercentuali(escapeHtml('Uve: ' + a.uve)) : '';
   var segNota = (a.descrizione && a.descrizione !== '(senza descrizione)') ? escapeHtml(a.descrizione) : '';
@@ -1535,12 +1560,14 @@ function generaAnteprimaFinePasto(articoli) {
   });
 
   // "Selezione 'Genova'": sezione virtuale trasversale (non è una tipologia) — tutti gli articoli
-  // Fine Pasto con regione Liguria e zona Genova, indipendentemente dal capitolo. Compaiono QUI IN
-  // PIÙ, oltre che nel proprio capitolo normale (es. una grappa Bruzzone di Genova sta sia in
-  // "Grappe" sia qui) — esattamente come nel PDF di riferimento. Nel PDF questa sezione va subito
-  // dopo "Grappe"; l'ordine dei suoi articoli lì è scelto a mano, qui si usa l'ordine alfabetico.
+  // Fine Pasto con zona Genova (la Zona resta un campo indipendente dal produttore, come già per i
+  // vini — non serve più incrociarla con la Regione ora che questa non è più usata in Fine Pasto),
+  // indipendentemente dal capitolo. Compaiono QUI IN PIÙ, oltre che nel proprio capitolo normale
+  // (es. una grappa Bruzzone di Genova sta sia in "Grappe" sia qui) — esattamente come nel PDF di
+  // riferimento. Nel PDF questa sezione va subito dopo "Grappe"; l'ordine dei suoi articoli lì è
+  // scelto a mano, qui si usa l'ordine alfabetico.
   var selezioneGenova = articoli.filter(function (a) {
-    return a.regione && a.regione.nome === 'Liguria' && a.zona && a.zona.nome === 'Genova';
+    return a.zona && a.zona.nome === 'Genova';
   }).sort(function (x, y) {
     var kx = chiaveAlfabeticaArticolo(x), ky = chiaveAlfabeticaArticolo(y);
     return kx < ky ? -1 : kx > ky ? 1 : 0;
@@ -1554,6 +1581,9 @@ function generaAnteprimaFinePasto(articoli) {
   ordineCapitoli.forEach(function (cap) {
     body += '<div class="fp-cap">' + escapeHtml(FINEPASTO_TITOLI_CAPITOLI[cap] || cap) + '</div>';
     if (FINEPASTO_CATEGORIE_ALTRE_REGIONI.indexOf(cap) !== -1) {
+      // Solo Passiti usa ancora la Regione (non il nuovo Paese): sono vini veri con denominazioni
+      // italiane reali (Sicilia, Toscana, Piemonte...) derivate dal produttore, non spiriti con
+      // provenienza libera — stessa logica già in uso per Rosati/Bollicine nella Carta dei Vini.
       var liguria = capitoli[cap].filter(function (a) { return a.regione && a.regione.nome === 'Liguria'; });
       var altreRegioni = capitoli[cap].filter(function (a) { return !(a.regione && a.regione.nome === 'Liguria'); });
       if (liguria.length) { body += '<div class="fp-sotto-gruppo"><div class="fp-sub">Liguria</div>'; stampaRigheFlat(liguria); body += '</div>'; }

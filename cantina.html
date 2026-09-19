@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!-- v 2026.09.19.10 — righe Fine Pasto senza prezzo: rigaFinePastoHtml leggeva solo prezzo_sala, ma
+     nel catalogo reale la stragrande maggioranza degli articoli Fine Pasto ha il prezzo compilato
+     in prezzo_calice (venduti a bicchierino), non in prezzo_sala — verificato via query diretta sul
+     database. Corretto per mostrare ENTRAMBI i prezzi quando presenti (bottiglia con ICONA_BOTTIGLIA
+     + calice con ICONA_CALICE), esattamente come già fa rigaVinoHtml per i vini: alcuni articoli
+     (es. "Malvasia Kaseki", "Picolit ZORZ" in Fine pasto) hanno infatti entrambi i prezzi, venduti
+     sia a bottiglia che a calice. -->
 <!-- v 2026.09.19.09 — il box anteprima di "Fine Pasto" era piccolo (altezza di default dell'iframe,
      nessuna regola CSS dedicata) mentre quello della Carta dei Vini è grande (70vh, regola
      `iframe#preview-frame`): estesa la stessa regola anche a `iframe#finepasto-preview-frame`, ora
@@ -454,7 +461,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.09</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.10</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -1453,11 +1460,15 @@ function chiaveAlfabeticaArticolo(a) {
 }
 
 // Riga di un articolo Fine Pasto: nome - [produttore o paese] grado% - [paese separato, se c'è
-// anche il produttore] - [Uve: ...] - [nota libera dal campo Descrizione] - prezzo. Ricalca gli
+// anche il produttore] - [Uve: ...] - [nota libera dal campo Descrizione] - prezzo/i. Ricalca gli
 // schemi osservati nel PDF di riferimento (es. "Grappa di Amarone - Allegrini 43% - Uve: Amarone
 // 100% - € 11" quando c'è il produttore; "Bareksten - Norvegia 46% - morbido e speziato - € 10"
 // quando c'è solo il paese). "Liguria" non si scrive mai in riga (è la provenienza "di casa",
-// implicita — stessa convenzione già in uso per i vini in rigaVinoHtml).
+// implicita — stessa convenzione già in uso per i vini in rigaVinoHtml). Prezzo: come i vini, si
+// mostrano ENTRAMBI prezzo_sala (bottiglia) e prezzo_calice quando presenti — nel catalogo reale la
+// maggior parte degli spiriti Fine Pasto ha il prezzo compilato solo in prezzo_calice (venduti a
+// bicchierino), ma alcuni articoli (es. Passiti/Fine pasto venduti anche a bottiglia intera, come
+// "Malvasia Kaseki" o "Picolit ZORZ") hanno entrambi i prezzi.
 function rigaFinePastoHtml(a) {
   var nome = a.codice || a.descrizione || '';
   var prod = a.produttore ? (a.produttore.codice || a.produttore.cognome || a.produttore.nome || '') : '';
@@ -1476,7 +1487,11 @@ function rigaFinePastoHtml(a) {
 
   var segUve = a.uve ? evidenziaPercentuali(escapeHtml('Uve: ' + a.uve)) : '';
   var segNota = (a.descrizione && a.descrizione !== '(senza descrizione)') ? escapeHtml(a.descrizione) : '';
-  var prezzoHtml = a.prezzo_sala ? ('<span class="prezzo-nowrap">' + ICONA_CALICE + '&nbsp;€&nbsp;' + Number(a.prezzo_sala).toFixed(0) + '</span>') : '';
+
+  var prezzoParts = [];
+  if (a.prezzo_sala) prezzoParts.push('<span class="prezzo-nowrap">' + ICONA_BOTTIGLIA + '&nbsp;€&nbsp;' + Number(a.prezzo_sala).toFixed(0) + '</span>');
+  if (a.prezzo_calice) prezzoParts.push('<span class="prezzo-nowrap">' + ICONA_CALICE + '&nbsp;€&nbsp;' + Number(a.prezzo_calice).toFixed(0) + '</span>');
+  var prezzoHtml = prezzoParts.join('&nbsp;&nbsp;');
 
   var segmenti = [];
   if (segPrimario) segmenti.push(segPrimario);

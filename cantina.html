@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!-- v 2026.09.19.09 — il box anteprima di "Fine Pasto" era piccolo (altezza di default dell'iframe,
+     nessuna regola CSS dedicata) mentre quello della Carta dei Vini è grande (70vh, regola
+     `iframe#preview-frame`): estesa la stessa regola anche a `iframe#finepasto-preview-frame`, ora
+     hanno le stesse dimensioni. -->
 <!-- v 2026.09.19.08 — layout di stampa Fine Pasto, sul modello del PDF "A008 - Menu fine pasto"
      fornito da Andrea: capitoli per categoria con titolo centrato uppercase (stesso stile del
      .sez-titolo dei vini) e nomi diversi da quelli in anagrafica dove il PDF li stampa diversamente
@@ -443,14 +447,14 @@
     .status.ok { color:var(--ok); }
     .status.err { color:var(--rust); }
 
-    iframe#preview-frame { width:100%; height:70vh; border:1px solid var(--rule); background:#fff; }
+    iframe#preview-frame, iframe#finepasto-preview-frame { width:100%; height:70vh; border:1px solid var(--rule); background:#fff; }
   </style>
 </head>
 <body>
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.08</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.09</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>

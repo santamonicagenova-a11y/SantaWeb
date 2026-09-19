@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!-- v 2026.09.19.02 — pannello "Categorie incluse in carta": nuovo pulsante "Memorizza impostazioni
+     attuali" di fianco a "Ripristina predefiniti" — salva in localStorage di questo browser (non su
+     DB, non condiviso tra dispositivi) lo stato di tutte le spunte (categorie + nuova pagina, sia a
+     livello di capitolo sia di sottocapitolo). Se presenti, queste impostazioni memorizzate
+     diventano il punto di partenza a ogni apertura della pagina e anche "Ripristina predefiniti" ora
+     torna a loro invece che ai valori di fabbrica (CARTA_TIP_DEFAULT). Nuove funzioni
+     caricaImpostazioniCartaSalvate()/salvaImpostazioniCartaCorrenti(). -->
 <!-- v 2026.09.19.01 — pannello "Categorie incluse in carta": aggiunte, sotto ogni capitolo che in
      stampa mostra un sotto-titolo di zona/regione, le spunte "nuova pagina" per le sottocategorie
      realmente presenti nel catalogo corrente (es. Genova, Liguria di Levante) — prima "nuova
@@ -387,7 +394,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.01</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.02</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -613,10 +620,14 @@
           "Nuova pagina" conta solo per la stampa: di default è attiva sulle categorie che vanno in carta (una
           pagina nuova per ciascuna) e spenta sulle altre; puoi cambiarla capitolo per capitolo. Sotto ogni
           capitolo compaiono anche le sue sottocategorie realmente presenti (es. Genova, Liguria di Levante):
-          spuntando "nuova pagina" su una di esse, anche lì si forza l'a-capo in stampa.
+          spuntando "nuova pagina" su una di esse, anche lì si forza l'a-capo in stampa. "Memorizza impostazioni
+          attuali" salva questa combinazione di spunte in questo browser: da quel momento è lei il nuovo punto di
+          partenza ogni volta che riapri la pagina, e anche "Ripristina predefiniti" torna a quella invece che ai
+          valori di fabbrica.
         </p>
         <div class="toolbar" style="margin-bottom:.6rem;">
           <button class="btn" id="carta-tipologie-reset">Ripristina predefiniti</button>
+          <button class="btn" id="carta-tipologie-salva">Memorizza impostazioni attuali</button>
         </div>
         <div id="carta-tipologie-list" style="display:flex;flex-direction:column;gap:.9rem;margin-bottom:.5rem;"></div>
         <div id="carta-tipologie-status" class="status"></div>
@@ -1610,12 +1621,36 @@ function generaHtmlCartaVini(articoli) {
 }
 
 // Categorie che vanno in carta per default (le uniche presenti nella carta stampata reale).
-// NON persistito su DB: le spunte servono solo per la generazione della sessione corrente —
-// ogni volta che si riapre la pagina si riparte sempre da questo elenco.
+// Questo è il default "di fabbrica": se l'utente non ha mai memorizzato nulla (v. sotto), è da qui
+// che si riparte ogni volta che si riapre la pagina.
 var CARTA_TIP_DEFAULT = ['Bianchi', 'Rossi', 'Rosati', 'Bollicine', 'Bollicine Rosé', 'Champagne', 'Champagne Rosé', 'Birra'];
 var CARTA_TIP_SELEZIONATE = {}; // tipologia_id -> bool, solo in memoria per questa sessione
 var CARTA_BREAK_CAPITOLI = {}; // tipologia_id -> bool ("nuova pagina prima di questo capitolo"), default true, solo in memoria
 var CARTA_BREAK_SOTTOCAPITOLI = {}; // "capitolo||sottocapitolo" (es. "Bianchi||Genova") -> bool, default false, solo in memoria
+
+// Impostazioni memorizzate dall'utente (pulsante "Memorizza impostazioni attuali"): persistite in
+// localStorage di QUESTO browser (non su DB, non condivise tra dispositivi). Quando presenti,
+// sostituiscono CARTA_TIP_DEFAULT come punto di partenza a ogni apertura della pagina — sia al
+// primo caricamento sia dopo "Ripristina predefiniti".
+var CARTA_IMPOSTAZIONI_STORAGE_KEY = 'santaweb_carta_impostazioni_v1';
+
+function caricaImpostazioniCartaSalvate() {
+  try {
+    var raw = localStorage.getItem(CARTA_IMPOSTAZIONI_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+
+function salvaImpostazioniCartaCorrenti() {
+  try {
+    localStorage.setItem(CARTA_IMPOSTAZIONI_STORAGE_KEY, JSON.stringify({
+      selezionate: CARTA_TIP_SELEZIONATE,
+      breakCapitoli: CARTA_BREAK_CAPITOLI,
+      breakSottocapitoli: CARTA_BREAK_SOTTOCAPITOLI,
+    }));
+    return true;
+  } catch (e) { return false; }
+}
 
 // Crea la coppia di spunte "in carta" + "nuova pagina" per un capitolo o un sotto-capitolo.
 // `isDefault` è lo stato iniziale di entrambe le spunte; `onToggleCarta` è null per i
@@ -1674,12 +1709,21 @@ function loadCartaTipologieSetup(messaggioFinale) {
     // qui corrispondono esattamente ai sotto-titoli che compariranno nella carta generata.
     var raggruppato = raggruppaCapitoliCarta(dataCatalogo.articoli || []);
 
+    // Se l'utente ha memorizzato delle impostazioni (pulsante "Memorizza impostazioni attuali"),
+    // sono quelle il punto di partenza invece dei default di fabbrica (CARTA_TIP_DEFAULT / spente).
+    var salvate = caricaImpostazioniCartaSalvate();
+
     var list = document.getElementById('carta-tipologie-list');
     list.innerHTML = '';
     (dataAnagrafiche.tipologie || []).forEach(function (t) {
-      var isDefault = CARTA_TIP_DEFAULT.indexOf(t.nome) !== -1;
+      var isDefault = (salvate && salvate.selezionate && (t.id in salvate.selezionate))
+        ? !!salvate.selezionate[t.id]
+        : CARTA_TIP_DEFAULT.indexOf(t.nome) !== -1;
+      var isDefaultPagina = (salvate && salvate.breakCapitoli && (t.id in salvate.breakCapitoli))
+        ? !!salvate.breakCapitoli[t.id]
+        : isDefault; // "nuova pagina" parte allineata a "categoria in carta" se non c'è un valore memorizzato
       CARTA_TIP_SELEZIONATE[t.id] = isDefault;
-      CARTA_BREAK_CAPITOLI[t.id] = isDefault; // "nuova pagina" parte allineata a "categoria in carta": attiva sulle categorie di default, spenta sulle altre
+      CARTA_BREAK_CAPITOLI[t.id] = isDefaultPagina;
 
       var blocco = document.createElement('div');
       blocco.style.cssText = 'display:flex;flex-direction:column;gap:.35rem;';
@@ -1687,7 +1731,7 @@ function loadCartaTipologieSetup(messaggioFinale) {
       var rigaCapitolo = creaRigaSpuntaCarta({
         etichetta: t.nome,
         isDefault: isDefault,
-        isDefaultPagina: isDefault,
+        isDefaultPagina: isDefaultPagina,
         titlePagina: 'Solo per la stampa: se spuntato, questo capitolo inizia sempre da una nuova pagina; se tolto, può continuare sulla stessa pagina del capitolo precedente.',
         onToggleCarta: function (checked) {
           CARTA_TIP_SELEZIONATE[t.id] = checked;
@@ -1710,11 +1754,14 @@ function loadCartaTipologieSetup(messaggioFinale) {
         wrapSotto.style.cssText = 'display:flex;flex-direction:column;gap:.25rem;margin-left:1.4rem;padding-left:.6rem;border-left:2px solid var(--rule,#d4c9b8);';
         capitoloDati.ordineSotto.forEach(function (sub) {
           var chiave = t.nome + '||' + sub;
-          CARTA_BREAK_SOTTOCAPITOLI[chiave] = false; // default: nessuna interruzione forzata sulle sottocategorie
+          var subDefaultPagina = (salvate && salvate.breakSottocapitoli && (chiave in salvate.breakSottocapitoli))
+            ? !!salvate.breakSottocapitoli[chiave]
+            : false; // default di fabbrica: nessuna interruzione forzata sulle sottocategorie
+          CARTA_BREAK_SOTTOCAPITOLI[chiave] = subDefaultPagina;
           var rigaSub = creaRigaSpuntaCarta({
             etichetta: sub,
             isDefault: false,
-            isDefaultPagina: false,
+            isDefaultPagina: subDefaultPagina,
             titlePagina: 'Solo per la stampa: se spuntato, questa sottocategoria (' + sub + ') inizia sempre da una nuova pagina; se tolto, può continuare sulla stessa pagina della sottocategoria precedente.',
             onToggleCarta: null,
             onTogglePagina: function (checked) {
@@ -1734,9 +1781,25 @@ function loadCartaTipologieSetup(messaggioFinale) {
 }
 
 document.getElementById('carta-tipologie-reset').addEventListener('click', function () {
-  // Ricarica da zero la lista: entrambe le spunte (categoria in carta + nuova pagina) tornano
-  // ai valori di default (isDefault per entrambe), scartando qualunque scelta fatta in sessione.
+  // Ricarica da zero la lista: entrambe le spunte (categoria in carta + nuova pagina, capitoli e
+  // sottocapitoli) tornano al punto di partenza — le impostazioni memorizzate se presenti,
+  // altrimenti i valori di fabbrica — scartando qualunque scelta fatta in sessione dopo l'ultima
+  // memorizzazione.
   loadCartaTipologieSetup('Ripristinati i valori di default — rigenera l\'anteprima per vedere l\'effetto.');
+});
+
+document.getElementById('carta-tipologie-salva').addEventListener('click', function () {
+  // Salva lo stato attuale di tutte le spunte (capitoli + sottocapitoli) in localStorage di questo
+  // browser: da qui in avanti è questa combinazione il punto di partenza a ogni apertura della
+  // pagina, anche dopo "Ripristina predefiniti".
+  var ok = salvaImpostazioniCartaCorrenti();
+  setStatus(
+    document.getElementById('carta-tipologie-status'),
+    ok
+      ? 'Impostazioni attuali memorizzate in questo browser: da ora sono il punto di partenza predefinito.'
+      : 'Impossibile memorizzare le impostazioni (storage del browser non disponibile).',
+    ok
+  );
 });
 
 document.getElementById('carta-pubblica').addEventListener('click', function () {

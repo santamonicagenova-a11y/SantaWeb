@@ -1,4 +1,24 @@
 <!DOCTYPE html>
+<!-- v 2026.09.19.08 — layout di stampa Fine Pasto, sul modello del PDF "A008 - Menu fine pasto"
+     fornito da Andrea: capitoli per categoria con titolo centrato uppercase (stesso stile del
+     .sez-titolo dei vini) e nomi diversi da quelli in anagrafica dove il PDF li stampa diversamente
+     (Grappa→Grappe, Rum→Rhum Ron Rum, Whiskey→Whisky Whiskey, Distillati→Distillati e Vini
+     Liquorosi — FINEPASTO_TITOLI_CAPITOLI), ordine fisso FINEPASTO_ORDINE_CAPITOLI. Solo "Passiti"
+     si divide in due blocchi Liguria/Altre regioni con sotto-titolo corsivo non centrato (stile
+     Cormorant Garamond, nuova classe .fp-sub, diversa dal .sottosez-titolo uppercase dei vini); le
+     altre categorie sono elenchi piatti in ordine alfabetico (bug corretto in corsa: il primo
+     tentativo riusava il raggruppamento per zona dei vini anche lì, mischiando l'ordine). Nuova
+     sezione virtuale "Selezione 'Genova'" (non è una tipologia): tutti gli articoli Fine Pasto con
+     regione Liguria e zona Genova, presi da qualunque categoria — compaiono LÌ IN PIÙ, oltre che nel
+     proprio capitolo normale, esattamente come nel PDF (dedotto dai dati: negli articoli reali
+     "Selezione Genova" corrisponde sempre a regione=Liguria + zona=Genova). Riga articolo dedicata
+     (rigaFinePastoHtml, non riusa rigaVinoHtml): un solo prezzo con l'icona calice già esistente
+     (non bottiglia, non una nuova icona — scelto da Andrea), produttore o paese di provenienza +
+     grado%, "Uve: ..." solo se presente, nota libera dal campo Descrizione (ora facoltativo, v.
+     19.07) come segmento a parte anziché frase finale. "Liguria" non si scrive mai in riga (stessa
+     convenzione dei vini). Nota per Andrea: quasi tutti gli articoli Fine Pasto nel database hanno
+     ancora produttore/regione/grado/prezzo vuoti — il layout è pronto, i dati vanno compilati dal
+     Catalogo perché l'anteprima abbia contenuto reale. -->
 <!-- v 2026.09.19.07 — nel form articolo del Catalogo, la descrizione era obbligatoria per qualunque
      categoria: ora lo è solo per gli articoli la cui categoria è assegnata a "Vini" (scheda
      "Categorie"), facoltativa per Fine Pasto/Esclusa. Controllo lato client basato su
@@ -430,7 +450,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.07</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.08</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -688,11 +708,13 @@
 
     <section id="sec-finepasto" class="section">
       <div class="panel">
-        <h2>Fine Pasto — anteprima (layout da definire)</h2>
+        <h2>Genera e stampa Fine Pasto</h2>
         <p style="font-size:.8rem;color:var(--stone);margin-bottom:1rem;">
-          Elenco provvisorio degli articoli delle categorie assegnate a "Fine Pasto" (scheda "Categorie") — solo per
-          verificare che le categorie giuste ci siano dentro. Grafica, raggruppamento e stampa definitivi si decidono
-          in un secondo momento; per ora non c'è pubblicazione sul sito.
+          Genera l'elenco degli articoli delle categorie assegnate a "Fine Pasto" (scheda "Categorie"), sul modello
+          del PDF fornito da Andrea: capitoli per categoria (Grappe, Gin, Whisky Whiskey, Distillati e Vini Liquorosi,
+          Vermouth...), sotto-titoli Liguria/Altre regioni solo per i Passiti, e una sezione "Selezione 'Genova'" che
+          raccoglie — in più, oltre al proprio capitolo — tutti gli articoli con regione Liguria e zona Genova. Per
+          ora nessuna pubblicazione sul sito, solo anteprima e stampa diretta da qui.
         </p>
         <div class="toolbar">
           <button class="btn primary" id="finepasto-genera">Genera anteprima</button>
@@ -1398,59 +1420,167 @@ document.getElementById('carta-stampa').addEventListener('click', function () {
 });
 
 // ================================================================
-// FINE PASTO — anteprima provvisoria (layout definitivo da decidere)
+// FINE PASTO — anteprima (layout dal PDF "A008 - Menu fine pasto" fornito da Andrea il 19/9/2026)
 // ================================================================
-// Elenco piatto per capitolo (Amari, Grappa, Distillati...), stessa riga formattata di rigaVinoHtml
-// (nome/produttore/grado/prezzi) solo per verificare rapidamente il contenuto — nessun raggruppamento
-// per zona/regione, nessuna spunta "nuova pagina" dedicata, nessuna pubblicazione: tutto questo si
-// decide quando si definisce il layout vero.
 var _finePastoHtml = '';
 
+// Titolo di stampa per ogni capitolo, dove diverso dal nome della tipologia in anagrafica (es.
+// "Grappa" in DB → "Grappe" stampato, plurale come nel PDF originale). Le tipologie non elencate qui
+// (es. eventuali nuove categorie assegnate a Fine Pasto) usano il proprio nome così com'è.
+var FINEPASTO_TITOLI_CAPITOLI = {
+  'Grappa': 'Grappe',
+  'Rum': 'Rhum Ron Rum',
+  'Whiskey': 'Whisky Whiskey',
+  'Distillati': 'Distillati e Vini Liquorosi',
+};
+
+// Ordine dei capitoli esattamente come nel PDF di riferimento. "Selezione 'Genova'" non è una
+// tipologia: è una sezione virtuale (v. sotto) inserita subito dopo "Grappa", nello stesso punto in
+// cui compare nel PDF. Tipologie assegnate a Fine Pasto ma non presenti in questo elenco (es. se in
+// futuro se ne aggiungono di nuove) finiscono in fondo, in ordine alfabetico.
+var FINEPASTO_ORDINE_CAPITOLI = ['Passiti', 'Grappa', 'Rum', 'Gin', 'Whiskey', 'Distillati', 'Vermouth', 'Amari', 'Fine pasto'];
+
+// Unica categoria Fine Pasto con sotto-capitoli di zona/regione (Liguria / Altre regioni), come nel
+// PDF — tutte le altre (Grappe, Gin, Whisky, Rum, Distillati, Vermouth...) sono elenchi piatti.
+var FINEPASTO_CATEGORIE_ALTRE_REGIONI = ['Passiti'];
+
+function chiaveAlfabeticaArticolo(a) {
+  return (a.codice || a.descrizione || '').replace(/["""]/g, '').trim().toLowerCase();
+}
+
+// Riga di un articolo Fine Pasto: nome - [produttore o paese] grado% - [paese separato, se c'è
+// anche il produttore] - [Uve: ...] - [nota libera dal campo Descrizione] - prezzo. Ricalca gli
+// schemi osservati nel PDF di riferimento (es. "Grappa di Amarone - Allegrini 43% - Uve: Amarone
+// 100% - € 11" quando c'è il produttore; "Bareksten - Norvegia 46% - morbido e speziato - € 10"
+// quando c'è solo il paese). "Liguria" non si scrive mai in riga (è la provenienza "di casa",
+// implicita — stessa convenzione già in uso per i vini in rigaVinoHtml).
+function rigaFinePastoHtml(a) {
+  var nome = a.codice || a.descrizione || '';
+  var prod = a.produttore ? (a.produttore.codice || a.produttore.cognome || a.produttore.nome || '') : '';
+  var grado = a.gradi ? (Number(a.gradi) + '%') : '';
+  var gradoHtml = grado ? '<span class="num-inline">' + escapeHtml(grado) + '</span>' : '';
+  var regioneNome = (a.regione && a.regione.nome !== 'Liguria') ? a.regione.nome : '';
+
+  var segPrimario = '';
+  if (prod) segPrimario = escapeHtml(prod);
+  else if (regioneNome) segPrimario = escapeHtml(regioneNome);
+  if (gradoHtml) segPrimario = segPrimario ? (segPrimario + ' ' + gradoHtml) : gradoHtml;
+
+  // Il paese/regione diventa un segmento a parte solo quando c'è ANCHE il produttore (altrimenti è
+  // già dentro segPrimario sopra).
+  var segRegioneSeparata = (prod && regioneNome) ? escapeHtml(regioneNome) : '';
+
+  var segUve = a.uve ? evidenziaPercentuali(escapeHtml('Uve: ' + a.uve)) : '';
+  var segNota = (a.descrizione && a.descrizione !== '(senza descrizione)') ? escapeHtml(a.descrizione) : '';
+  var prezzoHtml = a.prezzo_sala ? ('<span class="prezzo-nowrap">' + ICONA_CALICE + '&nbsp;€&nbsp;' + Number(a.prezzo_sala).toFixed(0) + '</span>') : '';
+
+  var segmenti = [];
+  if (segPrimario) segmenti.push(segPrimario);
+  if (segRegioneSeparata) segmenti.push(segRegioneSeparata);
+  if (segUve) segmenti.push(segUve);
+  if (segNota) segmenti.push(segNota);
+  if (prezzoHtml) segmenti.push(prezzoHtml);
+
+  var html = '<span class="vino-nome">' + formattaNomeVino(nome, a.virgolette) + '</span>';
+  if (segmenti.length) html += ' - ' + segmenti.join(' - ');
+  return html;
+}
+
 function generaAnteprimaFinePasto(articoli) {
+  // Raggruppa per capitolo (tipologia) — a differenza della Carta dei Vini, qui NON c'è un
+  // sotto-capitolo per ogni singola zona/regione: ogni categoria è un elenco piatto in ordine
+  // alfabetico, tranne "Passiti" che si divide in due soli blocchi, Liguria e Altre regioni (v.
+  // FINEPASTO_CATEGORIE_ALTRE_REGIONI).
   var capitoli = {};
-  var ordine = [];
+  var ordineCapitoli = [];
   articoli.forEach(function (a) {
     var cap = a.tipologia ? a.tipologia.nome : 'Altro';
-    if (!capitoli[cap]) { capitoli[cap] = []; ordine.push(cap); }
+    if (!capitoli[cap]) { capitoli[cap] = []; ordineCapitoli.push(cap); }
     capitoli[cap].push(a);
   });
-  function chiaveAlfabetica(a) {
-    return (a.codice || a.descrizione || '').replace(/["""]/g, '').trim().toLowerCase();
-  }
-  ordine.sort(function (a, b) { return a.localeCompare(b, 'it'); });
   Object.keys(capitoli).forEach(function (cap) {
     capitoli[cap].sort(function (x, y) {
-      var kx = chiaveAlfabetica(x), ky = chiaveAlfabetica(y);
+      var kx = chiaveAlfabeticaArticolo(x), ky = chiaveAlfabeticaArticolo(y);
       return kx < ky ? -1 : kx > ky ? 1 : 0;
     });
   });
 
-  var body = '';
-  ordine.forEach(function (cap) {
-    body += '<div class="fp-cap">' + escapeHtml(cap) + '</div>';
-    capitoli[cap].forEach(function (a) {
-      body += '<p class="fp-riga">' + rigaVinoHtml(a) + '</p>';
-    });
+  // Ordine finale: FINEPASTO_ORDINE_CAPITOLI, poi eventuali capitoli imprevisti in coda (alfabetico).
+  ordineCapitoli.sort(function (a, b) {
+    var ia = FINEPASTO_ORDINE_CAPITOLI.indexOf(a);
+    var ib = FINEPASTO_ORDINE_CAPITOLI.indexOf(b);
+    if (ia === -1 && ib === -1) return a.localeCompare(b, 'it');
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
   });
+
+  // "Selezione 'Genova'": sezione virtuale trasversale (non è una tipologia) — tutti gli articoli
+  // Fine Pasto con regione Liguria e zona Genova, indipendentemente dal capitolo. Compaiono QUI IN
+  // PIÙ, oltre che nel proprio capitolo normale (es. una grappa Bruzzone di Genova sta sia in
+  // "Grappe" sia qui) — esattamente come nel PDF di riferimento. Nel PDF questa sezione va subito
+  // dopo "Grappe"; l'ordine dei suoi articoli lì è scelto a mano, qui si usa l'ordine alfabetico.
+  var selezioneGenova = articoli.filter(function (a) {
+    return a.regione && a.regione.nome === 'Liguria' && a.zona && a.zona.nome === 'Genova';
+  }).sort(function (x, y) {
+    var kx = chiaveAlfabeticaArticolo(x), ky = chiaveAlfabeticaArticolo(y);
+    return kx < ky ? -1 : kx > ky ? 1 : 0;
+  });
+
+  var body = '';
+  function stampaRigheFlat(elenco) {
+    elenco.forEach(function (a) { body += '<p class="fp-riga">' + rigaFinePastoHtml(a) + '</p>'; });
+  }
+
+  ordineCapitoli.forEach(function (cap) {
+    body += '<div class="fp-cap">' + escapeHtml(FINEPASTO_TITOLI_CAPITOLI[cap] || cap) + '</div>';
+    if (FINEPASTO_CATEGORIE_ALTRE_REGIONI.indexOf(cap) !== -1) {
+      var liguria = capitoli[cap].filter(function (a) { return a.regione && a.regione.nome === 'Liguria'; });
+      var altreRegioni = capitoli[cap].filter(function (a) { return !(a.regione && a.regione.nome === 'Liguria'); });
+      if (liguria.length) { body += '<div class="fp-sotto-gruppo"><div class="fp-sub">Liguria</div>'; stampaRigheFlat(liguria); body += '</div>'; }
+      if (altreRegioni.length) { body += '<div class="fp-sotto-gruppo"><div class="fp-sub">Altre regioni</div>'; stampaRigheFlat(altreRegioni); body += '</div>'; }
+    } else {
+      stampaRigheFlat(capitoli[cap]);
+    }
+    if (cap === 'Grappa' && selezioneGenova.length) {
+      body += '<div class="fp-cap">Selezione <em>‘Genova’</em></div>';
+      stampaRigheFlat(selezioneGenova);
+    }
+  });
+  // Se "Grappa" non è tra i capitoli presenti ma ci sono comunque articoli di Selezione Genova
+  // (caso raro: nessun articolo Fine Pasto è di tipologia Grappa), la mettiamo comunque in fondo
+  // invece di perderla silenziosamente.
+  if (ordineCapitoli.indexOf('Grappa') === -1 && selezioneGenova.length) {
+    body += '<div class="fp-cap">Selezione <em>‘Genova’</em></div>';
+    stampaRigheFlat(selezioneGenova);
+  }
 
   return '<!DOCTYPE html>\n<html lang="it"><head><meta charset="UTF-8">' +
     '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-    '<title>Fine Pasto — anteprima (Ristorante Santamonica)</title>' +
-    '<link href="https://fonts.googleapis.com/css2?family=Jost:wght@100..900&display=swap" rel="stylesheet">' +
+    '<title>Fine Pasto — Ristorante Santamonica</title>' +
+    '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500&family=Jost:wght@100..900&display=swap" rel="stylesheet">' +
     '<style>' +
     ':root{--cream:#faf7f2;--ink:#1a1714;--stone:#8c7e6e;--rule:#d4c9b8;}' +
     '*{box-sizing:border-box;margin:0;padding:0;}' +
     'body{background:var(--cream);color:var(--ink);font-family:"Jost",sans-serif;font-weight:300;padding:2rem 1rem;}' +
     '.pg{max-width:700px;margin:0 auto;}' +
-    '.fp-cap{font-family:"Jost",sans-serif;font-weight:400;font-size:20pt;margin:1.8rem 0 .6rem;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--rule);padding-bottom:.3rem;}' +
-    '.fp-cap:first-child{margin-top:0;}' +
+    '.fp-cap{font-family:"Jost",sans-serif;font-weight:400;font-size:24pt;margin:2.8rem 0 .8rem;text-align:center;text-transform:uppercase;letter-spacing:.06em;}' +
+    '.pg>.fp-cap:first-child{margin-top:0;}' +
+    '.fp-cap em{font-style:italic;text-transform:none;}' +
+    '.fp-sub{font-family:"Cormorant Garamond",serif;font-style:italic;font-weight:500;font-size:15pt;margin:1.2rem 0 .3rem;color:var(--ink);}' +
     '.fp-riga{font-size:12pt;line-height:1.6;margin:0 0 .4rem;}' +
     '.vino-nome{text-decoration:underline;font-weight:350;}' +
     '.vino-nome em{font-style:italic;}' +
     '.num-inline{font-size:10pt;}' +
-    '.vino-regione{text-decoration:underline;}' +
     '.prezzo-nowrap{white-space:nowrap;font-size:10pt;}' +
     '.ic-prezzo{vertical-align:-2px;margin:0 1px 0 0;}' +
+    '@page{margin:1.5cm 1.5cm 1.5cm 1.8cm;}' +
+    '@media print{' +
+      'body{padding:0;}' +
+      '.fp-cap{break-after:avoid;}' +
+      '.fp-sub{break-after:avoid;break-inside:avoid;}' +
+      '.fp-riga{break-inside:avoid;}' +
+    '}' +
     '</style></head><body>' +
     '<div class="pg">' + body + '</div>' +
     '</body></html>';
@@ -1677,8 +1807,10 @@ function rigaGruppoAnnateHtml(gruppo) {
 // che non è "Liguria" finisce in UN SOLO sotto-capitolo "Altre regioni" (le regioni si distinguono
 // in riga, vedi rigaVinoHtml) — non si spezza in un sotto-capitolo per regione come nelle altre
 // categorie. Condivisa tra generaHtmlCartaVini (stampa) e loadCartaTipologieSetup (pannello
-// "Categorie incluse in carta", che ne usa l'elenco sotto-capitoli per mostrare le spunte "nuova
-// pagina" anche per le sottocategorie, es. Genova/Liguria di Levante).
+// "Categorie", che ne usa l'elenco sotto-capitoli per mostrare le spunte "nuova pagina" anche per le
+// sottocategorie, es. Genova/Liguria di Levante). Solo per la Carta dei Vini — Fine Pasto ha una sua
+// logica di raggruppamento dedicata (generaAnteprimaFinePasto), più semplice: al massimo un binario
+// Liguria/Altre regioni per i soli Passiti, non un sotto-capitolo per ogni singola regione.
 function raggruppaCapitoliCarta(articoli) {
   var capitoli = {};
   var ordineCapitoli = [];

@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- v 2026.09.19.07 — nel form articolo del Catalogo, la descrizione era obbligatoria per qualunque
+     categoria: ora lo è solo per gli articoli la cui categoria è assegnata a "Vini" (scheda
+     "Categorie"), facoltativa per Fine Pasto/Esclusa. Controllo lato client basato su
+     CARTA_TIP_DESTINAZIONE (se già caricata in sessione) con fallback su CARTA_DESTINAZIONE_DEFAULT
+     per nome tipologia. Nota: se l'edge function lato server applica anch'essa un vincolo NOT NULL
+     sulla descrizione, va rimosso separatamente — non è in questo repository. -->
 <!-- v 2026.09.19.06 — il pannello di assegnazione "Destinazione categorie" mostrava tutte e 22 le
      categorie (Vini + Fine Pasto + Esclusa mischiate) sia nella scheda "Carta dei Vini" sia in
      "Fine Pasto": spostato in una scheda dedicata "Categorie" (unico posto dove si CAMBIA la
@@ -424,7 +430,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.06</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.07</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -481,7 +487,7 @@
           <div class="field"><label>Codice / nome</label><input type="text" id="f-codice" /></div>
         </div>
         <div class="field">
-          <label>Descrizione (obbligatoria)</label>
+          <label>Descrizione <span style="font-weight:400;color:var(--stone);">(obbligatoria solo per le categorie assegnate a "Vini")</span></label>
           <textarea id="f-descrizione" rows="5" style="width:100%;font:inherit;padding:.5rem;border:1px solid var(--rule);border-radius:4px;resize:vertical;"></textarea>
         </div>
         <div class="grid3">
@@ -962,8 +968,19 @@ document.getElementById('cat-save').addEventListener('click', function () {
     mezza_bottiglia: document.getElementById('f-mezza').checked,
     virgolette: document.getElementById('f-virgolette').checked,
   };
-  if (!articolo.descrizione || !articolo.descrizione.trim()) {
-    setStatus(document.getElementById('cat-form-status'), 'La descrizione è obbligatoria', false);
+  // La descrizione è obbligatoria solo per gli articoli di categoria "Vini" (v. scheda "Categorie");
+  // per Fine Pasto/Esclusa resta facoltativa. CARTA_TIP_DESTINAZIONE riflette le scelte fatte in
+  // sessione se quella scheda è già stata aperta, altrimenti si ricade sui default di fabbrica
+  // (CARTA_DESTINAZIONE_DEFAULT) cercando per nome della tipologia selezionata.
+  var tipologiaSelect = document.getElementById('f-tipologia');
+  var tipologiaNome = (tipologiaSelect.selectedIndex >= 0 && tipologiaSelect.options[tipologiaSelect.selectedIndex])
+    ? tipologiaSelect.options[tipologiaSelect.selectedIndex].text
+    : '';
+  var destinazioneTipologia = (articolo.tipologia_id && CARTA_TIP_DESTINAZIONE[articolo.tipologia_id])
+    || CARTA_DESTINAZIONE_DEFAULT[tipologiaNome]
+    || 'esclusa';
+  if (destinazioneTipologia === 'vini' && (!articolo.descrizione || !articolo.descrizione.trim())) {
+    setStatus(document.getElementById('cat-form-status'), 'La descrizione è obbligatoria per gli articoli di categoria "Vini"', false);
     return;
   }
   setStatus(document.getElementById('cat-form-status'), 'Salvataggio…');

@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!-- v 2026.09.19.04 — icone bottiglia/calice ridisegnate una seconda volta su richiesta di Andrea,
+     stavolta ricalcando esattamente lo screenshot del vecchio menù in .doc che ha fornito:
+     bottiglia piena con fascia etichetta vuota bordata al centro (ritaglio evenodd, trasparente su
+     qualsiasi sfondo, non un rettangolo colorato), calice tornato a solo contorno sottile (non più
+     pieno come in v.19.03). Dimensione 15px confermata. -->
 <!-- v 2026.09.19.03 — icone bottiglia/calice accanto ai prezzi (ICONA_BOTTIGLIA/ICONA_CALICE) da
      contorno sottile (11px, stroke 1.3, opacity .8) a silhouette piena (fill, 15px, opacity piena):
      poco leggibili in stampa accanto al testo prezzi a 10pt. Forma e proporzioni restano quelle
@@ -399,7 +404,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.03</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.04</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -1351,11 +1356,14 @@ function confrontaSottoCapitoli(a, b) {
 }
 
 // Icone bottiglia/calice per marcare i due prezzi: intera vs calice. currentColor eredita il
-// colore del testo, così restano coerenti col resto della riga. Silhouette piene (fill, non più
-// solo contorno) e più grandi (15px, era 11px) su richiesta di Andrea — il contorno sottile a 11px
-// era poco leggibile in stampa, specie accanto al testo a 10pt dei prezzi.
-var ICONA_BOTTIGLIA = '<svg class="ic-prezzo" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M9 1.3h6v3.6c0 .45.18.9.5 1.25L17 7.9c.65.65 1 1.5 1 2.45V21a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V10.35c0-.95.35-1.8 1-2.45l1.5-1.5c.32-.35.5-.8.5-1.25V1.3Z" fill="currentColor"/><rect x="9" y="1.3" width="6" height="1.4" fill="currentColor"/></svg>';
-var ICONA_CALICE = '<svg class="ic-prezzo" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M6.3 2.6h11.4l-1.15 7A4.6 4.6 0 0 1 12.9 13v6.1h3.1V21H8v-1.9h3.1V13a4.6 4.6 0 0 1-3.65-3.4l-1.15-7Z" fill="currentColor"/></svg>';
+// colore del testo, così restano coerenti col resto della riga. Ridisegnate su richiesta di Andrea
+// per assomigliare a quelle del vecchio menù in formato .doc (screenshot fornito): bottiglia piena
+// con "fascia etichetta" vuota bordata al centro (ritaglio ottenuto con fill-rule evenodd, non un
+// rettangolo colorato — resta trasparente su qualsiasi sfondo), calice a solo contorno sottile
+// (non più pieno). Dimensione 15px (era 11px nella prima versione, poi resa piena in v.19.03 —
+// qui si torna al contorno per il calice ma si mantiene la dimensione più grande e leggibile).
+var ICONA_BOTTIGLIA = '<svg class="ic-prezzo" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill-rule="evenodd" fill="currentColor" d="M10 1.3h4v2.3c0 .5.2 1 .55 1.35L16 6.4c.65.65 1 1.5 1 2.45V20.5A1.5 1.5 0 0 1 15.5 22h-7A1.5 1.5 0 0 1 7 20.5V8.85c0-.95.35-1.8 1-2.45l1.45-1.45c.35-.35.55-.85.55-1.35V1.3Zm-1.5 11.4v4.1h7v-4.1h-7Z"/><rect x="8.5" y="12.7" width="7" height="4.1" fill="none" stroke="currentColor" stroke-width=".9"/></svg>';
+var ICONA_CALICE = '<svg class="ic-prezzo" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.1" d="M8.7 2.8c0 0-.5 5.6.2 7.8.6 2 2 3.3 3.1 3.3s2.5-1.3 3.1-3.3c.7-2.2.2-7.8.2-7.8Z"/><path fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" d="M12 13.9v5.7M9 20.6h6"/></svg>';
 
 // Corsivo solo sulla parte tra virgolette, non su tutto il nome: es. `"100" Ancestrale` diventa
 // "<em>100</em>" Ancestrale (corsivo solo su "100"). Se il nome non ha virgolette letterali nel

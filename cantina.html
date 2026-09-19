@@ -1,4 +1,17 @@
 <!DOCTYPE html>
+<!-- v 2026.09.19.05 — divisi Catalogo/Carta in due destinazioni: ogni categoria ora va assegnata a
+     "Vini", "Fine Pasto" o "Esclusa" (era solo un booleano "in carta sì/no"). Pannello "Categorie
+     incluse in carta" rinominato "Destinazione categorie", con selettore a 3 vie al posto della
+     spunta (creaRigaCapitolo/creaRigaSottocapitolo sostituiscono creaRigaSpuntaCarta).
+     CARTA_TIP_DESTINAZIONE sostituisce CARTA_TIP_SELEZIONATE, default per categoria in
+     CARTA_DESTINAZIONE_DEFAULT (deciso con Andrea categoria per categoria: Vini = Bianchi/Birra/
+     Bollicine/Bollicine Rosé/Champagne/Champagne Rosé/Rosati/Rossi/Moscati; Fine Pasto = Amari/
+     Grappa/Distillati/Gin/Rum/Vermouth/Whiskey/Passiti/Fine pasto; Esclusa = Cocktail/Dealcolati/
+     Sakè/Varie). localStorage passato a chiave v2 (schema diverso, non più compatibile con v1).
+     Nuova scheda "Fine Pasto" con anteprima provvisoria (generaAnteprimaFinePasto): elenco piatto
+     per capitolo, stessa formattazione riga di rigaVinoHtml, nessuna pubblicazione — il layout
+     definitivo si decide in una sessione successiva. Comportamento della Carta dei Vini invariato
+     (ora filtra su destinazione === 'vini' invece del vecchio booleano). -->
 <!-- v 2026.09.19.04 — icone bottiglia/calice ridisegnate una seconda volta su richiesta di Andrea,
      stavolta ricalcando esattamente lo screenshot del vecchio menù in .doc che ha fornito:
      bottiglia piena con fascia etichetta vuota bordata al centro (ritaglio evenodd, trasparente su
@@ -404,7 +417,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.04</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.05</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -413,7 +426,8 @@
     <div class="tab active" data-tab="catalogo">Catalogo</div>
     <div class="tab" data-tab="anagrafiche">Anagrafiche</div>
     <div class="tab" data-tab="magazzino">Magazzino</div>
-    <div class="tab" data-tab="carta">Pubblica carta vini</div>
+    <div class="tab" data-tab="carta">Carta dei Vini</div>
+    <div class="tab" data-tab="finepasto">Fine Pasto</div>
   </div>
 
   <main>
@@ -608,10 +622,11 @@
     <!-- ===================== CARTA VINI ===================== -->
     <section id="sec-carta" class="section">
       <div class="panel">
-        <h2>Genera e pubblica la carta vini</h2>
+        <h2>Genera e pubblica la Carta dei Vini</h2>
         <p style="font-size:.8rem;color:var(--stone);margin-bottom:1rem;">
-          Genera la pagina <code>menu-vini.html</code> a partire dagli articoli non nascosti, raggruppati per tipologia.
-          L'anteprima qui sotto mostra esattamente cosa verrà pubblicato.
+          Genera la pagina <code>menu-vini.html</code> a partire dagli articoli non nascosti la cui categoria è
+          assegnata a "Vini" (v. pannello sotto), raggruppati per tipologia. L'anteprima qui sotto mostra esattamente
+          cosa verrà pubblicato.
         </p>
         <div class="toolbar">
           <button class="btn primary" id="carta-genera">Genera anteprima</button>
@@ -623,17 +638,18 @@
       </div>
 
       <div class="panel">
-        <h2>Categorie incluse in carta</h2>
+        <h2>Destinazione categorie</h2>
         <p style="font-size:.8rem;color:var(--stone);margin-bottom:1rem;">
-          Solo gli articoli delle categorie selezionate finiscono nella carta pubblicata — utile per escludere le
-          categorie da bar (Grappa, Gin, Rum, Amari…) che vivono nello stesso database ma non vanno in carta vini.
-          "Nuova pagina" conta solo per la stampa: di default è attiva sulle categorie che vanno in carta (una
-          pagina nuova per ciascuna) e spenta sulle altre; puoi cambiarla capitolo per capitolo. Sotto ogni
-          capitolo compaiono anche le sue sottocategorie realmente presenti (es. Genova, Liguria di Levante):
-          spuntando "nuova pagina" su una di esse, anche lì si forza l'a-capo in stampa. "Memorizza impostazioni
-          attuali" salva questa combinazione di spunte in questo browser: da quel momento è lei il nuovo punto di
-          partenza ogni volta che riapri la pagina, e anche "Ripristina predefiniti" torna a quella invece che ai
-          valori di fabbrica.
+          Ogni categoria del catalogo va assegnata a una destinazione: <strong>Vini</strong> (finisce nella Carta dei
+          Vini), <strong>Fine Pasto</strong> (finisce nella pagina Fine Pasto, layout ancora da definire) o
+          <strong>Esclusa</strong> (non va in nessuna delle due — es. categorie da bar). Vale per entrambe le pagine di
+          stampa, si cambia da qui sola. "Nuova pagina" conta solo per la stampa: di default è attiva sulle categorie
+          assegnate a Vini o Fine Pasto (una pagina nuova per ciascuna) e spenta sulle altre; puoi cambiarla capitolo
+          per capitolo. Sotto ogni capitolo compaiono anche le sue sottocategorie realmente presenti (es. Genova,
+          Liguria di Levante): spuntando "nuova pagina" su una di esse, anche lì si forza l'a-capo in stampa.
+          "Memorizza impostazioni attuali" salva questa combinazione di scelte in questo browser: da quel momento è
+          lei il nuovo punto di partenza ogni volta che riapri la pagina, e anche "Ripristina predefiniti" torna a
+          quella invece che ai valori di fabbrica.
         </p>
         <div class="toolbar" style="margin-bottom:.6rem;">
           <button class="btn" id="carta-tipologie-reset">Ripristina predefiniti</button>
@@ -641,6 +657,24 @@
         </div>
         <div id="carta-tipologie-list" style="display:flex;flex-direction:column;gap:.9rem;margin-bottom:.5rem;"></div>
         <div id="carta-tipologie-status" class="status"></div>
+      </div>
+    </section>
+
+    <section id="sec-finepasto" class="section">
+      <div class="panel">
+        <h2>Fine Pasto — anteprima (layout da definire)</h2>
+        <p style="font-size:.8rem;color:var(--stone);margin-bottom:1rem;">
+          Elenco provvisorio degli articoli delle categorie assegnate a "Fine Pasto" (v. pannello "Destinazione
+          categorie" nella scheda Carta dei Vini) — solo per verificare che le categorie giuste ci siano dentro.
+          Grafica, raggruppamento e stampa definitivi si decidono in un secondo momento; per ora non c'è pubblicazione
+          sul sito.
+        </p>
+        <div class="toolbar">
+          <button class="btn primary" id="finepasto-genera">Genera anteprima</button>
+          <button class="btn" id="finepasto-stampa" style="display:none;">Stampa</button>
+        </div>
+        <div id="finepasto-status" class="status"></div>
+        <iframe id="finepasto-preview-frame" style="display:none;margin-top:1rem;"></iframe>
       </div>
     </section>
 
@@ -684,7 +718,7 @@ document.querySelectorAll('.tabs > .tab').forEach(function (t) {
     if (t.dataset.tab === 'catalogo' && !window._catLoaded) loadCatalogo();
     if (t.dataset.tab === 'anagrafiche' && !window._anLoaded) loadAnagraficheTabelle();
     if (t.dataset.tab === 'magazzino' && !window._magLoaded) { loadGiacenze(); loadSelectsMagazzino(); }
-    if (t.dataset.tab === 'carta' && !window._cartaSetupLoaded) { window._cartaSetupLoaded = true; loadCartaTipologieSetup(); }
+    if ((t.dataset.tab === 'carta' || t.dataset.tab === 'finepasto') && !window._cartaSetupLoaded) { window._cartaSetupLoaded = true; loadCartaTipologieSetup(); }
   });
 });
 
@@ -1295,7 +1329,7 @@ document.getElementById('carta-genera').addEventListener('click', function () {
   fetch(URL_CATALOGO + '?solo_visibili=1').then(function (r) { return r.json(); }).then(function (data) {
     if (!data.ok) { setStatus(document.getElementById('carta-status'), data.error, false); return; }
     var tutti = data.articoli || [];
-    var articoli = tutti.filter(function (a) { return !a.tipologia_id || CARTA_TIP_SELEZIONATE[a.tipologia_id] !== false; });
+    var articoli = tutti.filter(function (a) { return !a.tipologia_id || CARTA_TIP_DESTINAZIONE[a.tipologia_id] === 'vini'; });
     _cartaHtml = generaHtmlCartaVini(articoli);
     var frame = document.getElementById('preview-frame');
     frame.style.display = '';
@@ -1303,7 +1337,7 @@ document.getElementById('carta-genera').addEventListener('click', function () {
     document.getElementById('carta-pubblica').style.display = '';
     document.getElementById('carta-stampa').style.display = '';
     var escl = tutti.length - articoli.length;
-    setStatus(document.getElementById('carta-status'), articoli.length + ' articoli in carta' + (escl ? ' (' + escl + ' esclusi per categoria)' : '') + '.', true);
+    setStatus(document.getElementById('carta-status'), articoli.length + ' articoli in carta' + (escl ? ' (' + escl + ' non assegnati a Vini)' : '') + '.', true);
   }).catch(function (e) { setStatus(document.getElementById('carta-status'), String(e), false); });
 });
 
@@ -1315,6 +1349,90 @@ document.getElementById('carta-stampa').addEventListener('click', function () {
   if (!w) { setStatus(document.getElementById('carta-status'), 'Il browser ha bloccato la finestra di stampa (popup). Consenti i popup per questo sito e riprova.', false); return; }
   w.document.open();
   w.document.write(_cartaHtml);
+  w.document.close();
+  setTimeout(function () { w.focus(); w.print(); }, 300);
+});
+
+// ================================================================
+// FINE PASTO — anteprima provvisoria (layout definitivo da decidere)
+// ================================================================
+// Elenco piatto per capitolo (Amari, Grappa, Distillati...), stessa riga formattata di rigaVinoHtml
+// (nome/produttore/grado/prezzi) solo per verificare rapidamente il contenuto — nessun raggruppamento
+// per zona/regione, nessuna spunta "nuova pagina" dedicata, nessuna pubblicazione: tutto questo si
+// decide quando si definisce il layout vero.
+var _finePastoHtml = '';
+
+function generaAnteprimaFinePasto(articoli) {
+  var capitoli = {};
+  var ordine = [];
+  articoli.forEach(function (a) {
+    var cap = a.tipologia ? a.tipologia.nome : 'Altro';
+    if (!capitoli[cap]) { capitoli[cap] = []; ordine.push(cap); }
+    capitoli[cap].push(a);
+  });
+  function chiaveAlfabetica(a) {
+    return (a.codice || a.descrizione || '').replace(/["""]/g, '').trim().toLowerCase();
+  }
+  ordine.sort(function (a, b) { return a.localeCompare(b, 'it'); });
+  Object.keys(capitoli).forEach(function (cap) {
+    capitoli[cap].sort(function (x, y) {
+      var kx = chiaveAlfabetica(x), ky = chiaveAlfabetica(y);
+      return kx < ky ? -1 : kx > ky ? 1 : 0;
+    });
+  });
+
+  var body = '';
+  ordine.forEach(function (cap) {
+    body += '<div class="fp-cap">' + escapeHtml(cap) + '</div>';
+    capitoli[cap].forEach(function (a) {
+      body += '<p class="fp-riga">' + rigaVinoHtml(a) + '</p>';
+    });
+  });
+
+  return '<!DOCTYPE html>\n<html lang="it"><head><meta charset="UTF-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+    '<title>Fine Pasto — anteprima (Ristorante Santamonica)</title>' +
+    '<link href="https://fonts.googleapis.com/css2?family=Jost:wght@100..900&display=swap" rel="stylesheet">' +
+    '<style>' +
+    ':root{--cream:#faf7f2;--ink:#1a1714;--stone:#8c7e6e;--rule:#d4c9b8;}' +
+    '*{box-sizing:border-box;margin:0;padding:0;}' +
+    'body{background:var(--cream);color:var(--ink);font-family:"Jost",sans-serif;font-weight:300;padding:2rem 1rem;}' +
+    '.pg{max-width:700px;margin:0 auto;}' +
+    '.fp-cap{font-family:"Jost",sans-serif;font-weight:400;font-size:20pt;margin:1.8rem 0 .6rem;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--rule);padding-bottom:.3rem;}' +
+    '.fp-cap:first-child{margin-top:0;}' +
+    '.fp-riga{font-size:12pt;line-height:1.6;margin:0 0 .4rem;}' +
+    '.vino-nome{text-decoration:underline;font-weight:350;}' +
+    '.vino-nome em{font-style:italic;}' +
+    '.num-inline{font-size:10pt;}' +
+    '.vino-regione{text-decoration:underline;}' +
+    '.prezzo-nowrap{white-space:nowrap;font-size:10pt;}' +
+    '.ic-prezzo{vertical-align:-2px;margin:0 1px 0 0;}' +
+    '</style></head><body>' +
+    '<div class="pg">' + body + '</div>' +
+    '</body></html>';
+}
+
+document.getElementById('finepasto-genera').addEventListener('click', function () {
+  setStatus(document.getElementById('finepasto-status'), 'Generazione…');
+  fetch(URL_CATALOGO + '?solo_visibili=1').then(function (r) { return r.json(); }).then(function (data) {
+    if (!data.ok) { setStatus(document.getElementById('finepasto-status'), data.error, false); return; }
+    var tutti = data.articoli || [];
+    var articoli = tutti.filter(function (a) { return a.tipologia_id && CARTA_TIP_DESTINAZIONE[a.tipologia_id] === 'fine_pasto'; });
+    _finePastoHtml = generaAnteprimaFinePasto(articoli);
+    var frame = document.getElementById('finepasto-preview-frame');
+    frame.style.display = '';
+    frame.srcdoc = _finePastoHtml;
+    document.getElementById('finepasto-stampa').style.display = '';
+    setStatus(document.getElementById('finepasto-status'), articoli.length + ' articoli assegnati a Fine Pasto.', true);
+  }).catch(function (e) { setStatus(document.getElementById('finepasto-status'), String(e), false); });
+});
+
+document.getElementById('finepasto-stampa').addEventListener('click', function () {
+  if (!_finePastoHtml) return;
+  var w = window.open('', '_blank');
+  if (!w) { setStatus(document.getElementById('finepasto-status'), 'Il browser ha bloccato la finestra di stampa (popup). Consenti i popup per questo sito e riprova.', false); return; }
+  w.document.open();
+  w.document.write(_finePastoHtml);
   w.document.close();
   setTimeout(function () { w.focus(); w.print(); }, 300);
 });
@@ -1635,19 +1753,28 @@ function generaHtmlCartaVini(articoli) {
     '</body></html>';
 }
 
-// Categorie che vanno in carta per default (le uniche presenti nella carta stampata reale).
-// Questo è il default "di fabbrica": se l'utente non ha mai memorizzato nulla (v. sotto), è da qui
-// che si riparte ogni volta che si riapre la pagina.
-var CARTA_TIP_DEFAULT = ['Bianchi', 'Rossi', 'Rosati', 'Bollicine', 'Bollicine Rosé', 'Champagne', 'Champagne Rosé', 'Birra'];
-var CARTA_TIP_SELEZIONATE = {}; // tipologia_id -> bool, solo in memoria per questa sessione
+// Destinazione di ogni categoria per default (di fabbrica): 'vini' finisce nella Carta dei Vini,
+// 'fine_pasto' nella pagina Fine Pasto, 'esclusa' non va in nessuna delle due (categorie da bar).
+// Deciso insieme ad Andrea categoria per categoria il 19/9/2026. Se l'utente non ha mai memorizzato
+// nulla (v. sotto), è da qui che si riparte ogni volta che si riapre la pagina.
+var CARTA_DESTINAZIONE_DEFAULT = {
+  'Bianchi': 'vini', 'Birra': 'vini', 'Bollicine': 'vini', 'Bollicine Rosé': 'vini',
+  'Champagne': 'vini', 'Champagne Rosé': 'vini', 'Rosati': 'vini', 'Rossi': 'vini', 'Moscati': 'vini',
+  'Amari': 'fine_pasto', 'Grappa': 'fine_pasto', 'Distillati': 'fine_pasto', 'Gin': 'fine_pasto',
+  'Rum': 'fine_pasto', 'Vermouth': 'fine_pasto', 'Whiskey': 'fine_pasto', 'Passiti': 'fine_pasto',
+  'Fine pasto': 'fine_pasto',
+  'Cocktail': 'esclusa', 'Dealcolati': 'esclusa', 'Sakè': 'esclusa', 'Varie': 'esclusa',
+};
+var CARTA_TIP_DESTINAZIONE = {}; // tipologia_id -> 'vini'|'fine_pasto'|'esclusa', solo in memoria per questa sessione
 var CARTA_BREAK_CAPITOLI = {}; // tipologia_id -> bool ("nuova pagina prima di questo capitolo"), default true, solo in memoria
 var CARTA_BREAK_SOTTOCAPITOLI = {}; // "capitolo||sottocapitolo" (es. "Bianchi||Genova") -> bool, default false, solo in memoria
 
 // Impostazioni memorizzate dall'utente (pulsante "Memorizza impostazioni attuali"): persistite in
 // localStorage di QUESTO browser (non su DB, non condivise tra dispositivi). Quando presenti,
-// sostituiscono CARTA_TIP_DEFAULT come punto di partenza a ogni apertura della pagina — sia al
-// primo caricamento sia dopo "Ripristina predefiniti".
-var CARTA_IMPOSTAZIONI_STORAGE_KEY = 'santaweb_carta_impostazioni_v1';
+// sostituiscono CARTA_DESTINAZIONE_DEFAULT come punto di partenza a ogni apertura della pagina —
+// sia al primo caricamento sia dopo "Ripristina predefiniti". Chiave v2 (era v1 quando la
+// destinazione era ancora un booleano "in carta sì/no" invece delle 3 destinazioni).
+var CARTA_IMPOSTAZIONI_STORAGE_KEY = 'santaweb_carta_impostazioni_v2';
 
 function caricaImpostazioniCartaSalvate() {
   try {
@@ -1659,7 +1786,7 @@ function caricaImpostazioniCartaSalvate() {
 function salvaImpostazioniCartaCorrenti() {
   try {
     localStorage.setItem(CARTA_IMPOSTAZIONI_STORAGE_KEY, JSON.stringify({
-      selezionate: CARTA_TIP_SELEZIONATE,
+      destinazione: CARTA_TIP_DESTINAZIONE,
       breakCapitoli: CARTA_BREAK_CAPITOLI,
       breakSottocapitoli: CARTA_BREAK_SOTTOCAPITOLI,
     }));
@@ -1667,32 +1794,55 @@ function salvaImpostazioniCartaCorrenti() {
   } catch (e) { return false; }
 }
 
-// Crea la coppia di spunte "in carta" + "nuova pagina" per un capitolo o un sotto-capitolo.
-// `isDefault` è lo stato iniziale di entrambe le spunte; `onToggleCarta` è null per i
-// sotto-capitoli (non hanno una spunta "in carta" propria, solo "nuova pagina").
-function creaRigaSpuntaCarta(opts) {
+// Riga di un capitolo: selettore di destinazione (Vini/Fine Pasto/Esclusa) + spunta "nuova pagina".
+function creaRigaCapitolo(opts) {
   var riga = document.createElement('div');
   riga.style.cssText = 'display:inline-flex;align-items:center;gap:.7rem;';
 
-  if (opts.onToggleCarta) {
-    var wrap = document.createElement('label');
-    wrap.style.cssText = 'display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;text-transform:none;letter-spacing:0;color:var(--ink);cursor:pointer;';
-    var cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.checked = opts.isDefault;
-    var span = document.createElement('span');
-    span.textContent = opts.etichetta;
-    wrap.appendChild(cb);
-    wrap.appendChild(span);
-    cb.addEventListener('change', function () { opts.onToggleCarta(cb.checked); });
-    riga.appendChild(wrap);
-  } else {
-    var span2 = document.createElement('span');
-    span2.textContent = opts.etichetta;
-    span2.style.cssText = 'font-size:.78rem;color:var(--ink);';
-    riga.appendChild(span2);
-  }
+  var wrap = document.createElement('label');
+  wrap.style.cssText = 'display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;text-transform:none;letter-spacing:0;color:var(--ink);';
+  var span = document.createElement('span');
+  span.textContent = opts.etichetta;
+  var select = document.createElement('select');
+  select.style.cssText = 'font-size:.75rem;padding:.15rem .3rem;';
+  [['vini', 'Vini'], ['fine_pasto', 'Fine Pasto'], ['esclusa', 'Esclusa']].forEach(function (opt) {
+    var o = document.createElement('option');
+    o.value = opt[0]; o.textContent = opt[1];
+    if (opt[0] === opts.destinazioneDefault) o.selected = true;
+    select.appendChild(o);
+  });
+  wrap.appendChild(span);
+  wrap.appendChild(select);
+  select.addEventListener('change', function () { opts.onChangeDestinazione(select.value); });
+  riga.appendChild(wrap);
 
+  riga.appendChild(creaSpuntaPagina({
+    isDefaultPagina: opts.isDefaultPagina,
+    titlePagina: 'Solo per la stampa: se spuntato, questo capitolo inizia sempre da una nuova pagina; se tolto, può continuare sulla stessa pagina del capitolo precedente.',
+    onTogglePagina: opts.onTogglePagina,
+  }));
+
+  return riga;
+}
+
+// Riga di un sotto-capitolo (zona/regione): solo etichetta + spunta "nuova pagina", nessuna
+// destinazione propria (eredita quella del capitolo).
+function creaRigaSottocapitolo(etichetta, isDefaultPagina, onTogglePagina) {
+  var riga = document.createElement('div');
+  riga.style.cssText = 'display:inline-flex;align-items:center;gap:.7rem;';
+  var span = document.createElement('span');
+  span.textContent = etichetta;
+  span.style.cssText = 'font-size:.78rem;color:var(--ink);';
+  riga.appendChild(span);
+  riga.appendChild(creaSpuntaPagina({
+    isDefaultPagina: isDefaultPagina,
+    titlePagina: 'Solo per la stampa: se spuntato, questa sottocategoria (' + etichetta + ') inizia sempre da una nuova pagina; se tolto, può continuare sulla stessa pagina della sottocategoria precedente.',
+    onTogglePagina: onTogglePagina,
+  }));
+  return riga;
+}
+
+function creaSpuntaPagina(opts) {
   var wrapPagina = document.createElement('label');
   wrapPagina.title = opts.titlePagina;
   wrapPagina.style.cssText = 'display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;text-transform:none;letter-spacing:0;color:var(--stone);cursor:pointer;';
@@ -1704,9 +1854,7 @@ function creaRigaSpuntaCarta(opts) {
   wrapPagina.appendChild(cbPagina);
   wrapPagina.appendChild(spanPagina);
   cbPagina.addEventListener('change', function () { opts.onTogglePagina(cbPagina.checked); });
-  riga.appendChild(wrapPagina);
-
-  return riga;
+  return wrapPagina;
 }
 
 function loadCartaTipologieSetup(messaggioFinale) {
@@ -1725,31 +1873,30 @@ function loadCartaTipologieSetup(messaggioFinale) {
     var raggruppato = raggruppaCapitoliCarta(dataCatalogo.articoli || []);
 
     // Se l'utente ha memorizzato delle impostazioni (pulsante "Memorizza impostazioni attuali"),
-    // sono quelle il punto di partenza invece dei default di fabbrica (CARTA_TIP_DEFAULT / spente).
+    // sono quelle il punto di partenza invece dei default di fabbrica (CARTA_DESTINAZIONE_DEFAULT).
     var salvate = caricaImpostazioniCartaSalvate();
 
     var list = document.getElementById('carta-tipologie-list');
     list.innerHTML = '';
     (dataAnagrafiche.tipologie || []).forEach(function (t) {
-      var isDefault = (salvate && salvate.selezionate && (t.id in salvate.selezionate))
-        ? !!salvate.selezionate[t.id]
-        : CARTA_TIP_DEFAULT.indexOf(t.nome) !== -1;
+      var destinazioneDefault = (salvate && salvate.destinazione && (t.id in salvate.destinazione))
+        ? salvate.destinazione[t.id]
+        : (CARTA_DESTINAZIONE_DEFAULT[t.nome] || 'esclusa');
       var isDefaultPagina = (salvate && salvate.breakCapitoli && (t.id in salvate.breakCapitoli))
         ? !!salvate.breakCapitoli[t.id]
-        : isDefault; // "nuova pagina" parte allineata a "categoria in carta" se non c'è un valore memorizzato
-      CARTA_TIP_SELEZIONATE[t.id] = isDefault;
+        : destinazioneDefault !== 'esclusa'; // "nuova pagina" parte allineata a "va in carta" se non c'è un valore memorizzato
+      CARTA_TIP_DESTINAZIONE[t.id] = destinazioneDefault;
       CARTA_BREAK_CAPITOLI[t.id] = isDefaultPagina;
 
       var blocco = document.createElement('div');
       blocco.style.cssText = 'display:flex;flex-direction:column;gap:.35rem;';
 
-      var rigaCapitolo = creaRigaSpuntaCarta({
+      var rigaCapitolo = creaRigaCapitolo({
         etichetta: t.nome,
-        isDefault: isDefault,
+        destinazioneDefault: destinazioneDefault,
         isDefaultPagina: isDefaultPagina,
-        titlePagina: 'Solo per la stampa: se spuntato, questo capitolo inizia sempre da una nuova pagina; se tolto, può continuare sulla stessa pagina del capitolo precedente.',
-        onToggleCarta: function (checked) {
-          CARTA_TIP_SELEZIONATE[t.id] = checked;
+        onChangeDestinazione: function (valore) {
+          CARTA_TIP_DESTINAZIONE[t.id] = valore;
           setStatus(document.getElementById('carta-tipologie-status'), 'Vale solo per questa sessione — rigenera l\'anteprima per vedere l\'effetto.', true);
         },
         onTogglePagina: function (checked) {
@@ -1773,18 +1920,10 @@ function loadCartaTipologieSetup(messaggioFinale) {
             ? !!salvate.breakSottocapitoli[chiave]
             : false; // default di fabbrica: nessuna interruzione forzata sulle sottocategorie
           CARTA_BREAK_SOTTOCAPITOLI[chiave] = subDefaultPagina;
-          var rigaSub = creaRigaSpuntaCarta({
-            etichetta: sub,
-            isDefault: false,
-            isDefaultPagina: subDefaultPagina,
-            titlePagina: 'Solo per la stampa: se spuntato, questa sottocategoria (' + sub + ') inizia sempre da una nuova pagina; se tolto, può continuare sulla stessa pagina della sottocategoria precedente.',
-            onToggleCarta: null,
-            onTogglePagina: function (checked) {
-              CARTA_BREAK_SOTTOCAPITOLI[chiave] = checked;
-              setStatus(document.getElementById('carta-tipologie-status'), 'Vale solo per questa sessione — rigenera l\'anteprima per vedere l\'effetto.', true);
-            },
-          });
-          wrapSotto.appendChild(rigaSub);
+          wrapSotto.appendChild(creaRigaSottocapitolo(sub, subDefaultPagina, function (checked) {
+            CARTA_BREAK_SOTTOCAPITOLI[chiave] = checked;
+            setStatus(document.getElementById('carta-tipologie-status'), 'Vale solo per questa sessione — rigenera l\'anteprima per vedere l\'effetto.', true);
+          }));
         });
         blocco.appendChild(wrapSotto);
       }
@@ -1796,17 +1935,16 @@ function loadCartaTipologieSetup(messaggioFinale) {
 }
 
 document.getElementById('carta-tipologie-reset').addEventListener('click', function () {
-  // Ricarica da zero la lista: entrambe le spunte (categoria in carta + nuova pagina, capitoli e
-  // sottocapitoli) tornano al punto di partenza — le impostazioni memorizzate se presenti,
-  // altrimenti i valori di fabbrica — scartando qualunque scelta fatta in sessione dopo l'ultima
-  // memorizzazione.
+  // Ricarica da zero la lista: sia la destinazione che "nuova pagina" (capitoli e sottocapitoli)
+  // tornano al punto di partenza — le impostazioni memorizzate se presenti, altrimenti i valori di
+  // fabbrica — scartando qualunque scelta fatta in sessione dopo l'ultima memorizzazione.
   loadCartaTipologieSetup('Ripristinati i valori di default — rigenera l\'anteprima per vedere l\'effetto.');
 });
 
 document.getElementById('carta-tipologie-salva').addEventListener('click', function () {
-  // Salva lo stato attuale di tutte le spunte (capitoli + sottocapitoli) in localStorage di questo
-  // browser: da qui in avanti è questa combinazione il punto di partenza a ogni apertura della
-  // pagina, anche dopo "Ripristina predefiniti".
+  // Salva lo stato attuale (destinazione + nuova pagina, capitoli e sottocapitoli) in localStorage
+  // di questo browser: da qui in avanti è questa combinazione il punto di partenza a ogni apertura
+  // della pagina, anche dopo "Ripristina predefiniti".
   var ok = salvaImpostazioniCartaCorrenti();
   setStatus(
     document.getElementById('carta-tipologie-status'),

@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!-- v 2026.09.19.03 — icone bottiglia/calice accanto ai prezzi (ICONA_BOTTIGLIA/ICONA_CALICE) da
+     contorno sottile (11px, stroke 1.3, opacity .8) a silhouette piena (fill, 15px, opacity piena):
+     poco leggibili in stampa accanto al testo prezzi a 10pt. Forma e proporzioni restano quelle
+     originali (bottiglia con collo/tappo, calice a coppa con stelo e base), solo più grandi e piene
+     invece che a contorno. -->
 <!-- v 2026.09.19.02 — pannello "Categorie incluse in carta": nuovo pulsante "Memorizza impostazioni
      attuali" di fianco a "Ripristina predefiniti" — salva in localStorage di questo browser (non su
      DB, non condiviso tra dispositivi) lo stato di tutte le spunte (categorie + nuova pagina, sia a
@@ -394,7 +399,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.02</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.03</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -1345,10 +1350,12 @@ function confrontaSottoCapitoli(a, b) {
   return chiaveA.localeCompare(chiaveB, 'it');
 }
 
-// Icone bottiglia/calice (estratte dalla carta vini stampata) per marcare i due prezzi: intera vs calice.
-// currentColor eredita il colore del testo, così restano coerenti col resto della riga.
-var ICONA_BOTTIGLIA = '<svg class="ic-prezzo" viewBox="0 0 24 24" width="11" height="11" aria-hidden="true"><path d="M9 2h6v3.5c0 .6.2 1.1.6 1.5L17 8.5c.6.6 1 1.5 1 2.4V20a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-9.1c0-.9.4-1.8 1-2.4l1.4-1.5c.4-.4.6-.9.6-1.5V2Z" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M9 2h6M8.5 12h7" stroke="currentColor" stroke-width="1"/></svg>';
-var ICONA_CALICE = '<svg class="ic-prezzo" viewBox="0 0 24 24" width="11" height="11" aria-hidden="true"><path d="M7 3h10l-1 6a4 4 0 0 1-8 0L7 3Z" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M12 13v6M9 21h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>';
+// Icone bottiglia/calice per marcare i due prezzi: intera vs calice. currentColor eredita il
+// colore del testo, così restano coerenti col resto della riga. Silhouette piene (fill, non più
+// solo contorno) e più grandi (15px, era 11px) su richiesta di Andrea — il contorno sottile a 11px
+// era poco leggibile in stampa, specie accanto al testo a 10pt dei prezzi.
+var ICONA_BOTTIGLIA = '<svg class="ic-prezzo" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M9 1.3h6v3.6c0 .45.18.9.5 1.25L17 7.9c.65.65 1 1.5 1 2.45V21a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V10.35c0-.95.35-1.8 1-2.45l1.5-1.5c.32-.35.5-.8.5-1.25V1.3Z" fill="currentColor"/><rect x="9" y="1.3" width="6" height="1.4" fill="currentColor"/></svg>';
+var ICONA_CALICE = '<svg class="ic-prezzo" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M6.3 2.6h11.4l-1.15 7A4.6 4.6 0 0 1 12.9 13v6.1h3.1V21H8v-1.9h3.1V13a4.6 4.6 0 0 1-3.65-3.4l-1.15-7Z" fill="currentColor"/></svg>';
 
 // Corsivo solo sulla parte tra virgolette, non su tutto il nome: es. `"100" Ancestrale` diventa
 // "<em>100</em>" Ancestrale (corsivo solo su "100"). Se il nome non ha virgolette letterali nel
@@ -1599,7 +1606,7 @@ function generaHtmlCartaVini(articoli) {
     '.vino-nome{text-decoration:underline;font-weight:350;}' +
     '.vino-nome em{font-style:italic;}' +
     '.vino-annate-lista{margin:-.35rem 0 .6rem 1.2rem;font-size:.85rem;line-height:1.5;}' +
-    '.ic-prezzo{vertical-align:-1px;margin:0 1px 0 0;opacity:.8;}' +
+    '.ic-prezzo{vertical-align:-2px;margin:0 1px 0 0;}' +
     '.prezzo-nowrap{white-space:nowrap;font-size:10pt;}' +
     '.num-inline{font-size:10pt;}' +
     '.annata-label{font-size:12pt;}' +

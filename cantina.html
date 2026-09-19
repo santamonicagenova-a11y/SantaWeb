@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!-- v 2026.09.19.01 — pannello "Categorie incluse in carta": aggiunte, sotto ogni capitolo che in
+     stampa mostra un sotto-titolo di zona/regione, le spunte "nuova pagina" per le sottocategorie
+     realmente presenti nel catalogo corrente (es. Genova, Liguria di Levante) — prima "nuova
+     pagina" forzava l'a-capo solo a livello di capitolo, non di sottocapitolo. Grouping condiviso
+     tra pannello e generazione carta via nuova funzione raggruppaCapitoliCarta() (estratta da
+     generaHtmlCartaVini, comportamento di stampa invariato). Nuova mappa in-memory
+     CARTA_BREAK_SOTTOCAPITOLI (chiave "capitolo||sottocapitolo", default spenta). -->
 <!-- v 2026.09.12.04 — nome vino (.vino-nome) portato a font-weight:350 esplicito su richiesta di
      Andrea (prima ereditava 300 dal body, invariato): resta solo sottolineato (niente grassetto
      vero, 600+), ma leggermente più pesante del resto del testo per risaltare nella riga. -->
@@ -604,12 +611,14 @@
           Solo gli articoli delle categorie selezionate finiscono nella carta pubblicata — utile per escludere le
           categorie da bar (Grappa, Gin, Rum, Amari…) che vivono nello stesso database ma non vanno in carta vini.
           "Nuova pagina" conta solo per la stampa: di default è attiva sulle categorie che vanno in carta (una
-          pagina nuova per ciascuna) e spenta sulle altre; puoi cambiarla capitolo per capitolo.
+          pagina nuova per ciascuna) e spenta sulle altre; puoi cambiarla capitolo per capitolo. Sotto ogni
+          capitolo compaiono anche le sue sottocategorie realmente presenti (es. Genova, Liguria di Levante):
+          spuntando "nuova pagina" su una di esse, anche lì si forza l'a-capo in stampa.
         </p>
         <div class="toolbar" style="margin-bottom:.6rem;">
           <button class="btn" id="carta-tipologie-reset">Ripristina predefiniti</button>
         </div>
-        <div id="carta-tipologie-list" style="display:flex;flex-wrap:wrap;gap:.6rem 1.6rem;margin-bottom:.5rem;"></div>
+        <div id="carta-tipologie-list" style="display:flex;flex-direction:column;gap:.9rem;margin-bottom:.5rem;"></div>
         <div id="carta-tipologie-status" class="status"></div>
       </div>
     </section>
@@ -1475,11 +1484,14 @@ function rigaGruppoAnnateHtml(gruppo) {
   return '<div class="vino-gruppo"><p class="vino">' + testata + '</p><div class="vino-annate-lista">' + righeAnnate + '</div></div>';
 }
 
-function generaHtmlCartaVini(articoli) {
-  // Raggruppa per tipologia (capitolo) poi per zona/regione (sotto-capitolo), stessa struttura della carta stampata.
-  // Nelle categorie con sotto-capitolo eterogeneo (Bolle/Bolle Rosé/Rosato) tutto ciò che non è
-  // "Liguria" finisce in UN SOLO sotto-capitolo "Altre regioni" (le regioni si distinguono in riga,
-  // vedi rigaVinoHtml) — non si spezza in un sotto-capitolo per regione come nelle altre categorie.
+// Raggruppa per tipologia (capitolo) poi per zona/regione (sotto-capitolo), stessa struttura della
+// carta stampata. Nelle categorie con sotto-capitolo eterogeneo (Bolle/Bolle Rosé/Rosato) tutto ciò
+// che non è "Liguria" finisce in UN SOLO sotto-capitolo "Altre regioni" (le regioni si distinguono
+// in riga, vedi rigaVinoHtml) — non si spezza in un sotto-capitolo per regione come nelle altre
+// categorie. Condivisa tra generaHtmlCartaVini (stampa) e loadCartaTipologieSetup (pannello
+// "Categorie incluse in carta", che ne usa l'elenco sotto-capitoli per mostrare le spunte "nuova
+// pagina" anche per le sottocategorie, es. Genova/Liguria di Levante).
+function raggruppaCapitoliCarta(articoli) {
   var capitoli = {};
   var ordineCapitoli = [];
   articoli.forEach(function (a) {
@@ -1531,6 +1543,14 @@ function generaHtmlCartaVini(articoli) {
     return ia - ib;
   });
 
+  return { capitoli: capitoli, ordineCapitoli: ordineCapitoli };
+}
+
+function generaHtmlCartaVini(articoli) {
+  var raggruppato = raggruppaCapitoliCarta(articoli);
+  var capitoli = raggruppato.capitoli;
+  var ordineCapitoli = raggruppato.ordineCapitoli;
+
   var body = '';
   ordineCapitoli.forEach(function (cap) {
     var c = capitoli[cap];
@@ -1538,8 +1558,9 @@ function generaHtmlCartaVini(articoli) {
     body += '<div class="sez-titolo" data-break="' + (forzaPagina ? '1' : '0') + '">' + escapeHtml(cap) + '</div>';
     var mostraSottotitolo = CARTA_CAPITOLI_SENZA_SOTTOTITOLO.indexOf(cap) === -1;
     c.ordineSotto.forEach(function (sub) {
+      var forzaPaginaSub = CARTA_BREAK_SOTTOCAPITOLI[cap + '||' + sub] === true;
       body += '<div class="sottosez-gruppo">';
-      if (mostraSottotitolo) body += '<div class="sottosez-titolo">' + escapeHtml(sub) + '</div>';
+      if (mostraSottotitolo) body += '<div class="sottosez-titolo" data-break="' + (forzaPaginaSub ? '1' : '0') + '">' + escapeHtml(sub) + '</div>';
       raggruppaAnnate(c.sotto[sub]).forEach(function (voce) {
         if (voce.tipo === 'annate') {
           body += rigaGruppoAnnateHtml(voce);
@@ -1579,6 +1600,7 @@ function generaHtmlCartaVini(articoli) {
       '.sez-titolo[data-break="1"]{break-before:page;margin-top:0;}' +
       '.pg>.sez-titolo:first-child{break-before:avoid;margin-top:0;}' +
       '.sottosez-titolo{break-after:avoid;break-inside:avoid;}' +
+      '.sottosez-titolo[data-break="1"]{break-before:page;margin-top:0;}' +
       '.vino,.vino-annate-lista{break-inside:avoid;}' +
       '.vino-gruppo{break-inside:avoid;}' +
     '}' +
@@ -1593,52 +1615,119 @@ function generaHtmlCartaVini(articoli) {
 var CARTA_TIP_DEFAULT = ['Bianchi', 'Rossi', 'Rosati', 'Bollicine', 'Bollicine Rosé', 'Champagne', 'Champagne Rosé', 'Birra'];
 var CARTA_TIP_SELEZIONATE = {}; // tipologia_id -> bool, solo in memoria per questa sessione
 var CARTA_BREAK_CAPITOLI = {}; // tipologia_id -> bool ("nuova pagina prima di questo capitolo"), default true, solo in memoria
+var CARTA_BREAK_SOTTOCAPITOLI = {}; // "capitolo||sottocapitolo" (es. "Bianchi||Genova") -> bool, default false, solo in memoria
+
+// Crea la coppia di spunte "in carta" + "nuova pagina" per un capitolo o un sotto-capitolo.
+// `isDefault` è lo stato iniziale di entrambe le spunte; `onToggleCarta` è null per i
+// sotto-capitoli (non hanno una spunta "in carta" propria, solo "nuova pagina").
+function creaRigaSpuntaCarta(opts) {
+  var riga = document.createElement('div');
+  riga.style.cssText = 'display:inline-flex;align-items:center;gap:.7rem;';
+
+  if (opts.onToggleCarta) {
+    var wrap = document.createElement('label');
+    wrap.style.cssText = 'display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;text-transform:none;letter-spacing:0;color:var(--ink);cursor:pointer;';
+    var cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = opts.isDefault;
+    var span = document.createElement('span');
+    span.textContent = opts.etichetta;
+    wrap.appendChild(cb);
+    wrap.appendChild(span);
+    cb.addEventListener('change', function () { opts.onToggleCarta(cb.checked); });
+    riga.appendChild(wrap);
+  } else {
+    var span2 = document.createElement('span');
+    span2.textContent = opts.etichetta;
+    span2.style.cssText = 'font-size:.78rem;color:var(--ink);';
+    riga.appendChild(span2);
+  }
+
+  var wrapPagina = document.createElement('label');
+  wrapPagina.title = opts.titlePagina;
+  wrapPagina.style.cssText = 'display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;text-transform:none;letter-spacing:0;color:var(--stone);cursor:pointer;';
+  var cbPagina = document.createElement('input');
+  cbPagina.type = 'checkbox';
+  cbPagina.checked = opts.isDefaultPagina;
+  var spanPagina = document.createElement('span');
+  spanPagina.textContent = 'nuova pagina';
+  wrapPagina.appendChild(cbPagina);
+  wrapPagina.appendChild(spanPagina);
+  cbPagina.addEventListener('change', function () { opts.onTogglePagina(cbPagina.checked); });
+  riga.appendChild(wrapPagina);
+
+  return riga;
+}
 
 function loadCartaTipologieSetup(messaggioFinale) {
   setStatus(document.getElementById('carta-tipologie-status'), 'Caricamento…');
-  fetch(URL_ANAGRAFICHE).then(function (r) { return r.json(); }).then(function (data) {
-    if (!data.ok) { setStatus(document.getElementById('carta-tipologie-status'), data.error, false); return; }
+  Promise.all([
+    fetch(URL_ANAGRAFICHE).then(function (r) { return r.json(); }),
+    fetch(URL_CATALOGO + '?solo_visibili=1').then(function (r) { return r.json(); }),
+  ]).then(function (results) {
+    var dataAnagrafiche = results[0], dataCatalogo = results[1];
+    if (!dataAnagrafiche.ok) { setStatus(document.getElementById('carta-tipologie-status'), dataAnagrafiche.error, false); return; }
+    if (!dataCatalogo.ok) { setStatus(document.getElementById('carta-tipologie-status'), dataCatalogo.error, false); return; }
+
+    // Sotto-capitoli (zone/regioni, es. "Genova", "Liguria di Levante") realmente presenti per
+    // ogni capitolo, con lo stesso raggruppamento usato per la stampa — così le spunte mostrate
+    // qui corrispondono esattamente ai sotto-titoli che compariranno nella carta generata.
+    var raggruppato = raggruppaCapitoliCarta(dataCatalogo.articoli || []);
+
     var list = document.getElementById('carta-tipologie-list');
     list.innerHTML = '';
-    (data.tipologie || []).forEach(function (t) {
+    (dataAnagrafiche.tipologie || []).forEach(function (t) {
       var isDefault = CARTA_TIP_DEFAULT.indexOf(t.nome) !== -1;
       CARTA_TIP_SELEZIONATE[t.id] = isDefault;
       CARTA_BREAK_CAPITOLI[t.id] = isDefault; // "nuova pagina" parte allineata a "categoria in carta": attiva sulle categorie di default, spenta sulle altre
-      var riga = document.createElement('div');
-      riga.style.cssText = 'display:inline-flex;align-items:center;gap:.7rem;';
 
-      var wrap = document.createElement('label');
-      wrap.style.cssText = 'display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;text-transform:none;letter-spacing:0;color:var(--ink);cursor:pointer;';
-      var cb = document.createElement('input');
-      cb.type = 'checkbox';
-      cb.checked = isDefault;
-      var span = document.createElement('span');
-      span.textContent = t.nome;
-      wrap.appendChild(cb);
-      wrap.appendChild(span);
-      cb.addEventListener('change', function () {
-        CARTA_TIP_SELEZIONATE[t.id] = cb.checked;
-        setStatus(document.getElementById('carta-tipologie-status'), 'Vale solo per questa sessione — rigenera l\'anteprima per vedere l\'effetto.', true);
+      var blocco = document.createElement('div');
+      blocco.style.cssText = 'display:flex;flex-direction:column;gap:.35rem;';
+
+      var rigaCapitolo = creaRigaSpuntaCarta({
+        etichetta: t.nome,
+        isDefault: isDefault,
+        isDefaultPagina: isDefault,
+        titlePagina: 'Solo per la stampa: se spuntato, questo capitolo inizia sempre da una nuova pagina; se tolto, può continuare sulla stessa pagina del capitolo precedente.',
+        onToggleCarta: function (checked) {
+          CARTA_TIP_SELEZIONATE[t.id] = checked;
+          setStatus(document.getElementById('carta-tipologie-status'), 'Vale solo per questa sessione — rigenera l\'anteprima per vedere l\'effetto.', true);
+        },
+        onTogglePagina: function (checked) {
+          CARTA_BREAK_CAPITOLI[t.id] = checked;
+          setStatus(document.getElementById('carta-tipologie-status'), 'Vale solo per questa sessione — rigenera l\'anteprima per vedere l\'effetto.', true);
+        },
       });
+      blocco.appendChild(rigaCapitolo);
 
-      var wrapPagina = document.createElement('label');
-      wrapPagina.title = 'Solo per la stampa: se spuntato, questo capitolo inizia sempre da una nuova pagina; se tolto, può continuare sulla stessa pagina del capitolo precedente.';
-      wrapPagina.style.cssText = 'display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;text-transform:none;letter-spacing:0;color:var(--stone);cursor:pointer;';
-      var cbPagina = document.createElement('input');
-      cbPagina.type = 'checkbox';
-      cbPagina.checked = isDefault;
-      var spanPagina = document.createElement('span');
-      spanPagina.textContent = 'nuova pagina';
-      wrapPagina.appendChild(cbPagina);
-      wrapPagina.appendChild(spanPagina);
-      cbPagina.addEventListener('change', function () {
-        CARTA_BREAK_CAPITOLI[t.id] = cbPagina.checked;
-        setStatus(document.getElementById('carta-tipologie-status'), 'Vale solo per questa sessione — rigenera l\'anteprima per vedere l\'effetto.', true);
-      });
+      // Sotto-capitoli (zone/regioni): solo per i capitoli che in carta mostrano un sotto-titolo
+      // (esclusi Champagne/Champagne Rosé, sempre elenco piatto) e solo quelli davvero presenti
+      // nel catalogo corrente.
+      var mostraSottotitolo = CARTA_CAPITOLI_SENZA_SOTTOTITOLO.indexOf(t.nome) === -1;
+      var capitoloDati = raggruppato.capitoli[t.nome];
+      if (mostraSottotitolo && capitoloDati && capitoloDati.ordineSotto.length) {
+        var wrapSotto = document.createElement('div');
+        wrapSotto.style.cssText = 'display:flex;flex-direction:column;gap:.25rem;margin-left:1.4rem;padding-left:.6rem;border-left:2px solid var(--rule,#d4c9b8);';
+        capitoloDati.ordineSotto.forEach(function (sub) {
+          var chiave = t.nome + '||' + sub;
+          CARTA_BREAK_SOTTOCAPITOLI[chiave] = false; // default: nessuna interruzione forzata sulle sottocategorie
+          var rigaSub = creaRigaSpuntaCarta({
+            etichetta: sub,
+            isDefault: false,
+            isDefaultPagina: false,
+            titlePagina: 'Solo per la stampa: se spuntato, questa sottocategoria (' + sub + ') inizia sempre da una nuova pagina; se tolto, può continuare sulla stessa pagina della sottocategoria precedente.',
+            onToggleCarta: null,
+            onTogglePagina: function (checked) {
+              CARTA_BREAK_SOTTOCAPITOLI[chiave] = checked;
+              setStatus(document.getElementById('carta-tipologie-status'), 'Vale solo per questa sessione — rigenera l\'anteprima per vedere l\'effetto.', true);
+            },
+          });
+          wrapSotto.appendChild(rigaSub);
+        });
+        blocco.appendChild(wrapSotto);
+      }
 
-      riga.appendChild(wrap);
-      riga.appendChild(wrapPagina);
-      list.appendChild(riga);
+      list.appendChild(blocco);
     });
     setStatus(document.getElementById('carta-tipologie-status'), messaggioFinale || '', !!messaggioFinale);
   }).catch(function (e) { setStatus(document.getElementById('carta-tipologie-status'), String(e), false); });

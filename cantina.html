@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!-- v 2026.09.19.06 — il pannello di assegnazione "Destinazione categorie" mostrava tutte e 22 le
+     categorie (Vini + Fine Pasto + Esclusa mischiate) sia nella scheda "Carta dei Vini" sia in
+     "Fine Pasto": spostato in una scheda dedicata "Categorie" (unico posto dove si CAMBIA la
+     destinazione). Le schede "Carta dei Vini" e "Fine Pasto" mostrano ora solo un riepilogo di sola
+     lettura (elenco a "chip") delle categorie già assegnate a quella pagina — nuova funzione
+     renderRiepiloghiDestinazione(), aggiornata sia al caricamento sia a ogni cambio di destinazione.
+     Nessun cambiamento al comportamento di generazione/stampa. -->
 <!-- v 2026.09.19.05 — divisi Catalogo/Carta in due destinazioni: ogni categoria ora va assegnata a
      "Vini", "Fine Pasto" o "Esclusa" (era solo un booleano "in carta sì/no"). Pannello "Categorie
      incluse in carta" rinominato "Destinazione categorie", con selettore a 3 vie al posto della
@@ -417,7 +424,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.05</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.06</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -426,6 +433,7 @@
     <div class="tab active" data-tab="catalogo">Catalogo</div>
     <div class="tab" data-tab="anagrafiche">Anagrafiche</div>
     <div class="tab" data-tab="magazzino">Magazzino</div>
+    <div class="tab" data-tab="categorie">Categorie</div>
     <div class="tab" data-tab="carta">Carta dei Vini</div>
     <div class="tab" data-tab="finepasto">Fine Pasto</div>
   </div>
@@ -619,13 +627,39 @@
       </div>
     </section>
 
+    <!-- ===================== CATEGORIE (destinazione) ===================== -->
+    <section id="sec-categorie" class="section">
+      <div class="panel">
+        <h2>Destinazione categorie</h2>
+        <p style="font-size:.8rem;color:var(--stone);margin-bottom:1rem;">
+          Ogni categoria del catalogo va assegnata a una destinazione: <strong>Vini</strong> (finisce nella Carta dei
+          Vini), <strong>Fine Pasto</strong> (finisce nella pagina Fine Pasto, layout ancora da definire) o
+          <strong>Esclusa</strong> (non va in nessuna delle due — es. categorie da bar). Si assegna solo da qui — nelle
+          schede "Carta dei Vini" e "Fine Pasto" vedi solo le categorie già assegnate a quella pagina, in sola lettura.
+          "Nuova pagina" conta solo per la stampa: di default è attiva sulle categorie assegnate a Vini o Fine Pasto
+          (una pagina nuova per ciascuna) e spenta sulle altre; puoi cambiarla capitolo per capitolo. Sotto ogni
+          capitolo compaiono anche le sue sottocategorie realmente presenti (es. Genova, Liguria di Levante):
+          spuntando "nuova pagina" su una di esse, anche lì si forza l'a-capo in stampa. "Memorizza impostazioni
+          attuali" salva questa combinazione di scelte in questo browser: da quel momento è lei il nuovo punto di
+          partenza ogni volta che riapri la pagina, e anche "Ripristina predefiniti" torna a quella invece che ai
+          valori di fabbrica.
+        </p>
+        <div class="toolbar" style="margin-bottom:.6rem;">
+          <button class="btn" id="carta-tipologie-reset">Ripristina predefiniti</button>
+          <button class="btn" id="carta-tipologie-salva">Memorizza impostazioni attuali</button>
+        </div>
+        <div id="carta-tipologie-list" style="display:flex;flex-direction:column;gap:.9rem;margin-bottom:.5rem;"></div>
+        <div id="carta-tipologie-status" class="status"></div>
+      </div>
+    </section>
+
     <!-- ===================== CARTA VINI ===================== -->
     <section id="sec-carta" class="section">
       <div class="panel">
         <h2>Genera e pubblica la Carta dei Vini</h2>
         <p style="font-size:.8rem;color:var(--stone);margin-bottom:1rem;">
           Genera la pagina <code>menu-vini.html</code> a partire dagli articoli non nascosti la cui categoria è
-          assegnata a "Vini" (v. pannello sotto), raggruppati per tipologia. L'anteprima qui sotto mostra esattamente
+          assegnata a "Vini" (scheda "Categorie"), raggruppati per tipologia. L'anteprima qui sotto mostra esattamente
           cosa verrà pubblicato.
         </p>
         <div class="toolbar">
@@ -638,25 +672,11 @@
       </div>
 
       <div class="panel">
-        <h2>Destinazione categorie</h2>
-        <p style="font-size:.8rem;color:var(--stone);margin-bottom:1rem;">
-          Ogni categoria del catalogo va assegnata a una destinazione: <strong>Vini</strong> (finisce nella Carta dei
-          Vini), <strong>Fine Pasto</strong> (finisce nella pagina Fine Pasto, layout ancora da definire) o
-          <strong>Esclusa</strong> (non va in nessuna delle due — es. categorie da bar). Vale per entrambe le pagine di
-          stampa, si cambia da qui sola. "Nuova pagina" conta solo per la stampa: di default è attiva sulle categorie
-          assegnate a Vini o Fine Pasto (una pagina nuova per ciascuna) e spenta sulle altre; puoi cambiarla capitolo
-          per capitolo. Sotto ogni capitolo compaiono anche le sue sottocategorie realmente presenti (es. Genova,
-          Liguria di Levante): spuntando "nuova pagina" su una di esse, anche lì si forza l'a-capo in stampa.
-          "Memorizza impostazioni attuali" salva questa combinazione di scelte in questo browser: da quel momento è
-          lei il nuovo punto di partenza ogni volta che riapri la pagina, e anche "Ripristina predefiniti" torna a
-          quella invece che ai valori di fabbrica.
+        <h2>Categorie assegnate a Vini</h2>
+        <p style="font-size:.8rem;color:var(--stone);margin-bottom:.6rem;">
+          Sola lettura — per cambiarle vai alla scheda <strong>Categorie</strong>.
         </p>
-        <div class="toolbar" style="margin-bottom:.6rem;">
-          <button class="btn" id="carta-tipologie-reset">Ripristina predefiniti</button>
-          <button class="btn" id="carta-tipologie-salva">Memorizza impostazioni attuali</button>
-        </div>
-        <div id="carta-tipologie-list" style="display:flex;flex-direction:column;gap:.9rem;margin-bottom:.5rem;"></div>
-        <div id="carta-tipologie-status" class="status"></div>
+        <div id="carta-riepilogo-vini" style="display:flex;flex-wrap:wrap;gap:.4rem;"></div>
       </div>
     </section>
 
@@ -664,10 +684,9 @@
       <div class="panel">
         <h2>Fine Pasto — anteprima (layout da definire)</h2>
         <p style="font-size:.8rem;color:var(--stone);margin-bottom:1rem;">
-          Elenco provvisorio degli articoli delle categorie assegnate a "Fine Pasto" (v. pannello "Destinazione
-          categorie" nella scheda Carta dei Vini) — solo per verificare che le categorie giuste ci siano dentro.
-          Grafica, raggruppamento e stampa definitivi si decidono in un secondo momento; per ora non c'è pubblicazione
-          sul sito.
+          Elenco provvisorio degli articoli delle categorie assegnate a "Fine Pasto" (scheda "Categorie") — solo per
+          verificare che le categorie giuste ci siano dentro. Grafica, raggruppamento e stampa definitivi si decidono
+          in un secondo momento; per ora non c'è pubblicazione sul sito.
         </p>
         <div class="toolbar">
           <button class="btn primary" id="finepasto-genera">Genera anteprima</button>
@@ -675,6 +694,14 @@
         </div>
         <div id="finepasto-status" class="status"></div>
         <iframe id="finepasto-preview-frame" style="display:none;margin-top:1rem;"></iframe>
+      </div>
+
+      <div class="panel">
+        <h2>Categorie assegnate a Fine Pasto</h2>
+        <p style="font-size:.8rem;color:var(--stone);margin-bottom:.6rem;">
+          Sola lettura — per cambiarle vai alla scheda <strong>Categorie</strong>.
+        </p>
+        <div id="finepasto-riepilogo" style="display:flex;flex-wrap:wrap;gap:.4rem;"></div>
       </div>
     </section>
 
@@ -718,7 +745,7 @@ document.querySelectorAll('.tabs > .tab').forEach(function (t) {
     if (t.dataset.tab === 'catalogo' && !window._catLoaded) loadCatalogo();
     if (t.dataset.tab === 'anagrafiche' && !window._anLoaded) loadAnagraficheTabelle();
     if (t.dataset.tab === 'magazzino' && !window._magLoaded) { loadGiacenze(); loadSelectsMagazzino(); }
-    if ((t.dataset.tab === 'carta' || t.dataset.tab === 'finepasto') && !window._cartaSetupLoaded) { window._cartaSetupLoaded = true; loadCartaTipologieSetup(); }
+    if ((t.dataset.tab === 'categorie' || t.dataset.tab === 'carta' || t.dataset.tab === 'finepasto') && !window._cartaSetupLoaded) { window._cartaSetupLoaded = true; loadCartaTipologieSetup(); }
   });
 });
 
@@ -1768,6 +1795,30 @@ var CARTA_DESTINAZIONE_DEFAULT = {
 var CARTA_TIP_DESTINAZIONE = {}; // tipologia_id -> 'vini'|'fine_pasto'|'esclusa', solo in memoria per questa sessione
 var CARTA_BREAK_CAPITOLI = {}; // tipologia_id -> bool ("nuova pagina prima di questo capitolo"), default true, solo in memoria
 var CARTA_BREAK_SOTTOCAPITOLI = {}; // "capitolo||sottocapitolo" (es. "Bianchi||Genova") -> bool, default false, solo in memoria
+var CARTA_TIPOLOGIE_CACHE = []; // [{id, nome}, ...] tutte le tipologie, popolata da loadCartaTipologieSetup — serve
+                                 // solo a renderRiepiloghiDestinazione() per i riepiloghi di sola lettura nelle
+                                 // schede "Carta dei Vini" e "Fine Pasto" (l'assegnazione si fa solo in "Categorie").
+
+// Riepiloghi di sola lettura (elenco a "chip") delle categorie assegnate a Vini/Fine Pasto, mostrati
+// nelle rispettive schede — l'unico posto dove si CAMBIA la destinazione resta la scheda "Categorie".
+function renderRiepiloghiDestinazione() {
+  var chipVini = [], chipFP = [];
+  CARTA_TIPOLOGIE_CACHE.forEach(function (t) {
+    var dest = CARTA_TIP_DESTINAZIONE[t.id];
+    if (dest === 'vini') chipVini.push(t.nome);
+    else if (dest === 'fine_pasto') chipFP.push(t.nome);
+  });
+  function chipsHtml(nomi) {
+    if (!nomi.length) return '<span style="font-size:.78rem;color:var(--stone);">Nessuna categoria assegnata.</span>';
+    return nomi.map(function (n) {
+      return '<span style="display:inline-block;padding:.25rem .6rem;border:1px solid var(--rule);border-radius:999px;font-size:.75rem;color:var(--ink);">' + escapeHtml(n) + '</span>';
+    }).join('');
+  }
+  var elVini = document.getElementById('carta-riepilogo-vini');
+  if (elVini) elVini.innerHTML = chipsHtml(chipVini);
+  var elFP = document.getElementById('finepasto-riepilogo');
+  if (elFP) elFP.innerHTML = chipsHtml(chipFP);
+}
 
 // Impostazioni memorizzate dall'utente (pulsante "Memorizza impostazioni attuali"): persistite in
 // localStorage di QUESTO browser (non su DB, non condivise tra dispositivi). Quando presenti,
@@ -1876,6 +1927,8 @@ function loadCartaTipologieSetup(messaggioFinale) {
     // sono quelle il punto di partenza invece dei default di fabbrica (CARTA_DESTINAZIONE_DEFAULT).
     var salvate = caricaImpostazioniCartaSalvate();
 
+    CARTA_TIPOLOGIE_CACHE = dataAnagrafiche.tipologie || [];
+
     var list = document.getElementById('carta-tipologie-list');
     list.innerHTML = '';
     (dataAnagrafiche.tipologie || []).forEach(function (t) {
@@ -1897,6 +1950,7 @@ function loadCartaTipologieSetup(messaggioFinale) {
         isDefaultPagina: isDefaultPagina,
         onChangeDestinazione: function (valore) {
           CARTA_TIP_DESTINAZIONE[t.id] = valore;
+          renderRiepiloghiDestinazione();
           setStatus(document.getElementById('carta-tipologie-status'), 'Vale solo per questa sessione — rigenera l\'anteprima per vedere l\'effetto.', true);
         },
         onTogglePagina: function (checked) {
@@ -1930,6 +1984,7 @@ function loadCartaTipologieSetup(messaggioFinale) {
 
       list.appendChild(blocco);
     });
+    renderRiepiloghiDestinazione();
     setStatus(document.getElementById('carta-tipologie-status'), messaggioFinale || '', !!messaggioFinale);
   }).catch(function (e) { setStatus(document.getElementById('carta-tipologie-status'), String(e), false); });
 }

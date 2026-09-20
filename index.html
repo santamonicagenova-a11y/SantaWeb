@@ -601,6 +601,42 @@
 </head>
 <body>
 
+<!-- v 2026.09.20.01 — Banner temporaneo "Andiamo in Vacanzina" (chiusura 21/09-28/09): overlay
+     con l'immagine annuncio, mostrato una sola volta per sessione del browser (sessionStorage),
+     chiusura automatica dopo 2s (fade-out) o al click. Da rimuovere/disattivare dopo il rientro. -->
+<div id="banner-vacanzina" class="banner-vacanzina-overlay" role="dialog" aria-label="Avviso chiusura temporanea">
+  <img src="/img/sito/vacanzina-chiusura-2026-09.jpg" alt="Andiamo in Vacanzina — chiuso dal 21/09 al 28/09">
+</div>
+<style>
+  .banner-vacanzina-overlay{
+    position:fixed; inset:0; z-index:9999;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(0,0,0,.55);
+    opacity:1; transition:opacity .4s ease;
+    cursor:pointer;
+  }
+  .banner-vacanzina-overlay.is-hidden{ opacity:0; pointer-events:none; }
+  .banner-vacanzina-overlay img{
+    max-width:min(90vw,420px); max-height:80vh;
+    border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,.35);
+  }
+</style>
+<script>
+(function(){
+  var KEY='vacanzinaBannerShown_2026-09';
+  var el=document.getElementById('banner-vacanzina');
+  if(!el) return;
+  if(sessionStorage.getItem(KEY)){ el.remove(); return; }
+  sessionStorage.setItem(KEY,'1');
+  function hide(){
+    el.classList.add('is-hidden');
+    setTimeout(function(){ el.remove(); },400);
+  }
+  el.addEventListener('click',hide);
+  setTimeout(hide,2000);
+})();
+</script>
+
 <nav id="main-nav">
   <a href="#" class="nav-logo">Santamonica <span class="sub">sul mare</span></a>
   <ul class="nav-links">

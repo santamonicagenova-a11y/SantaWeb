@@ -601,9 +601,10 @@
 </head>
 <body>
 
+<!-- v 2026.09.20.02 — Banner "Vacanzina": durata auto-chiusura portata da 2s a 4s su richiesta. -->
 <!-- v 2026.09.20.01 — Banner temporaneo "Andiamo in Vacanzina" (chiusura 21/09-28/09): overlay
      con l'immagine annuncio, mostrato una sola volta per sessione del browser (sessionStorage),
-     chiusura automatica dopo 2s (fade-out) o al click. Da rimuovere/disattivare dopo il rientro. -->
+     chiusura automatica dopo 4s (fade-out) o al click. Da rimuovere/disattivare dopo il rientro. -->
 <div id="banner-vacanzina" class="banner-vacanzina-overlay" role="dialog" aria-label="Avviso chiusura temporanea">
   <img src="/img/sito/vacanzina-chiusura-2026-09.jpg" alt="Andiamo in Vacanzina — chiuso dal 21/09 al 28/09">
 </div>
@@ -633,7 +634,7 @@
     setTimeout(function(){ el.remove(); },400);
   }
   el.addEventListener('click',hide);
-  setTimeout(hide,2000);
+  setTimeout(hide,4000);
 })();
 </script>
 

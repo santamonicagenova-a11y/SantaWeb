@@ -1,4 +1,15 @@
 <!DOCTYPE html>
+<!-- v 2026.09.20.06 — eliminare un Produttore dalla scheda Anagrafiche falliva in silenzio se aveva
+     articoli collegati (vincolo di integrità referenziale su cantina_articoli.produttore_id, senza
+     ON DELETE CASCADE) — l'utente vedeva solo l'errore Postgres grezzo, senza sapere quali articoli
+     lo bloccavano né un modo per procedere. Nuova funzione eliminaProduttoreConArticoli(): quando il
+     produttore ha articoli collegati, li elenca esplicitamente in un window.confirm e chiede se
+     eliminarli insieme al produttore; solo con conferma positiva elimina prima tutti gli articoli
+     (action delete_articolo su cantina-catalogo, uno per uno) e infine il produttore (action delete
+     su cantina-anagrafiche) — ad annullamento, non elimina nulla. Senza articoli collegati si
+     comporta come la cancellazione normale (una sola conferma). Solo per i Produttori: le altre
+     anagrafiche (Regioni, Zone, Denominazioni, Paesi, Agenti, Tipologie...) restano con la
+     cancellazione semplice esistente, che può ancora fallire se referenziate. -->
 <!-- v 2026.09.20.05 — completato il lavoro di v.20.04: azzerati coravin/mezza_bottiglia sui 5+7
      articoli che li avevano a true (UPDATE diretto su Supabase), poi eliminate del tutto le colonne
      cantina_articoli.coravin e .mezza_bottiglia (migrazione drop_coravin_mezza_bottiglia). Tolti i
@@ -512,7 +523,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.20.05</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.20.06</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -1222,6 +1233,16 @@ document.getElementById('an-delete').addEventListener('click', function () {
   var id = document.getElementById('an-f-id').value;
   var table = document.getElementById('an-tabella').value;
   if (!id) return;
+
+  // Solo per i Produttori: il vincolo di integrità referenziale sugli articoli (produttore_id, senza
+  // ON DELETE CASCADE) fa fallire silenziosamente la cancellazione se il produttore ha articoli
+  // collegati — invece di limitarsi a far fallire, mostriamo l'elenco degli articoli collegati e
+  // chiediamo esplicitamente se eliminarli insieme al produttore.
+  if (table === 'produttori') {
+    eliminaProduttoreConArticoli(Number(id));
+    return;
+  }
+
   if (!window.confirm('Eliminare questa riga? Se è referenziata da articoli/movimenti l\'operazione può fallire.')) return;
   fetch(URL_ANAGRAFICHE, {
     method: 'POST',
@@ -1233,6 +1254,68 @@ document.getElementById('an-delete').addEventListener('click', function () {
     fetchAnagrafiche();
   });
 });
+
+// Elimina un produttore che ha articoli in catalogo collegati (produttore_id): prima elenca gli
+// articoli e chiede conferma esplicita, poi — solo in caso positivo — elimina prima tutti gli
+// articoli collegati e infine il produttore. Se non ci sono articoli collegati, si comporta come la
+// cancellazione normale (una sola conferma).
+function eliminaProduttoreConArticoli(produttoreId) {
+  setStatus(document.getElementById('an-form-status'), 'Controllo articoli collegati…');
+  fetch(URL_CATALOGO).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data.ok) { setStatus(document.getElementById('an-form-status'), data.error, false); return; }
+    var articoliCollegati = (data.articoli || []).filter(function (a) { return a.produttore_id === produttoreId; });
+
+    if (!articoliCollegati.length) {
+      if (!window.confirm('Eliminare questo produttore?')) return;
+      eliminaProduttoreDefinitivo(produttoreId);
+      return;
+    }
+
+    var elenco = articoliCollegati.map(function (a) { return '- ' + (a.codice || ('#' + a.id)); }).join('\n');
+    var confermaAnche = window.confirm(
+      'Questo produttore ha ' + articoliCollegati.length + ' articoli collegati nel catalogo:\n\n' + elenco +
+      '\n\nVuoi eliminare anche questi articoli, insieme al produttore?\n\n' +
+      '(OK = elimina tutto — articoli e produttore. Annulla = non elimino nulla.)'
+    );
+    if (!confermaAnche) { setStatus(document.getElementById('an-form-status'), 'Operazione annullata — nessun dato eliminato.', true); return; }
+
+    setStatus(document.getElementById('an-form-status'), 'Eliminazione di ' + articoliCollegati.length + ' articoli…');
+    var token = _ghToken();
+    Promise.all(articoliCollegati.map(function (a) {
+      return fetch(URL_CATALOGO, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete_articolo', github_token: token, id: a.id }),
+      }).then(function (r) { return r.json(); });
+    })).then(function (risultati) {
+      var falliti = risultati.filter(function (r) { return !r.ok; });
+      if (falliti.length) {
+        setStatus(
+          document.getElementById('an-form-status'),
+          'Eliminati ' + (risultati.length - falliti.length) + ' su ' + risultati.length + ' articoli, poi fermato per errore: ' + falliti[0].error + '. Il produttore NON è stato eliminato.',
+          false
+        );
+        return;
+      }
+      eliminaProduttoreDefinitivo(produttoreId);
+    }).catch(function (e) { setStatus(document.getElementById('an-form-status'), String(e), false); });
+  }).catch(function (e) { setStatus(document.getElementById('an-form-status'), String(e), false); });
+}
+
+function eliminaProduttoreDefinitivo(produttoreId) {
+  setStatus(document.getElementById('an-form-status'), 'Eliminazione produttore…');
+  fetch(URL_ANAGRAFICHE, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'delete', github_token: _ghToken(), table: 'produttori', id: produttoreId }),
+  }).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data.ok) { setStatus(document.getElementById('an-form-status'), data.error, false); return; }
+    setStatus(document.getElementById('an-form-status'), 'Produttore eliminato.', true);
+    document.getElementById('an-form-panel').style.display = 'none';
+    fetchAnagrafiche();
+    if (window._catLoaded) fetchCatalogo(); // aggiorna anche il Catalogo se già caricato in questa sessione
+  }).catch(function (e) { setStatus(document.getElementById('an-form-status'), String(e), false); });
+}
 
 // ================================================================
 // MAGAZZINO

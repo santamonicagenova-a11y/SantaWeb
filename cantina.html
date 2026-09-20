@@ -1,4 +1,16 @@
 <!DOCTYPE html>
+<!-- v 2026.09.20.01 — "Selezione Genova" diventa una tipologia vera (creata in cantina_tipologie, id
+     23) invece di una sezione virtuale auto-popolata dalla Zona: assegnazione manuale ed esclusiva,
+     su richiesta di Andrea — un articolo spostato in "Selezione Genova" compare SOLO lì, non più
+     anche duplicato nella sua categoria originale (comportamento diverso dal PDF di riferimento, che
+     duplicava). Rimossa tutta la logica di derivazione automatica (filtro per zona, inserimento
+     forzato dopo "Grappa", fallback se "Grappa" assente) da generaAnteprimaFinePasto: ora è un
+     capitolo come tutti gli altri nel loop di FINEPASTO_ORDINE_CAPITOLI (posizionato subito dopo
+     "Grappa", stessa posizione del PDF), con l'unica particolarità del titolo in corsivo tra apici
+     ("Genova"), gestito con un case speciale invece che tramite FINEPASTO_TITOLI_CAPITOLI (che passa
+     da escapeHtml e non supporterebbe il markup <em>). Aggiunta a CARTA_DESTINAZIONE_DEFAULT
+     (Fine Pasto), quindi selezionabile subito nella scheda "Categorie" e nel menu Tipologia del
+     Catalogo. -->
 <!-- v 2026.09.19.11 — nuovo campo "Paese" per gli articoli, indipendente dal produttore (non più
      derivato come la Regione, che resta una select disabilitata legata al produttore selezionato).
      Nuova anagrafica "Paesi" (tabella cantina_paesi + colonna cantina_articoli.paese_id, migrazione
@@ -477,7 +489,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.19.11</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.20.01</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -1459,6 +1471,8 @@ var _finePastoHtml = '';
 // Titolo di stampa per ogni capitolo, dove diverso dal nome della tipologia in anagrafica (es.
 // "Grappa" in DB → "Grappe" stampato, plurale come nel PDF originale). Le tipologie non elencate qui
 // (es. eventuali nuove categorie assegnate a Fine Pasto) usano il proprio nome così com'è.
+// "Selezione Genova" è un caso speciale: nel PDF il titolo ha solo la parola "Genova" in corsivo tra
+// apici — gestito a parte nel loop di stampa (non tramite questa mappa, che passa da escapeHtml).
 var FINEPASTO_TITOLI_CAPITOLI = {
   'Grappa': 'Grappe',
   'Rum': 'Rhum Ron Rum',
@@ -1466,11 +1480,12 @@ var FINEPASTO_TITOLI_CAPITOLI = {
   'Distillati': 'Distillati e Vini Liquorosi',
 };
 
-// Ordine dei capitoli esattamente come nel PDF di riferimento. "Selezione 'Genova'" non è una
-// tipologia: è una sezione virtuale (v. sotto) inserita subito dopo "Grappa", nello stesso punto in
-// cui compare nel PDF. Tipologie assegnate a Fine Pasto ma non presenti in questo elenco (es. se in
-// futuro se ne aggiungono di nuove) finiscono in fondo, in ordine alfabetico.
-var FINEPASTO_ORDINE_CAPITOLI = ['Passiti', 'Grappa', 'Rum', 'Gin', 'Whiskey', 'Distillati', 'Vermouth', 'Amari', 'Fine pasto'];
+// Ordine dei capitoli esattamente come nel PDF di riferimento. "Selezione Genova" è una tipologia
+// vera come le altre (creata il 20/9/2026 su richiesta di Andrea: prima era una sezione virtuale
+// auto-popolata dalla Zona, ora è un'assegnazione manuale ed esclusiva — un articolo spostato lì non
+// compare più anche nella sua categoria originale). Tipologie assegnate a Fine Pasto ma non presenti
+// in questo elenco (es. se in futuro se ne aggiungono di nuove) finiscono in fondo, in ordine alfabetico.
+var FINEPASTO_ORDINE_CAPITOLI = ['Passiti', 'Grappa', 'Selezione Genova', 'Rum', 'Gin', 'Whiskey', 'Distillati', 'Vermouth', 'Amari', 'Fine pasto'];
 
 // Unica categoria Fine Pasto con sotto-capitoli di zona/regione (Liguria / Altre regioni), come nel
 // PDF — tutte le altre (Grappe, Gin, Whisky, Rum, Distillati, Vermouth...) sono elenchi piatti.
@@ -1559,27 +1574,18 @@ function generaAnteprimaFinePasto(articoli) {
     return ia - ib;
   });
 
-  // "Selezione 'Genova'": sezione virtuale trasversale (non è una tipologia) — tutti gli articoli
-  // Fine Pasto con zona Genova (la Zona resta un campo indipendente dal produttore, come già per i
-  // vini — non serve più incrociarla con la Regione ora che questa non è più usata in Fine Pasto),
-  // indipendentemente dal capitolo. Compaiono QUI IN PIÙ, oltre che nel proprio capitolo normale
-  // (es. una grappa Bruzzone di Genova sta sia in "Grappe" sia qui) — esattamente come nel PDF di
-  // riferimento. Nel PDF questa sezione va subito dopo "Grappe"; l'ordine dei suoi articoli lì è
-  // scelto a mano, qui si usa l'ordine alfabetico.
-  var selezioneGenova = articoli.filter(function (a) {
-    return a.zona && a.zona.nome === 'Genova';
-  }).sort(function (x, y) {
-    var kx = chiaveAlfabeticaArticolo(x), ky = chiaveAlfabeticaArticolo(y);
-    return kx < ky ? -1 : kx > ky ? 1 : 0;
-  });
-
   var body = '';
   function stampaRigheFlat(elenco) {
     elenco.forEach(function (a) { body += '<p class="fp-riga">' + rigaFinePastoHtml(a) + '</p>'; });
   }
 
   ordineCapitoli.forEach(function (cap) {
-    body += '<div class="fp-cap">' + escapeHtml(FINEPASTO_TITOLI_CAPITOLI[cap] || cap) + '</div>';
+    // "Selezione Genova" ha il titolo con "Genova" in corsivo tra apici, come nel PDF di riferimento
+    // — unico capitolo che non passa per la mappa FINEPASTO_TITOLI_CAPITOLI (quella usa escapeHtml,
+    // qui serve markup <em>).
+    body += (cap === 'Selezione Genova')
+      ? '<div class="fp-cap">Selezione <em>‘Genova’</em></div>'
+      : '<div class="fp-cap">' + escapeHtml(FINEPASTO_TITOLI_CAPITOLI[cap] || cap) + '</div>';
     if (FINEPASTO_CATEGORIE_ALTRE_REGIONI.indexOf(cap) !== -1) {
       // Solo Passiti usa ancora la Regione (non il nuovo Paese): sono vini veri con denominazioni
       // italiane reali (Sicilia, Toscana, Piemonte...) derivate dal produttore, non spiriti con
@@ -1591,18 +1597,7 @@ function generaAnteprimaFinePasto(articoli) {
     } else {
       stampaRigheFlat(capitoli[cap]);
     }
-    if (cap === 'Grappa' && selezioneGenova.length) {
-      body += '<div class="fp-cap">Selezione <em>‘Genova’</em></div>';
-      stampaRigheFlat(selezioneGenova);
-    }
   });
-  // Se "Grappa" non è tra i capitoli presenti ma ci sono comunque articoli di Selezione Genova
-  // (caso raro: nessun articolo Fine Pasto è di tipologia Grappa), la mettiamo comunque in fondo
-  // invece di perderla silenziosamente.
-  if (ordineCapitoli.indexOf('Grappa') === -1 && selezioneGenova.length) {
-    body += '<div class="fp-cap">Selezione <em>‘Genova’</em></div>';
-    stampaRigheFlat(selezioneGenova);
-  }
 
   return '<!DOCTYPE html>\n<html lang="it"><head><meta charset="UTF-8">' +
     '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
@@ -1987,7 +1982,7 @@ var CARTA_DESTINAZIONE_DEFAULT = {
   'Champagne': 'vini', 'Champagne Rosé': 'vini', 'Rosati': 'vini', 'Rossi': 'vini', 'Moscati': 'vini',
   'Amari': 'fine_pasto', 'Grappa': 'fine_pasto', 'Distillati': 'fine_pasto', 'Gin': 'fine_pasto',
   'Rum': 'fine_pasto', 'Vermouth': 'fine_pasto', 'Whiskey': 'fine_pasto', 'Passiti': 'fine_pasto',
-  'Fine pasto': 'fine_pasto',
+  'Fine pasto': 'fine_pasto', 'Selezione Genova': 'fine_pasto',
   'Cocktail': 'esclusa', 'Dealcolati': 'esclusa', 'Sakè': 'esclusa', 'Varie': 'esclusa',
 };
 var CARTA_TIP_DESTINAZIONE = {}; // tipologia_id -> 'vini'|'fine_pasto'|'esclusa', solo in memoria per questa sessione

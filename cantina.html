@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!-- v 2026.09.20.02 — in Fine Pasto (rigaFinePastoHtml) il campo Uve ora compare SOLO col suo
+     contenuto, senza l'etichetta "Uve:" davanti (es. "Amarone 100%" invece di "Uve: Amarone 100%") —
+     richiesto da Andrea per tutte le categorie di Fine Pasto. La Carta dei Vini (rigaVinoHtml)
+     resta invariata, mantiene l'etichetta "Uve: ...". -->
 <!-- v 2026.09.20.01 — "Selezione Genova" diventa una tipologia vera (creata in cantina_tipologie, id
      23) invece di una sezione virtuale auto-popolata dalla Zona: assegnazione manuale ed esclusiva,
      su richiesta di Andrea — un articolo spostato in "Selezione Genova" compare SOLO lì, non più
@@ -489,7 +493,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.20.01</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.20.02</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -1496,10 +1500,12 @@ function chiaveAlfabeticaArticolo(a) {
 }
 
 // Riga di un articolo Fine Pasto: nome - [produttore o paese] grado% - [paese separato, se c'è
-// anche il produttore] - [Uve: ...] - [nota libera dal campo Descrizione] - prezzo/i. Ricalca gli
-// schemi osservati nel PDF di riferimento (es. "Grappa di Amarone - Allegrini 43% - Uve: Amarone
-// 100% - € 11" quando c'è il produttore; "Bareksten - Norvegia 46% - morbido e speziato - € 10"
-// quando c'è solo il paese). Il "paese" qui è il campo indipendente `paese_id` (nuova anagrafica
+// anche il produttore] - [Uve] - [nota libera dal campo Descrizione] - prezzo/i. Il campo Uve
+// compare SOLO col suo contenuto, senza l'etichetta "Uve:" davanti (richiesto da Andrea il
+// 20/9/2026 — diverso dalla Carta dei Vini, dove "Uve: ..." resta con l'etichetta). Es. "Grappa di
+// Amarone - Allegrini 43% - Amarone 100% - € 11" quando c'è il produttore; "Bareksten - Norvegia
+// 46% - morbido e speziato - € 10" quando c'è solo il paese. Il "paese" qui è il campo indipendente
+// `paese_id` (nuova anagrafica
 // "Paesi"), non più la Regione: la Regione restava legata al produttore (select disabilitata) ed
 // era poco sensata per spiriti/liquori la cui provenienza non dipende dal produttore selezionato
 // (es. "Norvegia" per un gin non è un produttore). Prezzo: come i vini, si mostrano ENTRAMBI
@@ -1525,7 +1531,7 @@ function rigaFinePastoHtml(a) {
   // già dentro segPrimario sopra).
   var segRegioneSeparata = (prod && paeseNome) ? escapeHtml(paeseNome) : '';
 
-  var segUve = a.uve ? evidenziaPercentuali(escapeHtml('Uve: ' + a.uve)) : '';
+  var segUve = a.uve ? evidenziaPercentuali(escapeHtml(a.uve)) : '';
   var segNota = (a.descrizione && a.descrizione !== '(senza descrizione)') ? escapeHtml(a.descrizione) : '';
 
   var prezzoParts = [];

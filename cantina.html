@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!-- v 2026.09.20.03 — corretto il giorno dopo (v.20.02 aveva tolto l'etichetta "Uve:" ovunque in
+     Fine Pasto): Passiti e Grappe la mantengono ("Uve: Amarone 100%"), su richiesta di Andrea —
+     nuova lista FINEPASTO_CATEGORIE_ETICHETTA_UVE = ['Passiti', 'Grappa']. Tutte le altre categorie
+     Fine Pasto (Gin, Whisky, Rum, Distillati, Vermouth, Amari, Fine pasto, Selezione Genova)
+     restano senza etichetta, solo contenuto. -->
 <!-- v 2026.09.20.02 — in Fine Pasto (rigaFinePastoHtml) il campo Uve ora compare SOLO col suo
      contenuto, senza l'etichetta "Uve:" davanti (es. "Amarone 100%" invece di "Uve: Amarone 100%") —
      richiesto da Andrea per tutte le categorie di Fine Pasto. La Carta dei Vini (rigaVinoHtml)
@@ -493,7 +498,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.20.02</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.20.03</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -1495,17 +1500,23 @@ var FINEPASTO_ORDINE_CAPITOLI = ['Passiti', 'Grappa', 'Selezione Genova', 'Rum',
 // PDF — tutte le altre (Grappe, Gin, Whisky, Rum, Distillati, Vermouth...) sono elenchi piatti.
 var FINEPASTO_CATEGORIE_ALTRE_REGIONI = ['Passiti'];
 
+// Categorie in cui il campo Uve mantiene l'etichetta "Uve: ..." davanti al contenuto (richiesto da
+// Andrea il 20/9/2026, dopo averla tolta ovunque il giorno prima): tutte le altre categorie Fine
+// Pasto mostrano solo il contenuto, senza etichetta.
+var FINEPASTO_CATEGORIE_ETICHETTA_UVE = ['Passiti', 'Grappa'];
+
 function chiaveAlfabeticaArticolo(a) {
   return (a.codice || a.descrizione || '').replace(/["""]/g, '').trim().toLowerCase();
 }
 
 // Riga di un articolo Fine Pasto: nome - [produttore o paese] grado% - [paese separato, se c'è
-// anche il produttore] - [Uve] - [nota libera dal campo Descrizione] - prezzo/i. Il campo Uve
-// compare SOLO col suo contenuto, senza l'etichetta "Uve:" davanti (richiesto da Andrea il
-// 20/9/2026 — diverso dalla Carta dei Vini, dove "Uve: ..." resta con l'etichetta). Es. "Grappa di
-// Amarone - Allegrini 43% - Amarone 100% - € 11" quando c'è il produttore; "Bareksten - Norvegia
-// 46% - morbido e speziato - € 10" quando c'è solo il paese. Il "paese" qui è il campo indipendente
-// `paese_id` (nuova anagrafica
+// anche il produttore] - [Uve] - [nota libera dal campo Descrizione] - prezzo/i. Il campo Uve ha
+// l'etichetta "Uve: " davanti solo per Passiti e Grappe (FINEPASTO_CATEGORIE_ETICHETTA_UVE, come
+// nella Carta dei Vini); per tutte le altre categorie Fine Pasto compare solo il contenuto, senza
+// etichetta (richiesto da Andrea il 20/9/2026, con questa eccezione aggiunta il giorno dopo). Es.
+// "Grappa di Amarone - Allegrini 43% - Uve: Amarone 100% - € 11" (Grappe, con etichetta);
+// "Bareksten - Norvegia 46% - morbido e speziato - € 10" (Gin, niente Uve). Il "paese" qui è il
+// campo indipendente `paese_id` (nuova anagrafica
 // "Paesi"), non più la Regione: la Regione restava legata al produttore (select disabilitata) ed
 // era poco sensata per spiriti/liquori la cui provenienza non dipende dal produttore selezionato
 // (es. "Norvegia" per un gin non è un produttore). Prezzo: come i vini, si mostrano ENTRAMBI
@@ -1531,7 +1542,9 @@ function rigaFinePastoHtml(a) {
   // già dentro segPrimario sopra).
   var segRegioneSeparata = (prod && paeseNome) ? escapeHtml(paeseNome) : '';
 
-  var segUve = a.uve ? evidenziaPercentuali(escapeHtml(a.uve)) : '';
+  var capNomeUve = a.tipologia ? a.tipologia.nome : '';
+  var etichettaUve = FINEPASTO_CATEGORIE_ETICHETTA_UVE.indexOf(capNomeUve) !== -1 ? 'Uve: ' : '';
+  var segUve = a.uve ? evidenziaPercentuali(escapeHtml(etichettaUve + a.uve)) : '';
   var segNota = (a.descrizione && a.descrizione !== '(senza descrizione)') ? escapeHtml(a.descrizione) : '';
 
   var prezzoParts = [];

@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- v 2026.09.20.05 — completato il lavoro di v.20.04: azzerati coravin/mezza_bottiglia sui 5+7
+     articoli che li avevano a true (UPDATE diretto su Supabase), poi eliminate del tutto le colonne
+     cantina_articoli.coravin e .mezza_bottiglia (migrazione drop_coravin_mezza_bottiglia). Tolti i
+     due campi nascosti #f-coravin-hidden/#f-mezza-hidden da cantina.html (non servivano più, dato
+     che la colonna non esiste più) e i riferimenti a coravin/mezza_bottiglia da cantina-catalogo
+     (ARTICOLO_SELECT e upsert_articolo, v4). Nessun dato residuo, nessun campo morto nel codice. -->
 <!-- v 2026.09.20.04 — rimosse dal form articolo del Catalogo le spunte visibili "Coravin" e "Mezza
      bottiglia" (inutilizzate, su richiesta di Andrea). ATTENZIONE ai dati esistenti: verificato sul
      database prima di procedere che 5 articoli hanno coravin=true e 7 mezza_bottiglia=true — se le
@@ -506,7 +512,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.20.04</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.20.05</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -559,11 +565,6 @@
       <div class="panel" id="cat-form-panel" style="display:none;">
         <h2 id="cat-form-title">Nuovo articolo</h2>
         <input type="hidden" id="f-id" />
-        <!-- Coravin/mezza bottiglia: spunte tolte dal form (inutilizzate), ma il dato esistente va
-             preservato invariato al salvataggio — non azzerato — per i pochi articoli che le hanno
-             già impostate. Campi nascosti, non passano dallo stato visibile del form. -->
-        <input type="hidden" id="f-coravin-hidden" />
-        <input type="hidden" id="f-mezza-hidden" />
         <div class="grid2">
           <div class="field"><label>Codice / nome</label><input type="text" id="f-codice" /></div>
         </div>
@@ -1015,8 +1016,6 @@ function openCatForm(a) {
   document.getElementById('f-zona').value = a.zona ? a.zona.id : '';
   document.getElementById('f-paese').value = a.paese ? a.paese.id : '';
   document.getElementById('f-sboccatura').value = a.sboccatura || '';
-  document.getElementById('f-coravin-hidden').value = a.coravin ? '1' : '';
-  document.getElementById('f-mezza-hidden').value = a.mezza_bottiglia ? '1' : '';
   document.getElementById('f-nascosto').checked = !!a.nascosto;
   document.getElementById('f-virgolette').checked = a.virgolette !== false;
   document.getElementById('cat-delete').style.display = a.id ? '' : 'none';
@@ -1049,8 +1048,6 @@ document.getElementById('cat-save').addEventListener('click', function () {
     paese_id: numOrNull(document.getElementById('f-paese').value),
     sboccatura: document.getElementById('f-sboccatura').value || null,
     nascosto: document.getElementById('f-nascosto').checked,
-    coravin: !!document.getElementById('f-coravin-hidden').value,
-    mezza_bottiglia: !!document.getElementById('f-mezza-hidden').value,
     virgolette: document.getElementById('f-virgolette').checked,
   };
   // La descrizione è obbligatoria solo per gli articoli di categoria "Vini" (v. scheda "Categorie");

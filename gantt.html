@@ -1,0 +1,211 @@
+<!-- gantt.html · pubblicato per accesso interno via santamonicagenova.it/gantt -->
+<!-- Sorgente: GANTT_Santamonica.html (renderer stabile, i dati stanno in gantt-data.js).
+     Deploy 2026-09-21: rinominato in gantt.html (pretty URL Cloudflare Pages /gantt) +
+     aggiunto <meta name="robots" content="noindex,nofollow"> come le altre pagine admin
+     (menu-admin.html, gestionale.html, cantina.html) — pagina interna, non da indicizzare.
+     Nessuna altra modifica: stesso identico renderer, stessi dati in gantt-data.js. -->
+<!-- Aggiornamento 2026-08-15 (ereditato dal sorgente): sezioni espandibili/collassabili (click
+     sull'intestazione di sezione, chevron ▾/▸) + pulsanti "Espandi tutto"/"Comprimi tutto" in
+     alto. Lo stato aperto/chiuso di ogni sezione si ricorda nel browser (localStorage, chiave
+     santamonicaGanttCollapsed) e non tocca i dati in gantt-data.js. -->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Gantt — Promozione Ristorante Santamonica</title>
+<style>
+  :root{
+    --bg:#f7f4ee; --panel:#fffdf9; --ink:#2b2622; --muted:#7d7062; --line:#e4ddd0;
+    --sito:#2c6e49; --seo:#1d6fb8; --mkt:#c0563a; --dec:#b8860b; --today:#d23b3b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:13px;line-height:1.4}
+  header{padding:22px 26px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+  h1{margin:0 0 4px;font-size:21px;font-weight:600;letter-spacing:.2px}
+  .sub{color:var(--muted);font-size:12.5px}
+  .legend{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;align-items:center}
+  .legend .grp{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .legend b{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:12px}
+  .sw{width:22px;height:12px;border-radius:3px;display:inline-block}
+  .sw.done{background:#7d7062}
+  .sw.prog{background:repeating-linear-gradient(45deg,#7d7062,#7d7062 4px,#bdae99 4px,#bdae99 8px)}
+  .sw.up{background:#fff;border:2px solid #7d7062}
+  .sw.future{background:#fff;border:1.5px dashed #9a8e7e}
+  .dotp{width:12px;height:12px;border-radius:50%;display:inline-block}
+  .scroll{overflow-x:auto;padding:0 0 30px}
+  .chart{min-width:1360px;position:relative}
+  .grid-head{display:flex;position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:1px solid var(--line)}
+  .lbl-col{width:320px;min-width:320px;padding:8px 14px;font-weight:700;font-size:11px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.06em;align-self:center}
+  .months{flex:1;display:flex;position:relative}
+  .mcell{flex:1;text-align:center;padding:8px 0;font-size:11px;color:var(--muted);
+    border-left:1px solid var(--line);font-weight:600}
+  .mcell.q{color:var(--ink)}
+  .row{display:flex;align-items:center;min-height:30px;border-bottom:1px solid #efe9dd}
+  .row:hover{background:#fffef9}
+  .row .lbl-col{font-weight:400;font-size:12.5px;color:var(--ink);text-transform:none;letter-spacing:0;
+    padding:5px 14px 5px 26px;line-height:1.25}
+  .track{flex:1;position:relative;height:30px}
+  .track .vline{position:absolute;top:0;bottom:0;width:1px;background:var(--line)}
+  .bar{position:absolute;top:6px;height:18px;border-radius:4px;display:flex;align-items:center;cursor:default}
+  .bar.prog{background-image:repeating-linear-gradient(45deg,rgba(255,255,255,0),rgba(255,255,255,0) 5px,rgba(255,255,255,.45) 5px,rgba(255,255,255,.45) 10px)}
+  .milestone{position:absolute;top:4px;width:14px;height:14px;transform:rotate(45deg);
+    border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+  .secrow{display:flex;align-items:center;background:#f0ebe0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);cursor:pointer;user-select:none}
+  .secrow:hover{background:#e9e2d3}
+  .secrow .lbl-col{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:700;color:var(--ink);
+    text-transform:none;letter-spacing:0;padding:9px 14px}
+  .secrow .track{height:34px}
+  .secbadge{font-size:11px;color:var(--muted);font-weight:600}
+  .chevron{display:inline-block;width:11px;font-size:10px;color:var(--muted);transition:transform .12s}
+  .toggle-all{font-size:11px;color:var(--muted);background:none;border:1px solid var(--line);border-radius:5px;
+    padding:3px 9px;cursor:pointer;font-family:inherit}
+  .toggle-all:hover{background:#efe9dd;color:var(--ink)}
+  .today{position:absolute;top:0;bottom:0;width:2px;background:var(--today);z-index:4;pointer-events:none}
+  .today .tag{position:absolute;top:-1px;left:4px;background:var(--today);color:#fff;font-size:10px;
+    padding:1px 6px;border-radius:0 4px 4px 0;font-weight:700;white-space:nowrap}
+  footer{padding:14px 26px 28px;color:var(--muted);font-size:11.5px;border-top:1px solid var(--line);background:var(--panel)}
+  .tip{position:fixed;z-index:50;background:#2b2622;color:#fff;padding:7px 10px;border-radius:6px;
+    font-size:11.5px;max-width:280px;box-shadow:0 6px 20px rgba(0,0,0,.25);pointer-events:none;opacity:0;
+    transition:opacity .08s;line-height:1.35}
+  .err{padding:40px 26px;color:#a33}
+</style>
+</head>
+<body>
+<header>
+  <h1>Gantt — Promozione Ristorante Santamonica</h1>
+  <div class="sub" id="sub"></div>
+  <div class="legend">
+    <div class="grp"><b>Progetto</b>
+      <span class="chip"><span class="dotp" style="background:var(--dec)"></span>Decennale (trasversale)</span>
+      <span class="chip"><span class="dotp" style="background:var(--sito)"></span>Sito</span>
+      <span class="chip"><span class="dotp" style="background:var(--seo)"></span>SEO</span>
+      <span class="chip"><span class="dotp" style="background:var(--mkt)"></span>Marketing</span>
+    </div>
+    <div class="grp"><b>Stato</b>
+      <span class="chip"><span class="sw done"></span>Fatto</span>
+      <span class="chip"><span class="sw prog"></span>In corso</span>
+      <span class="chip"><span class="sw up"></span>Prossimo / aperto</span>
+      <span class="chip"><span class="sw future"></span>Futuro</span>
+      <span class="chip"><span style="display:inline-block;width:11px;height:11px;transform:rotate(45deg);background:#7d7062;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15)"></span>Milestone</span>
+    </div>
+    <div class="grp">
+      <button class="toggle-all" id="btn-expand-all" type="button">▾ Espandi tutto</button>
+      <button class="toggle-all" id="btn-collapse-all" type="button">▸ Comprimi tutto</button>
+    </div>
+  </div>
+</header>
+
+<div class="scroll"><div class="chart" id="chart"></div></div>
+<footer id="foot"></footer>
+<div class="tip" id="tip"></div>
+
+<script src="gantt-data.js"></script>
+<script>
+const D = window.SANTAMONICA_GANTT;
+const chart = document.getElementById('chart');
+if(!D){
+  chart.innerHTML = '<div class="err">⚠ <b>gantt-data.js</b> non trovato. Tienilo nella stessa cartella di questo file.</div>';
+} else {
+  const AXIS_START=new Date(D.axisStart), AXIS_END=new Date(D.axisEnd), SPAN=AXIS_END-AXIS_START;
+  const TODAY=new Date(D.today);
+  const COL={dec:'#b8860b',sito:'#2c6e49',seo:'#1d6fb8',mkt:'#c0563a'};
+  const MN=['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+  const STLABEL={done:'Fatto',prog:'In corso',up:'Prossimo / aperto',future:'Futuro'};
+  const pct=d=>((new Date(d)-AXIS_START)/SPAN)*100;
+  const fmt=d=>{const x=new Date(d);return x.getDate()+' '+MN[x.getMonth()];};
+
+  document.getElementById('sub').innerHTML =
+    `Roadmap consolidata dei 3 progetti · ${MN[AXIS_START.getMonth()]} ${AXIS_START.getFullYear()} → ${MN[(AXIS_END.getMonth()+11)%12]} ${AXIS_END.getFullYear()-(AXIS_END.getMonth()===0?1:0)} · oggi: ${TODAY.getDate()} ${MN[TODAY.getMonth()]} ${TODAY.getFullYear()} · <b>v ${D.version}</b>`;
+  document.getElementById('foot').innerHTML =
+    `Fonte: CLAUDE.md centrale + schede progetto. I dati stanno in <code>gantt-data.js</code> (aggiornalo a fine sessione). Le date future sono pianificate e possono slittare. · <b>v ${D.version}</b> · agg. ${D.updated}`;
+
+  const MONTHS=[]; let m=new Date(AXIS_START);
+  while(m<AXIS_END){MONTHS.push(new Date(m));m.setMonth(m.getMonth()+1);}
+  const todayLeft=pct(TODAY);
+  const gridLines=()=>{let g='';for(let i=1;i<MONTHS.length;i++)g+=`<div class="vline" style="left:${(i/MONTHS.length)*100}%"></div>`;return g;};
+
+  let head='<div class="grid-head"><div class="lbl-col">Attività</div><div class="months">';
+  MONTHS.forEach((d,i)=>{const q=(d.getMonth()%3===0);
+    head+=`<div class="mcell ${q?'q':''}">${MN[d.getMonth()]}${(d.getMonth()===0||i===0)?" '"+String(d.getFullYear()).slice(2):''}</div>`;});
+  head+='</div></div>'; chart.innerHTML=head;
+
+  const COLLAPSE_KEY='santamonicaGanttCollapsed';
+  let collapsed={};
+  try{ collapsed=JSON.parse(localStorage.getItem(COLLAPSE_KEY)||'{}'); }catch(e){ collapsed={}; }
+  const saveCollapsed=()=>{ try{ localStorage.setItem(COLLAPSE_KEY, JSON.stringify(collapsed)); }catch(e){} };
+  const sectionBodies=[];
+
+  D.sections.forEach(sec=>{
+    const isCollapsed=!!collapsed[sec.key];
+    const sr=document.createElement('div'); sr.className='secrow';
+    sr.innerHTML=`<div class="lbl-col"><span class="chevron">${isCollapsed?'▸':'▾'}</span><span class="dotp" style="background:${COL[sec.key]}"></span>${sec.name}
+        <span class="secbadge">· ${sec.badge} · ${sec.tasks.length} attività</span></div>
+        <div class="track">${gridLines()}<div class="today" style="left:${todayLeft}%"><span class="tag">oggi</span></div></div>`;
+    chart.appendChild(sr);
+
+    const body=document.createElement('div'); body.className='secbody';
+    if(isCollapsed) body.style.display='none';
+
+    sec.tasks.forEach(tk=>{
+      const row=document.createElement('div'); row.className='row';
+      const start=pct(tk.s); const c=COL[sec.key];
+      let inner=gridLines()+`<div class="today" style="left:${todayLeft}%"></div>`;
+      if(tk.ms){
+        inner+=`<div class="milestone" style="left:calc(${start}% - 7px);background:${c}" data-tip="${tk.t}|${fmt(tk.s)}|Milestone"></div>`;
+      }else{
+        const end=pct(tk.e||tk.s); const w=Math.max(end-start,0.6);
+        let style=`left:${start}%;width:${w}%;`;
+        if(tk.st==='done'||tk.st==='prog')style+=`background:${c};color:#fff;`;
+        if(tk.st==='up')style+=`border:2px solid ${c};background:#fff;`;
+        if(tk.st==='future')style+=`border:1.5px dashed ${c};background:#fff;`;
+        inner+=`<div class="bar ${tk.st}" style="${style}" data-tip="${tk.t}|${fmt(tk.s)}${tk.e?' → '+fmt(tk.e):''}|${STLABEL[tk.st]}"></div>`;
+      }
+      row.innerHTML=`<div class="lbl-col">${tk.t}</div><div class="track">${inner}</div>`;
+      body.appendChild(row);
+    });
+
+    chart.appendChild(body);
+    sectionBodies.push({key:sec.key, sr, body});
+
+    sr.addEventListener('click', ()=>{
+      const nowHidden = body.style.display !== 'none';
+      body.style.display = nowHidden ? 'none' : '';
+      sr.querySelector('.chevron').textContent = nowHidden ? '▸' : '▾';
+      collapsed[sec.key] = nowHidden;
+      saveCollapsed();
+    });
+  });
+
+  document.getElementById('btn-expand-all').addEventListener('click', ()=>{
+    sectionBodies.forEach(({key,sr,body})=>{
+      body.style.display=''; sr.querySelector('.chevron').textContent='▾'; collapsed[key]=false;
+    });
+    saveCollapsed();
+  });
+  document.getElementById('btn-collapse-all').addEventListener('click', ()=>{
+    sectionBodies.forEach(({key,sr,body})=>{
+      body.style.display='none'; sr.querySelector('.chevron').textContent='▸'; collapsed[key]=true;
+    });
+    saveCollapsed();
+  });
+
+  const tip=document.getElementById('tip');
+  document.addEventListener('mousemove',e=>{
+    const el=e.target.closest('[data-tip]');
+    if(el){const[t,dates,st]=el.getAttribute('data-tip').split('|');
+      tip.innerHTML=`<b>${t}</b><br>${dates}<br><span style="opacity:.75">${st}</span>`;
+      tip.style.opacity='1'; let x=e.clientX+14,y=e.clientY+14;
+      if(x+290>window.innerWidth)x=e.clientX-290;
+      tip.style.left=x+'px'; tip.style.top=y+'px';
+    }else tip.style.opacity='0';
+  });
+}
+</script>
+</body>
+</html>

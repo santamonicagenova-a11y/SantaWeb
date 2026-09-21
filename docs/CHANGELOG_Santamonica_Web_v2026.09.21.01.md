@@ -1,9 +1,31 @@
 # CHANGELOG — Santamonica Web
 
-**Versione documento:** v 2026.09.18.02
-**Aggiornato:** 2026-09-18
+**Versione documento:** v 2026.09.21.01
+**Aggiornato:** 2026-09-21
 
 > Voci ordinate dal più recente al più vecchio. Appendere in cima a ogni sessione.
+
+---
+
+### 2026-09-21 — Food Cost: scorporo IVA anche a mano + totale cliccabile in Inventario
+
+**Versioni rilasciate:**
+- `menu-admin.html` v 2026.09.21.01 (Vercel)
+- `HANDOVER_Santamonica_Web_v2026.09.21.01.md`
+- `CHANGELOG_Santamonica_Web_v2026.09.21.01.md` (questo)
+
+**Sintesi:**
+Sessione breve, in continuazione diretta della v2026.09.18.02 (stessa conversazione, chiusura posticipata). Tre richieste puntuali di Andrea, tutte già rilasciate nei giorni precedenti come commit separati e qui solo documentate a consuntivo:
+
+1. **Incassi → inserimento manuale, scorporo IVA (v 2026.09.18.03)**: il form "Incasso del giorno" prendeva gli importi così come digitati, mentre l'import da Excel scorporava già il 10%. Andrea ha fatto notare l'incoerenza: anche gli importi inseriti a mano sono letti in cassa (IVA inclusa). Estratta una costante condivisa `FC_ALIQUOTA_IVA` (10%, prima duplicata solo nel blocco import come `FC_IMP_ALIQUOTA_IVA`) e una funzione `_fcScorporaIva()`, usate ora da entrambi i percorsi. Etichette dei campi aggiornate in "(IVA inclusa)". Nessun dato storico da correggere (Andrea non aveva ancora inserito nulla in Incassi).
+2. **Inventario → totale cliccabile (v 2026.09.21.01)**: sotto la data di conteggio compariva subito la tabella con un campo per reparto. Andrea voleva prima una cifra di sintesi. Aggiunto un `<summary>` "Totale: € X" (aggiornato live via `oninput` su ogni campo) che avvolge la tabella per reparto dentro un `<details>` collassato di default — un click la apre per il dettaglio/editing.
+3. **Chiarimento (nessuna modifica di codice)**: verificato con Andrea che un giorno con incasso realmente zero non genera problemi nel calcolo del Food Cost anche se l'import salta le righe non compilate — `calcolaRange` somma gli importi sul range senza dividere per numero di giorni, quindi un giorno senza riga in `fc_incassi_giornalieri` equivale matematicamente a una riga con `importo: 0`.
+
+**Nota**: durante la sessione sono stati rilevati altri due pull di allineamento da `origin/main` per commit di sessioni Cowork parallele (immagine banner chiusura vacanze + bump minori su pagine menu pubbliche: `menu.html`, `menu-it.html`, `menu-vini.html`). Nessun conflitto con `menu-admin.html` in questi pull (diversamente dal conflitto di versione della sessione precedente, v2026.09.18.02). Non documentati nel dettaglio qui: non fanno parte del lavoro di questa sessione, presumibilmente coperti dalla continuità documentale della sessione Cowork che li ha prodotti.
+
+**Loop di revisione (GATE PRODUZIONE):** P1 (formale: sintassi JS verificata dopo ogni modifica e dopo i pull, riferimenti `onclick`/`oninput` risolti) applicato per entrambe le modifiche. P2 (sostanziale) leggero, coerente con la dimensione dei cambi (refactor di una costante + toggle collassabile, nessuna nuova logica di calcolo). **Revisione Oppositiva (3ª passata)**: non eseguita — si somma al debito già aperto nelle sessioni precedenti (v2026.09.16.01, v2026.09.18.02) per l'intero modulo Food Cost/Tracciabilità. Nessun test in browser in questa sessione.
+
+**Handover dettagliato:** `HANDOVER_Santamonica_Web_v2026.09.21.01.md`
 
 ---
 
@@ -271,14 +293,16 @@ Su richiesta di Andrea, il carico di una fornitura (soprattutto pesce/crostacei)
 
 ---
 
-## STATO PROGETTO CONSOLIDATO (post 2026-09-18)
+## STATO PROGETTO CONSOLIDATO (post 2026-09-21)
 
 ### File deploy correnti
 
 | File | Versione | Hosting |
 |---|---|---|
-| **`menu-admin.html`** | **v 2026.09.18.02** ⭐ | Vercel |
+| **`menu-admin.html`** | **v 2026.09.21.01** ⭐ | Vercel |
 | `clienti.html` | v 2026.09.18.01 (sessione Cowork parallela) | Vercel |
+| `menu.html`, `menu-it.html`, `menu-vini.html` | bump minori, sessione Cowork parallela (non dettagliati qui) | GH Pages + CF Pages |
+| `img/sito/vacanzina-chiusura-2026-09.jpg` | NUOVO, sessione Cowork parallela | GH Pages + CF Pages |
 | `index.html` | v 2026.05.19.04 | GH Pages + CF Pages |
 | `dove-siamo.html` | v 2026.05.19.04 | GH Pages + CF Pages |
 | `regala.html` | v 2026.05.19.03 | GH Pages + CF Pages |
@@ -371,4 +395,4 @@ Su richiesta di Andrea, il carico di una fornitura (soprattutto pesce/crostacei)
 
 ---
 
-**Fine CHANGELOG · v 2026.09.18.02**
+**Fine CHANGELOG · v 2026.09.21.01**

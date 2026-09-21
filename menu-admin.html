@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!-- v 2026.09.21.01 — Food Cost → Inventario: sotto la data di conteggio compare ora un
+     "Totale: € X" cliccabile (richiesto da Andrea) al posto della tabella per reparto
+     sempre visibile — la tabella (dettaglio, editabile) è dentro un <details> collassato
+     di default, il totale si aggiorna live mentre si digita (oninput su ogni campo). -->
 <!-- v 2026.09.18.03 — Food Cost → Incassi: anche l'inserimento manuale del giorno singolo
      ora scorpora l'IVA al 10% (richiesto da Andrea: gli importi digitati sono quelli letti
      in cassa, IVA inclusa, come per l'import da Excel). Estratta la costante condivisa
@@ -1409,7 +1413,10 @@
           <span class="opt-lbl">Data conteggio</span>
           <input type="date" id="fc-inv-data" style="width:9.5rem;padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);" onchange="fcLoadInventario()" />
         </div>
-        <div id="fc-inventario-list" style="font-size:.85rem;">…</div>
+        <details id="fc-inv-details" style="margin-bottom:1rem;">
+          <summary id="fc-inv-totale" style="cursor:pointer;font-size:.95rem;font-weight:600;color:var(--ink);">Totale: € 0,00</summary>
+          <div id="fc-inventario-list" style="font-size:.85rem;margin-top:.8rem;">…</div>
+        </details>
         <div style="margin-top:1rem;">
           <button class="btn btn-publish" onclick="fcSalvaInventario()">💾 Salva conteggio</button>
         </div>
@@ -4595,16 +4602,31 @@ function fcUsaPeriodo(da, a) {
 function fcRenderInventario() {
   var list = document.getElementById('fc-inventario-list');
   if (!list) return;
-  if (!fcState.inventario.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun reparto attivo — crealo dalla scheda "Reparti".</p>'; return; }
+  if (!fcState.inventario.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun reparto attivo — crealo dalla scheda "Reparti".</p>'; fcInventarioAggiornaTotale(); return; }
   list.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;">' +
     '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Reparto</th><th>Conteggio (€)</th></tr>' +
     fcState.inventario.map(function (r) {
       return '<tr style="border-top:1px solid var(--rule);">' +
         '<td style="padding:.35rem 0;">' + _fcEsc(r.nome) + '</td>' +
-        '<td><input type="number" min="0" step="0.01" id="fc-inv-val-' + r.reparto_id + '" value="' + (r.valore == null ? '' : r.valore) + '" style="width:8rem;" /></td>' +
+        '<td><input type="number" min="0" step="0.01" id="fc-inv-val-' + r.reparto_id + '" value="' + (r.valore == null ? '' : r.valore) + '" oninput="fcInventarioAggiornaTotale()" style="width:8rem;" /></td>' +
         '</tr>';
     }).join('') +
     '</table>';
+  fcInventarioAggiornaTotale();
+}
+
+// Somma live dei conteggi inseriti nella tabella, mostrata come riepilogo nel
+// <summary> cliccabile sopra la tabella (dettaglio per reparto collassato di default —
+// richiesto da Andrea: "sotto la data vorrei una cifra finale, cliccandoci vedo il dettaglio").
+function fcInventarioAggiornaTotale() {
+  var el = document.getElementById('fc-inv-totale');
+  if (!el) return;
+  var totale = (fcState.inventario || []).reduce(function (somma, r) {
+    var input = document.getElementById('fc-inv-val-' + r.reparto_id);
+    var val = input ? input.value : '';
+    return somma + (val === '' ? 0 : Number(val));
+  }, 0);
+  el.textContent = 'Totale: ' + _fcEur(totale);
 }
 
 function fcSalvaInventario() {
@@ -6644,7 +6666,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.18.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.21.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

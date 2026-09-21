@@ -1,54 +1,41 @@
 # CHANGELOG — Santamonica Web
 
-**Versione documento:** v 2026.09.21.01
+**Versione documento:** v 2026.09.21.02
 **Aggiornato:** 2026-09-21
 
 > Voci ordinate dal più recente al più vecchio. Appendere in cima a ogni sessione.
 
 ---
 
-### 2026-09-21 — Food Cost: scorporo IVA anche a mano + totale cliccabile in Inventario
+### 2026-09-16 → 2026-09-21 (sessione unica, chiusura consolidata) — Food Cost: modulo Tracciabilità + import Incassi da Excel + rifiniture · 5 batch (.01→.05) · debito Revisione Oppositiva dichiarato
 
-**Versioni rilasciate:**
-- `menu-admin.html` v 2026.09.21.01 (Vercel)
-- `HANDOVER_Santamonica_Web_v2026.09.21.01.md`
-- `CHANGELOG_Santamonica_Web_v2026.09.21.01.md` (questo)
-
-**Sintesi:**
-Sessione breve, in continuazione diretta della v2026.09.18.02 (stessa conversazione, chiusura posticipata). Tre richieste puntuali di Andrea, tutte già rilasciate nei giorni precedenti come commit separati e qui solo documentate a consuntivo:
-
-1. **Incassi → inserimento manuale, scorporo IVA (v 2026.09.18.03)**: il form "Incasso del giorno" prendeva gli importi così come digitati, mentre l'import da Excel scorporava già il 10%. Andrea ha fatto notare l'incoerenza: anche gli importi inseriti a mano sono letti in cassa (IVA inclusa). Estratta una costante condivisa `FC_ALIQUOTA_IVA` (10%, prima duplicata solo nel blocco import come `FC_IMP_ALIQUOTA_IVA`) e una funzione `_fcScorporaIva()`, usate ora da entrambi i percorsi. Etichette dei campi aggiornate in "(IVA inclusa)". Nessun dato storico da correggere (Andrea non aveva ancora inserito nulla in Incassi).
-2. **Inventario → totale cliccabile (v 2026.09.21.01)**: sotto la data di conteggio compariva subito la tabella con un campo per reparto. Andrea voleva prima una cifra di sintesi. Aggiunto un `<summary>` "Totale: € X" (aggiornato live via `oninput` su ogni campo) che avvolge la tabella per reparto dentro un `<details>` collassato di default — un click la apre per il dettaglio/editing.
-3. **Chiarimento (nessuna modifica di codice)**: verificato con Andrea che un giorno con incasso realmente zero non genera problemi nel calcolo del Food Cost anche se l'import salta le righe non compilate — `calcolaRange` somma gli importi sul range senza dividere per numero di giorni, quindi un giorno senza riga in `fc_incassi_giornalieri` equivale matematicamente a una riga con `importo: 0`.
-
-**Nota**: durante la sessione sono stati rilevati altri due pull di allineamento da `origin/main` per commit di sessioni Cowork parallele (immagine banner chiusura vacanze + bump minori su pagine menu pubbliche: `menu.html`, `menu-it.html`, `menu-vini.html`). Nessun conflitto con `menu-admin.html` in questi pull (diversamente dal conflitto di versione della sessione precedente, v2026.09.18.02). Non documentati nel dettaglio qui: non fanno parte del lavoro di questa sessione, presumibilmente coperti dalla continuità documentale della sessione Cowork che li ha prodotti.
-
-**Loop di revisione (GATE PRODUZIONE):** P1 (formale: sintassi JS verificata dopo ogni modifica e dopo i pull, riferimenti `onclick`/`oninput` risolti) applicato per entrambe le modifiche. P2 (sostanziale) leggero, coerente con la dimensione dei cambi (refactor di una costante + toggle collassabile, nessuna nuova logica di calcolo). **Revisione Oppositiva (3ª passata)**: non eseguita — si somma al debito già aperto nelle sessioni precedenti (v2026.09.16.01, v2026.09.18.02) per l'intero modulo Food Cost/Tracciabilità. Nessun test in browser in questa sessione.
-
-**Handover dettagliato:** `HANDOVER_Santamonica_Web_v2026.09.21.01.md`
-
----
-
-### 2026-09-18 (sessione Food Cost/Cowork parallela) — Food Cost → Incassi: import da Excel Budget + modifiche Tracciabilità
-
-**Versioni rilasciate:**
-- `menu-admin.html` v 2026.09.18.02 (Vercel) — import Incassi da Excel + modifiche al modulo Tracciabilità
-- Edge function `foodcost-admin` (Supabase SafeTable) → v9, deploy diretto in sessione
-- `HANDOVER_Santamonica_Web_v2026.09.18.02.md`
-- `CHANGELOG_Santamonica_Web_v2026.09.18.02.md` (questo)
+**Versioni rilasciate (stessa sessione/conversazione, mai chiusa fino a oggi — vedi nota metodologica sotto):**
+- `menu-admin.html` v 2026.09.16.01 → v 2026.09.21.01 (Vercel), 7 bump in sessione
+- Edge function `foodcost-admin` (Supabase SafeTable) v7 → v9, deploy diretti in sessione
+- Migrazioni Supabase dirette (SafeTable: `fc_categorie_tracciabilita`, `fc_tracciabilita_prodotti`; SantaCantina: colonna `settore` su `fornitori`)
+- `docs/LESSONS_SantaWeb.md` (NUOVO)
+- `HANDOVER_Santamonica_Web_v2026.09.21.02.md` (consolidato, sostituisce i due handover intermedi `..._v2026.09.16.01.md` e `..._v2026.09.18.02.md` — vedi nota metodologica)
+- `CHANGELOG_Santamonica_Web_v2026.09.21.02.md` (questo)
 
 **Sintesi:**
-Sessione in continuazione della v2026.09.16.01 (modulo Tracciabilità), con due filoni:
 
-1. **Rifiniture Tracciabilità** (richieste dirette di Andrea): tolto il campo Categoria dalla riga prodotto — la scadenza ora si autocompila sempre dalla prima categoria attiva (default "Pesce abbattuto" = 30gg), niente più scelta manuale per riga; reparto del carico preselezionato di default su "Pesce e crostacei"; rimossa anche la sezione UI "Categorie e giorni di scadenza" (la regola resta in DB, solo il pannello CRUD è sparito dalla pagina — per cambiare i giorni serve un intervento diretto sul dato).
+- **Batch 1 (v.16.01) — Modulo Tracciabilità**: al carico di una fornitura (pesce/crostacei) un unico inserimento popola sia Spese sia uno storico di tracciabilità dedicato, con codice univoco `NN-MMAA` generato lato server e data di scadenza calcolata per categoria (default "Pesce abbattuto" = 30gg). Fornitore come testo libero, letto in sola lettura dall'anagrafica Cantina (`cantina-anagrafiche`, progetto Supabase separato — nessuna FK cross-database). Aggiunto anche il campo `settore` a `fornitori` (SantaCantina) su richiesta emersa a metà lavoro.
+- **Correzioni di processo in batch 1**: la Revisione Oppositiva era stata inizialmente dichiarata "non eseguita" senza prima tentarla — corretto rileggendo la skill: tentativo di pool multi-IA (nessuna chiave API/script disponibile nell'ambiente), proposta modalità manuale, **skip approvato esplicitamente dall'utente** (non omissione). Modifiche pushate su un branch feature dell'harness invece che su `main` — corretto: merge fast-forward su `main`, creato `docs/LESSONS_SantaWeb.md` con la regola "menu-admin si modifica direttamente su main". Versione bumpata solo nel commento header, non nel footer visibile in UI — corretto, aggiunta lezione "versione in due punti (header + footer)".
+- **Batch 2 (v.16.02/.03) — Rifiniture Tracciabilità**: tolto il campo Categoria dalla riga prodotto (scadenza sempre auto-calcolata dalla prima categoria attiva, editabile), reparto del carico preselezionato su "Pesce e crostacei", rimossa anche la sezione UI "Categorie e giorni di scadenza" (regola resta in DB, gestione ora solo via query diretta).
+- **Batch 3 (v.18.02) — Import Incassi da Excel**: nuovo pannello "📥 Importa da Excel" nel tab Incassi. Andrea aggiorna giorno per giorno un foglio "Budget" (una scheda per mese, lo stesso da cui derivava il vecchio "LibroCassa") con colonne FOOD/BEVERG (disponibili da ottobre 2026, IVA inclusa — prima erano FT/POS, non un vero split). Si sceglie la scheda mese, si scorpora l'IVA al 10%, anteprima prima di salvare in blocco (`incassi_bulk_upsert`, edge function v9). Schede pre-ottobre 2026 segnalate come non importabili. Parsing xlsx client-side (SheetJS via CDN cdnjs, lazy-load, coerente con jsPDF/html2canvas/Chart.js già caricate così in questo file). **Conflitto di merge**: push concorrente da una sessione Cowork parallela (PR #4, Rubrica professionisti) con collisione sullo stesso numero di versione `v 2026.09.18.01` per coincidenza — risolto con merge, non rebase; nessuna perdita di codice da nessuna delle due parti.
+- **Batch 4 (v.18.03) — Coerenza IVA**: Andrea ha notato che l'inserimento manuale di Incassi non scorporava l'IVA come faceva già l'import. Estratta costante condivisa `FC_ALIQUOTA_IVA` (10%) e funzione `_fcScorporaIva()`, usate ora da entrambi i percorsi. Nessun dato storico da correggere (Andrea non aveva ancora inserito nulla).
+- **Chiarimento senza codice**: verificato che un giorno con incasso zero non genera una riga nell'import ma non falsa comunque il calcolo del Food Cost (`calcolaRange` somma sul range senza dividere per giorni — riga assente = riga a 0, stesso risultato).
+- **Batch 5 (v.21.01) — Inventario, totale cliccabile**: sotto la data di conteggio compare ora "Totale: € X" (live, `oninput`), che avvolge in un `<details>` collassato di default la tabella per reparto — un click la apre.
+- **Richiesta "aggiorna gantt"**: nessun file gantt trovato in questo repo; chiesto all'utente in quale repository si trovasse, nessuna preferenza indicata, tentativo di collegare il repo `santamonicagit` rifiutato dall'utente — richiesta abbandonata, nessuna azione presa.
+- **Altri 2 pull di allineamento** da sessioni Cowork parallele durante la sessione (banner chiusura vacanze + bump minori su `menu.html`/`menu-it.html`/`menu-vini.html`), nessun conflitto con `menu-admin.html` questa volta.
 
-2. **Import Incassi da Excel**: nuovo pannello "📥 Importa da Excel" nel tab Incassi di Food Cost. Andrea aggiorna giorno per giorno un foglio Excel "Budget" (una scheda per mese, lo stesso file da cui derivava il vecchio "LibroCassa") con colonne FOOD/BEVERG (disponibili da ottobre 2026 in poi, IVA inclusa — prima erano FT/POS, non un vero split food/beverage). Il file si carica in pagina, si sceglie la scheda mese, si scorpora l'IVA al 10% (confermato da Andrea) e si mostra un'anteprima prima di salvare in blocco con la nuova azione `incassi_bulk_upsert`. Le schede precedenti a ottobre 2026 vengono segnalate come non importabili invece di essere lette in modo scorretto. Parsing xlsx interamente client-side (libreria SheetJS via CDN cdnjs, lazy-load al primo uso, coerente con jsPDF/html2canvas/Chart.js già caricate così in questo file — non vendorizzata in `/lib/`, convenzione "mai CDN" applicata finora solo alle pagine pubbliche).
+**Nota metodologica — correzione dell'utente**: durante questa sessione erano stati prodotti **due HANDOVER intermedi** (`..._v2026.09.16.01.md` dopo il batch 1-2, `..._v2026.09.18.02.md` dopo il batch 3) come se la sessione si fosse chiusa in quei punti, mentre si trattava sempre della stessa conversazione mai interrotta. L'utente ha corretto: *"quando chiudi la sessione devi considerare tutto dall'inizio della chat"*. Corretto qui: i due HANDOVER intermedi sono stati rimossi dalla KB (storico comunque in Git) e sostituiti da un unico HANDOVER consolidato che copre l'intera sessione dall'inizio, seguendo lo stesso principio già in uso per le sessioni con più batch di release (vedi voce 2026-05-19 sotto, "Sessione lunga: 3 release deploy coordinate... Documenti di continuità adottano NN più alto della giornata"). **Lezione registrata in LESSONS_SantaWeb.md**: produrre HANDOVER/CHANGELOG solo alla chiusura reale della sessione (esplicita o evidente), mai a metà di una conversazione ininterrotta — e quando si chiude, coprire tutto dall'inizio della chat, non solo il delta dall'ultimo checkpoint documentale.
 
-**Nota di processo — sessione parallela**: durante il lavoro è stato rilevato un push concorrente su `main` da una sessione Cowork (PR #4, "Rubrica professionisti: sincro NoShowApp" + altri fix), con conflitto di merge nell'header-comment di `menu-admin.html` (stesso timestamp di versione `v 2026.09.18.01` usato da entrambe le sessioni per coincidenza). Risolto con merge (non rebase): la versione Rubrica resta `v 2026.09.18.01`, questa sessione diventa `v 2026.09.18.02`. Nessuna perdita di codice da nessuna delle due parti.
+**Loop di revisione (GATE PRODUZIONE):** P1+P2 applicati a ogni batch (dettaglio nei commit e nell'handover). **Revisione Oppositiva (3ª passata): mai eseguita in nessuno dei 5 batch — debito cumulato su tutta la sessione**, da chiudere prima di considerare il modulo Food Cost/Tracciabilità definitivo. Nessun test in browser in sessione (ambiente senza interfaccia grafica) — Andrea ha verificato visivamente solo l'Inventario (screenshot in chat).
 
-**Loop di revisione (GATE PRODUZIONE):** P1 (formale: sintassi JS verificata, riferimenti `onclick`/`onchange` risolti) e P2 (sostanziale: revisione della logica di scorporo IVA, gestione righe con incasso zero vs non compilato, mapping mese/anno da nome scheda) applicati dal modello in sessione. **Revisione Oppositiva (3ª passata)**: non tentata in questa sessione (nessuna richiesta esplicita dell'utente di eseguirla) — **debito aperto**, si somma al debito già dichiarato in v2026.09.16.01 per il modulo Tracciabilità. Nessun test in browser eseguito (ambiente senza interfaccia grafica): da verificare sul sito reale, in particolare il flusso di lettura del file Excel e lo scorporo IVA su un mese reale.
+**Nota di disallineamento CHANGELOG (ancora aperta)**: prima del batch 1 la linea di questo CHANGELOG risaliva alla sessione del 2026-05-19. Tra quella sessione e il batch 1 qui sopra, `menu-admin.html` era già stato aggiornato più volte fino a v 2026.09.13.11 (modulo Food Cost/Dashboard/Inventario/Reparti, evidente dall'header del file) senza che le relative sessioni risultino in questo documento — gap di continuità documentale non ricostruito (per non fabbricare cronologia non verificata), da colmare in una sessione dedicata.
 
-**Handover dettagliato:** `HANDOVER_Santamonica_Web_v2026.09.18.02.md`
+**Handover dettagliato:** `HANDOVER_Santamonica_Web_v2026.09.21.02.md`
 
 ---
 
@@ -65,26 +52,6 @@ Su richiesta di Andrea: il contenuto del campo "Richieste particolari" (form di 
 **Loop di revisione (GATE PRODUZIONE):** non applicato — micro-fix di sola visualizzazione (nessun dato nuovo scritto, nessun output pubblico), rientra nell'eccezione "bozze interne/micro-fix non pubblicati" solo in parte: il file è di produzione (deploy Vercel), ma è una modifica a riga singola, puramente additiva e di sola lettura su un campo già esistente in DB. Applicato solo controllo diretto del diff (no bug introdotti: nessuna logica toccata, solo markup + un binding dati già presente nel payload).
 
 **Handover dettagliato:** `HANDOVER_Santamonica_Web_v2026.09.18.01.md`
-
----
-
-### 2026-09-16 — Nuovo modulo Tracciabilità in Food Cost (menu-admin) · campo Settore su fornitori Cantina
-
-**Versioni rilasciate:**
-- `menu-admin.html` v 2026.09.16.01 (Vercel) — nuovo sotto-tab "Tracciabilità" in Food Cost
-- Edge function `foodcost-admin` (Supabase SafeTable) → v8, deploy diretto in sessione (nessun file nel repo)
-- Migrazioni Supabase applicate direttamente in sessione (SafeTable: `fc_categorie_tracciabilita`, `fc_tracciabilita_prodotti`; SantaCantina: colonna `settore` su `fornitori`)
-- `HANDOVER_Santamonica_Web_v2026.09.16.01.md`
-- `CHANGELOG_Santamonica_Web_v2026.09.16.01.md` (questo)
-
-**Sintesi:**
-Su richiesta di Andrea, il carico di una fornitura (soprattutto pesce/crostacei) ora popola in un solo inserimento sia la lista Spese del Food Cost sia uno storico di tracciabilità dedicato, con codice univoco `NN-MMAA` generato lato server (stessa logica della procedura cartacea in uso) e data di scadenza calcolata automaticamente per categoria (es. "Pesce abbattuto" = 30gg, configurabile, sempre modificabile a mano). L'anagrafica fornitori resta quella già in uso nel modulo Cantina (progetto Supabase separato, letta in sola lettura via l'endpoint pubblico esistente `cantina-anagrafiche` — nessuna FK cross-database, il fornitore è salvato come testo libero). Aggiunto anche il campo `settore` a `fornitori` su richiesta dell'utente, utile a distinguere in futuro i fornitori pesce dagli altri.
-
-**Loop di revisione (GATE PRODUZIONE):** P1 (formale) e P2 (sostanziale, 1 bug trovato e corretto) applicati dal modello in sessione. **Revisione Oppositiva (3ª passata, pool multi-IA)**: tentata, non eseguibile in questa sessione (né chiavi API né script del pool disponibili nell'ambiente) — proposta la modalità manuale, **l'utente ha scelto esplicitamente di saltarla per ora** (skip approvato, non omissione). Debito dichiarato e approvato dall'utente, da chiudere prima di considerare il modulo definitivo. Nessun test in browser eseguito in questa sessione (ambiente senza interfaccia grafica): da verificare sul sito reale.
-
-**Nota di disallineamento CHANGELOG:** questo documento riprende la linea dell'ultimo CHANGELOG tracciato (v 2026.05.19.04). Tra quella sessione e questa, `menu-admin.html` è stato aggiornato più volte fino a v 2026.09.13.11 (modulo Food Cost/Dashboard/Inventario/Reparti, evidente dall'header del file) senza che le relative sessioni risultino in questo documento — probabile gap di continuità documentale da colmare in una sessione dedicata, non ricostruito qui per non fabricare cronologia non verificata.
-
-**Handover dettagliato:** `HANDOVER_Santamonica_Web_v2026.09.16.01.md`
 
 ---
 
@@ -395,4 +362,4 @@ Su richiesta di Andrea, il carico di una fornitura (soprattutto pesce/crostacei)
 
 ---
 
-**Fine CHANGELOG · v 2026.09.21.01**
+**Fine CHANGELOG · v 2026.09.21.02**

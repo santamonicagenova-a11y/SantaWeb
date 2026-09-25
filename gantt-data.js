@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.09.25.09",
+  version: "2026.09.25.11",
   updated: "2026-09-25",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -64,10 +64,8 @@ window.SANTAMONICA_GANTT = {
       {t:'Anagrafica cliente: ora overlay diretto SOPRA il gestionale (non più tab/pagina separata) — fix richiesto 2 volte', s:'2026-09-01', st:'done', ms:true},
       {t:'Gestionale — Fase 4 statistiche (on-demand, scope da definire, no piano sala)', s:'2026-09-01', e:'2026-12-31', st:'future'},
       {t:'Fase 2 carta-garanzia (automazione, on-demand) → SUPERSEDED dal wizard /prenota.html', s:'2026-07-15', e:'2026-07-23', st:'done'},
-      {t:'NoShowApp → prodotto multi-cliente da vendere (resta progetto Supabase separato da SafeTable, no merge — decisione 15/8)', s:'2026-08-15', e:'2026-12-31', st:'future'},
       {t:'Merge SantaCantina dentro SafeTable a livello DB (schema unico) per liberare uno slot progetto free Supabase e riattivare NoShowApp (oggi in pausa)', s:'2026-09-16', e:'2026-09-16', st:'done'},
       {t:'Rubrica professionisti: tabella tornata locale su ST (ricreata, separata da NoShowApp) + pulsante import una tantum da NSA', s:'2026-09-01', st:'done', ms:true},
-      {t:'NoShowApp: setup visibilità dati per-cliente (privato/condiviso, deciso da Andrea come titolare), possibile feature a pagamento', s:'2026-09-01', e:'2026-12-31', st:'future'},
       {t:'menu-admin: riordino barra pulsanti in 3 tab con colori (Gestione menù e sito · Prenotazioni e voucher · Setup)', s:'2026-09-02', st:'done', ms:true},
       {t:'menu-admin: spostati in Setup — Reminder prenotazioni (tutto) + Garanzia penale/disdetta+Testi mail (da "Prenotazioni online") + importi buoni/reset contatore (da "Voucher — Gestione")', s:'2026-09-02', st:'done', ms:true},
       {t:'menu-admin: Preview/Traduci e Pubblica/🔑 spostati dalla top-bar (fissa su ogni tab) a sotto "Gestione menù e sito" (unico gruppo dove hanno senso)', s:'2026-09-02', st:'done', ms:true},
@@ -173,6 +171,17 @@ window.SANTAMONICA_GANTT = {
       {t:'★ Obiettivo +20% infrasettimanale (mis. nov–gen)', s:'2026-11-01', e:'2027-01-31', st:'future', ms:true},
       {t:'Filone B — Picco strategico: adv Nord Italia + push concierge/PR alta stagione (se leading positivi)', s:'2027-03-01', e:'2027-08-31', st:'future'},
       {t:'Sponsorizzata Salone Nautico', s:'2026-09-25', st:'prog'},
+    ]},
+    { key:'nsa', name:'NoShowApp (prodotto SaaS)', badge:'progetto-nsa', tasks:[
+      {t:'NoShowApp fasi 1-5 completate (MVP no-show condiviso, accesso a invito, admin, UI + dominio, garanzia carta Stripe in test)', s:'2026-03-20', e:'2026-05-03', st:'done'},
+      {t:'NoShowApp F6 — acquisire 10 beta tester (WhatsApp + demo dal vivo con carta test) e guida onboarding', s:'2026-10-01', st:'up'},
+      {t:'NoShowApp F6 — registrare il marchio NoShowApp (verifica tmview.org, UIBM classe 42, ~200 €)', s:'2026-10-01', st:'up'},
+      {t:'NoShowApp F6 — Stripe live mode + paywall abbonamento 29 €/mese (stop attivazione automatica beta) + notifica admin nuovi iscritti', s:'2026-11-01', e:'2026-12-31', st:'future'},
+      {t:'NoShowApp: setup visibilità dati per-cliente (privato/condiviso, deciso da Andrea come titolare), possibile feature a pagamento', s:'2026-09-01', e:'2026-12-31', st:'future'},
+      {t:'NoShowApp F6 — migrazione da GitHub Pages a Vercel (+ pagina carta custom Stripe Elements)', s:'2026-11-01', e:'2026-12-31', st:'future'},
+      {t:'NoShowApp F6b — Stripe Connect Express: ogni ristoratore collega il proprio IBAN, addebiti diretti', s:'2027-01-01', e:'2027-03-31', st:'future'},
+      {t:'NoShowApp F7 — landing pubblica per ristorante (noshowapp.it/prenota/nome) con garanzia carta', s:'2027-02-01', e:'2027-06-30', st:'future'},
+      {t:'NoShowApp F8 — app native, caller ID, reminder Twilio, statistiche, TheFork/OpenTable, punteggio, FR/ES/DE (dopo 20+ utenti)', s:'2027-06-01', e:'2027-12-31', st:'future'},
     ]},
   ]
 };

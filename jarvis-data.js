@@ -2,12 +2,12 @@
 window.JARVIS_DATA = {
  "generato": "2026-09-25",
  "versione": "2026.09.25",
- "briefing": "**Briefing 25/9/2026** — Jarvis completo: pannello Obsidian, pagina web santamonicagenova.it/jarvis, briefing automatico ogni lunedì alle 9, Biblioteca separata. Orari su Google e TripAdvisor aggiornati. **Aspetta te**: dal 1/10 pubblicare FAQ e foglio QR dal pannello Orari di Apertura; calendario Mare d'Inverno appena pronto. **Segnale**: nessuna sessione SEO negli ultimi 30 giorni.",
+ "briefing": "**Briefing 25/9/2026 (sera)** — Nuovo sotto-progetto **NoShowApp** in Jarvis con le fasi della roadmap v5.5 (beta tester, marchio, Stripe live, Connect, landing, app). App aggiornata alla v 2026.09.25.2 (registrazione e storico condiviso rivisti), verificata online: pronta per i primi beta tester. **Aspetta te**: contattare i colleghi per la beta; marchio UIBM; dal 1/10 pubblicare FAQ e foglio QR dal pannello Orari di Apertura; calendario Mare d'Inverno. **Segnale**: nessuna sessione SEO negli ultimi 30 giorni.",
  "kpi": {
-  "aperte": 39,
+  "aperte": 45,
   "scadute": 8,
   "bloccate": 3,
-  "andrea": 7,
+  "andrea": 9,
   "debiti": 7,
   "chiuse30": 21
  },
@@ -35,11 +35,11 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 83,
+   "tot": 81,
    "done": 70,
    "prog": 0,
    "up": 1,
-   "future": 12,
+   "future": 10,
    "bloccato": 0,
    "scadute": 0,
    "andrea": 2,
@@ -65,6 +65,17 @@ window.JARVIS_DATA = {
    "bloccato": 0,
    "scadute": 0,
    "andrea": 0,
+   "debiti": 0
+  },
+  "NoShowApp": {
+   "tot": 9,
+   "done": 1,
+   "prog": 0,
+   "up": 2,
+   "future": 6,
+   "bloccato": 0,
+   "scadute": 0,
+   "andrea": 2,
    "debiti": 0
   }
  },
@@ -137,6 +148,30 @@ window.JARVIS_DATA = {
    "e": null,
    "own": "Andrea",
    "az": null,
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-25"
+  },
+  {
+   "t": "NoShowApp F6 — acquisire 10 beta tester (WhatsApp + demo dal vivo con carta test) e guida onboarding",
+   "sub": "NoShowApp",
+   "st": "up",
+   "s": "2026-10-01",
+   "e": null,
+   "own": "Andrea",
+   "az": "Contattare i colleghi ristoratori per la demo",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-25"
+  },
+  {
+   "t": "NoShowApp F6 — registrare il marchio NoShowApp (verifica tmview.org, UIBM classe 42, ~200 €)",
+   "sub": "NoShowApp",
+   "st": "up",
+   "s": "2026-10-01",
+   "e": null,
+   "own": "Andrea",
+   "az": "Verifica disponibilità su tmview.org e deposito UIBM",
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
@@ -357,6 +392,11 @@ window.JARVIS_DATA = {
  "sessioni": [
   {
    "d": "2026-09-25",
+   "sub": "NoShowApp",
+   "t": "roadmap in Jarvis e manutenzione app"
+  },
+  {
+   "d": "2026-09-25",
    "sub": "Sito",
    "t": "Attività ricostruita da commit SantaWeb"
   },
@@ -389,11 +429,6 @@ window.JARVIS_DATA = {
    "d": "2026-09-16",
    "sub": "Sito",
    "t": "Attività ricostruita da commit SantaWeb"
-  },
-  {
-   "d": "2026-09-16",
-   "sub": "Sito",
-   "t": "Food Cost — Tracciabilità, import Incassi, Inventario (sessione cloud 16-21 set)"
   }
  ],
  "perWeek": [
@@ -443,7 +478,7 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-21",
-   "n": 3
+   "n": 4
   }
  ],
  "perDay": [
@@ -465,7 +500,7 @@ window.JARVIS_DATA = {
   },
   {
    "g": "ven",
-   "n": 9
+   "n": 10
   },
   {
    "g": "sab",

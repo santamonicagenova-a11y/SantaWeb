@@ -9,7 +9,7 @@ window.JARVIS_DATA = {
   "bloccate": 3,
   "andrea": 7,
   "debiti": 7,
-  "chiuse30": 17
+  "chiuse30": 18
  },
  "subs": {
   "Decennale": {
@@ -24,10 +24,10 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "SEO": {
-   "tot": 37,
+   "tot": 38,
    "done": 29,
    "prog": 0,
-   "up": 0,
+   "up": 1,
    "future": 6,
    "bloccato": 2,
    "scadute": 5,
@@ -36,9 +36,9 @@ window.JARVIS_DATA = {
   },
   "Sito": {
    "tot": 83,
-   "done": 69,
+   "done": 70,
    "prog": 0,
-   "up": 2,
+   "up": 1,
    "future": 12,
    "bloccato": 0,
    "scadute": 0,
@@ -106,18 +106,6 @@ window.JARVIS_DATA = {
    "agg": "2026-09-25"
   },
   {
-   "t": "Aggiornare orari su Google Business Profile e schede esterne (settembre-ottobre)",
-   "sub": "Sito",
-   "st": "up",
-   "s": "2026-08-28",
-   "e": "2026-09-30",
-   "own": "Andrea",
-   "az": "Aggiornare a mano GBP, TheFork, TripAdvisor con gli orari di settembre e la chiusura della domenica sera dal 1/10",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-25"
-  },
-  {
    "t": "Meta budget teaser (set, 300€)",
    "sub": "Marketing",
    "st": "future",
@@ -125,6 +113,18 @@ window.JARVIS_DATA = {
    "e": "2026-09-30",
    "own": "Andrea",
    "az": "Confermare lo stato: nessuna traccia nei documenti dopo luglio (fatto, in corso o da ripianificare?)",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-25"
+  },
+  {
+   "t": "Chiusura cena domenica dal 1/10, senza data di ripristino (contenuti statici — disponibilità già corretta) — task schedulato 27/9",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-10-01",
+   "e": "2026-10-01",
+   "own": "Andrea",
+   "az": "Dal 1/10 aprire menu-admin → Orari di Apertura e pubblicare FAQ/JSON-LD/foglio QR del nuovo periodo (il vecchio task automatico del 27/9 non esiste più); confermare se il pranzo del venerdì da ottobre è voluto",
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
@@ -254,30 +254,6 @@ window.JARVIS_DATA = {
  ],
  "prossime": [
   {
-   "t": "Chiusura cena domenica dal 1/10, senza data di ripristino (contenuti statici — disponibilità già corretta) — task schedulato 27/9",
-   "sub": "Sito",
-   "st": "up",
-   "s": "2026-10-01",
-   "e": "2026-09-27",
-   "own": "Claude",
-   "az": null,
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-25"
-  },
-  {
-   "t": "Aggiornare orari su Google Business Profile e schede esterne (settembre-ottobre)",
-   "sub": "Sito",
-   "st": "up",
-   "s": "2026-08-28",
-   "e": "2026-09-30",
-   "own": "Andrea",
-   "az": "Aggiornare a mano GBP, TheFork, TripAdvisor con gli orari di settembre e la chiusura della domenica sera dal 1/10",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-25"
-  },
-  {
    "t": "Meta budget teaser (set, 300€)",
    "sub": "Marketing",
    "st": "future",
@@ -285,6 +261,30 @@ window.JARVIS_DATA = {
    "e": "2026-09-30",
    "own": "Andrea",
    "az": "Confermare lo stato: nessuna traccia nei documenti dopo luglio (fatto, in corso o da ripianificare?)",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-25"
+  },
+  {
+   "t": "Chiusura cena domenica dal 1/10, senza data di ripristino (contenuti statici — disponibilità già corretta) — task schedulato 27/9",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-10-01",
+   "e": "2026-10-01",
+   "own": "Andrea",
+   "az": "Dal 1/10 aprire menu-admin → Orari di Apertura e pubblicare FAQ/JSON-LD/foglio QR del nuovo periodo (il vecchio task automatico del 27/9 non esiste più); confermare se il pranzo del venerdì da ottobre è voluto",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-25"
+  },
+  {
+   "t": "Verificare aggiornamento orari su Michelin",
+   "sub": "SEO",
+   "st": "up",
+   "s": "2026-09-25",
+   "e": "2026-10-10",
+   "own": "Claude",
+   "az": null,
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"

@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- v 2026.09.25.01 — Food Cost → Tracciabilità: il campo Fornitore diventa un vero lookup
+     (richiesto da Andrea) — da input testo libero + datalist suggerito a <select>
+     popolato dall'anagrafica Cantina (cantina-anagrafiche), che obbliga a scegliere
+     un fornitore esistente invece di poterne digitare uno arbitrario. Salvato comunque
+     come testo libero in fc_tracciabilita_prodotti.fornitore_nome (nessuna FK
+     cross-database tra i due progetti Supabase). -->
 <!-- v 2026.09.21.01 — Food Cost → Inventario: sotto la data di conteggio compare ora un
      "Totale: € X" cliccabile (richiesto da Andrea) al posto della tabella per reparto
      sempre visibile — la tabella (dettaglio, editabile) è dentro un <details> collassato
@@ -1347,8 +1353,7 @@
           </div>
           <div style="flex:1;min-width:14rem;">
             <span class="opt-lbl">Fornitore</span>
-            <input type="text" id="fc-tracc-fornitore" list="fc-tracc-fornitori-list" placeholder="Ragione sociale" />
-            <datalist id="fc-tracc-fornitori-list"></datalist>
+            <select id="fc-tracc-fornitore" style="width:100%;padding:.35rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);"><option value="">— Seleziona fornitore —</option></select>
           </div>
           <div>
             <span class="opt-lbl">Reparto (Spese)</span>
@@ -4124,18 +4129,27 @@ function fcPopolaSelectRepartoTracc() {
   }
 }
 
+// Lookup vero (non più suggerimento libero): il fornitore va scelto dall'anagrafica
+// Cantina esistente, non digitato a mano — richiesto da Andrea per evitare voci
+// duplicate/incoerenti rispetto a quella tabella. Resta comunque un testo libero
+// salvato in fc_tracciabilita_prodotti.fornitore_nome (nessuna FK cross-database
+// tra i due progetti Supabase, vedi commento in testa al file).
 function fcLoadFornitoriCantina() {
+  var sel = document.getElementById('fc-tracc-fornitore');
+  if (!sel) return;
   fetch(CANTINA_ANAGRAFICHE_URL)
     .then(function (r) { return r.json(); })
     .then(function (data) {
-      var list = document.getElementById('fc-tracc-fornitori-list');
-      if (!list || !data || !data.fornitori) return;
+      if (!data || !data.fornitori) return;
+      var attuale = sel.value;
       var fornitori = data.fornitori.slice().sort(function (a, b) { return (a.ragione_sociale || '').localeCompare(b.ragione_sociale || ''); });
-      list.innerHTML = fornitori.filter(function (f) { return f.ragione_sociale; }).map(function (f) {
-        return '<option value="' + _fcEsc(f.ragione_sociale) + '">' + (f.settore ? _fcEsc(f.settore) : '') + '</option>';
+      sel.innerHTML = '<option value="">— Seleziona fornitore —</option>' + fornitori.filter(function (f) { return f.ragione_sociale; }).map(function (f) {
+        var etichetta = f.ragione_sociale + (f.settore ? ' (' + f.settore + ')' : '');
+        return '<option value="' + _fcEsc(f.ragione_sociale) + '">' + _fcEsc(etichetta) + '</option>';
       }).join('');
+      if (attuale) sel.value = attuale;
     })
-    .catch(function () { /* anagrafica fornitori non disponibile: il campo resta testo libero */ });
+    .catch(function () { _fcSetStatus('Anagrafica fornitori Cantina non raggiungibile — riprova più tardi.', true); });
 }
 
 // ---- Categorie/giorni scadenza ----
@@ -6666,7 +6680,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.21.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.25.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

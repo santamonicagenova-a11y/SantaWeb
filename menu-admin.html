@@ -1,4 +1,18 @@
 <!DOCTYPE html>
+<!-- v 2026.09.25.01 — Food Cost, richiesto da Andrea: 1) tab "Reparti" rinominato
+     in "Setup" (solo etichetta del pulsante, id/azioni interni invariati); 2) nuovo
+     pulsante "Apri anagrafica fornitori" nel tab Setup — apre cantina.html in una
+     nuova scheda, direttamente sul tab Anagrafiche → Fornitori (deep-link ?tab=
+     anagrafiche&ent=fornitori, nuovo IIFE aggiunto in cantina.html): l'anagrafica
+     fornitori resta un'unica tabella (cantina_fornitori, Gestionale Cantina), qui
+     si apre solo una scorciatoia, nessuna tabella duplicata; 3) nel tab Setup, nuovo
+     campo "Numerazione tracciabilità" (mese/anno/numero di partenza) per far
+     ripartire il codice NN-MMAA da un valore diverso da 1 in un mese specifico —
+     utile per non sovrapporsi a codici già assegnati a mano su carta prima del
+     passaggio al digitale. Backend: edge function foodcost-admin v10 (nuova tabella
+     fc_tracciabilita_config, nuove azioni tracciabilita_config_get/_set,
+     nextProgressivoMese usa il valore come floor — non fa mai tornare indietro la
+     numerazione se l'uso reale l'ha già superato). -->
 <!-- v 2026.09.21.01 — Food Cost → Inventario: sotto la data di conteggio compare ora un
      "Totale: € X" cliccabile (richiesto da Andrea) al posto della tabella per reparto
      sempre visibile — la tabella (dettaglio, editabile) è dentro un <details> collassato
@@ -1284,12 +1298,35 @@
         <button class="btn btn-load" id="fc-tab-btn-vendite" onclick="fcSetTab('vendite')">Vendite</button>
         <button class="btn btn-load" id="fc-tab-btn-inventario" onclick="fcSetTab('inventario')">Inventario</button>
         <button class="btn btn-load" id="fc-tab-btn-costi" onclick="fcSetTab('costi')">Costo piatti</button>
-        <button class="btn btn-load" id="fc-tab-btn-reparti" onclick="fcSetTab('reparti')">Reparti</button>
+        <button class="btn btn-load" id="fc-tab-btn-reparti" onclick="fcSetTab('reparti')">Setup</button>
       </div>
 
       <hr style="border:none;border-top:1px solid var(--rule);margin:0 0 1.2rem;">
 
       <div id="fc-view-reparti" style="display:none;">
+        <div class="sub" style="margin-top:0;">Fornitori</div>
+        <p style="font-size:.78rem;color:var(--stone);margin-bottom:.8rem;">L'anagrafica fornitori è unica per tutto il ristorante e vive nel Gestionale Cantina. Apri, modifica o aggiungi un fornitore da lì — qui in Tracciabilità viene solo suggerito per nome.</p>
+        <button class="btn" style="margin-bottom:1.4rem;" onclick="window.open('cantina.html?tab=anagrafiche&ent=fornitori','_blank')">📇 Apri anagrafica fornitori (Gestionale Cantina)</button>
+
+        <div class="sub">Numerazione tracciabilità</div>
+        <p style="font-size:.78rem;color:var(--stone);margin-bottom:.8rem;">Il codice di rintracciabilità (NN-MMAA) riparte da 1 a ogni nuovo mese. Per farlo continuare da un altro valore in un mese specifico — es. per non sovrapporsi ai codici già assegnati a mano su carta — imposta qui mese, anno e numero di partenza. Un valore già superato dall'uso reale non fa mai tornare indietro la numerazione.</p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:.5rem;">
+          <div>
+            <span class="opt-lbl">Mese</span>
+            <input type="number" id="fc-tracc-cfg-mese" min="1" max="12" style="width:5rem;" />
+          </div>
+          <div>
+            <span class="opt-lbl">Anno</span>
+            <input type="number" id="fc-tracc-cfg-anno" style="width:6.5rem;" />
+          </div>
+          <div>
+            <span class="opt-lbl">Parti da</span>
+            <input type="number" id="fc-tracc-cfg-numero" min="1" style="width:6rem;" />
+          </div>
+          <button class="btn btn-publish" onclick="fcSalvaTraccConfig()">💾 Salva</button>
+        </div>
+        <div id="fc-tracc-cfg-status" style="font-size:.75rem;color:var(--stone);margin-bottom:1.4rem;"></div>
+
         <div class="sub" style="margin-top:0;">Nuovo reparto</div>
         <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1.2rem;">
           <div style="flex:1;min-width:14rem;">
@@ -3900,7 +3937,7 @@ function fcSetTab(t) {
 }
 
 function fcLoadTab(t) {
-  if (t === 'reparti') fcLoadReparti();
+  if (t === 'reparti') { fcLoadReparti(); fcLoadTraccConfig(); }
   else if (t === 'spese') fcLoadSpese();
   else if (t === 'tracciabilita') fcTraccInizializza();
   else if (t === 'incassi') fcLoadIncassi();
@@ -3931,6 +3968,41 @@ function fcAutoCaricaUltimoPeriodo() {
       fcLoadDashboard();
     })
     .catch(function () { fcLoadDashboard(); });
+}
+
+// ---- Setup: numerazione tracciabilità (v 2026.09.25.01) ----
+
+function fcLoadTraccConfig() {
+  _fcFetch({ action: 'tracciabilita_config_get' })
+    .then(function (res) {
+      if (!_fcOk(res)) return;
+      var cfg = res.body.config || {};
+      var oggi = new Date();
+      document.getElementById('fc-tracc-cfg-mese').value = cfg.mese || (oggi.getMonth() + 1);
+      document.getElementById('fc-tracc-cfg-anno').value = cfg.anno || oggi.getFullYear();
+      document.getElementById('fc-tracc-cfg-numero').value = cfg.numero_iniziale || '';
+    })
+    .catch(function () {});
+}
+
+function fcSalvaTraccConfig() {
+  var mese = parseInt(document.getElementById('fc-tracc-cfg-mese').value, 10);
+  var anno = parseInt(document.getElementById('fc-tracc-cfg-anno').value, 10);
+  var numero = parseInt(document.getElementById('fc-tracc-cfg-numero').value, 10);
+  var stato = document.getElementById('fc-tracc-cfg-status');
+  if (!mese || mese < 1 || mese > 12 || !anno || !numero || numero <= 0) {
+    stato.textContent = 'Mese, anno e numero di partenza sono obbligatori.';
+    stato.style.color = 'var(--rust)';
+    return;
+  }
+  stato.textContent = 'Salvataggio…'; stato.style.color = 'var(--stone)';
+  _fcFetch({ action: 'tracciabilita_config_set', mese: mese, anno: anno, numero_iniziale: numero })
+    .then(function (res) {
+      if (!_fcOk(res)) { stato.textContent = _fcErrMsg(res); stato.style.color = 'var(--rust)'; return; }
+      stato.textContent = 'Salvato: da ' + String(mese).padStart(2, '0') + '/' + anno + ' i codici tracciabilità partiranno almeno da ' + numero + '.';
+      stato.style.color = 'var(--stone)';
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
 }
 
 // ---- Reparti ----
@@ -6666,7 +6738,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.21.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.25.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

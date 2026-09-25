@@ -849,6 +849,25 @@ document.querySelectorAll('.tabs > .tab').forEach(function (t) {
   });
 });
 
+// Deep-link: apertura diretta su una tab/anagrafica specifica da query string
+// (?tab=anagrafiche&ent=fornitori) — usato dal pulsante "Apri anagrafica fornitori"
+// nel tab Setup di Food Cost (menu-admin.html, v 2026.09.25.01), che apre questa
+// pagina in una nuova scheda già sulla tab e sulla tabella giuste, invece di
+// lasciare l'utente sul default (Catalogo) a dover navigare a mano.
+(function () {
+  var qs = new URLSearchParams(location.search);
+  var tab = qs.get('tab');
+  if (!tab) return;
+  var tEl = document.querySelector('.tabs > .tab[data-tab="' + tab + '"]');
+  if (!tEl) return;
+  tEl.click();
+  var ent = qs.get('ent');
+  if (tab === 'anagrafiche' && ent) {
+    var sel = document.getElementById('an-tabella');
+    if (sel && sel.querySelector('option[value="' + ent + '"]')) sel.value = ent;
+  }
+})();
+
 // ================================================================
 // CATALOGO
 // ================================================================

@@ -2,7 +2,7 @@
 window.JARVIS_DATA = {
  "generato": "2026-09-25",
  "versione": "2026.09.25",
- "briefing": "**Briefing 25/9/2026** — Jarvis completo: pannello Obsidian, pagina [santamonicagenova.it/jarvis](https://santamonicagenova.it/jarvis), briefing automatico ogni lunedì alle 9, Biblioteca separata. Orari su Google e TripAdvisor aggiornati. **Aspetta te**: dal 1/10 pubblicare FAQ e foglio QR dal pannello Orari di Apertura; calendario Mare d'Inverno appena pronto. **Segnale**: nessuna sessione SEO negli ultimi 30 giorni.",
+ "briefing": "**Briefing 25/9/2026** — Jarvis completo: pannello Obsidian, pagina web santamonicagenova.it/jarvis, briefing automatico ogni lunedì alle 9, Biblioteca separata. Orari su Google e TripAdvisor aggiornati. **Aspetta te**: dal 1/10 pubblicare FAQ e foglio QR dal pannello Orari di Apertura; calendario Mare d'Inverno appena pronto. **Segnale**: nessuna sessione SEO negli ultimi 30 giorni.",
  "kpi": {
   "aperte": 39,
   "scadute": 8,

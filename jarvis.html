@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<!-- JARVIS_Pannello.html · v 2026.09.25.01 · renderer del pannello Jarvis (i dati stanno in jarvis-data.js,
+     generato da `node Jarvis/_tools/jarvis.mjs build-pannello`). Pubblicato come jarvis.html (noindex). -->
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Jarvis · Santamonica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f4efe6; --card:#fffdf9; --line:#e4dccd; --ink:#1c2b2e; --ink-2:#51605f; --ink-3:#7d8583;
+  --accent:#8a4b2e; --bar:#51605f; --bar-soft:#d9d1c2;
+  --crit:#b3261e; --crit-bg:#fbe9e7; --warn:#9a5b12; --warn-bg:#fbf1e1; --ok:#2f6b4f; --ok-bg:#e8f2ec;
+  --c-Sito:#1f8a4c; --c-SEO:#1d6fb8; --c-Marketing:#c0563a; --c-Decennale:#b8860b; --c-Trasversale:#77736b;
+  --shadow:0 1px 2px rgba(28,43,46,.06),0 6px 20px rgba(28,43,46,.05);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#15130f; --card:#1c1a17; --line:#302c26; --ink:#f2ede4; --ink-2:#c4bdb0; --ink-3:#958e82;
+    --accent:#d99a72; --bar:#c4bdb0; --bar-soft:#3a352e;
+    --crit:#f08a80; --crit-bg:#3a1e1b; --warn:#e2a95a; --warn-bg:#3a2c18; --ok:#7cc4a0; --ok-bg:#1d3128;
+    --c-Sito:#2f9a5e; --c-SEO:#4a8fd4; --c-Marketing:#c9623f; --c-Decennale:#b0820f; --c-Trasversale:#8a877f;
+    --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#15130f; --card:#1c1a17; --line:#302c26; --ink:#f2ede4; --ink-2:#c4bdb0; --ink-3:#958e82;
+  --accent:#d99a72; --bar:#c4bdb0; --bar-soft:#3a352e;
+  --crit:#f08a80; --crit-bg:#3a1e1b; --warn:#e2a95a; --warn-bg:#3a2c18; --ok:#7cc4a0; --ok-bg:#1d3128;
+  --c-Sito:#2f9a5e; --c-SEO:#4a8fd4; --c-Marketing:#c9623f; --c-Decennale:#b0820f; --c-Trasversale:#8a877f;
+  --shadow:none;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Jost,system-ui,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 16px 48px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+h1{font:600 2.3rem/1.05 "Cormorant Garamond",serif;margin:0;letter-spacing:.01em}
+h1 small{display:block;font:500 .78rem Jost,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.meta{color:var(--ink-3);font-size:.85rem;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.meta a{color:var(--ink-2)}
+button.theme{font:inherit;font-size:.8rem;background:var(--card);color:var(--ink-2);border:1px solid var(--line);border-radius:999px;padding:4px 12px;cursor:pointer}
+.briefing{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:14px 18px;margin-bottom:18px;box-shadow:var(--shadow);color:var(--ink-2)}
+.briefing strong{color:var(--ink)}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow)}
+.kpi .n{font:600 2.2rem/1 "Cormorant Garamond",serif}
+.kpi .l{color:var(--ink-2);font-size:.85rem;margin-top:6px}
+.kpi.crit{background:var(--crit-bg);border-color:transparent}.kpi.crit .n,.kpi.crit .l{color:var(--crit)}
+.kpi.warn{background:var(--warn-bg);border-color:transparent}.kpi.warn .n,.kpi.warn .l{color:var(--warn)}
+.kpi.ok{background:var(--ok-bg);border-color:transparent}.kpi.ok .n,.kpi.ok .l{color:var(--ok)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow);min-width:0}
+.card h2{font:600 1.35rem/1.2 "Cormorant Garamond",serif;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.card h2 .c{font:500 .78rem Jost,sans-serif;color:var(--ink-3);margin-left:auto}
+ul.list{list-style:none;margin:0;padding:0}
+ul.list li{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;padding:9px 0;border-top:1px solid var(--line)}
+ul.list li:first-child{border-top:0}
+.dot{width:9px;height:9px;border-radius:50%;margin-top:7px;background:var(--sub)}
+.t{font-weight:500;overflow-wrap:anywhere}
+.sub{color:var(--ink-3);font-size:.8rem}
+.az{color:var(--ink-2);font-size:.85rem;margin-top:2px}
+.date{font-size:.8rem;color:var(--ink-2);white-space:nowrap;padding-top:2px}
+.date.late{color:var(--crit);font-weight:600}
+.empty{color:var(--ink-3);font-style:italic;padding:6px 0}
+.subs{display:flex;flex-direction:column;gap:14px}
+.subrow .top{display:flex;align-items:baseline;gap:8px}
+.subrow .name{font-weight:600}
+.subrow .pct{margin-left:auto;font-size:.85rem;color:var(--ink-2)}
+.track{height:10px;background:var(--bar-soft);border-radius:999px;margin:6px 0 5px;overflow:hidden}
+.fill{height:100%;background:var(--sub);border-radius:999px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:.75rem;padding:1px 8px;border-radius:999px;background:var(--bar-soft);color:var(--ink-2)}
+.chip.crit{background:var(--crit-bg);color:var(--crit)}.chip.warn{background:var(--warn-bg);color:var(--warn)}
+.timeline{position:relative;height:46px;margin:4px 6px 14px}
+.timeline .axis{position:absolute;left:0;right:0;top:22px;height:2px;background:var(--line)}
+.timeline .tick{position:absolute;top:30px;font-size:.7rem;color:var(--ink-3);transform:translateX(-50%)}
+.timeline .pt{position:absolute;top:16px;width:14px;height:14px;border-radius:50%;background:var(--sub);border:2px solid var(--card);transform:translateX(-50%);cursor:default}
+.chart{display:flex;align-items:flex-end;gap:6px;height:150px;padding:6px 0 0;border-bottom:1px solid var(--line)}
+.chart .col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative}
+.chart .b{width:70%;max-width:34px;background:var(--bar);border-radius:4px 4px 0 0;min-height:2px}
+.chart .v{font-size:.72rem;color:var(--ink-2);margin-bottom:3px}
+.labels{display:flex;gap:6px;margin-top:5px}.labels span{flex:1;text-align:center;font-size:.7rem;color:var(--ink-3)}
+.note{font-size:.8rem;color:var(--ink-3);margin-top:8px}
+#tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:.8rem;padding:6px 9px;border-radius:8px;max-width:280px;opacity:0;transition:opacity .1s;z-index:10}
+footer{color:var(--ink-3);font-size:.8rem;text-align:center;margin-top:10px}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:1fr}}
+@media (max-width:480px){.kpis{grid-template-columns:repeat(2,1fr)}h1{font-size:1.9rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><small>Jarvis · pannello di controllo</small>Santamonica</h1>
+    <div class="meta"><span id="gen"></span><a href="/gantt">Gantt →</a><button class="theme" id="themeBtn" type="button">Tema</button></div>
+  </header>
+  <div class="briefing" id="briefing"></div>
+  <section class="kpis" id="kpis" aria-label="Numeri principali"></section>
+  <div class="grid">
+    <section class="card"><h2>⏳ Aspetta te <span class="c" id="c-andrea"></span></h2><ul class="list" id="andrea"></ul></section>
+    <section class="card"><h2>📊 Sotto-progetti <span class="c">attività chiuse sul totale</span></h2><div class="subs" id="subs"></div></section>
+  </div>
+  <div class="grid">
+    <section class="card"><h2>⚠️ Scadute <span class="c" id="c-scadute"></span></h2><ul class="list" id="scadute"></ul></section>
+    <section class="card"><h2>📅 Prossimi 30 giorni</h2><div class="timeline" id="timeline" aria-hidden="true"></div><ul class="list" id="prossime"></ul></section>
+  </div>
+  <div class="grid">
+    <section class="card"><h2>🔥 In corso</h2><ul class="list" id="incorso"></ul></section>
+    <section class="card"><h2>⛔ Bloccate</h2><ul class="list" id="bloccate"></ul></section>
+  </div>
+  <div class="grid">
+    <section class="card"><h2>🗓 Sessioni di lavoro <span class="c">per settimana, ultime 12</span></h2><div class="chart" id="weeks"></div><div class="labels" id="weeksL"></div></section>
+    <section class="card"><h2>📈 Giorni in cui si lavora <span class="c">ultimi 90 giorni</span></h2><div class="chart" id="days"></div><div class="labels" id="daysL"></div></section>
+  </div>
+  <section class="card"><h2>🗂 Ultime sessioni</h2><ul class="list" id="sessioni"></ul></section>
+  <footer id="foot"></footer>
+</div>
+<div id="tip" role="tooltip"></div>
+<script src="jarvis-data.js"></script>
+<script>
+(function(){
+  var D = window.JARVIS_DATA; if(!D){document.body.textContent='Dati non disponibili (jarvis-data.js mancante).';return;}
+  var $ = function(id){return document.getElementById(id);};
+  var esc = function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
+  var md = function(s){return esc(s).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');};
+  var MESI=['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+  var fd = function(d){if(!d)return '';var p=d.split('-');return (+p[2])+' '+MESI[+p[1]-1];};
+  var subVar = function(s){return 'var(--c-'+(['Sito','SEO','Marketing','Decennale','Trasversale'].indexOf(s)>=0?s:'Trasversale')+')';};
+  var T = D.generato;
+
+  // tema
+  var root=document.documentElement;
+  try{var saved=localStorage.getItem('jarvisTheme'); if(saved) root.setAttribute('data-theme',saved);}catch(e){}
+  $('themeBtn').onclick=function(){var cur=root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');var n=cur==='dark'?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem('jarvisTheme',n);}catch(e){}};
+
+  $('gen').textContent='Aggiornato il '+fd(T)+' '+T.slice(0,4);
+  $('briefing').innerHTML=D.briefing?md(D.briefing):'Nessun briefing.';
+
+  var K=D.kpi;
+  var tiles=[['Aperte',K.aperte,''],['Aspettano te',K.andrea,K.andrea?'warn':''],['Scadute',K.scadute,K.scadute?'crit':''],['Bloccate',K.bloccate,K.bloccate?'warn':''],['Debiti aperti',K.debiti,''],['Chiuse negli ultimi 30 gg',K.chiuse30,'ok']];
+  $('kpis').innerHTML=tiles.map(function(t){return '<div class="kpi '+t[2]+'"><div class="n">'+t[1]+'</div><div class="l">'+t[0]+'</div></div>';}).join('');
+
+  function item(t,opt){
+    opt=opt||{};
+    var late=t.e&&t.e<T;
+    var right=t.e?'<div class="date'+(late?' late':'')+'">'+(late?'⚠ ':'')+fd(t.e)+'</div>':'<div class="date"></div>';
+    var extra=opt.az&&t.az?'<div class="az">'+esc(t.az)+'</div>':(opt.bl&&t.bl?'<div class="az">Bloccata da: '+esc(t.bl)+'</div>':'');
+    return '<li style="--sub:'+subVar(t.sub)+'"><span class="dot" aria-hidden="true"></span><div><div class="t">'+esc(t.t)+'</div><div class="sub">'+esc(t.sub)+(t.deb?' · debito':'')+'</div>'+extra+'</div>'+right+'</li>';
+  }
+  function list(id,arr,opt,emptyTxt){$(id).innerHTML=arr.length?arr.map(function(t){return item(t,opt);}).join(''):'<li class="empty" style="display:block">'+emptyTxt+'</li>';}
+  list('andrea',D.andrea,{az:true},'Niente in sospeso per te.'); $('c-andrea').textContent=D.andrea.length+' attività';
+  list('scadute',D.scadute,{},'Nessuna attività scaduta.'); $('c-scadute').textContent=D.scadute.length+' attività';
+  list('prossime',D.prossime,{},'Nessuna scadenza nei prossimi 30 giorni.');
+  list('incorso',D.inCorso,{},'Nessuna attività in corso.');
+  list('bloccate',D.bloccate,{bl:true},'Nessuna attività bloccata.');
+
+  var order=['Sito','SEO','Marketing','Decennale','Trasversale'];
+  var names=Object.keys(D.subs).sort(function(a,b){return order.indexOf(a)-order.indexOf(b);});
+  $('subs').innerHTML=names.map(function(n){
+    var s=D.subs[n], pct=s.tot?Math.round(s.done/s.tot*100):0, aperte=s.tot-s.done;
+    var pl=function(n,a,b){return n+' '+(n===1?a:b);};
+    var chips=['<span class="chip">'+pl(aperte,'aperta','aperte')+'</span>'];
+    if(s.prog) chips.push('<span class="chip">'+s.prog+' in corso</span>');
+    if(s.scadute) chips.push('<span class="chip crit">⚠ '+pl(s.scadute,'scaduta','scadute')+'</span>');
+    if(s.bloccato) chips.push('<span class="chip warn">⛔ '+pl(s.bloccato,'bloccata','bloccate')+'</span>');
+    if(s.andrea) chips.push('<span class="chip warn">'+s.andrea+' per te</span>');
+    return '<div class="subrow" style="--sub:'+subVar(n)+'"><div class="top"><span class="dot" style="margin-top:0" aria-hidden="true"></span><span class="name">'+esc(n)+'</span><span class="pct">'+s.done+' / '+s.tot+' · '+pct+'%</span></div><div class="track" role="img" aria-label="'+esc(n)+': '+pct+'% chiuse"><div class="fill" style="width:'+pct+'%"></div></div><div class="chips">'+chips.join('')+'</div></div>';
+  }).join('');
+
+  // tooltip
+  var tip=$('tip');
+  function bindTip(el,txt){el.addEventListener('mousemove',function(e){tip.textContent=txt;tip.style.opacity=1;tip.style.left=Math.min(e.clientX+12,innerWidth-290)+'px';tip.style.top=(e.clientY+14)+'px';});el.addEventListener('mouseleave',function(){tip.style.opacity=0;});}
+
+  // timeline 30 giorni
+  var tl=$('timeline'), day=864e5, t0=new Date(T).getTime();
+  var h='<div class="axis"></div>';
+  [0,7,14,21,30].forEach(function(k){var d=new Date(t0+k*day).toISOString().slice(0,10);h+='<span class="tick" style="left:'+(k/30*100)+'%">'+(k?fd(d):'oggi')+'</span>';});
+  tl.innerHTML=h;
+  D.prossime.forEach(function(t){var k=Math.round((new Date(t.e).getTime()-t0)/day);var p=document.createElement('span');p.className='pt';p.style.left=(k/30*100)+'%';p.style.setProperty('--sub',subVar(t.sub));bindTip(p,fd(t.e)+' · '+t.sub+' — '+t.t);tl.appendChild(p);});
+
+  function bars(id,lid,data,lab,val,tipf){
+    var max=Math.max(1,Math.max.apply(null,data.map(val)));
+    var c=$(id), l=$(lid); c.innerHTML=''; l.innerHTML='';
+    data.forEach(function(d){
+      var col=document.createElement('div');col.className='col';
+      col.innerHTML='<span class="v">'+(val(d)||'')+'</span><div class="b" style="height:'+(val(d)/max*100)+'%"></div>';
+      col.setAttribute('role','img');col.setAttribute('aria-label',tipf(d));bindTip(col,tipf(d));c.appendChild(col);
+      var s=document.createElement('span');s.textContent=lab(d);l.appendChild(s);
+    });
+  }
+  bars('weeks','weeksL',D.perWeek,function(d){var p=d.w.split('-');return (+p[2])+'/'+(+p[1]);},function(d){return d.n;},function(d){return 'Settimana del '+fd(d.w)+': '+d.n+' sessioni';});
+  bars('days','daysL',D.perDay,function(d){return d.g;},function(d){return d.n;},function(d){return d.g+': '+d.n+' sessioni';});
+
+  $('sessioni').innerHTML=D.sessioni.map(function(s){return '<li style="--sub:'+subVar(s.sub)+'"><span class="dot" aria-hidden="true"></span><div><div class="t">'+esc(s.t)+'</div><div class="sub">'+esc(s.sub)+'</div></div><div class="date">'+fd(s.d)+'</div></li>';}).join('');
+  $('foot').textContent='Generato da Jarvis dalle note Obsidian · dati del '+fd(T)+' '+T.slice(0,4)+' · pagina interna, non indicizzata';
+})();
+</script>
+</body>
+</html>

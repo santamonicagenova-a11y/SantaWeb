@@ -1,9 +1,27 @@
 # CHANGELOG — Santamonica Web
 
-**Versione documento:** v 2026.09.21.02
-**Aggiornato:** 2026-09-21
+**Versione documento:** v 2026.09.25.01
+**Aggiornato:** 2026-09-25
 
 > Voci ordinate dal più recente al più vecchio. Appendere in cima a ogni sessione.
+
+---
+
+### 2026-09-25 — Tracciabilità: campo Fornitore diventa lookup + merge con sessione Cowork parallela (Setup, numerazione)
+
+**Versioni rilasciate:**
+- `menu-admin.html` v 2026.09.25.02 (Vercel)
+- `HANDOVER_Santamonica_Web_v2026.09.25.01.md`
+- `CHANGELOG_Santamonica_Web_v2026.09.25.01.md` (questo)
+
+**Sintesi:**
+Sessione breve, in continuazione della chiusura v2026.09.21.02. Un'unica richiesta di Andrea: *"il campo fornitori deve fare lookup nella tabella fornitori della cantina"*. Il campo Fornitore nel form "Nuovo carico" di Tracciabilità era un `<input>` testo libero con suggerimenti via `<datalist>` (popolata da `cantina-anagrafiche`) — un fornitore poteva comunque essere digitato a mano, anche se non esistente in anagrafica. Convertito in un `<select>` che obbliga a scegliere un fornitore già presente nell'anagrafica Cantina. Il valore resta salvato come testo libero in `fc_tracciabilita_prodotti.fornitore_nome` (nessuna FK cross-database tra i due progetti Supabase, decisione già presa in v2026.09.16.01).
+
+**Conflitto di merge con sessione Cowork parallela**: durante il push è stato rilevato che nel frattempo una sessione Cowork aveva lavorato sulla stessa area di Tracciabilità, con una decisione opposta sul campo Fornitore — lasciarlo "solo suggerito per nome" e spostare la gestione vera dell'anagrafica su un pulsante "Apri anagrafica fornitori" che apre `cantina.html` in una nuova scheda (deep-link `?tab=anagrafiche&ent=fornitori`). Quella sessione ha anche rinominato il tab "Reparti" in "Setup" e aggiunto un nuovo campo "Numerazione tracciabilità" (mese/anno/numero di partenza, per far ripartire il codice `NN-MMAA` da un valore diverso da 1 quando serve non sovrapporsi a codici già assegnati a mano) — backend: edge function `foodcost-admin` → **v10** (nuova tabella `fc_tracciabilita_config`, azioni `tracciabilita_config_get/_set`), non toccata da questa sessione. Risolto il conflitto con un **merge** (non rebase): entrambe le modifiche convivono, con una nota nel commento header che spiega la divergenza di design (la richiesta esplicita di Andrea di oggi, arrivata dopo, prevale sul comportamento "solo suggerito" scelto in precedenza) — il pulsante "Apri anagrafica fornitori" resta comunque utile per aggiungere un fornitore mancante prima di trovarlo nel menu a tendina.
+
+**Loop di revisione (GATE PRODUZIONE):** P1 (formale: sintassi JS verificata dopo la modifica e dopo il merge, nessun marker di conflitto residuo, riferimento al vecchio `fc-tracc-fornitori-list` rimosso ovunque). P2 (sostanziale) leggero: cambio isolato a un elemento di form, nessuna nuova logica di calcolo. **Revisione Oppositiva (3ª passata)**: non eseguita — si somma al debito già dichiarato per l'intero modulo Food Cost/Tracciabilità (vedi voce precedente, 5 batch 2026-09-16→21). Nessun test in browser in questa sessione.
+
+**Handover dettagliato:** `HANDOVER_Santamonica_Web_v2026.09.25.01.md`
 
 ---
 
@@ -260,13 +278,15 @@ Su richiesta di Andrea: il contenuto del campo "Richieste particolari" (form di 
 
 ---
 
-## STATO PROGETTO CONSOLIDATO (post 2026-09-21)
+## STATO PROGETTO CONSOLIDATO (post 2026-09-25)
 
 ### File deploy correnti
 
 | File | Versione | Hosting |
 |---|---|---|
-| **`menu-admin.html`** | **v 2026.09.21.01** ⭐ | Vercel |
+| **`menu-admin.html`** | **v 2026.09.25.02** ⭐ | Vercel |
+| `cantina.html` | bump, sessione Cowork parallela (deep-link anagrafiche fornitori, non dettagliato qui) | Vercel |
+| `gantt.html`, `gantt-data.js` | NUOVI, aggiunti dall'utente direttamente nel repo (non da una sessione Claude) | Vercel |
 | `clienti.html` | v 2026.09.18.01 (sessione Cowork parallela) | Vercel |
 | `menu.html`, `menu-it.html`, `menu-vini.html` | bump minori, sessione Cowork parallela (non dettagliati qui) | GH Pages + CF Pages |
 | `img/sito/vacanzina-chiusura-2026-09.jpg` | NUOVO, sessione Cowork parallela | GH Pages + CF Pages |
@@ -295,7 +315,7 @@ Su richiesta di Andrea: il contenuto del campo "Richieste particolari" (form di 
 
 | Progetto | Ref | Uso |
 |---|---|---|
-| SafeTable | `xbksultfskvzgncncada` | Food Cost (tabelle `fc_*`), edge function `foodcost-admin` (v9) |
+| SafeTable | `xbksultfskvzgncncada` | Food Cost (tabelle `fc_*`), edge function `foodcost-admin` (v10, deploy da sessione Cowork parallela — non verificato in dettaglio da questa sessione) |
 | SantaCantina | `wpsghmmvlwkyqiholfzx` | Anagrafica Cantina/vini (tabelle lookup incl. `fornitori`), edge functions `cantina-*` |
 
 ### Sistema auth/credenziali
@@ -362,4 +382,4 @@ Su richiesta di Andrea: il contenuto del campo "Richieste particolari" (form di 
 
 ---
 
-**Fine CHANGELOG · v 2026.09.21.02**
+**Fine CHANGELOG · v 2026.09.25.01**

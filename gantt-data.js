@@ -1,40 +1,27 @@
 /* ============================================================================
    gantt-data.js · DATI del Gantt Santamonica  (renderer: GANTT_Santamonica.html)
    ----------------------------------------------------------------------------
-   QUESTO è l'unico file da toccare per aggiornare il Gantt.
-   L'HTML non si modifica più: legge da qui.
-
-   COME AGGIORNARE (a fine sessione, dentro il rituale handover):
-   1) Cambia lo stato di un task:  st: 'done' | 'prog' | 'up' | 'future'
-        done   = fatto (barra piena)
-        prog   = in corso (barra a righe)
-        up     = prossimo / aperto (contorno pieno)
-        future = futuro pianificato (contorno tratteggiato)
-   2) Aggiungi un task: copia una riga { ... } nella sezione giusta.
-        s = inizio 'AAAA-MM-GG'  ·  e = fine (ometti e per un evento singolo)
-        ms: true  → milestone (rombo, niente barra)
-   3) Sposta 'today' alla data odierna.
-   4) Bump 'version' (v AAAA.MM.GG.NN) + aggiorna 'updated'.
-   Nota: nome file SENZA versione (come i file di deploy); la versione vive qui dentro.
+   FILE GENERATO — non modificare a mano.
+   Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.09.21.02",
-  updated: "2026-09-21",
+  version: "2026.09.25.08",
+  updated: "2026-09-25",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
-  today:     "2026-09-21",
+  today:     "2026-09-25",
 
   sections: [
     { key:'dec', name:'★ Decennale — serata 1 luglio 2026', badge:'evento trasversale', tasks:[
       {t:'Concept decennale chiuso', s:'2026-05-28', st:'done', ms:true},
-      {t:'Funnel comunicazione W1–W5', s:'2026-05-27', e:'2026-07-01', st:'prog'},
+      {t:'Funnel comunicazione W1–W5', s:'2026-05-27', e:'2026-07-01', st:'done'},
       {t:'Sessione foto (genero)', s:'2026-06-01', e:'2026-06-07', st:'done'},
       {t:'Bloccanti chiusi (musicista · Muratori · brief Nicolò · invitati)', s:'2026-06-02', e:'2026-06-05', st:'done'},
-      {t:'Teaser organici (~2/sett, crescendo)', s:'2026-06-04', e:'2026-07-01', st:'prog'},
+      {t:'Teaser organici (~2/sett, crescendo)', s:'2026-06-04', e:'2026-07-01', st:'done'},
       {t:'Gate boost decennale: creatività + copy + landing allineati', s:'2026-06-04', e:'2026-06-16', st:'done'},
-      {t:'Apertura prenotazioni pubbliche', s:'2026-06-12', e:'2026-06-30', st:'prog'},
+      {t:'Apertura prenotazioni pubbliche', s:'2026-06-12', e:'2026-06-30', st:'done'},
       {t:'Reel 2016→2026: brief + scaletta foto per Monica', s:'2026-06-16', st:'done', ms:true},
-      {t:'Boost Reel decennale LIVE (via advertiser "Ristorante Santamonica", end date)', s:'2026-06-16', e:'2026-06-28', st:'prog'},
+      {t:'Boost Reel decennale LIVE (via advertiser "Ristorante Santamonica", end date)', s:'2026-06-16', e:'2026-06-28', st:'done'},
       {t:'Account Meta 264 SBLOCCATO (verificato dal vivo 29/6) — config business "1" resta aperta', s:'2026-06-16', e:'2026-06-29', st:'done', ms:true},
       {t:'SERATA DECENNALE (56/60 ospiti, 10 dal canale pubblico)', s:'2026-07-01', st:'done', ms:true},
     ]},
@@ -45,7 +32,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Prenotazioni: blocco / aperture / singoli orari', s:'2026-05-30', st:'done', ms:true},
       {t:'Fix mobile r-mail.html', s:'2026-05-30', e:'2026-06-01', st:'done'},
       {t:'Cambio orari (dal 7/6)', s:'2026-06-05', e:'2026-06-07', st:'done'},
-      {t:'Orario estivo (cena 20:00–22:30, mar–dom · pranzo chiuso · 21/6→31/8; ripristino da 1/9)', s:'2026-06-21', e:'2026-08-31', st:'prog'},
+      {t:'Orario estivo (cena 20:00–22:30, mar–dom · pranzo chiuso · 21/6→31/8; ripristino da 1/9)', s:'2026-06-21', e:'2026-08-31', st:'done'},
       {t:'menu-admin CSP + QR + controlli stampa', s:'2026-06-10', st:'done'},
       {t:'Sicurezza cauzioni RLS chiusa', s:'2026-06-11', st:'done', ms:true},
       {t:'Fix M1: ricevuta non conferma (v21)', s:'2026-06-12', st:'done', ms:true},
@@ -70,7 +57,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Pannello "Pacchi No-show" in sola lettura in menu-admin (elenco pacchi da NoShowApp)', s:'2026-07-26', st:'done', ms:true},
       {t:'Cliente segnalato (pacchi No-show) in mail M1bis + gestionale (nome rosso→arancione dopo redenzione)', s:'2026-07-27', st:'done', ms:true},
       {t:'Ripristino orari pre-estivi dal 1/9 (contenuti statici JSON-LD/FAQ aggiornati dal task schedulato 28/8; foglio stampa menu.html/menu-it.html già corretto sul live; disponibilità prenotazioni già corretta da prima)', s:'2026-08-28', e:'2026-09-01', st:'done', ms:true},
-      {t:'Chiusura cena domenica dal 1/10, senza data di ripristino (contenuti statici — disponibilità già corretta) — task schedulato 27/9', s:'2026-10-01', st:'up', ms:true},
+      {t:'Chiusura cena domenica dal 1/10, senza data di ripristino (contenuti statici — disponibilità già corretta) — task schedulato 27/9', s:'2026-10-01', e:'2026-09-27', st:'up', ms:true},
       {t:'Gestionale — Fase 2 CRM ospiti: clienti.html LIVE (storico da reservations + note/tag + clienti manuali)', s:'2026-09-01', st:'done', ms:true},
       {t:'CRM: dati per newsletter/marketing (colonna consenso, filtro, export CSV) + verifica reale iscrizione Brevo', s:'2026-09-01', st:'done', ms:true},
       {t:'CRM integrato nel gestionale prenotazioni: badge cliente abituale + modifica prenotazione + link anagrafica', s:'2026-09-01', st:'done', ms:true},
@@ -78,7 +65,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Gestionale — Fase 4 statistiche (on-demand, scope da definire, no piano sala)', s:'2026-09-01', e:'2026-12-31', st:'future'},
       {t:'Fase 2 carta-garanzia (automazione, on-demand) → SUPERSEDED dal wizard /prenota.html', s:'2026-07-15', e:'2026-07-23', st:'done'},
       {t:'NoShowApp → prodotto multi-cliente da vendere (resta progetto Supabase separato da SafeTable, no merge — decisione 15/8)', s:'2026-08-15', e:'2026-12-31', st:'future'},
-      {t:'Merge SantaCantina dentro SafeTable a livello DB (schema unico) per liberare uno slot progetto free Supabase e riattivare NoShowApp (oggi in pausa)', s:'2026-09-16', e:'2026-12-31', st:'future'},
+      {t:'Merge SantaCantina dentro SafeTable a livello DB (schema unico) per liberare uno slot progetto free Supabase e riattivare NoShowApp (oggi in pausa)', s:'2026-09-16', e:'2026-09-16', st:'done'},
       {t:'Rubrica professionisti: tabella tornata locale su ST (ricreata, separata da NoShowApp) + pulsante import una tantum da NSA', s:'2026-09-01', st:'done', ms:true},
       {t:'NoShowApp: setup visibilità dati per-cliente (privato/condiviso, deciso da Andrea come titolare), possibile feature a pagamento', s:'2026-09-01', e:'2026-12-31', st:'future'},
       {t:'menu-admin: riordino barra pulsanti in 3 tab con colori (Gestione menù e sito · Prenotazioni e voucher · Setup)', s:'2026-09-02', st:'done', ms:true},
@@ -97,7 +84,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Gestionale Cantina — campo Ubicazione eliminato dal DB (mai usato); colonna Annata in Catalogo', s:'2026-08-22', st:'done'},
       {t:'Gestionale Cantina — carta vini: rifinitura tipografica di stampa (font/dimensioni titoli e numeri, margini @page 1,8cm sx, blocco annate non separabile, ordinamento alfabetico senza virgolette) + pulsante Stampa', s:'2026-08-22', e:'2026-08-25', st:'done', ms:true},
       {t:'Gestionale Cantina — riconciliazione prezzi con PDF ufficiale carta vini: 1 correzione (Erbaspada), 3 vini nascosti riattivati, 3 vini mancanti aggiunti (nascosti, in revisione)', s:'2026-08-25', st:'done', ms:true},
-      {t:'Gestionale Cantina — commit cantina.html + menu-admin.html, primo giro d’uso reale', s:'2026-08-15', e:'2026-08-31', st:'up'},
+      {t:'Gestionale Cantina — commit cantina.html + menu-admin.html, primo giro d’uso reale', s:'2026-08-15', e:'2026-08-31', st:'done'},
       {t:'Fix mobile overflow orizzontale (menu-allergeni · cookies · privacy) — stesso pattern fix template 10/6, tabelle scorrevoli invece di sbordare', s:'2026-08-23', st:'done', ms:true},
       {t:'Food Cost giornaliero — tool costruito in menu-admin (date-range, dashboard Chart.js, sezione Beverage speculare, 4 KPI dedicate)', s:'2026-09-11', e:'2026-09-13', st:'done', ms:true},
       {t:'Food Cost — redesign inventario da range Dal/Al a conteggio puntuale per data (fc_inventario_conteggi), niente più doppia digitazione tra periodi consecutivi', s:'2026-09-13', st:'done', ms:true},
@@ -105,6 +92,15 @@ window.SANTAMONICA_GANTT = {
       {t:'Food Cost — riordino tab (Dashboard·Spese·Incassi·Vendite·Inventario·Costo piatti·Reparti) con colori per gruppo', s:'2026-09-13', st:'done'},
       {t:'Gantt trasversale ricostruito da zero + pubblicato su santamonicagenova.it/gantt (gantt.html noindex + gantt-data.js)', s:'2026-09-21', st:'done', ms:true},
       {t:'Food Cost — opzione futura (non richiesta come lavoro): Labor Cost % · Prime Cost % · Break-Even Point, serve una fonte dati costo-personale non ancora esistente', s:'2026-09-13', e:'2027-05-01', st:'future'},
+      {t:'Aggiornare orari su Google Business Profile e schede esterne (settembre-ottobre)', s:'2026-08-28', e:'2026-09-30', st:'up'},
+      {t:'Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)', s:'2026-09-21', st:'future'},
+      {t:'Restyling tema scuro del sito (home, menu, prenota, regala, dove-siamo)', s:'2026-09-04', e:'2026-09-04', st:'done'},
+      {t:'Home — sezione Info a 3 card + newsletter restyle, FAQ multilingua, redesign regala.html', s:'2026-09-05', e:'2026-09-06', st:'done'},
+      {t:'Modulo Food Cost in menu-admin (dashboard, KPI, Tracciabilità, Incassi, Inventario)', s:'2026-09-11', e:'2026-09-21', st:'done'},
+      {t:'Pannello admin "Orari di Apertura" centralizzato + FAQ/JSON-LD/foglio orario allineati ai periodi', s:'2026-09-12', e:'2026-09-12', st:'done'},
+      {t:'Rubrica professionisti — sincro a due vie con NoShowApp', s:'2026-09-18', e:'2026-09-18', st:'done'},
+      {t:'Gestionale Cantina — carta Vini e carta Fine Pasto (categorie, stampa, icone)', s:'2026-09-19', e:'2026-09-20', st:'done'},
+      {t:'Banner chiusura per vacanza 21-28 settembre', s:'2026-09-20', e:'2026-09-28', st:'done'},
     ]},
     { key:'seo', name:'SEO & GEO', badge:'progetto-seo', tasks:[
       {t:'Migrazione Cloudflare + fix Schema @type', s:'2026-05-25', e:'2026-05-31', st:'done'},
@@ -129,8 +125,8 @@ window.SANTAMONICA_GANTT = {
       {t:'Revisione critica SEO/GEO/AEO + soft-404 CHIUSO (404.html LIVE) + rettifica DEPLOY doc', s:'2026-07-02', e:'2026-07-05', st:'done'},
       {t:'IndexNow/Crawler Hints Cloudflare attivato', s:'2026-07-03', st:'done', ms:true},
       {t:'Pretty URLs (email GSC): sitemap URL pulite + robots senza estensione LIVE — pending reinvio sitemap GSC', s:'2026-07-03', e:'2026-07-05', st:'done', ms:true},
-      {t:'Canonical → URL pulite (debito pretty URLs, tocca template admin — col pacchetto pillar)', s:'2026-07-10', e:'2026-07-31', st:'up'},
-      {t:'Intervista pillar: §1-4 raccolte (identità · materia prima · sostenibilità · stile) — in attesa §5 piatti firma', s:'2026-07-05', st:'prog'},
+      {t:'Canonical → URL pulite (debito pretty URLs, tocca template admin — col pacchetto pillar)', s:'2026-07-10', e:'2026-09-25', st:'done'},
+      {t:'Intervista pillar: §1-4 raccolte (identità · materia prima · sostenibilità · stile) — in attesa §5 piatti firma', s:'2026-07-05', st:'up'},
       {t:'Piano recensioni (4,3★→4,6, leva GEO) + tentativo recupero TheFork Manager', s:'2026-07-10', e:'2026-08-31', st:'future'},
       {t:'Embriaco #8 profilato + backlink Vivarelli/I Cuochi chiusi (no dominio)', s:'2026-06-24', st:'done'},
       {t:'Backlink competitor Etra/Coco/Xena (avanti; dietro solo ai 2 stellati)', s:'2026-06-19', st:'done'},
@@ -139,9 +135,9 @@ window.SANTAMONICA_GANTT = {
       {t:'Pillar #1 /cucina-di-pesce (blocco: brief Nicolò + foto; al go-live: bucket B title + FAQ fine dining)', s:'2026-06-15', e:'2026-07-31', st:'up'},
       {t:'Pillar #2 /sul-mare-lungomare', s:'2026-07-01', e:'2026-07-31', st:'future'},
       {t:'Pillar #3 /storia-santamonica', s:'2026-08-01', e:'2026-08-31', st:'future'},
-      {t:'Content seriale IG + Brevo (2/mese)', s:'2026-06-15', e:'2026-11-30', st:'prog'},
+      {t:'Content seriale IG + Brevo (2/mese)', s:'2026-06-15', e:'2026-11-30', st:'future'},
       {t:'Multilingua URL separate /en/ /fr/ (mini-progetto ≈3-4 sess, post-pillar)', s:'2026-09-01', e:'2026-10-31', st:'future'},
-      {t:'Brevo automazioni email', s:'2026-08-01', e:'2026-09-15', st:'future'},
+      {t:'Brevo automazioni email', s:'2026-08-01', e:'2026-09-25', st:'done'},
     ]},
     { key:'mkt', name:'Marketing & Awareness', badge:'progetto-marketing', tasks:[
       {t:'Apertura IG + strategia content', s:'2026-05-28', st:'done'},
@@ -155,8 +151,6 @@ window.SANTAMONICA_GANTT = {
       {t:'Analisi insight teaser decennale (flyer 2.888 reach / 0 condiv.)', s:'2026-06-16', st:'done'},
       {t:'Sponsorizzata "Dieci anni": pivot a canale nativo "Metti in evidenza" (bypassa blocco #2859015 su 264), boost IN REVISIONE su post Monica', s:'2026-07-02', e:'2026-07-12', st:'done', ms:true},
       {t:'Post-mortem boost Reel decennale CHIUSO (56/60 ospiti, 10 pubblici, €13,88/prenotazione)', s:'2026-07-02', st:'done', ms:true},
-      {t:'Sponsorizzata domenica sera: kit pronto (264·Notorietà·P1·€50/14gg); P3 = debito', s:'2026-06-29', e:'2026-07-13', st:'up'},
-      {t:'Spedizione press kit', s:'2026-06-05', e:'2026-06-12', st:'prog'},
       {t:'Riunione d’ufficio — punto della situazione Awareness (report interno, no gate)', s:'2026-07-12', st:'done', ms:true},
       {t:'Revisione Oppositiva IG generale — tentativo Zapier fallito (quota esaurita), pacchetto pronto per riprova', s:'2026-07-10', st:'done', ms:true},
       {t:'Brief esplorativo "pranzo leggero crudo" — terza via fine dining/casual, nessuna decisione presa', s:'2026-07-22', st:'done', ms:true},
@@ -165,21 +159,20 @@ window.SANTAMONICA_GANTT = {
       {t:'Filone B — Piano Awareness Fase 5 (3 formati: discorsivo/tabellare/timeline) — gate chiuso, P3 3 vendor esterni (8/9)', s:'2026-09-08', st:'done', ms:true},
       {t:'Filone B — Costruzione: concierge Melia + Palazzo Grillo (2° tentativo, modello Capitolo Riviera)', s:'2026-09-01', e:'2026-11-30', st:'up'},
       {t:'Filone B — rinnovo iscrizione Genova Gourmet (annuale, ferma da mesi)', s:'2026-09-01', e:'2026-10-31', st:'up'},
-      {t:'Filone B — re-invio press kit + lista 15/22 a stampa/guide di viaggio enogastronomico nazionale', s:'2026-09-01', e:'2026-11-30', st:'up'},
+      {t:'Filone B — re-invio press kit + lista 15/22 a stampa/guide di viaggio enogastronomico nazionale', s:'2026-09-01', e:'2026-11-30', st:'future'},
       {t:'Filone B — contenuti sito "weekend gastronomico" (IT/EN/FR, sito già multilingua) + restyling foto GBP', s:'2026-09-15', e:'2026-11-30', st:'future'},
       {t:'Filone B — 4 settimane di raccolta baseline (provenienza booking, debito tecnico)', s:'2026-09-01', e:'2026-11-30', st:'future'},
-      {t:'Candidatura Genova Gourmet (scad. lug)', s:'2026-06-15', e:'2026-07-31', st:'up'},
       {t:'Baseline misurazione geografica IG (4 sett, post 2/7)', s:'2026-07-03', e:'2026-07-31', st:'future'},
-      {t:'Gate Nord: decisione budget paid', s:'2026-08-01', st:'future', ms:true},
-      {t:'Calendario cene a tema (entro ago)', s:'2026-07-01', e:'2026-08-31', st:'future'},
-      {t:'Partenariati concierge (Melia · Palazzo Grillo)', s:'2026-06-15', e:'2026-09-30', st:'future'},
+      {t:'Gate Nord: decisione budget paid', s:'2026-08-01', st:'up', ms:true},
+      {t:'Calendario cene a tema (entro ago)', s:'2026-07-01', e:'2026-08-31', st:'prog'},
       {t:'Mailing Brevo — lancio (entro 15 set)', s:'2026-08-15', e:'2026-09-15', st:'future'},
       {t:'Meta budget teaser (set, 300€)', s:'2026-09-01', e:'2026-09-30', st:'future'},
-      {t:"Cene a tema «Mare d'Inverno» (8 serate) — appiglio anche per Filone B turismo", s:'2026-09-01', e:'2027-04-30', st:'future'},
+      {t:'Cene a tema «Mare d\'Inverno» (8 serate) — appiglio anche per Filone B turismo', s:'2026-09-01', e:'2027-04-30', st:'future'},
       {t:'Meta budget inverno — picco (700€)', s:'2026-11-01', e:'2027-04-30', st:'future'},
       {t:'Filone B — Transizione: prime serate Mare d’Inverno comunicate/misurate, decisione riserva adv Nord', s:'2026-12-01', e:'2027-02-28', st:'future'},
       {t:'★ Obiettivo +20% infrasettimanale (mis. nov–gen)', s:'2026-11-01', e:'2027-01-31', st:'future', ms:true},
       {t:'Filone B — Picco strategico: adv Nord Italia + push concierge/PR alta stagione (se leading positivi)', s:'2027-03-01', e:'2027-08-31', st:'future'},
+      {t:'Sponsorizzata Salone Nautico', s:'2026-09-25', st:'prog'},
     ]},
   ]
 };

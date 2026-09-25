@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.09.25.01 — menu generati: canonical/og:url/JSON-LD puntano agli URL puliti (senza .html): le .html fanno redirect 308 verso la versione senza estensione e Google segnalava "Pagina con reindirizzamento". Nessun cambio di contenuto.
 // v 2026.09.12.01 — _pulisciViste() estesa con 'orari-apertura-section' (nuovo pannello
 //   unificato "Orari di Apertura" in Setup: periodi ricorrenti via get-opening-hours/
 //   set-reservations-config azione set_periods + le eccezioni puntuali — chiusure/aperture/
@@ -934,18 +935,18 @@ function eseguiPubblicazione(token) {
   function iniettaSeoITPubblico(html) {
     var SEO_HEAD = '<meta name="description" content="Scopri il menu del ristorante Santamonica a Genova: pesce fresco di Camogli, pasta fatta in casa, cucina ligure contemporanea. Ingredienti locali selezionati ogni giorno.">\n  ' +
       '<meta name="robots" content="index, follow">\n  ' +
-      '<link rel="canonical" href="https://santamonicagenova.it/menu.html">\n  ' +
+      '<link rel="canonical" href="https://santamonicagenova.it/menu">\n  ' +
       '<meta property="og:type" content="website">\n  ' +
       '<meta property="og:title" content="Menu | Ristorante Santamonica Genova">\n  ' +
       '<meta property="og:description" content="Pesce fresco di Camogli, pasta fatta in casa, cucina ligure contemporanea. Il menu del ristorante Santamonica sul Lungomare di Genova.">\n  ' +
-      '<meta property="og:url" content="https://santamonicagenova.it/menu.html">\n  ' +
+      '<meta property="og:url" content="https://santamonicagenova.it/menu">\n  ' +
       '<meta property="og:image" content="https://santamonicagenova.it/img/hero.jpg">\n  ' +
       '<script type="application/ld+json">\n' +
       '  {\n' +
       '    "@context": "https://schema.org",\n' +
       '    "@type": "Menu",\n' +
       '    "name": "Menu Santamonica",\n' +
-      '    "url": "https://santamonicagenova.it/menu.html",\n' +
+      '    "url": "https://santamonicagenova.it/menu",\n' +
       '    "inLanguage": "it",\n' +
       '    "hasMenuSection": [\n' +
       '      { "@type": "MenuSection", "name": "Antipasti" },\n' +
@@ -962,7 +963,7 @@ function eseguiPubblicazione(token) {
   // ── Helper: inietta noindex + canonical sul file menu-it.html (admin/preview, non SEO)
   function iniettaNoIndexIT(html) {
     var TAGS = '<meta name="robots" content="noindex, nofollow">\n  ' +
-               '<link rel="canonical" href="https://santamonicagenova.it/menu-it.html">\n  ';
+               '<link rel="canonical" href="https://santamonicagenova.it/menu-it">\n  ';
     return html.replace('<title>', TAGS + '<title>');
   }
 
@@ -975,7 +976,7 @@ function eseguiPubblicazione(token) {
             desc:  'Le menu du restaurant Santamonica à Gênes : poissons de la côte ligure, pâtes maison, salle avec vue sur la mer. Sélectionné par le Guide Michelin.' }
     };
     var TAGS = '<meta name="robots" content="index, follow">\n  ' +
-               '<link rel="canonical" href="https://santamonicagenova.it/menu-' + lang + '.html">\n  ';
+               '<link rel="canonical" href="https://santamonicagenova.it/menu-' + lang + '">\n  ';
     var s = SEO_LL[lang];
     if (s) {
       TAGS += '<meta name="description" content="' + s.desc + '">\n  ';

@@ -2,14 +2,14 @@
 window.JARVIS_DATA = {
  "generato": "2026-09-25",
  "versione": "2026.09.25",
- "briefing": "**Briefing 25/9/2026** — Jarvis attivo: storico migrato, stati delle attività verificati, Gantt e pannello si aggiornano da soli. **Aspettano te**: orari su Google Business Profile e schede esterne prima del 1/10 (chiude la domenica sera), calendario Mare d'Inverno (in chiusura). **Segnale**: nessuna sessione SEO negli ultimi 30 giorni. Primo briefing automatico: lunedì 28/9.",
+ "briefing": "**Briefing 25/9/2026** — Jarvis completo: pannello Obsidian, pagina [santamonicagenova.it/jarvis](https://santamonicagenova.it/jarvis), briefing automatico ogni lunedì alle 9, Biblioteca separata. Orari su Google e TripAdvisor aggiornati. **Aspetta te**: dal 1/10 pubblicare FAQ e foglio QR dal pannello Orari di Apertura; calendario Mare d'Inverno appena pronto. **Segnale**: nessuna sessione SEO negli ultimi 30 giorni.",
  "kpi": {
   "aperte": 39,
   "scadute": 8,
   "bloccate": 3,
   "andrea": 7,
   "debiti": 7,
-  "chiuse30": 18
+  "chiuse30": 21
  },
  "subs": {
   "Decennale": {
@@ -57,8 +57,8 @@ window.JARVIS_DATA = {
    "debiti": 1
   },
   "Trasversale": {
-   "tot": 3,
-   "done": 3,
+   "tot": 6,
+   "done": 6,
    "prog": 0,
    "up": 0,
    "future": 0,

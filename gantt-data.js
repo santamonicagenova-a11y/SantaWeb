@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.09.25.08",
+  version: "2026.09.25.09",
   updated: "2026-09-25",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -57,7 +57,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Pannello "Pacchi No-show" in sola lettura in menu-admin (elenco pacchi da NoShowApp)', s:'2026-07-26', st:'done', ms:true},
       {t:'Cliente segnalato (pacchi No-show) in mail M1bis + gestionale (nome rosso→arancione dopo redenzione)', s:'2026-07-27', st:'done', ms:true},
       {t:'Ripristino orari pre-estivi dal 1/9 (contenuti statici JSON-LD/FAQ aggiornati dal task schedulato 28/8; foglio stampa menu.html/menu-it.html già corretto sul live; disponibilità prenotazioni già corretta da prima)', s:'2026-08-28', e:'2026-09-01', st:'done', ms:true},
-      {t:'Chiusura cena domenica dal 1/10, senza data di ripristino (contenuti statici — disponibilità già corretta) — task schedulato 27/9', s:'2026-10-01', e:'2026-09-27', st:'up', ms:true},
+      {t:'Chiusura cena domenica dal 1/10, senza data di ripristino (contenuti statici — disponibilità già corretta) — task schedulato 27/9', s:'2026-10-01', e:'2026-10-01', st:'up', ms:true},
       {t:'Gestionale — Fase 2 CRM ospiti: clienti.html LIVE (storico da reservations + note/tag + clienti manuali)', s:'2026-09-01', st:'done', ms:true},
       {t:'CRM: dati per newsletter/marketing (colonna consenso, filtro, export CSV) + verifica reale iscrizione Brevo', s:'2026-09-01', st:'done', ms:true},
       {t:'CRM integrato nel gestionale prenotazioni: badge cliente abituale + modifica prenotazione + link anagrafica', s:'2026-09-01', st:'done', ms:true},
@@ -92,7 +92,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Food Cost — riordino tab (Dashboard·Spese·Incassi·Vendite·Inventario·Costo piatti·Reparti) con colori per gruppo', s:'2026-09-13', st:'done'},
       {t:'Gantt trasversale ricostruito da zero + pubblicato su santamonicagenova.it/gantt (gantt.html noindex + gantt-data.js)', s:'2026-09-21', st:'done', ms:true},
       {t:'Food Cost — opzione futura (non richiesta come lavoro): Labor Cost % · Prime Cost % · Break-Even Point, serve una fonte dati costo-personale non ancora esistente', s:'2026-09-13', e:'2027-05-01', st:'future'},
-      {t:'Aggiornare orari su Google Business Profile e schede esterne (settembre-ottobre)', s:'2026-08-28', e:'2026-09-30', st:'up'},
+      {t:'Aggiornare orari su Google Business Profile e schede esterne (settembre-ottobre)', s:'2026-08-28', e:'2026-09-25', st:'done'},
       {t:'Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)', s:'2026-09-21', st:'future'},
       {t:'Restyling tema scuro del sito (home, menu, prenota, regala, dove-siamo)', s:'2026-09-04', e:'2026-09-04', st:'done'},
       {t:'Home — sezione Info a 3 card + newsletter restyle, FAQ multilingua, redesign regala.html', s:'2026-09-05', e:'2026-09-06', st:'done'},

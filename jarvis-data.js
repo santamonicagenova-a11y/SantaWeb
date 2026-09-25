@@ -124,7 +124,7 @@ window.JARVIS_DATA = {
    "s": "2026-10-01",
    "e": "2026-10-01",
    "own": "Andrea",
-   "az": "Dal 1/10 aprire menu-admin → Orari di Apertura e pubblicare FAQ/JSON-LD/foglio QR del nuovo periodo (il vecchio task automatico del 27/9 non esiste più); confermare se il pranzo del venerdì da ottobre è voluto",
+   "az": "Dal 1/10 aprire menu-admin → Orari di Apertura e pubblicare FAQ/JSON-LD/foglio QR del nuovo periodo",
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
@@ -272,7 +272,7 @@ window.JARVIS_DATA = {
    "s": "2026-10-01",
    "e": "2026-10-01",
    "own": "Andrea",
-   "az": "Dal 1/10 aprire menu-admin → Orari di Apertura e pubblicare FAQ/JSON-LD/foglio QR del nuovo periodo (il vecchio task automatico del 27/9 non esiste più); confermare se il pranzo del venerdì da ottobre è voluto",
+   "az": "Dal 1/10 aprire menu-admin → Orari di Apertura e pubblicare FAQ/JSON-LD/foglio QR del nuovo periodo",
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"

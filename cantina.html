@@ -1,4 +1,19 @@
 <!DOCTYPE html>
+<!-- v 2026.09.25.02 — aggiunto deep-link da menu-admin.html (tab Setup di Food Cost, pulsante
+     "Apri anagrafica fornitori"): cantina.html?tab=anagrafiche&ent=fornitori apre direttamente la
+     tab Anagrafiche con "Fornitori" già selezionato nella tendina, invece di lasciare l'utente sul
+     default (Catalogo). CORREZIONE rispetto alla prima versione (v 2026.09.25.01, mai rilasciata
+     come voce di changelog): lo script del deep-link era posizionato subito dopo il blocco dei tab
+     handler, PRIMA che "var AN_TABLES = {...}" venisse assegnato più in basso nello stesso script.
+     Cliccando il tab "Anagrafiche" in automatico (tEl.click()) si invocava loadAnagraficheTabelle(),
+     che a sua volta faceva Object.keys(AN_TABLES) mentre AN_TABLES era ancora undefined (var non è
+     hoistata per valore, solo per nome) — TypeError silenzioso che interrompeva la funzione prima di
+     popolare la tendina #an-tabella e la tabella risultati: pagina apparentemente "aperta male" con
+     tendina e tabella vuote. Fix: lo stesso blocco IIFE del deep-link è stato spostato in fondo allo
+     script (dopo "// init / loadCatalogo();", prima di </script>), quando tutte le var e funzioni
+     del file sono già state definite/assegnate in ordine di esecuzione. Bump versione a v 2026.09.25.02
+     (v 2026.09.25.01 non era mai stata registrata qui in changelog).
+-->
 <!-- v 2026.09.20.06 — eliminare un Produttore dalla scheda Anagrafiche falliva in silenzio se aveva
      articoli collegati (vincolo di integrità referenziale su cantina_articoli.produttore_id, senza
      ON DELETE CASCADE) — l'utente vedeva solo l'errore Postgres grezzo, senza sapere quali articoli
@@ -523,7 +538,7 @@
   <div class="top-bar">
     <div>
       <div class="logo-sm">Santamonica</div>
-      <h1>Gestionale Cantina <span class="ver">v 2026.09.20.06</span></h1>
+      <h1>Gestionale Cantina <span class="ver">v 2026.09.25.02</span></h1>
     </div>
     <a class="back" href="menu-admin.html">← Torna al pannello menù</a>
   </div>
@@ -848,25 +863,6 @@ document.querySelectorAll('.tabs > .tab').forEach(function (t) {
     if ((t.dataset.tab === 'categorie' || t.dataset.tab === 'carta' || t.dataset.tab === 'finepasto') && !window._cartaSetupLoaded) { window._cartaSetupLoaded = true; loadCartaTipologieSetup(); }
   });
 });
-
-// Deep-link: apertura diretta su una tab/anagrafica specifica da query string
-// (?tab=anagrafiche&ent=fornitori) — usato dal pulsante "Apri anagrafica fornitori"
-// nel tab Setup di Food Cost (menu-admin.html, v 2026.09.25.01), che apre questa
-// pagina in una nuova scheda già sulla tab e sulla tabella giuste, invece di
-// lasciare l'utente sul default (Catalogo) a dover navigare a mano.
-(function () {
-  var qs = new URLSearchParams(location.search);
-  var tab = qs.get('tab');
-  if (!tab) return;
-  var tEl = document.querySelector('.tabs > .tab[data-tab="' + tab + '"]');
-  if (!tEl) return;
-  tEl.click();
-  var ent = qs.get('ent');
-  if (tab === 'anagrafiche' && ent) {
-    var sel = document.getElementById('an-tabella');
-    if (sel && sel.querySelector('option[value="' + ent + '"]')) sel.value = ent;
-  }
-})();
 
 // ================================================================
 // CATALOGO
@@ -2355,6 +2351,26 @@ document.getElementById('carta-pubblica').addEventListener('click', function () 
 
 // init
 loadCatalogo();
+
+// Deep-link: apertura diretta su una tab/anagrafica specifica da query string
+// (?tab=anagrafiche&ent=fornitori) — usato dal pulsante "Apri anagrafica fornitori"
+// nel tab Setup di Food Cost (menu-admin.html, v 2026.09.25.01). Posizionato qui, in
+// fondo allo script (dopo l'init e tutte le definizioni), cosicché "var AN_TABLES = {...}"
+// e le altre variabili/funzioni del file siano già assegnate quando gira: spostato qui in
+// v 2026.09.25.02 per correggere un bug di ordine di esecuzione (vedi changelog in testa al file).
+(function () {
+  var qs = new URLSearchParams(location.search);
+  var tab = qs.get('tab');
+  if (!tab) return;
+  var tEl = document.querySelector('.tabs > .tab[data-tab="' + tab + '"]');
+  if (!tEl) return;
+  tEl.click();
+  var ent = qs.get('ent');
+  if (tab === 'anagrafiche' && ent) {
+    var sel = document.getElementById('an-tabella');
+    if (sel && sel.querySelector('option[value="' + ent + '"]')) sel.value = ent;
+  }
+})();
 </script>
 </body>
 </html>

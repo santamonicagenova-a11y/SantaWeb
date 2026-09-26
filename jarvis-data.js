@@ -2,7 +2,7 @@
 window.JARVIS_DATA = {
  "generato": "2026-09-26",
  "versione": "2026.09.26",
- "briefing": "**Briefing 26/9/2026 (chiusura)** — Food Cost: **Calcolo Food Cost** da ingredienti online (menu-admin v.10: Ingredienti in Setup, ricette per piatto, Costo ricetta automatico in Costo piatti). Da oggi il push su main di SantaWeb lo fa Claude. **Aspetta te**: usare il Calcolo Food Cost su qualche piatto vero; giro di prova sugli altri tab Food Cost; beta tester e marchio NoShowApp; dal 1/10 FAQ e foglio QR dal pannello Orari. **Segnale**: nessuna sessione SEO negli ultimi 30 giorni.",
+ "briefing": "**Briefing 26-27/9/2026** — Food Cost: **Calcolo Food Cost** da ingredienti online (menu-admin v.10). Cambio orari del 1/10 **automatizzato** (GitHub Action alle 5:30, testi FAQ approvati): alla prima sessione dopo il 1/10 Claude verifica il sito. Da ora il push su main lo fa Claude. **Aspetta te**: usare il Calcolo Food Cost su piatti veri; giro di prova sugli altri tab Food Cost; beta tester e marchio NoShowApp. **Segnale**: nessuna sessione SEO negli ultimi 30 giorni.",
  "kpi": {
   "aperte": 46,
   "scadute": 8,

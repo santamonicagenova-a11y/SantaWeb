@@ -1,9 +1,27 @@
 # CHANGELOG — Santamonica Web
 
-**Versione documento:** v 2026.09.26.07
+**Versione documento:** v 2026.09.26.08
 **Aggiornato:** 2026-09-26
 
 > Voci ordinate dal più recente al più vecchio. Appendere in cima a ogni sessione.
+
+---
+
+### 2026-09-26 — Food Cost → Costo piatti: "Prezzo vendita" letto dalla carta pubblicata
+
+**Versioni rilasciate:**
+- `menu-admin.html` **v 2026.09.26.08** (Vercel) — backend `foodcost-admin` invariato
+- `CHANGELOG_Santamonica_Web_v2026.09.26.08.md` (questo)
+
+**Sintesi:**
+- La colonna "Prezzo vendita" prende il prezzo dalla carta pubblicata (fetch live di `menu-it.html` + `menu-dolci.html`). Il match usa sezione e nome normalizzati (`_pdNorm`); se non trova la sezione, cerca il solo nome purché sia univoco. Serve perché le sezioni di Dettagli piatti ("Antipasti", "Dolci — Golosità") non coincidono con quelle della carta ("Sfiziosi", "Golosità").
+- La cella è in sola lettura, con l'unità se presente ("cad."). I piatti non trovati in carta tengono l'input a mano, con avviso.
+- Aprendo il tab, le schede già salvate con prezzo diverso dalla carta vengono riallineate nel DB (costo e attivo invariati), così Vendite e Dashboard usano il prezzo pubblicato.
+- Se la carta non è raggiungibile, torna il comportamento precedente (prezzo salvato, modificabile).
+- Fix collaterale: l'upsert ora passa `attivo` (prima lo forzava sempre a `true`).
+- Verifica sui dati reali: 25 piatti su 25 di `piatti_dettagli` trovano il prezzo in carta. I 2 prezzi già salvati (Gillardeau 7, Sacripantina 12) coincidono con la carta.
+
+**Loop di revisione:** P1 (sintassi JS) e P2 (test node delle funzioni di match sui file carta reali e sui 25 nomi del DB) eseguiti da Claude. P3 non dovuta: tool admin interno, nessun contenuto pubblico. Prova in pagina a carico di Andrea.
 
 ---
 

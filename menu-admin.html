@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<!-- v 2026.09.26.08 — Food Cost → Costo piatti (richiesto da Andrea): la colonna "Prezzo
+     vendita" prende il prezzo dalla carta PUBBLICATA (fetch live di menu-it.html +
+     menu-dolci.html, match sezione+nome normalizzati con _pdNorm, ripiego sul solo nome se
+     univoco). Cella in sola lettura; i piatti non trovati in carta restano con input a mano.
+     All'apertura del tab le schede già salvate con prezzo diverso dalla carta vengono
+     riallineate nel DB (costo/attivo invariati) → Vendite e Dashboard usano il prezzo
+     pubblicato. Se la carta non è raggiungibile si torna al comportamento precedente.
+     Upsert ora passa anche "attivo" (prima veniva forzato a true). Backend invariato. -->
 <!-- v 2026.09.26.07 — fix (segnalato da Andrea): ricaricando la pagina su un tab diverso da
      "Gestione menù e sito" (es. Utilities), "📖 Procedure di aggiornamento e traduzione"
      restava visibile. Causa: setQaTab() all'avvio gira prima che #intro esista nel DOM.
@@ -1528,7 +1536,7 @@
       </div>
 
       <div id="fc-view-costi" style="display:none;">
-        <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Costo ricetta e prezzo di vendita per ogni piatto già presente in "Dettagli piatti (allergeni)". Aggiorna quando cambia un costo ingrediente.</p>
+        <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Costo ricetta per ogni piatto già presente in "Dettagli piatti (allergeni)". Il prezzo di vendita è letto dalla carta pubblicata (carta + dolci) e si riallinea da solo all’apertura di questo tab; solo i piatti non trovati in carta hanno il prezzo da inserire a mano. Aggiorna quando cambia un costo ingrediente.</p>
         <div id="fc-costi-list" style="font-size:.85rem;">…</div>
         <div style="margin-top:1rem;">
           <button class="btn btn-publish" onclick="fcSalvaCosti()">💾 Salva costi</button>
@@ -4956,14 +4964,83 @@ function fcSalvaInventario() {
 
 function fcLoadCosti() {
   _fcSetStatus('Caricamento costo piatti…');
-  _fcFetch({ action: 'piatti_costo_list' })
-    .then(function (res) {
+  Promise.all([_fcFetch({ action: 'piatti_costo_list' }), _fcPrezziCartaLive()])
+    .then(function (out) {
+      var res = out[0], carta = out[1];
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcState.costi = res.body.righe || [];
+      fcState.costiCartaOk = !!carta;
+      fcState.costi.forEach(function (r) {
+        var m = carta ? _fcPrezzoCartaPer(carta, r.sezione, r.piatto) : null;
+        r.prezzo_carta = m ? m.prezzo : null;
+        r.unita_carta = m ? m.unita : '';
+      });
       fcRenderCosti();
-      _fcSetStatus('');
+      if (!carta) { _fcSetStatus('Carta pubblicata non raggiungibile: prezzi di vendita modificabili a mano (valori salvati).', true); return; }
+      _fcAllineaPrezziCarta();
     })
     .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+// v 2026.09.26.08 — Prezzo di vendita preso dalla carta PUBBLICATA (menu-it.html + menu-dolci.html,
+// fetch live senza cache). Mappa: chiave sezione+nome normalizzati (_pdNorm, stesso criterio della
+// sincronizzazione Dettagli piatti) e, come ripiego, solo nome se univoco in tutta la carta.
+// Risolve null se la carta non è raggiungibile/parsabile (si torna al prezzo salvato, modificabile).
+function _fcPrezziCartaLive() {
+  var nc = function () { return '?nocache=' + Date.now() + '_' + Math.random().toString(36).slice(2); };
+  var get = function (url) {
+    return fetch(url + nc(), { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.text() : Promise.reject(new Error('HTTP ' + r.status)); })
+      .then(function (src) { return _estraiMenu(src); });
+  };
+  return Promise.all([get(MENU_URL), get(DOLCI_URL).catch(function () { return null; })])
+    .then(function (menus) {
+      if (!menus[0] || !Array.isArray(menus[0].sezioni)) return null;
+      var perSezNome = {}, perNome = {};
+      menus.forEach(function (m) {
+        if (!m || !Array.isArray(m.sezioni)) return;
+        m.sezioni.forEach(function (sez) {
+          var sezKeys = [sez.titolo_display, sez.titolo].filter(Boolean).map(_pdNorm);
+          (sez.piatti || []).forEach(function (p) {
+            if (!p || !p.nome || p.prezzo == null || p.prezzo === '' || isNaN(Number(p.prezzo))) return;
+            var v = { prezzo: Number(p.prezzo), unita: p.unita || '' }, n = _pdNorm(p.nome);
+            sezKeys.forEach(function (k) { perSezNome[k + '|' + n] = v; });
+            perNome[n] = perNome.hasOwnProperty(n) ? false : v; // false = nome ambiguo
+          });
+        });
+      });
+      return { perSezNome: perSezNome, perNome: perNome };
+    })
+    .catch(function (e) { console.warn('[Food Cost] carta pubblicata non disponibile: ' + e.message); return null; });
+}
+
+function _fcPrezzoCartaPer(carta, sezione, piatto) {
+  var n = _pdNorm(piatto);
+  return carta.perSezNome[_pdNorm(sezione) + '|' + n] || carta.perNome[n] || null;
+}
+
+// Schede già salvate con prezzo diverso dalla carta: riallineate subito nel DB (costo e attivo
+// invariati), così Vendite e Dashboard lavorano sul prezzo pubblicato.
+function _fcAllineaPrezziCarta() {
+  var daAllineare = fcState.costi.filter(function (r) {
+    return r.piatto_costo_id && r.prezzo_carta != null && Number(r.prezzo_vendita) !== r.prezzo_carta;
+  });
+  var nonTrovati = fcState.costi.filter(function (r) { return r.prezzo_carta == null; }).length;
+  var nota = nonTrovati ? ' ' + nonTrovati + ' piatt' + (nonTrovati === 1 ? 'o' : 'i') + ' non trovat' + (nonTrovati === 1 ? 'o' : 'i') + ' in carta: prezzo a mano.' : '';
+  if (!daAllineare.length) { _fcSetStatus(nota.trim()); return; }
+  _fcSetStatus('Allineamento prezzi alla carta…');
+  Promise.all(daAllineare.map(function (r) {
+    return _fcFetch({
+      action: 'piatti_costo_upsert', piatto_id: r.piatto_id,
+      costo_piatto: Number(r.costo_piatto) || 0, prezzo_vendita: r.prezzo_carta, attivo: r.attivo,
+    });
+  })).then(function (risultati) {
+    var errore = risultati.find(function (res) { return !_fcOk(res); });
+    if (errore) { _fcSetStatus(_fcErrMsg(errore), true); return; }
+    daAllineare.forEach(function (r) { r.prezzo_vendita = r.prezzo_carta; });
+    fcRenderCosti();
+    _fcSetStatus(daAllineare.length + ' prezz' + (daAllineare.length === 1 ? 'o allineato' : 'i allineati') + ' alla carta pubblicata.' + nota);
+  }).catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
 }
 
 function fcRenderCosti() {
@@ -4973,10 +5050,15 @@ function fcRenderCosti() {
   list.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;">' +
     '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Piatto</th><th>Costo ricetta (€)</th><th>Prezzo vendita (€)</th></tr>' +
     fcState.costi.map(function (r) {
+      var cellaPrezzo = r.prezzo_carta != null
+        ? '<span style="font-weight:600;">' + _fcEur(r.prezzo_carta) + (r.unita_carta ? ' <span style="font-weight:400;">' + _fcEsc(r.unita_carta) + '</span>' : '') + '</span>' +
+          '<div style="font-size:.7rem;color:var(--stone);">dalla carta pubblicata</div>'
+        : '<input type="number" min="0" step="0.01" id="fc-prezzo-' + r.piatto_id + '" value="' + (r.prezzo_vendita == null ? '' : r.prezzo_vendita) + '" style="width:8rem;" />' +
+          (fcState.costiCartaOk ? '<div style="font-size:.7rem;color:#b5651d;">non trovato in carta — a mano</div>' : '');
       return '<tr style="border-top:1px solid var(--rule);">' +
         '<td style="padding:.35rem 0;">' + _fcEsc(r.piatto) + '<div style="font-size:.7rem;color:var(--stone);">' + _fcEsc(r.sezione || '') + '</div></td>' +
         '<td><input type="number" min="0" step="0.01" id="fc-costo-' + r.piatto_id + '" value="' + (r.costo_piatto == null ? '' : r.costo_piatto) + '" style="width:8rem;" /></td>' +
-        '<td><input type="number" min="0" step="0.01" id="fc-prezzo-' + r.piatto_id + '" value="' + (r.prezzo_vendita == null ? '' : r.prezzo_vendita) + '" style="width:8rem;" /></td>' +
+        '<td>' + cellaPrezzo + '</td>' +
         '</tr>';
     }).join('') +
     '</table>';
@@ -4986,12 +5068,15 @@ function fcSalvaCosti() {
   var chiamate = [];
   fcState.costi.forEach(function (r) {
     var costoEl = document.getElementById('fc-costo-' + r.piatto_id), prezzoEl = document.getElementById('fc-prezzo-' + r.piatto_id);
-    var costo = costoEl.value, prezzo = prezzoEl.value;
-    if (costo === '' && prezzo === '' && !r.piatto_costo_id) return; // riga mai compilata: salta
+    var costo = costoEl.value;
+    var daCarta = r.prezzo_carta != null;
+    var prezzo = daCarta ? r.prezzo_carta : (prezzoEl ? prezzoEl.value : '');
+    if (costo === '' && (daCarta || prezzo === '') && !r.piatto_costo_id) return; // riga mai compilata: salta
     chiamate.push(_fcFetch({
       action: 'piatti_costo_upsert', piatto_id: r.piatto_id,
       costo_piatto: costo === '' ? 0 : Number(costo),
       prezzo_vendita: prezzo === '' ? 0 : Number(prezzo),
+      attivo: r.attivo,
     }));
   });
   if (!chiamate.length) { _fcSetStatus('Nessuna scheda da salvare.', true); return; }
@@ -6970,7 +7055,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.26.07</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.26.08</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

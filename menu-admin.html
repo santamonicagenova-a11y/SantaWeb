@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- v 2026.09.26.03 — Food Cost → Spese: nota modificabile (richiesto da Andrea).
+     1) Nuovo campo "Nota (facoltativa)" nel form "Nuova spesa", inviato a spese_create.
+     2) Nella lista, la colonna Note diventa un campo di testo modificabile in linea:
+        si salva con Invio o uscendo dal campo (spese_update, con data/reparto/importo
+        invariati). Se il salvataggio fallisce, torna il valore precedente. Nessuna
+        modifica al backend: foodcost-admin accettava già "note" in create/update. -->
 <!-- v 2026.09.26.02 — Food Cost → Tracciabilità: righe dello storico modificabili
      (richiesto da Andrea). Link "modifica" accanto a "elimina": la riga diventa un
      form in linea con tutti i campi tranne il codice NN-MMAA, che resta fisso.
@@ -1390,6 +1396,10 @@
           <div>
             <span class="opt-lbl">Importo € (no IVA)</span>
             <input type="number" id="fc-spesa-importo" min="0" step="0.01" style="width:8rem;" />
+          </div>
+          <div style="flex:1;min-width:12rem;">
+            <span class="opt-lbl">Nota (facoltativa)</span>
+            <input type="text" id="fc-spesa-note" placeholder="Es: fattura 123, fornitore…" />
           </div>
           <button class="btn btn-publish" onclick="fcAggiungiSpesa()">+ Aggiungi</button>
         </div>
@@ -4143,7 +4153,7 @@ function fcRenderSpese() {
         '<td style="padding:.35rem 0;">' + r.data + '</td>' +
         '<td>' + _fcEsc(r.fc_reparti ? r.fc_reparti.nome : '—') + '</td>' +
         '<td>' + _fcEur(r.importo) + '</td>' +
-        '<td style="color:var(--stone);font-size:.78rem;">' + _fcEsc(r.note || '') + '</td>' +
+        '<td style="padding-right:.5rem;"><input type="text" value="' + _fcEsc(r.note || '') + '" placeholder="aggiungi nota…" title="Modifica e premi Invio (o esci dal campo) per salvare" onchange="fcSalvaNotaSpesa(\'' + r.id + '\', this)" onkeydown="if(event.key===\'Enter\')this.blur()" style="width:100%;font-size:.78rem;padding:.2rem .4rem;color:var(--stone);" /></td>' +
         '<td><span onclick="fcEliminaSpesa(\'' + r.id + '\')" style="color:var(--rust);cursor:pointer;font-size:.78rem;">elimina</span></td>' +
         '</tr>';
     }).join('') +
@@ -4155,6 +4165,7 @@ function fcAggiungiSpesa() {
   var data_ = document.getElementById('fc-spesa-data').value;
   var reparto_id = document.getElementById('fc-spesa-reparto').value;
   var importo = document.getElementById('fc-spesa-importo').value;
+  var note = document.getElementById('fc-spesa-note').value.trim();
   if (!data_) { _fcSetStatus('Indica la data.', true); return; }
   if (!reparto_id) { _fcSetStatus('Indica il reparto (creane uno se la lista è vuota).', true); return; }
   if (importo === '' || Number(importo) < 0) { _fcSetStatus('Indica un importo valido.', true); return; }
@@ -4167,14 +4178,37 @@ function fcAggiungiSpesa() {
     return;
   }
   _fcSetStatus('Aggiunta…');
-  _fcFetch({ action: 'spese_create', data: data_, reparto_id: reparto_id, importo: Number(importo) })
+  _fcFetch({ action: 'spese_create', data: data_, reparto_id: reparto_id, importo: Number(importo), note: note })
     .then(function (res) {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       document.getElementById('fc-spesa-importo').value = '';
+      document.getElementById('fc-spesa-note').value = '';
       fcLoadSpese();
       _fcSetStatus('Spesa aggiunta.');
     })
     .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+// Nota modificabile direttamente nella lista (v 2026.09.26.03): salvataggio al change
+// (Invio o uscita dal campo) via spese_update, rimandando invariati data/reparto/importo
+// già presenti nella riga — nessuna modifica al backend. Per le spese nate da
+// Tracciabilità la nota resta modificabile, ma una successiva modifica della riga di
+// tracciabilità la rigenera dal formato standard "Carico … — prodotto · lotto · fornitore".
+function fcSalvaNotaSpesa(id, input) {
+  var r = (fcState.spese || []).find(function (x) { return x.id === id; });
+  if (!r) return;
+  var nota = input.value.trim();
+  if (nota === (r.note || '')) return;
+  input.disabled = true;
+  _fcSetStatus('Salvataggio nota…');
+  _fcFetch({ action: 'spese_update', id: id, data: r.data, reparto_id: r.reparto_id, importo: Number(r.importo), note: nota })
+    .then(function (res) {
+      input.disabled = false;
+      if (!_fcOk(res)) { input.value = r.note || ''; _fcSetStatus(_fcErrMsg(res), true); return; }
+      r.note = nota || null;
+      _fcSetStatus('Nota salvata.');
+    })
+    .catch(function (e) { input.disabled = false; input.value = r.note || ''; _fcErr(e, 'Errore di connessione.'); });
 }
 
 function fcEliminaSpesa(id) {
@@ -6872,7 +6906,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.26.02</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.26.03</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

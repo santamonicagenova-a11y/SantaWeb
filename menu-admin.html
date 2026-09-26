@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!-- v 2026.09.26.05 — Food Cost → Tracciabilità (richiesto da Andrea): la riga in
+     modifica è ora un riquadro ben separato dallo storico: sfondo viola più marcato,
+     bordo pieno #9085e9 (colore del tab) e titoletto a fascia colorata
+     "✏️ MODIFICA RIGA NN-MMAA". Solo aspetto grafico, nessuna logica toccata. -->
 <!-- v 2026.09.26.04 — Food Cost → Spese (richiesto da Andrea): le spese create da
      Tracciabilità non hanno più la nota modificabile. Mostrano la nota in sola
      lettura con il codice NN-MMAA della riga collegata (badge 🔗) e si modificano
@@ -4486,9 +4490,15 @@ function fcTraccRigaEditHtml(r) {
   }).join('');
   function campo(lbl, html) { return '<div><span class="opt-lbl">' + lbl + '</span>' + html + '</div>'; }
   var pre = 'fc-tracc-edit-' + id + '-';
-  return '<tr style="border-top:1px solid var(--rule);background:rgba(144,133,233,.08);"><td colspan="9" style="padding:.6rem .4rem;">' +
-    '<div style="font-weight:600;margin-bottom:.4rem;">' + _fcEsc(r.rif_interno) + ' <span style="font-weight:400;color:var(--stone);font-size:.75rem;">— il codice non cambia; la spesa collegata viene aggiornata di conseguenza</span></div>' +
-    '<div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:end;">' +
+  // v 2026.09.26.05 — riquadro di modifica ben distinto dal resto dello storico
+  // (richiesto da Andrea): sfondo viola più marcato, bordo pieno nel colore del tab
+  // Tracciabilità (#9085e9) e titoletto a fascia colorata con il codice in modifica.
+  return '<tr><td colspan="9" style="padding:.7rem 0;">' +
+    '<div style="border:2px solid #9085e9;border-radius:var(--radius);background:rgba(144,133,233,.18);overflow:hidden;">' +
+    '<div style="background:#9085e9;color:#12161d;padding:.35rem .8rem;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:flex;justify-content:space-between;gap:.8rem;flex-wrap:wrap;">' +
+    '<span>✏️ Modifica riga ' + _fcEsc(r.rif_interno) + '</span>' +
+    '<span style="font-weight:500;text-transform:none;letter-spacing:0;">il codice non cambia · la spesa collegata viene aggiornata</span></div>' +
+    '<div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:end;padding:.7rem .8rem;">' +
     '<div style="flex:1;min-width:9rem;"><span class="opt-lbl">Prodotto</span><input type="text" id="' + pre + 'prodotto" value="' + _fcEsc(r.prodotto || '') + '" /></div>' +
     campo('Peso', '<input type="number" id="' + pre + 'peso" min="0" step="0.001" style="width:5.5rem;" value="' + (r.peso != null ? r.peso : '') + '" />') +
     campo('U.M.', '<select id="' + pre + 'um" style="width:4.5rem;' + FC_SELECT_STYLE + '">' + optUm + '</select>') +
@@ -4501,7 +4511,7 @@ function fcTraccRigaEditHtml(r) {
     campo('Reparto (Spese)', '<select id="' + pre + 'reparto" style="width:10rem;' + FC_SELECT_STYLE + '">' + optReparti + '</select>') +
     '<button class="btn btn-publish" style="font-size:.75rem;padding:.3rem .7rem;" onclick="fcTraccSalvaModifica(\'' + id + '\')">💾 Salva</button>' +
     '<button class="btn btn-load" style="font-size:.75rem;padding:.3rem .7rem;" onclick="fcTraccAnnullaModifica()">Annulla</button>' +
-    '</div></td></tr>';
+    '</div></div></td></tr>';
 }
 
 function fcTraccModifica(id) {
@@ -6921,7 +6931,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.26.04</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.26.05</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!-- v 2026.09.26.04 — Food Cost → Spese (richiesto da Andrea): le spese create da
+     Tracciabilità non hanno più la nota modificabile. Mostrano la nota in sola
+     lettura con il codice NN-MMAA della riga collegata (badge 🔗) e si modificano
+     solo dal tab Tracciabilità. Backend foodcost-admin v12: spese_list include la
+     riga di tracciabilità collegata; spese_update rifiuta (409) le spese collegate. -->
 <!-- v 2026.09.26.03 — Food Cost → Spese: nota modificabile (richiesto da Andrea).
      1) Nuovo campo "Nota (facoltativa)" nel form "Nuova spesa", inviato a spese_create.
      2) Nella lista, la colonna Note diventa un campo di testo modificabile in linea:
@@ -4153,7 +4158,9 @@ function fcRenderSpese() {
         '<td style="padding:.35rem 0;">' + r.data + '</td>' +
         '<td>' + _fcEsc(r.fc_reparti ? r.fc_reparti.nome : '—') + '</td>' +
         '<td>' + _fcEur(r.importo) + '</td>' +
-        '<td style="padding-right:.5rem;"><input type="text" value="' + _fcEsc(r.note || '') + '" placeholder="aggiungi nota…" title="Modifica e premi Invio (o esci dal campo) per salvare" onchange="fcSalvaNotaSpesa(\'' + r.id + '\', this)" onkeydown="if(event.key===\'Enter\')this.blur()" style="width:100%;font-size:.78rem;padding:.2rem .4rem;color:var(--stone);" /></td>' +
+        (_fcSpesaTracc(r)
+          ? '<td style="color:var(--stone);font-size:.78rem;padding-right:.5rem;"><span title="Spesa creata da Tracciabilità: modificabile solo dal tab Tracciabilità" style="display:inline-block;font-size:.68rem;font-weight:600;color:#9085e9;border:1px solid #9085e9;border-radius:3px;padding:0 .3rem;margin-right:.35rem;">🔗 ' + _fcEsc(_fcSpesaTracc(r).rif_interno) + '</span>' + _fcEsc(r.note || '') + '</td>'
+          : '<td style="padding-right:.5rem;"><input type="text" value="' + _fcEsc(r.note || '') + '" placeholder="aggiungi nota…" title="Modifica e premi Invio (o esci dal campo) per salvare" onchange="fcSalvaNotaSpesa(\'' + r.id + '\', this)" onkeydown="if(event.key===\'Enter\')this.blur()" style="width:100%;font-size:.78rem;padding:.2rem .4rem;color:var(--stone);" /></td>') +
         '<td><span onclick="fcEliminaSpesa(\'' + r.id + '\')" style="color:var(--rust);cursor:pointer;font-size:.78rem;">elimina</span></td>' +
         '</tr>';
     }).join('') +
@@ -4191,12 +4198,20 @@ function fcAggiungiSpesa() {
 
 // Nota modificabile direttamente nella lista (v 2026.09.26.03): salvataggio al change
 // (Invio o uscita dal campo) via spese_update, rimandando invariati data/reparto/importo
-// già presenti nella riga — nessuna modifica al backend. Per le spese nate da
-// Tracciabilità la nota resta modificabile, ma una successiva modifica della riga di
-// tracciabilità la rigenera dal formato standard "Carico … — prodotto · lotto · fornitore".
+// già presenti nella riga. Solo per le spese "semplici": quelle nate da Tracciabilità
+// mostrano la nota in sola lettura con il codice NN-MMAA (v 2026.09.26.04).
+// v 2026.09.26.04 — riga di tracciabilità collegata alla spesa (spese_list, edge v12),
+// o null se la spesa è "semplice". Le spese collegate hanno la nota in sola lettura:
+// si modificano solo da Tracciabilità (e spese_update le rifiuta anche lato server).
+function _fcSpesaTracc(r) {
+  var t = r && r.fc_tracciabilita_prodotti;
+  if (Array.isArray(t)) return t.length ? t[0] : null;
+  return t || null;
+}
+
 function fcSalvaNotaSpesa(id, input) {
   var r = (fcState.spese || []).find(function (x) { return x.id === id; });
-  if (!r) return;
+  if (!r || _fcSpesaTracc(r)) return;
   var nota = input.value.trim();
   if (nota === (r.note || '')) return;
   input.disabled = true;
@@ -6906,7 +6921,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.26.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.26.04</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

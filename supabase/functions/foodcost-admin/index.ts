@@ -96,6 +96,12 @@
 // in tracciabilita_carico_create: se l'aggiornamento della riga di tracciabilità
 // fallisce dopo quello della spesa, la spesa viene riportata ai valori precedenti.
 // Note della spesa ora costruite da noteSpesaCarico (condivisa tra create e update).
+// v12 (2026-09-26, stessa giornata) — richiesto da Andrea: le spese nate da Tracciabilità
+// non si modificano dal tab Spese (si modificano solo da Tracciabilità, dove
+// tracciabilita_update le riallinea). spese_list include ora la riga di tracciabilità
+// collegata (fc_tracciabilita_prodotti(id, rif_interno), relazione inversa via
+// spesa_id), così il frontend sa quali spese mostrare in sola lettura; spese_update
+// rifiuta con 409 una spesa collegata (blocco anche lato server, non solo in UI).
 // Riferimento di progettazione: DESIGN_foodcost-giornaliero_v2026.09.11.01.md
 // (progetto-sito).
 
@@ -696,7 +702,7 @@ Deno.serve(async (req) => {
       const tipo = body.tipo === "beverage" ? "beverage" : "food";
       const { data, error } = await supabase
         .from("fc_spese_giornaliere")
-        .select("*, fc_reparti!inner(nome, tipo)")
+        .select("*, fc_reparti!inner(nome, tipo), fc_tracciabilita_prodotti(id, rif_interno)")
         .eq("fc_reparti.tipo", tipo)
         .gte("data", r.da).lte("data", r.a)
         .order("data", { ascending: false });
@@ -717,6 +723,12 @@ Deno.serve(async (req) => {
         if (error) throw error;
       } else {
         if (!id) return json({ error: "ID mancante" }, 400);
+        // v12: una spesa generata da Tracciabilità si modifica solo da lì.
+        const linkRes = await supabase.from("fc_tracciabilita_prodotti").select("rif_interno").eq("spesa_id", id).limit(1);
+        if (linkRes.error) throw linkRes.error;
+        if (linkRes.data && linkRes.data.length) {
+          return json({ error: `Spesa collegata alla tracciabilità ${linkRes.data[0].rif_interno}: modificala dal tab Tracciabilità.` }, 409);
+        }
         const { error } = await supabase.from("fc_spese_giornaliere").update(row).eq("id", id);
         if (error) throw error;
       }

@@ -2,7 +2,7 @@
 window.JARVIS_DATA = {
  "generato": "2026-09-26",
  "versione": "2026.09.26",
- "briefing": "**Briefing 26/9/2026** — Jarvis ora raccoglie anche il lavoro delle sessioni cloud: importata quella di stamattina sul Food Cost (Tracciabilità modificabile, note nelle Spese, ordine crescente). **Aspetta te**: un giro di prova su tutti i tab Food Cost; prova di Jarvis in Cowork (carica la skill, poi 'Jarvis stato'); beta tester e marchio NoShowApp; dal 1/10 FAQ e foglio QR dal pannello Orari. **Segnale**: nessuna sessione SEO negli ultimi 30 giorni.",
+ "briefing": "**Briefing 26/9/2026** — Jarvis ora funziona in Code, in Cowork (legge il riassunto `_stato-corrente.md`) e raccoglie il lavoro delle sessioni cloud; importata quella di stamattina sul Food Cost. **Aspetta te**: un giro di prova su tutti i tab Food Cost; beta tester e marchio NoShowApp; dal 1/10 FAQ e foglio QR dal pannello Orari; calendario Mare d'Inverno. **Segnale**: nessuna sessione SEO negli ultimi 30 giorni.",
  "kpi": {
   "aperte": 45,
   "scadute": 8,

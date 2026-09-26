@@ -1,15 +1,15 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
- "generato": "2026-09-25",
- "versione": "2026.09.25",
- "briefing": "**Briefing 25/9/2026 (sera)** — Nuovo sotto-progetto **NoShowApp** in Jarvis con le fasi della roadmap v5.5 (beta tester, marchio, Stripe live, Connect, landing, app). App aggiornata alla v 2026.09.25.2 (registrazione e storico condiviso rivisti), verificata online: pronta per i primi beta tester. **Aspetta te**: contattare i colleghi per la beta; marchio UIBM; dal 1/10 pubblicare FAQ e foglio QR dal pannello Orari di Apertura; calendario Mare d'Inverno. **Segnale**: nessuna sessione SEO negli ultimi 30 giorni.",
+ "generato": "2026-09-26",
+ "versione": "2026.09.26",
+ "briefing": "**Briefing 26/9/2026** — Jarvis ora raccoglie anche il lavoro delle sessioni cloud: importata quella di stamattina sul Food Cost (Tracciabilità modificabile, note nelle Spese, ordine crescente). **Aspetta te**: un giro di prova su tutti i tab Food Cost; prova di Jarvis in Cowork (carica la skill, poi 'Jarvis stato'); beta tester e marchio NoShowApp; dal 1/10 FAQ e foglio QR dal pannello Orari. **Segnale**: nessuna sessione SEO negli ultimi 30 giorni.",
  "kpi": {
-  "aperte": 45,
+  "aperte": 46,
   "scadute": 8,
   "bloccate": 3,
-  "andrea": 9,
+  "andrea": 11,
   "debiti": 7,
-  "chiuse30": 21
+  "chiuse30": 22
  },
  "subs": {
   "Decennale": {
@@ -35,14 +35,14 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 81,
-   "done": 70,
+   "tot": 82,
+   "done": 71,
    "prog": 0,
-   "up": 1,
-   "future": 10,
+   "up": 2,
+   "future": 9,
    "bloccato": 0,
    "scadute": 0,
-   "andrea": 2,
+   "andrea": 3,
    "debiti": 6
   },
   "Marketing": {
@@ -57,14 +57,14 @@ window.JARVIS_DATA = {
    "debiti": 1
   },
   "Trasversale": {
-   "tot": 6,
+   "tot": 7,
    "done": 6,
    "prog": 0,
-   "up": 0,
+   "up": 1,
    "future": 0,
    "bloccato": 0,
    "scadute": 0,
-   "andrea": 0,
+   "andrea": 1,
    "debiti": 0
   },
   "NoShowApp": {
@@ -177,6 +177,18 @@ window.JARVIS_DATA = {
    "agg": "2026-09-25"
   },
   {
+   "t": "Prova Jarvis in Cowork (cartella santamonica/, skill caricata sull'account)",
+   "sub": "Trasversale",
+   "st": "up",
+   "s": "2026-09-26",
+   "e": null,
+   "own": "Andrea",
+   "az": "Caricare jarvis-skill-v2026.09.26.01.zip in claude.ai → Impostazioni → Capacità → Skills; aprire Cowork sulla cartella santamonica/ e scrivere 'Jarvis stato'",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-26"
+  },
+  {
    "t": "Sponsorizzata Salone Nautico",
    "sub": "Marketing",
    "st": "prog",
@@ -187,6 +199,18 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
+  },
+  {
+   "t": "Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-09-21",
+   "e": null,
+   "own": "Andrea",
+   "az": "Giro veloce su tutti i tab Food Cost (Incassi, Inventario, Dashboard, Vendite, Costo piatti) + prova delle novità del 26/9",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-26"
   }
  ],
  "scadute": [
@@ -391,6 +415,16 @@ window.JARVIS_DATA = {
  ],
  "sessioni": [
   {
+   "d": "2026-09-26",
+   "sub": "Sito",
+   "t": "Food Cost rifiniture (sessione cloud)"
+  },
+  {
+   "d": "2026-09-26",
+   "sub": "Trasversale",
+   "t": "Jarvis multi-ambiente (Code, Cowork, cloud)"
+  },
+  {
    "d": "2026-09-25",
    "sub": "NoShowApp",
    "t": "roadmap in Jarvis e manutenzione app"
@@ -417,16 +451,6 @@ window.JARVIS_DATA = {
   },
   {
    "d": "2026-09-19",
-   "sub": "Sito",
-   "t": "Attività ricostruita da commit SantaWeb"
-  },
-  {
-   "d": "2026-09-18",
-   "sub": "Sito",
-   "t": "Attività ricostruita da commit SantaWeb"
-  },
-  {
-   "d": "2026-09-16",
    "sub": "Sito",
    "t": "Attività ricostruita da commit SantaWeb"
   }
@@ -478,7 +502,7 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-21",
-   "n": 4
+   "n": 6
   }
  ],
  "perDay": [
@@ -504,7 +528,7 @@ window.JARVIS_DATA = {
   },
   {
    "g": "sab",
-   "n": 14
+   "n": 16
   },
   {
    "g": "dom",

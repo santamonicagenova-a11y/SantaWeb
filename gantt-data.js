@@ -5,11 +5,11 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.09.25.11",
-  updated: "2026-09-25",
+  version: "2026.09.26.01",
+  updated: "2026-09-26",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
-  today:     "2026-09-25",
+  today:     "2026-09-26",
 
   sections: [
     { key:'dec', name:'★ Decennale — serata 1 luglio 2026', badge:'evento trasversale', tasks:[
@@ -84,6 +84,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Gestionale Cantina — riconciliazione prezzi con PDF ufficiale carta vini: 1 correzione (Erbaspada), 3 vini nascosti riattivati, 3 vini mancanti aggiunti (nascosti, in revisione)', s:'2026-08-25', st:'done', ms:true},
       {t:'Gestionale Cantina — commit cantina.html + menu-admin.html, primo giro d’uso reale', s:'2026-08-15', e:'2026-08-31', st:'done'},
       {t:'Fix mobile overflow orizzontale (menu-allergeni · cookies · privacy) — stesso pattern fix template 10/6, tabelle scorrevoli invece di sbordare', s:'2026-08-23', st:'done', ms:true},
+      {t:'Food Cost — rifiniture 26/9: righe Tracciabilità modificabili, note nelle Spese, ordine cronologico crescente', s:'2026-09-26', e:'2026-09-26', st:'done'},
       {t:'Food Cost giornaliero — tool costruito in menu-admin (date-range, dashboard Chart.js, sezione Beverage speculare, 4 KPI dedicate)', s:'2026-09-11', e:'2026-09-13', st:'done', ms:true},
       {t:'Food Cost — redesign inventario da range Dal/Al a conteggio puntuale per data (fc_inventario_conteggi), niente più doppia digitazione tra periodi consecutivi', s:'2026-09-13', st:'done', ms:true},
       {t:'Food Cost — badge "periodo non chiuso" sui KPI + storico conteggi con heatmap mensile + pannello periodi chiusi + auto-load ultimo periodo in Dashboard', s:'2026-09-13', st:'done', ms:true},
@@ -91,7 +92,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Gantt trasversale ricostruito da zero + pubblicato su santamonicagenova.it/gantt (gantt.html noindex + gantt-data.js)', s:'2026-09-21', st:'done', ms:true},
       {t:'Food Cost — opzione futura (non richiesta come lavoro): Labor Cost % · Prime Cost % · Break-Even Point, serve una fonte dati costo-personale non ancora esistente', s:'2026-09-13', e:'2027-05-01', st:'future'},
       {t:'Aggiornare orari su Google Business Profile e schede esterne (settembre-ottobre)', s:'2026-08-28', e:'2026-09-25', st:'done'},
-      {t:'Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)', s:'2026-09-21', st:'future'},
+      {t:'Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)', s:'2026-09-21', st:'up'},
       {t:'Restyling tema scuro del sito (home, menu, prenota, regala, dove-siamo)', s:'2026-09-04', e:'2026-09-04', st:'done'},
       {t:'Home — sezione Info a 3 card + newsletter restyle, FAQ multilingua, redesign regala.html', s:'2026-09-05', e:'2026-09-06', st:'done'},
       {t:'Modulo Food Cost in menu-admin (dashboard, KPI, Tracciabilità, Incassi, Inventario)', s:'2026-09-11', e:'2026-09-21', st:'done'},

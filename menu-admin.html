@@ -1,4 +1,14 @@
 <!DOCTYPE html>
+<!-- v 2026.09.26.09 — Food Cost, nuovo "Calcolo Food Cost" (richiesto da Andrea): 1) Setup →
+     nuova sezione "Ingredienti" (nome, u.m. kg/l/pz, prezzo per u.m. già netto di scarto e
+     IVA esclusa, fornitore scelto dall'anagrafica Cantina, attivo; modifica in linea, ricerca,
+     eliminazione solo se non usato in ricette); 2) nuovo tab "Calcolo Food Cost": per ogni
+     piatto di "Dettagli piatti" la ricetta = ingredienti + quantità (g/kg, ml/cl/l, pz) e
+     numero di porzioni, costo riga/totale/porzione e FC% sul prezzo della carta pubblicata
+     calcolati dal vivo; 3) Costo piatti: per i piatti con ricetta la colonna "Costo ricetta"
+     è in sola lettura e arriva dal calcolo (una sola fonte di verità, come il prezzo). Niente
+     semilavorati né prezzi dalla Tracciabilità (scelte di Andrea). Backend foodcost-admin v13
+     + tabelle fc_ingredienti / fc_ricette / fc_ricette_righe. -->
 <!-- v 2026.09.26.08 — Food Cost → Costo piatti (richiesto da Andrea): la colonna "Prezzo
      vendita" prende il prezzo dalla carta PUBBLICATA (fetch live di menu-it.html +
      menu-dolci.html, match sezione+nome normalizzati con _pdNorm, ripiego sul solo nome se
@@ -1032,6 +1042,7 @@
     input[type=text], input[type=number] { width:100%; padding:.4rem .5rem; border:1px solid var(--rule); border-radius:var(--radius); background:var(--field); font-family:'Inter',sans-serif; font-size:.82rem; color:var(--ink); }
     input:focus { outline:none; border-color:var(--rust); box-shadow:0 0 0 3px rgba(245,158,11,.16); }
     input[type=checkbox] { width:16px; height:16px; cursor:pointer; accent-color:var(--rust); display:block; margin:auto; }
+    .fc-sel { padding:.35rem .5rem; border:1px solid var(--rule); background:var(--field); border-radius:var(--radius); font-family:Inter,sans-serif; font-size:.82rem; color:var(--ink); }
 
     .toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(5rem); background:var(--green); color:#04220f; padding:.65rem 1.6rem; border-radius:var(--radius); font-size:.8rem; font-weight:600; transition:transform .3s; z-index:999; }
     .toast.on { transform:translateX(-50%) translateY(0); }
@@ -1371,6 +1382,7 @@
         <button class="btn btn-load" id="fc-tab-btn-vendite" onclick="fcSetTab('vendite')">Vendite</button>
         <button class="btn btn-load" id="fc-tab-btn-inventario" onclick="fcSetTab('inventario')">Inventario</button>
         <button class="btn btn-load" id="fc-tab-btn-costi" onclick="fcSetTab('costi')">Costo piatti</button>
+        <button class="btn btn-load" id="fc-tab-btn-ricette" onclick="fcSetTab('ricette')">Calcolo Food Cost</button>
         <button class="btn btn-load" id="fc-tab-btn-reparti" onclick="fcSetTab('reparti')">Setup</button>
       </div>
 
@@ -1416,6 +1428,30 @@
           <button class="btn btn-publish" onclick="fcAggiungiReparto()">+ Aggiungi</button>
         </div>
         <div id="fc-reparti-list" style="font-size:.85rem;">…</div>
+
+        <div class="sub">Ingredienti (per il Calcolo Food Cost)</div>
+        <p style="font-size:.78rem;color:var(--stone);margin-bottom:.8rem;">Prezzo per unità di misura già al netto dello scarto (costo reale del prodotto pulito) e IVA esclusa. Cambiando un prezzo si ricalcolano da sole le ricette che usano l'ingrediente e il loro Costo ricetta in "Costo piatti".</p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
+          <div style="flex:1;min-width:12rem;">
+            <span class="opt-lbl">Ingrediente</span>
+            <input type="text" id="fc-ingr-nome" placeholder="Es: Gambero viola pulito" />
+          </div>
+          <div>
+            <span class="opt-lbl">U.m.</span>
+            <select id="fc-ingr-um" class="fc-sel" style="width:5.5rem;"><option value="kg">kg</option><option value="l">l</option><option value="pz">pz</option></select>
+          </div>
+          <div>
+            <span class="opt-lbl">Prezzo € / u.m.</span>
+            <input type="number" id="fc-ingr-prezzo" min="0" step="any" style="width:7.5rem;" />
+          </div>
+          <div>
+            <span class="opt-lbl">Fornitore</span>
+            <select id="fc-ingr-fornitore" class="fc-sel" style="width:13rem;"></select>
+          </div>
+          <button class="btn btn-publish" onclick="fcAggiungiIngrediente()">+ Aggiungi</button>
+        </div>
+        <input type="text" id="fc-ingr-filtro" placeholder="Cerca ingrediente o fornitore…" oninput="fcRenderIngredienti()" style="max-width:20rem;margin-bottom:.6rem;" />
+        <div id="fc-ingredienti-list" style="font-size:.85rem;">…</div>
       </div>
 
       <div id="fc-view-spese" style="display:none;">
@@ -1536,11 +1572,17 @@
       </div>
 
       <div id="fc-view-costi" style="display:none;">
-        <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Costo ricetta per ogni piatto già presente in "Dettagli piatti (allergeni)". Il prezzo di vendita è letto dalla carta pubblicata (carta + dolci) e si riallinea da solo all’apertura di questo tab; solo i piatti non trovati in carta hanno il prezzo da inserire a mano. Aggiorna quando cambia un costo ingrediente.</p>
+        <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Costo ricetta per ogni piatto già presente in "Dettagli piatti (allergeni)". Il prezzo di vendita è letto dalla carta pubblicata (carta + dolci) e si riallinea da solo all’apertura di questo tab; solo i piatti non trovati in carta hanno il prezzo da inserire a mano. Per i piatti con una ricetta nel tab "Calcolo Food Cost" il costo arriva da lì (sola lettura); gli altri si inseriscono a mano.</p>
         <div id="fc-costi-list" style="font-size:.85rem;">…</div>
         <div style="margin-top:1rem;">
           <button class="btn btn-publish" onclick="fcSalvaCosti()">💾 Salva costi</button>
         </div>
+      </div>
+
+      <div id="fc-view-ricette" style="display:none;">
+        <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Per ogni piatto elenca ingredienti e quantità: il costo è calcolato dai prezzi di Setup → Ingredienti e riportato in "Costo piatti" (dove diventa sola lettura). FC% sul prezzo della carta pubblicata, IVA esclusa.</p>
+        <div id="fc-ricetta-editor" style="display:none;margin-bottom:1.4rem;"></div>
+        <div id="fc-ricette-list" style="font-size:.85rem;">…</div>
       </div>
 
       <div id="fc-view-vendite" style="display:none;">
@@ -3861,7 +3903,7 @@ var FC_ALIQUOTA_IVA = 0.10;
 var FC_CAT = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'];
 var FC_ME_COLORE = { STAR: '#22c55e', PLOWHORSE: '#3b82f6', PUZZLE: '#f59e0b', DOG: '#e34948' };
 var fcCharts = {};
-var fcState = { reparti: [], tab: 'dashboard', speseTipo: 'food', inventarioTipo: 'food', spese: [], incassi: [], inventario: [], costi: [], vendite: [], dashboard: null, dashboardAutoloadFatto: false, categorieTracc: [], tracciabilita: [], traccRigheSeq: [], traccInizializzato: false, traccEditId: null, fornitoriCantina: [] };
+var fcState = { reparti: [], tab: 'dashboard', speseTipo: 'food', inventarioTipo: 'food', spese: [], incassi: [], inventario: [], costi: [], vendite: [], dashboard: null, dashboardAutoloadFatto: false, categorieTracc: [], tracciabilita: [], traccRigheSeq: [], traccInizializzato: false, traccEditId: null, fornitoriCantina: [], ingredienti: [], ricettePiatti: [], ricettaEdit: null };
 
 // Accende/spegne lo stato "attivo" di un gruppo di pulsanti a interruttore (Food/Beverage),
 // stesso stile del tab attivo in fcSetTab (bordo+testo ambra + sfondo più chiaro).
@@ -3999,6 +4041,7 @@ var FC_TAB_GRUPPI = {
   vendite:    { colore: '#199e70', bg: 'rgba(25,158,112,.10)',  bgAttivo: 'rgba(25,158,112,.22)' },
   inventario: { colore: '#199e70', bg: 'rgba(25,158,112,.10)',  bgAttivo: 'rgba(25,158,112,.22)' },
   costi:      { colore: '#199e70', bg: 'rgba(25,158,112,.10)',  bgAttivo: 'rgba(25,158,112,.22)' },
+  ricette:    { colore: '#199e70', bg: 'rgba(25,158,112,.10)',  bgAttivo: 'rgba(25,158,112,.22)' },
   spese:      { colore: '#d95926', bg: 'rgba(217,89,38,.10)',   bgAttivo: 'rgba(217,89,38,.22)' },
   incassi:    { colore: '#d95926', bg: 'rgba(217,89,38,.10)',   bgAttivo: 'rgba(217,89,38,.22)' },
   tracciabilita: { colore: '#9085e9', bg: 'rgba(144,133,233,.10)', bgAttivo: 'rgba(144,133,233,.22)' },
@@ -4007,7 +4050,7 @@ var FC_TAB_GRUPPI = {
 
 function fcSetTab(t) {
   fcState.tab = t;
-  ['dashboard', 'spese', 'incassi', 'vendite', 'inventario', 'costi', 'reparti', 'tracciabilita'].forEach(function (k) {
+  ['dashboard', 'spese', 'incassi', 'vendite', 'inventario', 'costi', 'ricette', 'reparti', 'tracciabilita'].forEach(function (k) {
     var v = document.getElementById('fc-view-' + k), b = document.getElementById('fc-tab-btn-' + k);
     if (v) v.style.display = (k === t) ? '' : 'none';
     if (b) {
@@ -4021,7 +4064,8 @@ function fcSetTab(t) {
 }
 
 function fcLoadTab(t) {
-  if (t === 'reparti') { fcLoadReparti(); fcLoadTraccConfig(); }
+  if (t === 'reparti') { fcLoadReparti(); fcLoadTraccConfig(); fcLoadIngredienti(); }
+  else if (t === 'ricette') fcLoadRicette();
   else if (t === 'spese') fcLoadSpese();
   else if (t === 'tracciabilita') fcTraccInizializza();
   else if (t === 'incassi') fcLoadIncassi();
@@ -5057,7 +5101,9 @@ function fcRenderCosti() {
           (fcState.costiCartaOk ? '<div style="font-size:.7rem;color:#b5651d;">non trovato in carta — a mano</div>' : '');
       return '<tr style="border-top:1px solid var(--rule);">' +
         '<td style="padding:.35rem 0;">' + _fcEsc(r.piatto) + '<div style="font-size:.7rem;color:var(--stone);">' + _fcEsc(r.sezione || '') + '</div></td>' +
-        '<td><input type="number" min="0" step="0.01" id="fc-costo-' + r.piatto_id + '" value="' + (r.costo_piatto == null ? '' : r.costo_piatto) + '" style="width:8rem;" /></td>' +
+        '<td>' + (r.ha_ricetta
+          ? '<span style="font-weight:600;">' + _fcEur(r.costo_piatto) + '</span><div style="font-size:.7rem;color:var(--stone);">dalla ricetta (Calcolo Food Cost)</div>'
+          : '<input type="number" min="0" step="0.01" id="fc-costo-' + r.piatto_id + '" value="' + (r.costo_piatto == null ? '' : r.costo_piatto) + '" style="width:8rem;" />') + '</td>' +
         '<td>' + cellaPrezzo + '</td>' +
         '</tr>';
     }).join('') +
@@ -5068,7 +5114,8 @@ function fcSalvaCosti() {
   var chiamate = [];
   fcState.costi.forEach(function (r) {
     var costoEl = document.getElementById('fc-costo-' + r.piatto_id), prezzoEl = document.getElementById('fc-prezzo-' + r.piatto_id);
-    var costo = costoEl.value;
+    // v 2026.09.26.09: con ricetta il costo non si inserisce qui (il backend usa comunque quello calcolato).
+    var costo = r.ha_ricetta ? String(r.costo_piatto == null ? '' : r.costo_piatto) : costoEl.value;
     var daCarta = r.prezzo_carta != null;
     var prezzo = daCarta ? r.prezzo_carta : (prezzoEl ? prezzoEl.value : '');
     if (costo === '' && (daCarta || prezzo === '') && !r.piatto_costo_id) return; // riga mai compilata: salta
@@ -5087,6 +5134,308 @@ function fcSalvaCosti() {
     fcLoadCosti();
     _fcSetStatus('Costo piatti salvato.');
   }).catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+// ---- Setup → Ingredienti + tab Calcolo Food Cost (v 2026.09.26.09, backend foodcost-admin v13) ----
+// Prezzi per u.m. dell'ingrediente (kg, l, pz), già netti di scarto e IVA esclusa. Le righe
+// ricetta possono usare un sottomultiplo: FC_UNITA_RIGA dà il fattore verso l'u.m. (stessa
+// tabella di UNITA_RIGA nel backend, che ricalcola e scrive il costo in fc_piatti_costo).
+var FC_UNITA_RIGA = { g: { base: 'kg', f: 0.001 }, kg: { base: 'kg', f: 1 }, ml: { base: 'l', f: 0.001 }, cl: { base: 'l', f: 0.01 }, l: { base: 'l', f: 1 }, pz: { base: 'pz', f: 1 } };
+var FC_UNITA_PER_UM = { kg: ['g', 'kg'], l: ['ml', 'cl', 'l'], pz: ['pz'] };
+
+function _fcNum(v) { var x = Number(String(v == null ? '' : v).replace(',', '.')); return isFinite(x) ? x : 0; }
+
+// Opzioni fornitore dall'anagrafica Cantina (stesso elenco di Tracciabilità); un valore già
+// salvato ma non più in anagrafica resta selezionabile per non perderlo.
+function _fcOpzioniFornitore(selezionato) {
+  var nomi = (fcState.fornitoriCantina || []).map(function (f) { return f.ragione_sociale; });
+  if (selezionato && nomi.indexOf(selezionato) === -1) nomi = [selezionato].concat(nomi);
+  return '<option value="">— nessuno —</option>' + nomi.map(function (nm) {
+    return '<option value="' + _fcEsc(nm) + '"' + (nm === selezionato ? ' selected' : '') + '>' + _fcEsc(nm) + '</option>';
+  }).join('');
+}
+
+function _fcAssicuraFornitori(cb) {
+  if ((fcState.fornitoriCantina || []).length) { cb(); return; }
+  fetch(CANTINA_ANAGRAFICHE_URL)
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      var f = (data && data.fornitori) || [];
+      fcState.fornitoriCantina = f.filter(function (x) { return x.ragione_sociale; })
+        .sort(function (a, b) { return a.ragione_sociale.localeCompare(b.ragione_sociale); });
+      cb();
+    })
+    .catch(function () { _fcSetStatus('Anagrafica fornitori Cantina non raggiungibile — riprova più tardi.', true); cb(); });
+}
+
+function fcLoadIngredienti() {
+  _fcAssicuraFornitori(function () {
+    var sel = document.getElementById('fc-ingr-fornitore');
+    if (sel) sel.innerHTML = _fcOpzioniFornitore(sel.value);
+  });
+  _fcFetch({ action: 'ingredienti_list' })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcState.ingredienti = res.body.ingredienti || [];
+      _fcAssicuraFornitori(fcRenderIngredienti);
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function fcRenderIngredienti() {
+  var list = document.getElementById('fc-ingredienti-list');
+  if (!list) return;
+  if (!fcState.ingredienti.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun ingrediente ancora. Aggiungilo dal modulo qui sopra.</p>'; return; }
+  var q = ((document.getElementById('fc-ingr-filtro') || {}).value || '').trim().toLowerCase();
+  var righe = fcState.ingredienti.filter(function (i) {
+    return !q || (i.nome || '').toLowerCase().indexOf(q) !== -1 || (i.fornitore_nome || '').toLowerCase().indexOf(q) !== -1;
+  });
+  var th = 'style="padding:.3rem .4rem .3rem 0;"';
+  list.innerHTML = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:.82rem;">' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th ' + th + '>Ingrediente</th><th ' + th + '>U.m.</th><th ' + th + '>€ / u.m.</th><th ' + th + '>Fornitore</th><th ' + th + '>Attivo</th><th ' + th + '>Usato in</th><th></th></tr>' +
+    righe.map(function (i) {
+      return '<tr style="border-top:1px solid var(--rule);' + (i.attivo ? '' : 'opacity:.55;') + '">' +
+        '<td style="padding:.3rem .4rem .3rem 0;"><input type="text" id="fc-ingr-nome-' + i.id + '" value="' + _fcEsc(i.nome) + '" style="min-width:11rem;" /></td>' +
+        '<td style="padding-right:.4rem;"><select id="fc-ingr-um-' + i.id + '" class="fc-sel" style="width:4.8rem;">' + ['kg', 'l', 'pz'].map(function (u) { return '<option value="' + u + '"' + (u === i.unita_misura ? ' selected' : '') + '>' + u + '</option>'; }).join('') + '</select></td>' +
+        '<td style="padding-right:.4rem;"><input type="number" min="0" step="any" id="fc-ingr-prezzo-' + i.id + '" value="' + (i.prezzo == null ? '' : i.prezzo) + '" style="width:6.5rem;" /></td>' +
+        '<td style="padding-right:.4rem;"><select id="fc-ingr-forn-' + i.id + '" class="fc-sel" style="width:11rem;">' + _fcOpzioniFornitore(i.fornitore_nome || '') + '</select></td>' +
+        '<td style="padding-right:.4rem;"><input type="checkbox" id="fc-ingr-attivo-' + i.id + '" ' + (i.attivo ? 'checked' : '') + ' /></td>' +
+        '<td style="padding-right:.4rem;color:var(--stone);font-size:.75rem;white-space:nowrap;">' + (i.n_piatti ? i.n_piatti + ' piatt' + (i.n_piatti === 1 ? 'o' : 'i') : '—') + '</td>' +
+        '<td style="white-space:nowrap;"><button class="btn btn-load" style="font-size:.72rem;padding:.25rem .6rem;" onclick="fcSalvaIngrediente(\'' + i.id + '\')">💾</button> ' +
+        (i.n_piatti ? '' : '<button class="btn btn-load" style="font-size:.72rem;padding:.25rem .6rem;" title="Elimina" onclick="fcEliminaIngrediente(\'' + i.id + '\')">🗑</button>') + '</td>' +
+        '</tr>';
+    }).join('') +
+    '</table></div>' +
+    (righe.length ? '' : '<p style="color:var(--stone);font-size:.8rem;">Nessun ingrediente corrisponde alla ricerca.</p>');
+}
+
+function fcAggiungiIngrediente() {
+  var nomeEl = document.getElementById('fc-ingr-nome'), prezzoEl = document.getElementById('fc-ingr-prezzo');
+  var nome = nomeEl.value.trim();
+  if (!nome) { _fcSetStatus('Indica il nome dell\'ingrediente.', true); return; }
+  if (prezzoEl.value === '') { _fcSetStatus('Indica il prezzo per unità di misura.', true); return; }
+  _fcSetStatus('Aggiunta…');
+  _fcFetch({
+    action: 'ingredienti_create', nome: nome, unita_misura: document.getElementById('fc-ingr-um').value,
+    prezzo: _fcNum(prezzoEl.value), fornitore_nome: document.getElementById('fc-ingr-fornitore').value, attivo: true,
+  }).then(function (res) {
+    if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+    fcState.ingredienti = res.body.ingredienti || [];
+    nomeEl.value = ''; prezzoEl.value = '';
+    fcRenderIngredienti();
+    _fcSetStatus('Ingrediente aggiunto.');
+    nomeEl.focus();
+  }).catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function fcSalvaIngrediente(id) {
+  var nome = document.getElementById('fc-ingr-nome-' + id).value.trim();
+  if (!nome) { _fcSetStatus('Il nome dell\'ingrediente non può essere vuoto.', true); return; }
+  _fcSetStatus('Salvataggio…');
+  _fcFetch({
+    action: 'ingredienti_update', id: id, nome: nome,
+    unita_misura: document.getElementById('fc-ingr-um-' + id).value,
+    prezzo: _fcNum(document.getElementById('fc-ingr-prezzo-' + id).value),
+    fornitore_nome: document.getElementById('fc-ingr-forn-' + id).value,
+    attivo: document.getElementById('fc-ingr-attivo-' + id).checked,
+  }).then(function (res) {
+    if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+    fcState.ingredienti = res.body.ingredienti || [];
+    fcRenderIngredienti();
+    var ing = fcState.ingredienti.find(function (i) { return i.id === id; });
+    _fcSetStatus('Ingrediente salvato.' + (ing && ing.n_piatti ? ' Ricalcolato il costo di ' + ing.n_piatti + ' piatt' + (ing.n_piatti === 1 ? 'o' : 'i') + '.' : ''));
+  }).catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function fcEliminaIngrediente(id) {
+  var ing = fcState.ingredienti.find(function (i) { return i.id === id; });
+  if (!confirm('Eliminare l\'ingrediente "' + (ing ? ing.nome : '') + '"?')) return;
+  _fcSetStatus('Eliminazione…');
+  _fcFetch({ action: 'ingredienti_delete', id: id })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcState.ingredienti = res.body.ingredienti || [];
+      fcRenderIngredienti();
+      _fcSetStatus('Ingrediente eliminato.');
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+// ---- Tab Calcolo Food Cost ----
+
+function fcLoadRicette(msgDopo) {
+  _fcSetStatus('Caricamento ricette…');
+  Promise.all([_fcFetch({ action: 'piatti_costo_list' }), _fcFetch({ action: 'ingredienti_list' }), _fcPrezziCartaLive()])
+    .then(function (out) {
+      var resP = out[0], resI = out[1], carta = out[2];
+      if (!_fcOk(resP)) { _fcSetStatus(_fcErrMsg(resP), true); return; }
+      if (!_fcOk(resI)) { _fcSetStatus(_fcErrMsg(resI), true); return; }
+      fcState.ingredienti = resI.body.ingredienti || [];
+      fcState.ricettePiatti = (resP.body.righe || []).map(function (r) {
+        var m = carta ? _fcPrezzoCartaPer(carta, r.sezione, r.piatto) : null;
+        r.prezzo_calc = m ? m.prezzo : (Number(r.prezzo_vendita) || null);
+        return r;
+      });
+      fcRenderRicette();
+      if (fcState.ricettaEdit) fcRenderRicettaEditor();
+      if (msgDopo) _fcSetStatus(msgDopo);
+      else _fcSetStatus(fcState.ingredienti.length ? '' : 'Nessun ingrediente ancora: inseriscili prima in Setup → Ingredienti.', !fcState.ingredienti.length);
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function _fcFcPct(costo, prezzo) {
+  if (!prezzo || costo == null) return '—';
+  return _fcPct(costo / prezzo);
+}
+
+function fcRenderRicette() {
+  var list = document.getElementById('fc-ricette-list');
+  if (!list) return;
+  if (!fcState.ricettePiatti.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun piatto in "Dettagli piatti (allergeni)" — crealo prima da lì.</p>'; return; }
+  var conRicetta = fcState.ricettePiatti.filter(function (r) { return r.ha_ricetta; }).length;
+  list.innerHTML = '<div style="font-size:.75rem;color:var(--stone);margin-bottom:.5rem;">Ricette compilate: ' + conRicetta + ' su ' + fcState.ricettePiatti.length + ' piatti.</div>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:.82rem;">' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Piatto</th><th>Ingredienti</th><th>Costo porzione</th><th>Prezzo</th><th>FC %</th><th></th></tr>' +
+    fcState.ricettePiatti.map(function (r) {
+      var aperto = fcState.ricettaEdit && fcState.ricettaEdit.piatto_id === r.piatto_id;
+      return '<tr style="border-top:1px solid var(--rule);' + (aperto ? 'background:rgba(25,158,112,.10);' : '') + '">' +
+        '<td style="padding:.35rem 0;">' + _fcEsc(r.piatto) + '<div style="font-size:.7rem;color:var(--stone);">' + _fcEsc(r.sezione || '') + '</div></td>' +
+        '<td>' + (r.ha_ricetta ? r.ricetta_n_righe : '<span style="color:var(--stone);">—</span>') + '</td>' +
+        '<td>' + (r.ha_ricetta ? _fcEur(r.costo_piatto) : '<span style="color:var(--stone);">' + (r.costo_piatto != null ? _fcEur(r.costo_piatto) + ' a mano' : '—') + '</span>') + '</td>' +
+        '<td>' + (r.prezzo_calc ? _fcEur(r.prezzo_calc) : '—') + '</td>' +
+        '<td>' + (r.ha_ricetta ? _fcFcPct(Number(r.costo_piatto), r.prezzo_calc) : '—') + '</td>' +
+        '<td style="text-align:right;"><button class="btn btn-load" style="font-size:.72rem;padding:.25rem .6rem;" onclick="fcApriRicetta(\'' + r.piatto_id + '\')">' + (r.ha_ricetta ? '✏️ Modifica' : '+ Ricetta') + '</button></td>' +
+        '</tr>';
+    }).join('') +
+    '</table>';
+}
+
+function fcApriRicetta(piattoId) {
+  var p = fcState.ricettePiatti.find(function (r) { return r.piatto_id === piattoId; });
+  if (!p) return;
+  _fcSetStatus('Caricamento ricetta…');
+  _fcFetch({ action: 'ricetta_get', piatto_id: piattoId })
+    .then(function (res) {
+      if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+      fcState.ricettaEdit = {
+        piatto_id: piattoId, piatto: p.piatto, sezione: p.sezione, prezzo: p.prezzo_calc,
+        porzioni: (res.body.ricetta && res.body.ricetta.porzioni) || 1,
+        righe: (res.body.righe || []).map(function (g) { return { ingrediente_id: g.ingrediente_id, quantita: g.quantita, unita: g.unita }; }),
+      };
+      if (!fcState.ricettaEdit.righe.length) fcState.ricettaEdit.righe.push({ ingrediente_id: '', quantita: '', unita: '' });
+      fcRenderRicettaEditor();
+      fcRenderRicette();
+      _fcSetStatus('');
+      document.getElementById('fc-ricetta-editor').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    })
+    .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
+}
+
+function _fcIngr(id) { return fcState.ingredienti.find(function (i) { return i.id === id; }) || null; }
+
+function _fcCostoRiga(g) {
+  var ing = _fcIngr(g.ingrediente_id), u = FC_UNITA_RIGA[g.unita];
+  if (!ing || !u || u.base !== ing.unita_misura) return null;
+  return _fcNum(g.quantita) * u.f * Number(ing.prezzo || 0);
+}
+
+function fcRenderRicettaEditor() {
+  var box = document.getElementById('fc-ricetta-editor');
+  var e = fcState.ricettaEdit;
+  if (!box) return;
+  if (!e) { box.style.display = 'none'; box.innerHTML = ''; return; }
+  var ingOrdinati = fcState.ingredienti.slice().sort(function (a, b) { return (a.nome || '').localeCompare(b.nome || ''); });
+  var righeHtml = e.righe.map(function (g, idx) {
+    var ing = _fcIngr(g.ingrediente_id);
+    var opzIng = '<option value="">— scegli —</option>' + ingOrdinati.filter(function (i) { return i.attivo || i.id === g.ingrediente_id; }).map(function (i) {
+      return '<option value="' + i.id + '"' + (i.id === g.ingrediente_id ? ' selected' : '') + '>' + _fcEsc(i.nome) + ' — ' + _fcEur(i.prezzo) + '/' + i.unita_misura + (i.attivo ? '' : ' (disattivo)') + '</option>';
+    }).join('');
+    var unita = ing ? FC_UNITA_PER_UM[ing.unita_misura] : [];
+    var opzU = unita.map(function (u) { return '<option value="' + u + '"' + (u === g.unita ? ' selected' : '') + '>' + u + '</option>'; }).join('');
+    return '<tr style="border-top:1px solid var(--rule);">' +
+      '<td style="padding:.3rem .4rem .3rem 0;"><select class="fc-sel" style="min-width:14rem;max-width:100%;" onchange="fcRicettaSetIngr(' + idx + ', this.value)">' + opzIng + '</select></td>' +
+      '<td style="padding-right:.4rem;"><input type="number" min="0" step="any" value="' + (g.quantita === '' || g.quantita == null ? '' : g.quantita) + '" style="width:6.5rem;" oninput="fcRicettaSetQta(' + idx + ', this.value)" /></td>' +
+      '<td style="padding-right:.4rem;"><select class="fc-sel" style="width:4.8rem;" onchange="fcRicettaSetUnita(' + idx + ', this.value)"' + (ing ? '' : ' disabled') + '>' + opzU + '</select></td>' +
+      '<td style="padding-right:.4rem;white-space:nowrap;" id="fc-ric-costo-' + idx + '"></td>' +
+      '<td><button class="btn btn-load" style="font-size:.72rem;padding:.2rem .5rem;" title="Togli riga" onclick="fcRicettaTogliRiga(' + idx + ')">✕</button></td>' +
+      '</tr>';
+  }).join('');
+  box.style.display = '';
+  box.innerHTML = '<div class="fs"><div class="fs-body" style="padding:1rem;">' +
+    '<div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:baseline;margin-bottom:.8rem;">' +
+    '<div><div style="font-size:1rem;font-weight:600;color:var(--ink);">' + _fcEsc(e.piatto) + '</div><div style="font-size:.72rem;color:var(--stone);">' + _fcEsc(e.sezione || '') + '</div></div>' +
+    '<div><span class="opt-lbl">Porzioni della ricetta</span><input type="number" min="1" step="1" value="' + e.porzioni + '" style="width:5rem;" oninput="fcRicettaSetPorzioni(this.value)" /></div>' +
+    '</div>' +
+    '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:.82rem;">' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Ingrediente</th><th>Quantità</th><th>Unità</th><th>Costo</th><th></th></tr>' +
+    righeHtml + '</table></div>' +
+    '<button class="btn btn-load" style="margin-top:.6rem;font-size:.75rem;" onclick="fcRicettaAggiungiRiga()">+ Aggiungi ingrediente</button>' +
+    '<div id="fc-ric-totali" style="margin-top:1rem;font-size:.85rem;"></div>' +
+    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1rem;">' +
+    '<button class="btn btn-publish" onclick="fcSalvaRicetta()">💾 Salva ricetta</button>' +
+    '<button class="btn btn-load" style="border:1px solid var(--ink);color:var(--ink)" onclick="fcChiudiRicetta()">✕ Chiudi</button>' +
+    '</div></div></div>';
+  fcRicettaAggiornaTotali();
+}
+
+// Aggiorna solo i numeri (non ridisegna gli input, così il cursore resta dov'è).
+function fcRicettaAggiornaTotali() {
+  var e = fcState.ricettaEdit;
+  if (!e) return;
+  var totale = 0, incompleta = false;
+  e.righe.forEach(function (g, idx) {
+    var c = _fcCostoRiga(g), cella = document.getElementById('fc-ric-costo-' + idx);
+    if (c == null || !_fcNum(g.quantita)) { if (g.ingrediente_id || g.quantita !== '') incompleta = true; if (cella) cella.textContent = '—'; return; }
+    totale += c;
+    if (cella) cella.textContent = _fcEur(c);
+  });
+  var porz = Math.max(1, Math.round(_fcNum(e.porzioni)) || 1);
+  var perPorzione = totale / porz;
+  var el = document.getElementById('fc-ric-totali');
+  if (!el) return;
+  el.innerHTML =
+    '<div>Costo ricetta: <strong>' + _fcEur(totale) + '</strong>' + (porz > 1 ? ' per ' + porz + ' porzioni' : '') + '</div>' +
+    '<div>Costo per porzione: <strong>' + _fcEur(perPorzione) + '</strong></div>' +
+    '<div>Prezzo in carta: ' + (e.prezzo ? _fcEur(e.prezzo) + ' · FC <strong>' + _fcFcPct(perPorzione, e.prezzo) + '</strong>' : '<span style="color:var(--stone);">non trovato</span>') + '</div>' +
+    (incompleta ? '<div style="color:#b5651d;font-size:.75rem;margin-top:.3rem;">Ci sono righe incomplete: al salvataggio vanno completate o tolte.</div>' : '');
+}
+
+function fcRicettaSetIngr(idx, id) {
+  var g = fcState.ricettaEdit.righe[idx], ing = _fcIngr(id);
+  g.ingrediente_id = id;
+  var ammesse = ing ? FC_UNITA_PER_UM[ing.unita_misura] : [];
+  if (ammesse.indexOf(g.unita) === -1) g.unita = ammesse[0] || '';
+  fcRenderRicettaEditor();
+}
+function fcRicettaSetQta(idx, v) { fcState.ricettaEdit.righe[idx].quantita = v; fcRicettaAggiornaTotali(); }
+function fcRicettaSetUnita(idx, v) { fcState.ricettaEdit.righe[idx].unita = v; fcRicettaAggiornaTotali(); }
+function fcRicettaSetPorzioni(v) { fcState.ricettaEdit.porzioni = v; fcRicettaAggiornaTotali(); }
+function fcRicettaAggiungiRiga() { fcState.ricettaEdit.righe.push({ ingrediente_id: '', quantita: '', unita: '' }); fcRenderRicettaEditor(); }
+function fcRicettaTogliRiga(idx) { fcState.ricettaEdit.righe.splice(idx, 1); fcRenderRicettaEditor(); }
+function fcChiudiRicetta() { fcState.ricettaEdit = null; fcRenderRicettaEditor(); fcRenderRicette(); }
+
+function fcSalvaRicetta() {
+  var e = fcState.ricettaEdit;
+  if (!e) return;
+  var righe = e.righe.filter(function (g) { return g.ingrediente_id || g.quantita !== ''; });
+  for (var i = 0; i < righe.length; i++) {
+    if (_fcCostoRiga(righe[i]) == null || _fcNum(righe[i].quantita) <= 0) { _fcSetStatus('Riga ' + (i + 1) + ': scegli l\'ingrediente e indica una quantità.', true); return; }
+  }
+  var porzioni = Math.round(_fcNum(e.porzioni));
+  if (porzioni < 1) { _fcSetStatus('Le porzioni devono essere almeno 1.', true); return; }
+  if (!righe.length && !confirm('La ricetta è vuota: verrà eliminata e il costo in "Costo piatti" tornerà da inserire a mano. Procedere?')) return;
+  _fcSetStatus('Salvataggio ricetta…');
+  _fcFetch({
+    action: 'ricetta_save', piatto_id: e.piatto_id, porzioni: porzioni,
+    righe: righe.map(function (g) { return { ingrediente_id: g.ingrediente_id, quantita: _fcNum(g.quantita), unita: g.unita }; }),
+  }).then(function (res) {
+    if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
+    var c = res.body.costo;
+    fcState.ricettaEdit = null;
+    fcRenderRicettaEditor();
+    fcLoadRicette(res.body.eliminata ? 'Ricetta eliminata.' : 'Ricetta salvata — costo per porzione ' + _fcEur(c ? c.costo_porzione : 0) + ' riportato in "Costo piatti".');
+  }).catch(function (err) { _fcErr(err, 'Errore di connessione.'); });
 }
 
 // ---- Vendite di periodo (bulk, a fine mese) ----
@@ -7055,7 +7404,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.26.08</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.26.09</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

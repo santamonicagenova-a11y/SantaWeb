@@ -102,6 +102,18 @@
 // collegata (fc_tracciabilita_prodotti(id, rif_interno), relazione inversa via
 // spesa_id), così il frontend sa quali spese mostrare in sola lettura; spese_update
 // rifiuta con 409 una spesa collegata (blocco anche lato server, non solo in UI).
+// v13 (2026-09-26, stessa giornata) — richiesto da Andrea: calcolo del food cost dei piatti
+// a partire dagli ingredienti. Nuove tabelle fc_ingredienti (nome, u.m. kg/l/pz, prezzo
+// per u.m. già netto di scarto e IVA esclusa — lo scarto lo calcola Andrea a monte,
+// fornitore come testo dall'anagrafica Cantina), fc_ricette (una per piatto di
+// piatti_dettagli, con numero di porzioni) e fc_ricette_righe (ingrediente + quantità in
+// g/kg/ml/cl/l/pz, convertita nell'u.m. dell'ingrediente). Niente semilavorati né
+// aggiornamento prezzi dalla Tracciabilità (scelte di Andrea: solo ingredienti, prezzi a
+// mano). Il costo per porzione di un piatto con ricetta scrive fc_piatti_costo.costo_piatto
+// (la colonna "Costo ricetta" di Costo piatti, che diventa sola lettura): ricalcolo a ogni
+// salvataggio di ricetta e a ogni modifica di prezzo/u.m. di un ingrediente usato;
+// piatti_costo_upsert ignora il costo mandato dal client per i piatti con ricetta.
+// Nuove azioni: ingredienti_list/create/update/delete, ricetta_get, ricetta_save.
 // Riferimento di progettazione: DESIGN_foodcost-giornaliero_v2026.09.11.01.md
 // (progetto-sito).
 
@@ -156,6 +168,85 @@ function n(v: any): number {
 
 function isDate(v: any): boolean {
   return typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v);
+}
+
+// ---- Calcolo Food Cost da ingredienti (v13) ----
+// Unità di una riga ricetta → fattore verso l'u.m. dell'ingrediente (kg, l, pz).
+const UNITA_RIGA: Record<string, { base: string; f: number }> = {
+  g: { base: "kg", f: 0.001 }, kg: { base: "kg", f: 1 },
+  ml: { base: "l", f: 0.001 }, cl: { base: "l", f: 0.01 }, l: { base: "l", f: 1 },
+  pz: { base: "pz", f: 1 },
+};
+const UNITA_INGREDIENTE = ["kg", "l", "pz"];
+
+function arrot2(x: number): number { return Math.round(x * 100) / 100; }
+
+async function ingredientiList() {
+  const [ingRes, usoRes] = await Promise.all([
+    supabase.from("fc_ingredienti").select("*").order("nome", { ascending: true }),
+    supabase.from("fc_ricette_righe").select("ingrediente_id, piatto_id"),
+  ]);
+  if (ingRes.error) throw ingRes.error;
+  if (usoRes.error) throw usoRes.error;
+  const uso = new Map<string, Set<string>>();
+  (usoRes.data || []).forEach((r: any) => {
+    if (!uso.has(r.ingrediente_id)) uso.set(r.ingrediente_id, new Set());
+    uso.get(r.ingrediente_id)!.add(r.piatto_id);
+  });
+  return (ingRes.data || []).map((i: any) => ({ ...i, n_piatti: uso.has(i.id) ? uso.get(i.id)!.size : 0 }));
+}
+
+// Costo di ogni ricetta: { piatto_id → { costo_totale, porzioni, costo_porzione, n_righe } }.
+async function costoRicette(piattoIds?: string[]) {
+  let qr = supabase.from("fc_ricette").select("piatto_id, porzioni");
+  let qg = supabase.from("fc_ricette_righe").select("piatto_id, quantita, unita, fc_ingredienti(prezzo, unita_misura)");
+  if (piattoIds) { qr = qr.in("piatto_id", piattoIds); qg = qg.in("piatto_id", piattoIds); }
+  const [rRes, gRes] = await Promise.all([qr, qg]);
+  if (rRes.error) throw rRes.error;
+  if (gRes.error) throw gRes.error;
+  const out = new Map<string, any>();
+  (rRes.data || []).forEach((r: any) => out.set(r.piatto_id, { costo_totale: 0, porzioni: r.porzioni || 1, costo_porzione: 0, n_righe: 0 }));
+  (gRes.data || []).forEach((g: any) => {
+    const c = out.get(g.piatto_id);
+    const ing = g.fc_ingredienti;
+    const u = UNITA_RIGA[g.unita];
+    if (!c || !ing || !u) return;
+    c.costo_totale += n(g.quantita) * u.f * n(ing.prezzo);
+    c.n_righe++;
+  });
+  out.forEach((c) => { c.costo_porzione = arrot2(c.costo_totale / c.porzioni); c.costo_totale = arrot2(c.costo_totale); });
+  return out;
+}
+
+// Riporta in fc_piatti_costo.costo_piatto il costo per porzione dei piatti indicati che hanno
+// una ricetta con almeno una riga (prezzo di vendita e "attivo" invariati; scheda creata se
+// manca, con prezzo 0 — Costo piatti lo riallinea alla carta pubblicata all'apertura).
+async function ricalcolaCostiPiatti(piattoIds: string[]) {
+  const ids = Array.from(new Set(piattoIds.filter(Boolean)));
+  if (!ids.length) return;
+  const [costi, esistRes] = await Promise.all([
+    costoRicette(ids),
+    supabase.from("fc_piatti_costo").select("piatto_id, prezzo_vendita, attivo").in("piatto_id", ids),
+  ]);
+  if (esistRes.error) throw esistRes.error;
+  const esist = new Map((esistRes.data || []).map((r: any) => [r.piatto_id, r]));
+  const righe = ids.filter((id) => costi.has(id) && costi.get(id).n_righe > 0).map((id) => {
+    const e: any = esist.get(id);
+    return {
+      piatto_id: id, costo_piatto: costi.get(id).costo_porzione,
+      prezzo_vendita: e ? e.prezzo_vendita : 0, attivo: e ? e.attivo : true,
+      updated_at: new Date().toISOString(),
+    };
+  });
+  if (!righe.length) return;
+  const { error } = await supabase.from("fc_piatti_costo").upsert(righe, { onConflict: "piatto_id" });
+  if (error) throw error;
+}
+
+async function piattiCheUsano(ingredienteId: string): Promise<string[]> {
+  const { data, error } = await supabase.from("fc_ricette_righe").select("piatto_id").eq("ingrediente_id", ingredienteId);
+  if (error) throw error;
+  return Array.from(new Set((data || []).map((r: any) => r.piatto_id)));
 }
 
 // Intervallo libero "da/a" (sostituisce il vecchio "periodo" mensile fisso, v2 2026-09-13).
@@ -888,16 +979,23 @@ Deno.serve(async (req) => {
 
     // ---- Schede Costo Piatto (agganciate a piatti_dettagli) ----
     } else if (action === "piatti_costo_list") {
-      const [pdRes, fcRes] = await Promise.all([
+      const [pdRes, fcRes, ricette] = await Promise.all([
         supabase.from("piatti_dettagli").select("id, sezione, piatto, ordine").order("ordine", { ascending: true }),
         supabase.from("fc_piatti_costo").select("*"),
+        costoRicette(),
       ]);
       if (pdRes.error) throw pdRes.error;
       if (fcRes.error) throw fcRes.error;
       const byId = new Map((fcRes.data || []).map((r: any) => [r.piatto_id, r]));
       const righe = (pdRes.data || []).map((p: any) => {
         const c = byId.get(p.id);
+        const ric = ricette.get(p.id);
         return {
+          // v13: ha_ricetta = ricetta con almeno una riga → costo calcolato, sola lettura in UI.
+          ha_ricetta: !!(ric && ric.n_righe > 0),
+          ricetta_costo_totale: ric ? ric.costo_totale : null,
+          ricetta_porzioni: ric ? ric.porzioni : null,
+          ricetta_n_righe: ric ? ric.n_righe : 0,
           piatto_id: p.id, piatto: p.piatto, sezione: p.sezione,
           piatto_costo_id: c ? c.id : null,
           costo_piatto: c ? c.costo_piatto : null,
@@ -910,9 +1008,12 @@ Deno.serve(async (req) => {
     } else if (action === "piatti_costo_upsert") {
       const piatto_id = s(body.piatto_id);
       if (!piatto_id) return json({ error: "Piatto obbligatorio" }, 400);
-      const costo_piatto = n(body.costo_piatto);
+      let costo_piatto = n(body.costo_piatto);
       const prezzo_vendita = n(body.prezzo_vendita);
       if (costo_piatto < 0 || prezzo_vendita < 0) return json({ error: "Valori non validi" }, 400);
+      // v13: se il piatto ha una ricetta, il costo è sempre quello calcolato (non quello del client).
+      const ric = (await costoRicette([piatto_id])).get(piatto_id);
+      if (ric && ric.n_righe > 0) costo_piatto = ric.costo_porzione;
       const { error } = await supabase.from("fc_piatti_costo")
         .upsert({
           piatto_id, costo_piatto, prezzo_vendita,
@@ -974,6 +1075,110 @@ Deno.serve(async (req) => {
         trend.push({ da: blocco.da, a: blocco.a, food_cost_reale_pct: c.food_cost_reale_pct, food_cost_teorico_pct: c.food_cost_teorico_pct });
       }
       return json({ ok: true, ...corrente, trend });
+
+    // ---- Calcolo Food Cost: ingredienti (v13) ----
+    } else if (action === "ingredienti_list") {
+      return json({ ok: true, ingredienti: await ingredientiList() });
+
+    } else if (action === "ingredienti_create" || action === "ingredienti_update") {
+      const id = s(body.id);
+      if (action === "ingredienti_update" && !id) return json({ error: "ID mancante" }, 400);
+      const nome = s(body.nome);
+      const unita_misura = s(body.unita_misura);
+      const prezzo = n(body.prezzo);
+      if (!nome) return json({ error: "Nome ingrediente obbligatorio" }, 400);
+      if (!unita_misura || !UNITA_INGREDIENTE.includes(unita_misura)) return json({ error: "Unità di misura non valida (kg, l, pz)" }, 400);
+      if (prezzo < 0) return json({ error: "Prezzo non valido" }, 400);
+      const rec: any = {
+        nome, unita_misura, prezzo,
+        fornitore_nome: s(body.fornitore_nome), note: s(body.note),
+        attivo: body.attivo === undefined ? true : !!body.attivo,
+        updated_at: new Date().toISOString(),
+      };
+      if (action === "ingredienti_create") {
+        const { error } = await supabase.from("fc_ingredienti").insert(rec);
+        if (error) {
+          if ((error as any).code === "23505") return json({ error: "Esiste già un ingrediente con questo nome" }, 409);
+          throw error;
+        }
+      } else {
+        // Cambio di u.m. vietato se le ricette usano unità non compatibili (es. da kg a pz con righe in g).
+        const { data: usi, error: eUsi } = await supabase.from("fc_ricette_righe").select("unita").eq("ingrediente_id", id);
+        if (eUsi) throw eUsi;
+        const incompatibili = (usi || []).filter((u: any) => !UNITA_RIGA[u.unita] || UNITA_RIGA[u.unita].base !== unita_misura);
+        if (incompatibili.length) return json({ error: "Unità di misura non modificabile: l'ingrediente è usato in ricette con unità diverse. Correggi prima quelle righe." }, 409);
+        const { error } = await supabase.from("fc_ingredienti").update(rec).eq("id", id);
+        if (error) {
+          if ((error as any).code === "23505") return json({ error: "Esiste già un ingrediente con questo nome" }, 409);
+          throw error;
+        }
+        await ricalcolaCostiPiatti(await piattiCheUsano(id!));
+      }
+      return json({ ok: true, ingredienti: await ingredientiList() });
+
+    } else if (action === "ingredienti_delete") {
+      const id = s(body.id);
+      if (!id) return json({ error: "ID mancante" }, 400);
+      const usato = await piattiCheUsano(id);
+      if (usato.length) return json({ error: "Ingrediente usato in " + usato.length + " ricett" + (usato.length === 1 ? "a" : "e") + ": toglilo prima da lì, oppure disattivalo." }, 409);
+      const { error } = await supabase.from("fc_ingredienti").delete().eq("id", id);
+      if (error) throw error;
+      return json({ ok: true, ingredienti: await ingredientiList() });
+
+    // ---- Calcolo Food Cost: ricetta di un piatto (v13) ----
+    } else if (action === "ricetta_get") {
+      const piatto_id = s(body.piatto_id);
+      if (!piatto_id) return json({ error: "Piatto obbligatorio" }, 400);
+      const [rRes, gRes] = await Promise.all([
+        supabase.from("fc_ricette").select("*").eq("piatto_id", piatto_id).maybeSingle(),
+        supabase.from("fc_ricette_righe").select("ingrediente_id, quantita, unita, ordine").eq("piatto_id", piatto_id).order("ordine", { ascending: true }),
+      ]);
+      if (rRes.error) throw rRes.error;
+      if (gRes.error) throw gRes.error;
+      return json({ ok: true, ricetta: rRes.data || null, righe: gRes.data || [] });
+
+    } else if (action === "ricetta_save") {
+      const piatto_id = s(body.piatto_id);
+      if (!piatto_id) return json({ error: "Piatto obbligatorio" }, 400);
+      const porzioni = Math.round(n(body.porzioni)) || 1;
+      if (porzioni < 1) return json({ error: "Porzioni non valide" }, 400);
+      const righeIn = Array.isArray(body.righe) ? body.righe : [];
+      const { data: ingr, error: eIngr } = await supabase.from("fc_ingredienti").select("id, nome, unita_misura");
+      if (eIngr) throw eIngr;
+      const ingById = new Map((ingr || []).map((i: any) => [i.id, i]));
+      const righe: any[] = [];
+      for (let i = 0; i < righeIn.length; i++) {
+        const r = righeIn[i];
+        const ing: any = ingById.get(s(r.ingrediente_id) || "");
+        const q = n(r.quantita);
+        const u = s(r.unita) || "";
+        if (!ing) return json({ error: "Riga " + (i + 1) + ": ingrediente non trovato" }, 400);
+        if (q <= 0) return json({ error: "Riga " + (i + 1) + " (" + ing.nome + "): quantità non valida" }, 400);
+        if (!UNITA_RIGA[u] || UNITA_RIGA[u].base !== ing.unita_misura) return json({ error: "Riga " + (i + 1) + " (" + ing.nome + "): unità " + u + " non compatibile con " + ing.unita_misura }, 400);
+        righe.push({ piatto_id, ingrediente_id: ing.id, quantita: q, unita: u, ordine: i });
+      }
+      const { data: vecchie, error: eVecchie } = await supabase.from("fc_ricette_righe").select("piatto_id, ingrediente_id, quantita, unita, ordine").eq("piatto_id", piatto_id);
+      if (eVecchie) throw eVecchie;
+      if (!righe.length) {
+        // Ricetta svuotata: la si elimina; il costo in Costo piatti resta l'ultimo e torna modificabile a mano.
+        const { error } = await supabase.from("fc_ricette").delete().eq("piatto_id", piatto_id);
+        if (error) throw error;
+        return json({ ok: true, eliminata: true });
+      }
+      const { error: eR } = await supabase.from("fc_ricette")
+        .upsert({ piatto_id, porzioni, note: s(body.note), updated_at: new Date().toISOString() }, { onConflict: "piatto_id" });
+      if (eR) throw eR;
+      const { error: eDel } = await supabase.from("fc_ricette_righe").delete().eq("piatto_id", piatto_id);
+      if (eDel) throw eDel;
+      const { error: eIns } = await supabase.from("fc_ricette_righe").insert(righe);
+      if (eIns) {
+        // Compensazione applicativa (come nei carichi di Tracciabilità): rimette le righe di prima.
+        if (vecchie && vecchie.length) await supabase.from("fc_ricette_righe").insert(vecchie);
+        throw eIns;
+      }
+      await ricalcolaCostiPiatti([piatto_id]);
+      const c = (await costoRicette([piatto_id])).get(piatto_id);
+      return json({ ok: true, costo: c || null });
 
     } else {
       return json({ error: "Azione non riconosciuta" }, 400);

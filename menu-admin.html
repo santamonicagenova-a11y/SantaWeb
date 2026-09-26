@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<!-- v 2026.09.26.10 — Setup → Ingredienti in un riquadro verde (bordo + sfondo tenue, titolo verde),
+     stesso colore del tab "Calcolo Food Cost", per distinguerla dal resto del Setup (richiesto
+     da Andrea). Solo stile, nessuna logica toccata. -->
 <!-- v 2026.09.26.09 — Food Cost, nuovo "Calcolo Food Cost" (richiesto da Andrea): 1) Setup →
      nuova sezione "Ingredienti" (nome, u.m. kg/l/pz, prezzo per u.m. già netto di scarto e
      IVA esclusa, fornitore scelto dall'anagrafica Cantina, attivo; modifica in linea, ricerca,
@@ -1429,7 +1432,8 @@
         </div>
         <div id="fc-reparti-list" style="font-size:.85rem;">…</div>
 
-        <div class="sub">Ingredienti (per il Calcolo Food Cost)</div>
+        <div style="margin-top:1.8rem;padding:1rem 1.2rem 1.2rem;border:1px solid rgba(25,158,112,.5);border-left:4px solid #199e70;background:rgba(25,158,112,.07);border-radius:var(--radius);">
+        <div class="sub" style="margin-top:0;color:#199e70;font-size:.8rem;font-weight:600;">🧮 Ingredienti (per il Calcolo Food Cost)</div>
         <p style="font-size:.78rem;color:var(--stone);margin-bottom:.8rem;">Prezzo per unità di misura già al netto dello scarto (costo reale del prodotto pulito) e IVA esclusa. Cambiando un prezzo si ricalcolano da sole le ricette che usano l'ingrediente e il loro Costo ricetta in "Costo piatti".</p>
         <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
           <div style="flex:1;min-width:12rem;">
@@ -1452,6 +1456,7 @@
         </div>
         <input type="text" id="fc-ingr-filtro" placeholder="Cerca ingrediente o fornitore…" oninput="fcRenderIngredienti()" style="max-width:20rem;margin-bottom:.6rem;" />
         <div id="fc-ingredienti-list" style="font-size:.85rem;">…</div>
+        </div>
       </div>
 
       <div id="fc-view-spese" style="display:none;">
@@ -7404,7 +7409,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.26.09</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.26.10</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

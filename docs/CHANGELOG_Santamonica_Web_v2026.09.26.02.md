@@ -1,9 +1,31 @@
 # CHANGELOG — Santamonica Web
 
-**Versione documento:** v 2026.09.25.01
-**Aggiornato:** 2026-09-25
+**Versione documento:** v 2026.09.26.02
+**Aggiornato:** 2026-09-26
 
 > Voci ordinate dal più recente al più vecchio. Appendere in cima a ogni sessione.
+
+---
+
+### 2026-09-26 — Food Cost: avviso su spesa semplice "Pesce e crostacei" + righe di Tracciabilità modificabili (edge function v11) · sorgente edge function salvato nel repo
+
+**Versioni rilasciate:**
+- `menu-admin.html` v 2026.09.26.01 → v 2026.09.26.02 (Vercel)
+- Edge function `foodcost-admin` **v11** (Supabase SafeTable, versione piattaforma 21), nuova azione `tracciabilita_update`
+- `supabase/functions/foodcost-admin/index.ts` v11 (NUOVO nel repo: prima il sorgente esisteva solo su Supabase)
+- `docs/LESSONS_SantaWeb.md` (nuova regola)
+- `HANDOVER_Santamonica_Web_v2026.09.26.02.md`
+- `CHANGELOG_Santamonica_Web_v2026.09.26.02.md` (questo)
+
+**Sintesi:**
+- **Idea scartata**: collegare in Tracciabilità una spesa "semplice" già registrata (lookup su Spese). Abbandonata perché una spesa semplice copre di solito un'intera fattura, mentre ogni riga di fattura deve avere il suo codice NN-MMAA.
+- **Batch 1 (v.26.01)**: in Spese, aggiungendo una spesa sul reparto "Pesce e crostacei" compare un avviso di conferma (nessun codice di tracciabilità, si consiglia Tracciabilità → Nuovo carico). Esteso a "Ostriche"? No, per decisione di Andrea.
+- **Batch 2 (v.26.02 + edge v11)**: link "modifica" nello storico di Tracciabilità, con form in linea su tutti i campi tranne il codice NN-MMAA (fisso). La data di ricezione resta vincolata al mese/anno del codice. La spesa collegata viene riallineata (data, reparto, importo = peso × prezzo, note), con compensazione se l'update della tracciabilità fallisce.
+- **Sorgente edge function**: ricostruito integralmente dal deploy per aggiungere l'azione, poi salvato nel repo su richiesta di Andrea.
+
+**Loop di revisione (GATE PRODUZIONE):** P1+P2 eseguiti da Claude (sintassi JS/TS, test headless Playwright con backend stub). Batch 1 è un micro-fix UI, quindi P3 non dovuta. **Batch 2 + edge function v11: P3 saltata per decisione esplicita dell'utente, registrata come DEBITO** (si somma al debito cumulato del modulo Food Cost/Tracciabilità). Chiamata reale all'edge function non eseguibile dall'ambiente cloud (proxy): **prova end-to-end a carico di Andrea**. Rischio residuo: la ricostruzione integrale del sorgente (vedi HANDOVER).
+
+**Handover dettagliato:** `HANDOVER_Santamonica_Web_v2026.09.26.02.md`
 
 ---
 

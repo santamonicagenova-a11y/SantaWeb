@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.27.01 — SEO/a11y: landmark <main> attorno al contenuto (hero → FAQ); nav, menu mobile e footer restano fuori. Nessun cambio visivo. -->
 <!-- v 2026.09.25.01 — JSON-LD Restaurant "menu": URL pulito /menu invece di menu.html (redirect). -->
 <!-- v 2026.09.12.05 — Fix openingHoursSpecification STATICO (JSON-LD nel <head>): era ancora
      sull'orario ESTIVO (cena 20:00-22:30 mar-dom, pranzo chiuso), stantio da quando il pannello
@@ -674,6 +675,7 @@
   <a href="/prenota.html" style="font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-style:normal;background:var(--ink);color:var(--warm-white);padding:0.9rem 2.5rem;border-radius:4px;" data-i18n="nav_prenota">Prenota</a>
 </div>
 
+<main id="contenuto">
 <section class="hero" style="padding:0;position:relative;">
   <div class="hero-text-panel">
     <p class="hero-eyebrow" data-i18n="hero_eyebrow">Ristorante &middot; Genova</p>
@@ -887,6 +889,7 @@
     </div>
   </div>
 </section>
+</main>
 
 
 <footer>
@@ -896,7 +899,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.09.25.01</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.09.27.01</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>

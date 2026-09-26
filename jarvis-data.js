@@ -59,8 +59,8 @@ window.JARVIS_DATA = {
   "Trasversale": {
    "tot": 7,
    "done": 6,
-   "prog": 0,
-   "up": 1,
+   "prog": 1,
+   "up": 0,
    "future": 0,
    "bloccato": 0,
    "scadute": 0,
@@ -179,11 +179,11 @@ window.JARVIS_DATA = {
   {
    "t": "Prova Jarvis in Cowork (cartella santamonica/, skill caricata sull'account)",
    "sub": "Trasversale",
-   "st": "up",
+   "st": "prog",
    "s": "2026-09-26",
    "e": null,
    "own": "Andrea",
-   "az": "Caricare jarvis-skill-v2026.09.26.01.zip in claude.ai → Impostazioni → Capacità → Skills; aprire Cowork sulla cartella santamonica/ e scrivere 'Jarvis stato'",
+   "az": "Ricaricare la skill v 2026.09.26.02 (sostituisce la .01) e rifare 'Jarvis stato' in Cowork",
    "bl": null,
    "deb": false,
    "agg": "2026-09-26"
@@ -361,6 +361,18 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
+  },
+  {
+   "t": "Prova Jarvis in Cowork (cartella santamonica/, skill caricata sull'account)",
+   "sub": "Trasversale",
+   "st": "prog",
+   "s": "2026-09-26",
+   "e": null,
+   "own": "Andrea",
+   "az": "Ricaricare la skill v 2026.09.26.02 (sostituisce la .01) e rifare 'Jarvis stato' in Cowork",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-26"
   },
   {
    "t": "Sponsorizzata Salone Nautico",

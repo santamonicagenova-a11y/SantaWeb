@@ -1,4 +1,5 @@
 <!-- gantt.html · pubblicato per accesso interno via santamonicagenova.it/gantt -->
+<!-- Aggiornamento 2026-09-26: gantt-data.js caricato con ?v=<ora> (cache-busting): senza, il browser mostrava fino a 4 ore la versione precedente dei dati. -->
 <!-- Sorgente: GANTT_Santamonica.html (renderer stabile, i dati stanno in gantt-data.js).
      Deploy 2026-09-21: rinominato in gantt.html (pretty URL Cloudflare Pages /gantt) +
      aggiunto <meta name="robots" content="noindex,nofollow"> come le altre pagine admin
@@ -105,7 +106,7 @@
 <footer id="foot"></footer>
 <div class="tip" id="tip"></div>
 
-<script src="gantt-data.js"></script>
+<script>/* v 2026.09.26.01: ?v=ora evita la copia vecchia in cache (il browser tiene i .js 4 ore) */document.write('<script src="gantt-data.js?v='+Date.now()+'"><\/script>');</script>
 <script>
 const D = window.SANTAMONICA_GANTT;
 const chart = document.getElementById('chart');

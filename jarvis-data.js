@@ -147,7 +147,7 @@ window.JARVIS_DATA = {
    "s": "2026-09-26",
    "e": null,
    "own": "Andrea",
-   "az": "Provare in pagina (inserire 2-3 ingredienti in Setup, una ricetta nel tab Calcolo Food Cost, controllare Costo piatti), poi pubblicare menu-admin.html + index.ts dal clone SantaWeb-git (o dirmi di fare il push)",
+   "az": "Usare il Calcolo Food Cost su qualche piatto reale e segnalare correzioni",
    "bl": null,
    "deb": false,
    "agg": "2026-09-26"
@@ -357,7 +357,7 @@ window.JARVIS_DATA = {
    "s": "2026-09-26",
    "e": null,
    "own": "Andrea",
-   "az": "Provare in pagina (inserire 2-3 ingredienti in Setup, una ricetta nel tab Calcolo Food Cost, controllare Costo piatti), poi pubblicare menu-admin.html + index.ts dal clone SantaWeb-git (o dirmi di fare il push)",
+   "az": "Usare il Calcolo Food Cost su qualche piatto reale e segnalare correzioni",
    "bl": null,
    "deb": false,
    "agg": "2026-09-26"

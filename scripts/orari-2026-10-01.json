@@ -1,0 +1,14 @@
+{
+  "_nota": "Cambio orari del 1/10/2026 (domenica solo pranzo, venerdì anche pranzo). Letto da scripts/orari-cambio-periodo.mjs, lanciato dalla GitHub Action .github/workflows/orari-1-ottobre-2026.yml. Testi FAQ approvati da Andrea prima della pubblicazione automatica.",
+  "valido_dal": "2026-10-01",
+  "periodo_atteso": {
+    "day_services": { "0": ["pranzo"], "1": [], "2": ["cena"], "3": ["cena"], "4": ["cena"], "5": ["pranzo", "cena"], "6": ["pranzo", "cena"] },
+    "pranzo_opens": "12:30", "pranzo_closes": "14:30",
+    "cena_opens": "19:30", "cena_closes": "22:30"
+  },
+  "faq": {
+    "it": "<p>Il lunedì siamo chiusi. La cena è servita dal martedì al sabato, dalle 19:30 alle 22:30. Il pranzo il venerdì, il sabato e la domenica, dalle 12:30 alle 14:30. La domenica sera siamo chiusi. Gli orari aggiornati sono sempre su questa pagina.</p>",
+    "en": "<p>We are closed on Mondays. Dinner is served from Tuesday to Saturday, from 7:30 to 10:30 pm. Lunch is served on Friday, Saturday and Sunday, from 12:30 to 2:30 pm. We are closed on Sunday evening. Updated hours are always on this page.</p>",
+    "fr": "<p>Nous sommes fermés le lundi. Le dîner est servi du mardi au samedi, de 19h30 à 22h30. Le déjeuner est servi le vendredi, le samedi et le dimanche, de 12h30 à 14h30. Le dimanche soir, nous sommes fermés. Les horaires à jour sont toujours sur cette page.</p>"
+  }
+}

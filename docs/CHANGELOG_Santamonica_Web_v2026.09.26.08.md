@@ -21,6 +21,8 @@
 - Fix collaterale: l'upsert ora passa `attivo` (prima lo forzava sempre a `true`).
 - Verifica sui dati reali: 25 piatti su 25 di `piatti_dettagli` trovano il prezzo in carta. I 2 prezzi già salvati (Gillardeau 7, Sacripantina 12) coincidono con la carta.
 
+**Handover dettagliato:** `HANDOVER_Santamonica_Web_v2026.09.26.08.md`
+
 **Loop di revisione:** P1 (sintassi JS) e P2 (test node delle funzioni di match sui file carta reali e sui 25 nomi del DB) eseguiti da Claude. P3 non dovuta: tool admin interno, nessun contenuto pubblico. Prova in pagina a carico di Andrea.
 
 ---

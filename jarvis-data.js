@@ -7,7 +7,7 @@ window.JARVIS_DATA = {
   "aperte": 46,
   "scadute": 8,
   "bloccate": 3,
-  "andrea": 11,
+  "andrea": 10,
   "debiti": 7,
   "chiuse30": 24
  },
@@ -42,7 +42,7 @@ window.JARVIS_DATA = {
    "future": 9,
    "bloccato": 0,
    "scadute": 0,
-   "andrea": 4,
+   "andrea": 3,
    "debiti": 6
   },
   "Marketing": {
@@ -124,18 +124,6 @@ window.JARVIS_DATA = {
    "e": "2026-09-30",
    "own": "Andrea",
    "az": "Confermare lo stato: nessuna traccia nei documenti dopo luglio (fatto, in corso o da ripianificare?)",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-25"
-  },
-  {
-   "t": "Chiusura cena domenica dal 1/10, senza data di ripristino (contenuti statici — disponibilità già corretta) — task schedulato 27/9",
-   "sub": "Sito",
-   "st": "up",
-   "s": "2026-10-01",
-   "e": "2026-10-01",
-   "own": "Andrea",
-   "az": "Dal 1/10 aprire menu-admin → Orari di Apertura e pubblicare FAQ/JSON-LD/foglio QR del nuovo periodo",
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
@@ -330,11 +318,11 @@ window.JARVIS_DATA = {
    "st": "up",
    "s": "2026-10-01",
    "e": "2026-10-01",
-   "own": "Andrea",
-   "az": "Dal 1/10 aprire menu-admin → Orari di Apertura e pubblicare FAQ/JSON-LD/foglio QR del nuovo periodo",
+   "own": "Claude",
+   "az": "Approvare i testi FAQ IT/EN/FR in SantaWeb scripts/orari-2026-10-01.json (o chiedere modifiche) prima del 1/10",
    "bl": null,
    "deb": false,
-   "agg": "2026-09-25"
+   "agg": "2026-09-26"
   },
   {
    "t": "Verificare aggiornamento orari su Michelin",

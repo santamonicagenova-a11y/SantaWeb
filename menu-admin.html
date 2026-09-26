@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- v 2026.09.26.01 — Food Cost → Spese: se si aggiunge una spesa sul reparto "Pesce e crostacei"
+     compare un avviso di conferma (richiesto da Andrea). Per pesce e crostacei il
+     flusso corretto è Tracciabilità → Nuovo carico, che crea spesa e codice NN-MMAA
+     riga per riga. Una spesa semplice non ha codice di rintracciabilità e non può
+     essere collegata dopo (scartata l'idea del lookup: una spesa che copre più righe
+     di fattura non darebbe un codice per prodotto). Solo frontend, backend invariato. -->
 <!-- v 2026.09.25.03 — bump ?v= di admin-core.js a 2026.09.25.01 (canonical dei menu generati verso URL puliti) + footer-version. -->
 <!-- v 2026.09.25.02 — Food Cost → Tracciabilità: il campo Fornitore diventa un vero lookup
      (richiesto da Andrea) — da input testo libero + datalist suggerito a <select>
@@ -4144,6 +4150,14 @@ function fcAggiungiSpesa() {
   if (!data_) { _fcSetStatus('Indica la data.', true); return; }
   if (!reparto_id) { _fcSetStatus('Indica il reparto (creane uno se la lista è vuota).', true); return; }
   if (importo === '' || Number(importo) < 0) { _fcSetStatus('Indica un importo valido.', true); return; }
+  // v 2026.09.26.01 — pesce e crostacei vanno caricati da Tracciabilità (spesa + codice
+  // NN-MMAA per ogni riga di fattura): una spesa semplice qui resterebbe senza codice.
+  var rep = fcState.reparti.find(function (r) { return r.id === reparto_id; });
+  if (rep && rep.nome === FC_TRACC_REPARTO_DEFAULT_NOME &&
+      !window.confirm('Stai registrando una spesa semplice su "' + rep.nome + '": non avrà un codice di tracciabilità.\n\nPer pesce e crostacei di norma si usa Tracciabilità → Nuovo carico, che crea la spesa e il codice per ogni prodotto della fattura.\n\nSei sicuro di voler procedere?')) {
+    _fcSetStatus('Spesa non aggiunta.');
+    return;
+  }
   _fcSetStatus('Aggiunta…');
   _fcFetch({ action: 'spese_create', data: data_, reparto_id: reparto_id, importo: Number(importo) })
     .then(function (res) {
@@ -6759,7 +6773,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.25.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.26.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

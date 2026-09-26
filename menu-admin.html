@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- v 2026.09.26.06 — Food Cost (richiesto da Andrea, solo Food Cost): le liste Spese,
+     Incassi e storico Tracciabilità si leggono ora in ordine cronologico crescente
+     (riga più vecchia in alto, più recente in basso). Ordinamento fatto nel frontend
+     (helper _fcCmp), backend invariato. Tracciabilità ordinata per data ricezione +
+     anno/mese/progressivo numerico. Inventario (heatmap/periodi), import Excel e trend
+     Dashboard erano già in ordine crescente. -->
 <!-- v 2026.09.26.05 — Food Cost → Tracciabilità (richiesto da Andrea): la riga in
      modifica è ora un riquadro ben separato dallo storico: sfondo viola più marcato,
      bordo pieno #9085e9 (colore del tab) e titoletto a fascia colorata
@@ -3858,6 +3864,14 @@ function fcInventarioSetTipo(tipo) {
   fcLoadInventario();
 }
 
+// Confronto crescente generico per i sort delle liste Food Cost (v 2026.09.26.06).
+function _fcCmp(a, b) {
+  if (a == null && b == null) return 0;
+  if (a == null) return -1;
+  if (b == null) return 1;
+  return a < b ? -1 : a > b ? 1 : 0;
+}
+
 function _fcEsc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -4143,7 +4157,11 @@ function fcLoadSpese() {
   _fcFetch({ action: 'spese_list', da: r.da, a: r.a, tipo: fcState.speseTipo })
     .then(function (res) {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
-      fcState.spese = res.body.spese || [];
+      // v 2026.09.26.06 — ordine cronologico crescente (più vecchia in alto), a parità di
+      // data per ordine di inserimento; il backend continua a restituire in ordine inverso.
+      fcState.spese = (res.body.spese || []).slice().sort(function (x, y) {
+        return _fcCmp(x.data, y.data) || _fcCmp(x.created_at, y.created_at);
+      });
       fcRenderSpese();
       _fcSetStatus('');
     })
@@ -4426,7 +4444,11 @@ function fcLoadTracciabilita() {
   _fcFetch({ action: 'tracciabilita_list', da: r.da, a: r.a })
     .then(function (res) {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
-      fcState.tracciabilita = res.body.righe || [];
+      // v 2026.09.26.06 — più vecchia in alto: data di ricezione, poi codice (anno, mese,
+      // progressivo numerico — non il testo rif_interno, che non ordina bene "9-0926" vs "10-0926").
+      fcState.tracciabilita = (res.body.righe || []).slice().sort(function (x, y) {
+        return _fcCmp(x.data_ricezione, y.data_ricezione) || _fcCmp(x.anno, y.anno) || _fcCmp(x.mese, y.mese) || _fcCmp(x.progressivo, y.progressivo);
+      });
       fcRenderTracciabilita();
       _fcSetStatus('');
     })
@@ -4579,7 +4601,7 @@ function fcLoadIncassi() {
     var perData = {};
     (risultati[0].body.incassi || []).forEach(function (row) { perData[row.data] = perData[row.data] || {}; perData[row.data].food = row; });
     (risultati[1].body.incassi || []).forEach(function (row) { perData[row.data] = perData[row.data] || {}; perData[row.data].beverage = row; });
-    fcState.incassi = Object.keys(perData).sort(function (x, y) { return x < y ? 1 : -1; }).map(function (d) {
+    fcState.incassi = Object.keys(perData).sort()  /* v 2026.09.26.06: più vecchia in alto */.map(function (d) {
       return { data: d, food: perData[d].food || null, beverage: perData[d].beverage || null };
     });
     fcRenderIncassi();
@@ -6931,7 +6953,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.26.05</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.26.06</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

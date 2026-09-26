@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.27.02 — Immagini: (1) creati img/hero.jpg (1200x630, anteprima social og/twitter + JSON-LD image) e img/logo-santamonica.png (JSON-LD logo): erano 404 → anteprime WhatsApp/Facebook senza foto; (2) hero <img> punta direttamente a img/sito/hero.webp (prima img/hero.jpg in 404 + sostituzione via JS = LCP lento) con fetchpriority="high" e preload ripristinato. NB: se si cambia la foto hero dal pannello, aggiornare anche il preload qui. -->
 <!-- v 2026.09.27.01 — SEO/a11y: landmark <main> attorno al contenuto (hero → FAQ); nav, menu mobile e footer restano fuori. Nessun cambio visivo. -->
 <!-- v 2026.09.25.01 — JSON-LD Restaurant "menu": URL pulito /menu invece di menu.html (redirect). -->
 <!-- v 2026.09.12.05 — Fix openingHoursSpecification STATICO (JSON-LD nel <head>): era ancora
@@ -154,6 +155,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preload" as="image" href="/img/sito/hero.webp" fetchpriority="high">
 <title>Ristorante Pesce e Vista Mare a Genova | Santamonica</title>
 <meta name="description" content="Ristorante di pesce sul Lungomare Lombardo di Genova, sala affacciata sul mare aperto. Cucina ligure sul pescato del giorno, cantina curata.">
 <meta name="robots" content="index, follow">
@@ -173,6 +175,9 @@
 <meta property="og:description" content="Ristorante di pesce sul Lungomare Lombardo di Genova, sala affacciata sul mare aperto. Cucina ligure sul pescato del giorno, cantina curata.">
 <meta property="og:url" content="https://santamonicagenova.it/">
 <meta property="og:image" content="https://santamonicagenova.it/img/hero.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="La sala del ristorante Santamonica sul Lungomare di Genova">
 <meta property="og:locale" content="it_IT">
 <meta property="og:site_name" content="Santamonica Ristorante Genova">
 
@@ -688,7 +693,7 @@
     <div class="hero-scroll-indicator" data-i18n="hero_scorri">Scorri</div>
   </div>
   <div class="hero-image-panel">
-    <img src="img/hero.jpg" data-img-key="hero" alt="Vista del ristorante Santamonica sul Lungomare Lombardo di Genova con vista mare" loading="eager" decoding="async">
+    <img src="img/sito/hero.webp" data-img-key="hero" fetchpriority="high" alt="Vista del ristorante Santamonica sul Lungomare Lombardo di Genova con vista mare" loading="eager" decoding="async">
   </div>
 </section>
 
@@ -899,7 +904,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.09.27.01</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.09.27.02</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>

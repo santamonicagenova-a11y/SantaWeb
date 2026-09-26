@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.09.26.04",
+  version: "2026.09.26.05",
   updated: "2026-09-26",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -86,7 +86,9 @@ window.SANTAMONICA_GANTT = {
       {t:'Fix mobile overflow orizzontale (menu-allergeni · cookies · privacy) — stesso pattern fix template 10/6, tabelle scorrevoli invece di sbordare', s:'2026-08-23', st:'done', ms:true},
       {t:'Food Cost — rifiniture 26/9: righe Tracciabilità modificabili, note nelle Spese, ordine cronologico crescente', s:'2026-09-26', e:'2026-09-26', st:'done'},
       {t:'Food Cost giornaliero — tool costruito in menu-admin (date-range, dashboard Chart.js, sezione Beverage speculare, 4 KPI dedicate)', s:'2026-09-11', e:'2026-09-13', st:'done', ms:true},
+      {t:'Food Cost — Costo piatti: prezzo vendita dalla carta pubblicata (carta + dolci)', s:'2026-09-26', e:'2026-09-26', st:'done'},
       {t:'Food Cost — redesign inventario da range Dal/Al a conteggio puntuale per data (fc_inventario_conteggi), niente più doppia digitazione tra periodi consecutivi', s:'2026-09-13', st:'done', ms:true},
+      {t:'Calcolo Food Cost ricette da ingredienti: anagrafica ingredienti in Setup + tab Calcolo Food Cost che valorizza Costo Ricetta in Costo piatti', s:'2026-09-26', st:'prog'},
       {t:'Food Cost — badge "periodo non chiuso" sui KPI + storico conteggi con heatmap mensile + pannello periodi chiusi + auto-load ultimo periodo in Dashboard', s:'2026-09-13', st:'done', ms:true},
       {t:'Food Cost — riordino tab (Dashboard·Spese·Incassi·Vendite·Inventario·Costo piatti·Reparti) con colori per gruppo', s:'2026-09-13', st:'done'},
       {t:'Gantt trasversale ricostruito da zero + pubblicato su santamonicagenova.it/gantt (gantt.html noindex + gantt-data.js)', s:'2026-09-21', st:'done', ms:true},

@@ -2,14 +2,14 @@
 window.JARVIS_DATA = {
  "generato": "2026-09-26",
  "versione": "2026.09.26",
- "briefing": "**Briefing 26/9/2026** — Jarvis ora funziona in Code, in Cowork (legge il riassunto `_stato-corrente.md`) e raccoglie il lavoro delle sessioni cloud; importata quella di stamattina sul Food Cost. **Aspetta te**: un giro di prova su tutti i tab Food Cost; beta tester e marchio NoShowApp; dal 1/10 FAQ e foglio QR dal pannello Orari; calendario Mare d'Inverno. **Segnale**: nessuna sessione SEO negli ultimi 30 giorni.",
+ "briefing": "**Briefing 26/9/2026 (sera)** — Food Cost: nuovo **Calcolo Food Cost** da ingredienti (tabella Ingredienti in Setup, ricette per piatto, Costo ricetta automatico in Costo piatti). Backend già online; la pagina menu-admin v.09 è pronta ma non ancora pubblicata. **Aspetta te**: prova del Calcolo Food Cost e pubblicazione; giro di prova sugli altri tab Food Cost; beta tester e marchio NoShowApp; dal 1/10 FAQ e foglio QR dal pannello Orari. **Segnale**: nessuna sessione SEO negli ultimi 30 giorni.",
  "kpi": {
-  "aperte": 45,
+  "aperte": 46,
   "scadute": 8,
   "bloccate": 3,
-  "andrea": 10,
+  "andrea": 11,
   "debiti": 7,
-  "chiuse30": 23
+  "chiuse30": 24
  },
  "subs": {
   "Decennale": {
@@ -35,14 +35,14 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 82,
-   "done": 71,
-   "prog": 0,
+   "tot": 84,
+   "done": 72,
+   "prog": 1,
    "up": 2,
    "future": 9,
    "bloccato": 0,
    "scadute": 0,
-   "andrea": 3,
+   "andrea": 4,
    "debiti": 6
   },
   "Marketing": {
@@ -139,6 +139,18 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
+  },
+  {
+   "t": "Calcolo Food Cost ricette da ingredienti: anagrafica ingredienti in Setup + tab Calcolo Food Cost che valorizza Costo Ricetta in Costo piatti",
+   "sub": "Sito",
+   "st": "prog",
+   "s": "2026-09-26",
+   "e": null,
+   "own": "Andrea",
+   "az": "Provare in pagina (inserire 2-3 ingredienti in Setup, una ricetta nel tab Calcolo Food Cost, controllare Costo piatti), poi pubblicare menu-admin.html + index.ts dal clone SantaWeb-git (o dirmi di fare il push)",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-26"
   },
   {
    "t": "Cambio completo del menu",
@@ -339,6 +351,18 @@ window.JARVIS_DATA = {
  ],
  "inCorso": [
   {
+   "t": "Calcolo Food Cost ricette da ingredienti: anagrafica ingredienti in Setup + tab Calcolo Food Cost che valorizza Costo Ricetta in Costo piatti",
+   "sub": "Sito",
+   "st": "prog",
+   "s": "2026-09-26",
+   "e": null,
+   "own": "Andrea",
+   "az": "Provare in pagina (inserire 2-3 ingredienti in Setup, una ricetta nel tab Calcolo Food Cost, controllare Costo piatti), poi pubblicare menu-admin.html + index.ts dal clone SantaWeb-git (o dirmi di fare il push)",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-26"
+  },
+  {
    "t": "Calendario cene a tema (entro ago)",
    "sub": "Marketing",
    "st": "prog",
@@ -405,6 +429,16 @@ window.JARVIS_DATA = {
   {
    "d": "2026-09-26",
    "sub": "Sito",
+   "t": "Calcolo Food Cost da ingredienti"
+  },
+  {
+   "d": "2026-09-26",
+   "sub": "Sito",
+   "t": "Costo piatti prezzo da carta (sessione cloud)"
+  },
+  {
+   "d": "2026-09-26",
+   "sub": "Sito",
    "t": "Food Cost rifiniture (sessione cloud)"
   },
   {
@@ -431,16 +465,6 @@ window.JARVIS_DATA = {
    "d": "2026-09-21",
    "sub": "Trasversale",
    "t": "Gantt ricostruito da zero + pubblicato live su santamonicagenova.it"
-  },
-  {
-   "d": "2026-09-20",
-   "sub": "Sito",
-   "t": "Attività ricostruita da commit SantaWeb"
-  },
-  {
-   "d": "2026-09-19",
-   "sub": "Sito",
-   "t": "Attività ricostruita da commit SantaWeb"
   }
  ],
  "perWeek": [
@@ -490,7 +514,7 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-21",
-   "n": 6
+   "n": 8
   }
  ],
  "perDay": [
@@ -516,7 +540,7 @@ window.JARVIS_DATA = {
   },
   {
    "g": "sab",
-   "n": 16
+   "n": 18
   },
   {
    "g": "dom",

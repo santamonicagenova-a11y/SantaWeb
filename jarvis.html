@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.26.01: jarvis-data.js caricato con ?v=<ora> (cache-busting): senza, il browser mostrava fino a 4 ore la versione precedente dei dati. -->
 <!-- JARVIS_Pannello.html · v 2026.09.25.01 · renderer del pannello Jarvis (i dati stanno in jarvis-data.js,
      generato da `node Jarvis/_tools/jarvis.mjs build-pannello`). Pubblicato come jarvis.html (noindex). -->
 <html lang="it">
@@ -122,7 +123,7 @@ footer{color:var(--ink-3);font-size:.8rem;text-align:center;margin-top:10px}
   <footer id="foot"></footer>
 </div>
 <div id="tip" role="tooltip"></div>
-<script src="jarvis-data.js"></script>
+<script>/* v 2026.09.26.01: ?v=ora evita la copia vecchia in cache (il browser tiene i .js 4 ore) */document.write('<script src="jarvis-data.js?v='+Date.now()+'"><\/script>');</script>
 <script>
 (function(){
   var D = window.JARVIS_DATA; if(!D){document.body.textContent='Dati non disponibili (jarvis-data.js mancante).';return;}

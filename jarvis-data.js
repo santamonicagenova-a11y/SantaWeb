@@ -7,7 +7,7 @@ window.JARVIS_DATA = {
   "aperte": 46,
   "scadute": 8,
   "bloccate": 3,
-  "andrea": 10,
+  "andrea": 11,
   "debiti": 7,
   "chiuse30": 24
  },
@@ -42,7 +42,7 @@ window.JARVIS_DATA = {
    "future": 9,
    "bloccato": 0,
    "scadute": 0,
-   "andrea": 3,
+   "andrea": 4,
    "debiti": 6
   },
   "Marketing": {
@@ -127,6 +127,18 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
+  },
+  {
+   "t": "Chiusura cena domenica dal 1/10, senza data di ripristino (contenuti statici — disponibilità già corretta) — task schedulato 27/9",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-10-01",
+   "e": "2026-10-01",
+   "own": "Andrea",
+   "az": "Approvare i testi FAQ IT/EN/FR in SantaWeb scripts/orari-2026-10-01.json (o chiedere modifiche) prima del 1/10",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-26"
   },
   {
    "t": "Calcolo Food Cost ricette da ingredienti: anagrafica ingredienti in Setup + tab Calcolo Food Cost che valorizza Costo Ricetta in Costo piatti",
@@ -318,7 +330,7 @@ window.JARVIS_DATA = {
    "st": "up",
    "s": "2026-10-01",
    "e": "2026-10-01",
-   "own": "Claude",
+   "own": "Andrea",
    "az": "Approvare i testi FAQ IT/EN/FR in SantaWeb scripts/orari-2026-10-01.json (o chiedere modifiche) prima del 1/10",
    "bl": null,
    "deb": false,

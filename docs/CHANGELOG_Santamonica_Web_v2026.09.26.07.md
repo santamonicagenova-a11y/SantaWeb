@@ -1,31 +1,36 @@
 # CHANGELOG — Santamonica Web
 
-**Versione documento:** v 2026.09.26.02
+**Versione documento:** v 2026.09.26.07
 **Aggiornato:** 2026-09-26
 
 > Voci ordinate dal più recente al più vecchio. Appendere in cima a ogni sessione.
 
 ---
 
-### 2026-09-26 — Food Cost: avviso su spesa semplice "Pesce e crostacei" + righe di Tracciabilità modificabili (edge function v11) · sorgente edge function salvato nel repo
+### 2026-09-26 — Food Cost: Tracciabilità modificabile, note Spese (sola lettura se da Tracciabilità), ordine crescente, avviso "Pesce e crostacei" · edge function v11→v12 con sorgente nel repo · fix Procedure al reload
 
-**Versioni rilasciate:**
-- `menu-admin.html` v 2026.09.26.01 → v 2026.09.26.02 (Vercel)
-- Edge function `foodcost-admin` **v11** (Supabase SafeTable, versione piattaforma 21), nuova azione `tracciabilita_update`
-- `supabase/functions/foodcost-admin/index.ts` v11 (NUOVO nel repo: prima il sorgente esisteva solo su Supabase)
-- `docs/LESSONS_SantaWeb.md` (nuova regola)
-- `HANDOVER_Santamonica_Web_v2026.09.26.02.md`
-- `CHANGELOG_Santamonica_Web_v2026.09.26.02.md` (questo)
+**Versioni rilasciate (una sola conversazione, con chiusura intermedia v.02 poi ripresa: documenti consolidati qui):**
+- `menu-admin.html` v 2026.09.26.01 → **v 2026.09.26.07** (Vercel)
+- Edge function `foodcost-admin` **v11 → v12** (Supabase SafeTable, versioni piattaforma 21 → 22), nuove azioni/comportamenti `tracciabilita_update`, `spese_list` con tracciabilità collegata, `spese_update` 409 su spese collegate
+- `supabase/functions/foodcost-admin/index.ts` v12 (NUOVO nel repo: prima il sorgente esisteva solo su Supabase)
+- `docs/LESSONS_SantaWeb.md` (nuova regola sul sorgente dell'edge function)
+- `HANDOVER_Santamonica_Web_v2026.09.26.07.md` (sostituisce `..._v2026.09.26.02.md` della chiusura intermedia)
+- `CHANGELOG_Santamonica_Web_v2026.09.26.07.md` (questo)
 
 **Sintesi:**
-- **Idea scartata**: collegare in Tracciabilità una spesa "semplice" già registrata (lookup su Spese). Abbandonata perché una spesa semplice copre di solito un'intera fattura, mentre ogni riga di fattura deve avere il suo codice NN-MMAA.
-- **Batch 1 (v.26.01)**: in Spese, aggiungendo una spesa sul reparto "Pesce e crostacei" compare un avviso di conferma (nessun codice di tracciabilità, si consiglia Tracciabilità → Nuovo carico). Esteso a "Ostriche"? No, per decisione di Andrea.
-- **Batch 2 (v.26.02 + edge v11)**: link "modifica" nello storico di Tracciabilità, con form in linea su tutti i campi tranne il codice NN-MMAA (fisso). La data di ricezione resta vincolata al mese/anno del codice. La spesa collegata viene riallineata (data, reparto, importo = peso × prezzo, note), con compensazione se l'update della tracciabilità fallisce.
-- **Sorgente edge function**: ricostruito integralmente dal deploy per aggiungere l'azione, poi salvato nel repo su richiesta di Andrea.
+- **Idea scartata**: collegare in Tracciabilità una spesa semplice già registrata. Una spesa copre di solito un'intera fattura, mentre ogni riga deve avere il suo codice NN-MMAA.
+- **v.01**: avviso di conferma sulle spese semplici nel reparto "Pesce e crostacei" (non su "Ostriche", per scelta di Andrea).
+- **v.02 + edge v11**: righe dello storico Tracciabilità modificabili in linea. Il codice NN-MMAA è fisso e la data resta nel mese del codice. La spesa collegata viene riallineata (data, reparto, importo = peso × prezzo, note), con compensazione in caso di errore.
+- **Sorgente edge function** ricostruito dal deploy e salvato nel repo.
+- **v.03**: campo Nota nel form "Nuova spesa" e nota modificabile in linea nella lista Spese.
+- **v.04 + edge v12**: le spese nate da Tracciabilità mostrano la nota in sola lettura con il badge `🔗 NN-MMAA`; il server rifiuta (409) la loro modifica da Spese. Deploy confrontato col repo: identico.
+- **v.05**: riga di tracciabilità in modifica evidenziata (riquadro, sfondo e titoletto a fascia viola).
+- **v.06**: Spese, Incassi e storico Tracciabilità in ordine cronologico crescente (solo Food Cost), ordinati nel frontend.
+- **v.07**: fix — "📖 Procedure di aggiornamento e traduzione" restava visibile ricaricando la pagina su un tab diverso da "Gestione menù e sito" (`setQaTab()` girava prima che `#intro` esistesse).
 
-**Loop di revisione (GATE PRODUZIONE):** P1+P2 eseguiti da Claude (sintassi JS/TS, test headless Playwright con backend stub). Batch 1 è un micro-fix UI, quindi P3 non dovuta. **Batch 2 + edge function v11: P3 saltata per decisione esplicita dell'utente, registrata come DEBITO** (si somma al debito cumulato del modulo Food Cost/Tracciabilità). Chiamata reale all'edge function non eseguibile dall'ambiente cloud (proxy): **prova end-to-end a carico di Andrea**. Rischio residuo: la ricostruzione integrale del sorgente (vedi HANDOVER).
+**Loop di revisione (GATE PRODUZIONE):** P1+P2 eseguiti da Claude su ogni versione (sintassi JS/TS, test headless Playwright con backend stub, screenshot). P3 non dovuta per i micro-fix UI (v.01, .03, .05, .06, .07). **P3 DEBITO per v.02 + edge v11 (saltata per decisione esplicita dell'utente) e per v.04 + edge v12 (non eseguita)**; si somma al debito cumulato del modulo Food Cost/Tracciabilità. Chiamate reali all'edge function non eseguibili dall'ambiente cloud: **prova end-to-end a carico di Andrea**. Rischio residuo: ricostruzione integrale del sorgente v11 (rollback: versione piattaforma 20).
 
-**Handover dettagliato:** `HANDOVER_Santamonica_Web_v2026.09.26.02.md`
+**Handover dettagliato:** `HANDOVER_Santamonica_Web_v2026.09.26.07.md`
 
 ---
 

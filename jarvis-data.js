@@ -4,12 +4,12 @@ window.JARVIS_DATA = {
  "versione": "2026.09.26",
  "briefing": "**Briefing 26/9/2026** — Jarvis ora raccoglie anche il lavoro delle sessioni cloud: importata quella di stamattina sul Food Cost (Tracciabilità modificabile, note nelle Spese, ordine crescente). **Aspetta te**: un giro di prova su tutti i tab Food Cost; prova di Jarvis in Cowork (carica la skill, poi 'Jarvis stato'); beta tester e marchio NoShowApp; dal 1/10 FAQ e foglio QR dal pannello Orari. **Segnale**: nessuna sessione SEO negli ultimi 30 giorni.",
  "kpi": {
-  "aperte": 46,
+  "aperte": 45,
   "scadute": 8,
   "bloccate": 3,
-  "andrea": 11,
+  "andrea": 10,
   "debiti": 7,
-  "chiuse30": 22
+  "chiuse30": 23
  },
  "subs": {
   "Decennale": {
@@ -58,13 +58,13 @@ window.JARVIS_DATA = {
   },
   "Trasversale": {
    "tot": 7,
-   "done": 6,
-   "prog": 1,
+   "done": 7,
+   "prog": 0,
    "up": 0,
    "future": 0,
    "bloccato": 0,
    "scadute": 0,
-   "andrea": 1,
+   "andrea": 0,
    "debiti": 0
   },
   "NoShowApp": {
@@ -175,18 +175,6 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
-  },
-  {
-   "t": "Prova Jarvis in Cowork (cartella santamonica/, skill caricata sull'account)",
-   "sub": "Trasversale",
-   "st": "prog",
-   "s": "2026-09-26",
-   "e": null,
-   "own": "Andrea",
-   "az": "Ricaricare la skill v 2026.09.26.02 (sostituisce la .01) e rifare 'Jarvis stato' in Cowork",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-26"
   },
   {
    "t": "Sponsorizzata Salone Nautico",
@@ -361,18 +349,6 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
-  },
-  {
-   "t": "Prova Jarvis in Cowork (cartella santamonica/, skill caricata sull'account)",
-   "sub": "Trasversale",
-   "st": "prog",
-   "s": "2026-09-26",
-   "e": null,
-   "own": "Andrea",
-   "az": "Ricaricare la skill v 2026.09.26.02 (sostituisce la .01) e rifare 'Jarvis stato' in Cowork",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-26"
   },
   {
    "t": "Sponsorizzata Salone Nautico",

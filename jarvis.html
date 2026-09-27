@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.27.01: nuova sezione "📌 Aperte senza data" (task up senza scadenza, tutti i sotto-progetti, con owner), da D.senzaData. -->
 <!-- v 2026.09.26.01: jarvis-data.js caricato con ?v=<ora> (cache-busting): senza, il browser mostrava fino a 4 ore la versione precedente dei dati. -->
 <!-- JARVIS_Pannello.html · v 2026.09.25.01 · renderer del pannello Jarvis (i dati stanno in jarvis-data.js,
      generato da `node Jarvis/_tools/jarvis.mjs build-pannello`). Pubblicato come jarvis.html (noindex). -->
@@ -115,6 +116,7 @@ footer{color:var(--ink-3);font-size:.8rem;text-align:center;margin-top:10px}
     <section class="card"><h2>🔥 In corso</h2><ul class="list" id="incorso"></ul></section>
     <section class="card"><h2>⛔ Bloccate</h2><ul class="list" id="bloccate"></ul></section>
   </div>
+  <section class="card"><h2>📌 Aperte senza data <span class="c" id="c-senzadata"></span></h2><ul class="list" id="senzadata"></ul></section>
   <div class="grid">
     <section class="card"><h2>🗓 Sessioni di lavoro <span class="c">per settimana, ultime 12</span></h2><div class="chart" id="weeks"></div><div class="labels" id="weeksL"></div></section>
     <section class="card"><h2>📈 Giorni in cui si lavora <span class="c">ultimi 90 giorni</span></h2><div class="chart" id="days"></div><div class="labels" id="daysL"></div></section>
@@ -152,7 +154,7 @@ footer{color:var(--ink-3);font-size:.8rem;text-align:center;margin-top:10px}
     var late=t.e&&t.e<T;
     var right=t.e?'<div class="date'+(late?' late':'')+'">'+(late?'⚠ ':'')+fd(t.e)+'</div>':'<div class="date"></div>';
     var extra=opt.az&&t.az?'<div class="az">'+esc(t.az)+'</div>':(opt.bl&&t.bl?'<div class="az">Bloccata da: '+esc(t.bl)+'</div>':'');
-    return '<li style="--sub:'+subVar(t.sub)+'"><span class="dot" aria-hidden="true"></span><div><div class="t">'+esc(t.t)+'</div><div class="sub">'+esc(t.sub)+(t.deb?' · debito':'')+'</div>'+extra+'</div>'+right+'</li>';
+    return '<li style="--sub:'+subVar(t.sub)+'"><span class="dot" aria-hidden="true"></span><div><div class="t">'+esc(t.t)+'</div><div class="sub">'+esc(t.sub)+(opt.own&&t.own?' · '+esc(t.own):'')+(t.deb?' · debito':'')+'</div>'+extra+'</div>'+right+'</li>';
   }
   function list(id,arr,opt,emptyTxt){$(id).innerHTML=arr.length?arr.map(function(t){return item(t,opt);}).join(''):'<li class="empty" style="display:block">'+emptyTxt+'</li>';}
   list('andrea',D.andrea,{az:true},'Niente in sospeso per te.'); $('c-andrea').textContent=D.andrea.length+' attività';
@@ -160,6 +162,7 @@ footer{color:var(--ink-3);font-size:.8rem;text-align:center;margin-top:10px}
   list('prossime',D.prossime,{},'Nessuna scadenza nei prossimi 30 giorni.');
   list('incorso',D.inCorso,{},'Nessuna attività in corso.');
   list('bloccate',D.bloccate,{bl:true},'Nessuna attività bloccata.');
+  var SD=D.senzaData||[]; list('senzadata',SD,{own:true,az:true},'Nessuna attività aperta senza data.'); $('c-senzadata').textContent=SD.length+' attività, tutti i sotto-progetti';
 
   var order=['Sito','SEO','Marketing','Decennale','Trasversale'];
   var names=Object.keys(D.subs).sort(function(a,b){return order.indexOf(a)-order.indexOf(b);});

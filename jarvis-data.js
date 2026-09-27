@@ -413,6 +413,68 @@ window.JARVIS_DATA = {
    "agg": "2026-09-25"
   }
  ],
+ "senzaData": [
+  {
+   "t": "NoShowApp F6 — acquisire 10 beta tester (WhatsApp + demo dal vivo con carta test) e guida onboarding",
+   "sub": "NoShowApp",
+   "st": "up",
+   "s": "2026-10-01",
+   "e": null,
+   "own": "Andrea",
+   "az": "Contattare i colleghi ristoratori per la demo",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-25"
+  },
+  {
+   "t": "NoShowApp F6 — registrare il marchio NoShowApp (verifica tmview.org, UIBM classe 42, ~200 €)",
+   "sub": "NoShowApp",
+   "st": "up",
+   "s": "2026-10-01",
+   "e": null,
+   "own": "Andrea",
+   "az": "Verifica disponibilità su tmview.org e deposito UIBM",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-25"
+  },
+  {
+   "t": "menu-admin → Setup: reparti di «Numerazione tracciabilità» chiusi con freccia per aprirli; Fornitori e Numerazione tracciabilità in un box colorato come Ingredienti",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-09-27",
+   "e": null,
+   "own": "Claude",
+   "az": null,
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-27"
+  },
+  {
+   "t": "menu-admin → Voucher: un punto dove vedere tutte le informazioni di un singolo voucher emesso",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-09-27",
+   "e": null,
+   "own": "Claude",
+   "az": null,
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-27"
+  },
+  {
+   "t": "Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-09-21",
+   "e": null,
+   "own": "Andrea",
+   "az": "Giro veloce su tutti i tab Food Cost (Incassi, Inventario, Dashboard, Vendite, Costo piatti) + prova delle novità del 26/9",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-26"
+  }
+ ],
  "sessioni": [
   {
    "d": "2026-09-27",

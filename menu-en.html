@@ -145,6 +145,7 @@
       transform: translateY(var(--shift, 0));
     }
     .degu-titolo {
+      margin-top: 0;
       font-size: calc(1.4rem * var(--fs, 1.12));
       font-weight: 600;
       letter-spacing: .16em;
@@ -486,7 +487,7 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Black lemon, lovage and lime ice cream with milk biscuits"
+          "nome": "Black lemon, lovage and lime ice cream with milk crackers"
         }
       ],
       "Sette": "Chef's free interpretation menu"
@@ -544,7 +545,7 @@ const MENU = {
       "titolo": "Sfiziosi",
       "piatti": [
         {
-          "nome": "Raw local red seabream, sea urchins, lemon, almonds",
+          "nome": "Raw local red sea bream, sea urchins, lemon, almonds",
           "prezzo": 27,
           "sostenibile": true
         },
@@ -564,9 +565,9 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "“Not cheeses”",
+          "nome": "“Not cheese”",
           "prezzo": 22,
-          "descrizione": "(Tasting of ‘artificial’ artisan cheeses made from cashews and almond milk)"
+          "descrizione": "(Tasting of ‘fake’ artisan cheeses made from cashews and almond milk)"
         }
       ],
       "titolo_display": "Starters"
@@ -601,7 +602,7 @@ const MENU = {
       "titolo": "Non Solo Mare",
       "piatti": [
         {
-          "nome": "Local amberjack, aubergines, the umami flavour of tomatoes and peppers, tahini",
+          "nome": "Local amberjack, aubergines, the umami of tomatoes and peppers, tahini",
           "prezzo": 32,
           "sostenibile": true
         },
@@ -626,7 +627,7 @@ const MENU = {
       "titolo": "Golosità",
       "piatti": [
         {
-          "nome": "Black lemon, lovage and lime ice cream with milk biscuits",
+          "nome": "Black lemon, lovage and lime ice cream with milk crackers",
           "prezzo": 12
         },
         {
@@ -634,7 +635,7 @@ const MENU = {
           "prezzo": 12
         },
         {
-          "nome": "Porcini mushroom ice cream, strawberries, chocolate crumble",
+          "nome": "Porcini mushroom ice cream, strawberries, chocolate crumb",
           "prezzo": 12
         },
         {
@@ -723,7 +724,7 @@ const MENU = {
         "titolo_display": "Antipasti",
         "piatti": [
           {
-            "nome": "Raw local red seabream, sea urchins, lemon, almonds",
+            "nome": "Raw local red sea bream, sea urchins, lemon, almonds",
             "allergeni": [
               "gluten",
               "fish",
@@ -754,7 +755,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "“Not cheeses”",
+            "nome": "“Not cheese”",
             "allergeni": [
               "nuts",
               "sulphites"
@@ -808,7 +809,7 @@ const MENU = {
         "titolo_display": "Not Only Sea",
         "piatti": [
           {
-            "nome": "Local amberjack, aubergines, the umami flavour of tomatoes and peppers, tahini",
+            "nome": "Local amberjack, aubergines, the umami of tomatoes and peppers, tahini",
             "allergeni": [
               "fish",
               "sesame",
@@ -959,7 +960,7 @@ function buildDegu(degu) {
 
   return `
     <div class="degu">
-      <div class="degu-titolo">Tasting Menu</div>
+      <h1 class="degu-titolo">Tasting Menu</h1>
       <div class="degu-prezzi">${optsHtml}</div>
       <div class="degu-nota">${degu.nota.replace("l'intero tavolo", "<strong>l\u2019intero tavolo</strong>")}</div>
       ${percorsiHtml}

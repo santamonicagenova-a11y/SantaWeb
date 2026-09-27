@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.27.01 — SEO: ripristinati title/description approvati il 10/6 (persi), + robots index e canonical /menu-allergeni; titolo "Allergeni" da <div> a <h1> (margin:0, aspetto invariato). Nessuna modifica ai dati allergeni. Head e render sono preservati dalla pubblicazione del pannello. -->
 <!-- v 2026.09.12.03 — Allineamento centrato in orizzontale su richiesta di Andrea: titoli
      sezione e le due colonne di ogni riga piatto (nome piatto, allergeni) ora con text-align:
      center invece di sinistra; larghezze di colonna (38%/auto) e spaziature invariate. Nessuna
@@ -24,7 +25,10 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>Allergeni — Santamonica</title>
+<title>Tabella Allergeni | Ristorante Santamonica Genova</title>
+<meta name="description" content="Tabella allergeni del ristorante Santamonica a Genova: informazioni chiare su allergie e intolleranze alimentari per ogni piatto del menù.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://santamonicagenova.it/menu-allergeni">
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
 <style>
@@ -96,6 +100,7 @@ text-align: center;
 margin-bottom: 8mm;
 }
 .pg-header-title {
+margin: 0;
 font-size: 1.9rem;
 font-weight: 600;
 letter-spacing: .22em;
@@ -373,7 +378,7 @@ pg.className = 'pg';
 
 // Intestazione
 pg.innerHTML = '<div class="pg-header">' +
-'<div class="pg-header-title">Allergeni</div>' +
+'<h1 class="pg-header-title">Allergeni</h1>' +
 '</div>';
 
 // Sezioni

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.27.01 — SEO carta vini pubblicata (menu-vini.html): ripristinati title/description approvati il 10/6 (persi col passaggio della carta al gestionale Cantina), + robots index e canonical /menu-vini, + H1 visivamente nascosto (il titolo visibile era stato tolto il 22/8 per scelta grafica). Effetto alla prossima "Pubblica su menu-vini.html". -->
 <!-- v 2026.09.25.02 — aggiunto deep-link da menu-admin.html (tab Setup di Food Cost, pulsante
      "Apri anagrafica fornitori"): cantina.html?tab=anagrafiche&ent=fornitori apre direttamente la
      tab Anagrafiche con "Fornitori" già selezionato nella tendina, invece di lasciare l'utente sul
@@ -2063,8 +2064,10 @@ function generaHtmlCartaVini(articoli) {
 
   return '<!DOCTYPE html>\n<html lang="it"><head><meta charset="UTF-8">' +
     '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-    '<title>Carta dei Vini — Ristorante Santamonica</title>' +
-    '<meta name="description" content="Carta dei vini del Ristorante Santamonica, Genova.">' +
+    '<title>Carta dei Vini | Ristorante Santamonica Genova</title>' +
+    '<meta name="description" content="La carta dei vini di Santamonica a Genova: bollicine e Champagne, bianchi liguri, cantine da tutta Italia. Selezione della sommelier Monica Capurro.">' +
+    '<meta name="robots" content="index, follow">' +
+    '<link rel="canonical" href="https://santamonicagenova.it/menu-vini">' +
     '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Jost:wght@100..900&display=swap" rel="stylesheet">' +
     '<style>' +
     ':root{--cream:#faf7f2;--ink:#1a1714;--stone:#8c7e6e;--rule:#d4c9b8;}' +
@@ -2094,6 +2097,7 @@ function generaHtmlCartaVini(articoli) {
       '.vino-gruppo{break-inside:avoid;}' +
     '}' +
     '</style></head><body>' +
+    '<h1 style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0">Carta dei vini — Ristorante Santamonica, Genova</h1>' +
     '<div class="pg">' + body + '</div>' +
     '</body></html>';
 }

@@ -1,4 +1,13 @@
 <!DOCTYPE html>
+<!-- v 2026.09.27.06 — Food Cost → Setup (richiesta Andrea, Inbox 27/9): (1) elenco reparti + form
+     "Nuovo reparto" ora dentro un <details> chiuso di default ("+ Reparti (elenco e aggiunta)"),
+     stesso pattern di "+ Genera nuovo voucher" — prima erano sempre visibili ad ogni apertura del
+     tab; (2) "Fornitori" e "Numerazione tracciabilità" ora in un riquadro colorato (bordo/sfondo
+     violetto #a78bfa, --violet = colore categoria "Setup" già usato altrove nel file) con lo stesso
+     trattamento grafico del riquadro verde "Ingredienti" del 26/9, per distinguerli visivamente dal
+     resto del pannello. Nessuna modifica alle funzioni JS (fcRenderReparti, fcAggiungiReparto,
+     fcSalvaTraccConfig invariate: il <details> non nasconde il DOM via display:none scriptato,
+     solo la collapse nativa del browser). -->
 <!-- v 2026.09.27.05 — Voucher: nuova "Scheda" per il singolo voucher (richiesta Andrea, Inbox 27/9:
      "un punto dove vedere tutte le informazioni di un singolo voucher emesso"). Pulsante "📋 Scheda"
      su ogni riga dell'elenco unico (_vuRowVoucher) apre un pannello (#vu-scheda-modal) con TUTTI i
@@ -1405,6 +1414,8 @@
       <hr style="border:none;border-top:1px solid var(--rule);margin:0 0 1.2rem;">
 
       <div id="fc-view-reparti" style="display:none;">
+        <div style="margin-bottom:1.4rem;padding:1rem 1.2rem 1.2rem;border:1px solid rgba(167,139,250,.5);border-left:4px solid #a78bfa;background:rgba(167,139,250,.07);border-radius:var(--radius);">
+        <div class="sub" style="margin-top:0;color:#a78bfa;font-size:.8rem;font-weight:600;">📇 Fornitori e numerazione tracciabilità</div>
         <div class="sub" style="margin-top:0;">Fornitori</div>
         <p style="font-size:.78rem;color:var(--stone);margin-bottom:.8rem;">L'anagrafica fornitori è unica per tutto il ristorante e vive nel Gestionale Cantina. Apri, modifica o aggiungi un fornitore da lì — qui in Tracciabilità viene solo suggerito per nome.</p>
         <button class="btn" style="margin-bottom:1.4rem;" onclick="window.open('cantina.html?tab=anagrafiche&ent=fornitori','_blank')">📇 Apri anagrafica fornitori (Gestionale Cantina)</button>
@@ -1426,24 +1437,30 @@
           </div>
           <button class="btn btn-publish" onclick="fcSalvaTraccConfig()">💾 Salva</button>
         </div>
-        <div id="fc-tracc-cfg-status" style="font-size:.75rem;color:var(--stone);margin-bottom:1.4rem;"></div>
-
-        <div class="sub" style="margin-top:0;">Nuovo reparto</div>
-        <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1.2rem;">
-          <div style="flex:1;min-width:14rem;">
-            <span class="opt-lbl">Nome reparto</span>
-            <input type="text" id="fc-new-reparto" placeholder="Es: Carne e Salumi" />
-          </div>
-          <div>
-            <span class="opt-lbl">Tipo</span>
-            <select id="fc-new-reparto-tipo" style="width:9rem;padding:.35rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);">
-              <option value="food">Food</option>
-              <option value="beverage">Beverage</option>
-            </select>
-          </div>
-          <button class="btn btn-publish" onclick="fcAggiungiReparto()">+ Aggiungi</button>
+        <div id="fc-tracc-cfg-status" style="font-size:.75rem;color:var(--stone);margin-bottom:0;"></div>
         </div>
-        <div id="fc-reparti-list" style="font-size:.85rem;">…</div>
+
+        <details id="fc-reparti-details" style="margin-bottom:1.2rem;border:1px solid var(--rule);padding:.8rem 1rem;">
+          <summary style="cursor:pointer;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--stone);">+ Reparti (elenco e aggiunta)</summary>
+          <div style="margin-top:1rem;">
+            <div class="sub" style="margin-top:0;">Nuovo reparto</div>
+            <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1.2rem;">
+              <div style="flex:1;min-width:14rem;">
+                <span class="opt-lbl">Nome reparto</span>
+                <input type="text" id="fc-new-reparto" placeholder="Es: Carne e Salumi" />
+              </div>
+              <div>
+                <span class="opt-lbl">Tipo</span>
+                <select id="fc-new-reparto-tipo" style="width:9rem;padding:.35rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);">
+                  <option value="food">Food</option>
+                  <option value="beverage">Beverage</option>
+                </select>
+              </div>
+              <button class="btn btn-publish" onclick="fcAggiungiReparto()">+ Aggiungi</button>
+            </div>
+            <div id="fc-reparti-list" style="font-size:.85rem;">…</div>
+          </div>
+        </details>
 
         <div style="margin-top:1.8rem;padding:1rem 1.2rem 1.2rem;border:1px solid rgba(25,158,112,.5);border-left:4px solid #199e70;background:rgba(25,158,112,.07);border-radius:var(--radius);">
         <div class="sub" style="margin-top:0;color:#199e70;font-size:.8rem;font-weight:600;">🧮 Ingredienti (per il Calcolo Food Cost)</div>
@@ -7492,7 +7509,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.27.05</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.27.06</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

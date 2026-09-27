@@ -1,15 +1,15 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-09-27",
- "versione": "2026.09.27.05",
- "briefing": "**Briefing 27/9/2026** — Sessione SEO: Search Console ora collegata a Claude (pesce pos 8,4, mare pos 2,0; clic non-brand triplicati da maggio). Sistemati sul sito: immagini rotte e troppo pesanti (-2,8 MB in home), H1 e testi SEO di menu, vini, allergeni e dolci. Riprogrammate le attività scadute: pillar mare a ottobre, **pillar pesce senza chef entro 15/11** (intervista quasi chiusa), storia a dicembre. **Aspetta te entro 5/10**: abbinamenti vino con Monica e foto del crudo. Aggiunta anche in giornata (da Inbox): in menu-admin → Voucher, pulsante \"Scheda\" su ogni voucher con tutte le informazioni (acquirente, mittente, date, pagamento, eccedenza) — **da provare dal vivo**, non ancora testata con la chiave amministratore reale. **Prossimo**: dopo il 1/10 GEO giro 5 + orari Michelin; verifica cambio orari 1/10; Calcolo Food Cost su piatti veri.",
+ "versione": "2026.09.27.07",
+ "briefing": "**Briefing 27/9/2026** — Sessione SEO: Search Console ora collegata a Claude (pesce pos 8,4, mare pos 2,0; clic non-brand triplicati da maggio). Sistemati sul sito: immagini rotte e troppo pesanti (-2,8 MB in home), H1 e testi SEO di menu, vini, allergeni e dolci. Riprogrammate le attività scadute: pillar mare a ottobre, **pillar pesce senza chef entro 15/11** (intervista quasi chiusa), storia a dicembre. **Aspetta te entro 5/10**: abbinamenti vino con Monica e foto del crudo. Aggiunte anche in giornata (da Inbox): in menu-admin → Voucher, pulsante \"Scheda\" su ogni voucher con tutte le informazioni (acquirente, mittente, date, pagamento, eccedenza); in Food Cost → Setup, elenco reparti ora a scomparsa e riquadro violetto per Fornitori/Numerazione tracciabilità. **Entrambe da provare dal vivo**, non ancora testate a video con la chiave amministratore reale. **Prossimo**: dopo il 1/10 GEO giro 5 + orari Michelin; verifica cambio orari 1/10; Calcolo Food Cost su piatti veri.",
  "kpi": {
-  "aperte": 49,
+  "aperte": 48,
   "scadute": 3,
   "bloccate": 1,
   "andrea": 12,
   "debiti": 7,
-  "chiuse30": 28
+  "chiuse30": 29
  },
  "subs": {
   "SEO": {
@@ -36,9 +36,9 @@ window.JARVIS_DATA = {
   },
   "Sito": {
    "tot": 86,
-   "done": 73,
+   "done": 74,
    "prog": 1,
-   "up": 3,
+   "up": 2,
    "future": 9,
    "bloccato": 0,
    "scadute": 0,
@@ -439,18 +439,6 @@ window.JARVIS_DATA = {
    "agg": "2026-09-25"
   },
   {
-   "t": "menu-admin → Setup: reparti di «Numerazione tracciabilità» chiusi con freccia per aprirli; Fornitori e Numerazione tracciabilità in un box colorato come Ingredienti",
-   "sub": "Sito",
-   "st": "up",
-   "s": "2026-09-27",
-   "e": null,
-   "own": "Claude",
-   "az": null,
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-27"
-  },
-  {
    "t": "Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)",
    "sub": "Sito",
    "st": "up",
@@ -468,6 +456,11 @@ window.JARVIS_DATA = {
    "d": "2026-09-27",
    "sub": "SEO",
    "t": "riprogrammazione + dominio, immagini, menu, GSC via API"
+  },
+  {
+   "d": "2026-09-27",
+   "sub": "Sito",
+   "t": "Setup reparti tracciabilità e box colorati"
   },
   {
    "d": "2026-09-27",
@@ -498,11 +491,6 @@ window.JARVIS_DATA = {
    "d": "2026-09-25",
    "sub": "NoShowApp",
    "t": "roadmap in Jarvis e manutenzione app"
-  },
-  {
-   "d": "2026-09-25",
-   "sub": "Sito",
-   "t": "Attività ricostruita da commit SantaWeb"
   }
  ],
  "perWeek": [
@@ -552,7 +540,7 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-21",
-   "n": 10
+   "n": 11
   }
  ],
  "perDay": [
@@ -582,7 +570,7 @@ window.JARVIS_DATA = {
   },
   {
    "g": "dom",
-   "n": 17
+   "n": 18
   }
  ]
 };

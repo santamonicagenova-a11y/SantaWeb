@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.09.27.06",
+  version: "2026.09.27.07",
   updated: "2026-09-27",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -74,7 +74,7 @@ window.SANTAMONICA_GANTT = {
       {t:'CRM — 4 funzionalità dopo ricerca su SevenRooms/OpenTable/Resy/Brevo: compleanno/anniversario + pannello "Prossime ricorrenze", filtro "non viene da 3+/6+/12+ mesi", badge milestone Abituale/Fedelissimo, mini-dashboard KPI in clienti.html', s:'2026-09-02', st:'done', ms:true},
       {t:'Fix menu-admin: cambio tab ora pulisce il contenuto sotto (carta caricata ecc.) + "Procedure di aggiornamento" visibile solo su Gestione menù e sito', s:'2026-09-02', st:'done', ms:true},
       {t:'Gestionale Cantina — nuovo progetto Supabase "SantaCantina", 578 articoli migrati da Access', s:'2026-08-15', st:'done', ms:true},
-      {t:'menu-admin → Setup: reparti di «Numerazione tracciabilità» chiusi con freccia per aprirli; Fornitori e Numerazione tracciabilità in un box colorato come Ingredienti', s:'2026-09-27', st:'up'},
+      {t:'menu-admin → Setup: reparti di «Numerazione tracciabilità» chiusi con freccia per aprirli; Fornitori e Numerazione tracciabilità in un box colorato come Ingredienti', s:'2026-09-27', e:'2026-09-27', st:'done'},
       {t:'menu-admin → Voucher: un punto dove vedere tutte le informazioni di un singolo voucher emesso', s:'2026-09-27', e:'2026-09-27', st:'done'},
       {t:'Gestionale Cantina — 3 Edge Function (catalogo/anagrafiche/magazzino) + cantina.html + carta vini dinamica', s:'2026-08-15', st:'done', ms:true},
       {t:'Gestionale Cantina — 50 cantine mancanti collegate + carta vini riga-unica formato PDF + setup categorie in carta', s:'2026-08-15', st:'done', ms:true},

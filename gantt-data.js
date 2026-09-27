@@ -5,11 +5,11 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.09.26.11",
-  updated: "2026-09-26",
+  version: "2026.09.27.01",
+  updated: "2026-09-27",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
-  today:     "2026-09-26",
+  today:     "2026-09-27",
 
   sections: [
     { key:'dec', name:'★ Decennale — serata 1 luglio 2026', badge:'evento trasversale', tasks:[
@@ -119,7 +119,7 @@ window.SANTAMONICA_GANTT = {
       {t:'AZIONE #2 orari schede terze (TheFork non gestibile; resto = affidamento ricrawl)', s:'2026-06-12', e:'2026-06-24', st:'done'},
       {t:'GEO giro 3 (ChatGPT + Claude 5° motore) ✅', s:'2026-06-13', st:'done', ms:true},
       {t:'GEO giro 4 (orari estivi: solo Gemini ok; ChatGPT/Claude al ricrawl)', s:'2026-06-24', st:'done', ms:true},
-      {t:'GEO giro 5 (verifica ricrawl orari ChatGPT/Claude)', s:'2026-07-08', e:'2026-07-15', st:'future'},
+      {t:'GEO giro 5 (verifica ricrawl orari ChatGPT/Claude)', s:'2026-10-02', e:'2026-10-10', st:'up'},
       {t:'AEO impostato (lente dentro GEO) + audit skill seo-geo-aeo (AEO 7→8)', s:'2026-06-24', st:'done', ms:true},
       {t:'Quick-win AEO home LIVE (definizione + H1 + 6 heading-domanda + 3 liste)', s:'2026-06-24', st:'done'},
       {t:'P3 quick-win AEO (3 vendor) + deploy bucket A LIVE (no "gourmet", H1 entità, meta ~140c)', s:'2026-06-29', st:'done', ms:true},
@@ -127,17 +127,21 @@ window.SANTAMONICA_GANTT = {
       {t:'IndexNow/Crawler Hints Cloudflare attivato', s:'2026-07-03', st:'done', ms:true},
       {t:'Pretty URLs (email GSC): sitemap URL pulite + robots senza estensione LIVE — pending reinvio sitemap GSC', s:'2026-07-03', e:'2026-07-05', st:'done', ms:true},
       {t:'Canonical → URL pulite (debito pretty URLs, tocca template admin — col pacchetto pillar)', s:'2026-07-10', e:'2026-09-25', st:'done'},
-      {t:'Intervista pillar: §1-4 raccolte (identità · materia prima · sostenibilità · stile) — in attesa §5 piatti firma', s:'2026-07-05', st:'up'},
-      {t:'Piano recensioni (4,3★→4,6, leva GEO) + tentativo recupero TheFork Manager', s:'2026-07-10', e:'2026-08-31', st:'future'},
+      {t:'Search Console collegata a Claude via API (service account claude-seo)', s:'2026-09-27', e:'2026-09-27', st:'done'},
+      {t:'Piano recensioni (4,3★→4,6, leva GEO) + tentativo recupero TheFork Manager', s:'2026-10-06', e:'2026-11-30', st:'up'},
       {t:'Embriaco #8 profilato + backlink Vivarelli/I Cuochi chiusi (no dominio)', s:'2026-06-24', st:'done'},
+      {t:'Audit pagine sitemap 27/9: immagini 404, H1, meta e canonical delle pagine generate', s:'2026-09-27', e:'2026-09-27', st:'done'},
       {t:'Backlink competitor Etra/Coco/Xena (avanti; dietro solo ai 2 stellati)', s:'2026-06-19', st:'done'},
       {t:'PR decennale comunicato — ABBANDONATO (decisione Andrea 24/6)', s:'2026-06-19', e:'2026-06-24', st:'done'},
       {t:'Brief SEO pillar /cucina-di-pesce (spec pronta)', s:'2026-06-19', st:'done', ms:true},
-      {t:'Pillar #1 /cucina-di-pesce (blocco: brief Nicolò + foto; al go-live: bucket B title + FAQ fine dining)', s:'2026-06-15', e:'2026-07-31', st:'up'},
-      {t:'Pillar #2 /sul-mare-lungomare', s:'2026-07-01', e:'2026-07-31', st:'future'},
-      {t:'Pillar #3 /storia-santamonica', s:'2026-08-01', e:'2026-08-31', st:'future'},
-      {t:'Content seriale IG + Brevo (2/mese)', s:'2026-06-15', e:'2026-11-30', st:'future'},
-      {t:'Multilingua URL separate /en/ /fr/ (mini-progetto ≈3-4 sess, post-pillar)', s:'2026-09-01', e:'2026-10-31', st:'future'},
+      {t:'Intervista pillar /cucina-di-pesce ad Andrea e Monica (materia prima, pescatori, crudo, sala e cantina)', s:'2026-10-01', e:'2026-10-05', st:'prog'},
+      {t:'Pillar pesce §7 — 2-3 abbinamenti vino con pesce/crudo raccontati da Monica', s:'2026-09-28', e:'2026-10-05', st:'up'},
+      {t:'Pillar pesce §10 — foto recenti del crudo/sashimi (anche da telefono) + scelta delle migliori esistenti', s:'2026-09-28', e:'2026-10-05', st:'up'},
+      {t:'Pillar #1 /cucina-di-pesce (voce Andrea+Monica; al go-live: bucket B title + FAQ fine dining)', s:'2026-10-01', e:'2026-11-15', st:'up'},
+      {t:'Pillar #2 /sul-mare-lungomare', s:'2026-10-01', e:'2026-10-31', st:'up'},
+      {t:'Pillar #3 /storia-santamonica', s:'2026-12-01', e:'2026-12-31', st:'future'},
+      {t:'Content seriale IG + Brevo (2/mese)', s:'2026-11-01', e:'2027-03-31', st:'future'},
+      {t:'Multilingua URL separate /en/ /fr/ (mini-progetto ≈3-4 sess, post-pillar)', s:'2027-01-07', e:'2027-02-28', st:'future'},
       {t:'Brevo automazioni email', s:'2026-08-01', e:'2026-09-25', st:'done'},
     ]},
     { key:'mkt', name:'Marketing & Awareness', badge:'progetto-marketing', tasks:[

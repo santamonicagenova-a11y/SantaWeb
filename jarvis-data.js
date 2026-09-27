@@ -1,17 +1,28 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
- "generato": "2026-09-26",
- "versione": "2026.09.26",
- "briefing": "**Briefing 26-27/9/2026** — Food Cost: **Calcolo Food Cost** da ingredienti online (menu-admin v.10). Cambio orari del 1/10 **automatizzato** (GitHub Action alle 5:30, testi FAQ approvati): alla prima sessione dopo il 1/10 Claude verifica il sito. Da ora il push su main lo fa Claude. **Aspetta te**: usare il Calcolo Food Cost su piatti veri; giro di prova sugli altri tab Food Cost; beta tester e marchio NoShowApp. **Segnale**: nessuna sessione SEO negli ultimi 30 giorni.",
+ "generato": "2026-09-27",
+ "versione": "2026.09.27",
+ "briefing": "**Briefing 27/9/2026** — Sessione SEO: Search Console ora collegata a Claude (pesce pos 8,4, mare pos 2,0; clic non-brand triplicati da maggio). Sistemati sul sito: immagini rotte e troppo pesanti (-2,8 MB in home), H1 e testi SEO di menu, vini, allergeni e dolci. Riprogrammate le attività scadute: pillar mare a ottobre, **pillar pesce senza chef entro 15/11** (intervista quasi chiusa), storia a dicembre. **Aspetta te entro 5/10**: abbinamenti vino con Monica e foto del crudo. **Prossimo**: dopo il 1/10 GEO giro 5 + orari Michelin; verifica cambio orari 1/10; Calcolo Food Cost su piatti veri.",
  "kpi": {
-  "aperte": 46,
-  "scadute": 8,
-  "bloccate": 3,
-  "andrea": 10,
+  "aperte": 48,
+  "scadute": 3,
+  "bloccate": 1,
+  "andrea": 12,
   "debiti": 7,
-  "chiuse30": 24
+  "chiuse30": 27
  },
  "subs": {
+  "SEO": {
+   "tot": 42,
+   "done": 31,
+   "prog": 1,
+   "up": 7,
+   "future": 3,
+   "bloccato": 0,
+   "scadute": 0,
+   "andrea": 3,
+   "debiti": 0
+  },
   "Decennale": {
    "tot": 11,
    "done": 11,
@@ -21,17 +32,6 @@ window.JARVIS_DATA = {
    "bloccato": 0,
    "scadute": 0,
    "andrea": 0,
-   "debiti": 0
-  },
-  "SEO": {
-   "tot": 38,
-   "done": 29,
-   "prog": 0,
-   "up": 1,
-   "future": 6,
-   "bloccato": 2,
-   "scadute": 5,
-   "andrea": 1,
    "debiti": 0
   },
   "Sito": {
@@ -81,18 +81,6 @@ window.JARVIS_DATA = {
  },
  "andrea": [
   {
-   "t": "GEO giro 5 (verifica ricrawl orari ChatGPT/Claude)",
-   "sub": "SEO",
-   "st": "future",
-   "s": "2026-07-08",
-   "e": "2026-07-15",
-   "own": "Andrea",
-   "az": "Confermare lo stato: nessuna traccia nei documenti dopo luglio (fatto, in corso o da ripianificare?)",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-25"
-  },
-  {
    "t": "Baseline misurazione geografica IG (4 sett, post 2/7)",
    "sub": "Marketing",
    "st": "future",
@@ -127,6 +115,42 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
+  },
+  {
+   "t": "Pillar pesce §7 — 2-3 abbinamenti vino con pesce/crudo raccontati da Monica",
+   "sub": "SEO",
+   "st": "up",
+   "s": "2026-09-28",
+   "e": "2026-10-05",
+   "own": "Andrea",
+   "az": "Chiedere a Monica 2-3 esempi (con le ostriche X perché Y) e passarli a Claude",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-27"
+  },
+  {
+   "t": "Pillar pesce §10 — foto recenti del crudo/sashimi (anche da telefono) + scelta delle migliori esistenti",
+   "sub": "SEO",
+   "st": "up",
+   "s": "2026-09-28",
+   "e": "2026-10-05",
+   "own": "Andrea",
+   "az": "Indicare a Claude dove sono le foto del crudo/sashimi (cartella PC o IG)",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-27"
+  },
+  {
+   "t": "Intervista pillar /cucina-di-pesce ad Andrea e Monica (materia prima, pescatori, crudo, sala e cantina)",
+   "sub": "SEO",
+   "st": "prog",
+   "s": "2026-10-01",
+   "e": "2026-10-05",
+   "own": "Andrea",
+   "az": "Dedicare ~1 ora all'intervista (anche in 2 volte), con Monica per la parte vini/sala",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-27"
   },
   {
    "t": "Calcolo Food Cost ricette da ingredienti: anagrafica ingredienti in Setup + tab Calcolo Food Cost che valorizza Costo Ricetta in Costo piatti",
@@ -203,18 +227,6 @@ window.JARVIS_DATA = {
  ],
  "scadute": [
   {
-   "t": "GEO giro 5 (verifica ricrawl orari ChatGPT/Claude)",
-   "sub": "SEO",
-   "st": "future",
-   "s": "2026-07-08",
-   "e": "2026-07-15",
-   "own": "Andrea",
-   "az": "Confermare lo stato: nessuna traccia nei documenti dopo luglio (fatto, in corso o da ripianificare?)",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-25"
-  },
-  {
    "t": "Baseline misurazione geografica IG (4 sett, post 2/7)",
    "sub": "Marketing",
    "st": "future",
@@ -227,30 +239,6 @@ window.JARVIS_DATA = {
    "agg": "2026-09-25"
   },
   {
-   "t": "Pillar #1 /cucina-di-pesce (blocco: brief Nicolò + foto; al go-live: bucket B title + FAQ fine dining)",
-   "sub": "SEO",
-   "st": "bloccato",
-   "s": "2026-06-15",
-   "e": "2026-07-31",
-   "own": null,
-   "az": null,
-   "bl": "In attesa per decisione di Andrea (25/9), dipende dalla intervista pillar",
-   "deb": false,
-   "agg": "2026-09-25"
-  },
-  {
-   "t": "Pillar #2 /sul-mare-lungomare",
-   "sub": "SEO",
-   "st": "future",
-   "s": "2026-07-01",
-   "e": "2026-07-31",
-   "own": null,
-   "az": null,
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-21"
-  },
-  {
    "t": "Calendario cene a tema (entro ago)",
    "sub": "Marketing",
    "st": "prog",
@@ -261,30 +249,6 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
-  },
-  {
-   "t": "Piano recensioni (4,3★→4,6, leva GEO) + tentativo recupero TheFork Manager",
-   "sub": "SEO",
-   "st": "future",
-   "s": "2026-07-10",
-   "e": "2026-08-31",
-   "own": null,
-   "az": null,
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-25"
-  },
-  {
-   "t": "Pillar #3 /storia-santamonica",
-   "sub": "SEO",
-   "st": "future",
-   "s": "2026-08-01",
-   "e": "2026-08-31",
-   "own": null,
-   "az": null,
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-21"
   },
   {
    "t": "Mailing Brevo — lancio (entro 15 set)",
@@ -325,16 +289,64 @@ window.JARVIS_DATA = {
    "agg": "2026-09-26"
   },
   {
-   "t": "Verificare aggiornamento orari su Michelin",
+   "t": "Pillar pesce §7 — 2-3 abbinamenti vino con pesce/crudo raccontati da Monica",
    "sub": "SEO",
    "st": "up",
-   "s": "2026-09-25",
+   "s": "2026-09-28",
+   "e": "2026-10-05",
+   "own": "Andrea",
+   "az": "Chiedere a Monica 2-3 esempi (con le ostriche X perché Y) e passarli a Claude",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-27"
+  },
+  {
+   "t": "Pillar pesce §10 — foto recenti del crudo/sashimi (anche da telefono) + scelta delle migliori esistenti",
+   "sub": "SEO",
+   "st": "up",
+   "s": "2026-09-28",
+   "e": "2026-10-05",
+   "own": "Andrea",
+   "az": "Indicare a Claude dove sono le foto del crudo/sashimi (cartella PC o IG)",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-27"
+  },
+  {
+   "t": "Intervista pillar /cucina-di-pesce ad Andrea e Monica (materia prima, pescatori, crudo, sala e cantina)",
+   "sub": "SEO",
+   "st": "prog",
+   "s": "2026-10-01",
+   "e": "2026-10-05",
+   "own": "Andrea",
+   "az": "Dedicare ~1 ora all'intervista (anche in 2 volte), con Monica per la parte vini/sala",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-27"
+  },
+  {
+   "t": "GEO giro 5 (verifica ricrawl orari ChatGPT/Claude)",
+   "sub": "SEO",
+   "st": "up",
+   "s": "2026-10-02",
    "e": "2026-10-10",
    "own": "Claude",
    "az": null,
    "bl": null,
    "deb": false,
-   "agg": "2026-09-25"
+   "agg": "2026-09-27"
+  },
+  {
+   "t": "Verificare aggiornamento orari su Michelin",
+   "sub": "SEO",
+   "st": "up",
+   "s": "2026-10-02",
+   "e": "2026-10-10",
+   "own": "Claude",
+   "az": null,
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-27"
   }
  ],
  "inCorso": [
@@ -363,6 +375,18 @@ window.JARVIS_DATA = {
    "agg": "2026-09-25"
   },
   {
+   "t": "Intervista pillar /cucina-di-pesce ad Andrea e Monica (materia prima, pescatori, crudo, sala e cantina)",
+   "sub": "SEO",
+   "st": "prog",
+   "s": "2026-10-01",
+   "e": "2026-10-05",
+   "own": "Andrea",
+   "az": "Dedicare ~1 ora all'intervista (anche in 2 volte), con Monica per la parte vini/sala",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-27"
+  },
+  {
    "t": "Sponsorizzata Salone Nautico",
    "sub": "Marketing",
    "st": "prog",
@@ -387,33 +411,14 @@ window.JARVIS_DATA = {
    "bl": "Baseline geografica IG non ancora raccolta",
    "deb": false,
    "agg": "2026-09-25"
-  },
-  {
-   "t": "Intervista pillar: §1-4 raccolte (identità · materia prima · sostenibilità · stile) — in attesa §5 piatti firma",
-   "sub": "SEO",
-   "st": "bloccato",
-   "s": "2026-07-05",
-   "e": null,
-   "own": null,
-   "az": null,
-   "bl": "In attesa per decisione di Andrea (25/9); chef Nicolò uscito il 14/8",
-   "deb": false,
-   "agg": "2026-09-25"
-  },
-  {
-   "t": "Pillar #1 /cucina-di-pesce (blocco: brief Nicolò + foto; al go-live: bucket B title + FAQ fine dining)",
-   "sub": "SEO",
-   "st": "bloccato",
-   "s": "2026-06-15",
-   "e": "2026-07-31",
-   "own": null,
-   "az": null,
-   "bl": "In attesa per decisione di Andrea (25/9), dipende dalla intervista pillar",
-   "deb": false,
-   "agg": "2026-09-25"
   }
  ],
  "sessioni": [
+  {
+   "d": "2026-09-27",
+   "sub": "SEO",
+   "t": "riprogrammazione + dominio, immagini, menu, GSC via API"
+  },
   {
    "d": "2026-09-26",
    "sub": "Sito",
@@ -448,11 +453,6 @@ window.JARVIS_DATA = {
    "d": "2026-09-25",
    "sub": "Trasversale",
    "t": "Setup Jarvis"
-  },
-  {
-   "d": "2026-09-21",
-   "sub": "Trasversale",
-   "t": "Gantt ricostruito da zero + pubblicato live su santamonicagenova.it"
   }
  ],
  "perWeek": [
@@ -502,7 +502,7 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-21",
-   "n": 8
+   "n": 9
   }
  ],
  "perDay": [
@@ -532,7 +532,7 @@ window.JARVIS_DATA = {
   },
   {
    "g": "dom",
-   "n": 15
+   "n": 16
   }
  ]
 };

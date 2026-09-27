@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- v 2026.09.27.07 — Riorganizzazione pulsanti pannello iniziale (richiesta Andrea): "Prenotazioni
+     online" spostato dal tab "Prenotazioni e voucher" al tab "Setup" (era il primo bottone di
+     "pren", ora primo di "setup"); "Foto cucina" e "Foto sito" spostati dal tab "Gestione menù e
+     sito" al tab "Setup" (in coda, dopo "Voucher — Setup"). Solo spostamento di 3 <button> tra
+     <div class="qa-group">: cambiata solo la classe colore (qa-menu/qa-pren → qa-setup, quindi ora
+     bordo viola come il resto di "Setup"), nessuna funzione onclick toccata. -->
 <!-- v 2026.09.27.06 — Food Cost → Setup (richiesta Andrea, Inbox 27/9): (1) elenco reparti + form
      "Nuovo reparto" ora dentro un <details> chiuso di default ("+ Reparti (elenco e aggiunta)"),
      stesso pattern di "+ Genera nuovo voucher" — prima erano sempre visibili ad ogni apertura del
@@ -1096,8 +1102,6 @@
     <button class="qa-btn qa-menu" onclick="caricaDalSito('dolci')">Menù dolci</button>
     <button class="qa-btn qa-menu" onclick="caricaDalSito('allergeni')">Allergeni carta</button>
     <button class="qa-btn qa-menu" onclick="apriSezionePiattiDettagli()">Dettagli piatti (allergeni)</button>
-    <button class="qa-btn qa-menu" onclick="apriGestoreFoto()">Foto cucina</button>
-    <button class="qa-btn qa-menu" onclick="apriGestoreFotoSito()">Foto sito</button>
     <button class="qa-btn qa-menu" onclick="apriSezioneDocGenerico()">Documento generico</button>
     <button class="qa-btn qa-menu" onclick="location.href='cantina.html'">Gestionale Cantina</button>
     <div class="menu-top-btns" style="width:100%">
@@ -1115,7 +1119,6 @@
   </div>
 
   <div class="qa-group" data-group="pren">
-    <button class="qa-btn qa-pren" onclick="apriSezionePrenotazioni()">Prenotazioni online</button>
     <button class="qa-btn qa-pren" onclick="location.href='gestionale.html'">Gestionale</button>
     <button class="qa-btn qa-pren" onclick="location.href='clienti.html'">Gestione Clienti</button>
     <button class="qa-btn qa-pren" onclick="apriSezioneCauzioni()">Cauzioni (storico)</button>
@@ -1124,10 +1127,13 @@
   </div>
 
   <div class="qa-group" data-group="setup">
+    <button class="qa-btn qa-setup" onclick="apriSezionePrenotazioni()">Prenotazioni online</button>
     <button class="qa-btn qa-setup" onclick="apriSezioneOrariApertura()">Orari di Apertura</button>
     <button class="qa-btn qa-setup" onclick="apriSezioneReminder()">Reminder prenotazioni</button>
     <button class="qa-btn qa-setup" onclick="apriSezionePrenotazioniSetup()">Prenotazioni — Setup</button>
     <button class="qa-btn qa-setup" onclick="apriSezioneVoucherSetup()">Voucher — Setup</button>
+    <button class="qa-btn qa-setup" onclick="apriGestoreFoto()">Foto cucina</button>
+    <button class="qa-btn qa-setup" onclick="apriGestoreFotoSito()">Foto sito</button>
   </div>
 
   <div class="qa-group" data-group="util">
@@ -7509,7 +7515,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.27.06</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.27.07</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

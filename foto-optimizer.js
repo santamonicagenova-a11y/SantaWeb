@@ -1,8 +1,10 @@
-// foto-optimizer.js — v 2026.05.09.02
+// foto-optimizer.js — v 2026.09.27.01
+// v 2026.09.27.01 — Foto sito (Hero/Cucina/Cantina): lato lungo max 1600px e q=0.78 (prima 1920px di larghezza, q=0.90:
+//   hero 298 KB, cantina verticale 2,1 MB → LCP e peso pagina). Parametro opzionale maxH in _processImage. Galleria invariata.
 // Ottimizzazione immagini per repo SantaWeb (Canvas API → WebP).
 //
 // API pubblica (window.*):
-//   ottimizzaImmagine(dataUrl, callback)            → WebP qualità alta, max 1920px, q=0.90
+//   ottimizzaImmagine(dataUrl, callback)            → WebP, lato lungo max 1600px, q=0.78
 //                                                     (usata per Hero / Cucina / Cantina sito)
 //   ottimizzaImmagineFullGalleria(dataUrl, cb)      → WebP "full" per lightbox, max 2400px, q=0.90
 //   ottimizzaImmagineThumb(dataUrl, cb)             → WebP thumbnail, max 800px, q=0.82
@@ -20,13 +22,14 @@
 (function (global) {
   'use strict';
 
-  function _processImage(dataUrl, maxW, quality, callback) {
+  function _processImage(dataUrl, maxW, quality, callback, maxH) {
     if (!dataUrl) { callback(null); return; }
     var img = new Image();
     img.onload = function () {
       var w = img.width, h = img.height;
       if (!w || !h) { callback(null); return; }
       if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      if (maxH && h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
       var canvas = document.createElement('canvas');
       canvas.width = w; canvas.height = h;
       var ctx = canvas.getContext('2d');
@@ -54,7 +57,7 @@
 
   // Foto singola alta qualità (Hero / Cucina / Cantina sito)
   global.ottimizzaImmagine = function (dataUrl, callback) {
-    _processImage(dataUrl, 1920, 0.90, callback);
+    _processImage(dataUrl, 1600, 0.78, callback, 1600);
   };
 
   // Foto "full" per galleria — più grande perché aperta nel lightbox

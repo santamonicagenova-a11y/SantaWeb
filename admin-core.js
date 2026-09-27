@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.09.27.02 — Traduzioni EN/FR: replace anche di "Men&ugrave; Degustazione" (refuso apostrofo tolto nel template carta).
 // v 2026.09.27.01 — /menu (IT pubblico): title/description/og nuovi, orientati a chi cerca "il menu di Santamonica" (la pagina riceve quasi solo ricerche brand): via "Pesce Fresco" (anti-cannibalizzazione con la pillar /cucina-di-pesce) e "Cucina Ligure"; niente numero di portate né prezzi (cambiano col nuovo menu). Testi approvati da Andrea 27/9.
 // v 2026.09.25.01 — menu generati: canonical/og:url/JSON-LD puntano agli URL puliti (senza .html): le .html fanno redirect 308 verso la versione senza estensione e Google segnalava "Pagina con reindirizzamento". Nessun cambio di contenuto.
 // v 2026.09.12.01 — _pulisciViste() estesa con 'orari-apertura-section' (nuovo pannello
@@ -1028,6 +1029,7 @@ function eseguiPubblicazione(token) {
     html = html.replace(/Per mantenere costanti[\s\S]*?simbolo: \*`/, t.note_orario + '`');
     html = html.replace('Menù’ Degustazione', t.titolo_degustazione);
     html = html.replace('Men&ugrave;&rsquo; Degustazione', t.titolo_degustazione);
+    html = html.replace('Men&ugrave; Degustazione', t.titolo_degustazione);
     html = html.replace(/\${o\.portate} portate/g, '${o.portate} ' + t.degu_portate_label);
     html = html.replace(/eventuale abbinamento vini/g, t.degu_vini_label);
     html = html.replace('ORARIO DI SERVIZIO:', t.orario_titolo);

@@ -1,4 +1,13 @@
 <!DOCTYPE html>
+<!-- v 2026.09.27.05 — Voucher: nuova "Scheda" per il singolo voucher (richiesta Andrea, Inbox 27/9:
+     "un punto dove vedere tutte le informazioni di un singolo voucher emesso"). Pulsante "📋 Scheda"
+     su ogni riga dell'elenco unico (_vuRowVoucher) apre un pannello (#vu-scheda-modal) con TUTTI i
+     campi del voucher, non solo quelli già in riga: acquirente (nome+email), mittente ("da parte
+     di"), consegna, prezzo pagato, riferimento pagamento, date (emissione/scadenza/riscatto), stato,
+     eccedenza (dovuta/richiesta/chiusa), nota interna. Dato via fetch fresco (_vcCall('lookup')),
+     non dalla cache di lista, per essere sempre allineata. Richiede riscatta-voucher v 2026.09.27.01
+     (SAFE_FIELDS esteso con acquirente_email, mittente, rif_pagamento — prima non restituiti da
+     nessuna azione). Nessuna modifica alle altre funzioni voucher. -->
 <!-- v 2026.09.27.04 — bump ?v= admin-templates-shared.js e admin-core.js a 2026.09.27.02 (refuso "Menù’ Degustazione"). -->
 <!-- v 2026.09.27.03 — cache-busting ?v= su foto-optimizer.js (foto sito: lato lungo max 1600px, q=0.78). -->
 <!-- v 2026.09.27.02 — bump ?v= admin-core.js a 2026.09.27.01 (nuovi title/description della pagina pubblica /menu). -->
@@ -2245,6 +2254,19 @@
         <button class="btn btn-load" onclick="chiudiSezioneVoucher()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
         <button class="btn btn-load" onclick="resetVoucherSecret()" title="Cambia chiave amministratore" style="font-size:.6rem;padding:.45rem .7rem;opacity:.7">🔑</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Voucher — Scheda di dettaglio (v 2026.09.27.05): pannello con TUTTI i campi di un singolo
+     voucher, aperto dal pulsante "📋 Scheda" di ogni riga in "Voucher — Gestione". Dato fresco via
+     _vcCall('lookup', {codice}), non dalla cache di lista. -->
+<div class="modal-overlay" id="vu-scheda-modal">
+  <div class="modal" style="max-width:560px;">
+    <h3>Scheda voucher</h3>
+    <div id="vu-scheda-body" style="font-size:.82rem;color:var(--ink);line-height:1.7;">…</div>
+    <div class="modal-btns" style="margin-top:1.2rem;">
+      <button class="btn btn-load" style="border:1px solid var(--ink);color:var(--ink)" onclick="_vuChiudiScheda()">✕ Chiudi</button>
     </div>
   </div>
 </div>
@@ -6572,7 +6594,7 @@ function _vuRowVoucher(v) {
   var isExp = v.tipo === 'esperienza';
   var importo = isExp ? (v.descrizione || '') : (_czEuro(v.residuo_eur) + ' / ' + _czEuro(v.valore_eur));
   var finale = (v.stato === 'riscattato' || v.stato === 'scaduto' || v.stato === 'recesso');
-  var actions = '';
+  var actions = '<button class="btn btn-load" style="font-size:.68rem;padding:.35rem .6rem;border:1px solid var(--ink);color:var(--ink)" onclick="_vuApriScheda(\'' + v.codice + '\')">📋 Scheda</button>';
   var impMsgDiv = '';
   if (finale) {
     actions += '<span style="font-size:.7rem;color:var(--stone);">—</span>';
@@ -6659,6 +6681,63 @@ function _vuSaveNote(codice) {
       _vuSetMsg((res.j && res.j.error) || 'Errore nel salvataggio della nota.', false);
     }
   });
+}
+
+// Scheda di dettaglio di un singolo voucher (v 2026.09.27.05): tutti i campi, anche quelli non
+// mostrati nella riga compatta dell'elenco unico (acquirente_email, mittente, rif_pagamento,
+// prezzo pagato, data_riscatto, note). Fetch fresco via 'lookup' (non la cache di lista) per
+// essere sempre allineata allo stato reale. Richiede riscatta-voucher v 2026.09.27.01+.
+function _vuApriScheda(codice) {
+  var modal = document.getElementById('vu-scheda-modal');
+  var body = document.getElementById('vu-scheda-body');
+  body.innerHTML = 'Caricamento…';
+  modal.classList.add('on');
+  _vcCall('lookup', { codice: codice }).then(function (res) {
+    if (!res.ok || !res.j || !res.j.voucher) {
+      body.innerHTML = '<span style="color:var(--rust);">' + _czEsc((res.j && res.j.error) || 'Errore nel caricamento.') + '</span>';
+      return;
+    }
+    body.innerHTML = _vuRenderScheda(res.j.voucher);
+  }).catch(function (ex) {
+    body.innerHTML = '<span style="color:var(--rust);">' + _czEsc(ex.message) + '</span>';
+  });
+}
+function _vuChiudiScheda() {
+  document.getElementById('vu-scheda-modal').classList.remove('on');
+}
+function _vuRigaScheda(label, value) {
+  if (value === null || value === undefined || value === '') return '';
+  return '<div style="display:flex;gap:.6rem;padding:.3rem 0;border-bottom:1px dotted var(--rule);">' +
+    '<span style="flex:0 0 150px;color:var(--stone);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;">' + _czEsc(label) + '</span>' +
+    '<span style="flex:1;">' + value + '</span></div>';
+}
+function _vuRenderScheda(v) {
+  var isExp = v.tipo === 'esperienza';
+  var st = VC_STATUS_LABEL[v.stato] || v.stato, color = VC_STATUS_COLOR[v.stato] || 'var(--stone)';
+  var h = '<div style="font-family:monospace;font-weight:700;font-size:1.4rem;color:var(--gold,#b89d6a);margin-bottom:.6rem;">' + _czEsc(v.codice) + '</div>';
+  h += _vuRigaScheda('Stato', '<strong style="color:' + color + ';">' + _czEsc(st) + '</strong>');
+  h += _vuRigaScheda('Tipo', isExp ? 'Esperienza' : 'Buono libero');
+  h += _vuRigaScheda('Descrizione', _czEsc(v.descrizione));
+  if (!isExp) {
+    h += _vuRigaScheda('Valore', _czEuro(v.valore_eur));
+    h += _vuRigaScheda('Residuo', _czEuro(v.residuo_eur));
+    h += _vuRigaScheda('Eccedenza a carico di', v.eccedenza_a_carico === 'acquirente' ? 'Acquirente' : (v.eccedenza_a_carico === 'destinatario' ? 'Destinatario' : ''));
+  }
+  h += _vuRigaScheda('Prezzo pagato', v.prezzo_pagato_eur != null ? _czEuro(v.prezzo_pagato_eur) : '');
+  h += _vuRigaScheda('Riferimento pagamento', _czEsc(v.rif_pagamento));
+  h += _vuRigaScheda('Acquirente', _czEsc(v.acquirente_nome));
+  h += _vuRigaScheda('Email acquirente', _czEsc(v.acquirente_email));
+  h += _vuRigaScheda('Destinatario', _czEsc(v.destinatario));
+  h += _vuRigaScheda('Da parte di', _czEsc(v.mittente));
+  h += _vuRigaScheda('Consegna', v.consegna === 'elettronico' ? 'Elettronico (PDF)' : (v.consegna === 'fisico' ? 'Fisico (stampato)' : ''));
+  h += _vuRigaScheda('Data emissione', v.data_emissione);
+  h += _vuRigaScheda('Data scadenza', v.data_scadenza);
+  h += _vuRigaScheda('Data riscatto', v.data_riscatto ? _czDateTime(v.data_riscatto) : '');
+  if (v.eccedenza_dovuta_eur !== null && v.eccedenza_dovuta_eur !== undefined && Number(v.eccedenza_dovuta_eur) > 0) {
+    h += _vuRigaScheda('Eccedenza dovuta', _czEuro(v.eccedenza_dovuta_eur) + (v.eccedenza_chiusa_at ? ' — saldata il ' + _czEsc(String(v.eccedenza_chiusa_at).slice(0, 10)) : (v.eccedenza_richiesta ? ' — richiesta al cliente' : ' — non ancora richiesta')));
+  }
+  h += _vuRigaScheda('Note interne', _czEsc(v.note));
+  return h;
 }
 
 // ══ VOUCHER — richieste dal form di regala.html ═════════════

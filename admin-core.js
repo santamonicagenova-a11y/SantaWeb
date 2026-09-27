@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.09.27.01 — /menu (IT pubblico): title/description/og nuovi, orientati a chi cerca "il menu di Santamonica" (la pagina riceve quasi solo ricerche brand): via "Pesce Fresco" (anti-cannibalizzazione con la pillar /cucina-di-pesce) e "Cucina Ligure"; niente numero di portate né prezzi (cambiano col nuovo menu). Testi approvati da Andrea 27/9.
 // v 2026.09.25.01 — menu generati: canonical/og:url/JSON-LD puntano agli URL puliti (senza .html): le .html fanno redirect 308 verso la versione senza estensione e Google segnalava "Pagina con reindirizzamento". Nessun cambio di contenuto.
 // v 2026.09.12.01 — _pulisciViste() estesa con 'orari-apertura-section' (nuovo pannello
 //   unificato "Orari di Apertura" in Setup: periodi ricorrenti via get-opening-hours/
@@ -933,12 +934,12 @@ function eseguiPubblicazione(token) {
 
   // ── Helper: inietta meta SEO completi sul file menu.html (versione IT pubblica)
   function iniettaSeoITPubblico(html) {
-    var SEO_HEAD = '<meta name="description" content="Scopri il menu del ristorante Santamonica a Genova: pesce fresco di Camogli, pasta fatta in casa, cucina ligure contemporanea. Ingredienti locali selezionati ogni giorno.">\n  ' +
+    var SEO_HEAD = '<meta name="description" content="Il menu di Santamonica sul Lungomare di Genova: degustazione e carta con prodotti del territorio e pescato del giorno, vini della sommelier Monica Capurro.">\n  ' +
       '<meta name="robots" content="index, follow">\n  ' +
       '<link rel="canonical" href="https://santamonicagenova.it/menu">\n  ' +
       '<meta property="og:type" content="website">\n  ' +
-      '<meta property="og:title" content="Menu | Ristorante Santamonica Genova">\n  ' +
-      '<meta property="og:description" content="Pesce fresco di Camogli, pasta fatta in casa, cucina ligure contemporanea. Il menu del ristorante Santamonica sul Lungomare di Genova.">\n  ' +
+      '<meta property="og:title" content="Menu degustazione e carta | Santamonica, Genova">\n  ' +
+      '<meta property="og:description" content="Il menu di Santamonica sul Lungomare di Genova: degustazione e carta con prodotti del territorio e pescato del giorno, vini della sommelier Monica Capurro.">\n  ' +
       '<meta property="og:url" content="https://santamonicagenova.it/menu">\n  ' +
       '<meta property="og:image" content="https://santamonicagenova.it/img/hero.jpg">\n  ' +
       '<script type="application/ld+json">\n' +
@@ -957,7 +958,7 @@ function eseguiPubblicazione(token) {
       '  }\n' +
       '  </script>\n  ';
     // Sostituisce title con SEO + title (in modo da posizionare i meta prima del title come da convenzione)
-    return html.replace(/<title>([^<]*)<\/title>/, '<title>Menu Pesce Fresco e Cucina Ligure | Ristorante Santamonica Genova</title>\n  ' + SEO_HEAD);
+    return html.replace(/<title>([^<]*)<\/title>/, '<title>Menu degustazione e carta | Santamonica, Genova</title>\n  ' + SEO_HEAD);
   }
 
   // ── Helper: inietta noindex + canonical sul file menu-it.html (admin/preview, non SEO)

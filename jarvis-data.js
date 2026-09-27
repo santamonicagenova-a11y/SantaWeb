@@ -1,7 +1,7 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-09-27",
- "versione": "2026.09.27",
+ "versione": "2026.09.27.03",
  "briefing": "**Briefing 27/9/2026** — Sessione SEO: Search Console ora collegata a Claude (pesce pos 8,4, mare pos 2,0; clic non-brand triplicati da maggio). Sistemati sul sito: immagini rotte e troppo pesanti (-2,8 MB in home), H1 e testi SEO di menu, vini, allergeni e dolci. Riprogrammate le attività scadute: pillar mare a ottobre, **pillar pesce senza chef entro 15/11** (intervista quasi chiusa), storia a dicembre. **Aspetta te entro 5/10**: abbinamenti vino con Monica e foto del crudo. **Prossimo**: dopo il 1/10 GEO giro 5 + orari Michelin; verifica cambio orari 1/10; Calcolo Food Cost su piatti veri.",
  "kpi": {
   "aperte": 50,

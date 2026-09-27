@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.27.02: accanto a "Aggiornato il …" mostra la versione dei dati (v YYYY.MM.DD.NN, da D.versione). -->
 <!-- v 2026.09.27.01: nuova sezione "📌 Aperte senza data" (task up senza scadenza, tutti i sotto-progetti, con owner), da D.senzaData. -->
 <!-- v 2026.09.26.01: jarvis-data.js caricato con ?v=<ora> (cache-busting): senza, il browser mostrava fino a 4 ore la versione precedente dei dati. -->
 <!-- JARVIS_Pannello.html · v 2026.09.25.01 · renderer del pannello Jarvis (i dati stanno in jarvis-data.js,
@@ -142,7 +143,7 @@ footer{color:var(--ink-3);font-size:.8rem;text-align:center;margin-top:10px}
   try{var saved=localStorage.getItem('jarvisTheme'); if(saved) root.setAttribute('data-theme',saved);}catch(e){}
   $('themeBtn').onclick=function(){var cur=root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');var n=cur==='dark'?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem('jarvisTheme',n);}catch(e){}};
 
-  $('gen').textContent='Aggiornato il '+fd(T)+' '+T.slice(0,4);
+  $('gen').textContent='Aggiornato il '+fd(T)+' '+T.slice(0,4)+(D.versione&&/^\d{4}\.\d{2}\.\d{2}\.\d{2}$/.test(D.versione)?' · v '+D.versione:'');
   $('briefing').innerHTML=D.briefing?md(D.briefing):'Nessun briefing.';
 
   var K=D.kpi;

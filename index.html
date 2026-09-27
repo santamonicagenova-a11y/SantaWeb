@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.27.03 — Immagini sezioni Cucina/Cantina: src diretti su img/sito/*.webp (prima img/*.jpg in 404, sostituiti solo via JS) e alt statici allineati alle foto reali (sala, veranda, tramonto: i vecchi alt descrivevano piatti/cantina che non ci sono). -->
 <!-- v 2026.09.27.02 — Immagini: (1) creati img/hero.jpg (1200x630, anteprima social og/twitter + JSON-LD image) e img/logo-santamonica.png (JSON-LD logo): erano 404 → anteprime WhatsApp/Facebook senza foto; (2) hero <img> punta direttamente a img/sito/hero.webp (prima img/hero.jpg in 404 + sostituzione via JS = LCP lento) con fetchpriority="high" e preload ripristinato. NB: se si cambia la foto hero dal pannello, aggiornare anche il preload qui. -->
 <!-- v 2026.09.27.01 — SEO/a11y: landmark <main> attorno al contenuto (hero → FAQ); nav, menu mobile e footer restano fuori. Nessun cambio visivo. -->
 <!-- v 2026.09.25.01 — JSON-LD Restaurant "menu": URL pulito /menu invece di menu.html (redirect). -->
@@ -715,8 +716,8 @@
         </div>
       </div>
       <div class="cucina-images reveal" style="transition-delay:0.15s">
-        <img src="img/cucina-piatto.jpg" data-img-key="cucina_piatto" alt="Piatto gourmet di pesce fresco del ristorante Santamonica Genova" loading="lazy" decoding="async">
-        <img src="img/cucina-ingredienti.jpg" data-img-key="cucina_ingredienti" alt="Ingredienti freschi liguri: pesce di Camogli e verdure dell'orto genovese" loading="lazy" decoding="async">
+        <img src="img/sito/cucina-piatto.webp" data-img-key="cucina_piatto" alt="La sala di Santamonica affacciata sul mare di Genova" loading="lazy" decoding="async">
+        <img src="img/sito/cucina-ingredienti.webp" data-img-key="cucina_ingredienti" alt="La veranda di Santamonica sulla spiaggia del Lungomare di Genova" loading="lazy" decoding="async">
       </div>
     </div>
   </div>
@@ -739,7 +740,7 @@
   <div class="section-inner">
     <div class="cantina-grid">
       <div class="cantina-image reveal">
-        <img src="img/cantina.jpg" data-img-key="cantina" alt="Cantina con selezione di vini liguri del ristorante Santamonica Genova" loading="lazy" decoding="async">
+        <img src="img/sito/cantina.webp" data-img-key="cantina" alt="Tramonto sul mare dalla veranda di Santamonica" loading="lazy" decoding="async">
       </div>
       <div class="reveal" style="transition-delay:0.15s">
         <p class="section-label" data-i18n="cantina_label">I nostri vini</p>
@@ -904,7 +905,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.09.27.02</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.09.27.03</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>

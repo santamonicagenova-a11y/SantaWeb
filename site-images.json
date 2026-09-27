@@ -5,14 +5,14 @@
   },
   "cucina_piatto": {
     "src": "img/sito/cucina-piatto.webp",
-    "alt": "La sala"
+    "alt": "La sala di Santamonica affacciata sul mare di Genova"
   },
   "cucina_ingredienti": {
     "src": "img/sito/cucina-ingredienti.webp",
-    "alt": "La veranda"
+    "alt": "La veranda di Santamonica sulla spiaggia del Lungomare di Genova"
   },
   "cantina": {
     "src": "img/sito/cantina.webp",
-    "alt": "Mare al tramonto"
+    "alt": "Tramonto sul mare dalla veranda di Santamonica"
   }
 }

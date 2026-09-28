@@ -1,8 +1,8 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-09-28",
- "versione": "2026.09.28.07",
- "briefing": "**Briefing 28/9/2026** — Sessione con diverse richieste dirette. **Food Cost**: (1) storico conteggi Inventario mostra ora anche l'importo per ogni data; (2) la sezione si apre sempre su Dashboard, non più sull'ultima scheda usata. **Dolci**: dopo la tua pubblicazione, Calcolo Food Cost mostrava sia i piatti vecchi che i nuovi di \"Golosità\" (sezione rinominata, la sync non riconosce sezioni rinominate) — ripulito a mano, riagganciata la scheda costo di Sacripantina. **Traduci e Pubblica**: risolto il popup \"Traduzioni fallite 31/114\" (HTTP 429 DeepL) — ora riprova automaticamente con attesa crescente. **Menù Degustazione**: nuovi 2 checkbox \"Escludi dalla stampa\" per i percorsi 6 e 7, più tre bug collaterali scoperti e chiusi in giornata (percorso \"7\" vuoto comparso online come titolo orfano, poi la sua riga prezzo rimasta visibile, poi lo stesso testo \"congelato\" nelle preview EN/FR con una traduzione vecchia) — ora un percorso senza contenuto non si mostra più da nessuna parte, in nessuna lingua, effetto immediato già live. **Aspetta te**: verifica dal vivo Food Cost (Dashboard di default, dolci senza duplicati) e riempi il percorso \"7\" quando è pronto. **Prossimo**: resta aperto il giro di verifica generale dei flussi Food Cost dopo il backend ricostruito il 26/9; se ricapita un duplicato su un'altra sezione rinominata (carta o dolci), stessa causa nota — vedi task dedicata.",
+ "versione": "2026.09.28.08",
+ "briefing": "**Briefing 28/9/2026** — Sessione lunga con diverse richieste dirette. **Food Cost**: (1) storico conteggi Inventario mostra ora anche l'importo per ogni data; (2) la sezione si apre sempre su Dashboard, non più sull'ultima scheda usata. **Dolci**: dopo la tua pubblicazione, Calcolo Food Cost mostrava sia i piatti vecchi che i nuovi di \"Golosità\" (sezione rinominata, la sync non riconosce sezioni rinominate) — ripulito a mano, riagganciata la scheda costo di Sacripantina. **Traduci e Pubblica**: risolto il popup \"Traduzioni fallite 31/114\" (HTTP 429 DeepL) — ora riprova automaticamente con attesa crescente. **Menù Degustazione**: nuovi 2 checkbox \"Escludi dalla stampa\" per i percorsi 6 e 7, più tre bug collaterali scoperti e chiusi in giornata (percorso \"7\" vuoto comparso online, poi la sua riga prezzo, poi lo stesso testo \"congelato\" in EN/FR) — ora un percorso senza contenuto non si mostra più da nessuna parte, in nessuna lingua. **Home**: rimosso il banner temporaneo \"Vacanzina\" (chiusura 21-28/9, ormai finita). Tutto già live. **Aspetta te**: verifica dal vivo Food Cost (Dashboard di default, dolci senza duplicati) e riempi il percorso \"7\" quando è pronto. **Prossimo**: resta aperto il giro di verifica generale dei flussi Food Cost dopo il backend ricostruito il 26/9; se ricapita un duplicato su un'altra sezione rinominata (carta o dolci), stessa causa nota — vedi task dedicata.",
  "kpi": {
   "aperte": 49,
   "scadute": 3,
@@ -490,6 +490,11 @@ window.JARVIS_DATA = {
    "t": "Retry 429 DeepL su Traduci e Pubblica"
   },
   {
+   "d": "2026-09-28",
+   "sub": "Sito",
+   "t": "Rimosso banner Vacanzina scaduto"
+  },
+  {
    "d": "2026-09-27",
    "sub": "SEO",
    "t": "riprogrammazione + dominio, immagini, menu, GSC via API"
@@ -498,11 +503,6 @@ window.JARVIS_DATA = {
    "d": "2026-09-27",
    "sub": "Sito",
    "t": "Riorganizzazione pannello Setup"
-  },
-  {
-   "d": "2026-09-27",
-   "sub": "Sito",
-   "t": "Setup reparti tracciabilità e box colorati"
   }
  ],
  "perWeek": [
@@ -552,13 +552,13 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-28",
-   "n": 5
+   "n": 6
   }
  ],
  "perDay": [
   {
    "g": "lun",
-   "n": 8
+   "n": 9
   },
   {
    "g": "mar",

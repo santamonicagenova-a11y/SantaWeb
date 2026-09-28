@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!-- v 2026.09.28.02 — Food Cost: apertura della sezione ora va sempre alla scheda Dashboard
+     (richiesta Andrea), non più all'ultima scheda usata nella sessione. apriSezioneFoodCost()
+     chiamava fcSetTab(fcState.tab || 'dashboard'): fcState.tab resta in memoria finché la pagina
+     non si ricarica, quindi chiudendo e riaprendo Food Cost (es. dopo essere stati su Inventario)
+     si riapriva sull'ultima scheda invece che su Dashboard. Ora fcSetTab('dashboard') fisso. -->
 <!-- v 2026.09.28.01 — Food Cost → Inventario: nello storico conteggi (heatmap) ogni cella mostra ora
      anche l'importo totale del conteggio di quella data, non solo il giorno del mese (richiesta
      Andrea). Backend: edge function foodcost-admin v14, inventario_periodi_disponibili somma
@@ -4081,7 +4086,7 @@ function apriSezioneFoodCost() {
   if (dInv && !dInv.value) dInv.value = oggi;
   if (dTracc && !dTracc.value) dTracc.value = oggi;
   fcState.dashboardAutoloadFatto = false;
-  fcLoadReparti(function () { fcSetTab(fcState.tab || 'dashboard'); });
+  fcLoadReparti(function () { fcSetTab('dashboard'); });
 }
 
 function chiudiSezioneFoodCost() {
@@ -7528,7 +7533,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.28.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.28.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

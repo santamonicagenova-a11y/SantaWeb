@@ -736,7 +736,16 @@ function buildSezione(s) {
 }
 
 function buildDegu(degu) {
-  const optsHtml = degu.opzioni.map(o =>
+  let percorso6Vuoto = true, percorso7Vuoto = true;
+  for (const piatti of Object.values(degu.percorsi)) {
+    if (typeof piatti === 'string') { if (piatti.trim()) percorso7Vuoto = false; }
+    else { if (piatti && piatti.length) percorso6Vuoto = false; }
+  }
+  const optsHtml = degu.opzioni.filter(o => {
+    if (o.portate === 6) return !percorso6Vuoto;
+    if (o.portate === 7) return !percorso7Vuoto;
+    return true;
+  }).map(o =>
     `${o.portate} portate &nbsp;${o.prezzo}, eventuale abbinamento vini ${o.vini}`
   ).join('<br>');
 

@@ -465,9 +465,10 @@ const MENU = {
     ],
     "nota": "Price per person, menu to be shared by the whole table.<br>Menus are available until 1:30 PM for lunch and 9:30 PM for dinner.",
     "percorsi": {
+      "7": "Chef's free interpretation menu",
       "Sei": [
         {
-          "nome": "&quot;Macchetto, what’s the point in me saying that...&quot;",
+          "nome": "&quot;I&#x27;m just saying...&quot;",
           "sostenibile": true
         },
         {
@@ -489,11 +490,10 @@ const MENU = {
         {
           "nome": "&quot;Panissa salad&quot;"
         }
-      ],
-      "Sette": "Chef's free interpretation menu"
+      ]
     },
     "percorso_label_6": "Sei",
-    "percorso_label_7": "Sette"
+    "percorso_label_7": "7"
   },
   "sezioni": [
     {
@@ -545,7 +545,7 @@ const MENU = {
       "titolo": "Sfiziosi",
       "piatti": [
         {
-          "nome": "&quot;Macchetto, what’s the point in me saying that...&quot;",
+          "nome": "&quot;I&#x27;m just saying...&quot;",
           "prezzo": null,
           "sostenibile": true,
           "descrizione": "Stuffed baby lettuce, peppers and a dish of anchovies"
@@ -554,7 +554,7 @@ const MENU = {
           "nome": "&quot;Every yellowtail has its own quirks&quot;",
           "prezzo": null,
           "sostenibile": true,
-          "descrizione": "Yellowtail, sage, beetroot in a tangy sauce, leeks, horseradish"
+          "descrizione": "Yellowtail, sage, pickled beetroot, leeks, horseradish"
         },
         {
           "nome": "&quot;Sanna&quot;",
@@ -571,7 +571,7 @@ const MENU = {
         {
           "nome": "“Not cheeses”",
           "prezzo": 22,
-          "descrizione": "Tasting of vegan artisanal ‘cheeses’ made from cashews and almond milk"
+          "descrizione": "Tasting of artisan ‘cheese’ alternatives made from cashews and almond milk"
         }
       ],
       "titolo_display": "Starters"
@@ -601,7 +601,7 @@ const MENU = {
           "nome": "&quot;Itosnap&quot;",
           "prezzo": null,
           "sostenibile": true,
-          "descrizione": "Pansori stuffed with walnut sauce in a porcini mushroom stock"
+          "descrizione": "Pansori stuffed with walnut sauce in porcini mushroom stock"
         }
       ],
       "titolo_display": "Pasta & Grains"
@@ -611,14 +611,14 @@ const MENU = {
       "piatti": [
         {
           "nome": "&quot;Curry, curry, lad&quot;",
-          "prezzo": null,
+          "prezzo": 32,
           "sostenibile": true,
           "descrizione": "Red mullet, courgettes, curry, pineapple, friggitelli peppers, peanuts"
         },
         {
           "nome": "&quot;Buridda chaperon&quot;",
           "prezzo": null,
-          "descrizione": "Yellowtail, cuttlefish buridda, mango",
+          "descrizione": "Yellowtail, cuttlefish salad, mango",
           "sostenibile": true
         },
         {
@@ -640,20 +640,23 @@ const MENU = {
       "titolo": "Golosità",
       "piatti": [
         {
-          "nome": "Black lemon, lovage and lime ice cream with milk biscuits",
-          "prezzo": 12
+          "nome": "&quot;Panissa salad&quot;",
+          "prezzo": 10,
+          "descrizione": "Chickpea cannoli, prescinseua, Taggiasca olives, chocolate"
         },
         {
-          "nome": "Pineapple, charcoal parfait, coffee caramel",
-          "prezzo": 12
+          "nome": "&quot;Tradizionello&quot;",
+          "prezzo": 10,
+          "descrizione": "Canestrello, chocolate cream, wild berries"
         },
         {
-          "nome": "Porcini mushroom ice cream, strawberries, chocolate crumble",
-          "prezzo": 12
+          "nome": "&quot;Ripienamisù&quot;",
+          "prezzo": 10,
+          "descrizione": "Savoiardo, mascarpone, gelato al caffè"
         },
         {
           "nome": "Sacripantina",
-          "prezzo": 12
+          "prezzo": 11
         },
         {
           "nome": "Ligurian blue cheese and Picolit Zorzettig",
@@ -737,7 +740,7 @@ const MENU = {
         "titolo_display": "Antipasti",
         "piatti": [
           {
-            "nome": "Raw local red sea bream, sea urchins, lemon, almonds",
+            "nome": "Dentice reale nostrano crudo, ricci di mare, limone, mandorle",
             "allergeni": [
               "gluten",
               "fish",
@@ -745,13 +748,13 @@ const MENU = {
             ]
           },
           {
-            "nome": "Raw purple prawns, Puttanesca-style",
+            "nome": "Gamberi viola crudi alla puttanesca",
             "allergeni": [
               "crustaceans"
             ]
           },
           {
-            "nome": "Local squid, bagna cauda, kefir",
+            "nome": "Calamaro nostrano, bagna cauda, kefir",
             "allergeni": [
               "fish",
               "milk",
@@ -760,7 +763,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "Veal sweetbreads, celeriac, hazelnuts, fish stock reduction",
+            "nome": "Veal sweetbread, celeriac, hazelnuts, fish stock reduction",
             "allergeni": [
               "fish",
               "nuts",
@@ -780,14 +783,14 @@ const MENU = {
         "titolo_display": "Pasta & Grains",
         "piatti": [
           {
-            "nome": "Mancini square spaghettoni, sea anemones, nduja, marjoram",
+            "nome": "Spaghettoni quadrati Mancini, anemoni di mare, nduja, maggiorana",
             "allergeni": [
               "gluten",
               "milk"
             ]
           },
           {
-            "nome": "Poached baby octopus, chanterelle mushrooms, clams, friggitelli peppers, smoked paprika",
+            "nome": "Bottoni di moscardini affogati, finferli, vongole, friggitelli, paprika affumicata",
             "allergeni": [
               "gluten",
               "eggs",
@@ -798,7 +801,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "Mancini pasta tubes, salt cod, spinach, citrus kosho",
+            "nome": "Tubetti Mancini, baccalà, spinaci, kosho di agrumi",
             "allergeni": [
               "gluten",
               "fish",
@@ -807,7 +810,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "San Massimo Riserva rice, oysters, medlars, apricots",
+            "nome": "Riso Riserva San Massimo, ostriche, nespole, albicocche",
             "allergeni": [
               "gluten",
               "fish",
@@ -822,7 +825,7 @@ const MENU = {
         "titolo_display": "Not Only Sea",
         "piatti": [
           {
-            "nome": "Local amberjack, aubergines, the umami flavour of tomatoes and peppers, tahini",
+            "nome": "Ricciola nostrana, melanzane, umami di pomodoro e peperone, tahina",
             "allergeni": [
               "fish",
               "sesame",
@@ -830,14 +833,14 @@ const MENU = {
             ]
           },
           {
-            "nome": "Roasted leek, macadamia nuts, vegetable stock and peaches",
+            "nome": "Porro arrostito, noci macadamia, fondo di verdure e pesche",
             "allergeni": [
               "nuts",
               "celery"
             ]
           },
           {
-            "nome": "Local sea bream, escarole, fig leaves",
+            "nome": "Ombrina nostrana, scarola, foglie di fico",
             "allergeni": [
               "eggs",
               "fish",
@@ -847,7 +850,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "Lamb, pak choi, stock",
+            "nome": "Agnello, pak choi, fondo",
             "allergeni": [
               "soya",
               "milk",

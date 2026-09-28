@@ -746,6 +746,8 @@ function buildDegu(degu) {
 
   let percorsiHtml = '';
   for (const [n, piatti] of Object.entries(degu.percorsi)) {
+    const vuoto = typeof piatti === 'string' ? !piatti.trim() : !piatti.length;
+    if (vuoto) continue;
     const escl = typeof piatti === 'string' ? !!degu.escludi_stampa_7 : !!degu.escludi_stampa_6;
     const printCls = escl ? ' no-print' : '';
     if (typeof piatti === 'string') {

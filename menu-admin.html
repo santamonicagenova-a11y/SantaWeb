@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- v 2026.09.28.05 — Fix scoperto da Andrea subito dopo la v.04: un percorso degustazione senza
+     contenuto (percorso "7" libero vuoto) compariva online come titolo orfano senza nulla sotto —
+     il checkbox "Escludi dalla stampa" copre solo la stampa per design, non l'online. buildDegu
+     ora salta del tutto (online e stampa) qualunque percorso vuoto. Bump ?v= admin-templates-
+     shared.js a 2026.09.28.02. Applicato anche a mano a menu.html/menu-it.html/menu-en.html/
+     menu-fr.html per effetto immediato sul sito, oltre che al template sorgente. -->
 <!-- v 2026.09.28.04 — Menù Degustazione: 2 checkbox "Escludi dalla stampa", uno per il percorso 6
      e uno per il 7, per toglierli singolarmente dalla stampa/PDF senza toccarli online (richiesta
      Andrea). Bump ?v= admin-core.js a 2026.09.28.02 (checkbox nel form + salvataggio in leggi())
@@ -2378,7 +2384,7 @@
 <div class="toast" id="toast">✓ Scaricato!</div>
 
 <script src="admin-translations.js"></script>
-<script src="admin-templates-shared.js?v=2026.09.28.01"></script>
+<script src="admin-templates-shared.js?v=2026.09.28.02"></script>
 <script src="admin-core.js?v=2026.09.28.02"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 <script>
@@ -7546,7 +7552,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.28.04</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.28.05</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

@@ -388,6 +388,7 @@
       body { background: white; }
       .ctrl-bar { display: none; }
       .stampa-hint { display: none; }
+      .percorso.no-print { display: none; }
 
       /* carta: 3 pagine */
       #layout-carta .pg {
@@ -454,7 +455,7 @@ const MENU = {
     "opzioni": [
       {
         "portate": 6,
-        "prezzo": 80,
+        "prezzo": 75,
         "vini": 50
       },
       {
@@ -466,9 +467,9 @@ const MENU = {
     "nota": "Price per person, menu to be shared by the whole table.<br>Menus are available until 1:30 PM for lunch and 9:30 PM for dinner.",
     "percorsi": {
       "7": "Chef's free interpretation menu",
-      "Sei": [
+      "A tôa no se ven vëgi": [
         {
-          "nome": "&quot;Macchetto, what’s the point in saying that...&quot;",
+          "nome": "&quot;Macchetto, what&#x27;s the point in saying that...&quot;",
           "sostenibile": true
         },
         {
@@ -480,11 +481,11 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "&quot;Noble waste&quot;",
+          "nome": "&quot;Itosnap&quot;",
           "sostenibile": true
         },
         {
-          "nome": "&quot;Buridda chaperon&quot;",
+          "nome": "&quot;Mr Bean&quot;",
           "sostenibile": true
         },
         {
@@ -492,8 +493,10 @@ const MENU = {
         }
       ]
     },
-    "percorso_label_6": "Sei",
-    "percorso_label_7": "7"
+    "percorso_label_6": "A tôa no se ven vëgi",
+    "percorso_label_7": "7",
+    "escludi_stampa_6": false,
+    "escludi_stampa_7": true
   },
   "sezioni": [
     {
@@ -545,13 +548,13 @@ const MENU = {
       "titolo": "Sfiziosi",
       "piatti": [
         {
-          "nome": "&quot;Macchetto, what’s the point in saying that...&quot;",
+          "nome": "&quot;Macchetto, what&#x27;s the point in saying that...&quot;",
           "prezzo": null,
           "sostenibile": true,
           "descrizione": "Stuffed baby lettuce, peppers and a dish of anchovies"
         },
         {
-          "nome": "&quot;Every yellowtail has its own quirks&quot;",
+          "nome": "&quot;Every yellowtail is a bit of a whim&quot;",
           "prezzo": null,
           "sostenibile": true,
           "descrizione": "Yellowtail, sage, beetroot in a tangy sauce, leeks, horseradish"
@@ -566,12 +569,12 @@ const MENU = {
           "nome": "&quot;Forest oyster&quot;",
           "prezzo": null,
           "sostenibile": true,
-          "descrizione": "Tempura-fried oysters, porcini mushrooms, quinces, cucumbers"
+          "descrizione": "Tempura-fried oyster, porcini mushrooms, quinces, cucumbers"
         },
         {
-          "nome": "“Not cheese”",
+          "nome": "“Not cheeses”",
           "prezzo": 22,
-          "descrizione": "Tasting of vegan artisanal ‘cheeses’ made from cashews and almond milk"
+          "descrizione": "Tasting of artisan ‘cheese’ alternatives made from cashews and almond milk"
         }
       ],
       "titolo_display": "Starters"
@@ -613,23 +616,23 @@ const MENU = {
           "nome": "&quot;Curry, curry, lad&quot;",
           "prezzo": 32,
           "sostenibile": true,
-          "descrizione": "Red snapper, courgettes, curry, pineapple, friggitelli peppers, peanuts"
+          "descrizione": "Red seabream, courgettes, curry, pineapple, friggitelli peppers, peanuts"
         },
         {
           "nome": "&quot;Buridda chaperon&quot;",
-          "prezzo": null,
-          "descrizione": "Yellowtail, cuttlefish stew, mango",
+          "prezzo": 32,
+          "descrizione": "Yellowtail, cuttlefish salad, mango",
           "sostenibile": true
         },
         {
           "nome": "&quot;Mr Bean&quot;",
-          "prezzo": null,
+          "prezzo": 18,
           "sostenibile": true,
           "descrizione": "Salt cod, cannellini beans, lard, aioli sauce"
         },
         {
           "nome": "&quot;Coniggio&quot;",
-          "prezzo": null,
+          "prezzo": 18,
           "sostenibile": true,
           "descrizione": "Fried rabbit, cauliflower, porcini mushrooms, persimmons, mint"
         }
@@ -642,12 +645,12 @@ const MENU = {
         {
           "nome": "&quot;Panissa salad&quot;",
           "prezzo": 10,
-          "descrizione": "Chickpea cannolo, prescinseua, Taggiasca olives, chocolate"
+          "descrizione": "Chickpea cannoli, prescinseua, Taggiasca olives, chocolate"
         },
         {
           "nome": "&quot;Tradizionello&quot;",
           "prezzo": 10,
-          "descrizione": "Canestrello, chocolate cream, mixed berries"
+          "descrizione": "Canestrello, chocolate cream, wild berries"
         },
         {
           "nome": "&quot;Ripienamisù&quot;",
@@ -748,7 +751,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "Raw purple prawns with puttanesca sauce",
+            "nome": "Raw purple prawns, Puttanesca-style",
             "allergeni": [
               "crustaceans"
             ]
@@ -763,7 +766,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "Veal sweetbreads, celeriac, hazelnuts, fish stock reduction",
+            "nome": "Veal sweetbread, celeriac, hazelnuts, fish stock reduction",
             "allergeni": [
               "fish",
               "nuts",
@@ -771,7 +774,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "“Not cheese”",
+            "nome": "“Not cheeses”",
             "allergeni": [
               "nuts",
               "sulphites"
@@ -790,7 +793,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "Poached baby octopus, chanterelle mushrooms, clams, friggitelli peppers, smoked paprika",
+            "nome": "Poached baby octopus, chanterelle mushrooms, clams, ‘friggitelli’ peppers, smoked paprika",
             "allergeni": [
               "gluten",
               "eggs",
@@ -801,7 +804,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "Mancini tubetti, salt cod, spinach, citrus kosho",
+            "nome": "Mancini pasta, salted cod, spinach, citrus kosho",
             "allergeni": [
               "gluten",
               "fish",
@@ -840,7 +843,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "Local sea bream, escarole, fig leaves",
+            "nome": "Local ombrina, escarole, fig leaves",
             "allergeni": [
               "eggs",
               "fish",
@@ -955,9 +958,11 @@ function buildDegu(degu) {
 
   let percorsiHtml = '';
   for (const [n, piatti] of Object.entries(degu.percorsi)) {
+    const escl = typeof piatti === 'string' ? !!degu.escludi_stampa_7 : !!degu.escludi_stampa_6;
+    const printCls = escl ? ' no-print' : '';
     if (typeof piatti === 'string') {
       percorsiHtml += `
-        <div class="percorso">
+        <div class="percorso${printCls}">
           <div class="percorso-label">&ldquo;${n}&rdquo;</div>
           <div class="percorso-piatto percorso-libero">${piatti}</div>
         </div>`;
@@ -967,7 +972,7 @@ function buildDegu(degu) {
         return `<div class="percorso-piatto${p.sostenibile ? ' eco' : ''}">${p.nome}${descHtml}</div>`;
       }).join('');
       percorsiHtml += `
-        <div class="percorso">
+        <div class="percorso${printCls}">
           <div class="percorso-label">&ldquo;${n}&rdquo;</div>
           ${righe}
         </div>`;

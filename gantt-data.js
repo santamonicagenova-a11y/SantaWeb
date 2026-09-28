@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.09.28.02",
+  version: "2026.09.28.03",
   updated: "2026-09-28",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -95,6 +95,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Food Cost: apertura della sezione va sempre alla scheda Dashboard, non più all\'ultima scheda usata nella sessione', s:'2026-09-28', e:'2026-09-28', st:'done'},
       {t:'Dolci: pulita la sezione "Dolci — Golosità" orfana in Dettagli piatti (duplicati in Calcolo Food Cost)', s:'2026-09-28', e:'2026-09-28', st:'done'},
       {t:'Dettagli piatti: la sync con Carta/Dolci non segnala quando un\'intera sezione cambia nome — piatti orfani silenziosi (visto coi dolci 28/9)', s:'2026-09-28', st:'up'},
+      {t:'"Traduci e Pubblica" (carta/dolci/allergeni): retry automatico con attesa crescente sui 429 DeepL', s:'2026-09-28', e:'2026-09-28', st:'done'},
       {t:'Food Cost — badge "periodo non chiuso" sui KPI + storico conteggi con heatmap mensile + pannello periodi chiusi + auto-load ultimo periodo in Dashboard', s:'2026-09-13', st:'done', ms:true},
       {t:'Food Cost — riordino tab (Dashboard·Spese·Incassi·Vendite·Inventario·Costo piatti·Reparti) con colori per gruppo', s:'2026-09-13', st:'done'},
       {t:'Gantt trasversale ricostruito da zero + pubblicato su santamonicagenova.it/gantt (gantt.html noindex + gantt-data.js)', s:'2026-09-21', st:'done', ms:true},

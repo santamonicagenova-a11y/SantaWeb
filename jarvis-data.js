@@ -1,15 +1,15 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-09-28",
- "versione": "2026.09.28.02",
- "briefing": "**Briefing 28/9/2026** — Due richieste dirette in Food Cost. (1) Storico conteggi Inventario: ora mostra anche l'importo per ogni data, non solo il giorno (backend `foodcost-admin` deploy 24). (2) Food Cost si apre sempre su Dashboard, non più sull'ultima scheda usata. Trovato e risolto anche un problema collaterale: dopo la tua pubblicazione dei dolci di oggi, Calcolo Food Cost mostrava sia i piatti vecchi che i nuovi di \"Golosità\" — la sezione era stata rinominata da \"Dolci — Golosità\" a \"Golosità\" e la sincronizzazione automatica non riconosce sezioni rinominate (limite noto, i vecchi restano orfani). Ripulito a mano: cancellati i 5 piatti orfani, riagganciata la scheda costo di Sacripantina (2,50€) al piatto nuovo. **Aspetta te**: verifica dal vivo che Food Cost apra su Dashboard e che in Calcolo Food Cost → dolci ci sia una sola \"Golosità\" con 5 piatti. **Prossimo**: resta aperto il giro di verifica generale dei flussi Food Cost dopo il backend ricostruito il 26/9; se ricapita lo stesso duplicato su un'altra sezione rinominata, stessa causa — vedi task dedicata.",
+ "versione": "2026.09.28.03",
+ "briefing": "**Briefing 28/9/2026** — Sessione con più richieste dirette. **Food Cost**: (1) storico conteggi Inventario mostra ora anche l'importo per ogni data; (2) la sezione si apre sempre su Dashboard, non più sull'ultima scheda usata. **Dolci**: dopo la tua pubblicazione, Calcolo Food Cost mostrava sia i piatti vecchi che i nuovi di \"Golosità\" (sezione rinominata da \"Dolci — Golosità\" a \"Golosità\", la sync non riconosce sezioni rinominate) — ripulito a mano, riagganciata la scheda costo di Sacripantina. **Traduci e Pubblica**: risolto anche il popup \"Traduzioni fallite 31/114\" (HTTP 429 DeepL) che avevi visto — ora il sistema riprova automaticamente con attesa crescente prima di arrendersi, invece di lasciare le voci in italiano al primo errore. **Aspetta te**: verifica dal vivo Food Cost (Dashboard di default, dolci senza duplicati). **Prossimo**: resta aperto il giro di verifica generale dei flussi Food Cost dopo il backend ricostruito il 26/9; se ricapita un duplicato su un'altra sezione rinominata (carta o dolci), stessa causa nota — vedi task dedicata.",
  "kpi": {
   "aperte": 49,
   "scadute": 3,
   "bloccate": 1,
   "andrea": 12,
   "debiti": 8,
-  "chiuse30": 33
+  "chiuse30": 34
  },
  "subs": {
   "SEO": {
@@ -35,8 +35,8 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 90,
-   "done": 77,
+   "tot": 91,
+   "done": 78,
    "prog": 1,
    "up": 3,
    "future": 9,
@@ -475,6 +475,11 @@ window.JARVIS_DATA = {
    "t": "Importo per data nello storico conteggi Inventario"
   },
   {
+   "d": "2026-09-28",
+   "sub": "Sito",
+   "t": "Retry 429 DeepL su Traduci e Pubblica"
+  },
+  {
    "d": "2026-09-27",
    "sub": "SEO",
    "t": "riprogrammazione + dominio, immagini, menu, GSC via API"
@@ -498,11 +503,6 @@ window.JARVIS_DATA = {
    "d": "2026-09-26",
    "sub": "Sito",
    "t": "Calcolo Food Cost da ingredienti"
-  },
-  {
-   "d": "2026-09-26",
-   "sub": "Sito",
-   "t": "Costo piatti prezzo da carta (sessione cloud)"
   }
  ],
  "perWeek": [
@@ -552,13 +552,13 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-28",
-   "n": 2
+   "n": 3
   }
  ],
  "perDay": [
   {
    "g": "lun",
-   "n": 5
+   "n": 6
   },
   {
    "g": "mar",

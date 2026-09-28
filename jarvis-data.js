@@ -1,15 +1,15 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-09-28",
- "versione": "2026.09.28.01",
- "briefing": "**Briefing 28/9/2026** — Sessione breve, richiesta diretta da Inbox/screenshot: in Food Cost → Inventario, la sezione \"Storico conteggi\" mostrava solo il giorno del mese in ogni cella, non l'importo contato. Aggiunto: backend `foodcost-admin` (deploy 24) somma il valore per ogni data, frontend mostra giorno + € su due righe con tooltip esteso. Commit push diretto su `main`. **Aspetta te**: un giro dal vivo su Inventario per confermare che le celle mostrino l'importo corretto, comprese le date parziali (gialle). **Prossimo**: resta aperto il giro di verifica generale dei flussi Food Cost (Tracciabilità, import Excel, IVA) dopo il backend ricostruito il 26/9.",
+ "versione": "2026.09.28.02",
+ "briefing": "**Briefing 28/9/2026** — Due richieste dirette in Food Cost. (1) Storico conteggi Inventario: ora mostra anche l'importo per ogni data, non solo il giorno (backend `foodcost-admin` deploy 24). (2) Food Cost si apre sempre su Dashboard, non più sull'ultima scheda usata. Trovato e risolto anche un problema collaterale: dopo la tua pubblicazione dei dolci di oggi, Calcolo Food Cost mostrava sia i piatti vecchi che i nuovi di \"Golosità\" — la sezione era stata rinominata da \"Dolci — Golosità\" a \"Golosità\" e la sincronizzazione automatica non riconosce sezioni rinominate (limite noto, i vecchi restano orfani). Ripulito a mano: cancellati i 5 piatti orfani, riagganciata la scheda costo di Sacripantina (2,50€) al piatto nuovo. **Aspetta te**: verifica dal vivo che Food Cost apra su Dashboard e che in Calcolo Food Cost → dolci ci sia una sola \"Golosità\" con 5 piatti. **Prossimo**: resta aperto il giro di verifica generale dei flussi Food Cost dopo il backend ricostruito il 26/9; se ricapita lo stesso duplicato su un'altra sezione rinominata, stessa causa — vedi task dedicata.",
  "kpi": {
-  "aperte": 48,
+  "aperte": 49,
   "scadute": 3,
   "bloccate": 1,
   "andrea": 12,
-  "debiti": 7,
-  "chiuse30": 31
+  "debiti": 8,
+  "chiuse30": 33
  },
  "subs": {
   "SEO": {
@@ -35,15 +35,15 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 87,
-   "done": 75,
+   "tot": 90,
+   "done": 77,
    "prog": 1,
-   "up": 2,
+   "up": 3,
    "future": 9,
    "bloccato": 0,
    "scadute": 0,
    "andrea": 3,
-   "debiti": 6
+   "debiti": 7
   },
   "Marketing": {
    "tot": 34,
@@ -439,6 +439,18 @@ window.JARVIS_DATA = {
    "agg": "2026-09-25"
   },
   {
+   "t": "Dettagli piatti: la sync con Carta/Dolci non segnala quando un'intera sezione cambia nome — piatti orfani silenziosi (visto coi dolci 28/9)",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-09-28",
+   "e": null,
+   "own": null,
+   "az": null,
+   "bl": null,
+   "deb": true,
+   "agg": "2026-09-28"
+  },
+  {
    "t": "Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)",
    "sub": "Sito",
    "st": "up",
@@ -452,6 +464,11 @@ window.JARVIS_DATA = {
   }
  ],
  "sessioni": [
+  {
+   "d": "2026-09-28",
+   "sub": "Sito",
+   "t": "Food Cost Dashboard default + pulizia dolci orfani"
+  },
   {
    "d": "2026-09-28",
    "sub": "Sito",
@@ -486,11 +503,6 @@ window.JARVIS_DATA = {
    "d": "2026-09-26",
    "sub": "Sito",
    "t": "Costo piatti prezzo da carta (sessione cloud)"
-  },
-  {
-   "d": "2026-09-26",
-   "sub": "Sito",
-   "t": "Food Cost rifiniture (sessione cloud)"
   }
  ],
  "perWeek": [
@@ -540,13 +552,13 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-28",
-   "n": 1
+   "n": 2
   }
  ],
  "perDay": [
   {
    "g": "lun",
-   "n": 4
+   "n": 5
   },
   {
    "g": "mar",

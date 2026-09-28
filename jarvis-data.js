@@ -1,15 +1,15 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-09-28",
- "versione": "2026.09.28.08",
- "briefing": "**Briefing 28/9/2026** — Sessione lunga con diverse richieste dirette. **Food Cost**: (1) storico conteggi Inventario mostra ora anche l'importo per ogni data; (2) la sezione si apre sempre su Dashboard, non più sull'ultima scheda usata. **Dolci**: dopo la tua pubblicazione, Calcolo Food Cost mostrava sia i piatti vecchi che i nuovi di \"Golosità\" (sezione rinominata, la sync non riconosce sezioni rinominate) — ripulito a mano, riagganciata la scheda costo di Sacripantina. **Traduci e Pubblica**: risolto il popup \"Traduzioni fallite 31/114\" (HTTP 429 DeepL) — ora riprova automaticamente con attesa crescente. **Menù Degustazione**: nuovi 2 checkbox \"Escludi dalla stampa\" per i percorsi 6 e 7, più tre bug collaterali scoperti e chiusi in giornata (percorso \"7\" vuoto comparso online, poi la sua riga prezzo, poi lo stesso testo \"congelato\" in EN/FR) — ora un percorso senza contenuto non si mostra più da nessuna parte, in nessuna lingua. **Home**: rimosso il banner temporaneo \"Vacanzina\" (chiusura 21-28/9, ormai finita). Tutto già live. **Aspetta te**: verifica dal vivo Food Cost (Dashboard di default, dolci senza duplicati) e riempi il percorso \"7\" quando è pronto. **Prossimo**: resta aperto il giro di verifica generale dei flussi Food Cost dopo il backend ricostruito il 26/9; se ricapita un duplicato su un'altra sezione rinominata (carta o dolci), stessa causa nota — vedi task dedicata.",
+ "versione": "2026.09.28.09",
+ "briefing": "**Briefing 28/9/2026** — Sessione molto lunga con diverse richieste dirette. **Food Cost**: (1) storico conteggi Inventario mostra ora anche l'importo per ogni data; (2) la sezione si apre sempre su Dashboard. **Dolci**: Calcolo Food Cost mostrava piatti vecchi e nuovi insieme di \"Golosità\" — ripulito, riagganciata la scheda costo di Sacripantina. **Traduci e Pubblica**: risolto il popup \"Traduzioni fallite\" (HTTP 429 DeepL) — ora riprova automaticamente. **Menù Degustazione**: checkbox \"Escludi dalla stampa\" per i percorsi 6/7, più tre bug a catena chiusi (percorso vuoto visibile online, riga prezzo residua, traduzione EN/FR congelata) — ora un percorso senza contenuto non si mostra più da nessuna parte. **Home**: rimosso il banner \"Vacanzina\" scaduto. **Voucher regalo**: allineati al Menù Degustazione (disponibilità/titolo/prezzo) — e nel farlo scoperto e corretto un mismatch di prezzo REALE tra quanto mostrato in regala.html (170€) e quanto realmente addebitato da Stripe (180€), mai notato prima. Tutto già live. **Aspetta te**: verifica dal vivo Food Cost, controlla che su regala.html resti solo \"Degustazione 6 portate\" (il 7 è vuoto), riempi il percorso \"7\" quando è pronto. **Prossimo**: resta aperto il giro di verifica generale dei flussi Food Cost dopo il backend ricostruito il 26/9; se ricapita un duplicato su un'altra sezione rinominata (carta o dolci), stessa causa nota — vedi task dedicata.",
  "kpi": {
   "aperte": 49,
   "scadute": 3,
   "bloccate": 1,
   "andrea": 12,
   "debiti": 8,
-  "chiuse30": 35
+  "chiuse30": 36
  },
  "subs": {
   "SEO": {
@@ -35,8 +35,8 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 92,
-   "done": 79,
+   "tot": 93,
+   "done": 80,
    "prog": 1,
    "up": 3,
    "future": 9,
@@ -495,14 +495,14 @@ window.JARVIS_DATA = {
    "t": "Rimosso banner Vacanzina scaduto"
   },
   {
-   "d": "2026-09-27",
-   "sub": "SEO",
-   "t": "riprogrammazione + dominio, immagini, menu, GSC via API"
+   "d": "2026-09-28",
+   "sub": "Sito",
+   "t": "Voucher regalo sincronizzato con Menù Degustazione"
   },
   {
    "d": "2026-09-27",
-   "sub": "Sito",
-   "t": "Riorganizzazione pannello Setup"
+   "sub": "SEO",
+   "t": "riprogrammazione + dominio, immagini, menu, GSC via API"
   }
  ],
  "perWeek": [
@@ -552,13 +552,13 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-28",
-   "n": 6
+   "n": 7
   }
  ],
  "perDay": [
   {
    "g": "lun",
-   "n": 9
+   "n": 10
   },
   {
    "g": "mar",

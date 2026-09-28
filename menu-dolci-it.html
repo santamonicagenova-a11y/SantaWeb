@@ -407,7 +407,6 @@
   </style>
 </head>
 <body>
-<h1 style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0">Dolci e dessert — Ristorante Santamonica, Genova</h1>
 <div class="ctrl-bar">
   <button class="ctrl-btn" onclick="window.print()">⚡ Stampa</button>
   <div class="ctrl-sep"></div>
@@ -426,8 +425,9 @@
   <button class="ctrl-btn" onclick="_szR()" title="Ripristina dimensioni">↺</button>
   <button class="ctrl-btn" onclick="_szSave()" title="Fissa i valori attuali come predefiniti per questo menù">✔ Fissa come default</button>
 </div>
-<style>@media print{.stampa-hint{display:none!important}}</style><div class="stampa-hint">Per una stampa senza margini storti: Stampa → Salva come PDF → apri il PDF con Foxit Reader → Stampa con Scala personalizzata 97%.</div>
+<div class="stampa-hint">Per una stampa senza margini storti: Stampa → Salva come PDF → apri il PDF con Foxit Reader → Stampa con Scala personalizzata 97%.</div>
 
+<h1 style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0">Dolci e dessert — Ristorante Santamonica, Genova</h1>
 
 
 
@@ -444,20 +444,23 @@ const MENU = {
       "titolo": "Golosità",
       "piatti": [
         {
-          "nome": "Gelato al limone nero, levistico, lime, cracker di latte",
-          "prezzo": 12
+          "nome": "\"Insalata di panissa\"",
+          "prezzo": 10,
+          "descrizione": "Cannolo di ceci, prescinseua, olive taggiasche, cioccolato"
         },
         {
-          "nome": "Ananas, parfait al carbone, caramello al caffè",
-          "prezzo": 12
+          "nome": "\"Tradizionello\"",
+          "prezzo": 10,
+          "descrizione": "Canestrello, cremoso al cioccolato, frutti di bosco"
         },
         {
-          "nome": "Gelato al porcino, fragole, terra al cioccolato",
-          "prezzo": 12
+          "nome": "\"Ripienamisù\"",
+          "prezzo": 10,
+          "descrizione": "Savoiardo, mascarpone, gelato al caffè"
         },
         {
           "nome": "Sacripantina",
-          "prezzo": 12
+          "prezzo": 11
         },
         {
           "nome": "Erborinato ligure e Picolit Zorzettig",

@@ -388,6 +388,7 @@
       body { background: white; }
       .ctrl-bar { display: none; }
       .stampa-hint { display: none; }
+      .percorso.no-print { display: none; }
 
       /* carta: 3 pagine */
       #layout-carta .pg {
@@ -454,7 +455,7 @@ const MENU = {
     "opzioni": [
       {
         "portate": 6,
-        "prezzo": 80,
+        "prezzo": 75,
         "vini": 50
       },
       {
@@ -466,9 +467,9 @@ const MENU = {
     "nota": "Prix par personne, menu à partager par toute la table.<br>Les menus sont disponibles jusqu'à 13h30 pour le déjeuner et 21h30 pour le dîner.",
     "percorsi": {
       "7": "Menu carte blanche du Chef",
-      "Sei": [
+      "A tôa no se ven vëgi": [
         {
-          "nome": "« Macchetto, je le dis comme ça... »",
+          "nome": "« Macchetto, je le dis juste comme ça… »",
           "sostenibile": true
         },
         {
@@ -480,11 +481,11 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "« Déchet noble »",
+          "nome": "« Itosnap »",
           "sostenibile": true
         },
         {
-          "nome": "« Buridda chaperon »",
+          "nome": "« Mr. Bean »",
           "sostenibile": true
         },
         {
@@ -492,8 +493,10 @@ const MENU = {
         }
       ]
     },
-    "percorso_label_6": "Sei",
-    "percorso_label_7": "7"
+    "percorso_label_6": "A tôa no se ven vëgi",
+    "percorso_label_7": "7",
+    "escludi_stampa_6": false,
+    "escludi_stampa_7": true
   },
   "sezioni": [
     {
@@ -533,7 +536,7 @@ const MENU = {
           "staccato": true
         },
         {
-          "nome": "Assortiment de fruits de mer (poisson, crustacés, huîtres)",
+          "nome": "Assortiment de produits crus (poisson, crustacés, huîtres)",
           "prezzo": 75,
           "sostenibile": true,
           "staccato": true
@@ -545,7 +548,7 @@ const MENU = {
       "titolo": "Sfiziosi",
       "piatti": [
         {
-          "nome": "« Macchetto, je le dis comme ça... »",
+          "nome": "« Macchetto, je le dis juste comme ça… »",
           "prezzo": null,
           "sostenibile": true,
           "descrizione": "Petites laitues farcies, poivrons et macchetto aux anchois"
@@ -589,13 +592,13 @@ const MENU = {
           "nome": "« Tomamilla »",
           "prezzo": null,
           "sostenibile": true,
-          "descrizione": "Spaghetti, beurre à la camomille, toma de brebis de Brigasca, poivre noir torréfié"
+          "descrizione": "Spaghetti, beurre à la camomille, toma de brebis de Brigasca, poivre noir grillé"
         },
         {
-          "nome": "« Ganbou au navet »",
+          "nome": "« Ganbou aux navets »",
           "prezzo": null,
           "sostenibile": true,
-          "descrizione": "Riz « <em>Riserva San Massimo</em> », langoustines et crevettes, feuilles de navet"
+          "descrizione": "Riz <em>« Riserva San Massimo</em> », langoustines et crevettes, feuilles de navet"
         },
         {
           "nome": "« Itosnap »",
@@ -617,19 +620,19 @@ const MENU = {
         },
         {
           "nome": "« Buridda chaperon »",
-          "prezzo": null,
+          "prezzo": 32,
           "descrizione": "Sériole, buridda de seiches, mangue",
           "sostenibile": true
         },
         {
           "nome": "« Mr. Bean »",
-          "prezzo": null,
+          "prezzo": 18,
           "sostenibile": true,
           "descrizione": "Morue, haricots cannellini, lard, sauce aïoli"
         },
         {
           "nome": "« Coniggio »",
-          "prezzo": null,
+          "prezzo": 18,
           "sostenibile": true,
           "descrizione": "Lapin frit, choux-fleurs, cèpes, kakis, menthe"
         }
@@ -642,7 +645,7 @@ const MENU = {
         {
           "nome": "« Salade de panissa »",
           "prezzo": 10,
-          "descrizione": "Cannolo aux pois chiches, prescinseua, olives de Taggia, chocolat"
+          "descrizione": "Cannolo aux pois chiches, prescinseua, olives de Taggiasca, chocolat"
         },
         {
           "nome": "« Tradizionello »",
@@ -790,7 +793,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "Petits poulpes mijotés, chanterelles, palourdes, piments « friggitelli », paprika fumé",
+            "nome": "Petits poulpes à l&#x27;étouffée, chanterelles, palourdes, piments « friggitelli », paprika fumé",
             "allergeni": [
               "gluten",
               "œufs",
@@ -955,9 +958,11 @@ function buildDegu(degu) {
 
   let percorsiHtml = '';
   for (const [n, piatti] of Object.entries(degu.percorsi)) {
+    const escl = typeof piatti === 'string' ? !!degu.escludi_stampa_7 : !!degu.escludi_stampa_6;
+    const printCls = escl ? ' no-print' : '';
     if (typeof piatti === 'string') {
       percorsiHtml += `
-        <div class="percorso">
+        <div class="percorso${printCls}">
           <div class="percorso-label">&ldquo;${n}&rdquo;</div>
           <div class="percorso-piatto percorso-libero">${piatti}</div>
         </div>`;
@@ -967,7 +972,7 @@ function buildDegu(degu) {
         return `<div class="percorso-piatto${p.sostenibile ? ' eco' : ''}">${p.nome}${descHtml}</div>`;
       }).join('');
       percorsiHtml += `
-        <div class="percorso">
+        <div class="percorso${printCls}">
           <div class="percorso-label">&ldquo;${n}&rdquo;</div>
           ${righe}
         </div>`;

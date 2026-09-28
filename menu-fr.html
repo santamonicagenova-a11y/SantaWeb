@@ -454,40 +454,40 @@ const MENU = {
     "opzioni": [
       {
         "portate": 6,
-        "prezzo": 85,
-        "vini": 60
+        "prezzo": 80,
+        "vini": 50
       },
       {
         "portate": 7,
-        "prezzo": 110,
-        "vini": 70
+        "prezzo": 100,
+        "vini": 60
       }
     ],
     "nota": "Prix par personne, menu à partager par toute la table.<br>Les menus sont disponibles jusqu'à 13h30 pour le déjeuner et 21h30 pour le dîner.",
     "percorsi": {
       "Sei": [
         {
-          "nome": "Calamars locaux, bagna cauda, kéfir",
+          "nome": "« Macchetto, je le dis comme ça... »",
           "sostenibile": true
         },
         {
-          "nome": "Ris de veau, céleri-rave, noisettes, fond de poisson",
+          "nome": "« Huître des bois »",
           "sostenibile": true
         },
         {
-          "nome": "Spaghettoni carrés <em>Mancini</em>, anémones de mer, nduja, marjolaine",
+          "nome": "« Sanna »",
           "sostenibile": true
         },
         {
-          "nome": "Tubetti <em>Mancini</em>, morue, épinards, kosho aux agrumes",
+          "nome": "« Déchet noble »",
           "sostenibile": true
         },
         {
-          "nome": "Ombrine locale, scarole, feuilles de figuier",
+          "nome": "« Buridda chaperon »",
           "sostenibile": true
         },
         {
-          "nome": "Glace au citron noir, au livèche, au citron vert et aux biscuits au lait"
+          "nome": "« Salade de panissa »"
         }
       ],
       "Sette": "Menu carte blanche du Chef"
@@ -500,8 +500,8 @@ const MENU = {
       "titolo": "Crudi",
       "piatti": [
         {
-          "nome": "Huîtres Gillardeau",
-          "prezzo": 7,
+          "nome": "Huîtres « Fine de Claire »",
+          "prezzo": 4,
           "unita": "p."
         },
         {
@@ -516,7 +516,7 @@ const MENU = {
         },
         {
           "nome": "Langoustines locales",
-          "prezzo": 14,
+          "prezzo": 16,
           "unita": "p.",
           "sostenibile": true
         },
@@ -545,29 +545,33 @@ const MENU = {
       "titolo": "Sfiziosi",
       "piatti": [
         {
-          "nome": "Denté royal local cru, oursins, citron, amandes",
-          "prezzo": 27,
-          "sostenibile": true
+          "nome": "« Macchetto, je le dis comme ça... »",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Petites laitues farcies, poivrons et macchetto aux anchois"
         },
         {
-          "nome": "Crevettes violettes crues à la puttanesca",
-          "prezzo": 23,
-          "sostenibile": true
+          "nome": "« Chaque ricciola a ses caprices »",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Sériole, sauge, betterave au vinaigre, poireaux, raifort"
         },
         {
-          "nome": "Calamars locaux, bagna cauda, kéfir",
-          "prezzo": 19,
-          "sostenibile": true
+          "nome": "« Sanna »",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "calmars, crevettes roses, aubergines, chou noir, oignon rouge"
         },
         {
-          "nome": "Ris de veau, céleri-rave, noisettes, réduction de fond de poisson",
-          "prezzo": 19,
-          "sostenibile": true
+          "nome": "« Huître des bois »",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Huître en tempura, cèpes, coings, concombres"
         },
         {
           "nome": "« Pas de fromages »",
           "prezzo": 22,
-          "descrizione": "(Dégustation de « faux » fromages artisanaux à base de noix de cajou et de lait d&#x27;amande)"
+          "descrizione": "Dégustation de « faux » fromages artisanaux à base de noix de cajou et de lait d&#x27;amande"
         }
       ],
       "titolo_display": "Entrées"
@@ -576,24 +580,28 @@ const MENU = {
       "titolo": "Amidi e Carboidrati",
       "piatti": [
         {
-          "nome": "Spaghettoni carrés <em>Mancini</em>, anémones de mer, nduja, marjolaine",
-          "prezzo": 32,
-          "sostenibile": true
+          "nome": "« Déchet noble »",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Tortelli à la sériole et au denté, safran, raisin, persil"
         },
         {
-          "nome": "Petits poulpes à l&#x27;étouffée, chanterelles, palourdes, piments « friggitelli », paprika fumé",
-          "prezzo": 29,
-          "sostenibile": true
+          "nome": "« Tomamilla »",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Spaghetti, beurre à la camomille, toma de brebis brigasca, poivre noir torréfié"
         },
         {
-          "nome": "Tubetti <em>Mancini</em>, morue, épinards, kosho aux agrumes",
-          "prezzo": 22,
-          "sostenibile": true
+          "nome": "« Ganbou au navet »",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Riz <em>« Riserva San Massimo</em> », langoustines et crevettes, feuilles de navet"
         },
         {
-          "nome": "Riz « <em>Riserva San Massimo</em> », huîtres, nèfles, abricots",
-          "prezzo": 29,
-          "sostenibile": true
+          "nome": "« Itosnap »",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Pansori farcis à la sauce aux noix, dans un bouillon aux cèpes"
         }
       ],
       "titolo_display": "Pâtes & Céréales"
@@ -602,23 +610,28 @@ const MENU = {
       "titolo": "Non Solo Mare",
       "piatti": [
         {
-          "nome": "Sériole locale, aubergines, umami de tomate et de poivron, tahini",
-          "prezzo": 32,
+          "nome": "« Curry curry, les gars ! »",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Dentice, courgettes, curry, ananas, piments « friggitelli », cacahuètes"
+        },
+        {
+          "nome": "« Buridda chaperon »",
+          "prezzo": null,
+          "descrizione": "Sériole, salade de seiches, mangue",
           "sostenibile": true
         },
         {
-          "nome": "Poireau rôti, noix de macadamia, fond de légumes et pêches",
-          "prezzo": 14
+          "nome": "« Mr. Bean »",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Morue, haricots cannellini, lard, sauce aïoli"
         },
         {
-          "nome": "Ombrine locale, scarole, feuilles de figuier",
-          "prezzo": 32,
-          "sostenibile": true
-        },
-        {
-          "nome": "Agneau, pak choï, fond",
-          "prezzo": 27,
-          "sostenibile": true
+          "nome": "« Coniggio »",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Lapin frit, choux-fleurs, cèpes, kakis, menthe"
         }
       ],
       "titolo_display": "Pas Seulement la Mer"
@@ -627,7 +640,7 @@ const MENU = {
       "titolo": "Golosità",
       "piatti": [
         {
-          "nome": "Glace au citron noir, au livèche, au citron vert et aux biscuits au lait",
+          "nome": "Glace au citron noir, au livèche, au citron vert et aux crackers au lait",
           "prezzo": 12
         },
         {

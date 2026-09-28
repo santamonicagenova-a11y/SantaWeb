@@ -1,11 +1,25 @@
 <!DOCTYPE html>
 <!--
   regala.html
-  Versione: v 2026.09.05.02
+  Versione: v 2026.09.28.01
   Pagina: Voucher regalo Santamonica — consegna elettronica COMPLETAMENTE AUTOMATICA
           (Stripe Checkout mode='payment' → PDF+mail automatici, nessun intervento admin);
           il ritiro fisico resta sul flusso manuale via mail (richiedi-voucher).
   Lingua: it (IT only, dec. F0.10 C1)
+
+  Cambio v.09.05.02 → v.09.28.01 (richiesto da Andrea: i 2 buoni degustazione (deg6/deg7) vanno
+  allineati al Menù Degustazione a ogni pubblicazione della carta, non più un listino scritto a
+  mano scollegato). Le righe VOUCHERS per deg6/deg7 restano solo come fallback offline: all'avvio,
+  dopo il fetch di /voucher-config.json (già usato per i 3 buoni liberi), applicaDegustazione()
+  sovrascrive titolo/base/vini dei 2 blocchi dal campo "degustazione" del config — e NASCONDE del
+  tutto il voucher di un percorso con attivo:false (percorso vuoto nel menù, niente da vendere).
+  La costruzione delle righe (costruisciRighe()) e la preselezione (preferisce deg7, poi deg6, poi
+  la prima voce disponibile) ora avvengono SEMPRE dopo il fetch, per non mostrare per un istante
+  un percorso poi da togliere. Il calcolo lato admin (formula: prezzo per persona in carta × 2,
+  con vini = (prezzo+vini) × 2) è in admin-core.js v 2026.09.28.03 (calcolaVoucherDegustazione).
+  Scoperto e corretto nello stesso giro un mismatch di prezzo reale: il 170€ mostrato qui per il
+  6 portate non era il prezzo realmente addebitato da Stripe (create-voucher-checkout aveva un
+  listino fisso separato, 180€) — ora entrambi i lati leggono da voucher-config.json, unica fonte.
 
   Cambio v.09.05.01 → v.09.05.02 (redesign completo, richiesto da Andrea: "voglio semplificare
   la pagina dei voucher", ispirato a un mockup fornito): la vecchia pagina (griglie di card,
@@ -635,8 +649,11 @@
     var RICHIEDI_VOUCHER_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/richiedi-voucher';
     var CREATE_VOUCHER_CHECKOUT_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/create-voucher-checkout';
 
-    // 5 tipologie reali: 2 degustazione + 3 buono libero. I valori "libero" vengono poi
-    // allineati a /voucher-config.json (fallback: quelli qui sotto).
+    // 5 tipologie reali: 2 degustazione + 3 buono libero. Valori di fallback (usati se
+    // /voucher-config.json non risponde): i due blocchi degustazione sono anche allineati in
+    // automatico al Menù Degustazione a ogni pubblicazione della carta (vedi admin-core.js,
+    // sincronizzaVoucherDegustazione) — titolo/prezzo/disponibilità vivono in voucher-config.json,
+    // qui restano solo come rete di sicurezza offline.
     var VOUCHERS = [
       { key: 'deg6', card: 'deg6', title: 'Degustazione 6 portate', sub: 'Per due persone · bevande escluse', base: 170, viniPrice: 290, viniSupp: 120, hasVini: true },
       { key: 'deg7', card: 'deg7', title: 'Degustazione 7 portate', sub: 'A mano libera dello chef · per due persone · bevande escluse', base: 220, viniPrice: 360, viniSupp: 140, hasVini: true, featured: true },
@@ -648,46 +665,68 @@
     var giftIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="11" rx="1"/><path d="M12 9v11M3 9h18M12 9c-1.5-4-6-5-6-2s3 2 6 2Zm0 0c1.5-4 6-5 6-2s-3 2-6 2Z"/></svg>';
 
     var listEl = document.getElementById('vh-list');
-    VOUCHERS.forEach(function(v) {
-      var row = document.createElement('button');
-      row.type = 'button';
-      row.className = 'vh-row';
-      row.dataset.key = v.key;
-      row.innerHTML =
-        '<span class="vh-row-icon">' + giftIcon + '</span>' +
-        '<span class="vh-row-body"><p class="vh-row-title">' + v.title + '</p>' + (v.sub ? '<p class="vh-row-sub">' + v.sub + '</p>' : '') + '</span>' +
-        '<span class="vh-row-price eur-num" data-key="' + v.key + '">' + v.base + '€</span>';
-      row.addEventListener('click', function() { selectVoucher(v.key); });
-      listEl.appendChild(row);
-    });
-
-    // spazio tra le 2 degustazioni e i 3 buoni liberi, alto quanto mezza riga
-    (function() {
-      var rows = listEl.querySelectorAll('.vh-row');
-      if (rows.length > 2) {
-        var spacer = document.createElement('div');
-        spacer.style.height = (rows[0].getBoundingClientRect().height / 2) + 'px';
-        listEl.insertBefore(spacer, rows[2]);
-      }
-    })();
-
-    // valori dei 3 buoni liberi da voucher-config.json (fonte unica, condivisa con menu-admin)
-    fetch('/voucher-config.json', { cache: 'no-store' }).then(function(r) { return r.ok ? r.json() : null; })
-      .then(function(cfg) {
-        if (!cfg || !Array.isArray(cfg.liberi)) return;
-        VOUCHERS.forEach(function(v) {
-          if (v.liberoIndex == null) return;
-          var val = cfg.liberi[v.liberoIndex];
-          if (val == null) return;
-          v.base = val;
-          var priceEl = document.querySelector('.vh-row-price[data-key="' + v.key + '"]');
-          if (priceEl) priceEl.textContent = val + '€';
-          if (selected && selected.key === v.key) updateCard();
-        });
-      }).catch(function(){ /* offline o file assente: restano i valori qui sopra */ });
-
     var selected = null;
     var viniChecked = false;
+
+    // Applica al voucher "deg6"/"deg7" i valori letti da voucher-config.json.degustazione —
+    // stesso schema { attivo, titolo, base, vini } scritto da sincronizzaVoucherDegustazione()
+    // a ogni pubblicazione della carta. Se un percorso è disattivato (menù vuoto), il voucher
+    // corrispondente sparisce del tutto: non ha senso venderlo se oggi non esiste in carta.
+    function applicaDegustazione(cfg) {
+      if (!cfg || !cfg.degustazione) return;
+      var map = { deg6: cfg.degustazione.sei, deg7: cfg.degustazione.sette };
+      VOUCHERS = VOUCHERS.filter(function(v) {
+        var d = map[v.key];
+        if (!d) return true; // niente in config per questa chiave: tieni il fallback statico
+        if (d.attivo === false) return false; // percorso vuoto/disattivato nel menù: nascondi
+        if (d.titolo) v.title = d.titolo;
+        if (typeof d.base === 'number') v.base = d.base;
+        if (typeof d.vini === 'number') { v.viniPrice = d.vini; v.viniSupp = d.vini - v.base; }
+        return true;
+      });
+    }
+
+    function costruisciRighe() {
+      listEl.innerHTML = '';
+      VOUCHERS.forEach(function(v) {
+        var row = document.createElement('button');
+        row.type = 'button';
+        row.className = 'vh-row';
+        row.dataset.key = v.key;
+        row.innerHTML =
+          '<span class="vh-row-icon">' + giftIcon + '</span>' +
+          '<span class="vh-row-body"><p class="vh-row-title">' + v.title + '</p>' + (v.sub ? '<p class="vh-row-sub">' + v.sub + '</p>' : '') + '</span>' +
+          '<span class="vh-row-price eur-num" data-key="' + v.key + '">' + v.base + '€</span>';
+        row.addEventListener('click', function() { selectVoucher(v.key); });
+        listEl.appendChild(row);
+      });
+      // spazio tra le degustazioni e i buoni liberi, alto quanto mezza riga
+      var rows = listEl.querySelectorAll('.vh-row');
+      var nDeg = VOUCHERS.filter(function(v){ return v.liberoIndex == null; }).length;
+      if (rows.length > nDeg && nDeg > 0) {
+        var spacer = document.createElement('div');
+        spacer.style.height = (rows[0].getBoundingClientRect().height / 2) + 'px';
+        listEl.insertBefore(spacer, rows[nDeg]);
+      }
+    }
+
+    // valori da voucher-config.json (fonte unica, condivisa con menu-admin): i 3 buoni liberi +
+    // i 2 blocchi degustazione (titolo/prezzo/disponibilità). Le righe si costruiscono SEMPRE
+    // dopo questo fetch (o dopo il suo fallimento) per evitare di mostrare per un istante un
+    // percorso poi da nascondere.
+    fetch('/voucher-config.json', { cache: 'no-store' }).then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(cfg) {
+        if (cfg && Array.isArray(cfg.liberi)) {
+          VOUCHERS.forEach(function(v) {
+            if (v.liberoIndex == null) return;
+            var val = cfg.liberi[v.liberoIndex];
+            if (val != null) v.base = val;
+          });
+        }
+        applicaDegustazione(cfg);
+      })
+      .catch(function(){ /* offline o file assente: restano i valori di fallback qui sopra */ })
+      .then(function() { avvia(); });
 
     function byKey(key) { for (var i = 0; i < VOUCHERS.length; i++) if (VOUCHERS[i].key === key) return VOUCHERS[i]; return null; }
 
@@ -761,11 +800,17 @@
       r.addEventListener('change', function() { document.getElementById('vh-eccedenza-error').style.display = 'none'; });
     });
 
-    // preseleziona la degustazione 7 portate (già "featured" nella versione precedente), così
-    // la card di riepilogo non è mai vuota — l'utente può comunque cambiare scelta subito.
-    // skipScroll=true: altrimenti la pagina si apriva già scrollata sulla card invece di
-    // mostrare l'inizio della pagina.
-    selectVoucher('deg7', true);
+    // Costruisce le righe (dopo il fetch di voucher-config.json, così un percorso disattivato
+    // non è mai visibile nemmeno per un istante) e preseleziona una card, così quella di
+    // riepilogo non è mai vuota — l'utente può comunque cambiare scelta subito. Preferenza
+    // deg7 (era "featured" per design), poi deg6, poi la prima voce disponibile: uno dei due
+    // può sparire se il percorso corrispondente è vuoto nel menù. skipScroll=true: altrimenti
+    // la pagina si apriva già scrollata sulla card invece di mostrare l'inizio della pagina.
+    function avvia() {
+      costruisciRighe();
+      var preferita = byKey('deg7') || byKey('deg6') || VOUCHERS[0];
+      if (preferita) selectVoucher(preferita.key, true);
+    }
 
     // Banner "pagamento annullato" — redirect di ritorno da Stripe Checkout se l'utente
     // annulla prima di pagare. Nessun dato è andato perso: i campi restano compilati.

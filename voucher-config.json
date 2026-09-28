@@ -6,14 +6,18 @@
   ],
   "degustazione": {
     "sei": {
-      "base": 170,
-      "vini": 290
+      "attivo": true,
+      "titolo": "Degustazione 6 portate",
+      "base": 150,
+      "vini": 250
     },
     "sette": {
-      "base": 220,
-      "vini": 360
+      "attivo": false,
+      "titolo": "Degustazione 7 portate",
+      "base": 200,
+      "vini": 320
     }
   },
-  "versione": "v 2026.09.05.01",
-  "_nota": "Fonte unica dei valori dei voucher. Modificabile da menu-admin (pannello Buoni regalo) o a mano."
+  "versione": "v 2026.09.28.01",
+  "_nota": "Fonte unica dei valori dei voucher. \"liberi\" modificabile da menu-admin (pannello Buoni regalo) o a mano; \"degustazione\" si aggiorna da solo a ogni pubblicazione della carta."
 }

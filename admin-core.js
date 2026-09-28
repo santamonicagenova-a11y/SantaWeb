@@ -1,4 +1,18 @@
 // Core functions per menu-admin Santamonica
+// v 2026.09.28.03 — richiesto da Andrea: la sezione voucher regalo (regala.html) va allineata al
+//   Menù Degustazione a ogni pubblicazione della carta — titolo/prezzo/disponibilità dei 2 buoni
+//   deg6/deg7, non più un listino scritto a mano scollegato dal menù reale. Nuove
+//   calcolaVoucherDegustazione()/_accodaVoucherConfig(), chiamate da eseguiPubblicazione() solo
+//   per tipoMenuCorrente==='carta': calcolano attivo/titolo/base/vini per i 2 percorsi (formula
+//   confermata da Andrea: prezzo per persona in carta × 2, con vini = (prezzo+vini per persona)
+//   × 2; percorso vuoto → attivo:false) e pubblicano voucher-config.json insieme agli altri file
+//   della carta, preservando i 3 valori "liberi" esistenti. Corretto insieme al mismatch di
+//   prezzo scoperto in create-voucher-checkout (v 2026.09.28.01, deploy Supabase): il prezzo
+//   mostrato in regala.html per il 6 portate (170€) non era quello realmente addebitato da
+//   Stripe (180€, listino fisso lì mai allineato) — ora entrambi leggono da voucher-config.json.
+//   Aggiornato anche a mano il file live voucher-config.json e regala.html (nuovo schema
+//   {attivo,titolo,base,vini}, righe deg6/deg7 nascoste se il percorso è vuoto) per effetto
+//   immediato, oltre al codice sorgente.
 // v 2026.09.28.02 — richiesto da Andrea: 2 checkbox "Escludi dalla stampa", uno per ogni percorso
 //   degustazione (6 e 7), nel form Menù Degustazione (costruisci()). leggi() li salva in
 //   m.degustazione.escludi_stampa_6/7. Il rendering (buildDegu, no-print CSS) è nel template
@@ -950,6 +964,56 @@ function costruisciMenuItPub() {
   return html;
 }
 
+// ── Buoni regalo: sincronizza voucher-config.json.degustazione col Menù Degustazione ──────
+// Richiesto da Andrea: quando cambia uno dei 2 percorsi (prezzo, contenuto, o viene svuotato/
+// riempito) il buono regalo corrispondente in regala.html deve rispecchiarlo, invece di restare
+// un listino scritto a mano scollegato dal menù reale — scollegamento che aveva anche creato un
+// mismatch di prezzo mai notato (il prezzo mostrato in regala.html per il 6 portate non era
+// quello realmente addebitato da Stripe, corretto insieme a questa modifica in
+// create-voucher-checkout v 2026.09.28.01). Formula confermata da Andrea: prezzo voucher (2
+// persone, senza vini) = prezzo menù a persona × 2; con abbinamento vini = (prezzo + vini a
+// persona) × 2. Un percorso vuoto (nessun contenuto nel Menù Degustazione, stesso criterio già
+// usato per nasconderlo dalla carta) rende il voucher corrispondente "attivo:false": non si vende
+// un buono per un'esperienza che oggi non è in carta.
+function calcolaVoucherDegustazione(m) {
+  if (!m || !m.degustazione) return null;
+  var degu = m.degustazione;
+  var percKeys = Object.keys(degu.percorsi || {});
+  var key6 = percKeys.find(function(k){ return Array.isArray(degu.percorsi[k]); });
+  var key7 = percKeys.find(function(k){ return typeof degu.percorsi[k] === 'string'; });
+  var opz6 = (degu.opzioni || []).find(function(o){ return o.portate === 6; });
+  var opz7 = (degu.opzioni || []).find(function(o){ return o.portate === 7; });
+  function blocco(key, opz) {
+    var piatti = key != null ? degu.percorsi[key] : undefined;
+    var vuoto = piatti == null || (typeof piatti === 'string' ? !piatti.trim() : !piatti.length);
+    return {
+      attivo: !vuoto && !!opz,
+      titolo: opz ? ('Degustazione ' + opz.portate + ' portate') : null,
+      base: opz ? Math.round(opz.prezzo * 2) : null,
+      vini: opz ? Math.round((opz.prezzo + (opz.vini || 0)) * 2) : null
+    };
+  }
+  return { sei: blocco(key6, opz6), sette: blocco(key7, opz7) };
+}
+
+// Legge voucher-config.json (per non perdere i valori "liberi"), sostituisce solo il blocco
+// "degustazione" e lo aggiunge alla coda di file da pubblicare. proseguiCb viene chiamato sempre,
+// anche se il fetch fallisce — un problema di rete su questo file non deve mai bloccare la
+// pubblicazione della carta.
+function _accodaVoucherConfig(voucherDegu, files, proseguiCb) {
+  fetch('/voucher-config.json', { cache: 'no-store' })
+    .then(function(r){ return r.ok ? r.json() : {}; })
+    .catch(function(){ return {}; })
+    .then(function(cur){
+      cur = cur || {};
+      cur.degustazione = voucherDegu;
+      cur.versione = 'v ' + new Date().toISOString().slice(0,10).replace(/-/g, '.') + '.01';
+      cur._nota = 'Fonte unica dei valori dei voucher. "liberi" modificabile da menu-admin (pannello Buoni regalo) o a mano; "degustazione" si aggiorna da solo a ogni pubblicazione della carta.';
+      files.push({ path: 'voucher-config.json', content: JSON.stringify(cur, null, 2) + '\n', label: 'Buoni regalo (sincronizzati col menù)' });
+    })
+    .then(proseguiCb, proseguiCb);
+}
+
 function eseguiPubblicazione(token) {
   // Guard: senza menu caricato (dati===null) leggi() crasherebbe su "dati.degustazione".
   // Puo' capitare dal percorso modale-token (confermaPubblica) dopo un refresh senza ricaricare il menu.
@@ -1119,29 +1183,39 @@ function eseguiPubblicazione(token) {
     files.unshift({ path: 'orario-qr.png', content: null, rawBase64: _qrBase64, label: 'QR code' });
   }
 
-  toast('⏳ Pubblicazione in corso…');
+  function pubblicaFiles() {
+    toast('⏳ Pubblicazione in corso…');
 
-  var i = 0;
-  function next() {
-    if (i >= files.length) {
-      _qrBase64 = null; var fi=document.getElementById('orario-qr-file'); if(fi) fi.value='';
-      toast('✓ Pubblicato! Ricarica tra 90 secondi…');
-      setTimeout(function() {
-        toast('⏳ Ricarico dal sito…');
-        setTimeout(caricaDalSito, 1500);
-      }, 90000);
-      return;
+    var i = 0;
+    function next() {
+      if (i >= files.length) {
+        _qrBase64 = null; var fi=document.getElementById('orario-qr-file'); if(fi) fi.value='';
+        toast('✓ Pubblicato! Ricarica tra 90 secondi…');
+        setTimeout(function() {
+          toast('⏳ Ricarico dal sito…');
+          setTimeout(caricaDalSito, 1500);
+        }, 90000);
+        return;
+      }
+      var f = files[i++];
+      pubblicaFile(token, headers, f.path, f.content, f.rawBase64)
+        .then(function(r) {
+          if (!r.ok) return r.json().then(function(e){ throw new Error(f.path + ': ' + e.message); });
+          toast('✓ ' + f.label + ' (' + i + '/' + files.length + ')');
+          setTimeout(next, 400);
+        })
+        .catch(function(ex) { alert('Errore: ' + ex.message); });
     }
-    var f = files[i++];
-    pubblicaFile(token, headers, f.path, f.content, f.rawBase64)
-      .then(function(r) {
-        if (!r.ok) return r.json().then(function(e){ throw new Error(f.path + ': ' + e.message); });
-        toast('✓ ' + f.label + ' (' + i + '/' + files.length + ')');
-        setTimeout(next, 400);
-      })
-      .catch(function(ex) { alert('Errore: ' + ex.message); });
+    next();
   }
-  next();
+
+  // Solo per la carta (unico tipo con dati.degustazione): sincronizza i buoni regalo prima di
+  // avviare la coda di pubblicazione, così voucher-config.json finisce nello stesso giro.
+  if (tipoMenuCorrente === 'carta') {
+    var voucherDegu = calcolaVoucherDegustazione(leggi());
+    if (voucherDegu) { _accodaVoucherConfig(voucherDegu, files, pubblicaFiles); return; }
+  }
+  pubblicaFiles();
 }
 
 

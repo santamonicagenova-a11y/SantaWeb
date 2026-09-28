@@ -1,4 +1,8 @@
 // Core functions per menu-admin Santamonica
+// v 2026.09.28.02 — richiesto da Andrea: 2 checkbox "Escludi dalla stampa", uno per ogni percorso
+//   degustazione (6 e 7), nel form Menù Degustazione (costruisci()). leggi() li salva in
+//   m.degustazione.escludi_stampa_6/7. Il rendering (buildDegu, no-print CSS) è nel template
+//   condiviso: admin-templates-shared.js v 2026.09.28.01.
 // v 2026.09.28.01 — chiamaDeepL espone res.status; i loop di "Traduci e Pubblica" (carta/dolci in
 //   traduciEPubblica, allergeni in traduciEPubblicaAllergeni) ora riprovano con attesa crescente
 //   (2s/5s/10s, fino a 3 tentativi in più) solo quando DeepL risponde 429 (troppe richieste — quota
@@ -365,6 +369,7 @@ function costruisci() {
 
   var s6wrap = el('div','opt-row');
   var s6lbl = el('div'); s6lbl.appendChild(el('span','opt-lbl','Label percorso 6')); s6lbl.appendChild(inp('text','degu-label-6', m.degustazione.percorso_label_6)); s6wrap.appendChild(s6lbl);
+  var s6ex = el('div'); s6ex.appendChild(el('span','opt-lbl','Escludi dalla stampa')); s6ex.appendChild(chk('degu-escludi-6', m.degustazione.escludi_stampa_6)); s6wrap.appendChild(s6ex);
   bd.appendChild(s6wrap);
   var s6 = el('div','sub'); s6.innerHTML = 'Percorso \u201c6\u201d \u00a0<span style="color:var(--rust);font-size:.6rem">\u2611 = sostenibile *</span>';
   bd.appendChild(s6);
@@ -380,6 +385,7 @@ function costruisci() {
 
   var s7wrap = el('div','opt-row');
   var s7lbl = el('div'); s7lbl.appendChild(el('span','opt-lbl','Label percorso 7')); s7lbl.appendChild(inp('text','degu-label-7', m.degustazione.percorso_label_7)); s7wrap.appendChild(s7lbl);
+  var s7ex = el('div'); s7ex.appendChild(el('span','opt-lbl','Escludi dalla stampa')); s7ex.appendChild(chk('degu-escludi-7', m.degustazione.escludi_stampa_7)); s7wrap.appendChild(s7ex);
   bd.appendChild(s7wrap);
   bd.appendChild(el('div','sub','Percorso \u201c7\u201d'));
   var i7 = inp('text','degu7', m.degustazione.percorsi[_key7]);
@@ -516,6 +522,10 @@ function leggi(keepEmpty) {
     m.degustazione.percorsi = newPercorsi;
     m.degustazione.percorso_label_6 = newLabel6;
     m.degustazione.percorso_label_7 = newLabel7;
+    var e6El = document.getElementById('degu-escludi-6');
+    var e7El = document.getElementById('degu-escludi-7');
+    m.degustazione.escludi_stampa_6 = !!(e6El && e6El.checked);
+    m.degustazione.escludi_stampa_7 = !!(e7El && e7El.checked);
   }
 
   m.sezioni.forEach(function(sez, si) {

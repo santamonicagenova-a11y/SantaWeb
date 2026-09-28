@@ -387,6 +387,7 @@
       body { background: white; }
       .ctrl-bar { display: none; }
       .stampa-hint { display: none; }
+      .percorso.no-print { display: none; }
 
       /* carta: 3 pagine */
       #layout-carta .pg {
@@ -464,7 +465,7 @@ const MENU = {
     "opzioni": [
       {
         "portate": 6,
-        "prezzo": 80,
+        "prezzo": 75,
         "vini": 50
       },
       {
@@ -476,7 +477,7 @@ const MENU = {
     "nota": "Prezzo a persona, menù da considerarsi per l'intero tavolo.<br>I menù sono disponibili fino alle 22:00",
     "percorsi": {
       "7": "",
-      "Sei": [
+      "A tôa no se ven vëgi": [
         {
           "nome": "\"Macchetto lo dico a fare ...\"",
           "sostenibile": true
@@ -490,11 +491,11 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "\"Scarto nobile\"",
+          "nome": "\"Itosnap\"",
           "sostenibile": true
         },
         {
-          "nome": "\"Buridda chaperon\"",
+          "nome": "\"Mr. Bean\"",
           "sostenibile": true
         },
         {
@@ -502,8 +503,10 @@ const MENU = {
         }
       ]
     },
-    "percorso_label_6": "Sei",
-    "percorso_label_7": "7"
+    "percorso_label_6": "A tôa no se ven vëgi",
+    "percorso_label_7": "7",
+    "escludi_stampa_6": false,
+    "escludi_stampa_7": true
   },
   "sezioni": [
     {
@@ -627,19 +630,19 @@ const MENU = {
         },
         {
           "nome": "\"Buridda chaperon\"",
-          "prezzo": null,
+          "prezzo": 32,
           "descrizione": "Ricciola, buridda di seppie, mango",
           "sostenibile": true
         },
         {
           "nome": "\"Mr. Bean\"",
-          "prezzo": null,
+          "prezzo": 18,
           "sostenibile": true,
           "descrizione": "Baccalà, cannellini, lardo, salsa aioli"
         },
         {
           "nome": "\"Coniggio\"",
-          "prezzo": null,
+          "prezzo": 18,
           "sostenibile": true,
           "descrizione": "Coniglio fritto, cavolfiori, porcini, cachi, menta"
         }
@@ -743,9 +746,11 @@ function buildDegu(degu) {
 
   let percorsiHtml = '';
   for (const [n, piatti] of Object.entries(degu.percorsi)) {
+    const escl = typeof piatti === 'string' ? !!degu.escludi_stampa_7 : !!degu.escludi_stampa_6;
+    const printCls = escl ? ' no-print' : '';
     if (typeof piatti === 'string') {
       percorsiHtml += `
-        <div class="percorso">
+        <div class="percorso${printCls}">
           <div class="percorso-label">&ldquo;${n}&rdquo;</div>
           <div class="percorso-piatto percorso-libero">${piatti}</div>
         </div>`;
@@ -755,7 +760,7 @@ function buildDegu(degu) {
         return `<div class="percorso-piatto${p.sostenibile ? ' eco' : ''}">${p.nome}${descHtml}</div>`;
       }).join('');
       percorsiHtml += `
-        <div class="percorso">
+        <div class="percorso${printCls}">
           <div class="percorso-label">&ldquo;${n}&rdquo;</div>
           ${righe}
         </div>`;

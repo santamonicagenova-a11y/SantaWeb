@@ -1,4 +1,11 @@
 // Core functions per menu-admin Santamonica
+// v 2026.09.28.01 — chiamaDeepL espone res.status; i loop di "Traduci e Pubblica" (carta/dolci in
+//   traduciEPubblica, allergeni in traduciEPubblicaAllergeni) ora riprovano con attesa crescente
+//   (2s/5s/10s, fino a 3 tentativi in più) solo quando DeepL risponde 429 (troppe richieste — quota
+//   al minuto esaurita, tipico dopo più pubblicazioni ravvicinate), invece di segnare subito la
+//   voce come fallita. Gli altri errori (rete, chiave server-side invalida, risposta vuota)
+//   falliscono ancora al primo tentativo come prima. Segnalato da Andrea: 31/114 traduzioni fallite
+//   con HTTP 429 in una pubblicazione dopo diverse pubblicazioni ravvicinate nella stessa sessione.
 // v 2026.09.27.02 — Traduzioni EN/FR: replace anche di "Men&ugrave; Degustazione" (refuso apostrofo tolto nel template carta).
 // v 2026.09.27.01 — /menu (IT pubblico): title/description/og nuovi, orientati a chi cerca "il menu di Santamonica" (la pagina riceve quasi solo ricerche brand): via "Pesce Fresco" (anti-cannibalizzazione con la pillar /cucina-di-pesce) e "Cucina Ligure"; niente numero di portate né prezzi (cambiano col nuovo menu). Testi approvati da Andrea 27/9.
 // v 2026.09.25.01 — menu generati: canonical/og:url/JSON-LD puntano agli URL puliti (senza .html): le .html fanno redirect 308 verso la versione senza estensione e Google segnalava "Pagina con reindirizzamento". Nessun cambio di contenuto.
@@ -185,9 +192,9 @@ function chiamaDeepL(testo, langCode) {
     if (!r.ok) {
       return r.json().then(function(err) {
         console.error('[Translate] HTTP ' + r.status, err);
-        return { trad: null, authError: false, errorMsg: 'HTTP ' + r.status + ' (' + (err && err.error || 'errore') + ')' };
+        return { trad: null, authError: false, status: r.status, errorMsg: 'HTTP ' + r.status + ' (' + (err && err.error || 'errore') + ')' };
       }).catch(function() {
-        return { trad: null, authError: false, errorMsg: 'HTTP ' + r.status };
+        return { trad: null, authError: false, status: r.status, errorMsg: 'HTTP ' + r.status };
       });
     }
     return r.json().then(function(data) {
@@ -875,22 +882,36 @@ function traduci() {
       return;
     }
     var item = coda[i];
-    btn.textContent = '\u23f3 ' + (i+1) + '/' + totale + '\u2026';
+    provaTraduci(item, 0);
 
-    chiamaDeepL(item.testo, item.lang)
-      .then(function(res) {
-        if (res.authError) {
-          btn.textContent = '\uD83C\uDF10 Traduci';
-          btn.classList.remove('translating');
-          btn.disabled = false;
-          alert('Errore proxy DeepL: ' + (res.errorMsg || 'chiave non valida lato server') +
-                '\n\nVerifica che la env variable DEEPL_KEY sia configurata su Vercel.');
-          return;
-        }
-        if (res.trad) TRANSLATIONS[item.lang]['piatti'][item.testo] = res.trad;
-        else falliti.push({ testo: item.testo, lang: item.lang, errorMsg: res.errorMsg });
-        setTimeout(function() { traduciVoce(i + 1); }, 80);
-      });
+    // Riprova con attesa crescente solo sul 429 (troppe richieste \u2014 quota DeepL al minuto):
+    // gli altri errori (rete, chiave, risposta vuota) falliscono subito come prima.
+    function provaTraduci(item, tentativo) {
+      btn.textContent = '\u23f3 ' + (i+1) + '/' + totale + (tentativo ? ' (riprovo, limite DeepL raggiunto)\u2026' : '\u2026');
+      chiamaDeepL(item.testo, item.lang)
+        .then(function(res) {
+          if (res.authError) {
+            btn.textContent = '\uD83C\uDF10 Traduci';
+            btn.classList.remove('translating');
+            btn.disabled = false;
+            alert('Errore proxy DeepL: ' + (res.errorMsg || 'chiave non valida lato server') +
+                  '\n\nVerifica che la env variable DEEPL_KEY sia configurata su Vercel.');
+            return;
+          }
+          if (res.trad) {
+            TRANSLATIONS[item.lang]['piatti'][item.testo] = res.trad;
+            setTimeout(function() { traduciVoce(i + 1); }, 80);
+            return;
+          }
+          var RITARDI_429 = [2000, 5000, 10000]; // ms, fino a 3 tentativi in pi\u00F9
+          if (res.status === 429 && tentativo < RITARDI_429.length) {
+            setTimeout(function() { provaTraduci(item, tentativo + 1); }, RITARDI_429[tentativo]);
+            return;
+          }
+          falliti.push({ testo: item.testo, lang: item.lang, errorMsg: res.errorMsg });
+          setTimeout(function() { traduciVoce(i + 1); }, 80);
+        });
+    }
   }
 
   traduciVoce(0);
@@ -1385,20 +1406,35 @@ function traduciEPubblica() {
       return;
     }
     var item = coda[i];
-    btn.textContent = '⏳ Traduzione ' + (i+1) + '/' + totale + '…';
-    chiamaDeepL(item.testo, item.lang)
-      .then(function(res) {
-        if (res.authError) {
-          btn.textContent = '✶ Traduci e Pubblica';
-          btn.disabled = false;
-          alert('Errore proxy DeepL: ' + (res.errorMsg || 'chiave non valida lato server') +
-                '\n\nVerifica che la env variable DEEPL_KEY sia configurata su Vercel.');
-          return;
-        }
-        if (res.trad) TRANSLATIONS[item.lang]['piatti'][item.testo] = res.trad;
-        else falliti.push({ testo: item.testo, lang: item.lang, errorMsg: res.errorMsg });
-        setTimeout(function() { traduciVoce(i + 1); }, 80);
-      });
+    provaTraduci(item, 0);
+
+    // Riprova con attesa crescente solo sul 429 (troppe richieste — quota DeepL al minuto):
+    // gli altri errori (rete, chiave, risposta vuota) falliscono subito come prima.
+    function provaTraduci(item, tentativo) {
+      btn.textContent = '⏳ Traduzione ' + (i+1) + '/' + totale + (tentativo ? ' (riprovo, limite DeepL raggiunto)…' : '…');
+      chiamaDeepL(item.testo, item.lang)
+        .then(function(res) {
+          if (res.authError) {
+            btn.textContent = '✶ Traduci e Pubblica';
+            btn.disabled = false;
+            alert('Errore proxy DeepL: ' + (res.errorMsg || 'chiave non valida lato server') +
+                  '\n\nVerifica che la env variable DEEPL_KEY sia configurata su Vercel.');
+            return;
+          }
+          if (res.trad) {
+            TRANSLATIONS[item.lang]['piatti'][item.testo] = res.trad;
+            setTimeout(function() { traduciVoce(i + 1); }, 80);
+            return;
+          }
+          var RITARDI_429 = [2000, 5000, 10000]; // ms, fino a 3 tentativi in più
+          if (res.status === 429 && tentativo < RITARDI_429.length) {
+            setTimeout(function() { provaTraduci(item, tentativo + 1); }, RITARDI_429[tentativo]);
+            return;
+          }
+          falliti.push({ testo: item.testo, lang: item.lang, errorMsg: res.errorMsg });
+          setTimeout(function() { traduciVoce(i + 1); }, 80);
+        });
+    }
   }
   traduciVoce(0);
   }

@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.09.28.03",
+  version: "2026.09.28.04",
   updated: "2026-09-28",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -97,6 +97,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Dettagli piatti: la sync con Carta/Dolci non segnala quando un\'intera sezione cambia nome — piatti orfani silenziosi (visto coi dolci 28/9)', s:'2026-09-28', st:'up'},
       {t:'"Traduci e Pubblica" (carta/dolci/allergeni): retry automatico con attesa crescente sui 429 DeepL', s:'2026-09-28', e:'2026-09-28', st:'done'},
       {t:'Food Cost — badge "periodo non chiuso" sui KPI + storico conteggi con heatmap mensile + pannello periodi chiusi + auto-load ultimo periodo in Dashboard', s:'2026-09-13', st:'done', ms:true},
+      {t:'Menù Degustazione: checkbox "Escludi dalla stampa" per il percorso 6 e per il 7, indipendenti', s:'2026-09-28', e:'2026-09-28', st:'done'},
       {t:'Food Cost — riordino tab (Dashboard·Spese·Incassi·Vendite·Inventario·Costo piatti·Reparti) con colori per gruppo', s:'2026-09-13', st:'done'},
       {t:'Gantt trasversale ricostruito da zero + pubblicato su santamonicagenova.it/gantt (gantt.html noindex + gantt-data.js)', s:'2026-09-21', st:'done', ms:true},
       {t:'Food Cost — opzione futura (non richiesta come lavoro): Labor Cost % · Prime Cost % · Break-Even Point, serve una fonte dati costo-personale non ancora esistente', s:'2026-09-13', e:'2027-05-01', st:'future'},

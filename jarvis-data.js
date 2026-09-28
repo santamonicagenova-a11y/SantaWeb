@@ -1,15 +1,15 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-09-28",
- "versione": "2026.09.28.03",
- "briefing": "**Briefing 28/9/2026** — Sessione con più richieste dirette. **Food Cost**: (1) storico conteggi Inventario mostra ora anche l'importo per ogni data; (2) la sezione si apre sempre su Dashboard, non più sull'ultima scheda usata. **Dolci**: dopo la tua pubblicazione, Calcolo Food Cost mostrava sia i piatti vecchi che i nuovi di \"Golosità\" (sezione rinominata da \"Dolci — Golosità\" a \"Golosità\", la sync non riconosce sezioni rinominate) — ripulito a mano, riagganciata la scheda costo di Sacripantina. **Traduci e Pubblica**: risolto anche il popup \"Traduzioni fallite 31/114\" (HTTP 429 DeepL) che avevi visto — ora il sistema riprova automaticamente con attesa crescente prima di arrendersi, invece di lasciare le voci in italiano al primo errore. **Aspetta te**: verifica dal vivo Food Cost (Dashboard di default, dolci senza duplicati). **Prossimo**: resta aperto il giro di verifica generale dei flussi Food Cost dopo il backend ricostruito il 26/9; se ricapita un duplicato su un'altra sezione rinominata (carta o dolci), stessa causa nota — vedi task dedicata.",
+ "versione": "2026.09.28.04",
+ "briefing": "**Briefing 28/9/2026** — Sessione con diverse richieste dirette. **Food Cost**: (1) storico conteggi Inventario mostra ora anche l'importo per ogni data; (2) la sezione si apre sempre su Dashboard, non più sull'ultima scheda usata. **Dolci**: dopo la tua pubblicazione, Calcolo Food Cost mostrava sia i piatti vecchi che i nuovi di \"Golosità\" (sezione rinominata da \"Dolci — Golosità\" a \"Golosità\", la sync non riconosce sezioni rinominate) — ripulito a mano, riagganciata la scheda costo di Sacripantina. **Traduci e Pubblica**: risolto il popup \"Traduzioni fallite 31/114\" (HTTP 429 DeepL) — ora riprova automaticamente con attesa crescente. **Menù Degustazione**: nuovi 2 checkbox \"Escludi dalla stampa\", uno per il percorso 6 e uno per il 7 — resta visibile online, sparisce solo da stampa/PDF (effetto sul sito dopo la prossima pubblicazione carta). **Aspetta te**: verifica dal vivo Food Cost (Dashboard di default, dolci senza duplicati) e prova il nuovo checkbox alla prossima pubblicazione carta. **Prossimo**: resta aperto il giro di verifica generale dei flussi Food Cost dopo il backend ricostruito il 26/9; se ricapita un duplicato su un'altra sezione rinominata (carta o dolci), stessa causa nota — vedi task dedicata.",
  "kpi": {
   "aperte": 49,
   "scadute": 3,
   "bloccate": 1,
   "andrea": 12,
   "debiti": 8,
-  "chiuse30": 34
+  "chiuse30": 35
  },
  "subs": {
   "SEO": {
@@ -35,8 +35,8 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 91,
-   "done": 78,
+   "tot": 92,
+   "done": 79,
    "prog": 1,
    "up": 3,
    "future": 9,
@@ -467,6 +467,11 @@ window.JARVIS_DATA = {
   {
    "d": "2026-09-28",
    "sub": "Sito",
+   "t": "Checkbox escludi dalla stampa per percorso degustazione"
+  },
+  {
+   "d": "2026-09-28",
+   "sub": "Sito",
    "t": "Food Cost Dashboard default + pulizia dolci orfani"
   },
   {
@@ -498,11 +503,6 @@ window.JARVIS_DATA = {
    "d": "2026-09-27",
    "sub": "Sito",
    "t": "Voucher scheda dettaglio"
-  },
-  {
-   "d": "2026-09-26",
-   "sub": "Sito",
-   "t": "Calcolo Food Cost da ingredienti"
   }
  ],
  "perWeek": [
@@ -552,13 +552,13 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-28",
-   "n": 3
+   "n": 4
   }
  ],
  "perDay": [
   {
    "g": "lun",
-   "n": 6
+   "n": 7
   },
   {
    "g": "mar",

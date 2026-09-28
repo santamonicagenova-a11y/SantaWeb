@@ -1,15 +1,15 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
- "generato": "2026-09-27",
- "versione": "2026.09.27.10",
- "briefing": "**Briefing 27/9/2026** — Sessione SEO: Search Console ora collegata a Claude (pesce pos 8,4, mare pos 2,0; clic non-brand triplicati da maggio). Sistemati sul sito: immagini rotte e troppo pesanti (-2,8 MB in home), H1 e testi SEO di menu, vini, allergeni e dolci. Riprogrammate le attività scadute: pillar mare a ottobre, **pillar pesce senza chef entro 15/11** (intervista quasi chiusa), storia a dicembre. **Aspetta te entro 5/10**: abbinamenti vino con Monica e foto del crudo. Aggiunte anche in giornata, **tutte provate dal vivo da Andrea e ok**: in menu-admin → Voucher, pulsante \"Scheda\" su ogni voucher con tutte le informazioni (acquirente, mittente, date, pagamento, eccedenza); in Food Cost → Setup, elenco reparti a scomparsa e riquadro violetto per Fornitori/Numerazione tracciabilità; pannello iniziale riorganizzato, \"Prenotazioni online\" + \"Foto cucina/sito\" ora sotto Setup. **Prossimo**: dopo il 1/10 GEO giro 5 + orari Michelin; verifica cambio orari 1/10; Calcolo Food Cost su piatti veri.",
+ "generato": "2026-09-28",
+ "versione": "2026.09.28.01",
+ "briefing": "**Briefing 28/9/2026** — Sessione breve, richiesta diretta da Inbox/screenshot: in Food Cost → Inventario, la sezione \"Storico conteggi\" mostrava solo il giorno del mese in ogni cella, non l'importo contato. Aggiunto: backend `foodcost-admin` (deploy 24) somma il valore per ogni data, frontend mostra giorno + € su due righe con tooltip esteso. Commit push diretto su `main`. **Aspetta te**: un giro dal vivo su Inventario per confermare che le celle mostrino l'importo corretto, comprese le date parziali (gialle). **Prossimo**: resta aperto il giro di verifica generale dei flussi Food Cost (Tracciabilità, import Excel, IVA) dopo il backend ricostruito il 26/9.",
  "kpi": {
   "aperte": 48,
   "scadute": 3,
   "bloccate": 1,
   "andrea": 12,
   "debiti": 7,
-  "chiuse30": 29
+  "chiuse30": 31
  },
  "subs": {
   "SEO": {
@@ -35,8 +35,8 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 86,
-   "done": 74,
+   "tot": 87,
+   "done": 75,
    "prog": 1,
    "up": 2,
    "future": 9,
@@ -222,7 +222,7 @@ window.JARVIS_DATA = {
    "az": "Giro veloce su tutti i tab Food Cost (Incassi, Inventario, Dashboard, Vendite, Costo piatti) + prova delle novità del 26/9",
    "bl": null,
    "deb": false,
-   "agg": "2026-09-26"
+   "agg": "2026-09-28"
   }
  ],
  "scadute": [
@@ -448,10 +448,15 @@ window.JARVIS_DATA = {
    "az": "Giro veloce su tutti i tab Food Cost (Incassi, Inventario, Dashboard, Vendite, Costo piatti) + prova delle novità del 26/9",
    "bl": null,
    "deb": false,
-   "agg": "2026-09-26"
+   "agg": "2026-09-28"
   }
  ],
  "sessioni": [
+  {
+   "d": "2026-09-28",
+   "sub": "Sito",
+   "t": "Importo per data nello storico conteggi Inventario"
+  },
   {
    "d": "2026-09-27",
    "sub": "SEO",
@@ -486,18 +491,9 @@ window.JARVIS_DATA = {
    "d": "2026-09-26",
    "sub": "Sito",
    "t": "Food Cost rifiniture (sessione cloud)"
-  },
-  {
-   "d": "2026-09-26",
-   "sub": "Trasversale",
-   "t": "Jarvis multi-ambiente (Code, Cowork, cloud)"
   }
  ],
  "perWeek": [
-  {
-   "w": "2026-07-06",
-   "n": 2
-  },
   {
    "w": "2026-07-13",
    "n": 1
@@ -541,12 +537,16 @@ window.JARVIS_DATA = {
   {
    "w": "2026-09-21",
    "n": 12
+  },
+  {
+   "w": "2026-09-28",
+   "n": 1
   }
  ],
  "perDay": [
   {
    "g": "lun",
-   "n": 5
+   "n": 4
   },
   {
    "g": "mar",

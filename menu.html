@@ -460,40 +460,40 @@ const MENU = {
     "opzioni": [
       {
         "portate": 6,
-        "prezzo": 85,
-        "vini": 60
+        "prezzo": 80,
+        "vini": 50
       },
       {
         "portate": 7,
-        "prezzo": 110,
-        "vini": 70
+        "prezzo": 100,
+        "vini": 60
       }
     ],
     "nota": "Prezzo a persona, menù da considerarsi per l'intero tavolo.<br>I menù sono disponibili fino alle 22:00",
     "percorsi": {
       "Sei": [
         {
-          "nome": "Calamaro nostrano, bagna cauda, kefir",
+          "nome": "\"Macchetto lo dico a fare ...\"",
           "sostenibile": true
         },
         {
-          "nome": "Animella di vitello, sedano rapa, nocciole, fondo di pesce",
+          "nome": "\"Ostrica boschiva\"",
           "sostenibile": true
         },
         {
-          "nome": "Spaghettoni quadrati <em>Mancini</em>, anemoni di mare, nduja, maggiorana",
+          "nome": "\"Sanna\"",
           "sostenibile": true
         },
         {
-          "nome": "Tubetti <em>Mancini</em>, baccalà, spinaci, kosho di agrumi",
+          "nome": "\"Scarto nobile\"",
           "sostenibile": true
         },
         {
-          "nome": "Ombrina nostrana, scarola, foglie di fico",
+          "nome": "\"Buridda chaperon\"",
           "sostenibile": true
         },
         {
-          "nome": "Gelato al limone nero, levistico, lime, cracker di latte"
+          "nome": "\"Insalata di panissa\""
         }
       ],
       "Sette": "Menù a mano libera dello Chef"
@@ -506,8 +506,8 @@ const MENU = {
       "titolo": "Crudi",
       "piatti": [
         {
-          "nome": "Ostriche Gillardeau",
-          "prezzo": 7,
+          "nome": "Ostriche Fine de Claire",
+          "prezzo": 4,
           "unita": "cad."
         },
         {
@@ -522,7 +522,7 @@ const MENU = {
         },
         {
           "nome": "Scampi nostrani",
-          "prezzo": 14,
+          "prezzo": 16,
           "unita": "cad.",
           "sostenibile": true
         },
@@ -551,29 +551,33 @@ const MENU = {
       "titolo": "Sfiziosi",
       "piatti": [
         {
-          "nome": "Dentice reale nostrano crudo, ricci di mare, limone, mandorle",
-          "prezzo": 27,
-          "sostenibile": true
+          "nome": "\"Macchetto lo dico a fare ...\"",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Lattughina ripiena, peperoni e macchetto di acciughe"
         },
         {
-          "nome": "Gamberi viola crudi alla puttanesca",
-          "prezzo": 23,
-          "sostenibile": true
+          "nome": "\"Oggni ricciola un capriccio\"",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Ricciola, salvia, barbabietola in agro, porri, rafano"
         },
         {
-          "nome": "Calamaro nostrano, bagna cauda, kefir",
-          "prezzo": 19,
-          "sostenibile": true
+          "nome": "\"Sanna\"",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Totani, gamberi rosa, melanzana, cavolo nero, cipolla rossa"
         },
         {
-          "nome": "Animella di vitello, sedano rapa, nocciole, riduzione di fondo di pesce",
-          "prezzo": 19,
-          "sostenibile": true
+          "nome": "\"Ostrica boschiva\"",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Ostrica in tempura, porcini, mele cotogna, cetrioli"
         },
         {
           "nome": "“Non formaggi”",
           "prezzo": 22,
-          "descrizione": "(Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla)"
+          "descrizione": "Degustazione di finti formaggi artigianali a base anacardi e latte di mandorla"
         }
       ],
       "titolo_display": "Antipasti"
@@ -582,24 +586,28 @@ const MENU = {
       "titolo": "Amidi e Carboidrati",
       "piatti": [
         {
-          "nome": "Spaghettoni quadrati <em>Mancini</em>, anemoni di mare, nduja, maggiorana",
-          "prezzo": 32,
-          "sostenibile": true
+          "nome": "\"Scarto nobile\"",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Tortelli di ricciola e dentice, zafferano, uva, prezzemolo"
         },
         {
-          "nome": "Bottoni di moscardini affogati, finferli, vongole, friggitelli, paprika affumicata",
-          "prezzo": 29,
-          "sostenibile": true
+          "nome": "\"Tomamilla\"",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Spaghetti, burro alla camomilla, toma di pecora brigasca, pepe nero tostato"
         },
         {
-          "nome": "Tubetti <em>Mancini</em>, baccalà, spinaci, kosho di agrumi",
-          "prezzo": 22,
-          "sostenibile": true
+          "nome": "\"Ganbou di rapa\"",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Riso <em>Riserva San Massimo</em>, scampi e gamberi, cime di rapa"
         },
         {
-          "nome": "Riso <em>Riserva San Massimo</em>, ostriche, nespole, albicocche",
-          "prezzo": 29,
-          "sostenibile": true
+          "nome": "\"Itosnap\"",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Pansori ripieni di salsa di noci in brodo di porcini"
         }
       ],
       "titolo_display": "Amidi e Carboidrati"
@@ -608,23 +616,28 @@ const MENU = {
       "titolo": "Non Solo Mare",
       "piatti": [
         {
-          "nome": "Ricciola nostrana, melanzane, umami di pomodoro e peperone, tahina",
-          "prezzo": 32,
+          "nome": "\"Curry curry uagliò\"",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Dentice, zucchine, curry, ananas, friggitelli, arachidi"
+        },
+        {
+          "nome": "\"Buridda chaperon\"",
+          "prezzo": null,
+          "descrizione": "Ricciola, buridda di seppie, mango",
           "sostenibile": true
         },
         {
-          "nome": "Porro arrostito, noci macadamia, fondo di verdure e pesche",
-          "prezzo": 14
+          "nome": "\"Mr. Bean\"",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Baccalà, cannellini, lardo, salsa aioli"
         },
         {
-          "nome": "Ombrina nostrana, scarola, foglie di fico",
-          "prezzo": 32,
-          "sostenibile": true
-        },
-        {
-          "nome": "Agnello, pak choi, fondo",
-          "prezzo": 27,
-          "sostenibile": true
+          "nome": "\"Coniggio\"",
+          "prezzo": null,
+          "sostenibile": true,
+          "descrizione": "Coniglio fritto, cavolfiori, porcini, cachi, menta"
         }
       ],
       "titolo_display": "Non Solo Mare"

@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!-- v 2026.09.28.07 — Bug scoperto da Andrea sulle preview EN/FR: il percorso "7" vuoto in italiano
+     continuava a comparire tradotto (testo "congelato" da prima dello svuotamento). Fix in
+     costruisciMenuTradotto (admin-templates-shared.js v 2026.09.28.04): la traduzione statica si
+     applica solo se il percorso italiano non è vuoto. Applicato anche a mano a menu-en.html/
+     menu-fr.html per effetto immediato. -->
 <!-- v 2026.09.28.06 — Fix richiesto da Andrea subito dopo la v.05: se un percorso degustazione è
      vuoto, ora sparisce anche la sua riga nelle "Opzioni prezzo" in cima al blocco (es. "7 portate
      100..." restava visibile anche col percorso "7" già nascosto). Bump ?v= admin-templates-
@@ -2389,7 +2394,7 @@
 <div class="toast" id="toast">✓ Scaricato!</div>
 
 <script src="admin-translations.js"></script>
-<script src="admin-templates-shared.js?v=2026.09.28.03"></script>
+<script src="admin-templates-shared.js?v=2026.09.28.04"></script>
 <script src="admin-core.js?v=2026.09.28.02"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 <script>
@@ -7557,7 +7562,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.28.06</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.28.07</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

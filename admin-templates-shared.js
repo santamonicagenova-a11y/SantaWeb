@@ -1,4 +1,13 @@
-// admin-templates-shared.js — v 2026.09.28.03
+// admin-templates-shared.js — v 2026.09.28.04
+// v 2026.09.28.04 — bug scoperto da Andrea sulle preview EN/FR: il percorso "7" vuoto in italiano
+//   continuava a comparire in inglese/francese con un testo tradotto "congelato" da prima che
+//   Andrea lo svuotasse (costruisciMenuTradotto sovrascriveva SEMPRE m.degustazione.percorsi[lbl7]
+//   con t.percorso_7, la traduzione statica salvata in TRANSLATIONS, indipendentemente da quanto
+//   l'italiano fosse vuoto o no). Fix: la sostituzione avviene solo se il percorso 7 italiano NON
+//   è vuoto; se è vuoto resta vuoto anche in EN/FR, così le regole già introdotte in v.02/v.03
+//   (percorso e riga prezzo nascosti se vuoti) scattano correttamente anche nelle lingue tradotte.
+//   Applicato anche a mano a menu-en.html/menu-fr.html (percorsi["7"] svuotato) per effetto
+//   immediato, oltre che al codice sorgente di costruisciMenuTradotto.
 // v 2026.09.28.03 — richiesto da Andrea subito dopo la v.02: se un percorso è vuoto, ora sparisce
 //   anche la sua riga nelle "Opzioni prezzo" in cima al blocco Degustazione (es. "7 portate 100,
 //   eventuale abbinamento vini 60" restava visibile anche col percorso "7" già nascosto). buildDegu
@@ -99,7 +108,10 @@ function costruisciMenuTradotto(menuForm, t) {
   // Chiavi dinamiche percorsi
   var lbl6 = m.degustazione.percorso_label_6 || '6';
   var lbl7 = m.degustazione.percorso_label_7 || '7';
-  if (m.degustazione.percorsi[lbl7] !== undefined) m.degustazione.percorsi[lbl7] = t.percorso_7;
+  if (m.degustazione.percorsi[lbl7] !== undefined) {
+    var eraVuoto7 = !String(m.degustazione.percorsi[lbl7] || '').trim();
+    m.degustazione.percorsi[lbl7] = eraVuoto7 ? '' : t.percorso_7;
+  }
   if (Array.isArray(m.degustazione.percorsi[lbl6])) {
     m.degustazione.percorsi[lbl6].forEach(function(p) {
       if (p) p.nome = tr(p.nome);

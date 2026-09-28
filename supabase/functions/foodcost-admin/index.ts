@@ -116,6 +116,11 @@
 // Nuove azioni: ingredienti_list/create/update/delete, ricetta_get, ricetta_save.
 // Riferimento di progettazione: DESIGN_foodcost-giornaliero_v2026.09.11.01.md
 // (progetto-sito).
+// v14 (2026-09-28) — richiesto da Andrea: nello storico conteggi dell'Inventario
+// mancava l'importo, si vedeva solo quanti reparti erano stati contati per data.
+// inventario_periodi_disponibili ora somma valore su tutti i reparti contati in
+// quella data e lo restituisce come valore_totale in date_dettaglio (per data
+// parziale è la somma dei soli reparti già contati, non l'inventario completo).
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
@@ -953,22 +958,25 @@ Deno.serve(async (req) => {
     // v7: aggiunto date_dettaglio (ogni data con almeno un conteggio + copertura
     // reparti/totale) per la vista calendario/heatmap richiesta da Andrea, utile
     // con una cadenza di conteggio irregolare per individuare a colpo d'occhio i buchi.
+    // v14: date_dettaglio ha anche valore_totale (somma dei conteggi contati in quella data).
     } else if (action === "inventario_periodi_disponibili") {
       const tipo = body.tipo === "beverage" ? "beverage" : "food";
       const repartiRes = await supabase.from("fc_reparti").select("id").eq("attivo", true).eq("tipo", tipo);
       if (repartiRes.error) throw repartiRes.error;
       const repartiIds = (repartiRes.data || []).map((r: any) => r.id);
       if (!repartiIds.length) return json({ ok: true, tipo, date_complete: [], periodi: [], date_dettaglio: [] });
-      const conteggiRes = await supabase.from("fc_inventario_conteggi").select("data, reparto_id").in("reparto_id", repartiIds);
+      const conteggiRes = await supabase.from("fc_inventario_conteggi").select("data, reparto_id, valore").in("reparto_id", repartiIds);
       if (conteggiRes.error) throw conteggiRes.error;
       const repartiPerData = new Map<string, Set<string>>();
+      const valorePerData = new Map<string, number>();
       for (const row of conteggiRes.data || []) {
         if (!repartiPerData.has(row.data)) repartiPerData.set(row.data, new Set());
         repartiPerData.get(row.data)!.add(row.reparto_id);
+        valorePerData.set(row.data, (valorePerData.get(row.data) || 0) + n(row.valore));
       }
       const totaleReparti = repartiIds.length;
       const dateDettaglio = Array.from(repartiPerData.entries())
-        .map(([data, set]) => ({ data, contati: set.size, totale: totaleReparti }))
+        .map(([data, set]) => ({ data, contati: set.size, totale: totaleReparti, valore_totale: valorePerData.get(data) || 0 }))
         .sort((a, b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : 0));
       const dateComplete = dateDettaglio.filter((d) => d.contati === d.totale).map((d) => d.data);
       const periodi = [];

@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- v 2026.09.28.01 — Food Cost → Inventario: nello storico conteggi (heatmap) ogni cella mostra ora
+     anche l'importo totale del conteggio di quella data, non solo il giorno del mese (richiesta
+     Andrea). Backend: edge function foodcost-admin v14, inventario_periodi_disponibili somma
+     "valore" per data e lo restituisce come valore_totale in date_dettaglio; per una data parziale
+     (giallo) è la somma dei soli reparti già contati. Frontend: fcRenderPeriodiDisponibili, celle
+     più larghe (day + € su due righe) e tooltip esteso col totale. -->
 <!-- v 2026.09.27.07 — Riorganizzazione pulsanti pannello iniziale (richiesta Andrea): "Prenotazioni
      online" spostato dal tab "Prenotazioni e voucher" al tab "Setup" (era il primo bottone di
      "pren", ora primo di "setup"); "Foto cucina" e "Foto sito" spostati dal tab "Gestione menù e
@@ -4953,6 +4959,9 @@ function fcLoadInventario() {
 // data, giallo = parziale) + i periodi già "chiusi" (conteggio completo a inizio
 // e fine) come chip cliccabili per caricarli in Dashboard. Indipendente dalla
 // data selezionata sopra: dipende solo dal tipo (food/beverage) attivo.
+// v 2026.09.28.01: ogni cella mostra anche l'importo totale del conteggio di
+// quella data (richiesto da Andrea), non solo il giorno — dato da valore_totale
+// dell'edge function (foodcost-admin v14).
 function fcLoadPeriodiDisponibili() {
   var el = document.getElementById('fc-periodi-list');
   if (!el) return;
@@ -4983,7 +4992,11 @@ function fcRenderPeriodiDisponibili(payload) {
       var completo = d.contati === d.totale;
       var colore = completo ? '#199e70' : '#eab308';
       var giorno = d.data.slice(8, 10);
-      return '<div title="' + _fcEsc(d.data) + ': ' + d.contati + '/' + d.totale + ' reparti contati" style="width:1.6rem;height:1.6rem;border-radius:4px;background:' + colore + ';color:#fff;font-size:.62rem;display:flex;align-items:center;justify-content:center;font-weight:600;">' + _fcEsc(giorno) + '</div>';
+      var valore = _fcEur(d.valore_totale);
+      return '<div title="' + _fcEsc(d.data) + ': ' + d.contati + '/' + d.totale + ' reparti contati · ' + valore + '" style="width:2.9rem;height:2.15rem;border-radius:4px;background:' + colore + ';color:#fff;font-size:.62rem;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:600;line-height:1.15;">' +
+        '<span>' + _fcEsc(giorno) + '</span>' +
+        '<span style="font-size:.55rem;font-weight:500;opacity:.92;">' + _fcEsc(valore) + '</span>' +
+        '</div>';
     }).join('');
     return '<div style="margin-bottom:.4rem;">' +
       '<div style="font-size:.68rem;color:var(--stone);margin-bottom:.2rem;">' + _fcEsc(mese) + '</div>' +
@@ -7515,7 +7528,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.27.07</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.28.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

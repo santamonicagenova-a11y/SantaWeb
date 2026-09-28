@@ -465,6 +465,7 @@ const MENU = {
     ],
     "nota": "Prix par personne, menu à partager par toute la table.<br>Les menus sont disponibles jusqu'à 13h30 pour le déjeuner et 21h30 pour le dîner.",
     "percorsi": {
+      "7": "Menu carte blanche du Chef",
       "Sei": [
         {
           "nome": "« Macchetto, je le dis juste comme ça… »",
@@ -489,18 +490,17 @@ const MENU = {
         {
           "nome": "« Salade de panissa »"
         }
-      ],
-      "Sette": "Menu carte blanche du Chef"
+      ]
     },
     "percorso_label_6": "Sei",
-    "percorso_label_7": "Sette"
+    "percorso_label_7": "7"
   },
   "sezioni": [
     {
       "titolo": "Crudi",
       "piatti": [
         {
-          "nome": "Huîtres Fine de Claire",
+          "nome": "Huîtres « Fine de Claire »",
           "prezzo": 4,
           "unita": "p."
         },
@@ -527,13 +527,13 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Uniquement du poisson cru (pas d&#x27;huîtres, pas de crustacés)",
+          "nome": "Uniquement des poissons crus (pas d&#x27;huîtres, pas de crustacés)",
           "prezzo": 35,
           "sostenibile": true,
           "staccato": true
         },
         {
-          "nome": "Assortiment de fruits de mer crus (poissons, crustacés, huîtres)",
+          "nome": "Assortiment de produits crus (poisson, crustacés, huîtres)",
           "prezzo": 75,
           "sostenibile": true,
           "staccato": true
@@ -548,7 +548,7 @@ const MENU = {
           "nome": "« Macchetto, je le dis juste comme ça… »",
           "prezzo": null,
           "sostenibile": true,
-          "descrizione": "Petites laitues farcies, poivrons et macchetto aux anchois"
+          "descrizione": "Petite laitue farcie, poivrons et macchetto d&#x27;anchois"
         },
         {
           "nome": "« Chaque ricciola a ses caprices »",
@@ -583,13 +583,13 @@ const MENU = {
           "nome": "« Déchet noble »",
           "prezzo": null,
           "sostenibile": true,
-          "descrizione": "Tortelli à la sériole et au denté, safran, raisin, persil"
+          "descrizione": "Tortelli à la sériole et au denté, safran, raisins, persil"
         },
         {
           "nome": "« Tomamilla »",
           "prezzo": null,
           "sostenibile": true,
-          "descrizione": "Spaghetti, beurre à la camomille, toma de brebis de Brigasca, poivre noir grillé"
+          "descrizione": "Spaghetti, beurre à la camomille, toma de brebis de Brigasca, poivre noir torréfié"
         },
         {
           "nome": "« Ganbou au navet »",
@@ -611,9 +611,9 @@ const MENU = {
       "piatti": [
         {
           "nome": "« Curry curry, les gars ! »",
-          "prezzo": null,
+          "prezzo": 32,
           "sostenibile": true,
-          "descrizione": "Dentice, courgettes, curry, ananas, piments « friggitelli », cacahuètes"
+          "descrizione": "Dentex, courgettes, curry, ananas, piments « friggitelli », cacahuètes"
         },
         {
           "nome": "« Buridda chaperon »",
@@ -640,23 +640,26 @@ const MENU = {
       "titolo": "Golosità",
       "piatti": [
         {
-          "nome": "Glace au citron noir, au livèche, au citron vert et aux biscuits au lait",
-          "prezzo": 12
+          "nome": "« Salade de panissa »",
+          "prezzo": 10,
+          "descrizione": "Cannolo aux pois chiches, prescinseua, olives de Taggia, chocolat"
         },
         {
-          "nome": "Ananas, parfait au charbon, caramel au café",
-          "prezzo": 12
+          "nome": "« Tradizionello »",
+          "prezzo": 10,
+          "descrizione": "Canestrello, crème au chocolat, fruits des bois"
         },
         {
-          "nome": "Glace aux cèpes, fraises, terre au chocolat",
-          "prezzo": 12
+          "nome": "\"Ripienamisù\"",
+          "prezzo": 10,
+          "descrizione": "Savoiardo, mascarpone, gelato al caffè"
         },
         {
           "nome": "Sacripantina",
-          "prezzo": 12
+          "prezzo": 11
         },
         {
-          "nome": "Fromage bleu ligure et Picolit Zorzettig",
+          "nome": "Fromage persillé ligurien et Picolit Zorzettig",
           "prezzo": 12
         }
       ],
@@ -737,7 +740,7 @@ const MENU = {
         "titolo_display": "Antipasti",
         "piatti": [
           {
-            "nome": "Denté royal local cru, oursins, citron, amandes",
+            "nome": "Dentice reale nostrano crudo, ricci di mare, limone, mandorle",
             "allergeni": [
               "gluten",
               "poisson",
@@ -745,13 +748,13 @@ const MENU = {
             ]
           },
           {
-            "nome": "Crevettes violettes crues à la puttanesca",
+            "nome": "Gamberi viola crudi alla puttanesca",
             "allergeni": [
               "crustacés"
             ]
           },
           {
-            "nome": "Calamars locaux, bagna cauda, kéfir",
+            "nome": "Calamaro nostrano, bagna cauda, kefir",
             "allergeni": [
               "poisson",
               "lait",
@@ -780,14 +783,14 @@ const MENU = {
         "titolo_display": "Pâtes & Céréales",
         "piatti": [
           {
-            "nome": "Spaghettoni carrés Mancini, anémones de mer, nduja, marjolaine",
+            "nome": "Spaghettoni quadrati Mancini, anemoni di mare, nduja, maggiorana",
             "allergeni": [
               "gluten",
               "lait"
             ]
           },
           {
-            "nome": "Petits poulpes à l&#x27;étouffée, chanterelles, palourdes, piments « friggitelli », paprika fumé",
+            "nome": "Bottoni di moscardini affogati, finferli, vongole, friggitelli, paprika affumicata",
             "allergeni": [
               "gluten",
               "œufs",
@@ -798,7 +801,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "Tubetti Mancini, morue, épinards, kosho aux agrumes",
+            "nome": "Tubetti Mancini, baccalà, spinaci, kosho di agrumi",
             "allergeni": [
               "gluten",
               "poisson",
@@ -807,7 +810,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "Riz « Riserva San Massimo », huîtres, nèfles, abricots",
+            "nome": "Riso Riserva San Massimo, ostriche, nespole, albicocche",
             "allergeni": [
               "gluten",
               "poisson",
@@ -822,7 +825,7 @@ const MENU = {
         "titolo_display": "Pas Seulement la Mer",
         "piatti": [
           {
-            "nome": "Sériole locale, aubergines, umami de tomate et de poivron, tahini",
+            "nome": "Ricciola nostrana, melanzane, umami di pomodoro e peperone, tahina",
             "allergeni": [
               "poisson",
               "sésame",
@@ -830,14 +833,14 @@ const MENU = {
             ]
           },
           {
-            "nome": "Poireau rôti, noix de macadamia, fond de légumes et pêches",
+            "nome": "Porro arrostito, noci macadamia, fondo di verdure e pesche",
             "allergeni": [
               "fruits à coque",
               "céleri"
             ]
           },
           {
-            "nome": "Ombrine locale, scarole, feuilles de figuier",
+            "nome": "Ombrina nostrana, scarola, foglie di fico",
             "allergeni": [
               "œufs",
               "poisson",
@@ -847,7 +850,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "Agneau, pak choï, fond",
+            "nome": "Agnello, pak choi, fondo",
             "allergeni": [
               "soja",
               "lait",

@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<!-- v 2026.09.28.01 — Rimosso il banner overlay "Vacanzina" (chiusura 21/09-28/09, introdotto
+     v 2026.09.20.01/.02): la chiusura è finita, richiesto da Andrea di toglierlo. Rimossi il div,
+     lo style e lo script associati (nessun altro file lo referenzia). -->
 <!-- v 2026.09.27.03 — Immagini sezioni Cucina/Cantina: src diretti su img/sito/*.webp (prima img/*.jpg in 404, sostituiti solo via JS) e alt statici allineati alle foto reali (sala, veranda, tramonto: i vecchi alt descrivevano piatti/cantina che non ci sono). -->
 <!-- v 2026.09.27.02 — Immagini: (1) creati img/hero.jpg (1200x630, anteprima social og/twitter + JSON-LD image) e img/logo-santamonica.png (JSON-LD logo): erano 404 → anteprime WhatsApp/Facebook senza foto; (2) hero <img> punta direttamente a img/sito/hero.webp (prima img/hero.jpg in 404 + sostituzione via JS = LCP lento) con fetchpriority="high" e preload ripristinato. NB: se si cambia la foto hero dal pannello, aggiornare anche il preload qui. -->
 <!-- v 2026.09.27.01 — SEO/a11y: landmark <main> attorno al contenuto (hero → FAQ); nav, menu mobile e footer restano fuori. Nessun cambio visivo. -->
@@ -608,43 +611,6 @@
 
 </head>
 <body>
-
-<!-- v 2026.09.20.02 — Banner "Vacanzina": durata auto-chiusura portata da 2s a 4s su richiesta. -->
-<!-- v 2026.09.20.01 — Banner temporaneo "Andiamo in Vacanzina" (chiusura 21/09-28/09): overlay
-     con l'immagine annuncio, mostrato una sola volta per sessione del browser (sessionStorage),
-     chiusura automatica dopo 4s (fade-out) o al click. Da rimuovere/disattivare dopo il rientro. -->
-<div id="banner-vacanzina" class="banner-vacanzina-overlay" role="dialog" aria-label="Avviso chiusura temporanea">
-  <img src="/img/sito/vacanzina-chiusura-2026-09.jpg" alt="Andiamo in Vacanzina — chiuso dal 21/09 al 28/09">
-</div>
-<style>
-  .banner-vacanzina-overlay{
-    position:fixed; inset:0; z-index:9999;
-    display:flex; align-items:center; justify-content:center;
-    background:rgba(0,0,0,.55);
-    opacity:1; transition:opacity .4s ease;
-    cursor:pointer;
-  }
-  .banner-vacanzina-overlay.is-hidden{ opacity:0; pointer-events:none; }
-  .banner-vacanzina-overlay img{
-    max-width:min(90vw,420px); max-height:80vh;
-    border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,.35);
-  }
-</style>
-<script>
-(function(){
-  var KEY='vacanzinaBannerShown_2026-09';
-  var el=document.getElementById('banner-vacanzina');
-  if(!el) return;
-  if(sessionStorage.getItem(KEY)){ el.remove(); return; }
-  sessionStorage.setItem(KEY,'1');
-  function hide(){
-    el.classList.add('is-hidden');
-    setTimeout(function(){ el.remove(); },400);
-  }
-  el.addEventListener('click',hide);
-  setTimeout(hide,4000);
-})();
-</script>
 
 <nav id="main-nav">
   <a href="#" class="nav-logo">Santamonica <span class="sub">sul mare</span></a>

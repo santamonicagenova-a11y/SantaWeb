@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.09.28.09",
+  version: "2026.09.28.10",
   updated: "2026-09-28",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -187,6 +187,7 @@ window.SANTAMONICA_GANTT = {
       {t:'★ Obiettivo +20% infrasettimanale (mis. nov–gen)', s:'2026-11-01', e:'2027-01-31', st:'future', ms:true},
       {t:'Filone B — Picco strategico: adv Nord Italia + push concierge/PR alta stagione (se leading positivi)', s:'2027-03-01', e:'2027-08-31', st:'future'},
       {t:'Sponsorizzata Salone Nautico', s:'2026-09-25', st:'prog'},
+      {t:'Post Instagram orari di apertura — grafica Canva rifatta, calendario dal 1/10 (pronto, non pubblicato)', s:'2026-09-28', st:'prog'},
     ]},
     { key:'nsa', name:'NoShowApp (prodotto SaaS)', badge:'progetto-nsa', tasks:[
       {t:'NoShowApp fasi 1-5 completate (MVP no-show condiviso, accesso a invito, admin, UI + dominio, garanzia carta Stripe in test)', s:'2026-03-20', e:'2026-05-03', st:'done'},

@@ -1,14 +1,14 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-09-28",
- "versione": "2026.09.28.09",
- "briefing": "**Briefing 28/9/2026** — Sessione molto lunga con diverse richieste dirette. **Food Cost**: (1) storico conteggi Inventario mostra ora anche l'importo per ogni data; (2) la sezione si apre sempre su Dashboard. **Dolci**: Calcolo Food Cost mostrava piatti vecchi e nuovi insieme di \"Golosità\" — ripulito, riagganciata la scheda costo di Sacripantina. **Traduci e Pubblica**: risolto il popup \"Traduzioni fallite\" (HTTP 429 DeepL) — ora riprova automaticamente. **Menù Degustazione**: checkbox \"Escludi dalla stampa\" per i percorsi 6/7, più tre bug a catena chiusi (percorso vuoto visibile online, riga prezzo residua, traduzione EN/FR congelata) — ora un percorso senza contenuto non si mostra più da nessuna parte. **Home**: rimosso il banner \"Vacanzina\" scaduto. **Voucher regalo**: allineati al Menù Degustazione (disponibilità/titolo/prezzo) — e nel farlo scoperto e corretto un mismatch di prezzo REALE tra quanto mostrato in regala.html (170€) e quanto realmente addebitato da Stripe (180€), mai notato prima. Tutto già live. **Aspetta te**: verifica dal vivo Food Cost, controlla che su regala.html resti solo \"Degustazione 6 portate\" (il 7 è vuoto), riempi il percorso \"7\" quando è pronto. **Prossimo**: resta aperto il giro di verifica generale dei flussi Food Cost dopo il backend ricostruito il 26/9; se ricapita un duplicato su un'altra sezione rinominata (carta o dolci), stessa causa nota — vedi task dedicata.",
+ "versione": "2026.09.28.10",
+ "briefing": "**Briefing 28/9/2026 (sera)** — **Sito** (già live): Food Cost (importo per data nello storico conteggi, apertura su Dashboard, pulizia dolci \"Golosità\"), retry automatico su 429 DeepL in Traduci e Pubblica, checkbox \"Escludi dalla stampa\" per i percorsi degustazione (+ 3 bug a catena chiusi), rimosso il banner \"Vacanzina\", voucher regalo allineati al Menù Degustazione (corretto un mismatch reale 170€ mostrato / 180€ addebitato da Stripe). **Marketing**: post Instagram orari di apertura rifatto su Canva (copia `DAHWhGgzoyA`, orari dal sito, calendario dal 1/10) — pronto, non pubblicato; **P3 saltata su tua decisione = debito dichiarato**. **Aspetta te**: pubblicare il post dal 1/10 e scegliere i canali; verifica dal vivo Food Cost; su regala.html deve restare solo \"Degustazione 6 portate\"; riempire il percorso \"7\". **Prossimo**: giro di verifica dei flussi Food Cost; sul PC eseguire `check`, `build-gantt`, `build-pannello`, `publish` (rimandati: sessione senza terminale).",
  "kpi": {
-  "aperte": 49,
+  "aperte": 51,
   "scadute": 3,
   "bloccate": 1,
-  "andrea": 12,
-  "debiti": 8,
+  "andrea": 13,
+  "debiti": 9,
   "chiuse30": 36
  },
  "subs": {
@@ -46,15 +46,15 @@ window.JARVIS_DATA = {
    "debiti": 7
   },
   "Marketing": {
-   "tot": 34,
+   "tot": 36,
    "done": 17,
-   "prog": 2,
+   "prog": 3,
    "up": 2,
-   "future": 12,
+   "future": 13,
    "bloccato": 1,
    "scadute": 3,
-   "andrea": 4,
-   "debiti": 1
+   "andrea": 5,
+   "debiti": 2
   },
   "Trasversale": {
    "tot": 7,
@@ -199,6 +199,18 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
+  },
+  {
+   "t": "Post Instagram orari di apertura — grafica Canva rifatta, calendario dal 1/10 (pronto, non pubblicato)",
+   "sub": "Marketing",
+   "st": "prog",
+   "s": "2026-09-28",
+   "e": null,
+   "own": "Andrea",
+   "az": "Pubblicare il post dal 1/10 (il calendario mostrato è quello dal 1/10) e scegliere i canali; opzionale: logo (nessun Brand Kit su Canva)",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-28"
   },
   {
    "t": "Sponsorizzata Salone Nautico",
@@ -387,6 +399,18 @@ window.JARVIS_DATA = {
    "agg": "2026-09-27"
   },
   {
+   "t": "Post Instagram orari di apertura — grafica Canva rifatta, calendario dal 1/10 (pronto, non pubblicato)",
+   "sub": "Marketing",
+   "st": "prog",
+   "s": "2026-09-28",
+   "e": null,
+   "own": "Andrea",
+   "az": "Pubblicare il post dal 1/10 (il calendario mostrato è quello dal 1/10) e scegliere i canali; opzionale: logo (nessun Brand Kit su Canva)",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-28"
+  },
+  {
    "t": "Sponsorizzata Salone Nautico",
    "sub": "Marketing",
    "st": "prog",
@@ -466,6 +490,11 @@ window.JARVIS_DATA = {
  "sessioni": [
   {
    "d": "2026-09-28",
+   "sub": "Marketing",
+   "t": "Post Instagram orari di apertura (grafica Canva)"
+  },
+  {
+   "d": "2026-09-28",
    "sub": "Sito",
    "t": "Checkbox escludi dalla stampa per percorso degustazione"
   },
@@ -498,11 +527,6 @@ window.JARVIS_DATA = {
    "d": "2026-09-28",
    "sub": "Sito",
    "t": "Voucher regalo sincronizzato con Menù Degustazione"
-  },
-  {
-   "d": "2026-09-27",
-   "sub": "SEO",
-   "t": "riprogrammazione + dominio, immagini, menu, GSC via API"
   }
  ],
  "perWeek": [
@@ -552,13 +576,13 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-28",
-   "n": 7
+   "n": 8
   }
  ],
  "perDay": [
   {
    "g": "lun",
-   "n": 10
+   "n": 11
   },
   {
    "g": "mar",

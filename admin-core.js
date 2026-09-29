@@ -1360,7 +1360,15 @@ function costruisciAllergeniPerCarta(lang) {
   // 2) DOLCI (da menu-dolci.html, campo MENU.allergeni)
   var dolciAll = (_dolciCartaLive && _dolciCartaLive.allergeni) ||
                  (typeof MENU_DOLCI_IT !== 'undefined' && MENU_DOLCI_IT && MENU_DOLCI_IT.allergeni) || null;
-  if (dolciAll && dolciAll.length) {
+  // v 2026.09.29.03 — se la pagina Allergeni carta ha già la sezione dei dolci (es. Golosità), NON
+  // aggiungere l'elenco MENU.allergeni di menu-dolci.html (vecchio, non modificabile da admin):
+  // compariva doppio con i piatti vecchi (Gelato al limone nero, …).
+  var dolciSezMenu = ((_dolciCartaLive && _dolciCartaLive.sezioni) || (typeof MENU_DOLCI_IT !== 'undefined' && MENU_DOLCI_IT && MENU_DOLCI_IT.sezioni) || []);
+  var titoliDolci = dolciSezMenu.map(function (s) { return _pdNorm(s.titolo_display || s.titolo); });
+  var dolciGiaInCarta = ((_allergeniCartaLive && _allergeniCartaLive.sezioni) || []).some(function (s) {
+    return titoliDolci.indexOf(_pdNorm(s.titolo)) >= 0;
+  });
+  if (dolciAll && dolciAll.length && !dolciGiaInCarta) {
     sezioni.push({
       titolo_display: (typeof TRADUZIONI_DOLCI !== 'undefined' && TRADUZIONI_DOLCI[lang] && TRADUZIONI_DOLCI[lang].sezione) || T.dolciTitolo,
       piatti: dolciAll.map(function(p) {

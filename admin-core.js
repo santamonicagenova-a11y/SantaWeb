@@ -1783,8 +1783,15 @@ function _pdEseguiPiano(piano, token, piattiAttualiCompleti, callback) {
   piano.nuovi.forEach(function (p) { azioni.push({ tipo: 'create', sezione: p.sezione, piatto: p.nome }); });
 
   var i = 0;
+  var falliti = [];
   function next() {
-    if (i >= azioni.length) { callback(true); return; }
+    if (i >= azioni.length) {
+      if (falliti.length) {
+        alert('Dettagli piatti: ' + falliti.length + ' operazione/i NON riuscita/e:\n\n' + falliti.join('\n') +
+          '\n\nSe è una cancellazione: il piatto ha ancora una scheda in Food Cost (Costo piatti / ricetta) che lo tiene agganciato. Il menù è stato pubblicato lo stesso.');
+      }
+      callback(true); return;
+    }
     var a = azioni[i++];
     var payload;
     if (a.tipo === 'delete') {
@@ -1809,8 +1816,11 @@ function _pdEseguiPiano(piano, token, piattiAttualiCompleti, callback) {
     payload.github_token = token;
     fetch(PD_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
       .then(function (r) { return r.json(); })
-      .then(function (res) { if (res && res.ok && Array.isArray(res.piatti)) working = res.piatti; })
-      .catch(function (e) { console.warn('[Dettagli piatti sync] azione fallita: ' + e.message); })
+      .then(function (res) {
+        if (res && res.ok && Array.isArray(res.piatti)) working = res.piatti;
+        else falliti.push('• ' + a.tipo + ' — ' + (a.piatto || a.id) + ((res && res.error) ? ' (' + res.error + ')' : ''));
+      })
+      .catch(function (e) { falliti.push('• ' + a.tipo + ' — ' + (a.piatto || a.id) + ' (' + e.message + ')'); console.warn('[Dettagli piatti sync] azione fallita: ' + e.message); })
       .then(function () { setTimeout(next, 150); });
   }
   next();
@@ -1830,6 +1840,12 @@ function _pdSincronizzaEProsegui(mDaPubblicare, token, callback) {
     var res = results[0];
     if (!res || !res.ok) { callback(); return; }
     var piano = _pdCalcolaPiano(mDaPubblicare.sezioni, res.piatti || []);
+    // Piatti "da tenere": se rispondi Annulla, i piatti da rimuovere si ricordano (in questo browser)
+    // e non vengono più proposti finché non cambiano.
+    var tenuti = [];
+    try { tenuti = JSON.parse(localStorage.getItem('pd_rimossi_tenuti') || '[]'); } catch (e) { tenuti = []; }
+    var chiaveRim = function (p) { return _pdNorm(p.sezione) + '|' + _pdNorm(p.piatto); };
+    piano.rimossi = piano.rimossi.filter(function (p) { return tenuti.indexOf(chiaveRim(p)) < 0; });
     if (!(piano.nuovi.length || piano.rimossi.length || piano.rinominati.length)) { callback(); return; }
     var msg = 'Dettagli piatti (allergeni) — la pubblicazione porta questi cambiamenti:\n\n' +
       _pdRiepilogoPiano(piano) +
@@ -1837,6 +1853,11 @@ function _pdSincronizzaEProsegui(mDaPubblicare, token, callback) {
     if (window.confirm(msg)) {
       _pdEseguiPiano(piano, token, res.piatti || [], function () { callback(); });
     } else {
+      // Annulla = tengo questi piatti in Dettagli piatti: non richiederli più
+      if (piano.rimossi.length) {
+        piano.rimossi.forEach(function (p) { var k = chiaveRim(p); if (tenuti.indexOf(k) < 0) tenuti.push(k); });
+        try { localStorage.setItem('pd_rimossi_tenuti', JSON.stringify(tenuti)); } catch (e) {}
+      }
       callback();
     }
   }).catch(function () { callback(); });

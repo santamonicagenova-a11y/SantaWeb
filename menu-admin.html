@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.29.05 — Food Cost → Calcolo Food Cost: elenco piatti nell'ordine della carta pubblicata con lo stesso colore per sezione di Vendite (helper _fcOrdinaEColoraPerCarta); i piatti non piu' in carta in un gruppo in fondo. + footer-version. -->
 <!-- v 2026.09.29.04 — Food Cost → Vendite rispecchia la carta pubblicata: mostra solo i piatti in carta (nel suo ordine, colori per sezione); i piatti in carta senza scheda costo ne ricevono una (costo 0, prezzo della carta) all'apertura; i piatti non piu' in carta compaiono solo se hanno quantita nel periodo (gruppo in fondo); il salvataggio scrive solo le righe mostrate. + footer-version. -->
 <!-- v 2026.09.29.03 — Food Cost → Vendite: piatti nell'ordine della carta pubblicata (sezioni e piatti), con un colore per tipologia (barra + sfondo tinto + intestazione di sezione) + footer-version. admin-core.js invariato. -->
 <!-- v 2026.09.29.02 (bump ?v= admin-core.js a 2026.09.29.06 e admin-templates-shared.js a 2026.09.29.09 + footer-version) — Food Cost → Vendite: nuova colonna "Consumo interno" (porzioni mangiate da noi: prove/staff). Salvata in fc_vendite_periodo.quantita_interna; la edge function foodcost-admin (v15) ne toglie il costo (porzioni x costo piatto) dal costo materie prime consumate, quindi Food Cost Reale e GAP non sono più gonfiati. Dashboard: riga di riepilogo dei consumi interni. -->
@@ -5376,9 +5377,10 @@ function fcEliminaIngrediente(id) {
 
 function fcLoadRicette(msgDopo) {
   _fcSetStatus('Caricamento ricette…');
-  Promise.all([_fcFetch({ action: 'piatti_costo_list' }), _fcFetch({ action: 'ingredienti_list' }), _fcPrezziCartaLive()])
+  Promise.all([_fcFetch({ action: 'piatti_costo_list' }), _fcFetch({ action: 'ingredienti_list' }), _fcPrezziCartaLive(), _fcOrdineCartaLive()])
     .then(function (out) {
       var resP = out[0], resI = out[1], carta = out[2];
+      fcState.ordineCarta = out[3];
       if (!_fcOk(resP)) { _fcSetStatus(_fcErrMsg(resP), true); return; }
       if (!_fcOk(resI)) { _fcSetStatus(_fcErrMsg(resI), true); return; }
       fcState.ingredienti = resI.body.ingredienti || [];
@@ -5400,6 +5402,29 @@ function _fcFcPct(costo, prezzo) {
   return _fcPct(costo / prezzo);
 }
 
+// Ordina le righe come la carta pubblicata e assegna un colore per sezione. Restituisce
+// [{ r, col, intest }]: intest = testo dell'intestazione da mettere PRIMA della riga (cambio sezione).
+// I piatti non piu' in carta vanno in un gruppo in fondo.
+function _fcOrdinaEColoraPerCarta(righe, ord, ncol) {
+  var lista = righe.slice();
+  var inCarta = function (r) { return !ord || ord.piatti[_pdNorm(r.sezione) + '|' + _pdNorm(r.piatto)] != null || ord.nomi[_pdNorm(r.piatto)] != null; };
+  if (ord) {
+    var kS = function (r) { if (!inCarta(r)) return 999; var v = ord.sez[_pdNorm(r.sezione)]; return v == null ? (ord.nomi[_pdNorm(r.piatto)] || [998])[0] : v; };
+    var kP = function (r) { var v = ord.piatti[_pdNorm(r.sezione) + '|' + _pdNorm(r.piatto)]; return v == null ? ((ord.nomi[_pdNorm(r.piatto)] || [0, 999])[1]) : v; };
+    lista.sort(function (a, b) { return (kS(a) - kS(b)) || (kP(a) - kP(b)) || String(a.piatto).localeCompare(String(b.piatto)); });
+  }
+  var colori = {}, n = 0, prec = null;
+  return lista.map(function (r) {
+    var fuori = !inCarta(r);
+    var chiave = fuori ? '__fuori' : _pdNorm(r.sezione || '');
+    if (colori[chiave] == null) colori[chiave] = FC_SEZ_COLORI[n++ % FC_SEZ_COLORI.length];
+    var intest = null;
+    if (chiave !== prec) { prec = chiave; intest = fuori ? 'Non più in carta' : (r.sezione || 'Altro'); }
+    return { r: r, col: colori[chiave], intest: intest };
+  });
+}
+function _fcHexRgba(h, a) { var v = parseInt(h.slice(1), 16); return 'rgba(' + (v >> 16) + ',' + ((v >> 8) & 255) + ',' + (v & 255) + ',' + a + ')'; }
+
 function fcRenderRicette() {
   var list = document.getElementById('fc-ricette-list');
   if (!list) return;
@@ -5408,10 +5433,12 @@ function fcRenderRicette() {
   list.innerHTML = '<div style="font-size:.75rem;color:var(--stone);margin-bottom:.5rem;">Ricette compilate: ' + conRicetta + ' su ' + fcState.ricettePiatti.length + ' piatti.</div>' +
     '<table style="width:100%;border-collapse:collapse;font-size:.82rem;">' +
     '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Piatto</th><th>Ingredienti</th><th>Costo porzione</th><th>Prezzo</th><th>FC %</th><th></th></tr>' +
-    fcState.ricettePiatti.map(function (r) {
+    _fcOrdinaEColoraPerCarta(fcState.ricettePiatti, fcState.ordineCarta).map(function (o) {
+      var r = o.r, col = o.col;
       var aperto = fcState.ricettaEdit && fcState.ricettaEdit.piatto_id === r.piatto_id;
-      return '<tr style="border-top:1px solid var(--rule);' + (aperto ? 'background:rgba(25,158,112,.10);' : '') + '">' +
-        '<td style="padding:.35rem 0;">' + _fcEsc(r.piatto) + '<div style="font-size:.7rem;color:var(--stone);">' + _fcEsc(r.sezione || '') + '</div></td>' +
+      var intest = o.intest ? '<tr><td colspan="6" style="padding:.6rem .5rem .25rem;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:' + col + ';border-left:4px solid ' + col + ';background:' + _fcHexRgba(col, .16) + ';">' + _fcEsc(o.intest) + '</td></tr>' : '';
+      return intest + '<tr style="border-top:1px solid var(--rule);background:' + (aperto ? 'rgba(25,158,112,.18)' : _fcHexRgba(col, .07)) + ';">' +
+        '<td style="padding:.35rem .5rem;border-left:4px solid ' + col + ';">' + _fcEsc(r.piatto) + '<div style="font-size:.7rem;color:var(--stone);">' + _fcEsc(r.sezione || '') + '</div></td>' +
         '<td>' + (r.ha_ricetta ? r.ricetta_n_righe : '<span style="color:var(--stone);">—</span>') + '</td>' +
         '<td>' + (r.ha_ricetta ? _fcEur(r.costo_piatto) : '<span style="color:var(--stone);">' + (r.costo_piatto != null ? _fcEur(r.costo_piatto) + ' a mano' : '—') + '</span>') + '</td>' +
         '<td>' + (r.prezzo_calc ? _fcEur(r.prezzo_calc) : '—') + '</td>' +
@@ -7669,7 +7696,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.29.04</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.29.05</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

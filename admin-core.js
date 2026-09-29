@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.09.29.01 — Dolci: l'elenco allergeni stampato in fondo (MENU.allergeni) non aveva campi nel form e restava quello del vecchio menu. Ora leggi() lo ricostruisce da "Dettagli piatti" (match per nome piatto, skip escludi_stampa/senza allergeni; vocabolario stampa: latte->latticini). Cache caricata all'apertura dei dolci (_dolciPdRefresh, usa il token gh_token già salvato).
 // v 2026.09.28.03 — richiesto da Andrea: la sezione voucher regalo (regala.html) va allineata al
 //   Menù Degustazione a ogni pubblicazione della carta — titolo/prezzo/disponibilità dei 2 buoni
 //   deg6/deg7, non più un listino scritto a mano scollegato dal menù reale. Nuove
@@ -568,6 +569,11 @@ function leggi(keepEmpty) {
       if (al) a.allergeni = al.value;
     });
   }
+  // Dolci: l'elenco allergeni stampato NON ha campi nel form -> si ricostruisce da "Dettagli piatti"
+  if (tipoMenuCorrente === 'dolci' && _dolciPdCache) {
+    var _al = _dolciAllergeniDaDettagli(m);
+    if (_al.length) m.allergeni = _al;
+  }
   // Scarta i piatti senza nome (righe aggiunte col "+" e non valorizzate),
   // tranne durante l'editing (keepEmpty). Così non escono righe vuote nel menu.
   if (!keepEmpty && Array.isArray(m.sezioni)) {
@@ -592,6 +598,32 @@ var DOLCI_PATH = 'menu-dolci.html';
 var MENU_DOLCI_IT = {"sezioni": [{"titolo": "Golosità", "piatti": [{"nome": "Gelato al limone nero, levistico, lime, cracker di latte", "prezzo": 14}, {"nome": "Ananas, parfait al carbone, caramello al caffè", "prezzo": 14}, {"nome": "Gelato al porcino, fragole, terra al cioccolato", "prezzo": 14}, {"nome": "Sacripantina", "prezzo": 11}, {"nome": "Erborinato ligure e Picolit Zorzettig", "prezzo": 12}]}], "allergeni": [{"nome": "Gelato al limone nero", "allergeni": "glutine, latticini"}, {"nome": "Gelato porcino", "allergeni": "latticini, uova"}, {"nome": "Ananas", "allergeni": "uovo, glutine, latticini"}, {"nome": "Sacripantina", "allergeni": "frutta a guscio, uovo, glutine, latticini, solforosa"}, {"nome": "Erborinato e Picolit", "allergeni": "latticini, solforosa"}], "pagine": [{"sezioni": ["Golosità"]}]};
 var TRADUZIONI_DOLCI = {"en": {"title": "Desserts — Santamonica", "sezione": "Sweets", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Black lemon gelato, lovage, lime, milk cracker", "Ananas, parfait al carbone, caramello al caffè": "Pineapple, charcoal parfait, coffee caramel", "Gelato al porcino, fragole, terra al cioccolato": "Porcini gelato, strawberries, chocolate soil", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Ligurian blue cheese and Picolit Zorzettig", "glutine, latticini": "gluten, dairy", "latticini, uova": "dairy, eggs", "uovo, glutine, latticini": "egg, gluten, dairy", "frutta a guscio, uovo, glutine, latticini, solforosa": "tree nuts, egg, gluten, dairy, sulphites", "latticini, solforosa": "dairy, sulphites", "Gelato al limone nero": "Black lemon gelato", "Gelato porcino": "Porcini gelato", "Ananas": "Pineapple", "Erborinato e Picolit": "Blue cheese and Picolit"}}, "fr": {"title": "Desserts — Santamonica", "sezione": "Gourmandises", "piatti": {"Gelato al limone nero, levistico, lime, cracker di latte": "Glace citron noir, livèche, citron vert, cracker au lait", "Ananas, parfait al carbone, caramello al caffè": "Ananas, parfait au charbon, caramel au café", "Gelato al porcino, fragole, terra al cioccolato": "Glace aux cèpes, fraises, terre au chocolat", "Sacripantina": "Sacripantina", "Erborinato ligure e Picolit Zorzettig": "Fromage persillé ligurien et Picolit Zorzettig", "glutine, latticini": "gluten, produits laitiers", "latticini, uova": "produits laitiers, œufs", "uovo, glutine, latticini": "œuf, gluten, produits laitiers", "frutta a guscio, uovo, glutine, latticini, solforosa": "fruits à coque, œuf, gluten, produits laitiers, sulfites", "latticini, solforosa": "produits laitiers, sulfites", "Gelato al limone nero": "Glace citron noir", "Gelato porcino": "Glace aux cèpes", "Ananas": "Ananas", "Erborinato e Picolit": "Fromage persillé et Picolit"}}};
 var tipoMenuCorrente = 'carta';
+
+// Cache di "Dettagli piatti" (righe DB), caricata all'apertura dei dolci (_dolciPdRefresh).
+var _dolciPdCache = null;
+function _dolciPdRefresh() {
+  var token = localStorage.getItem('gh_token') || '';
+  if (!token) return;
+  fetch(PD_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'list', github_token: token }) })
+    .then(function (r) { return r.json(); })
+    .then(function (res) { if (res && res.ok && Array.isArray(res.piatti)) _dolciPdCache = res.piatti; })
+    .catch(function () {});
+}
+// Elenco allergeni per la stampa dolci: [{nome, allergeni:"glutine, latticini"}] nell'ordine del menù,
+// con allergeni da Dettagli piatti (match per nome; piatti "escludi dalla stampa" o senza allergeni saltati).
+function _dolciAllergeniDaDettagli(m) {
+  var out = [];
+  (m.sezioni || []).forEach(function (sez) {
+    (sez.piatti || []).forEach(function (p) {
+      if (!p || !String(p.nome || '').trim()) return;
+      var r = _dolciPdCache.filter(function (x) { return _pdNorm(x.piatto) === _pdNorm(p.nome); })[0];
+      if (!r || r.escludi_stampa || !String(r.allergeni || '').trim()) return;
+      var lista = _normAllergeni(r.allergeni).map(function (k) { return k === 'latte' ? 'latticini' : k; });
+      if (lista.length) out.push({ nome: String(p.nome).replace(/^["“]+|["”]+$/g, ''), allergeni: lista.join(', ') });
+    });
+  });
+  return out;
+}
 
 function costruisciOutput() {
   var m = leggi();
@@ -728,6 +760,7 @@ function caricaDalSito(tipo) {
         document.getElementById('wrap').classList.add('on');
         costruisci();
         _setCartaSideNote(tipo === 'dolci' ? 'dolci' : 'carta');
+        if (tipo === 'dolci') { _dolciPdCache = null; _dolciPdRefresh(); }
         toast('✓ Menù caricato dal sito');
       } catch(ex) {
         document.getElementById('err').textContent = 'Errore: ' + ex.message;

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v 2026.09.29.02 — Food Cost → Vendite: nuova colonna "Consumo interno" (porzioni mangiate da noi: prove/staff). Salvata in fc_vendite_periodo.quantita_interna; la edge function foodcost-admin (v15) ne toglie il costo (porzioni x costo piatto) dal costo materie prime consumate, quindi Food Cost Reale e GAP non sono più gonfiati. Dashboard: riga di riepilogo dei consumi interni. -->
+<!-- v 2026.09.29.02 (bump ?v= admin-core.js a 2026.09.29.06 e admin-templates-shared.js a 2026.09.29.09 + footer-version) — Food Cost → Vendite: nuova colonna "Consumo interno" (porzioni mangiate da noi: prove/staff). Salvata in fc_vendite_periodo.quantita_interna; la edge function foodcost-admin (v15) ne toglie il costo (porzioni x costo piatto) dal costo materie prime consumate, quindi Food Cost Reale e GAP non sono più gonfiati. Dashboard: riga di riepilogo dei consumi interni. -->
 <!-- v 2026.09.29.01 — Food Cost → Vendite: prima di caricare, i prezzi delle schede costo si riallineano alla carta pubblicata (_fcAllineaPrezziPrimaDiVendite); prima restavano a 0,00 i piatti nuovi finché non si apriva "Costo piatti". -->
 <!-- v 2026.09.28.08 — richiesto da Andrea: la sezione voucher regalo (regala.html) si allinea ora
      al Menù Degustazione a ogni pubblicazione della carta (titolo/prezzo/disponibilità dei 2
@@ -2402,8 +2402,8 @@
 <div class="toast" id="toast">✓ Scaricato!</div>
 
 <script src="admin-translations.js"></script>
-<script src="admin-templates-shared.js?v=2026.09.28.04"></script>
-<script src="admin-core.js?v=2026.09.28.03"></script>
+<script src="admin-templates-shared.js?v=2026.09.29.09"></script>
+<script src="admin-core.js?v=2026.09.29.06"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
@@ -7599,7 +7599,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.28.08</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.29.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

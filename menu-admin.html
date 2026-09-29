@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.29.01 — Food Cost → Vendite: prima di caricare, i prezzi delle schede costo si riallineano alla carta pubblicata (_fcAllineaPrezziPrimaDiVendite); prima restavano a 0,00 i piatti nuovi finché non si apriva "Costo piatti". -->
 <!-- v 2026.09.28.08 — richiesto da Andrea: la sezione voucher regalo (regala.html) si allinea ora
      al Menù Degustazione a ogni pubblicazione della carta (titolo/prezzo/disponibilità dei 2
      buoni deg6/deg7). Bump ?v= admin-core.js a 2026.09.28.03 (calcolaVoucherDegustazione +
@@ -5547,11 +5548,35 @@ function fcSalvaRicetta() {
 
 // ---- Vendite di periodo (bulk, a fine mese) ----
 
+function _fcAllineaPrezziPrimaDiVendite() {
+  return Promise.all([_fcFetch({ action: 'piatti_costo_list' }), _fcPrezziCartaLive()])
+    .then(function (out) {
+      var res = out[0], carta = out[1];
+      if (!carta || !_fcOk(res)) return;
+      var righe = res.body.righe || [];
+      var daAllineare = righe.filter(function (x) {
+        var m = _fcPrezzoCartaPer(carta, x.sezione, x.piatto);
+        x.prezzo_carta = m ? m.prezzo : null;
+        return x.piatto_costo_id && x.prezzo_carta != null && Number(x.prezzo_vendita) !== x.prezzo_carta;
+      });
+      return Promise.all(daAllineare.map(function (x) {
+        return _fcFetch({
+          action: 'piatti_costo_upsert', piatto_id: x.piatto_id,
+          costo_piatto: Number(x.costo_piatto) || 0, prezzo_vendita: x.prezzo_carta, attivo: x.attivo,
+        });
+      }));
+    })
+    .catch(function () {});
+}
+
 function fcLoadVendite() {
   var r = fcRangeValido();
   if (!r) { _fcSetStatus('Imposta un intervallo di date valido (Dal/Al).', true); return; }
   _fcSetStatus('Caricamento vendite…');
-  _fcFetch({ action: 'vendite_get', da: r.da, a: r.a })
+  // I prezzi di Vendite sono quelli salvati nelle schede costo: si riallineano prima alla carta
+  // pubblicata (come fa il tab Costo piatti), altrimenti i piatti nuovi restano a 0,00.
+  _fcAllineaPrezziPrimaDiVendite()
+    .then(function () { return _fcFetch({ action: 'vendite_get', da: r.da, a: r.a }); })
     .then(function (res) {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcState.vendite = res.body.righe || [];

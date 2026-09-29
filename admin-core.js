@@ -601,23 +601,24 @@ var tipoMenuCorrente = 'carta';
 
 // Cache di "Dettagli piatti" (righe DB), caricata all'apertura dei dolci (_dolciPdRefresh).
 var _dolciPdCache = null;
+// v 2026.09.29.02 — sorgente = pagina "Allergeni carta" PUBBLICATA (menu-allergeni.html, sezione Golosità), come per la carta: compili dolci → pubblichi → compili allergeni → pubblichi → la stampa li riunisce. Niente token.
 function _dolciPdRefresh() {
-  var token = localStorage.getItem('gh_token') || '';
-  if (!token) return;
-  fetch(PD_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'list', github_token: token }) })
-    .then(function (r) { return r.json(); })
-    .then(function (res) { if (res && res.ok && Array.isArray(res.piatti)) _dolciPdCache = res.piatti; })
-    .catch(function () {});
+  _allergeniCartaLive = null;
+  return _pdAssicuraAllergeniCartaLive().then(function () {
+    if (_allergeniCartaLive && _allergeniCartaLive.sezioni) _dolciPdCache = _allergeniCartaLive;
+  });
 }
 // Elenco allergeni per la stampa dolci: [{nome, allergeni:"glutine, latticini"}] nell'ordine del menù,
 // con allergeni da Dettagli piatti (match per nome; piatti "escludi dalla stampa" o senza allergeni saltati).
 function _dolciAllergeniDaDettagli(m) {
   var out = [];
+  var tutti = [];
+  (_dolciPdCache.sezioni || []).forEach(function (sz) { (sz.piatti || []).forEach(function (x) { tutti.push(x); }); });
   (m.sezioni || []).forEach(function (sez) {
     (sez.piatti || []).forEach(function (p) {
       if (!p || !String(p.nome || '').trim()) return;
-      var r = _dolciPdCache.filter(function (x) { return _pdNorm(x.piatto) === _pdNorm(p.nome); })[0];
-      if (!r || r.escludi_stampa || !String(r.allergeni || '').trim()) return;
+      var r = tutti.filter(function (x) { return _pdNorm(x.nome) === _pdNorm(p.nome); })[0];
+      if (!r) return;
       var lista = _normAllergeni(r.allergeni).map(function (k) { return k === 'latte' ? 'latticini' : k; });
       if (lista.length) out.push({ nome: String(p.nome).replace(/^["“]+|["”]+$/g, ''), allergeni: lista.join(', ') });
     });
@@ -713,6 +714,11 @@ function _dolciCtrlBar() {
 }
 
 function apriPreview(lang) {
+  // Dolci: prima rilegge gli allergeni pubblicati, poi apre la preview
+  if (tipoMenuCorrente === 'dolci' && !apriPreview._ok) {
+    _dolciPdRefresh().then(function () { apriPreview._ok = true; apriPreview(lang); apriPreview._ok = false; });
+    return;
+  }
   if (tipoMenuCorrente === 'allergeni') { apriPreviewAllergeni(); return; }
   if (!dati) { alert('Prima carica il menù'); return; }
   document.getElementById('preview-menu').classList.remove('open');

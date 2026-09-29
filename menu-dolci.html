@@ -395,6 +395,9 @@
       .pg { background: #fff; }
       .ctrl-bar { display: none; }
       .stampa-hint { display: none; }
+      /* v 2026.09.29.05: come la carta - nome 18pt, descrizione 15pt in stampa (A+/A- scalano in proporzione; base --fs 1.12) */
+      #layout-carta .piatto { font-size: calc(18pt * var(--fs, 1.12) / 1.12); }
+      #layout-carta .piatto-desc { font-size: .8333em; }
 
       /* carta: 3 pagine */
       #layout-carta .pg {

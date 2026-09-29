@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.09.29.03",
+  version: "2026.09.29.04",
   updated: "2026-09-29",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -116,7 +116,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Gestionale Cantina — carta Vini e carta Fine Pasto (categorie, stampa, icone)', s:'2026-09-19', e:'2026-09-20', st:'done'},
       {t:'Banner chiusura per vacanza 21-28 settembre', s:'2026-09-20', e:'2026-09-28', st:'done'},
       {t:'menu-admin — audit flussi 29/9: ricarica sicura dopo Pubblica, guida corretta, FC % e Menu Engineering su prezzo netto, avviso vendite mancanti', s:'2026-09-29', e:'2026-09-29', st:'done'},
-      {t:'menu-admin — decisioni aperte dall\'audit: degustazione nel Food Cost, grafico Andamento, piatti tolti dalla carta', s:'2026-09-29', st:'up'},
+      {t:'menu-admin — decisioni aperte dall\'audit: degustazione nel Food Cost, grafico Andamento, piatti tolti dalla carta', s:'2026-09-29', e:'2026-09-29', st:'done'},
     ]},
     { key:'seo', name:'SEO & GEO', badge:'progetto-seo', tasks:[
       {t:'Migrazione Cloudflare + fix Schema @type', s:'2026-05-25', e:'2026-05-31', st:'done'},

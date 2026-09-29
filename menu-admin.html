@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.29.07 (bump ?v= admin-core.js a 2026.09.29.07 + footer-version) — Audit flussi menu-admin: guida "Procedure" corretta (dolci PRIMA degli allergeni; Allergeni carta = carta + dolci pubblicati e aggiorna Dettagli piatti; tolto il pulsante «Menù Vini» inesistente → Gestionale Cantina; nuova sezione "Menù e Food Cost: come sono collegati"). Food Cost: FC % per piatto e Menu Engineering (margine, ricavo, classi) calcolati sul prezzo in carta SENZA IVA (_fcPrezzoNetto/_fcMenuEngNetto — prima prezzo lordo vs costi netti); Dashboard avvisa quando non ci sono vendite salvate con lo stesso Dal/Al (Teorico/GAP non significativi). -->
 <!-- v 2026.09.29.06 — Food Cost → Costo piatti: stesso ordine della carta pubblicata e stessi colori per sezione di Vendite/Calcolo Food Cost. + footer-version. -->
 <!-- v 2026.09.29.05 — Food Cost → Calcolo Food Cost: elenco piatti nell'ordine della carta pubblicata con lo stesso colore per sezione di Vendite (helper _fcOrdinaEColoraPerCarta); i piatti non piu' in carta in un gruppo in fondo. + footer-version. -->
 <!-- v 2026.09.29.04 — Food Cost → Vendite rispecchia la carta pubblicata: mostra solo i piatti in carta (nel suo ordine, colori per sezione); i piatti in carta senza scheda costo ne ricevono una (costo 0, prezzo della carta) all'apertura; i piatti non piu' in carta compaiono solo se hanno quantita nel periodo (gruppo in fondo); il salvataggio scrive solo le righe mostrate. + footer-version. -->
@@ -1248,30 +1249,39 @@
 
       <h3 style="margin:1rem 0 .25rem;font-size:.86rem">⚠️ Allergeni</h3>
       <ol style="margin:.2rem 0 .2rem 1.2rem;padding:0">
-        <li>Clicca <strong>«Allergeni carta»</strong> (si sincronizza dai piatti della carta <em>già pubblicata</em>)</li>
+        <li>Clicca <strong>«Allergeni carta»</strong> (elenca i piatti della carta <em>e</em> dei dolci <em>già pubblicati</em>; i Crudi sono esclusi)</li>
         <li>Spunta gli allergeni di ogni piatto</li>
-        <li><strong>✦ Traduci e Pubblica</strong> → pubblica la pagina allergeni in italiano</li>
+        <li><strong>✦ Traduci e Pubblica</strong> → pubblica la pagina allergeni in italiano e aggiorna da sola gli allergeni in <strong>«Dettagli piatti»</strong></li>
         <li>⚠️ <strong>Per aggiornarla in EN/FR</strong>: aspetta ~1–2 min, poi <strong>Carica la carta → Traduci e Pubblica</strong> (la pagina allergeni tradotta è in coda alla carta EN/FR)</li>
       </ol>
 
       <h3 style="margin:1rem 0 .25rem;font-size:.86rem">🔁 Ho cambiato i piatti (e magari i loro allergeni)</h3>
-      <p style="margin:.2rem 0">Sequenza completa, con la carta pubblicata <strong>due volte</strong> (la prima porta i piatti nuovi, l'ultima aggiorna allergeni/dolci in lingua):</p>
+      <p style="margin:.2rem 0">Sequenza completa, con la carta pubblicata <strong>due volte</strong> (la prima porta i piatti nuovi, l'ultima aggiorna allergeni/dolci in lingua). I dolci vanno pubblicati <strong>prima</strong> degli allergeni, perché «Allergeni carta» elenca i dolci già pubblicati:</p>
       <ol style="margin:.2rem 0 .2rem 1.2rem;padding:0">
-        <li><strong>Carta</strong>: clicca «Menù alla carta» → modifica i piatti → <strong>Traduci e Pubblica</strong></li>
-        <li>aspetta ~1–2 min</li>
-        <li><strong>Allergeni</strong>: clicca «Allergeni carta» (riprende i piatti nuovi) → spunta → <strong>Traduci e Pubblica</strong></li>
+        <li><strong>Carta</strong>: clicca «Menù alla carta» → modifica i piatti → <strong>Traduci e Pubblica</strong> (se chiede di allineare «Dettagli piatti» rispondi OK)</li>
         <li>(se hai toccato i dolci) <strong>Dolci</strong>: clicca «Menù dolci» → modifica → <strong>Traduci e Pubblica</strong></li>
         <li>aspetta ~1–2 min</li>
+        <li><strong>Allergeni</strong>: clicca «Allergeni carta» (riprende piatti e dolci nuovi) → spunta → <strong>Traduci e Pubblica</strong></li>
+        <li>aspetta ~1–2 min</li>
         <li><strong>Carta</strong>: clicca «Menù alla carta» → <strong>Traduci e Pubblica</strong> un'ultima volta → ora EN/FR ha piatti, allergeni e dolci aggiornati</li>
+        <li>(se hai toccato i dolci) <strong>Dolci</strong>: «Menù dolci» → <strong>Preview 🇮🇹</strong> per stampare: l'elenco allergeni in fondo si ricompone dagli Allergeni appena pubblicati</li>
       </ol>
+      <p style="margin:.2rem 0;color:var(--stone)">Mentre aspetti puoi lavorare in altre sezioni: il ricaricamento automatico dopo la pubblicazione avviene solo se sei rimasto sullo stesso menù senza toccarlo.</p>
       <p style="margin:.2rem 0;color:var(--stone)">Se hai cambiato solo prezzi/nomi e <em>non</em> gli allergeni: basta la sola Carta (passi 1–2), salta allergeni e la seconda pubblicazione.</p>
 
       <h3 style="margin:1rem 0 .25rem;font-size:.86rem">🍷 Vini · 📷 Foto · 🎁 Buoni · 🔒 Prenotazioni</h3>
       <ul style="margin:.2rem 0 .2rem 1.2rem;padding:0">
-        <li><strong>Carta vini</strong>: «Menù Vini» → scegli il PDF → <strong>Converti e Pubblica</strong> (si apre prima un'anteprima; ogni pagina del PDF diventa un'immagine fedele)</li>
+        <li><strong>Carta vini e Fine Pasto</strong>: si generano e pubblicano dal <strong>«Gestionale Cantina»</strong></li>
         <li><strong>Foto cucina / Foto sito</strong>: scegli le immagini → <strong>Pubblica foto</strong></li>
         <li><strong>Voucher — Gestione</strong>: emetti un nuovo voucher, valori dei buoni liberi, cerca/riscatta/annulla per codice, storico completo</li>
-        <li><strong>Prenotazioni online</strong>: chiusure/aperture (giorno, servizio o singolo orario) → si applicano subito</li>
+        <li><strong>Orari di Apertura</strong> (Setup): periodi, chiusure/aperture per giorno, servizio o singolo orario → si applicano subito</li>
+      </ul>
+
+      <h3 style="margin:1rem 0 .25rem;font-size:.86rem">🧮 Menù e Food Cost: come sono collegati</h3>
+      <ul style="margin:.2rem 0 .2rem 1.2rem;padding:0">
+        <li>Ogni piatto pubblicato (carta e dolci) ha una riga in <strong>«Dettagli piatti»</strong>: è l'elenco su cui lavorano <strong>Costo piatti</strong>, <strong>Calcolo Food Cost</strong> (ricette) e <strong>Vendite</strong></li>
+        <li>I <strong>prezzi di vendita</strong> del Food Cost si prendono dalla carta pubblicata (IVA inclusa); FC % e margini si calcolano sul prezzo <strong>senza IVA</strong>, come incassi e spese</li>
+        <li>In <strong>Vendite</strong> le quantità valgono per l'intervallo Dal/Al con cui le salvi: la Dashboard le usa solo se ha <strong>le stesse date</strong></li>
       </ul>
 
       <h3 style="margin:1rem 0 .25rem;font-size:.86rem">ℹ️ Note utili</h3>
@@ -2407,7 +2417,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.09.29.09"></script>
-<script src="admin-core.js?v=2026.09.29.06"></script>
+<script src="admin-core.js?v=2026.09.29.07"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
@@ -5401,9 +5411,11 @@ function fcLoadRicette(msgDopo) {
     .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
 }
 
+// v 2026.09.29.07 — prezzo = prezzo in carta (IVA inclusa), costo = IVA esclusa: il FC% si
+// calcola sul prezzo netto, come il Food Cost reale/teorico (incassi scorporati al 10%).
 function _fcFcPct(costo, prezzo) {
   if (!prezzo || costo == null) return '—';
-  return _fcPct(costo / prezzo);
+  return _fcPct(costo / _fcPrezzoNetto(prezzo));
 }
 
 // Ordina le righe come la carta pubblicata e assegna un colore per sezione. Restituisce
@@ -5436,7 +5448,7 @@ function fcRenderRicette() {
   var conRicetta = fcState.ricettePiatti.filter(function (r) { return r.ha_ricetta; }).length;
   list.innerHTML = '<div style="font-size:.75rem;color:var(--stone);margin-bottom:.5rem;">Ricette compilate: ' + conRicetta + ' su ' + fcState.ricettePiatti.length + ' piatti.</div>' +
     '<table style="width:100%;border-collapse:collapse;font-size:.82rem;">' +
-    '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Piatto</th><th>Ingredienti</th><th>Costo porzione</th><th>Prezzo</th><th>FC %</th><th></th></tr>' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Piatto</th><th>Ingredienti</th><th>Costo porzione</th><th>Prezzo</th><th title="Costo porzione / prezzo in carta senza IVA (10%)">FC % (su netto)</th><th></th></tr>' +
     _fcOrdinaEColoraPerCarta(fcState.ricettePiatti, fcState.ordineCarta).map(function (o) {
       var r = o.r, col = o.col;
       var aperto = fcState.ricettaEdit && fcState.ricettaEdit.piatto_id === r.piatto_id;
@@ -5539,7 +5551,7 @@ function fcRicettaAggiornaTotali() {
   el.innerHTML =
     '<div>Costo ricetta: <strong>' + _fcEur(totale) + '</strong>' + (porz > 1 ? ' per ' + porz + ' porzioni' : '') + '</div>' +
     '<div>Costo per porzione: <strong>' + _fcEur(perPorzione) + '</strong></div>' +
-    '<div>Prezzo in carta: ' + (e.prezzo ? _fcEur(e.prezzo) + ' · FC <strong>' + _fcFcPct(perPorzione, e.prezzo) + '</strong>' : '<span style="color:var(--stone);">non trovato</span>') + '</div>' +
+    '<div>Prezzo in carta: ' + (e.prezzo ? _fcEur(e.prezzo) + ' (senza IVA ' + _fcEur(_fcPrezzoNetto(e.prezzo)) + ') · FC <strong>' + _fcFcPct(perPorzione, e.prezzo) + '</strong>' : '<span style="color:var(--stone);">non trovato</span>') + '</div>' +
     (incompleta ? '<div style="color:#b5651d;font-size:.75rem;margin-top:.3rem;">Ci sono righe incomplete: al salvataggio vanno completate o tolte.</div>' : '');
 }
 
@@ -5748,10 +5760,16 @@ function _fcGapColore(gap) {
   return '#b91c1c';
 }
 
+// warning: true = inventario non chiuso (badge standard); array di stringhe = più avvisi
+// (ognuno "testo|spiegazione al passaggio del mouse").
 function _fcKpiTile(etichetta, valore, colore, warning) {
-  var badge = warning
-    ? '<div style="font-size:.62rem;color:#f59e0b;margin-top:.15rem;font-weight:600;" title="Manca il conteggio di inventario iniziale e/o finale per almeno un reparto nel periodo selezionato: il periodo non è ancora chiuso e questo numero può essere fuorviante.">⚠️ periodo non chiuso</div>'
-    : '';
+  var avvisi = [];
+  if (warning === true) avvisi.push('periodo non chiuso|Manca il conteggio di inventario iniziale e/o finale per almeno un reparto nel periodo selezionato: il periodo non è ancora chiuso e questo numero può essere fuorviante.');
+  else if (Array.isArray(warning)) avvisi = warning.filter(Boolean);
+  var badge = avvisi.map(function (a) {
+    var p = a.split('|');
+    return '<div style="font-size:.62rem;color:#f59e0b;margin-top:.15rem;font-weight:600;" title="' + _fcEsc(p[1] || '') + '">⚠️ ' + _fcEsc(p[0]) + '</div>';
+  }).join('');
   return '<div class="fs" style="flex:1;min-width:9.5rem;border-left:3px solid ' + colore + ';">' +
     '<div class="fs-body" style="padding:.7rem .9rem;">' +
     '<div class="opt-lbl">' + _fcEsc(etichetta) + '</div>' +
@@ -5764,15 +5782,47 @@ function _fcDestroyChart(key) {
   if (fcCharts[key]) { fcCharts[key].destroy(); delete fcCharts[key]; }
 }
 
+// v 2026.09.29.07 — I prezzi di vendita arrivano dalla carta (IVA inclusa), mentre costi, spese e
+// incassi sono IVA esclusa. Il backend calcola margine/ricavo sul prezzo lordo: qui si ricalcolano
+// margine unitario, ricavo, margine totale e classe STAR/PLOWHORSE/PUZZLE/DOG sul prezzo NETTO
+// (stesse soglie del backend: media semplice di qty e margine su tutti i piatti attivi).
+function _fcPrezzoNetto(p) { return (Number(p) || 0) / (1 + FC_ALIQUOTA_IVA); }
+function _fcMenuEngNetto(d) {
+  var me = d.menu_engineering || [];
+  if (!me.length || d._meNetto) return;
+  me.forEach(function (p) {
+    var netto = _fcPrezzoNetto(p.prezzo_vendita);
+    p.prezzo_netto = netto;
+    p.margine_unitario = netto - (Number(p.costo_piatto) || 0);
+    p.ricavo = p.qty_venduta * netto;
+    p.margine_totale = p.qty_venduta * p.margine_unitario;
+  });
+  var sogliaPop = me.reduce(function (a, p) { return a + p.qty_venduta; }, 0) / me.length;
+  var sogliaMar = me.reduce(function (a, p) { return a + p.margine_unitario; }, 0) / me.length;
+  me.forEach(function (p) {
+    var pop = p.qty_venduta >= sogliaPop, mar = p.margine_unitario >= sogliaMar;
+    p.classificazione = pop && mar ? 'STAR' : pop ? 'PLOWHORSE' : mar ? 'PUZZLE' : 'DOG';
+  });
+  d.soglia_margine = sogliaMar;
+  d._meNetto = true;
+}
+
 function fcRenderDashboard() {
   var el = document.getElementById('fc-dashboard-body');
   if (!el || !fcState.dashboard) return;
   var d = fcState.dashboard;
+  _fcMenuEngNetto(d);
+
+  // v 2026.09.29.07 — Le vendite valgono solo per lo STESSO identico intervallo Dal/Al con cui
+  // sono state salvate. Senza vendite il Teorico va a 0% e il GAP coincide col Reale: va detto.
+  var senzaVendite = !(d.menu_engineering || []).some(function (p) { return Number(p.qty_venduta) > 0; }) && !(d.consumi_interni_qty > 0);
+  var AVV_VENDITE = 'nessuna vendita per questo intervallo|In Vendite non ci sono quantità salvate con esattamente queste date Dal/Al: il Teorico è 0 e il GAP non è significativo. Inserisci le vendite con lo stesso intervallo della Dashboard.';
+  var AVV_INV = 'periodo non chiuso|Manca il conteggio di inventario iniziale e/o finale per almeno un reparto nel periodo selezionato: il periodo non è ancora chiuso e questo numero può essere fuorviante.';
 
   var kpi = '<div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:.6rem;">' +
     _fcKpiTile('Food Cost Reale', _fcPct(d.food_cost_reale_pct), '#3987e5', d.inventario_incompleto) +
-    _fcKpiTile('Food Cost Teorico', _fcPct(d.food_cost_teorico_pct), '#9085e9') +
-    _fcKpiTile('GAP (Reale − Teorico)', _fcPct(d.gap_pct), _fcGapColore(d.gap_pct), d.inventario_incompleto) +
+    _fcKpiTile('Food Cost Teorico', _fcPct(d.food_cost_teorico_pct), '#9085e9', senzaVendite ? [AVV_VENDITE] : null) +
+    _fcKpiTile('GAP (Reale − Teorico)', _fcPct(d.gap_pct), senzaVendite ? 'var(--stone)' : _fcGapColore(d.gap_pct), [d.inventario_incompleto ? AVV_INV : null, senzaVendite ? AVV_VENDITE : null]) +
     _fcKpiTile('Incassi food', _fcEur(d.totale_incassi), '#199e70') +
     _fcKpiTile('Spese materie prime', _fcEur(d.totale_spese), '#d95926') +
     '</div>';
@@ -5784,9 +5834,12 @@ function fcRenderDashboard() {
     _fcKpiTile('Incidenza beverage sull\'incasso', _fcPct(d.incidenza_beverage_pct), '#9085e9') +
     '</div>';
 
-  var notaInterni = (d.consumi_interni_qty > 0)
-    ? '<p style="font-size:.78rem;color:var(--stone);margin:0 0 1rem;">Consumi interni (staff/prove): <strong>' + d.consumi_interni_qty + ' porzioni = ' + _fcEur(d.consumi_interni_costo) + '</strong> al costo piatto, già tolti dal Food Cost Reale (materie prime consumate: ' + _fcEur(d.costo_materie_prime_lordo) + ' → ' + _fcEur(d.costo_materie_prime_consumate) + ').</p>'
+  var notaVendite = senzaVendite
+    ? '<p style="font-size:.78rem;color:#b5651d;margin:0 0 1rem;">⚠️ Nessuna vendita salvata con queste date (' + _fcEsc(d.da) + ' → ' + _fcEsc(d.a) + '): Teorico, GAP e Menu Engineering non sono significativi. In "Vendite" imposta lo stesso Dal/Al della Dashboard e salva le quantità.</p>'
     : '';
+  var notaInterni = notaVendite + ((d.consumi_interni_qty > 0)
+    ? '<p style="font-size:.78rem;color:var(--stone);margin:0 0 1rem;">Consumi interni (staff/prove): <strong>' + d.consumi_interni_qty + ' porzioni = ' + _fcEur(d.consumi_interni_costo) + '</strong> al costo piatto, già tolti dal Food Cost Reale (materie prime consumate: ' + _fcEur(d.costo_materie_prime_lordo) + ' → ' + _fcEur(d.costo_materie_prime_consumate) + ').</p>'
+    : '');
   var contaME = { STAR: 0, PLOWHORSE: 0, PUZZLE: 0, DOG: 0 };
   d.menu_engineering.forEach(function (p) { contaME[p.classificazione] = (contaME[p.classificazione] || 0) + 1; });
   var chipME = '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.4rem;">' +
@@ -5826,7 +5879,7 @@ function fcRenderDashboard() {
 
   var me = '<div class="sub">Menu Engineering</div>' +
     '<table style="width:100%;border-collapse:collapse;font-size:.8rem;margin-bottom:1.2rem;">' +
-    '<tr style="text-align:left;color:var(--stone);font-size:.68rem;text-transform:uppercase;"><th>Piatto</th><th>Qtà</th><th>Margine unit.</th><th>Mix %</th><th>Classe</th></tr>' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.68rem;text-transform:uppercase;"><th>Piatto</th><th>Qtà</th><th title="Prezzo in carta senza IVA (10%) meno costo piatto">Margine unit. (netto)</th><th>Mix %</th><th>Classe</th></tr>' +
     d.menu_engineering.map(function (p) {
       var col = FC_ME_COLORE[p.classificazione] || 'var(--ink)';
       return '<tr style="border-top:1px solid var(--rule);"><td style="padding:.3rem 0;">' + _fcEsc(p.nome) + '</td><td>' + p.qty_venduta + '</td><td>' + _fcEur(p.margine_unitario) + '</td><td>' + _fcPct(p.mix_pct) + '</td><td style="color:' + col + ';font-weight:600;">' + p.classificazione + '</td></tr>';
@@ -7700,7 +7753,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.29.06</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.29.07</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

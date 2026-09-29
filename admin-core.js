@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.09.29.07 — Audit flussi menu-admin (29/9): (1) dopo "Pubblica" la ricarica a 90s avviene solo se sei ancora sullo stesso menù e non l'hai toccato (_vistaSeq in _pulisciViste + confronto del form); prima ricaricava sempre la carta, anche dopo i dolci, e cancellava la vista aperta nel frattempo (es. le spunte di «Allergeni carta»). (2) Promemoria laterali carta/dolci/allergeni aggiornati: allergeni = carta + dolci pubblicati, dolci da pubblicare prima degli allergeni, la pubblicazione allergeni aggiorna Dettagli piatti.
 // v 2026.09.29.01 — Dolci: l'elenco allergeni stampato in fondo (MENU.allergeni) non aveva campi nel form e restava quello del vecchio menu. Ora leggi() lo ricostruisce da "Dettagli piatti" (match per nome piatto, skip escludi_stampa/senza allergeni; vocabolario stampa: latte->latticini). Cache caricata all'apertura dei dolci (_dolciPdRefresh, usa il token gh_token già salvato).
 // v 2026.09.28.03 — richiesto da Andrea: la sezione voucher regalo (regala.html) va allineata al
 //   Menù Degustazione a ogni pubblicazione della carta — titolo/prezzo/disponibilità dei 2 buoni
@@ -299,7 +300,7 @@ var _SIDE_NOTE_HTML = {
     '<ul>' +
     '<li>Modifica → <strong>Preview</strong> per controllare → <strong>✦ Traduci e Pubblica</strong></li>' +
     '<li>Il sito si aggiorna in <strong>~90 secondi</strong></li>' +
-    '<li>Hai toccato anche gli <strong>allergeni</strong>? Pubblica prima la carta, poi «Allergeni carta» → Pubblica, poi ripubblica la carta un\'ultima volta (aggiorna anche EN/FR)</li>' +
+    '<li>Hai toccato anche gli <strong>allergeni</strong>? Pubblica prima la carta (e i dolci, se cambiati), poi «Allergeni carta» → Pubblica, poi ripubblica la carta un\'ultima volta (aggiorna anche EN/FR)</li>' +
     '<li>Un piatto ti sembra "tornato indietro"? Ricarica qui con «Menù alla carta»: quello che vedi è sempre la versione vera pubblicata</li>' +
     '</ul>',
   dolci:
@@ -307,6 +308,7 @@ var _SIDE_NOTE_HTML = {
     '<ul>' +
     '<li>Modifica → <strong>Preview 🇮🇹</strong> per controllare → <strong>✦ Traduci e Pubblica</strong> (pubblica l\'italiano)</li>' +
     '<li>Il sito si aggiorna in <strong>~90 secondi</strong></li>' +
+    '<li>Dolce nuovo o cambiato? Dopo averli pubblicati apri «Allergeni carta», spunta i suoi allergeni → Pubblica</li>' +
     '<li>Per aggiornarli anche in <strong>EN/FR</strong>: aspetta ~1–2 min, poi «Menù alla carta» → Traduci e Pubblica (i dolci vivono dentro la carta tradotta)</li>' +
     '<li>Un dolce ti sembra "tornato indietro"? Ricarica qui con «Menù dolci»: quello che vedi è sempre la versione vera pubblicata</li>' +
     '<li><span style="text-decoration:underline">Dalla Preview puoi stampare direttamente</span>, senza salvare prima in PDF</li>' +
@@ -314,8 +316,8 @@ var _SIDE_NOTE_HTML = {
   allergeni:
     '<div class="warn"><strong>Gli allergeni si modificano e pubblicano SOLO da qui.</strong> Sono un dato di sicurezza alimentare: non fidarti mai di una copia salvata altrove, ricarica sempre da qui prima di controllare/correggere.</div>' +
     '<ul>' +
-    '<li>Questa pagina riprende i piatti della <strong>carta già pubblicata</strong>: se hai appena cambiato i piatti, pubblica prima la carta e aspetta ~1–2 min <em>prima</em> di aprire qui, altrimenti riprende piatti vecchi</li>' +
-    '<li>Spunta gli allergeni → <strong>✦ Traduci e Pubblica</strong> (pubblica l\'italiano)</li>' +
+    '<li>Questa pagina riprende i piatti della <strong>carta e dei dolci già pubblicati</strong> (Crudi esclusi): se li hai appena cambiati, pubblicali prima e aspetta ~1–2 min <em>prima</em> di aprire qui, altrimenti riprende piatti vecchi</li>' +
+    '<li>Spunta gli allergeni → <strong>✦ Traduci e Pubblica</strong> (pubblica l\'italiano e aggiorna gli allergeni in «Dettagli piatti»)</li>' +
     '<li>Per aggiornarli anche in <strong>EN/FR</strong>: aspetta ~1–2 min, poi «Menù alla carta» → Traduci e Pubblica</li>' +
     '</ul>'
 };
@@ -338,7 +340,9 @@ function _setCartaSideNote(tipo) {
 // Nasconde TUTTE le viste/sezioni e svuota il form della carta.
 // Va chiamata a ogni caricamento (carta, dolci, allergeni, vini, foto, documento generico,
 // prenotazioni) così la pagina non trascina la vista precedente in fondo.
+var _vistaSeq = 0; // v 2026.09.29.07 — cresce a ogni cambio vista (vedi ricarica dopo Pubblica in eseguiPubblicazione)
 function _pulisciViste() {
+  _vistaSeq++;
   ['foto-section','foto-sito-section','vini-section','doc-section','piatti-dettagli-section','prenotazioni-section','prenotazioni-setup-section','orari-apertura-section','reminder-section','cauzioni-section','voucher-section','voucher-setup-section','rubrica-section','pacchi-section','foodcost-section'].forEach(function(id){
     var e = document.getElementById(id); if (e) e.style.display = 'none';
   });
@@ -1229,10 +1233,20 @@ function eseguiPubblicazione(token) {
     function next() {
       if (i >= files.length) {
         _qrBase64 = null; var fi=document.getElementById('orario-qr-file'); if(fi) fi.value='';
-        toast('✓ Pubblicato! Ricarica tra 90 secondi…');
+        // v 2026.09.29.07 — Ricarica dopo 90s SOLO se sei ancora sullo stesso menù e non l'hai
+        // toccato: prima ricaricava sempre la carta (anche dopo i dolci) e cancellava la vista
+        // aperta nel frattempo — es. le spunte in «Allergeni carta», aperta proprio come dice la
+        // procedura ("aspetta 1–2 min, poi Allergeni").
+        var tipoPubblicato = tipoMenuCorrente, seqPubblicato = _vistaSeq;
+        var formPubblicato = JSON.stringify(leggi(true));
+        toast('✓ Pubblicato! Il sito si aggiorna in ~90 secondi');
         setTimeout(function() {
+          var stessaVista = _vistaSeq === seqPubblicato && tipoMenuCorrente === tipoPubblicato;
+          var nonToccato = false;
+          try { nonToccato = stessaVista && JSON.stringify(leggi(true)) === formPubblicato; } catch (e) {}
+          if (!nonToccato) return;
           toast('⏳ Ricarico dal sito…');
-          setTimeout(caricaDalSito, 1500);
+          setTimeout(function() { caricaDalSito(tipoPubblicato); }, 1500);
         }, 90000);
         return;
       }

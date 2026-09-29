@@ -121,6 +121,11 @@
 // inventario_periodi_disponibili ora somma valore su tutti i reparti contati in
 // quella data e lo restituisce come valore_totale in date_dettaglio (per data
 // parziale è la somma dei soli reparti già contati, non l'inventario completo).
+// v15 (2026-09-29) — richiesto da Andrea: i piatti mangiati da noi (prove/staff) non generano
+// incasso ma escono dall'inventario e gonfiavano Food Cost reale e GAP. fc_vendite_periodo ha
+// ora quantita_interna (porzioni interne per piatto e periodo); calcolaRange toglie dal costo
+// materie prime consumate il costo teorico di quelle porzioni (porzioni x costo piatto) e
+// restituisce costo_materie_prime_lordo, consumi_interni_qty, consumi_interni_costo.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
@@ -389,7 +394,7 @@ async function calcolaRange(da: string, a: string) {
     supabase.from("fc_incassi_giornalieri").select("importo, tipo").gte("data", da).lte("data", a),
     supabase.from("fc_inventario_conteggi").select("data, reparto_id, valore").in("data", [da, dataFinale]),
     supabase.from("fc_piatti_costo").select("*, piatti_dettagli(piatto, sezione)").eq("attivo", true),
-    supabase.from("fc_vendite_periodo").select("piatto_costo_id, quantita_venduta").eq("data_da", da).eq("data_a", a),
+    supabase.from("fc_vendite_periodo").select("piatto_costo_id, quantita_venduta, quantita_interna").eq("data_da", da).eq("data_a", a),
   ]);
   for (const r of [repartiRes, speseRes, incassiRes, invRes, costiRes, venditeRes]) {
     if (r.error) throw r.error;
@@ -450,7 +455,19 @@ async function calcolaRange(da: string, a: string) {
   const inventarioIncompleto = repartiDettaglio.some((r) => r.inventario_iniziale_mancante || r.inventario_finale_mancante);
   const inventarioIncompletoBev = repartiDettaglioBev.some((r) => r.inventario_iniziale_mancante || r.inventario_finale_mancante);
 
-  const costoMateriePrimeConsumate = totaleInvIniziale + totaleSpese - totaleInvFinale;
+  // Consumi interni (staff/prove): porzioni mangiate da noi, senza incasso. Il loro costo teorico
+  // (porzioni x costo piatto) viene tolto dal costo materie prime consumate, cosi non gonfia il
+  // Food Cost reale ne' il GAP (che resta la misura di sprechi/scarti).
+  const costoPerPiattoId = new Map<string, number>();
+  for (const c of costiRes.data || []) costoPerPiattoId.set(c.id, n(c.costo_piatto));
+  let consumiInterniQty = 0, consumiInterniCosto = 0;
+  for (const row of venditeRes.data || []) {
+    const q = n(row.quantita_interna);
+    consumiInterniQty += q;
+    consumiInterniCosto += q * (costoPerPiattoId.get(row.piatto_costo_id) || 0);
+  }
+  const costoMateriePrimeLordo = totaleInvIniziale + totaleSpese - totaleInvFinale;
+  const costoMateriePrimeConsumate = costoMateriePrimeLordo - consumiInterniCosto;
   const foodCostRealePct = totaleIncassi > 0 ? costoMateriePrimeConsumate / totaleIncassi : 0;
 
   const costoMateriePrimeConsumateBev = totaleInvInizialeBev + totaleSpeseBev - totaleInvFinaleBev;
@@ -506,6 +523,9 @@ async function calcolaRange(da: string, a: string) {
     totale_inventario_iniziale: totaleInvIniziale,
     totale_inventario_finale: totaleInvFinale,
     costo_materie_prime_consumate: costoMateriePrimeConsumate,
+    costo_materie_prime_lordo: costoMateriePrimeLordo,
+    consumi_interni_qty: consumiInterniQty,
+    consumi_interni_costo: consumiInterniCosto,
     food_cost_reale_pct: foodCostRealePct,
     costo_teorico_totale: costoTeoricoTotale,
     food_cost_teorico_pct: foodCostTeoricoPct,
@@ -1050,6 +1070,7 @@ Deno.serve(async (req) => {
           sezione: c.piatti_dettagli ? c.piatti_dettagli.sezione : null,
           costo_piatto: c.costo_piatto, prezzo_vendita: c.prezzo_vendita,
           quantita_venduta: v ? v.quantita_venduta : 0,
+          quantita_interna: v ? v.quantita_interna : 0,
         };
       });
       return json({ ok: true, da: r.da, a: r.a, righe });
@@ -1065,6 +1086,7 @@ Deno.serve(async (req) => {
           .upsert({
             data_da: r.da, data_a: r.a, piatto_costo_id,
             quantita_venduta: Math.max(0, Math.round(n(riga.quantita_venduta))),
+            quantita_interna: Math.max(0, Math.round(n(riga.quantita_interna))),
             updated_at: new Date().toISOString(),
           }, { onConflict: "data_da,data_a,piatto_costo_id" });
         if (error) throw error;

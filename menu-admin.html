@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.29.02 — Food Cost → Vendite: nuova colonna "Consumo interno" (porzioni mangiate da noi: prove/staff). Salvata in fc_vendite_periodo.quantita_interna; la edge function foodcost-admin (v15) ne toglie il costo (porzioni x costo piatto) dal costo materie prime consumate, quindi Food Cost Reale e GAP non sono più gonfiati. Dashboard: riga di riepilogo dei consumi interni. -->
 <!-- v 2026.09.29.01 — Food Cost → Vendite: prima di caricare, i prezzi delle schede costo si riallineano alla carta pubblicata (_fcAllineaPrezziPrimaDiVendite); prima restavano a 0,00 i piatti nuovi finché non si apriva "Costo piatti". -->
 <!-- v 2026.09.28.08 — richiesto da Andrea: la sezione voucher regalo (regala.html) si allinea ora
      al Menù Degustazione a ogni pubblicazione della carta (titolo/prezzo/disponibilità dei 2
@@ -5591,13 +5592,14 @@ function fcRenderVendite() {
   if (!list) return;
   if (!fcState.vendite.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun piatto con un costo impostato — vai prima su "Costo piatti".</p>'; return; }
   list.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;">' +
-    '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Piatto</th><th>Costo (€)</th><th>Prezzo (€)</th><th>Qtà venduta</th></tr>' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Piatto</th><th>Costo (€)</th><th>Prezzo (€)</th><th>Qtà venduta</th><th title="Porzioni mangiate da noi (prove, staff): niente incasso, escono dall’inventario ma NON sporcano il Food Cost">Consumo interno</th></tr>' +
     fcState.vendite.map(function (r) {
       return '<tr style="border-top:1px solid var(--rule);">' +
         '<td style="padding:.35rem 0;">' + _fcEsc(r.piatto) + '</td>' +
         '<td>' + _fcEur(r.costo_piatto) + '</td>' +
         '<td>' + _fcEur(r.prezzo_vendita) + '</td>' +
         '<td><input type="number" min="0" step="1" id="fc-qty-' + r.piatto_costo_id + '" value="' + r.quantita_venduta + '" style="width:6rem;" /></td>' +
+        '<td><input type="number" min="0" step="1" id="fc-int-' + r.piatto_costo_id + '" value="' + (r.quantita_interna || 0) + '" style="width:6rem;" /></td>' +
         '</tr>';
     }).join('') +
     '</table>';
@@ -5608,7 +5610,8 @@ function fcSalvaVendite() {
   if (!range) { _fcSetStatus('Imposta un intervallo di date valido (Dal/Al).', true); return; }
   var righe = fcState.vendite.map(function (r) {
     var el = document.getElementById('fc-qty-' + r.piatto_costo_id);
-    return { piatto_costo_id: r.piatto_costo_id, quantita_venduta: el ? Number(el.value || 0) : 0 };
+    var elI = document.getElementById('fc-int-' + r.piatto_costo_id);
+    return { piatto_costo_id: r.piatto_costo_id, quantita_venduta: el ? Number(el.value || 0) : 0, quantita_interna: elI ? Number(elI.value || 0) : 0 };
   });
   _fcSetStatus('Salvataggio…');
   _fcFetch({ action: 'vendite_bulk_upsert', da: range.da, a: range.a, righe: righe })
@@ -5680,6 +5683,9 @@ function fcRenderDashboard() {
     _fcKpiTile('Incidenza beverage sull\'incasso', _fcPct(d.incidenza_beverage_pct), '#9085e9') +
     '</div>';
 
+  var notaInterni = (d.consumi_interni_qty > 0)
+    ? '<p style="font-size:.78rem;color:var(--stone);margin:0 0 1rem;">Consumi interni (staff/prove): <strong>' + d.consumi_interni_qty + ' porzioni = ' + _fcEur(d.consumi_interni_costo) + '</strong> al costo piatto, già tolti dal Food Cost Reale (materie prime consumate: ' + _fcEur(d.costo_materie_prime_lordo) + ' → ' + _fcEur(d.costo_materie_prime_consumate) + ').</p>'
+    : '';
   var contaME = { STAR: 0, PLOWHORSE: 0, PUZZLE: 0, DOG: 0 };
   d.menu_engineering.forEach(function (p) { contaME[p.classificazione] = (contaME[p.classificazione] || 0) + 1; });
   var chipME = '<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.4rem;">' +
@@ -5734,7 +5740,7 @@ function fcRenderDashboard() {
     }).join('') +
     '</table>';
 
-  el.innerHTML = kpi + kpiBev + chipME + grafici + graficoPiatti + reparti + repartiBev + me + trend;
+  el.innerHTML = kpi + kpiBev + notaInterni + chipME + grafici + graficoPiatti + reparti + repartiBev + me + trend;
 
   _fcDisegnaGrafici(d, top8);
 }

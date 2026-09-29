@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.29.01 — Aggiunto stile .stampa-hint (schermo) + display:none in stampa (le 2 righe di promemoria comparivano nel PDF); preview admin (con .ctrl-bar) su carta chiara invece del tema scuro. -->
 <!-- v 2026.09.27.01 — SEO: aggiunto H1 visivamente nascosto (la pagina non aveva nessun H1; il layout di stampa non ha un titolo di pagina). Nessuna modifica ai dati. -->
 <!-- v 2026.07.05.01 — Aggiunto CSS .ctrl-val (riquadri valore %/mm nella barra preview), mancante da questo file: senza, i riquadri iniettati da _szApply (gia' presente) restavano senza stile. Vedi anche admin-core.js v 2026.07.05.03 (bottone Fissa come default + spans in _SIZE_BTNS) e admin-templates-shared.js v 2026.07.05.01 (stessa CSS per la carta). -->
 <!-- v 2026.06.14.02 — _szApply aggiorna anche i riquadri valore della barra preview (#szv-fs/#szv-lh/#szv-gap/#szv-shift) → valori visibili in tempo reale mentre si regola. Span definiti in _SIZE_BTNS (admin-core.js). -->
@@ -80,6 +81,19 @@
       background: var(--ink);
       color: var(--cream);
     }
+    .stampa-hint {
+      text-align: center;
+      font-family: 'Jost', sans-serif;
+      font-size: .68rem;
+      color: var(--stone);
+      padding: .4rem 1rem .8rem;
+      background: var(--cream);
+      border-bottom: 1px solid var(--rule);
+    }
+    /* Preview di stampa (admin): carta chiara come la stampa, non il tema scuro del sito pubblico */
+    :root:has(.ctrl-bar) { --cream: #fff; --ink: #1a1714; --stone: #8c7e6e; --rust: #9e4a2a; --rule: #d4c9b8; }
+    :root:has(.ctrl-bar) body { background: #e9e5df; }
+    :root:has(.ctrl-bar) .pg { background: #fff; }
     .ctrl-sep {
       width: 1px;
       height: 1.4rem;
@@ -380,6 +394,7 @@
       body { background: white; }
       .pg { background: #fff; }
       .ctrl-bar { display: none; }
+      .stampa-hint { display: none; }
 
       /* carta: 3 pagine */
       #layout-carta .pg {

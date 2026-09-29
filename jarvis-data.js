@@ -1,15 +1,15 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-09-29",
- "versione": "2026.09.29.02",
- "briefing": "**Briefing 28/9/2026 (sera)** — **Sito** (già live): Food Cost (importo per data nello storico conteggi, apertura su Dashboard, pulizia dolci \"Golosità\"), retry automatico su 429 DeepL in Traduci e Pubblica, checkbox \"Escludi dalla stampa\" per i percorsi degustazione (+ 3 bug a catena chiusi), rimosso il banner \"Vacanzina\", voucher regalo allineati al Menù Degustazione (corretto un mismatch reale 170€ mostrato / 180€ addebitato da Stripe). **Marketing**: post Instagram orari di apertura rifatto su Canva (copia `DAHWhGgzoyA`, orari dal sito, calendario dal 1/10) — pronto, non pubblicato; **P3 saltata su tua decisione = debito dichiarato**. **Aspetta te**: pubblicare il post dal 1/10 e scegliere i canali; verifica dal vivo Food Cost; su regala.html deve restare solo \"Degustazione 6 portate\"; riempire il percorso \"7\". **Prossimo**: giro di verifica dei flussi Food Cost; sul PC eseguire `check`, `build-gantt`, `build-pannello`, `publish` (rimandati: sessione senza terminale).",
+ "versione": "2026.09.29.03",
+ "briefing": "**Briefing 29/9/2026** — **Sito** (live, v 2026.09.29.07): audit completo dei flussi di menu-admin, 12 incongruenze trovate. Corretti: la ricarica automatica dopo Pubblica non cancella più la vista aperta (es. Allergeni), guida \"Procedure\" riallineata (dolci prima degli allergeni, via «Menù Vini»), FC % e Menu Engineering calcolati sul prezzo senza IVA, avviso in Dashboard quando mancano le vendite per l'intervallo scelto. In giornata anche stampa dolci/carta, allergeni carta e consumi interni nel Food Cost. **Aspetta te**: decidere degustazione nel Food Cost, grafico Andamento e piatti tolti dalla carta; ricompilare e pubblicare Allergeni carta; pubblicare il post orari dal 1/10. **Prossimo**: applicare le 3 decisioni, poi giro di verifica dal vivo del Food Cost.",
  "kpi": {
-  "aperte": 52,
+  "aperte": 53,
   "scadute": 3,
   "bloccate": 1,
-  "andrea": 14,
+  "andrea": 15,
   "debiti": 10,
-  "chiuse30": 39
+  "chiuse30": 40
  },
  "subs": {
   "SEO": {
@@ -35,14 +35,14 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 97,
-   "done": 83,
+   "tot": 99,
+   "done": 84,
    "prog": 2,
-   "up": 3,
+   "up": 4,
    "future": 9,
    "bloccato": 0,
    "scadute": 0,
-   "andrea": 4,
+   "andrea": 5,
    "debiti": 8
   },
   "Marketing": {
@@ -199,6 +199,18 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
+  },
+  {
+   "t": "menu-admin — decisioni aperte dall'audit: degustazione nel Food Cost, grafico Andamento, piatti tolti dalla carta",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-09-29",
+   "e": null,
+   "own": "Andrea",
+   "az": "Decidere: (a) come entra il percorso degustazione in Vendite; (b) Andamento sui periodi di inventario chiusi; (c) schede costo dei piatti tolti dalla carta: spegnere/archiviare",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-29"
   },
   {
    "t": "NoShowApp F6 — acquisire 10 beta tester (WhatsApp + demo dal vivo con carta test) e guida onboarding",
@@ -511,6 +523,18 @@ window.JARVIS_DATA = {
    "agg": "2026-09-28"
   },
   {
+   "t": "menu-admin — decisioni aperte dall'audit: degustazione nel Food Cost, grafico Andamento, piatti tolti dalla carta",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-09-29",
+   "e": null,
+   "own": "Andrea",
+   "az": "Decidere: (a) come entra il percorso degustazione in Vendite; (b) Andamento sui periodi di inventario chiusi; (c) schede costo dei piatti tolti dalla carta: spegnere/archiviare",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-29"
+  },
+  {
    "t": "Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)",
    "sub": "Sito",
    "st": "up",
@@ -524,6 +548,11 @@ window.JARVIS_DATA = {
   }
  ],
  "sessioni": [
+  {
+   "d": "2026-09-29",
+   "sub": "Sito",
+   "t": "Audit flussi menu-admin"
+  },
   {
    "d": "2026-09-29",
    "sub": "Sito",
@@ -558,11 +587,6 @@ window.JARVIS_DATA = {
    "d": "2026-09-28",
    "sub": "Sito",
    "t": "Importo per data nello storico conteggi Inventario"
-  },
-  {
-   "d": "2026-09-28",
-   "sub": "Sito",
-   "t": "Retry 429 DeepL su Traduci e Pubblica"
   }
  ],
  "perWeek": [
@@ -612,7 +636,7 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-28",
-   "n": 10
+   "n": 11
   }
  ],
  "perDay": [
@@ -622,7 +646,7 @@ window.JARVIS_DATA = {
   },
   {
    "g": "mar",
-   "n": 4
+   "n": 5
   },
   {
    "g": "mer",

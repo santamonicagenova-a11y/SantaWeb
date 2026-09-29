@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.09.29.08 — Sync Dettagli piatti: la cancellazione di un piatto tolto dalla carta non è più bloccata dalla sua scheda Food Cost (trigger DB: la scheda resta come storico, spenta). Testi del riepilogo e dell'avviso errori aggiornati.
 // v 2026.09.29.07 — Audit flussi menu-admin (29/9): (1) dopo "Pubblica" la ricarica a 90s avviene solo se sei ancora sullo stesso menù e non l'hai toccato (_vistaSeq in _pulisciViste + confronto del form); prima ricaricava sempre la carta, anche dopo i dolci, e cancellava la vista aperta nel frattempo (es. le spunte di «Allergeni carta»). (2) Promemoria laterali carta/dolci/allergeni aggiornati: allergeni = carta + dolci pubblicati, dolci da pubblicare prima degli allergeni, la pubblicazione allergeni aggiorna Dettagli piatti.
 // v 2026.09.29.01 — Dolci: l'elenco allergeni stampato in fondo (MENU.allergeni) non aveva campi nel form e restava quello del vecchio menu. Ora leggi() lo ricostruisce da "Dettagli piatti" (match per nome piatto, skip escludi_stampa/senza allergeni; vocabolario stampa: latte->latticini). Cache caricata all'apertura dei dolci (_dolciPdRefresh, usa il token gh_token già salvato).
 // v 2026.09.28.03 — richiesto da Andrea: la sezione voucher regalo (regala.html) va allineata al
@@ -1766,7 +1767,7 @@ function _pdRiepilogoPiano(piano) {
     piano.nuovi.forEach(function (p) { righe.push('  + ' + p.sezione + ' — ' + p.nome); });
   }
   if (piano.rimossi.length) {
-    righe.push('RIMOSSI dalla carta — verranno CANCELLATI con i loro dati di sicurezza alimentare (' + piano.rimossi.length + '):');
+    righe.push('RIMOSSI dalla carta — verranno CANCELLATI con i loro dati di sicurezza alimentare; la scheda Food Cost resta come storico, spenta (' + piano.rimossi.length + '):');
     piano.rimossi.forEach(function (p) { righe.push('  − ' + p.sezione + ' — ' + p.piatto); });
   }
   if (piano.rinominati.length) {
@@ -1802,7 +1803,7 @@ function _pdEseguiPiano(piano, token, piattiAttualiCompleti, callback) {
     if (i >= azioni.length) {
       if (falliti.length) {
         alert('Dettagli piatti: ' + falliti.length + ' operazione/i NON riuscita/e:\n\n' + falliti.join('\n') +
-          '\n\nSe è una cancellazione: il piatto ha ancora una scheda in Food Cost (Costo piatti / ricetta) che lo tiene agganciato. Il menù è stato pubblicato lo stesso.');
+          '\n\nIl menù è stato pubblicato lo stesso: alla prossima pubblicazione la differenza verrà riproposta.');
       }
       callback(true); return;
     }

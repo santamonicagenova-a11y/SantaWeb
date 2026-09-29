@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.29.08 (bump ?v= admin-core.js a 2026.09.29.08 + footer-version; backend foodcost-admin v16 + migration fc_piatti_costo_degustazione_e_archivio) — Decisioni di Andrea sull'audit: (1) Menù Degustazione nel Food Cost: schede per percorso allineate al menù pubblicato (_fcAllineaDegustazione, costo = somma piatti + costo extra), tabella in Costo piatti, righe in Vendite (persone), riepilogo in Dashboard, fuori dal Menu Engineering; (2) Andamento sugli ultimi periodi di inventario chiusi, Teorico '—' dove mancano le vendite; (3) piatti tolti dalla carta: la scheda Food Cost resta come storico spenta (trigger DB), niente più cancellazioni bloccate. Guida aggiornata. -->
 <!-- v 2026.09.29.07 (bump ?v= admin-core.js a 2026.09.29.07 + footer-version) — Audit flussi menu-admin: guida "Procedure" corretta (dolci PRIMA degli allergeni; Allergeni carta = carta + dolci pubblicati e aggiorna Dettagli piatti; tolto il pulsante «Menù Vini» inesistente → Gestionale Cantina; nuova sezione "Menù e Food Cost: come sono collegati"). Food Cost: FC % per piatto e Menu Engineering (margine, ricavo, classi) calcolati sul prezzo in carta SENZA IVA (_fcPrezzoNetto/_fcMenuEngNetto — prima prezzo lordo vs costi netti); Dashboard avvisa quando non ci sono vendite salvate con lo stesso Dal/Al (Teorico/GAP non significativi). -->
 <!-- v 2026.09.29.06 — Food Cost → Costo piatti: stesso ordine della carta pubblicata e stessi colori per sezione di Vendite/Calcolo Food Cost. + footer-version. -->
 <!-- v 2026.09.29.05 — Food Cost → Calcolo Food Cost: elenco piatti nell'ordine della carta pubblicata con lo stesso colore per sezione di Vendite (helper _fcOrdinaEColoraPerCarta); i piatti non piu' in carta in un gruppo in fondo. + footer-version. -->
@@ -1282,6 +1283,8 @@
         <li>Ogni piatto pubblicato (carta e dolci) ha una riga in <strong>«Dettagli piatti»</strong>: è l'elenco su cui lavorano <strong>Costo piatti</strong>, <strong>Calcolo Food Cost</strong> (ricette) e <strong>Vendite</strong></li>
         <li>I <strong>prezzi di vendita</strong> del Food Cost si prendono dalla carta pubblicata (IVA inclusa); FC % e margini si calcolano sul prezzo <strong>senza IVA</strong>, come incassi e spese</li>
         <li>In <strong>Vendite</strong> le quantità valgono per l'intervallo Dal/Al con cui le salvi: la Dashboard le usa solo se ha <strong>le stesse date</strong></li>
+        <li>Il <strong>Menù Degustazione</strong> ha una scheda per percorso: costo = somma dei piatti del percorso (dalle loro schede) + un costo extra a mano; in Vendite si indicano le persone</li>
+        <li>Un piatto tolto dalla carta sparisce da «Dettagli piatti», ma la sua scheda Food Cost resta come storico (spenta)</li>
       </ul>
 
       <h3 style="margin:1rem 0 .25rem;font-size:.86rem">ℹ️ Note utili</h3>
@@ -1676,6 +1679,7 @@
 
       <div id="fc-view-costi" style="display:none;">
         <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Costo ricetta per ogni piatto già presente in "Dettagli piatti (allergeni)". Il prezzo di vendita è letto dalla carta pubblicata (carta + dolci) e si riallinea da solo all’apertura di questo tab; solo i piatti non trovati in carta hanno il prezzo da inserire a mano. Per i piatti con una ricetta nel tab "Calcolo Food Cost" il costo arriva da lì (sola lettura); gli altri si inseriscono a mano.</p>
+        <div id="fc-degu-list" style="font-size:.85rem;margin-bottom:1.4rem;"></div>
         <div id="fc-costi-list" style="font-size:.85rem;">…</div>
         <div style="margin-top:1rem;">
           <button class="btn btn-publish" onclick="fcSalvaCosti()">💾 Salva costi</button>
@@ -1689,7 +1693,7 @@
       </div>
 
       <div id="fc-view-vendite" style="display:none;">
-        <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Quantità vendute nel periodo per ogni piatto con un costo impostato — da inserire a fine mese.</p>
+        <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Quantità vendute nel periodo per ogni piatto con un costo impostato — da inserire a fine mese. Per il <strong>Menù Degustazione</strong> indica le <strong>persone</strong> che l'hanno preso. Le quantità valgono solo per queste date Dal/Al: la Dashboard le usa se ha lo stesso intervallo.</p>
         <div id="fc-vendite-list" style="font-size:.85rem;">…</div>
         <div style="margin-top:1rem;">
           <button class="btn btn-publish" onclick="fcSalvaVendite()">💾 Salva vendite</button>
@@ -2417,7 +2421,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.09.29.09"></script>
-<script src="admin-core.js?v=2026.09.29.07"></script>
+<script src="admin-core.js?v=2026.09.29.08"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
@@ -5129,8 +5133,99 @@ function fcSalvaInventario() {
 
 // ---- Schede Costo Piatto (agganciate a piatti_dettagli) ----
 
+// ---- Menù Degustazione nel Food Cost (v 2026.09.29.08, backend foodcost-admin v16) ----
+// Una scheda costo per percorso ('6' = elenco piatti, '7' = testo libero), letta dal menù PUBBLICATO:
+// costo = somma dei costi dei piatti del percorso che hanno una scheda in Costo piatti (match per
+// nome) + "costo extra" a mano (piatti senza scheda, percorso a testo libero). Prezzo = prezzo a
+// persona della carta; percorso vuoto = scheda spenta. In Vendite la quantità è in persone.
+function _fcAllineaDegustazione() {
+  var get = function (url) {
+    return fetch(url + '?nocache=' + Date.now() + '_' + Math.random().toString(36).slice(2), { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.text() : Promise.reject(new Error('HTTP ' + r.status)); })
+      .then(function (src) { return _estraiMenu(src); });
+  };
+  return Promise.all([get(MENU_URL), _fcFetch({ action: 'piatti_costo_list' }), _fcFetch({ action: 'degustazione_list' })])
+    .then(function (out) {
+      var menu = out[0], resP = out[1], resD = out[2];
+      if (!menu || !menu.degustazione || !_fcOk(resP) || !_fcOk(resD)) { fcState.degu = null; return; }
+      var degu = menu.degustazione, perc = degu.percorsi || {}, keys = Object.keys(perc);
+      var k6 = keys.find(function (k) { return Array.isArray(perc[k]); });
+      var k7 = keys.find(function (k) { return typeof perc[k] === 'string'; });
+      var costoPerNome = {};
+      (resP.body.righe || []).forEach(function (r) { if (Number(r.costo_piatto) > 0) costoPerNome[_pdNorm(r.piatto)] = Number(r.costo_piatto); });
+      var esistenti = {};
+      (resD.body.righe || []).forEach(function (r) { esistenti[r.degu_chiave] = r; });
+      var calcola = function (chiave, portate, key) {
+        var opz = (degu.opzioni || []).find(function (o) { return Number(o.portate) === portate; });
+        var contenuto = key != null ? perc[key] : null;
+        var vuoto = contenuto == null || (typeof contenuto === 'string' ? !contenuto.trim() : !contenuto.length);
+        var somma = 0, trovati = 0, mancanti = [], nPiatti = 0;
+        if (Array.isArray(contenuto)) {
+          contenuto.forEach(function (p) {
+            var nome = String((p && p.nome) || '').trim(); if (!nome) return;
+            nPiatti++;
+            var c = costoPerNome[_pdNorm(nome)];
+            if (c != null) { somma += c; trovati++; } else mancanti.push(nome.replace(/^["“]+|["”]+$/g, ''));
+          });
+        } else if (!vuoto) mancanti.push('percorso scritto a testo libero: costo tutto a mano');
+        var es = esistenti[chiave] || null;
+        var extra = es ? Number(es.costo_extra) || 0 : 0;
+        var label = key && key !== chiave ? key : '';
+        return {
+          chiave: chiave, portate: portate, label: label,
+          nome: 'Degustazione ' + portate + ' portate' + (label ? ' — «' + label + '»' : ''),
+          attivo: !vuoto && !!opz, prezzo: opz ? Number(opz.prezzo) || 0 : 0,
+          somma: Math.round(somma * 100) / 100, trovati: trovati, nPiatti: nPiatti, mancanti: mancanti,
+          costo_extra: extra, costo: Math.round((somma + extra) * 100) / 100, esistente: es
+        };
+      };
+      var lista = [calcola('6', 6, k6), calcola('7', 7, k7)];
+      fcState.degu = lista;
+      var daSalvare = lista.filter(function (d) {
+        var e = d.esistente;
+        return !e || Number(e.costo_piatto) !== d.costo || Number(e.prezzo_vendita) !== d.prezzo || !!e.attivo !== d.attivo || e.nome !== d.nome;
+      });
+      return Promise.all(daSalvare.map(function (d) {
+        return _fcFetch({ action: 'degustazione_upsert', degu_chiave: d.chiave, nome: d.nome, costo_piatto: d.costo, costo_extra: d.costo_extra, prezzo_vendita: d.prezzo, attivo: d.attivo });
+      }));
+    })
+    .catch(function (e) { console.warn('[Food Cost] allineamento Degustazione non riuscito: ' + (e && e.message)); });
+}
+
+function fcRenderDegustazione() {
+  var box = document.getElementById('fc-degu-list');
+  if (!box) return;
+  var lista = fcState.degu;
+  if (!lista) { box.innerHTML = '<p style="color:var(--stone);font-size:.8rem;">Menù Degustazione: carta pubblicata non raggiungibile, riprova più tardi.</p>'; return; }
+  var col = '#c98500';
+  box.innerHTML = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:.82rem;min-width:34rem;">' +
+    '<tr><td colspan="4" style="padding:.6rem .5rem .25rem;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:' + col + ';border-left:4px solid ' + col + ';background:' + _fcHexRgba(col, .16) + ';">Menù Degustazione (costo a persona)</td></tr>' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th style="padding-left:.5rem;">Percorso</th><th>Somma piatti</th><th title="Piatti senza scheda costo, percorso a testo libero, extra (pane, pre-dessert…)">Costo extra (€)</th><th>Costo · Prezzo · FC %</th></tr>' +
+    lista.map(function (d) {
+      var nota = !d.attivo ? '<div style="font-size:.7rem;color:var(--stone);">percorso vuoto in carta: escluso</div>'
+        : (d.mancanti.length ? '<div style="font-size:.7rem;color:#b5651d;">senza costo: ' + _fcEsc(d.mancanti.join(', ')) + ' → mettilo nel costo extra</div>' : '<div style="font-size:.7rem;color:var(--stone);">' + d.trovati + ' piatti su ' + d.nPiatti + ' con costo</div>');
+      return '<tr style="border-top:1px solid var(--rule);background:' + _fcHexRgba(col, .07) + ';' + (d.attivo ? '' : 'opacity:.55;') + '">' +
+        '<td style="padding:.35rem .5rem;border-left:4px solid ' + col + ';">' + _fcEsc(d.nome) + nota + '</td>' +
+        '<td>' + _fcEur(d.somma) + '</td>' +
+        '<td><input type="number" min="0" step="0.01" id="fc-degu-extra-' + d.chiave + '" value="' + (d.costo_extra || '') + '" style="width:7rem;" /></td>' +
+        '<td><strong>' + _fcEur(d.costo) + '</strong> · ' + (d.prezzo ? _fcEur(d.prezzo) + ' · FC <strong>' + _fcFcPct(d.costo, d.prezzo) + '</strong>' : '—') + '</td>' +
+        '</tr>';
+    }).join('') + '</table></div>';
+}
+
+function _fcSalvaDegustazioneExtra() {
+  return Promise.all((fcState.degu || []).map(function (d) {
+    var el = document.getElementById('fc-degu-extra-' + d.chiave);
+    if (!el) return null;
+    var extra = _fcNum(el.value);
+    if (extra === (Number(d.costo_extra) || 0)) return null;
+    return _fcFetch({ action: 'degustazione_upsert', degu_chiave: d.chiave, nome: d.nome, costo_piatto: Math.round((d.somma + extra) * 100) / 100, costo_extra: extra, prezzo_vendita: d.prezzo, attivo: d.attivo });
+  }));
+}
+
 function fcLoadCosti() {
   _fcSetStatus('Caricamento costo piatti…');
+  _fcAllineaDegustazione().then(fcRenderDegustazione);
   Promise.all([_fcFetch({ action: 'piatti_costo_list' }), _fcPrezziCartaLive(), _fcOrdineCartaLive()])
     .then(function (out) {
       var res = out[0], carta = out[1];
@@ -5252,7 +5347,7 @@ function fcSalvaCosti() {
       attivo: r.attivo,
     }));
   });
-  if (!chiamate.length) { _fcSetStatus('Nessuna scheda da salvare.', true); return; }
+  chiamate.push(_fcSalvaDegustazioneExtra().then(function () { return { status: 200, body: { ok: true } }; }));
   _fcSetStatus('Salvataggio…');
   Promise.all(chiamate).then(function (risultati) {
     var errore = risultati.find(function (res) { return !_fcOk(res); });
@@ -5625,6 +5720,7 @@ function fcLoadVendite() {
   // I prezzi di Vendite sono quelli salvati nelle schede costo: si riallineano prima alla carta
   // pubblicata (come fa il tab Costo piatti), altrimenti i piatti nuovi restano a 0,00.
   _fcAllineaPrezziPrimaDiVendite()
+    .then(_fcAllineaDegustazione)
     .then(function () { return Promise.all([_fcFetch({ action: 'vendite_get', da: r.da, a: r.a }), _fcOrdineCartaLive()]); })
     .then(function (out) {
       var res = out[0];
@@ -5682,10 +5778,11 @@ function fcRenderVendite() {
   if (ord) {
     // L'elenco rispecchia la carta pubblicata: solo i piatti in carta, nel suo ordine. I piatti
     // che non sono (piu') in carta si vedono solo se hanno quantita nel periodo, in fondo.
-    var inCarta = function (r) { return ord.piatti[_pdNorm(r.sezione) + '|' + _pdNorm(r.piatto)] != null || ord.nomi[_pdNorm(r.piatto)] != null; };
+    var isDegu = function (r) { return r.tipo === 'degustazione'; };
+    var inCarta = function (r) { return isDegu(r) || ord.piatti[_pdNorm(r.sezione) + '|' + _pdNorm(r.piatto)] != null || ord.nomi[_pdNorm(r.piatto)] != null; };
     var conQty = function (r) { return Number(r.quantita_venduta) > 0 || Number(r.quantita_interna) > 0; };
     righeOrd = righeOrd.filter(function (r) { return inCarta(r) || conQty(r); });
-    var kS = function (r) { if (!inCarta(r)) return 999; var v = ord.sez[_pdNorm(r.sezione)]; return v == null ? (ord.nomi[_pdNorm(r.piatto)] || [998])[0] : v; };
+    var kS = function (r) { if (isDegu(r)) return -1; if (!inCarta(r)) return 999; var v = ord.sez[_pdNorm(r.sezione)]; return v == null ? (ord.nomi[_pdNorm(r.piatto)] || [998])[0] : v; };
     var kP = function (r) { var v = ord.piatti[_pdNorm(r.sezione) + '|' + _pdNorm(r.piatto)]; return v == null ? ((ord.nomi[_pdNorm(r.piatto)] || [0, 999])[1]) : v; };
     righeOrd.sort(function (a, b) { return (kS(a) - kS(b)) || (kP(a) - kP(b)) || String(a.piatto).localeCompare(String(b.piatto)); });
     righeOrd.forEach(function (r) { if (!inCarta(r)) r._fuoriCarta = true; });
@@ -5699,7 +5796,7 @@ function fcRenderVendite() {
     var intest = '';
     if (chiave !== sezPrec) {
       sezPrec = chiave;
-      intest = '<tr><td colspan="5" style="padding:.6rem .5rem .25rem;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:' + col + ';border-left:4px solid ' + col + ';background:' + hex2rgba(col, .16) + ';">' + _fcEsc(r._fuoriCarta ? 'Non più in carta (con quantità nel periodo)' : (r.sezione || 'Altro')) + '</td></tr>';
+      intest = '<tr><td colspan="5" style="padding:.6rem .5rem .25rem;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:' + col + ';border-left:4px solid ' + col + ';background:' + hex2rgba(col, .16) + ';">' + _fcEsc(r._fuoriCarta ? 'Non più in carta (con quantità nel periodo)' : r.tipo === 'degustazione' ? 'Menù Degustazione — quantità = persone' : (r.sezione || 'Altro')) + '</td></tr>';
     }
     return intest + '<tr style="border-top:1px solid var(--rule);background:' + hex2rgba(col, .07) + ';">' +
       '<td style="padding:.35rem .5rem;border-left:4px solid ' + col + ';">' + _fcEsc(r.piatto) + '</td>' +
@@ -5742,7 +5839,8 @@ function fcLoadDashboard() {
   var r = fcRangeValido();
   if (!r) { _fcSetStatus('Imposta un intervallo di date valido (Dal/Al).', true); return; }
   _fcSetStatus('Calcolo…');
-  _fcFetch({ action: 'dashboard', da: r.da, a: r.a })
+  _fcAllineaDegustazione()
+    .then(function () { return _fcFetch({ action: 'dashboard', da: r.da, a: r.a }); })
     .then(function (res) {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcState.dashboard = res.body;
@@ -5815,7 +5913,9 @@ function fcRenderDashboard() {
 
   // v 2026.09.29.07 — Le vendite valgono solo per lo STESSO identico intervallo Dal/Al con cui
   // sono state salvate. Senza vendite il Teorico va a 0% e il GAP coincide col Reale: va detto.
-  var senzaVendite = !(d.menu_engineering || []).some(function (p) { return Number(p.qty_venduta) > 0; }) && !(d.consumi_interni_qty > 0);
+  var senzaVendite = d.vendite_presenti === undefined
+    ? !(d.menu_engineering || []).some(function (p) { return Number(p.qty_venduta) > 0; }) && !(d.consumi_interni_qty > 0)
+    : !d.vendite_presenti;
   var AVV_VENDITE = 'nessuna vendita per questo intervallo|In Vendite non ci sono quantità salvate con esattamente queste date Dal/Al: il Teorico è 0 e il GAP non è significativo. Inserisci le vendite con lo stesso intervallo della Dashboard.';
   var AVV_INV = 'periodo non chiuso|Manca il conteggio di inventario iniziale e/o finale per almeno un reparto nel periodo selezionato: il periodo non è ancora chiuso e questo numero può essere fuorviante.';
 
@@ -5837,7 +5937,11 @@ function fcRenderDashboard() {
   var notaVendite = senzaVendite
     ? '<p style="font-size:.78rem;color:#b5651d;margin:0 0 1rem;">⚠️ Nessuna vendita salvata con queste date (' + _fcEsc(d.da) + ' → ' + _fcEsc(d.a) + '): Teorico, GAP e Menu Engineering non sono significativi. In "Vendite" imposta lo stesso Dal/Al della Dashboard e salva le quantità.</p>'
     : '';
-  var notaInterni = notaVendite + ((d.consumi_interni_qty > 0)
+  var deguVend = (d.degustazione || []).filter(function (p) { return p.qty_venduta > 0; });
+  var notaDegu = deguVend.length
+    ? '<p style="font-size:.78rem;color:var(--stone);margin:0 0 1rem;">Menù Degustazione nel costo teorico: ' + deguVend.map(function (p) { return _fcEsc(p.nome) + ' <strong>' + p.qty_venduta + ' persone</strong> × ' + _fcEur(p.costo_piatto) + ' = ' + _fcEur(p.costo_teorico); }).join(' · ') + ' (non entra nel Menu Engineering).</p>'
+    : '';
+  var notaInterni = notaVendite + notaDegu + ((d.consumi_interni_qty > 0)
     ? '<p style="font-size:.78rem;color:var(--stone);margin:0 0 1rem;">Consumi interni (staff/prove): <strong>' + d.consumi_interni_qty + ' porzioni = ' + _fcEur(d.consumi_interni_costo) + '</strong> al costo piatto, già tolti dal Food Cost Reale (materie prime consumate: ' + _fcEur(d.costo_materie_prime_lordo) + ' → ' + _fcEur(d.costo_materie_prime_consumate) + ').</p>'
     : '');
   var contaME = { STAR: 0, PLOWHORSE: 0, PUZZLE: 0, DOG: 0 };
@@ -5854,7 +5958,8 @@ function fcRenderDashboard() {
     '<div style="position:relative;height:14rem;"><canvas id="fc-chart-spese"></canvas></div>' +
     '</div></div>' +
     '<div class="fs" style="flex:1.4;min-width:17rem;"><div class="fs-body" style="padding:.9rem;">' +
-    '<div class="sub" style="margin-top:0;">Food Cost Reale vs Teorico — ' + ((d.trend || []).length) + ' intervalli (stessa durata di quello selezionato)</div>' +
+    '<div class="sub" style="margin-top:0;">Food Cost Reale vs Teorico — ultimi ' + ((d.trend || []).length) + ' periodi di inventario chiusi</div>' +
+    ((d.trend || []).length ? '' : '<p style="color:var(--stone);font-size:.8rem;">Nessun periodo chiuso: servono almeno due conteggi di inventario completi (tutti i reparti food).</p>') +
     '<div style="position:relative;height:14rem;"><canvas id="fc-chart-trend"></canvas></div>' +
     '</div></div>' +
     '</div>';
@@ -5886,11 +5991,12 @@ function fcRenderDashboard() {
     }).join('') +
     '</table>';
 
-  var trend = '<div class="sub">Andamento — intervalli precedenti (stessa durata)</div>' +
+  var trend = '<div class="sub">Andamento — periodi di inventario chiusi</div>' +
     '<table style="width:100%;border-collapse:collapse;font-size:.8rem;">' +
     '<tr style="text-align:left;color:var(--stone);font-size:.68rem;text-transform:uppercase;"><th>Intervallo</th><th>Reale</th><th>Teorico</th></tr>' +
     (d.trend || []).map(function (t) {
-      return '<tr style="border-top:1px solid var(--rule);"><td style="padding:.3rem 0;">' + t.da + ' → ' + t.a + '</td><td>' + _fcPct(t.food_cost_reale_pct) + '</td><td>' + _fcPct(t.food_cost_teorico_pct) + '</td></tr>';
+      var teo = t.vendite_presenti === false ? '<span style="color:var(--stone);" title="Nessuna vendita salvata con queste date">— senza vendite</span>' : _fcPct(t.food_cost_teorico_pct);
+      return '<tr style="border-top:1px solid var(--rule);"><td style="padding:.3rem 0;">' + t.da + ' → ' + t.a + '</td><td>' + _fcPct(t.food_cost_reale_pct) + '</td><td>' + teo + '</td></tr>';
     }).join('') +
     '</table>';
 
@@ -5935,7 +6041,7 @@ function _fcDisegnaGrafici(d, top8) {
         labels: (d.trend || []).map(function (t) { return t.a; }),
         datasets: [
           { label: 'Reale', data: (d.trend || []).map(function (t) { return t.food_cost_reale_pct * 100; }), borderColor: '#d95926', backgroundColor: '#d9592633', tension: .3, pointRadius: 3 },
-          { label: 'Teorico', data: (d.trend || []).map(function (t) { return t.food_cost_teorico_pct * 100; }), borderColor: '#3987e5', backgroundColor: '#3987e533', tension: .3, pointRadius: 3 }
+          { label: 'Teorico', data: (d.trend || []).map(function (t) { return t.vendite_presenti === false ? null : t.food_cost_teorico_pct * 100; }), borderColor: '#3987e5', backgroundColor: '#3987e533', tension: .3, pointRadius: 3 }
         ]
       },
       options: {
@@ -7753,7 +7859,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.29.07</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.29.08</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

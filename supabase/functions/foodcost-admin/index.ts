@@ -126,6 +126,19 @@
 // ora quantita_interna (porzioni interne per piatto e periodo); calcolaRange toglie dal costo
 // materie prime consumate il costo teorico di quelle porzioni (porzioni x costo piatto) e
 // restituisce costo_materie_prime_lordo, consumi_interni_qty, consumi_interni_costo.
+// v16 (2026-09-29) — dall'audit dei flussi di menu-admin, 3 scelte di Andrea:
+// (1) MENÙ DEGUSTAZIONE nel Food Cost: fc_piatti_costo ha ora tipo 'piatto'|'degustazione'; una
+//     scheda per percorso (degu_chiave '6'/'7', senza piatto_id), costo = somma dei costi dei piatti
+//     del percorso + costo_extra (piatti senza scheda o percorso a testo libero) calcolato dal
+//     frontend sul menù pubblicato. Entra in Vendite (quantità = persone) e nel costo teorico, NON
+//     nel Menu Engineering (è un menù, non un piatto). Nuove azioni degustazione_list/_upsert.
+// (2) ANDAMENTO in dashboard: non più 6 intervalli di pari durata all'indietro (non coincidevano
+//     mai con conteggi né vendite) ma gli ultimi 6 PERIODI DI INVENTARIO CHIUSI (food) che finiscono
+//     entro "a"; ogni punto dice se ha vendite salvate con quelle date (vendite_presenti).
+// (3) PIATTI TOLTI DALLA CARTA: FK fc_piatti_costo.piatto_id ON DELETE SET NULL + trigger su
+//     piatti_dettagli che prima della cancellazione copia nome/sezione nella scheda e la spegne
+//     (attivo=false): Dettagli piatti si cancella, la scheda resta come storico. Calcoli e Vendite
+//     includono le schede spente solo se hanno quantità nel periodo (storico corretto).
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
@@ -257,6 +270,45 @@ async function piattiCheUsano(ingredienteId: string): Promise<string[]> {
   const { data, error } = await supabase.from("fc_ricette_righe").select("piatto_id").eq("ingrediente_id", ingredienteId);
   if (error) throw error;
   return Array.from(new Set((data || []).map((r: any) => r.piatto_id)));
+}
+
+// v16: nome/sezione di una scheda costo — piatto collegato, altrimenti copia archiviata
+// (piatto cancellato da Dettagli piatti) o etichetta del percorso degustazione.
+function nomeScheda(c: any): string {
+  if (c.piatti_dettagli) return c.piatti_dettagli.piatto;
+  return c.nome || "(piatto rimosso)";
+}
+function sezioneScheda(c: any): string | null {
+  if (c.piatti_dettagli) return c.piatti_dettagli.sezione;
+  if (c.tipo === "degustazione") return "Menù Degustazione";
+  return c.sezione_label || null;
+}
+
+// v16: periodi di inventario chiusi (ogni reparto attivo del tipo contato a entrambe le date).
+async function periodiInventario(tipo: string) {
+  const repartiRes = await supabase.from("fc_reparti").select("id").eq("attivo", true).eq("tipo", tipo);
+  if (repartiRes.error) throw repartiRes.error;
+  const repartiIds = (repartiRes.data || []).map((r: any) => r.id);
+  if (!repartiIds.length) return { date_complete: [] as string[], periodi: [] as { da: string; a: string }[], date_dettaglio: [] as any[] };
+  const conteggiRes = await supabase.from("fc_inventario_conteggi").select("data, reparto_id, valore").in("reparto_id", repartiIds);
+  if (conteggiRes.error) throw conteggiRes.error;
+  const repartiPerData = new Map<string, Set<string>>();
+  const valorePerData = new Map<string, number>();
+  for (const row of conteggiRes.data || []) {
+    if (!repartiPerData.has(row.data)) repartiPerData.set(row.data, new Set());
+    repartiPerData.get(row.data)!.add(row.reparto_id);
+    valorePerData.set(row.data, (valorePerData.get(row.data) || 0) + n(row.valore));
+  }
+  const totaleReparti = repartiIds.length;
+  const dateDettaglio = Array.from(repartiPerData.entries())
+    .map(([data, set]) => ({ data, contati: set.size, totale: totaleReparti, valore_totale: valorePerData.get(data) || 0 }))
+    .sort((a, b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : 0));
+  const dateComplete = dateDettaglio.filter((d) => d.contati === d.totale).map((d) => d.data);
+  const periodi: { da: string; a: string }[] = [];
+  for (let i = 0; i < dateComplete.length - 1; i++) {
+    periodi.push({ da: dateComplete[i], a: addGiorni(dateComplete[i + 1], -1) });
+  }
+  return { date_complete: dateComplete, periodi, date_dettaglio: dateDettaglio };
 }
 
 // Intervallo libero "da/a" (sostituisce il vecchio "periodo" mensile fisso, v2 2026-09-13).
@@ -393,7 +445,7 @@ async function calcolaRange(da: string, a: string) {
     supabase.from("fc_spese_giornaliere").select("reparto_id, importo").gte("data", da).lte("data", a),
     supabase.from("fc_incassi_giornalieri").select("importo, tipo").gte("data", da).lte("data", a),
     supabase.from("fc_inventario_conteggi").select("data, reparto_id, valore").in("data", [da, dataFinale]),
-    supabase.from("fc_piatti_costo").select("*, piatti_dettagli(piatto, sezione)").eq("attivo", true),
+    supabase.from("fc_piatti_costo").select("*, piatti_dettagli(piatto, sezione)"),
     supabase.from("fc_vendite_periodo").select("piatto_costo_id, quantita_venduta, quantita_interna").eq("data_da", da).eq("data_a", a),
   ]);
   for (const r of [repartiRes, speseRes, incassiRes, invRes, costiRes, venditeRes]) {
@@ -479,16 +531,21 @@ async function calcolaRange(da: string, a: string) {
   const incidenzaBeveragePct = incassoTotale > 0 ? totaleIncassiBev / incassoTotale : 0;
 
   const venditeByPiatto = new Map<string, number>();
+  const conQtyNelPeriodo = new Set<string>();
   for (const row of venditeRes.data || []) {
     venditeByPiatto.set(row.piatto_costo_id, n(row.quantita_venduta));
+    if (n(row.quantita_venduta) > 0 || n(row.quantita_interna) > 0) conQtyNelPeriodo.add(row.piatto_costo_id);
   }
-  const piatti = (costiRes.data || []).map((c: any) => {
+  // v16: schede attive + schede spente (piatti tolti dalla carta) solo se hanno quantità nel periodo.
+  const schede = (costiRes.data || []).filter((c: any) => c.attivo || conQtyNelPeriodo.has(c.id));
+  const tutte = schede.map((c: any) => {
     const qty = venditeByPiatto.get(c.id) || 0;
     const costo = n(c.costo_piatto), prezzo = n(c.prezzo_vendita);
     return {
       piatto_costo_id: c.id,
-      nome: c.piatti_dettagli ? c.piatti_dettagli.piatto : "(piatto rimosso)",
-      sezione: c.piatti_dettagli ? c.piatti_dettagli.sezione : null,
+      tipo: c.tipo || "piatto",
+      nome: nomeScheda(c),
+      sezione: sezioneScheda(c),
       qty_venduta: qty, costo_piatto: costo, prezzo_vendita: prezzo,
       margine_unitario: prezzo - costo,
       costo_teorico: qty * costo,
@@ -497,7 +554,10 @@ async function calcolaRange(da: string, a: string) {
     };
   });
 
-  const costoTeoricoTotale = piatti.reduce((a, p) => a + p.costo_teorico, 0);
+  // Costo teorico: piatti + percorsi degustazione. Menu Engineering: solo i piatti.
+  const piatti = tutte.filter((p) => p.tipo !== "degustazione");
+  const degustazione = tutte.filter((p) => p.tipo === "degustazione");
+  const costoTeoricoTotale = tutte.reduce((a, p) => a + p.costo_teorico, 0);
   const foodCostTeoricoPct = totaleIncassi > 0 ? costoTeoricoTotale / totaleIncassi : 0;
   const gapPct = foodCostRealePct - foodCostTeoricoPct;
 
@@ -532,6 +592,8 @@ async function calcolaRange(da: string, a: string) {
     gap_pct: gapPct,
     inventario_incompleto: inventarioIncompleto,
     menu_engineering: menuEngineering,
+    degustazione,
+    vendite_presenti: conQtyNelPeriodo.size > 0,
     soglia_popolarita: sogliaPopolarita,
     soglia_margine: sogliaMargine,
     reparti_beverage: repartiDettaglioBev,
@@ -981,29 +1043,8 @@ Deno.serve(async (req) => {
     // v14: date_dettaglio ha anche valore_totale (somma dei conteggi contati in quella data).
     } else if (action === "inventario_periodi_disponibili") {
       const tipo = body.tipo === "beverage" ? "beverage" : "food";
-      const repartiRes = await supabase.from("fc_reparti").select("id").eq("attivo", true).eq("tipo", tipo);
-      if (repartiRes.error) throw repartiRes.error;
-      const repartiIds = (repartiRes.data || []).map((r: any) => r.id);
-      if (!repartiIds.length) return json({ ok: true, tipo, date_complete: [], periodi: [], date_dettaglio: [] });
-      const conteggiRes = await supabase.from("fc_inventario_conteggi").select("data, reparto_id, valore").in("reparto_id", repartiIds);
-      if (conteggiRes.error) throw conteggiRes.error;
-      const repartiPerData = new Map<string, Set<string>>();
-      const valorePerData = new Map<string, number>();
-      for (const row of conteggiRes.data || []) {
-        if (!repartiPerData.has(row.data)) repartiPerData.set(row.data, new Set());
-        repartiPerData.get(row.data)!.add(row.reparto_id);
-        valorePerData.set(row.data, (valorePerData.get(row.data) || 0) + n(row.valore));
-      }
-      const totaleReparti = repartiIds.length;
-      const dateDettaglio = Array.from(repartiPerData.entries())
-        .map(([data, set]) => ({ data, contati: set.size, totale: totaleReparti, valore_totale: valorePerData.get(data) || 0 }))
-        .sort((a, b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : 0));
-      const dateComplete = dateDettaglio.filter((d) => d.contati === d.totale).map((d) => d.data);
-      const periodi = [];
-      for (let i = 0; i < dateComplete.length - 1; i++) {
-        periodi.push({ da: dateComplete[i], a: addGiorni(dateComplete[i + 1], -1) });
-      }
-      return json({ ok: true, tipo, date_complete: dateComplete, periodi, date_dettaglio: dateDettaglio });
+      const p = await periodiInventario(tipo);
+      return json({ ok: true, tipo, ...p });
 
     // ---- Schede Costo Piatto (agganciate a piatti_dettagli) ----
     } else if (action === "piatti_costo_list") {
@@ -1056,18 +1097,26 @@ Deno.serve(async (req) => {
       const r = rangeValido(body.da, body.a);
       if (!r) return json({ error: "Intervallo non valido" }, 400);
       const [costiRes, vendRes] = await Promise.all([
-        supabase.from("fc_piatti_costo").select("*, piatti_dettagli(piatto, sezione)").eq("attivo", true),
+        supabase.from("fc_piatti_costo").select("*, piatti_dettagli(piatto, sezione)"),
         supabase.from("fc_vendite_periodo").select("*").eq("data_da", r.da).eq("data_a", r.a),
       ]);
       if (costiRes.error) throw costiRes.error;
       if (vendRes.error) throw vendRes.error;
       const byPiatto = new Map((vendRes.data || []).map((row: any) => [row.piatto_costo_id, row]));
-      const righe = (costiRes.data || []).map((c: any) => {
+      // v16: schede spente (piatti tolti dalla carta) solo se hanno quantità in questo periodo.
+      const visibili = (costiRes.data || []).filter((c: any) => {
+        const v: any = byPiatto.get(c.id);
+        return c.attivo || (v && (n(v.quantita_venduta) > 0 || n(v.quantita_interna) > 0));
+      });
+      const righe = visibili.map((c: any) => {
         const v = byPiatto.get(c.id);
         return {
           piatto_costo_id: c.id,
-          piatto: c.piatti_dettagli ? c.piatti_dettagli.piatto : "(piatto rimosso)",
-          sezione: c.piatti_dettagli ? c.piatti_dettagli.sezione : null,
+          tipo: c.tipo || "piatto",
+          degu_chiave: c.degu_chiave || null,
+          attivo: c.attivo,
+          piatto: nomeScheda(c),
+          sezione: sezioneScheda(c),
           costo_piatto: c.costo_piatto, prezzo_vendita: c.prezzo_vendita,
           quantita_venduta: v ? v.quantita_venduta : 0,
           quantita_interna: v ? v.quantita_interna : 0,
@@ -1098,13 +1147,36 @@ Deno.serve(async (req) => {
       const r = rangeValido(body.da, body.a);
       if (!r) return json({ error: "Intervallo non valido" }, 400);
       const corrente = await calcolaRange(r.da, r.a);
+      // v16: andamento sugli ultimi 6 periodi di inventario chiusi (food) che finiscono entro "a".
+      const { periodi } = await periodiInventario("food");
+      const scelti = periodi.filter((p) => p.a <= r.a).slice(-6);
       const trend = [];
-      for (let i = 5; i >= 0; i--) {
-        const blocco = shiftRangeIndietro(r.da, r.a, i);
-        const c = await calcolaRange(blocco.da, blocco.a);
-        trend.push({ da: blocco.da, a: blocco.a, food_cost_reale_pct: c.food_cost_reale_pct, food_cost_teorico_pct: c.food_cost_teorico_pct });
+      for (const p of scelti) {
+        const c = await calcolaRange(p.da, p.a);
+        trend.push({ da: p.da, a: p.a, food_cost_reale_pct: c.food_cost_reale_pct, food_cost_teorico_pct: c.food_cost_teorico_pct, vendite_presenti: c.vendite_presenti });
       }
-      return json({ ok: true, ...corrente, trend });
+      return json({ ok: true, ...corrente, trend, trend_tipo: "periodi_inventario" });
+
+    // ---- Menù Degustazione (v16): una scheda costo per percorso ----
+    } else if (action === "degustazione_list") {
+      const { data, error } = await supabase.from("fc_piatti_costo").select("*").eq("tipo", "degustazione").order("degu_chiave", { ascending: true });
+      if (error) throw error;
+      return json({ ok: true, righe: data || [] });
+
+    } else if (action === "degustazione_upsert") {
+      const chiave = s(body.degu_chiave);
+      if (!chiave) return json({ error: "Percorso mancante" }, 400);
+      const costo_piatto = n(body.costo_piatto), prezzo_vendita = n(body.prezzo_vendita), costo_extra = n(body.costo_extra);
+      if (costo_piatto < 0 || prezzo_vendita < 0 || costo_extra < 0) return json({ error: "Valori non validi" }, 400);
+      const { error } = await supabase.from("fc_piatti_costo").upsert({
+        degu_chiave: chiave, tipo: "degustazione", piatto_id: null,
+        nome: s(body.nome) || ("Degustazione " + chiave), sezione_label: "Menù Degustazione",
+        costo_piatto, costo_extra, prezzo_vendita,
+        attivo: body.attivo === undefined ? true : !!body.attivo,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "degu_chiave" });
+      if (error) throw error;
+      return json({ ok: true });
 
     // ---- Calcolo Food Cost: ingredienti (v13) ----
     } else if (action === "ingredienti_list") {

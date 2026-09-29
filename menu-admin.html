@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.29.06 — Food Cost → Costo piatti: stesso ordine della carta pubblicata e stessi colori per sezione di Vendite/Calcolo Food Cost. + footer-version. -->
 <!-- v 2026.09.29.05 — Food Cost → Calcolo Food Cost: elenco piatti nell'ordine della carta pubblicata con lo stesso colore per sezione di Vendite (helper _fcOrdinaEColoraPerCarta); i piatti non piu' in carta in un gruppo in fondo. + footer-version. -->
 <!-- v 2026.09.29.04 — Food Cost → Vendite rispecchia la carta pubblicata: mostra solo i piatti in carta (nel suo ordine, colori per sezione); i piatti in carta senza scheda costo ne ricevono una (costo 0, prezzo della carta) all'apertura; i piatti non piu' in carta compaiono solo se hanno quantita nel periodo (gruppo in fondo); il salvataggio scrive solo le righe mostrate. + footer-version. -->
 <!-- v 2026.09.29.03 — Food Cost → Vendite: piatti nell'ordine della carta pubblicata (sezioni e piatti), con un colore per tipologia (barra + sfondo tinto + intestazione di sezione) + footer-version. admin-core.js invariato. -->
@@ -5120,9 +5121,10 @@ function fcSalvaInventario() {
 
 function fcLoadCosti() {
   _fcSetStatus('Caricamento costo piatti…');
-  Promise.all([_fcFetch({ action: 'piatti_costo_list' }), _fcPrezziCartaLive()])
+  Promise.all([_fcFetch({ action: 'piatti_costo_list' }), _fcPrezziCartaLive(), _fcOrdineCartaLive()])
     .then(function (out) {
       var res = out[0], carta = out[1];
+      fcState.ordineCarta = out[2];
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcState.costi = res.body.righe || [];
       fcState.costiCartaOk = !!carta;
@@ -5205,14 +5207,16 @@ function fcRenderCosti() {
   if (!fcState.costi.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun piatto in "Dettagli piatti (allergeni)" — crealo prima da lì.</p>'; return; }
   list.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;">' +
     '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Piatto</th><th>Costo ricetta (€)</th><th>Prezzo vendita (€)</th></tr>' +
-    fcState.costi.map(function (r) {
+    _fcOrdinaEColoraPerCarta(fcState.costi, fcState.ordineCarta).map(function (o) {
+      var r = o.r, col = o.col;
+      var intest = o.intest ? '<tr><td colspan="3" style="padding:.6rem .5rem .25rem;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:' + col + ';border-left:4px solid ' + col + ';background:' + _fcHexRgba(col, .16) + ';">' + _fcEsc(o.intest) + '</td></tr>' : '';
       var cellaPrezzo = r.prezzo_carta != null
         ? '<span style="font-weight:600;">' + _fcEur(r.prezzo_carta) + (r.unita_carta ? ' <span style="font-weight:400;">' + _fcEsc(r.unita_carta) + '</span>' : '') + '</span>' +
           '<div style="font-size:.7rem;color:var(--stone);">dalla carta pubblicata</div>'
         : '<input type="number" min="0" step="0.01" id="fc-prezzo-' + r.piatto_id + '" value="' + (r.prezzo_vendita == null ? '' : r.prezzo_vendita) + '" style="width:8rem;" />' +
           (fcState.costiCartaOk ? '<div style="font-size:.7rem;color:#b5651d;">non trovato in carta — a mano</div>' : '');
-      return '<tr style="border-top:1px solid var(--rule);">' +
-        '<td style="padding:.35rem 0;">' + _fcEsc(r.piatto) + '<div style="font-size:.7rem;color:var(--stone);">' + _fcEsc(r.sezione || '') + '</div></td>' +
+      return intest + '<tr style="border-top:1px solid var(--rule);background:' + _fcHexRgba(col, .07) + ';">' +
+        '<td style="padding:.35rem .5rem;border-left:4px solid ' + col + ';">' + _fcEsc(r.piatto) + '<div style="font-size:.7rem;color:var(--stone);">' + _fcEsc(r.sezione || '') + '</div></td>' +
         '<td>' + (r.ha_ricetta
           ? '<span style="font-weight:600;">' + _fcEur(r.costo_piatto) + '</span><div style="font-size:.7rem;color:var(--stone);">dalla ricetta (Calcolo Food Cost)</div>'
           : '<input type="number" min="0" step="0.01" id="fc-costo-' + r.piatto_id + '" value="' + (r.costo_piatto == null ? '' : r.costo_piatto) + '" style="width:8rem;" />') + '</td>' +
@@ -7696,7 +7700,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.29.05</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.29.06</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

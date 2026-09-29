@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.09.29.01",
+  version: "2026.09.29.02",
   updated: "2026-09-29",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -102,7 +102,10 @@ window.SANTAMONICA_GANTT = {
       {t:'Food Cost — riordino tab (Dashboard·Spese·Incassi·Vendite·Inventario·Costo piatti·Reparti) con colori per gruppo', s:'2026-09-13', st:'done'},
       {t:'Stampa dolci e carta: allergeni dolci da Allergeni carta pubblicato, nome 18pt/descrizione 15pt, promemoria fuori dalla stampa, preview chiara', s:'2026-09-29', e:'2026-09-29', st:'done'},
       {t:'Gantt trasversale ricostruito da zero + pubblicato su santamonicagenova.it/gantt (gantt.html noindex + gantt-data.js)', s:'2026-09-21', st:'done', ms:true},
+      {t:'Food Cost: consumi interni (piatti mangiati da noi, prove/staff) esclusi dal Food Cost reale e dal GAP', s:'2026-09-29', e:'2026-09-29', st:'done'},
       {t:'Food Cost — opzione futura (non richiesta come lavoro): Labor Cost % · Prime Cost % · Break-Even Point, serve una fonte dati costo-personale non ancora esistente', s:'2026-09-13', e:'2027-05-01', st:'future'},
+      {t:'Food Cost: elenchi Vendite, Costo piatti e Calcolo Food Cost nell\'ordine della carta pubblicata, con un colore per sezione', s:'2026-09-29', e:'2026-09-29', st:'done'},
+      {t:'Allergeni carta: il form parte sempre da carta + dolci pubblicati (bug perdita allergeni), la pubblicazione aggiorna Dettagli piatti, niente doppia sezione dolci in EN/FR', s:'2026-09-29', st:'prog'},
       {t:'Aggiornare orari su Google Business Profile e schede esterne (settembre-ottobre)', s:'2026-08-28', e:'2026-09-25', st:'done'},
       {t:'Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)', s:'2026-09-21', st:'up'},
       {t:'Restyling tema scuro del sito (home, menu, prenota, regala, dove-siamo)', s:'2026-09-04', e:'2026-09-04', st:'done'},

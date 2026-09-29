@@ -1,15 +1,15 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-09-29",
- "versione": "2026.09.29.01",
+ "versione": "2026.09.29.02",
  "briefing": "**Briefing 28/9/2026 (sera)** — **Sito** (già live): Food Cost (importo per data nello storico conteggi, apertura su Dashboard, pulizia dolci \"Golosità\"), retry automatico su 429 DeepL in Traduci e Pubblica, checkbox \"Escludi dalla stampa\" per i percorsi degustazione (+ 3 bug a catena chiusi), rimosso il banner \"Vacanzina\", voucher regalo allineati al Menù Degustazione (corretto un mismatch reale 170€ mostrato / 180€ addebitato da Stripe). **Marketing**: post Instagram orari di apertura rifatto su Canva (copia `DAHWhGgzoyA`, orari dal sito, calendario dal 1/10) — pronto, non pubblicato; **P3 saltata su tua decisione = debito dichiarato**. **Aspetta te**: pubblicare il post dal 1/10 e scegliere i canali; verifica dal vivo Food Cost; su regala.html deve restare solo \"Degustazione 6 portate\"; riempire il percorso \"7\". **Prossimo**: giro di verifica dei flussi Food Cost; sul PC eseguire `check`, `build-gantt`, `build-pannello`, `publish` (rimandati: sessione senza terminale).",
  "kpi": {
-  "aperte": 51,
+  "aperte": 52,
   "scadute": 3,
   "bloccate": 1,
-  "andrea": 13,
-  "debiti": 9,
-  "chiuse30": 37
+  "andrea": 14,
+  "debiti": 10,
+  "chiuse30": 39
  },
  "subs": {
   "SEO": {
@@ -35,15 +35,15 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 94,
-   "done": 81,
-   "prog": 1,
+   "tot": 97,
+   "done": 83,
+   "prog": 2,
    "up": 3,
    "future": 9,
    "bloccato": 0,
    "scadute": 0,
-   "andrea": 3,
-   "debiti": 7
+   "andrea": 4,
+   "debiti": 8
   },
   "Marketing": {
    "tot": 36,
@@ -163,6 +163,18 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-27"
+  },
+  {
+   "t": "Allergeni carta: il form parte sempre da carta + dolci pubblicati (bug perdita allergeni), la pubblicazione aggiorna Dettagli piatti, niente doppia sezione dolci in EN/FR",
+   "sub": "Sito",
+   "st": "prog",
+   "s": "2026-09-29",
+   "e": null,
+   "own": "Andrea",
+   "az": "Allergeni carta → ricompilare gli allergeni di tutti i piatti della carta (la pagina online oggi ha solo Golosità: erano stati persi) e pubblicare; poi Traduci e Pubblica della carta per rigenerare EN/FR con gli allergeni in fondo",
+   "bl": null,
+   "deb": true,
+   "agg": "2026-09-29"
   },
   {
    "t": "Calcolo Food Cost ricette da ingredienti: anagrafica ingredienti in Setup + tab Calcolo Food Cost che valorizza Costo Ricetta in Costo piatti",
@@ -375,6 +387,18 @@ window.JARVIS_DATA = {
  ],
  "inCorso": [
   {
+   "t": "Allergeni carta: il form parte sempre da carta + dolci pubblicati (bug perdita allergeni), la pubblicazione aggiorna Dettagli piatti, niente doppia sezione dolci in EN/FR",
+   "sub": "Sito",
+   "st": "prog",
+   "s": "2026-09-29",
+   "e": null,
+   "own": "Andrea",
+   "az": "Allergeni carta → ricompilare gli allergeni di tutti i piatti della carta (la pagina online oggi ha solo Golosità: erano stati persi) e pubblicare; poi Traduci e Pubblica della carta per rigenerare EN/FR con gli allergeni in fondo",
+   "bl": null,
+   "deb": true,
+   "agg": "2026-09-29"
+  },
+  {
    "t": "Calcolo Food Cost ricette da ingredienti: anagrafica ingredienti in Setup + tab Calcolo Food Cost che valorizza Costo Ricetta in Costo piatti",
    "sub": "Sito",
    "st": "prog",
@@ -503,6 +527,11 @@ window.JARVIS_DATA = {
   {
    "d": "2026-09-29",
    "sub": "Sito",
+   "t": "Food Cost consumi interni, allergeni carta ed elenchi"
+  },
+  {
+   "d": "2026-09-29",
+   "sub": "Sito",
    "t": "Stampa dolci e carta"
   },
   {
@@ -534,11 +563,6 @@ window.JARVIS_DATA = {
    "d": "2026-09-28",
    "sub": "Sito",
    "t": "Retry 429 DeepL su Traduci e Pubblica"
-  },
-  {
-   "d": "2026-09-28",
-   "sub": "Sito",
-   "t": "Rimosso banner Vacanzina scaduto"
   }
  ],
  "perWeek": [
@@ -588,7 +612,7 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-28",
-   "n": 9
+   "n": 10
   }
  ],
  "perDay": [
@@ -598,7 +622,7 @@ window.JARVIS_DATA = {
   },
   {
    "g": "mar",
-   "n": 3
+   "n": 4
   },
   {
    "g": "mer",

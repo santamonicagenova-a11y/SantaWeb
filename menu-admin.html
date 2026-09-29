@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.29.04 — Food Cost → Vendite rispecchia la carta pubblicata: mostra solo i piatti in carta (nel suo ordine, colori per sezione); i piatti in carta senza scheda costo ne ricevono una (costo 0, prezzo della carta) all'apertura; i piatti non piu' in carta compaiono solo se hanno quantita nel periodo (gruppo in fondo); il salvataggio scrive solo le righe mostrate. + footer-version. -->
 <!-- v 2026.09.29.03 — Food Cost → Vendite: piatti nell'ordine della carta pubblicata (sezioni e piatti), con un colore per tipologia (barra + sfondo tinto + intestazione di sezione) + footer-version. admin-core.js invariato. -->
 <!-- v 2026.09.29.02 (bump ?v= admin-core.js a 2026.09.29.06 e admin-templates-shared.js a 2026.09.29.09 + footer-version) — Food Cost → Vendite: nuova colonna "Consumo interno" (porzioni mangiate da noi: prove/staff). Salvata in fc_vendite_periodo.quantita_interna; la edge function foodcost-admin (v15) ne toglie il costo (porzioni x costo piatto) dal costo materie prime consumate, quindi Food Cost Reale e GAP non sono più gonfiati. Dashboard: riga di riepilogo dei consumi interni. -->
 <!-- v 2026.09.29.01 — Food Cost → Vendite: prima di caricare, i prezzi delle schede costo si riallineano alla carta pubblicata (_fcAllineaPrezziPrimaDiVendite); prima restavano a 0,00 i piatti nuovi finché non si apriva "Costo piatti". -->
@@ -5561,10 +5562,13 @@ function _fcAllineaPrezziPrimaDiVendite() {
         x.prezzo_carta = m ? m.prezzo : null;
         return x.piatto_costo_id && x.prezzo_carta != null && Number(x.prezzo_vendita) !== x.prezzo_carta;
       });
-      return Promise.all(daAllineare.map(function (x) {
+      // Piatti in carta senza scheda costo (mai valorizzati): scheda con costo 0 e prezzo della carta,
+      // cosi compaiono in Vendite come nella carta (il costo si imposta poi in Costo piatti / ricette).
+      var senzaScheda = righe.filter(function (x) { return !x.piatto_costo_id && x.prezzo_carta != null; });
+      return Promise.all(daAllineare.concat(senzaScheda).map(function (x) {
         return _fcFetch({
           action: 'piatti_costo_upsert', piatto_id: x.piatto_id,
-          costo_piatto: Number(x.costo_piatto) || 0, prezzo_vendita: x.prezzo_carta, attivo: x.attivo,
+          costo_piatto: Number(x.costo_piatto) || 0, prezzo_vendita: x.prezzo_carta, attivo: x.attivo === false && x.piatto_costo_id ? false : true,
         });
       }));
     })
@@ -5600,7 +5604,7 @@ function _fcOrdineCartaLive() {
   };
   return Promise.all([get(MENU_URL), get(DOLCI_URL).catch(function () { return null; })])
     .then(function (menus) {
-      var sezIdx = {}, piattoIdx = {}, ns = 0;
+      var sezIdx = {}, piattoIdx = {}, nomiIdx = {}, ns = 0;
       menus.forEach(function (m) {
         if (!m || !Array.isArray(m.sezioni)) return;
         var byTitolo = {};
@@ -5610,11 +5614,15 @@ function _fcOrdineCartaLive() {
         m.sezioni.forEach(function (sz) { if (ordine.indexOf(sz) < 0) ordine.push(sz); });
         ordine.forEach(function (sz) {
           [sz.titolo_display, sz.titolo].filter(Boolean).forEach(function (t) { if (sezIdx[_pdNorm(t)] == null) sezIdx[_pdNorm(t)] = ns; });
-          (sz.piatti || []).forEach(function (p, i) { if (p && p.nome) piattoIdx[_pdNorm(sz.titolo_display || sz.titolo) + '|' + _pdNorm(p.nome)] = i; });
+          (sz.piatti || []).forEach(function (p, i) {
+            if (!(p && p.nome)) return;
+            piattoIdx[_pdNorm(sz.titolo_display || sz.titolo) + '|' + _pdNorm(p.nome)] = i;
+            if (nomiIdx[_pdNorm(p.nome)] == null) nomiIdx[_pdNorm(p.nome)] = [ns, i];
+          });
           ns++;
         });
       });
-      return { sez: sezIdx, piatti: piattoIdx };
+      return { sez: sezIdx, piatti: piattoIdx, nomi: nomiIdx };
     })
     .catch(function () { return null; });
 }
@@ -5629,20 +5637,26 @@ function fcRenderVendite() {
   var ord = fcState.ordineCarta;
   var righeOrd = fcState.vendite.slice();
   if (ord) {
-    var kS = function (r) { var v = ord.sez[_pdNorm(r.sezione)]; return v == null ? 999 : v; };
-    var kP = function (r) { var v = ord.piatti[_pdNorm(r.sezione) + '|' + _pdNorm(r.piatto)]; return v == null ? 999 : v; };
+    // L'elenco rispecchia la carta pubblicata: solo i piatti in carta, nel suo ordine. I piatti
+    // che non sono (piu') in carta si vedono solo se hanno quantita nel periodo, in fondo.
+    var inCarta = function (r) { return ord.piatti[_pdNorm(r.sezione) + '|' + _pdNorm(r.piatto)] != null || ord.nomi[_pdNorm(r.piatto)] != null; };
+    var conQty = function (r) { return Number(r.quantita_venduta) > 0 || Number(r.quantita_interna) > 0; };
+    righeOrd = righeOrd.filter(function (r) { return inCarta(r) || conQty(r); });
+    var kS = function (r) { if (!inCarta(r)) return 999; var v = ord.sez[_pdNorm(r.sezione)]; return v == null ? (ord.nomi[_pdNorm(r.piatto)] || [998])[0] : v; };
+    var kP = function (r) { var v = ord.piatti[_pdNorm(r.sezione) + '|' + _pdNorm(r.piatto)]; return v == null ? ((ord.nomi[_pdNorm(r.piatto)] || [0, 999])[1]) : v; };
     righeOrd.sort(function (a, b) { return (kS(a) - kS(b)) || (kP(a) - kP(b)) || String(a.piatto).localeCompare(String(b.piatto)); });
+    righeOrd.forEach(function (r) { if (!inCarta(r)) r._fuoriCarta = true; });
   }
   var colorePerSez = {}, nCol = 0, sezPrec = null;
   var hex2rgba = function (h, a) { var n = parseInt(h.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')'; };
   var corpo = righeOrd.map(function (r) {
-    var chiave = _pdNorm(r.sezione || '');
+    var chiave = r._fuoriCarta ? '__fuori' : _pdNorm(r.sezione || '');
     if (colorePerSez[chiave] == null) colorePerSez[chiave] = FC_SEZ_COLORI[nCol++ % FC_SEZ_COLORI.length];
     var col = colorePerSez[chiave];
     var intest = '';
     if (chiave !== sezPrec) {
       sezPrec = chiave;
-      intest = '<tr><td colspan="5" style="padding:.6rem .5rem .25rem;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:' + col + ';border-left:4px solid ' + col + ';background:' + hex2rgba(col, .16) + ';">' + _fcEsc(r.sezione || 'Altro') + '</td></tr>';
+      intest = '<tr><td colspan="5" style="padding:.6rem .5rem .25rem;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:' + col + ';border-left:4px solid ' + col + ';background:' + hex2rgba(col, .16) + ';">' + _fcEsc(r._fuoriCarta ? 'Non più in carta (con quantità nel periodo)' : (r.sezione || 'Altro')) + '</td></tr>';
     }
     return intest + '<tr style="border-top:1px solid var(--rule);background:' + hex2rgba(col, .07) + ';">' +
       '<td style="padding:.35rem .5rem;border-left:4px solid ' + col + ';">' + _fcEsc(r.piatto) + '</td>' +
@@ -5661,10 +5675,13 @@ function fcRenderVendite() {
 function fcSalvaVendite() {
   var range = fcRangeValido();
   if (!range) { _fcSetStatus('Imposta un intervallo di date valido (Dal/Al).', true); return; }
-  var righe = fcState.vendite.map(function (r) {
+  // Solo le righe mostrate: i piatti nascosti (non piu' in carta, senza quantita) non vengono toccati.
+  var righe = [];
+  fcState.vendite.forEach(function (r) {
     var el = document.getElementById('fc-qty-' + r.piatto_costo_id);
     var elI = document.getElementById('fc-int-' + r.piatto_costo_id);
-    return { piatto_costo_id: r.piatto_costo_id, quantita_venduta: el ? Number(el.value || 0) : 0, quantita_interna: elI ? Number(elI.value || 0) : 0 };
+    if (!el && !elI) return;
+    righe.push({ piatto_costo_id: r.piatto_costo_id, quantita_venduta: el ? Number(el.value || 0) : 0, quantita_interna: elI ? Number(elI.value || 0) : 0 });
   });
   _fcSetStatus('Salvataggio…');
   _fcFetch({ action: 'vendite_bulk_upsert', da: range.da, a: range.a, righe: righe })
@@ -7652,7 +7669,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.29.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.29.04</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

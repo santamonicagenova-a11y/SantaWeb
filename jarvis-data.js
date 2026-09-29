@@ -1,8 +1,8 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-09-29",
- "versione": "2026.09.29.04",
- "briefing": "**Briefing 29/9/2026** — **Sito** (live, menu-admin v 2026.09.29.08 + Food Cost server v16): audit completo dei flussi di menu-admin, 12 incongruenze trovate e sistemate le principali — ricarica dopo Pubblica che non cancella più la vista aperta, guida \"Procedure\" riallineata, FC % e Menu Engineering su prezzo senza IVA, avviso vendite mancanti; poi, su tua approvazione, **Menù Degustazione nel Food Cost**, **Andamento sui periodi di inventario chiusi**, **piatti tolti dalla carta conservati come storico**. **Aspetta te**: in Costo piatti compilare il costo extra della degustazione (Insalata di panissa); ricompilare e pubblicare Allergeni carta; post orari dal 1/10. **Prossimo**: primo uso reale di Costo piatti/Vendite/Dashboard come verifica; restano da valutare rinomina sezioni (duplicati in Dettagli piatti) e costi storicizzati.",
+ "versione": "2026.09.29.05",
+ "briefing": "**Briefing 29/9/2026** — **Sito** (live, menu-admin v 2026.09.29.09 + Food Cost server v17): audit completo dei flussi di menu-admin, 12 incongruenze trovate e sistemate le principali — ricarica dopo Pubblica che non cancella più la vista aperta, guida \"Procedure\" riallineata, FC % e Menu Engineering su prezzo senza IVA, avviso vendite mancanti; poi, su tua approvazione, **Menù Degustazione nel Food Cost** (costo = somma piatti × % porzione), **Andamento sui periodi di inventario chiusi**, **piatti tolti dalla carta conservati come storico**. **Aspetta te**: in Costo piatti impostare la % porzione dei percorsi degustazione; ricompilare e pubblicare Allergeni carta; post orari dal 1/10. **Prossimo**: primo uso reale di Costo piatti/Vendite/Dashboard come verifica; restano da valutare rinomina sezioni (duplicati in Dettagli piatti) e costi storicizzati.",
  "kpi": {
   "aperte": 52,
   "scadute": 3,

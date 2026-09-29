@@ -320,7 +320,7 @@
       text-align: center;
       margin-bottom: .55rem;
     }
-    .orario-piatto:last-child { margin-bottom: 0; }
+    .orario-piatto:last-child { margin-bottom: 0; } .orario-desc { display: block; font-style: italic; font-size: .68em; line-height: 1.25; color: var(--stone); margin-top: .3mm; }
 
     .orario-piatto .eco::after {
       content: ' *';
@@ -826,7 +826,7 @@ function buildOrarioColonna(titoli, sepDopo) {
       const eco = p.sostenibile ? ' eco' : '';
       const unitaHtml = p.unita ? ` ${p.unita}` : '';
       const prezzoHtml = p.prezzo != null ? ` ${p.prezzo}${unitaHtml}` : '';
-      return `<div class="orario-piatto"><span class="${'piatto-riga' + eco}">${p.nome}${prezzoHtml}</span></div>`;
+      return `<div class="orario-piatto"><span class="${'piatto-riga' + eco}">${p.nome}${prezzoHtml}</span>${p.descrizione ? '<span class="orario-desc">' + p.descrizione + '</span>' : ''}</div>`;
     }).join('');
 
     const sep = (titolo === sepDopo) ? '<hr class="orario-sep">' : '';

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.29.09 (+ footer-version; backend foodcost-admin v17 + migration fc_piatti_costo_porzione_pct) — Menù Degustazione: richiesto da Andrea, le porzioni sono più piccole di quelle alla carta → il costo del percorso = somma dei costi dei piatti alla carta × "% porzione" (campo in Costo piatti, 1–200, default 100) al posto del "costo extra"; percorso a testo libero: somma dei piatti della carta nominati nel testo. admin-core.js invariato. -->
 <!-- v 2026.09.29.08 (bump ?v= admin-core.js a 2026.09.29.08 + footer-version; backend foodcost-admin v16 + migration fc_piatti_costo_degustazione_e_archivio) — Decisioni di Andrea sull'audit: (1) Menù Degustazione nel Food Cost: schede per percorso allineate al menù pubblicato (_fcAllineaDegustazione, costo = somma piatti + costo extra), tabella in Costo piatti, righe in Vendite (persone), riepilogo in Dashboard, fuori dal Menu Engineering; (2) Andamento sugli ultimi periodi di inventario chiusi, Teorico '—' dove mancano le vendite; (3) piatti tolti dalla carta: la scheda Food Cost resta come storico spenta (trigger DB), niente più cancellazioni bloccate. Guida aggiornata. -->
 <!-- v 2026.09.29.07 (bump ?v= admin-core.js a 2026.09.29.07 + footer-version) — Audit flussi menu-admin: guida "Procedure" corretta (dolci PRIMA degli allergeni; Allergeni carta = carta + dolci pubblicati e aggiorna Dettagli piatti; tolto il pulsante «Menù Vini» inesistente → Gestionale Cantina; nuova sezione "Menù e Food Cost: come sono collegati"). Food Cost: FC % per piatto e Menu Engineering (margine, ricavo, classi) calcolati sul prezzo in carta SENZA IVA (_fcPrezzoNetto/_fcMenuEngNetto — prima prezzo lordo vs costi netti); Dashboard avvisa quando non ci sono vendite salvate con lo stesso Dal/Al (Teorico/GAP non significativi). -->
 <!-- v 2026.09.29.06 — Food Cost → Costo piatti: stesso ordine della carta pubblicata e stessi colori per sezione di Vendite/Calcolo Food Cost. + footer-version. -->
@@ -1283,7 +1284,7 @@
         <li>Ogni piatto pubblicato (carta e dolci) ha una riga in <strong>«Dettagli piatti»</strong>: è l'elenco su cui lavorano <strong>Costo piatti</strong>, <strong>Calcolo Food Cost</strong> (ricette) e <strong>Vendite</strong></li>
         <li>I <strong>prezzi di vendita</strong> del Food Cost si prendono dalla carta pubblicata (IVA inclusa); FC % e margini si calcolano sul prezzo <strong>senza IVA</strong>, come incassi e spese</li>
         <li>In <strong>Vendite</strong> le quantità valgono per l'intervallo Dal/Al con cui le salvi: la Dashboard le usa solo se ha <strong>le stesse date</strong></li>
-        <li>Il <strong>Menù Degustazione</strong> ha una scheda per percorso: costo = somma dei piatti del percorso (dalle loro schede) + un costo extra a mano; in Vendite si indicano le persone</li>
+        <li>Il <strong>Menù Degustazione</strong> ha una scheda per percorso: costo = somma dei costi dei piatti alla carta × la <strong>% porzione</strong> che imposti in Costo piatti (le porzioni sono più piccole); in Vendite si indicano le persone</li>
         <li>Un piatto tolto dalla carta sparisce da «Dettagli piatti», ma la sua scheda Food Cost resta come storico (spenta)</li>
       </ul>
 
@@ -5134,10 +5135,12 @@ function fcSalvaInventario() {
 // ---- Schede Costo Piatto (agganciate a piatti_dettagli) ----
 
 // ---- Menù Degustazione nel Food Cost (v 2026.09.29.08, backend foodcost-admin v16) ----
-// Una scheda costo per percorso ('6' = elenco piatti, '7' = testo libero), letta dal menù PUBBLICATO:
-// costo = somma dei costi dei piatti del percorso che hanno una scheda in Costo piatti (match per
-// nome) + "costo extra" a mano (piatti senza scheda, percorso a testo libero). Prezzo = prezzo a
-// persona della carta; percorso vuoto = scheda spenta. In Vendite la quantità è in persone.
+// Una scheda costo per percorso ('6' = elenco piatti, '7' = testo libero), letta dal menù PUBBLICATO.
+// v 2026.09.29.09 (backend v17) — richiesto da Andrea: in degustazione le porzioni sono più piccole
+// di quelle alla carta → costo = somma dei costi dei piatti alla carta × "% porzione" (scelta da
+// Andrea, 1–200, default 100), al posto del "costo extra". Percorso a testo libero: si sommano i
+// piatti della carta il cui nome compare nel testo. Prezzo = prezzo a persona della carta;
+// percorso vuoto = scheda spenta. In Vendite la quantità è in persone.
 function _fcAllineaDegustazione() {
   var get = function (url) {
     return fetch(url + '?nocache=' + Date.now() + '_' + Math.random().toString(36).slice(2), { cache: 'no-store' })
@@ -5167,16 +5170,23 @@ function _fcAllineaDegustazione() {
             var c = costoPerNome[_pdNorm(nome)];
             if (c != null) { somma += c; trovati++; } else mancanti.push(nome.replace(/^["“]+|["”]+$/g, ''));
           });
-        } else if (!vuoto) mancanti.push('percorso scritto a testo libero: costo tutto a mano');
+        } else if (!vuoto) {
+          // Testo libero: piatti della carta il cui nome compare nel testo del percorso.
+          var testoN = ' ' + _pdNorm(contenuto) + ' ';
+          Object.keys(costoPerNome).forEach(function (nomeN) {
+            if (nomeN.length > 3 && testoN.indexOf(' ' + nomeN + ' ') >= 0) { somma += costoPerNome[nomeN]; trovati++; nPiatti++; }
+          });
+          if (!trovati) mancanti.push('percorso scritto a testo libero: nessun piatto della carta riconosciuto nel testo');
+        }
         var es = esistenti[chiave] || null;
-        var extra = es ? Number(es.costo_extra) || 0 : 0;
+        var pct = es && Number(es.porzione_pct) > 0 ? Number(es.porzione_pct) : 100;
         var label = key && key !== chiave ? key : '';
         return {
           chiave: chiave, portate: portate, label: label,
           nome: 'Degustazione ' + portate + ' portate' + (label ? ' — «' + label + '»' : ''),
           attivo: !vuoto && !!opz, prezzo: opz ? Number(opz.prezzo) || 0 : 0,
           somma: Math.round(somma * 100) / 100, trovati: trovati, nPiatti: nPiatti, mancanti: mancanti,
-          costo_extra: extra, costo: Math.round((somma + extra) * 100) / 100, esistente: es
+          porzione_pct: pct, costo: Math.round(somma * pct) / 100, esistente: es
         };
       };
       var lista = [calcola('6', 6, k6), calcola('7', 7, k7)];
@@ -5186,7 +5196,7 @@ function _fcAllineaDegustazione() {
         return !e || Number(e.costo_piatto) !== d.costo || Number(e.prezzo_vendita) !== d.prezzo || !!e.attivo !== d.attivo || e.nome !== d.nome;
       });
       return Promise.all(daSalvare.map(function (d) {
-        return _fcFetch({ action: 'degustazione_upsert', degu_chiave: d.chiave, nome: d.nome, costo_piatto: d.costo, costo_extra: d.costo_extra, prezzo_vendita: d.prezzo, attivo: d.attivo });
+        return _fcFetch({ action: 'degustazione_upsert', degu_chiave: d.chiave, nome: d.nome, costo_piatto: d.costo, porzione_pct: d.porzione_pct, prezzo_vendita: d.prezzo, attivo: d.attivo });
       }));
     })
     .catch(function (e) { console.warn('[Food Cost] allineamento Degustazione non riuscito: ' + (e && e.message)); });
@@ -5200,14 +5210,14 @@ function fcRenderDegustazione() {
   var col = '#c98500';
   box.innerHTML = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:.82rem;min-width:34rem;">' +
     '<tr><td colspan="4" style="padding:.6rem .5rem .25rem;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:' + col + ';border-left:4px solid ' + col + ';background:' + _fcHexRgba(col, .16) + ';">Menù Degustazione (costo a persona)</td></tr>' +
-    '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th style="padding-left:.5rem;">Percorso</th><th>Somma piatti</th><th title="Piatti senza scheda costo, percorso a testo libero, extra (pane, pre-dessert…)">Costo extra (€)</th><th>Costo · Prezzo · FC %</th></tr>' +
+    '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th style="padding-left:.5rem;">Percorso</th><th title="Somma dei costi dei piatti del percorso, a porzione intera come alla carta">Somma piatti (carta)</th><th title="Quanto pesa la porzione in degustazione rispetto a quella alla carta: il costo del percorso è la somma dei piatti × questa percentuale">% porzione</th><th>Costo · Prezzo · FC %</th></tr>' +
     lista.map(function (d) {
       var nota = !d.attivo ? '<div style="font-size:.7rem;color:var(--stone);">percorso vuoto in carta: escluso</div>'
-        : (d.mancanti.length ? '<div style="font-size:.7rem;color:#b5651d;">senza costo: ' + _fcEsc(d.mancanti.join(', ')) + ' → mettilo nel costo extra</div>' : '<div style="font-size:.7rem;color:var(--stone);">' + d.trovati + ' piatti su ' + d.nPiatti + ' con costo</div>');
+        : (d.mancanti.length ? '<div style="font-size:.7rem;color:#b5651d;">non conteggiati (senza scheda costo): ' + _fcEsc(d.mancanti.join(', ')) + '</div>' : '<div style="font-size:.7rem;color:var(--stone);">' + d.trovati + ' piatti su ' + d.nPiatti + ' con costo</div>');
       return '<tr style="border-top:1px solid var(--rule);background:' + _fcHexRgba(col, .07) + ';' + (d.attivo ? '' : 'opacity:.55;') + '">' +
         '<td style="padding:.35rem .5rem;border-left:4px solid ' + col + ';">' + _fcEsc(d.nome) + nota + '</td>' +
         '<td>' + _fcEur(d.somma) + '</td>' +
-        '<td><input type="number" min="0" step="0.01" id="fc-degu-extra-' + d.chiave + '" value="' + (d.costo_extra || '') + '" style="width:7rem;" /></td>' +
+        '<td style="white-space:nowrap;"><input type="number" min="1" max="200" step="1" id="fc-degu-pct-' + d.chiave + '" value="' + d.porzione_pct + '" style="width:5rem;" /> %</td>' +
         '<td><strong>' + _fcEur(d.costo) + '</strong> · ' + (d.prezzo ? _fcEur(d.prezzo) + ' · FC <strong>' + _fcFcPct(d.costo, d.prezzo) + '</strong>' : '—') + '</td>' +
         '</tr>';
     }).join('') + '</table></div>';
@@ -5215,11 +5225,12 @@ function fcRenderDegustazione() {
 
 function _fcSalvaDegustazioneExtra() {
   return Promise.all((fcState.degu || []).map(function (d) {
-    var el = document.getElementById('fc-degu-extra-' + d.chiave);
+    var el = document.getElementById('fc-degu-pct-' + d.chiave);
     if (!el) return null;
-    var extra = _fcNum(el.value);
-    if (extra === (Number(d.costo_extra) || 0)) return null;
-    return _fcFetch({ action: 'degustazione_upsert', degu_chiave: d.chiave, nome: d.nome, costo_piatto: Math.round((d.somma + extra) * 100) / 100, costo_extra: extra, prezzo_vendita: d.prezzo, attivo: d.attivo });
+    var pct = Math.round(_fcNum(el.value));
+    if (pct < 1 || pct > 200) { _fcSetStatus('% porzione della degustazione: da 1 a 200.', true); return null; }
+    if (pct === d.porzione_pct) return null;
+    return _fcFetch({ action: 'degustazione_upsert', degu_chiave: d.chiave, nome: d.nome, costo_piatto: Math.round(d.somma * pct) / 100, porzione_pct: pct, prezzo_vendita: d.prezzo, attivo: d.attivo });
   }));
 }
 
@@ -7859,7 +7870,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.29.08</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.29.09</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

@@ -139,6 +139,10 @@
 //     piatti_dettagli che prima della cancellazione copia nome/sezione nella scheda e la spegne
 //     (attivo=false): Dettagli piatti si cancella, la scheda resta come storico. Calcoli e Vendite
 //     includono le schede spente solo se hanno quantità nel periodo (storico corretto).
+// v17 (2026-09-29, stessa giornata) — richiesto da Andrea: in degustazione le porzioni sono più
+// piccole di quelle alla carta. Il costo del percorso = somma dei costi dei piatti alla carta ×
+// porzione_pct / 100 (percentuale scelta da Andrea, 1–200, default 100), al posto del "costo extra".
+// degustazione_upsert accetta porzione_pct; costo_extra resta in tabella ma non si usa più (0).
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
@@ -1166,12 +1170,14 @@ Deno.serve(async (req) => {
     } else if (action === "degustazione_upsert") {
       const chiave = s(body.degu_chiave);
       if (!chiave) return json({ error: "Percorso mancante" }, 400);
-      const costo_piatto = n(body.costo_piatto), prezzo_vendita = n(body.prezzo_vendita), costo_extra = n(body.costo_extra);
-      if (costo_piatto < 0 || prezzo_vendita < 0 || costo_extra < 0) return json({ error: "Valori non validi" }, 400);
+      const costo_piatto = n(body.costo_piatto), prezzo_vendita = n(body.prezzo_vendita);
+      const porzione_pct = body.porzione_pct === undefined || body.porzione_pct === null || body.porzione_pct === "" ? 100 : n(body.porzione_pct);
+      if (costo_piatto < 0 || prezzo_vendita < 0) return json({ error: "Valori non validi" }, 400);
+      if (porzione_pct <= 0 || porzione_pct > 200) return json({ error: "Percentuale porzione non valida (1–200)" }, 400);
       const { error } = await supabase.from("fc_piatti_costo").upsert({
         degu_chiave: chiave, tipo: "degustazione", piatto_id: null,
         nome: s(body.nome) || ("Degustazione " + chiave), sezione_label: "Menù Degustazione",
-        costo_piatto, costo_extra, prezzo_vendita,
+        costo_piatto, costo_extra: 0, porzione_pct, prezzo_vendita,
         attivo: body.attivo === undefined ? true : !!body.attivo,
         updated_at: new Date().toISOString(),
       }, { onConflict: "degu_chiave" });

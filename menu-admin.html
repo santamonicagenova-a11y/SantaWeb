@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.29.03 — Food Cost → Vendite: piatti nell'ordine della carta pubblicata (sezioni e piatti), con un colore per tipologia (barra + sfondo tinto + intestazione di sezione) + footer-version. admin-core.js invariato. -->
 <!-- v 2026.09.29.02 (bump ?v= admin-core.js a 2026.09.29.06 e admin-templates-shared.js a 2026.09.29.09 + footer-version) — Food Cost → Vendite: nuova colonna "Consumo interno" (porzioni mangiate da noi: prove/staff). Salvata in fc_vendite_periodo.quantita_interna; la edge function foodcost-admin (v15) ne toglie il costo (porzioni x costo piatto) dal costo materie prime consumate, quindi Food Cost Reale e GAP non sono più gonfiati. Dashboard: riga di riepilogo dei consumi interni. -->
 <!-- v 2026.09.29.01 — Food Cost → Vendite: prima di caricare, i prezzi delle schede costo si riallineano alla carta pubblicata (_fcAllineaPrezziPrimaDiVendite); prima restavano a 0,00 i piatti nuovi finché non si apriva "Costo piatti". -->
 <!-- v 2026.09.28.08 — richiesto da Andrea: la sezione voucher regalo (regala.html) si allinea ora
@@ -5577,8 +5578,10 @@ function fcLoadVendite() {
   // I prezzi di Vendite sono quelli salvati nelle schede costo: si riallineano prima alla carta
   // pubblicata (come fa il tab Costo piatti), altrimenti i piatti nuovi restano a 0,00.
   _fcAllineaPrezziPrimaDiVendite()
-    .then(function () { return _fcFetch({ action: 'vendite_get', da: r.da, a: r.a }); })
-    .then(function (res) {
+    .then(function () { return Promise.all([_fcFetch({ action: 'vendite_get', da: r.da, a: r.a }), _fcOrdineCartaLive()]); })
+    .then(function (out) {
+      var res = out[0];
+      fcState.ordineCarta = out[1];
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       fcState.vendite = res.body.righe || [];
       fcRenderVendite();
@@ -5587,21 +5590,71 @@ function fcLoadVendite() {
     .catch(function (e) { _fcErr(e, 'Errore di connessione.'); });
 }
 
+// Ordine della carta pubblicata (sezioni nell'ordine di stampa: prima quelle delle pagine, poi le altre;
+// piatti nell'ordine della sezione; poi i dolci). null se la carta non è raggiungibile.
+function _fcOrdineCartaLive() {
+  var get = function (url) {
+    return fetch(url + '?nocache=' + Date.now() + '_' + Math.random().toString(36).slice(2), { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.text() : Promise.reject(new Error('HTTP ' + r.status)); })
+      .then(function (src) { return _estraiMenu(src); });
+  };
+  return Promise.all([get(MENU_URL), get(DOLCI_URL).catch(function () { return null; })])
+    .then(function (menus) {
+      var sezIdx = {}, piattoIdx = {}, ns = 0;
+      menus.forEach(function (m) {
+        if (!m || !Array.isArray(m.sezioni)) return;
+        var byTitolo = {};
+        m.sezioni.forEach(function (sz) { byTitolo[_pdNorm(sz.titolo)] = sz; });
+        var ordine = [];
+        (m.pagine || []).forEach(function (pg) { (pg.sezioni || []).forEach(function (t) { if (byTitolo[_pdNorm(t)] && ordine.indexOf(byTitolo[_pdNorm(t)]) < 0) ordine.push(byTitolo[_pdNorm(t)]); }); });
+        m.sezioni.forEach(function (sz) { if (ordine.indexOf(sz) < 0) ordine.push(sz); });
+        ordine.forEach(function (sz) {
+          [sz.titolo_display, sz.titolo].filter(Boolean).forEach(function (t) { if (sezIdx[_pdNorm(t)] == null) sezIdx[_pdNorm(t)] = ns; });
+          (sz.piatti || []).forEach(function (p, i) { if (p && p.nome) piattoIdx[_pdNorm(sz.titolo_display || sz.titolo) + '|' + _pdNorm(p.nome)] = i; });
+          ns++;
+        });
+      });
+      return { sez: sezIdx, piatti: piattoIdx };
+    })
+    .catch(function () { return null; });
+}
+
+// Un colore per tipologia (sezione): barra a sinistra + sfondo appena tinto.
+var FC_SEZ_COLORI = ['#3987e5', '#d95926', '#199e70', '#c98500', '#9085e9', '#d55181', '#0ea5a5', '#8f8f8f'];
+
 function fcRenderVendite() {
   var list = document.getElementById('fc-vendite-list');
   if (!list) return;
   if (!fcState.vendite.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun piatto con un costo impostato — vai prima su "Costo piatti".</p>'; return; }
+  var ord = fcState.ordineCarta;
+  var righeOrd = fcState.vendite.slice();
+  if (ord) {
+    var kS = function (r) { var v = ord.sez[_pdNorm(r.sezione)]; return v == null ? 999 : v; };
+    var kP = function (r) { var v = ord.piatti[_pdNorm(r.sezione) + '|' + _pdNorm(r.piatto)]; return v == null ? 999 : v; };
+    righeOrd.sort(function (a, b) { return (kS(a) - kS(b)) || (kP(a) - kP(b)) || String(a.piatto).localeCompare(String(b.piatto)); });
+  }
+  var colorePerSez = {}, nCol = 0, sezPrec = null;
+  var hex2rgba = function (h, a) { var n = parseInt(h.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')'; };
+  var corpo = righeOrd.map(function (r) {
+    var chiave = _pdNorm(r.sezione || '');
+    if (colorePerSez[chiave] == null) colorePerSez[chiave] = FC_SEZ_COLORI[nCol++ % FC_SEZ_COLORI.length];
+    var col = colorePerSez[chiave];
+    var intest = '';
+    if (chiave !== sezPrec) {
+      sezPrec = chiave;
+      intest = '<tr><td colspan="5" style="padding:.6rem .5rem .25rem;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:' + col + ';border-left:4px solid ' + col + ';background:' + hex2rgba(col, .16) + ';">' + _fcEsc(r.sezione || 'Altro') + '</td></tr>';
+    }
+    return intest + '<tr style="border-top:1px solid var(--rule);background:' + hex2rgba(col, .07) + ';">' +
+      '<td style="padding:.35rem .5rem;border-left:4px solid ' + col + ';">' + _fcEsc(r.piatto) + '</td>' +
+      '<td>' + _fcEur(r.costo_piatto) + '</td>' +
+      '<td>' + _fcEur(r.prezzo_vendita) + '</td>' +
+      '<td><input type="number" min="0" step="1" id="fc-qty-' + r.piatto_costo_id + '" value="' + r.quantita_venduta + '" style="width:6rem;" /></td>' +
+      '<td><input type="number" min="0" step="1" id="fc-int-' + r.piatto_costo_id + '" value="' + (r.quantita_interna || 0) + '" style="width:6rem;" /></td>' +
+      '</tr>';
+  }).join('');
   list.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;">' +
     '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Piatto</th><th>Costo (€)</th><th>Prezzo (€)</th><th>Qtà venduta</th><th title="Porzioni mangiate da noi (prove, staff): niente incasso, escono dall’inventario ma NON sporcano il Food Cost">Consumo interno</th></tr>' +
-    fcState.vendite.map(function (r) {
-      return '<tr style="border-top:1px solid var(--rule);">' +
-        '<td style="padding:.35rem 0;">' + _fcEsc(r.piatto) + '</td>' +
-        '<td>' + _fcEur(r.costo_piatto) + '</td>' +
-        '<td>' + _fcEur(r.prezzo_vendita) + '</td>' +
-        '<td><input type="number" min="0" step="1" id="fc-qty-' + r.piatto_costo_id + '" value="' + r.quantita_venduta + '" style="width:6rem;" /></td>' +
-        '<td><input type="number" min="0" step="1" id="fc-int-' + r.piatto_costo_id + '" value="' + (r.quantita_interna || 0) + '" style="width:6rem;" /></td>' +
-        '</tr>';
-    }).join('') +
+    corpo +
     '</table>';
 }
 
@@ -7599,7 +7652,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.29.02</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.29.03</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

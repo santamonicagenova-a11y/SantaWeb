@@ -2103,6 +2103,52 @@ function apriPreviewAllergeni() {
   window.open(URL.createObjectURL(blob), '_blank').focus();
 }
 
+// v 2026.09.29.05 — Dopo "Pubblica" degli Allergeni carta, aggiorna anche "Dettagli piatti":
+// per ogni piatto con almeno un allergene spuntato, se esiste una riga con lo stesso nome ne
+// aggiorna il campo allergeni (gli altri campi restano invariati); se non esiste la crea nella
+// sezione del piatto. Piatti senza nessuna spunta: non toccati (non si cancellano dati di sicurezza).
+function _pdAllineaDaAllergeniCarta(m, token) {
+  if (!m || !m.sezioni || !token) return;
+  fetch(PD_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'list', github_token: token }) })
+    .then(function (r) { return r.json(); })
+    .then(function (res) {
+      if (!res || !res.ok || !Array.isArray(res.piatti)) throw new Error('lista non disponibile');
+      var working = res.piatti.slice();
+      var azioni = [], aggiornati = 0, creati = 0;
+      m.sezioni.forEach(function (sez) {
+        (sez.piatti || []).forEach(function (p) {
+          var lista = _normAllergeni(p.allergeni || []);
+          if (!lista.length) return;
+          var txt = lista.map(function (k) { return k.charAt(0).toUpperCase() + k.slice(1); }).join(', ');
+          var riga = working.filter(function (x) { return _pdNorm(x.piatto) === _pdNorm(p.nome); })[0];
+          if (riga) {
+            if (String(riga.allergeni || '').trim() === txt) return;
+            aggiornati++;
+            azioni.push({ action: 'update', id: riga.id, sezione: riga.sezione, piatto: riga.piatto,
+              descrizione: riga.descrizione, allergeni: txt,
+              allergeni_contaminazione: riga.allergeni_contaminazione, allergeni_eliminabili: riga.allergeni_eliminabili,
+              gravidanza: riga.gravidanza, modifiche: riga.modifiche, stato: riga.stato, fonte: riga.fonte,
+              escludi_stampa: riga.escludi_stampa });
+          } else {
+            creati++;
+            azioni.push({ action: 'create', sezione: sez.titolo, piatto: String(p.nome).replace(/<[^>]+>/g, ''), allergeni: txt });
+          }
+        });
+      });
+      if (!azioni.length) { toast('✓ Dettagli piatti già allineato'); return; }
+      var i = 0;
+      (function next() {
+        if (i >= azioni.length) { toast('✓ Dettagli piatti: ' + aggiornati + ' aggiornati, ' + creati + ' creati'); return; }
+        var a = azioni[i++]; a.github_token = token;
+        fetch(PD_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) })
+          .then(function (r) { return r.json(); })
+          .catch(function (e) { console.warn('[Allergeni→Dettagli piatti] ' + e.message); })
+          .then(function () { setTimeout(next, 150); });
+      })();
+    })
+    .catch(function (e) { toast('⚠ Allergeni pubblicati, ma Dettagli piatti non aggiornato (' + e.message + ')'); });
+}
+
 // ── Pubblica allergeni su GitHub ───────────────────────
 function pubblicaAllergeni(token) {
   var html = costruisciOutputAllergeni();
@@ -2129,6 +2175,7 @@ function pubblicaAllergeni(token) {
       toast('\u2713 Allergeni pubblicati!');
       var btn = document.getElementById('btn-pubblica');
       if (btn) { btn.textContent = '\u2756 Traduci e Pubblica'; btn.disabled = false; }
+      _pdAllineaDaAllergeniCarta(leggiFormAllergeni(), token);
     })
     .catch(function(e) { toast('\u2717 Errore: ' + e.message); });
 }

@@ -1,7 +1,7 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
- "generato": "2026-09-28",
- "versione": "2026.09.28.10",
+ "generato": "2026-09-29",
+ "versione": "2026.09.29.01",
  "briefing": "**Briefing 28/9/2026 (sera)** — **Sito** (già live): Food Cost (importo per data nello storico conteggi, apertura su Dashboard, pulizia dolci \"Golosità\"), retry automatico su 429 DeepL in Traduci e Pubblica, checkbox \"Escludi dalla stampa\" per i percorsi degustazione (+ 3 bug a catena chiusi), rimosso il banner \"Vacanzina\", voucher regalo allineati al Menù Degustazione (corretto un mismatch reale 170€ mostrato / 180€ addebitato da Stripe). **Marketing**: post Instagram orari di apertura rifatto su Canva (copia `DAHWhGgzoyA`, orari dal sito, calendario dal 1/10) — pronto, non pubblicato; **P3 saltata su tua decisione = debito dichiarato**. **Aspetta te**: pubblicare il post dal 1/10 e scegliere i canali; verifica dal vivo Food Cost; su regala.html deve restare solo \"Degustazione 6 portate\"; riempire il percorso \"7\". **Prossimo**: giro di verifica dei flussi Food Cost; sul PC eseguire `check`, `build-gantt`, `build-pannello`, `publish` (rimandati: sessione senza terminale).",
  "kpi": {
   "aperte": 51,
@@ -9,7 +9,7 @@ window.JARVIS_DATA = {
   "bloccate": 1,
   "andrea": 13,
   "debiti": 9,
-  "chiuse30": 36
+  "chiuse30": 37
  },
  "subs": {
   "SEO": {
@@ -35,8 +35,8 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 93,
-   "done": 80,
+   "tot": 94,
+   "done": 81,
    "prog": 1,
    "up": 3,
    "future": 9,
@@ -115,6 +115,18 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
+  },
+  {
+   "t": "Sponsorizzata Salone Nautico",
+   "sub": "Marketing",
+   "st": "prog",
+   "s": "2026-09-25",
+   "e": "2026-10-04",
+   "own": "Andrea",
+   "az": null,
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-29"
   },
   {
    "t": "Pillar pesce §7 — 2-3 abbinamenti vino con pesce/crudo raccontati da Monica",
@@ -213,18 +225,6 @@ window.JARVIS_DATA = {
    "agg": "2026-09-28"
   },
   {
-   "t": "Sponsorizzata Salone Nautico",
-   "sub": "Marketing",
-   "st": "prog",
-   "s": "2026-09-25",
-   "e": null,
-   "own": "Andrea",
-   "az": null,
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-25"
-  },
-  {
    "t": "Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)",
    "sub": "Sito",
    "st": "up",
@@ -299,6 +299,18 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-26"
+  },
+  {
+   "t": "Sponsorizzata Salone Nautico",
+   "sub": "Marketing",
+   "st": "prog",
+   "s": "2026-09-25",
+   "e": "2026-10-04",
+   "own": "Andrea",
+   "az": null,
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-29"
   },
   {
    "t": "Pillar pesce §7 — 2-3 abbinamenti vino con pesce/crudo raccontati da Monica",
@@ -415,12 +427,12 @@ window.JARVIS_DATA = {
    "sub": "Marketing",
    "st": "prog",
    "s": "2026-09-25",
-   "e": null,
+   "e": "2026-10-04",
    "own": "Andrea",
    "az": null,
    "bl": null,
    "deb": false,
-   "agg": "2026-09-25"
+   "agg": "2026-09-29"
   }
  ],
  "bloccate": [
@@ -489,6 +501,11 @@ window.JARVIS_DATA = {
  ],
  "sessioni": [
   {
+   "d": "2026-09-29",
+   "sub": "Sito",
+   "t": "Stampa dolci e carta"
+  },
+  {
    "d": "2026-09-28",
    "sub": "Marketing",
    "t": "Post Instagram orari di apertura (grafica Canva)"
@@ -522,11 +539,6 @@ window.JARVIS_DATA = {
    "d": "2026-09-28",
    "sub": "Sito",
    "t": "Rimosso banner Vacanzina scaduto"
-  },
-  {
-   "d": "2026-09-28",
-   "sub": "Sito",
-   "t": "Voucher regalo sincronizzato con Menù Degustazione"
   }
  ],
  "perWeek": [
@@ -576,7 +588,7 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-28",
-   "n": 8
+   "n": 9
   }
  ],
  "perDay": [
@@ -586,7 +598,7 @@ window.JARVIS_DATA = {
   },
   {
    "g": "mar",
-   "n": 2
+   "n": 3
   },
   {
    "g": "mer",

@@ -5,11 +5,11 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.09.28.10",
-  updated: "2026-09-28",
+  version: "2026.09.29.01",
+  updated: "2026-09-29",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
-  today:     "2026-09-28",
+  today:     "2026-09-29",
 
   sections: [
     { key:'dec', name:'★ Decennale — serata 1 luglio 2026', badge:'evento trasversale', tasks:[
@@ -100,6 +100,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Menù Degustazione: checkbox "Escludi dalla stampa" per il percorso 6 e per il 7, indipendenti', s:'2026-09-28', e:'2026-09-28', st:'done'},
       {t:'Voucher regalo (regala.html): sincronizzati con il Menù Degustazione — disponibilità, titolo, prezzo', s:'2026-09-28', e:'2026-09-28', st:'done'},
       {t:'Food Cost — riordino tab (Dashboard·Spese·Incassi·Vendite·Inventario·Costo piatti·Reparti) con colori per gruppo', s:'2026-09-13', st:'done'},
+      {t:'Stampa dolci e carta: allergeni dolci da Allergeni carta pubblicato, nome 18pt/descrizione 15pt, promemoria fuori dalla stampa, preview chiara', s:'2026-09-29', e:'2026-09-29', st:'done'},
       {t:'Gantt trasversale ricostruito da zero + pubblicato su santamonicagenova.it/gantt (gantt.html noindex + gantt-data.js)', s:'2026-09-21', st:'done', ms:true},
       {t:'Food Cost — opzione futura (non richiesta come lavoro): Labor Cost % · Prime Cost % · Break-Even Point, serve una fonte dati costo-personale non ancora esistente', s:'2026-09-13', e:'2027-05-01', st:'future'},
       {t:'Aggiornare orari su Google Business Profile e schede esterne (settembre-ottobre)', s:'2026-08-28', e:'2026-09-25', st:'done'},
@@ -186,7 +187,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Filone B — Transizione: prime serate Mare d’Inverno comunicate/misurate, decisione riserva adv Nord', s:'2026-12-01', e:'2027-02-28', st:'future'},
       {t:'★ Obiettivo +20% infrasettimanale (mis. nov–gen)', s:'2026-11-01', e:'2027-01-31', st:'future', ms:true},
       {t:'Filone B — Picco strategico: adv Nord Italia + push concierge/PR alta stagione (se leading positivi)', s:'2027-03-01', e:'2027-08-31', st:'future'},
-      {t:'Sponsorizzata Salone Nautico', s:'2026-09-25', st:'prog'},
+      {t:'Sponsorizzata Salone Nautico', s:'2026-09-25', e:'2026-10-04', st:'prog'},
       {t:'Post Instagram orari di apertura — grafica Canva rifatta, calendario dal 1/10 (pronto, non pubblicato)', s:'2026-09-28', st:'prog'},
     ]},
     { key:'nsa', name:'NoShowApp (prodotto SaaS)', badge:'progetto-nsa', tasks:[

@@ -1877,8 +1877,29 @@ function caricaAllergeniDalSito() {
     })
     .then(function(src) {
       analizzaAllergeni(src);
-      // Serve anche il menu carta per ricavare lista piatti aggiornata
-      // Se dati (menu carta) già caricato usiamo quello, altrimenti lo fetch
+      // v 2026.09.29.04 — la lista piatti viene SEMPRE da carta pubblicata + dolci pubblicati.
+      // Prima usava `dati` (l'ultimo menu aperto): se era quello dei dolci il form aveva solo
+      // Golosità e pubblicando si perdevano gli allergeni di tutta la carta (successo il 29/9).
+      var _nc = function () { return '?nocache=' + Date.now() + '_' + Math.random().toString(36).slice(2); };
+      var _get = function (url) {
+        return fetch(url + _nc(), { cache: 'no-store' })
+          .then(function (r) { return r.ok ? r.text() : Promise.reject(new Error('HTTP ' + r.status)); })
+          .then(function (t) { return _estraiMenu(t); });
+      };
+      Promise.all([_get(MENU_URL), _get(DOLCI_URL).catch(function () { return null; })])
+        .then(function (menus) {
+          var sez = [];
+          menus.forEach(function (m) { if (m && Array.isArray(m.sezioni)) sez = sez.concat(m.sezioni); });
+          if (!sez.length) throw new Error('menu carta non leggibile');
+          datiMenuPerAllergeni = { sezioni: sez };
+          costruisciFormAllergeni();
+          toast('✓ Allergeni caricati (carta + dolci)');
+        })
+        .catch(function (e) {
+          costruisciFormAllergeni();
+          toast('⚠ Allergeni caricati, ma carta/dolci non sincronizzati (' + e.message + ')');
+        });
+      return;
       if (dati && dati.sezioni) {
         datiMenuPerAllergeni = dati;
         costruisciFormAllergeni();

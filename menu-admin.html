@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.30.03 (+ footer-version; backend foodcost-admin v18 + migration fc_vendite_periodo_costo_unitario) — Food Cost: costi storicizzati. Al salvataggio delle Vendite il costo di ogni piatto resta fissato per quel periodo (i periodi chiusi non cambiano se si modificano ricette/prezzi); in Vendite, se il costo fissato differisce da quello attuale, si vede "oggi € X" sotto; risalvare aggiorna. admin-core.js invariato. -->
 <!-- v 2026.09.30.02 (bump ?v= admin-core.js a 2026.09.30.02 + footer-version) — Secondo audit, punti approvati da Andrea: Allergeni carta con Crudi e piatti solo in degustazione + conferma dei piatti senza allergeni (admin-core); avviso in Dettagli piatti che gli allergeni pubblici si cambiano da «Allergeni carta»; voucher: listino dal voucher-config.json (via i prezzi scritti nel codice, ormai vecchi) e avviso/conferma se il percorso non è in carta; tendine orario di chiusure/aperture/limiti prese dai periodi; nuovo pannello Setup «Chiavi di accesso»; sezione carta rinominata = righe Dettagli piatti spostate, non duplicate (admin-core); tolto il pannello morto «Menù Vini». -->
 <!-- v 2026.09.30.01 (bump ?v= admin-templates-shared.js a 2026.09.30.01 + footer-version; edge function reminder-settings-status v3 e reservations-status v9) — Secondo audit: (1) PRIVACY Reminder prenotazioni: l'elenco (nome/telefono) si legge solo col token GitHub (POST), il servizio non lo dà più a chiunque; (2) Prenotazioni — Setup: i testi del ringraziamento ora arrivano davvero dal server (prima campi vuoti, rischio di sovrascriverli) e i valori di ripiego del servizio in errore non vengono più mostrati come salvati; (3) avviso dopo "Salva periodi" corretto (rimanda a Genera/Pubblica FAQ orari, non più al commit a mano); (4) QR del foglio orario dal sito invece che da GitHub Pages. -->
 <!-- v 2026.09.29.09 (+ footer-version; backend foodcost-admin v17 + migration fc_piatti_costo_porzione_pct) — Menù Degustazione: richiesto da Andrea, le porzioni sono più piccole di quelle alla carta → il costo del percorso = somma dei costi dei piatti alla carta × "% porzione" (campo in Costo piatti, 1–200, default 100) al posto del "costo extra"; percorso a testo libero: somma dei piatti della carta nominati nel testo. admin-core.js invariato. -->
@@ -1691,7 +1692,7 @@
       </div>
 
       <div id="fc-view-vendite" style="display:none;">
-        <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Quantità vendute nel periodo per ogni piatto con un costo impostato — da inserire a fine mese. Per il <strong>Menù Degustazione</strong> indica le <strong>persone</strong> che l'hanno preso. Le quantità valgono solo per queste date Dal/Al: la Dashboard le usa se ha lo stesso intervallo.</p>
+        <p style="font-size:.78rem;color:var(--stone);margin-bottom:1rem;">Quantità vendute nel periodo per ogni piatto con un costo impostato — da inserire a fine mese. Per il <strong>Menù Degustazione</strong> indica le <strong>persone</strong> che l'hanno preso. Le quantità valgono solo per queste date Dal/Al: la Dashboard le usa se ha lo stesso intervallo. Salvando, anche il <strong>costo</strong> di ogni piatto resta fissato per questo periodo (se poi cambi ricette o prezzi, i periodi passati non cambiano): per aggiornarlo ai costi di oggi basta salvare di nuovo.</p>
         <div id="fc-vendite-list" style="font-size:.85rem;">…</div>
         <div style="margin-top:1rem;">
           <button class="btn btn-publish" onclick="fcSalvaVendite()">💾 Salva vendite</button>
@@ -5855,7 +5856,9 @@ function fcRenderVendite() {
     }
     return intest + '<tr style="border-top:1px solid var(--rule);background:' + hex2rgba(col, .07) + ';">' +
       '<td style="padding:.35rem .5rem;border-left:4px solid ' + col + ';">' + _fcEsc(r.piatto) + '</td>' +
-      '<td>' + _fcEur(r.costo_piatto) + '</td>' +
+      '<td>' + (r.costo_unitario != null && Number(r.costo_unitario) !== Number(r.costo_piatto)
+        ? _fcEur(r.costo_unitario) + '<div style="font-size:.68rem;color:#b5651d;" title="Costo fissato al salvataggio di queste vendite. Risalva per usare il costo attuale.">oggi ' + _fcEur(r.costo_piatto) + '</div>'
+        : _fcEur(r.costo_piatto)) + '</td>' +
       '<td>' + _fcEur(r.prezzo_vendita) + '</td>' +
       '<td><input type="number" min="0" step="1" id="fc-qty-' + r.piatto_costo_id + '" value="' + r.quantita_venduta + '" style="width:6rem;" /></td>' +
       '<td><input type="number" min="0" step="1" id="fc-int-' + r.piatto_costo_id + '" value="' + (r.quantita_interna || 0) + '" style="width:6rem;" /></td>' +
@@ -8025,7 +8028,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.30.02</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.30.03</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

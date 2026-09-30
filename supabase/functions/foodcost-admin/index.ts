@@ -143,6 +143,11 @@
 // piccole di quelle alla carta. Il costo del percorso = somma dei costi dei piatti alla carta ×
 // porzione_pct / 100 (percentuale scelta da Andrea, 1–200, default 100), al posto del "costo extra".
 // degustazione_upsert accetta porzione_pct; costo_extra resta in tabella ma non si usa più (0).
+// v18 (2026-09-30) — costi storicizzati: vendite_bulk_upsert salva in fc_vendite_periodo.costo_unitario
+// il costo del piatto in quel momento; calcolaRange usa quel costo (se presente) per costo teorico,
+// margini e consumi interni, così un periodo chiuso non cambia quando si modificano ricette o
+// prezzi. Per aggiornare un periodo ai costi attuali basta risalvare le sue Vendite. null (vendite
+// salvate prima della v18) = costo attuale, come prima. vendite_get restituisce anche costo_unitario.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
@@ -450,7 +455,7 @@ async function calcolaRange(da: string, a: string) {
     supabase.from("fc_incassi_giornalieri").select("importo, tipo").gte("data", da).lte("data", a),
     supabase.from("fc_inventario_conteggi").select("data, reparto_id, valore").in("data", [da, dataFinale]),
     supabase.from("fc_piatti_costo").select("*, piatti_dettagli(piatto, sezione)"),
-    supabase.from("fc_vendite_periodo").select("piatto_costo_id, quantita_venduta, quantita_interna").eq("data_da", da).eq("data_a", a),
+    supabase.from("fc_vendite_periodo").select("piatto_costo_id, quantita_venduta, quantita_interna, costo_unitario").eq("data_da", da).eq("data_a", a),
   ]);
   for (const r of [repartiRes, speseRes, incassiRes, invRes, costiRes, venditeRes]) {
     if (r.error) throw r.error;
@@ -516,6 +521,10 @@ async function calcolaRange(da: string, a: string) {
   // Food Cost reale ne' il GAP (che resta la misura di sprechi/scarti).
   const costoPerPiattoId = new Map<string, number>();
   for (const c of costiRes.data || []) costoPerPiattoId.set(c.id, n(c.costo_piatto));
+  // v18: costo fotografato al salvataggio delle vendite del periodo, se presente.
+  for (const row of venditeRes.data || []) {
+    if (row.costo_unitario !== null && row.costo_unitario !== undefined) costoPerPiattoId.set(row.piatto_costo_id, n(row.costo_unitario));
+  }
   let consumiInterniQty = 0, consumiInterniCosto = 0;
   for (const row of venditeRes.data || []) {
     const q = n(row.quantita_interna);
@@ -544,7 +553,7 @@ async function calcolaRange(da: string, a: string) {
   const schede = (costiRes.data || []).filter((c: any) => c.attivo || conQtyNelPeriodo.has(c.id));
   const tutte = schede.map((c: any) => {
     const qty = venditeByPiatto.get(c.id) || 0;
-    const costo = n(c.costo_piatto), prezzo = n(c.prezzo_vendita);
+    const costo = costoPerPiattoId.has(c.id) ? costoPerPiattoId.get(c.id)! : n(c.costo_piatto), prezzo = n(c.prezzo_vendita);
     return {
       piatto_costo_id: c.id,
       tipo: c.tipo || "piatto",
@@ -1122,6 +1131,7 @@ Deno.serve(async (req) => {
           piatto: nomeScheda(c),
           sezione: sezioneScheda(c),
           costo_piatto: c.costo_piatto, prezzo_vendita: c.prezzo_vendita,
+          costo_unitario: v && v.costo_unitario !== null && v.costo_unitario !== undefined ? v.costo_unitario : null,
           quantita_venduta: v ? v.quantita_venduta : 0,
           quantita_interna: v ? v.quantita_interna : 0,
         };
@@ -1132,12 +1142,21 @@ Deno.serve(async (req) => {
       const r = rangeValido(body.da, body.a);
       if (!r) return json({ error: "Intervallo non valido" }, 400);
       const righe = Array.isArray(body.righe) ? body.righe : [];
+      // v18: costo di ogni scheda in questo momento, salvato insieme alle quantità.
+      const ids = righe.map((x: any) => s(x.piatto_costo_id)).filter(Boolean);
+      const costiOra = new Map<string, number>();
+      if (ids.length) {
+        const cr = await supabase.from("fc_piatti_costo").select("id, costo_piatto").in("id", ids);
+        if (cr.error) throw cr.error;
+        for (const c of cr.data || []) costiOra.set(c.id, n(c.costo_piatto));
+      }
       for (const riga of righe) {
         const piatto_costo_id = s(riga.piatto_costo_id);
         if (!piatto_costo_id) continue;
         const { error } = await supabase.from("fc_vendite_periodo")
           .upsert({
             data_da: r.da, data_a: r.a, piatto_costo_id,
+            costo_unitario: costiOra.has(piatto_costo_id) ? costiOra.get(piatto_costo_id) : null,
             quantita_venduta: Math.max(0, Math.round(n(riga.quantita_venduta))),
             quantita_interna: Math.max(0, Math.round(n(riga.quantita_interna))),
             updated_at: new Date().toISOString(),

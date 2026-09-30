@@ -1,15 +1,15 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-09-30",
- "versione": "2026.09.30.02",
+ "versione": "2026.09.30.03",
  "briefing": "**Briefing 30/9/2026 (sera)** — **Sito** (live, menu-admin v 2026.09.30.03 + Food Cost server v18): secondo audit di menu-admin chiuso. Sistemati: elenco prenotazioni del Reminder protetto, testi ringraziamento, avviso orari, QR dal sito, listino voucher (i prezzi nel codice erano vecchi), tendine orari dai periodi, pannello «Chiavi di accesso», sezioni rinominate senza doppioni, costi Food Cost fissati per periodo, Allergeni carta con i Crudi. FAQ orari dal 1/10 pubblicata. **Aspetta te**: spuntare gli allergeni dei 6 Crudi in «Allergeni carta» e pubblicare (poi Traduci e Pubblica della carta); % porzione della degustazione. **Prossimo**: primo uso reale del Food Cost (Costo piatti, Vendite, Dashboard).",
  "kpi": {
-  "aperte": 53,
+  "aperte": 62,
   "scadute": 3,
   "bloccate": 1,
   "andrea": 15,
   "debiti": 10,
-  "chiuse30": 43
+  "chiuse30": 44
  },
  "subs": {
   "SEO": {
@@ -35,11 +35,11 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 102,
-   "done": 87,
+   "tot": 112,
+   "done": 88,
    "prog": 2,
-   "up": 4,
-   "future": 9,
+   "up": 9,
+   "future": 13,
    "bloccato": 0,
    "scadute": 0,
    "andrea": 5,
@@ -535,6 +535,54 @@ window.JARVIS_DATA = {
    "agg": "2026-09-28"
   },
   {
+   "t": "Gestionale — note ospite dal CRM (allergie, occasioni) e auguri compleanno/anniversario (idea 12)",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-09-30",
+   "e": null,
+   "own": "Claude",
+   "az": null,
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-30"
+  },
+  {
+   "t": "Menu online — allergeni accanto a ogni piatto nella carta EN/FR (idea 9)",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-09-30",
+   "e": null,
+   "own": "Claude",
+   "az": null,
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-30"
+  },
+  {
+   "t": "Prenotazioni — garanzia carta mirata: gruppi ≥6, serate a tema, Menù Degustazione (idea 11)",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-09-30",
+   "e": null,
+   "own": "Claude",
+   "az": null,
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-30"
+  },
+  {
+   "t": "Prenotazioni — lista d'attesa digitale per orari pieni (idea 10)",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-09-30",
+   "e": null,
+   "own": "Claude",
+   "az": null,
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-30"
+  },
+  {
    "t": "Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)",
    "sub": "Sito",
    "st": "up",
@@ -545,6 +593,18 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-28"
+  },
+  {
+   "t": "Voucher — quadro dei buoni venduti e non ancora usati, valore e scadenze (idea 15)",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-09-30",
+   "e": null,
+   "own": "Claude",
+   "az": null,
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-30"
   }
  ],
  "sessioni": [

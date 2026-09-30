@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.09.30.02",
+  version: "2026.09.30.03",
   updated: "2026-09-30",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -26,6 +26,15 @@ window.SANTAMONICA_GANTT = {
       {t:'SERATA DECENNALE (56/60 ospiti, 10 dal canale pubblico)', s:'2026-07-01', st:'done', ms:true},
     ]},
     { key:'sito', name:'Sito (SantaWeb + SafeTable)', badge:'progetto-sito', tasks:[
+      {t:'Menu online — allergeni accanto a ogni piatto nella carta EN/FR (idea 9)', s:'2026-09-30', st:'up'},
+      {t:'Voucher — quadro dei buoni venduti e non ancora usati, valore e scadenze (idea 15)', s:'2026-09-30', st:'up'},
+      {t:'Prenotazioni — lista d\'attesa digitale per orari pieni (idea 10)', s:'2026-09-30', st:'up'},
+      {t:'Prenotazioni — garanzia carta mirata: gruppi ≥6, serate a tema, Menù Degustazione (idea 11)', s:'2026-09-30', st:'up'},
+      {t:'Gestionale — note ospite dal CRM (allergie, occasioni) e auguri compleanno/anniversario (idea 12)', s:'2026-09-30', st:'up'},
+      {t:'Food Cost — avviso sui rincari dei fornitori dai carichi di Tracciabilità (idea 1)', s:'2026-09-30', st:'future'},
+      {t:'HACCP — registro temperature frigo/abbattitore e piano pulizie digitale (idea 7)', s:'2026-09-30', st:'future'},
+      {t:'Voucher — buoni aziendali in blocco (idea 14)', s:'2026-09-30', st:'future'},
+      {t:'Food Cost — registro scarti per spiegare il GAP (idea 2, step futuro)', s:'2026-09-30', st:'future'},
       {t:'Go-live sito Cloudflare Pages', s:'2026-05-22', st:'done', ms:true},
       {t:'GA4 + Meta Pixel attivi', s:'2026-05-27', st:'done', ms:true},
       {t:'Carta-garanzia prenotazioni — Fase 1 LIVE', s:'2026-05-27', e:'2026-05-28', st:'done'},
@@ -118,6 +127,7 @@ window.SANTAMONICA_GANTT = {
       {t:'menu-admin — audit flussi 29/9: ricarica sicura dopo Pubblica, guida corretta, FC % e Menu Engineering su prezzo netto, avviso vendite mancanti', s:'2026-09-29', e:'2026-09-29', st:'done'},
       {t:'menu-admin — decisioni aperte dall\'audit: degustazione nel Food Cost, grafico Andamento, piatti tolti dalla carta', s:'2026-09-29', e:'2026-09-29', st:'done'},
       {t:'Allergeni — completare Crudi e piatti solo in degustazione (pagina pubblica + Dettagli piatti)', s:'2026-09-30', st:'up'},
+      {t:'Menu online — filtro allergeni per l\'ospite (IT/EN/FR)', s:'2026-09-30', e:'2026-09-30', st:'done'},
       {t:'menu-admin — secondo audit: migliorie aperte (voucher degustazione, orari a tendina, allergeni in Dettagli piatti, pannello chiavi, pulizia codice)', s:'2026-09-30', e:'2026-09-30', st:'done'},
       {t:'Pubblicare FAQ orari il 1/10 (nuovo periodo: venerdì pranzo, domenica solo pranzo) — allinea FAQ, JSON-LD e foglio orario', s:'2026-10-01', e:'2026-09-30', st:'done'},
     ]},

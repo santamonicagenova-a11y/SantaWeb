@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.09.30.06 — 'lista-attesa-section' in _pulisciViste (nuovo pannello Lista d'attesa in menu-admin.html).
 // v 2026.09.30.05 — Carta EN/FR: allergeni scritti sotto ogni piatto (riga piccola in corsivo, es. "gluten, milk"), solo a schermo — in stampa resta la pagina allergeni finale (la pagina A4 ha altezza fissa). Nuova renderAllergeniInline() iniettata con renderAllergeniPage(), stessi dati MENU.allergeni. Italiano invariato (scelta di Andrea). Attivo dalla prossima pubblicazione della carta.
 // v 2026.09.30.02 — Secondo audit: (1) Allergeni carta: Crudi inclusi (prima esclusi per costruzione) + sezione "Menù Degustazione" coi piatti del percorso non presenti in carta/dolci; conferma esplicita dei piatti pubblicati senza allergeni; titoli sezione EN/FR anche dal dizionario piatti. (2) Sync Dettagli piatti: una sezione rinominata nella carta sposta le righe esistenti (dati di sicurezza, ricette e costi mantenuti) invece di creare doppioni. (3) Tolto il codice morto del vecchio pannello «Menù Vini» (la carta vini si fa dal Gestionale Cantina) e la vecchia traduci() senza pubblicazione; 'chiavi-section' in _pulisciViste.
 // v 2026.09.29.08 — Sync Dettagli piatti: la cancellazione di un piatto tolto dalla carta non è più bloccata dalla sua scheda Food Cost (trigger DB: la scheda resta come storico, spenta). Testi del riepilogo e dell'avviso errori aggiornati.
@@ -346,7 +347,7 @@ function _setCartaSideNote(tipo) {
 var _vistaSeq = 0; // v 2026.09.29.07 — cresce a ogni cambio vista (vedi ricarica dopo Pubblica in eseguiPubblicazione)
 function _pulisciViste() {
   _vistaSeq++;
-  ['foto-section','foto-sito-section','doc-section','piatti-dettagli-section','prenotazioni-section','prenotazioni-setup-section','orari-apertura-section','reminder-section','cauzioni-section','voucher-section','voucher-setup-section','rubrica-section','pacchi-section','foodcost-section','chiavi-section'].forEach(function(id){
+  ['foto-section','foto-sito-section','doc-section','piatti-dettagli-section','prenotazioni-section','prenotazioni-setup-section','orari-apertura-section','reminder-section','cauzioni-section','voucher-section','voucher-setup-section','rubrica-section','pacchi-section','foodcost-section','chiavi-section','lista-attesa-section'].forEach(function(id){
     var e = document.getElementById(id); if (e) e.style.display = 'none';
   });
   var w = document.getElementById('wrap');

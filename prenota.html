@@ -2,7 +2,14 @@
 <!--
   prenota.html — Wizard prenotazioni con carta a garanzia obbligatoria
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.08.26.01
+  Versione: v 2026.09.30.01
+  v 2026.09.30.01 — LISTA D'ATTESA (idea 10 approvata da Andrea): i giorni al completo nel
+  calendario diventano cliccabili e nel passo 3 compare "Mettiti in lista d'attesa" quando un
+  orario è pieno; schermata dedicata (step-wl, fuori dallo stepper) con giorno, pranzo/cena,
+  persone, orario preferito, nome, telefono, email facoltativa, note → edge function
+  lista-attesa (azione join). Alla disdetta di una prenotazione in quel giorno Andrea riceve una
+  mail con l'elenco e chiama lui (nessuna mail automatica all'ospite). Dati cancellati 30 giorni
+  dopo la data.
   v 2026.08.26.01 — Aggiunto campo "CAP (facoltativo)" al passo 4 (Contatti), richiesta Andrea
   per capire da dove arrivano gli ospiti. Facoltativo, nessuna validazione client-side oltre
   al maxlength; il payload invia `cap` a create-reservation-checkout, che valida/salva.
@@ -180,6 +187,11 @@
   .orario-btn:disabled { opacity: 0.35; cursor: default; text-decoration: line-through; }
   .orario-cap { display: block; font-size: 0.65rem; margin-top: 2px; opacity: 0.75; }
   .orario-empty { color: var(--secondario); font-size: 0.9rem; }
+  .cal-day.full.wl { cursor: pointer; }
+  .cal-day.full.wl:hover { border-color: var(--oro); color: rgba(245,240,232,0.6); }
+  .wl-link { display: inline-block; margin-top: 1.1rem; background: none; border: none; padding: 0; font: inherit; font-size: 0.88rem; color: var(--oro); text-decoration: underline; cursor: pointer; }
+  .wl-done { text-align: center; padding: 1rem 0; }
+  .wl-done h3 { font-family: 'Cormorant', Georgia, serif; font-size: 1.4rem; font-weight: 500; margin-bottom: 0.6rem; }
 
   /* ── Form contatti ── */
   .field { margin-bottom: 1.1rem; }
@@ -297,7 +309,7 @@
           <button type="button" id="cal-next" aria-label="Mese successivo">›</button>
         </div>
         <div class="cal-grid" id="cal-grid"></div>
-        <p class="cal-legend">I giorni in grigio sono chiusi o già al completo. Chiamaci al 010 5533155 per richieste fuori calendario.</p>
+        <p class="cal-legend">I giorni in grigio sono chiusi o già al completo: tocca un giorno al completo per metterti in lista d'attesa. Chiamaci al 010 5533155 per richieste fuori calendario.</p>
       </section>
 
       <!-- STEP 2 — PERSONE -->
@@ -384,6 +396,42 @@
           <button type="button" class="btn btn-primary" id="confirm-btn">Registra la carta e conferma</button>
         </div>
         <div class="status-msg" id="confirm-status"></div>
+      </section>
+
+      <!-- LISTA D'ATTESA (v 2026.09.30.01) — fuori dallo stepper, si apre da un giorno al completo
+           o dal link nel passo 3. -->
+      <section class="step" id="step-wl">
+        <p class="step-label">Lista d'attesa</p>
+        <h2 class="step-title">Ti chiamiamo noi se si libera un tavolo</h2>
+        <p class="hint" style="margin:0 0 1.2rem;">Se qualcuno disdice, ti telefoniamo al numero che ci lasci, in ordine di iscrizione. Non è ancora una prenotazione.</p>
+        <form id="wl-form" novalidate>
+          <input type="text" name="_hp" id="wl-hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" aria-hidden="true">
+          <div class="field-row">
+            <div class="field"><label for="wl-data">Giorno *</label><input type="date" id="wl-data" required></div>
+            <div class="field"><label for="wl-servizio">Servizio *</label><select id="wl-servizio"><option value="cena">Cena</option><option value="pranzo">Pranzo</option></select></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="wl-persone">Persone *</label><select id="wl-persone"></select></div>
+            <div class="field"><label for="wl-orario">Orario preferito</label><select id="wl-orario"><option value="">Qualsiasi</option></select></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="wl-nome">Nome *</label><input type="text" id="wl-nome" required autocomplete="name"></div>
+            <div class="field"><label for="wl-tel">Telefono *</label><input type="tel" id="wl-tel" required autocomplete="tel"></div>
+          </div>
+          <div class="field"><label for="wl-email">Email (facoltativa)</label><input type="email" id="wl-email" autocomplete="email"></div>
+          <div class="field"><label for="wl-note">Note (facoltative)</label><textarea id="wl-note" placeholder="Es. allergie, occasione, flessibilità sull'orario"></textarea></div>
+          <p class="hint" style="margin-top:-0.4rem;">Per più di 6 persone chiamaci al 010 5533155. I tuoi dati servono solo a ricontattarti per questa richiesta e vengono cancellati entro 30 giorni dalla data — <a href="/privacy.html" style="color:inherit;">privacy</a>.</p>
+          <div class="btn-row">
+            <button type="button" class="btn btn-ghost" id="wl-back">Indietro</button>
+            <button type="submit" class="btn btn-primary" id="wl-submit">Mettimi in lista</button>
+          </div>
+          <div class="status-msg" id="wl-status"></div>
+        </form>
+        <div class="wl-done" id="wl-done" style="display:none;">
+          <h3>Sei in lista d'attesa</h3>
+          <p id="wl-done-txt"></p>
+          <a href="/" class="btn btn-primary" style="display:inline-block;margin-top:1rem;">Torna al sito</a>
+        </div>
       </section>
 
     </div>
@@ -575,6 +623,10 @@
       if (state.selectedDate === dateStr) cell.classList.add('selected');
       if (status === 'selectable') {
         cell.addEventListener('click', function(ds){ return function(){ selectDate(ds); }; }(dateStr));
+      } else if (status === 'full') {
+        cell.classList.add('wl');
+        cell.title = "Al completo: tocca per la lista d'attesa";
+        cell.addEventListener('click', function(ds){ return function(){ openWaitlist(ds); }; }(dateStr));
       }
       grid.appendChild(cell);
     }
@@ -649,7 +701,94 @@
       periodSlots.forEach(function(s){ grid.appendChild(buildBtn(s)); });
       container.appendChild(grid);
     });
+    var qualchePieno = slots.some(function(s){ return s.capMax !== null && Math.max(0, s.capMax - s.capUsed) < (state.selectedPersone || 1); });
+    if (qualchePieno) {
+      var wl = document.createElement('button');
+      wl.type = 'button'; wl.className = 'wl-link';
+      wl.textContent = "Non trovi l'orario che volevi? Mettiti in lista d'attesa";
+      wl.addEventListener('click', function(){ openWaitlist(state.selectedDate); });
+      container.appendChild(wl);
+    }
   }
+
+  /* ── LISTA D'ATTESA (v 2026.09.30.01) ── */
+  var WL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/lista-attesa';
+  function wlRiempiServizi() {
+    var d = document.getElementById('wl-data').value;
+    var selS = document.getElementById('wl-servizio'), selO = document.getElementById('wl-orario');
+    var periodSlots = (d && typeof window.getPeriodSlots === 'function') ? window.getPeriodSlots(d) : { pranzo: [], cena: [] };
+    var svc = d ? servicesForDate(d) : { pranzo: true, cena: true };
+    var prima = selS.value;
+    var opts = [];
+    if (svc.cena || !svc.pranzo) opts.push(['cena', 'Cena']);
+    if (svc.pranzo || !svc.cena) opts.push(['pranzo', 'Pranzo']);
+    selS.innerHTML = opts.map(function(o){ return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join('');
+    if (opts.some(function(o){ return o[0] === prima; })) selS.value = prima;
+    var orari = (periodSlots[selS.value] || []);
+    selO.innerHTML = '<option value="">Qualsiasi</option>' + orari.map(function(t){ return '<option value="' + t + '">' + t + '</option>'; }).join('');
+  }
+  function openWaitlist(dateStr) {
+    state.wlFrom = state.step;
+    var inp = document.getElementById('wl-data');
+    var oggi = todayStr();
+    var max = new Date(); max.setMonth(max.getMonth() + 6);
+    inp.min = oggi;
+    inp.max = max.getFullYear() + '-' + String(max.getMonth()+1).padStart(2,'0') + '-' + String(max.getDate()).padStart(2,'0');
+    inp.value = dateStr || '';
+    var selP = document.getElementById('wl-persone');
+    if (!selP.options.length) { for (var n = 1; n <= 6; n++) { var o = document.createElement('option'); o.value = n; o.textContent = n; selP.appendChild(o); } }
+    selP.value = String(state.selectedPersone || 2);
+    ['nome', 'tel', 'email'].forEach(function(k){
+      var src = document.getElementById('p-' + k), dst = document.getElementById('wl-' + k);
+      if (src && dst && !dst.value) dst.value = src.value;
+    });
+    wlRiempiServizi();
+    if (state.selectedOrario) {
+      var selO = document.getElementById('wl-orario');
+      if ([].some.call(selO.options, function(o){ return o.value === state.selectedOrario; })) selO.value = state.selectedOrario;
+    }
+    document.getElementById('wl-status').textContent = '';
+    goToStep('wl');
+  }
+  document.getElementById('wl-data').addEventListener('change', wlRiempiServizi);
+  document.getElementById('wl-servizio').addEventListener('change', function(){
+    var d = document.getElementById('wl-data').value;
+    var periodSlots = (d && typeof window.getPeriodSlots === 'function') ? window.getPeriodSlots(d) : { pranzo: [], cena: [] };
+    var orari = periodSlots[this.value] || [];
+    document.getElementById('wl-orario').innerHTML = '<option value="">Qualsiasi</option>' + orari.map(function(t){ return '<option value="' + t + '">' + t + '</option>'; }).join('');
+  });
+  document.getElementById('wl-back').addEventListener('click', function(){ goToStep(state.wlFrom && state.wlFrom !== 'wl' ? state.wlFrom : 1); });
+  document.getElementById('wl-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var st = document.getElementById('wl-status');
+    var payload = {
+      action: 'join',
+      _hp: document.getElementById('wl-hp').value,
+      data: document.getElementById('wl-data').value,
+      servizio: document.getElementById('wl-servizio').value,
+      orario: document.getElementById('wl-orario').value,
+      persone: Number(document.getElementById('wl-persone').value),
+      nome: document.getElementById('wl-nome').value.trim(),
+      telefono: document.getElementById('wl-tel').value.trim(),
+      email: document.getElementById('wl-email').value.trim(),
+      note: document.getElementById('wl-note').value.trim()
+    };
+    if (!payload.data || !payload.nome || !payload.telefono) { st.textContent = 'Giorno, nome e telefono sono obbligatori.'; return; }
+    var btn = document.getElementById('wl-submit');
+    btn.disabled = true; st.textContent = 'Invio…';
+    fetch(WL_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      .then(function(r){ return r.json().then(function(j){ return { ok: r.ok, j: j }; }); })
+      .then(function(res){
+        btn.disabled = false;
+        if (!res.ok || !res.j || !res.j.ok) { st.textContent = (res.j && res.j.error) || 'Qualcosa non ha funzionato: chiamaci al 010 5533155.'; return; }
+        document.getElementById('wl-form').style.display = 'none';
+        document.getElementById('wl-done').style.display = '';
+        document.getElementById('wl-done-txt').textContent = (res.j.gia_iscritto ? 'Eri già in lista per ' : 'Ti abbiamo messo in lista per ') +
+          formatDateIt(payload.data) + (payload.servizio === 'pranzo' ? ' a pranzo' : ' a cena') + ', ' + payload.persone + (payload.persone === 1 ? ' persona' : ' persone') +
+          '. Se si libera un tavolo ti chiamiamo al ' + payload.telefono + '.';
+      })
+      .catch(function(){ btn.disabled = false; st.textContent = 'Errore di connessione: riprova o chiamaci al 010 5533155.'; });
+  });
   function selectOrario(t) {
     state.selectedOrario = t;
     renderOrario();

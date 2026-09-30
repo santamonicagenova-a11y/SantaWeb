@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.30.07 (bump ?v= admin-core.js a 2026.09.30.06 + footer-version) — Nuovo pannello «Lista d'attesa» (Prenotazioni e voucher): iscrizioni dal sito (prenota.html v 2026.09.30.01, edge function lista-attesa), stato In attesa/Contattato/Prenotato/Annullato; alla disdetta arriva la mail ad Andrea (pg_cron waitlist-tick). Idea 10 approvata da Andrea. -->
 <!-- v 2026.09.30.06 (+ footer-version) — Voucher — Gestione: quadro dei buoni venduti e non ancora usati (valore in sospeso, scadenze a 30/90 giorni con elenco, scaduti mai usati) — idea 15 approvata da Andrea. admin-core invariato. -->
 <!-- v 2026.09.30.05 (bump ?v= admin-core.js e admin-templates-shared.js a 2026.09.30.05 + footer-version) — Carta EN/FR: allergeni sotto ogni piatto, solo a schermo (idea 9 approvata da Andrea). + FIX admin-templates-shared.js v.05: la v.04 generava pagine carta con script non valido (segnaposto non sostituiti) — mai pubblicate. -->
 <!-- v 2026.09.30.04 (bump ?v= admin-templates-shared.js a 2026.09.30.04 + footer-version) — Filtro allergeni per l'ospite nei menu pubblici IT/EN/FR (codice nel template carta, admin-templates-shared.js v 2026.09.30.04): attivo dalla prossima pubblicazione della carta. Guida Procedure: nota sul filtro. -->
@@ -1185,6 +1186,7 @@
     <button class="qa-btn qa-pren" onclick="apriSezioneCauzioni()">Cauzioni (storico)</button>
     <button class="qa-btn qa-pren" onclick="apriSezioneVoucher()">Voucher — Gestione</button>
     <button class="qa-btn qa-pren" onclick="apriSezionePacchi()">Pacchi No-show (NoShowApp)</button>
+    <button class="qa-btn qa-pren" onclick="apriSezioneListaAttesa()">Lista d'attesa</button>
   </div>
 
   <div class="qa-group" data-group="setup">
@@ -1386,6 +1388,22 @@
         <button class="btn btn-load" onclick="chiudiSezioneDocGenerico()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
         <span id="doc-generico-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
       </div>
+    </div>
+  </div>
+</div>
+
+<div id="lista-attesa-section" style="max-width:900px;margin:1.5rem auto;padding:0 1rem;display:none;">
+  <div class="fs">
+    <div class="fs-head">Lista d'attesa</div>
+    <div class="fs-body">
+      <p style="font-size:.8rem;color:var(--stone);margin-bottom:1rem;line-height:1.55;">Chi si è iscritto dal sito quando un giorno o un orario era al completo. Quando qualcuno disdice in un giorno con persone in lista ti arriva una mail con l'elenco: chiami tu e poi segni qui lo stato. Le iscrizioni si cancellano da sole 30 giorni dopo la data.</p>
+      <div style="display:flex;gap:.6rem;align-items:center;margin-bottom:.8rem;">
+        <label style="font-size:.78rem;display:flex;align-items:center;gap:.35rem;"><input type="checkbox" id="wl-mostra-chiusi" onchange="renderListaAttesa()" style="width:auto;" /> mostra anche contattati / prenotati / annullati</label>
+        <button class="btn btn-load" onclick="caricaListaAttesa()" style="border:1px solid var(--ink);color:var(--ink);margin-left:auto;">↻ Aggiorna</button>
+      </div>
+      <div id="wl-admin-status" style="font-size:.75rem;color:var(--stone);margin-bottom:.6rem;"></div>
+      <div id="wl-admin-list" style="font-size:.85rem;"></div>
+      <div style="margin-top:1rem;"><button class="btn btn-load" onclick="chiudiSezioneListaAttesa()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button></div>
     </div>
   </div>
 </div>
@@ -2425,7 +2443,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.09.30.05"></script>
-<script src="admin-core.js?v=2026.09.30.05"></script>
+<script src="admin-core.js?v=2026.09.30.06"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
@@ -6620,6 +6638,75 @@ function chiudiSezioneVoucher() {
 // Gestione", spostata in Setup su richiesta Andrea. vb-1/2/3 e vs-anno/vs-ultimo vivono SOLO
 // qui ora: caricaVoucherBuoni()/pubblicaVoucherBuoni()/azzeraContatoreVoucher() non sono
 // null-safe su quegli ID, quindi vanno chiamati/popolati solo quando questa sezione è aperta.
+// v 2026.09.30.07 — Pannello "Lista d'attesa" (idea 10 approvata da Andrea): iscrizioni dal
+// wizard /prenota.html (edge function lista-attesa), stato modificabile. Avviso delle disdette via
+// mail (job pg_cron waitlist-tick), niente mail automatiche agli ospiti.
+var WL_ADMIN_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/lista-attesa';
+var WL_STATI = [['attesa', 'In attesa'], ['contattato', 'Contattato'], ['prenotato', 'Prenotato'], ['annullato', 'Annullato']];
+var wlState = { righe: [] };
+function apriSezioneListaAttesa() {
+  document.getElementById('carica-menu').classList.remove('open');
+  document.getElementById('intro').style.display = 'none';
+  _pulisciViste();
+  document.getElementById('lista-attesa-section').style.display = 'block';
+  caricaListaAttesa();
+}
+function chiudiSezioneListaAttesa() {
+  document.getElementById('lista-attesa-section').style.display = 'none';
+  _riapriIntroSeAppropriato();
+}
+function _wlStatus(msg, err) {
+  var el = document.getElementById('wl-admin-status');
+  el.textContent = msg || ''; el.style.color = err ? 'var(--rust)' : 'var(--stone)';
+}
+function _wlFetch(payload) {
+  var token = _prenGhToken();
+  if (!token) return Promise.reject(new Error('no-token'));
+  payload.github_token = token;
+  return fetch(WL_ADMIN_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+    .then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); });
+}
+function caricaListaAttesa() {
+  _wlStatus('Caricamento…');
+  _wlFetch({ action: 'list' }).then(function (res) {
+    if (res.status === 401) { _wlStatus('Token GitHub non valido: reimpostalo in Setup → Chiavi di accesso.', true); return; }
+    if (!res.body || !res.body.ok) { _wlStatus((res.body && res.body.error) || 'Errore.', true); return; }
+    wlState.righe = res.body.righe || [];
+    renderListaAttesa();
+    _wlStatus('');
+  }).catch(function (e) { _wlStatus(e && e.message === 'no-token' ? 'Serve il token GitHub.' : 'Errore di connessione.', true); });
+}
+function renderListaAttesa() {
+  var box = document.getElementById('wl-admin-list');
+  var tutti = document.getElementById('wl-mostra-chiusi').checked;
+  var righe = wlState.righe.filter(function (r) { return tutti || r.stato === 'attesa'; });
+  if (!righe.length) { box.innerHTML = '<p style="color:var(--stone);">Nessuno in lista d\'attesa' + (tutti ? '' : ' da richiamare') + '.</p>'; return; }
+  var html = '', gruppo = null;
+  righe.forEach(function (r) {
+    var g = r.data + '|' + r.servizio;
+    if (g !== gruppo) {
+      gruppo = g;
+      html += '<div class="sub" style="margin-top:1rem;">' + _prenFormatDate(r.data) + ' — ' + (r.servizio === 'pranzo' ? 'pranzo' : 'cena') + '</div>';
+    }
+    var opts = WL_STATI.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === r.stato ? ' selected' : '') + '>' + x[1] + '</option>'; }).join('');
+    html += '<div style="display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;padding:.5rem 0;border-bottom:1px dotted var(--rule);' + (r.stato === 'attesa' ? '' : 'opacity:.6;') + '">' +
+      '<div style="flex:1;min-width:14rem;"><strong>' + _czEsc(r.nome) + '</strong> — ' + r.persone + ' pers.' + (r.orario ? ' — preferisce le ' + _czEsc(r.orario) : '') +
+      '<div style="font-size:.78rem;"><a href="tel:' + _czEsc(r.telefono) + '" style="color:var(--rust);">' + _czEsc(r.telefono) + '</a>' + (r.email ? ' · ' + _czEsc(r.email) : '') + '</div>' +
+      (r.note ? '<div style="font-size:.75rem;color:var(--stone);font-style:italic;">' + _czEsc(r.note) + '</div>' : '') +
+      '<div style="font-size:.7rem;color:var(--stone);">iscritto il ' + new Date(r.created_at).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) + (r.notificato_at ? ' · <span style="color:#c98500;">segnalato per una disdetta</span>' : '') + '</div></div>' +
+      '<select onchange="cambiaStatoListaAttesa(\'' + r.id + '\', this.value)" style="width:auto;">' + opts + '</select></div>';
+  });
+  box.innerHTML = html;
+}
+function cambiaStatoListaAttesa(id, stato) {
+  _wlStatus('Salvataggio…');
+  _wlFetch({ action: 'set_stato', id: id, stato: stato }).then(function (res) {
+    if (!res.body || !res.body.ok) { _wlStatus((res.body && res.body.error) || 'Errore.', true); return; }
+    var r = wlState.righe.find(function (x) { return x.id === id; }); if (r) r.stato = stato;
+    renderListaAttesa(); _wlStatus('Stato salvato.');
+  }).catch(function () { _wlStatus('Errore di connessione.', true); });
+}
+
 // v 2026.09.30.02 — Pannello unico "Chiavi di accesso": token GitHub (pubblicazioni, prenotazioni,
 // Food Cost, Dettagli piatti…), chiave SafeTable (Cauzioni) e chiave voucher. Prima il 🔑
 // cambiava solo il token GitHub e le altre due si potevano rimuovere solo da dentro le sezioni.
@@ -8088,7 +8175,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.30.06</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.30.07</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

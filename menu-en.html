@@ -440,6 +440,8 @@
     .alg-all.vuoto{color:var(--stone,#8c7e6e);}
     .alg-legenda{margin-top:auto;padding-top:4mm;border-top:1px solid var(--rule,#d4c9b8);font-size:.66rem;color:var(--stone,#8c7e6e);font-style:italic;line-height:1.6;text-align:center;}
     .alg-legenda strong{font-style:normal;font-weight:600;color:var(--ink,#1a1714);}
+    .alg-inline{display:block;font-size:.74rem;font-style:italic;color:var(--stone,#8c7e6e);margin-top:1px;line-height:1.3;letter-spacing:.01em;}
+    @media print{.alg-inline{display:none!important}}
   </style>
 </head>
 <body>
@@ -469,11 +471,11 @@ const MENU = {
       "7": "",
       "A tôa no se ven vëgi": [
         {
-          "nome": "&quot;Macchetto, what&#x27;s the point in me saying that...&quot;",
+          "nome": "&quot;Macchetto, what’s the point in me saying that...&quot;",
           "sostenibile": true
         },
         {
-          "nome": "&quot;Forest oyster&quot;",
+          "nome": "&quot;Wood Oyster&quot;",
           "sostenibile": true
         },
         {
@@ -543,7 +545,7 @@ const MENU = {
       "titolo": "Sfiziosi",
       "piatti": [
         {
-          "nome": "&quot;Macchetto, what&#x27;s the point in me saying that...&quot;",
+          "nome": "&quot;Macchetto, what’s the point in me saying that...&quot;",
           "prezzo": 14,
           "sostenibile": true,
           "descrizione": "Stuffed baby lettuce, peppers and a dish of anchovies"
@@ -552,7 +554,7 @@ const MENU = {
           "nome": "&quot;Every curl is a whim&quot;",
           "prezzo": 19,
           "sostenibile": true,
-          "descrizione": "Yellowtail, sage, pickled beetroot, leeks, horseradish"
+          "descrizione": "Yellowtail, sage, beetroot in a tangy sauce, leeks, horseradish"
         },
         {
           "nome": "&quot;Sanna&quot;",
@@ -561,7 +563,7 @@ const MENU = {
           "descrizione": "Squid, pink prawns, aubergine, black cabbage, red onion"
         },
         {
-          "nome": "&quot;Forest oyster&quot;",
+          "nome": "&quot;Wood Oyster&quot;",
           "prezzo": 25,
           "sostenibile": true,
           "descrizione": "Tempura-fried oyster, porcini mushrooms, quinces, cucumbers"
@@ -569,7 +571,7 @@ const MENU = {
         {
           "nome": "“Not cheeses”",
           "prezzo": 22,
-          "descrizione": "Tasting of artisan ‘fake’ cheeses made from cashews and almond milk"
+          "descrizione": "Tasting of artisan ‘cheese’ alternatives made from cashews and almond milk"
         }
       ],
       "titolo_display": "Starters"
@@ -581,7 +583,7 @@ const MENU = {
           "nome": "&quot;Noble waste&quot;",
           "prezzo": 24,
           "sostenibile": true,
-          "descrizione": "Tortelli with yellowtail and red seabream, saffron, grapes and parsley"
+          "descrizione": "Tortelli with yellowtail and red sea bream, saffron, grapes and parsley"
         },
         {
           "nome": "&quot;Tomamilla&quot;",
@@ -611,7 +613,7 @@ const MENU = {
           "nome": "&quot;Curry, curry, lad&quot;",
           "prezzo": 32,
           "sostenibile": true,
-          "descrizione": "Red snapper, courgettes, curry, pineapple, friggitelli peppers, peanuts"
+          "descrizione": "Red mullet, courgettes, curry, pineapple, friggitelli peppers, peanuts"
         },
         {
           "nome": "&quot;Buridda chaperon&quot;",
@@ -640,7 +642,7 @@ const MENU = {
         {
           "nome": "&quot;Panissa salad&quot;",
           "prezzo": 10,
-          "descrizione": "Chickpea cannoli, prescinseua, Taggiasca olives, chocolate"
+          "descrizione": "Chickpea cannolo, prescinseua, Taggiasca olives, chocolate"
         },
         {
           "nome": "&quot;Tradizionello&quot;",
@@ -781,7 +783,7 @@ const MENU = {
         "titolo_display": "Antipasti",
         "piatti": [
           {
-            "nome": "&quot;Macchetto, what&#x27;s the point in me saying that...&quot;",
+            "nome": "&quot;Macchetto, what’s the point in me saying that...&quot;",
             "allergeni": [
               "fish",
               "milk",
@@ -804,7 +806,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "&quot;Forest oyster&quot;",
+            "nome": "&quot;Wood Oyster&quot;",
             "allergeni": [
               "gluten",
               "peanuts",
@@ -956,16 +958,12 @@ const MENU = {
 
 /* ── helpers condivisi ── */
 const NOTE_CARTA = `
-  <span class="note-ospite-titolo">Note per l'ospite</span>
-  Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche delle materie prime i prodotti ittici
-  acquistati freschi vengono abbattuti e congelati. Tali prodotti vengono contrassegnati con il simbolo * per una
-  chiara e trasparente informazione alla clientela.<br>
-  L'elenco degli <u>allergeni</u> è consultabile nell'ultima pagina di questo menù.
+  <span class="note-ospite-titolo">Guest notes</span>
+  To maintain consistent quality and organoleptic characteristics of raw ingredients, fresh fish products are blast-frozen after purchase. These products are marked with the symbol * for clear and transparent customer information.<br>
+  The list of allergens is available on the last page of this menu.
 `;
 
-const NOTE_ORARIO = `Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche
-delle materie prime i prodotti acquistati freschi vengono abbattuti e congelati.
-Questi prodotti vengono contrassegnati con il simbolo: *`;
+const NOTE_ORARIO = `To maintain consistent quality standards and organoleptic characteristics, fresh fish products are blast-frozen. These products are marked with the symbol: *`;
 
 function getSez(titolo) {
   var found = MENU.sezioni.find(s => s.titolo === titolo);
@@ -1193,8 +1191,27 @@ function renderAllergeniPage(){
   h += "<div class=\"alg-legenda\"><strong>"+esc(A.legendaTitolo)+"</strong><br>"+A.legenda.map(esc).join(" &bull; ")+"</div>";
   pg.innerHTML = h; root.appendChild(pg);
 }
+
+/* allergeni sotto ogni piatto (EN/FR, solo schermo) */
+function renderAllergeniInline(){
+  if (typeof MENU === "undefined" || !MENU.allergeni || !MENU.allergeni.sezioni) return;
+  var norm = function(x){ return String(x||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9 ]+/g," ").replace(/\s+/g," ").trim(); };
+  var mappa = {};
+  MENU.allergeni.sezioni.forEach(function(s){ (s.piatti||[]).forEach(function(p){ mappa[norm(String(p.nome||"").replace(/<[^>]+>/g,""))] = p.allergeni||[]; }); });
+  var root = document.getElementById("layout-carta"); if(!root) return;
+  Array.prototype.forEach.call(root.querySelectorAll(".piatto, .percorso-piatto"), function(el){
+    if (el.closest && el.closest(".alg-pg")) return;
+    var nomeEl = el.classList.contains("piatto") ? el.querySelector(".piatto-riga") : el;
+    var nome = nomeEl ? (nomeEl.childNodes[0] ? nomeEl.childNodes[0].textContent : nomeEl.textContent) : "";
+    var lista = mappa[norm(nome)];
+    if (!lista || !lista.length) return;
+    var sp = document.createElement("span"); sp.className = "alg-inline"; sp.textContent = lista.join(", ");
+    el.appendChild(sp);
+  });
+}
 renderCarta();
 renderAllergeniPage();
+renderAllergeniInline();
 renderOrario();
 showLayout('carta');
 _szApply();

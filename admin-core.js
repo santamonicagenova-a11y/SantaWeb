@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.09.30.02 — Secondo audit: (1) Allergeni carta: Crudi inclusi (prima esclusi per costruzione) + sezione "Menù Degustazione" coi piatti del percorso non presenti in carta/dolci; conferma esplicita dei piatti pubblicati senza allergeni; titoli sezione EN/FR anche dal dizionario piatti. (2) Sync Dettagli piatti: una sezione rinominata nella carta sposta le righe esistenti (dati di sicurezza, ricette e costi mantenuti) invece di creare doppioni. (3) Tolto il codice morto del vecchio pannello «Menù Vini» (la carta vini si fa dal Gestionale Cantina) e la vecchia traduci() senza pubblicazione; 'chiavi-section' in _pulisciViste.
 // v 2026.09.29.08 — Sync Dettagli piatti: la cancellazione di un piatto tolto dalla carta non è più bloccata dalla sua scheda Food Cost (trigger DB: la scheda resta come storico, spenta). Testi del riepilogo e dell'avviso errori aggiornati.
 // v 2026.09.29.07 — Audit flussi menu-admin (29/9): (1) dopo "Pubblica" la ricarica a 90s avviene solo se sei ancora sullo stesso menù e non l'hai toccato (_vistaSeq in _pulisciViste + confronto del form); prima ricaricava sempre la carta, anche dopo i dolci, e cancellava la vista aperta nel frattempo (es. le spunte di «Allergeni carta»). (2) Promemoria laterali carta/dolci/allergeni aggiornati: allergeni = carta + dolci pubblicati, dolci da pubblicare prima degli allergeni, la pubblicazione allergeni aggiorna Dettagli piatti.
 // v 2026.09.29.01 — Dolci: l'elenco allergeni stampato in fondo (MENU.allergeni) non aveva campi nel form e restava quello del vecchio menu. Ora leggi() lo ricostruisce da "Dettagli piatti" (match per nome piatto, skip escludi_stampa/senza allergeni; vocabolario stampa: latte->latticini). Cache caricata all'apertura dei dolci (_dolciPdRefresh, usa il token gh_token già salvato).
@@ -344,7 +345,7 @@ function _setCartaSideNote(tipo) {
 var _vistaSeq = 0; // v 2026.09.29.07 — cresce a ogni cambio vista (vedi ricarica dopo Pubblica in eseguiPubblicazione)
 function _pulisciViste() {
   _vistaSeq++;
-  ['foto-section','foto-sito-section','vini-section','doc-section','piatti-dettagli-section','prenotazioni-section','prenotazioni-setup-section','orari-apertura-section','reminder-section','cauzioni-section','voucher-section','voucher-setup-section','rubrica-section','pacchi-section','foodcost-section'].forEach(function(id){
+  ['foto-section','foto-sito-section','doc-section','piatti-dettagli-section','prenotazioni-section','prenotazioni-setup-section','orari-apertura-section','reminder-section','cauzioni-section','voucher-section','voucher-setup-section','rubrica-section','pacchi-section','foodcost-section','chiavi-section'].forEach(function(id){
     var e = document.getElementById(id); if (e) e.style.display = 'none';
   });
   var w = document.getElementById('wrap');
@@ -884,108 +885,6 @@ function _pubblicaVoucherConfig(token) {
 }
 
 
-function traduci() {
-  if (!dati) { alert('Prima carica il men\u00f9'); return; }
-  if (!_assicuraDeepLKey('traduci')) return;
-  var m = leggi();
-  var btn = document.getElementById('btn-traduci');
-
-  // Raccogli tutti i testi dal form
-  var testi = [];
-  if (m.degustazione) {
-    var key6;
-    if (m.degustazione.percorsi && typeof m.degustazione.percorsi === 'object') {
-      key6 = Object.keys(m.degustazione.percorsi).find(function(k) { 
-        return Array.isArray(m.degustazione.percorsi[k]); 
-      });
-    }
-    if (key6) {
-      m.degustazione.percorsi[key6].forEach(function(p) { if (p.nome) testi.push(p.nome); });
-    }
-  }
-  m.sezioni.forEach(function(sez) {
-    if (sez.titolo) testi.push(sez.titolo);
-    sez.piatti.forEach(function(p) {
-      if (p.nome) testi.push(p.nome);
-      if (p.descrizione) testi.push(p.descrizione);
-    });
-  });
-  if (m.allergeni) {
-    m.allergeni.forEach(function(a) {
-      if (a.nome) testi.push(a.nome);
-      if (a.allergeni) testi.push(a.allergeni);
-    });
-  }
-  testi = testi.filter(function(v, i, a) { return v && a.indexOf(v) === i; });
-
-  if (testi.length === 0) { toast('Nessun testo da tradurre'); return; }
-
-  var langs = ['en', 'fr'];
-  var totale = testi.length * langs.length;
-  var completati = 0;
-
-  btn.textContent = '\u23f3 0/' + totale + '\u2026';
-  btn.classList.add('translating');
-  btn.disabled = true;
-
-  // Coda sequenziale: una richiesta alla volta
-  var coda = [];
-  testi.forEach(function(testo) {
-    langs.forEach(function(lang) {
-      coda.push({ testo: testo, lang: lang });
-    });
-  });
-  var falliti = [];
-
-  function traduciVoce(i) {
-    if (i >= coda.length) {
-      btn.textContent = '\uD83C\uDF10 Traduci';
-      btn.classList.remove('translating');
-      btn.disabled = false;
-      if (falliti.length > 0) {
-        toast('\u26a0 ' + (testi.length - falliti.length) + '/' + testi.length + ' voci tradotte, ' + falliti.length + ' fallite (vedi console)');
-      } else {
-        toast('\u2713 ' + testi.length + ' voci tradotte in 4 lingue!');
-      }
-      return;
-    }
-    var item = coda[i];
-    provaTraduci(item, 0);
-
-    // Riprova con attesa crescente solo sul 429 (troppe richieste \u2014 quota DeepL al minuto):
-    // gli altri errori (rete, chiave, risposta vuota) falliscono subito come prima.
-    function provaTraduci(item, tentativo) {
-      btn.textContent = '\u23f3 ' + (i+1) + '/' + totale + (tentativo ? ' (riprovo, limite DeepL raggiunto)\u2026' : '\u2026');
-      chiamaDeepL(item.testo, item.lang)
-        .then(function(res) {
-          if (res.authError) {
-            btn.textContent = '\uD83C\uDF10 Traduci';
-            btn.classList.remove('translating');
-            btn.disabled = false;
-            alert('Errore proxy DeepL: ' + (res.errorMsg || 'chiave non valida lato server') +
-                  '\n\nVerifica che la env variable DEEPL_KEY sia configurata su Vercel.');
-            return;
-          }
-          if (res.trad) {
-            TRANSLATIONS[item.lang]['piatti'][item.testo] = res.trad;
-            setTimeout(function() { traduciVoce(i + 1); }, 80);
-            return;
-          }
-          var RITARDI_429 = [2000, 5000, 10000]; // ms, fino a 3 tentativi in pi\u00F9
-          if (res.status === 429 && tentativo < RITARDI_429.length) {
-            setTimeout(function() { provaTraduci(item, tentativo + 1); }, RITARDI_429[tentativo]);
-            return;
-          }
-          falliti.push({ testo: item.testo, lang: item.lang, errorMsg: res.errorMsg });
-          setTimeout(function() { traduciVoce(i + 1); }, 80);
-        });
-    }
-  }
-
-  traduciVoce(0);
-}
-
-
 function pubblicaFile(token, headers, path, content, rawBase64) {
   var apiBase = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + path;
   return fetch(apiBase, { headers: headers })
@@ -1325,14 +1224,16 @@ var ALLERGENI_TESTI = {
     nota: 'Information pursuant to Regulation (EU) No 1169/2011. For further information on allergens in our dishes, please ask our staff.',
     legendaTitolo: 'Regulated allergens (Reg. EU 1169/2011):',
     vuoto: 'no declared allergen',
-    dolciTitolo: 'Desserts'
+    dolciTitolo: 'Desserts',
+    deguTitolo: 'Tasting menu'
   },
   fr: {
     header: 'Allerg\u00e8nes',
     nota: 'Information conform\u00e9ment au R\u00e8glement (UE) n\u00b0 1169/2011. Pour plus d\u2019informations sur les allerg\u00e8nes pr\u00e9sents dans nos plats, veuillez vous adresser \u00e0 notre personnel.',
     legendaTitolo: 'Allerg\u00e8nes r\u00e9glement\u00e9s (R\u00e8gl. UE 1169/2011) :',
     vuoto: 'aucun allerg\u00e8ne d\u00e9clar\u00e9',
-    dolciTitolo: 'Desserts'
+    dolciTitolo: 'Desserts',
+    deguTitolo: 'Menu dégustation'
   }
 };
 
@@ -1359,7 +1260,7 @@ function costruisciAllergeniPerCarta(lang) {
   var dynPiatti = (TRANSLATIONS[lang] && TRANSLATIONS[lang].piatti) || {};
   var dynSez    = (TRANSLATIONS[lang] && TRANSLATIONS[lang].sezioni) || {};
   function trNome(n) { var c = String(n).replace(/<[^>]+>/g, ''); return dynPiatti[c] || dynPiatti[n] || c; }
-  function trSez(t)  { return dynSez[t] || t; }
+  function trSez(t)  { if (t === 'Menù Degustazione') return T.deguTitolo; return dynSez[t] || dynPiatti[t] || t; }
   var sezioni = [];
   // 1) CARTA (da menu-allergeni.html)
   if (_allergeniCartaLive && _allergeniCartaLive.sezioni) {
@@ -1715,6 +1616,22 @@ function _pdAllergeniDaCartaPerNome(nome) {
 // Confronta i piatti in pubblicazione (mSezioni, da leggi()) con lo stato attuale di Dettagli
 // piatti e calcola il piano: { nuovi:[{sezione,nome}], rimossi:[rigaDettagliPiatti],
 // rinominati:[{vecchia:rigaDettagliPiatti, nuovoNome}] }.
+// v 2026.09.30.02 — Sezioni rinominate nel form (titolo_display cambiato rispetto a quello
+// caricato): { nomeVecchioNorm: nomeNuovo }. Senza, i piatti di una sezione rinominata finivano
+// tutti "nuovi" (righe vuote duplicate) e le vecchie righe restavano scollegate da ricette/costi.
+function _pdSezioniRinominate(mSezioni) {
+  var out = {};
+  if (!datiOriginali || !Array.isArray(datiOriginali.sezioni)) return out;
+  (mSezioni || []).forEach(function (sez, i) {
+    var o = datiOriginali.sezioni[i];
+    if (!o || o.titolo !== sez.titolo) return;
+    var vecchio = String(o.titolo_display || o.titolo || '').trim();
+    var nuovo = String(sez.titolo_display || sez.titolo || '').trim();
+    if (vecchio && nuovo && _pdNorm(vecchio) !== _pdNorm(nuovo)) out[_pdNorm(vecchio)] = nuovo;
+  });
+  return out;
+}
+
 function _pdCalcolaPiano(mSezioni, piattiDettagliAttuali) {
   var sezioniPubblicateNorm = {};
   var pubblicati = [];
@@ -1727,7 +1644,14 @@ function _pdCalcolaPiano(mSezioni, piattiDettagliAttuali) {
     });
   });
 
-  var attualiInUniverso = (piattiDettagliAttuali || []).filter(function (p) {
+  var rinomine = _pdSezioniRinominate(mSezioni);
+  var spostati = [];
+  var attualiInUniverso = (piattiDettagliAttuali || []).map(function (p) {
+    var nuova = rinomine[_pdNorm(p.sezione)];
+    if (!nuova) return p;
+    var copia = Object.assign({}, p, { sezione: nuova, _sezioneVecchia: p.sezione });
+    return copia;
+  }).filter(function (p) {
     return sezioniPubblicateNorm[_pdNorm(p.sezione)];
   });
 
@@ -1757,7 +1681,12 @@ function _pdCalcolaPiano(mSezioni, piattiDettagliAttuali) {
     }
   });
 
-  return { nuovi: nuovi, rimossi: pool, rinominati: rinominati };
+  // Righe della sezione rinominata rimaste uguali di nome: vanno solo spostate nella nuova sezione.
+  var coinvolti = {};
+  rinominati.forEach(function (r) { coinvolti[r.vecchia.id] = true; });
+  pool.forEach(function (p) { coinvolti[p.id] = true; });
+  attualiInUniverso.forEach(function (p) { if (p._sezioneVecchia && !coinvolti[p.id]) spostati.push(p); });
+  return { nuovi: nuovi, rimossi: pool, rinominati: rinominati, spostati: spostati };
 }
 
 function _pdRiepilogoPiano(piano) {
@@ -1769,6 +1698,10 @@ function _pdRiepilogoPiano(piano) {
   if (piano.rimossi.length) {
     righe.push('RIMOSSI dalla carta — verranno CANCELLATI con i loro dati di sicurezza alimentare; la scheda Food Cost resta come storico, spenta (' + piano.rimossi.length + '):');
     piano.rimossi.forEach(function (p) { righe.push('  − ' + p.sezione + ' — ' + p.piatto); });
+  }
+  if (piano.spostati && piano.spostati.length) {
+    righe.push('SEZIONE RINOMINATA — piatti spostati, dati mantenuti (' + piano.spostati.length + '):');
+    piano.spostati.forEach(function (p) { righe.push('  → "' + p._sezioneVecchia + '" → "' + p.sezione + '" — ' + p.piatto); });
   }
   if (piano.rinominati.length) {
     righe.push('PROBABILE RINOMINA — dati di sicurezza alimentare mantenuti (' + piano.rinominati.length + '):');
@@ -1793,6 +1726,16 @@ function _pdEseguiPiano(piano, token, piattiAttualiCompleti, callback) {
       allergeni_eliminabili: old.allergeni_eliminabili,
       gravidanza: old.gravidanza, modifiche: old.modifiche,
       stato: old.stato, fonte: old.fonte, escludi_stampa: old.escludi_stampa
+    });
+  });
+  (piano.spostati || []).forEach(function (p) {
+    azioni.push({
+      tipo: 'update', id: p.id, sezione: p.sezione, piatto: p.piatto,
+      descrizione: p.descrizione, allergeni: p.allergeni,
+      allergeni_contaminazione: p.allergeni_contaminazione,
+      allergeni_eliminabili: p.allergeni_eliminabili,
+      gravidanza: p.gravidanza, modifiche: p.modifiche,
+      stato: p.stato, fonte: p.fonte, escludi_stampa: p.escludi_stampa
     });
   });
   piano.nuovi.forEach(function (p) { azioni.push({ tipo: 'create', sezione: p.sezione, piatto: p.nome }); });
@@ -1861,7 +1804,7 @@ function _pdSincronizzaEProsegui(mDaPubblicare, token, callback) {
     try { tenuti = JSON.parse(localStorage.getItem('pd_rimossi_tenuti') || '[]'); } catch (e) { tenuti = []; }
     var chiaveRim = function (p) { return _pdNorm(p.sezione) + '|' + _pdNorm(p.piatto); };
     piano.rimossi = piano.rimossi.filter(function (p) { return tenuti.indexOf(chiaveRim(p)) < 0; });
-    if (!(piano.nuovi.length || piano.rimossi.length || piano.rinominati.length)) { callback(); return; }
+    if (!(piano.nuovi.length || piano.rimossi.length || piano.rinominati.length || (piano.spostati || []).length)) { callback(); return; }
     var msg = 'Dettagli piatti (allergeni) — la pubblicazione porta questi cambiamenti:\n\n' +
       _pdRiepilogoPiano(piano) +
       '\n\nApplicarli anche al database Dettagli piatti?\nOK = applica e pubblica — Annulla = pubblica solo il menù, Dettagli piatti resta invariato.';
@@ -1927,7 +1870,7 @@ function caricaAllergeniDalSito() {
           var sez = [];
           menus.forEach(function (m) { if (m && Array.isArray(m.sezioni)) sez = sez.concat(m.sezioni); });
           if (!sez.length) throw new Error('menu carta non leggibile');
-          datiMenuPerAllergeni = { sezioni: sez };
+          datiMenuPerAllergeni = { sezioni: sez, degustazione: menus[0] && menus[0].degustazione };
           costruisciFormAllergeni();
           toast('✓ Allergeni caricati (carta + dolci)');
         })
@@ -1935,37 +1878,6 @@ function caricaAllergeniDalSito() {
           costruisciFormAllergeni();
           toast('⚠ Allergeni caricati, ma carta/dolci non sincronizzati (' + e.message + ')');
         });
-      return;
-      if (dati && dati.sezioni) {
-        datiMenuPerAllergeni = dati;
-        costruisciFormAllergeni();
-        toast('\u2713 Allergeni caricati');
-      } else {
-        fetch(MENU_URL + '?nocache=' + Date.now(), { cache: 'no-store' })
-          .then(function(r2) {
-            if (!r2.ok) throw new Error('HTTP ' + r2.status);
-            return r2.text();
-          })
-          .then(function(src2) {
-            try {
-              analizza(src2);
-              datiMenuPerAllergeni = dati;
-              costruisciFormAllergeni();
-              toast('\u2713 Allergeni caricati');
-            } catch(e) {
-              // Sync dal menu fallita (parse KO): mostra comunque il form ma
-              // avvisa chiaramente \u2014 prima veniva nascosto da un catch silenzioso
-              // e appariva un falso "successo" anche a sincronizzazione mancata.
-              costruisciFormAllergeni();
-              toast('\u26a0 Allergeni caricati, ma il men\u00f9 carta non si \u00e8 sincronizzato (' + e.message + ')');
-            }
-          })
-          .catch(function(e) {
-            // fallback: usa solo datiAllergeni senza aggiornare i piatti
-            costruisciFormAllergeni();
-            toast('\u26a0 Allergeni caricati (men\u00f9 non aggiornato: ' + e.message + ')');
-          });
-      }
     })
     .catch(function(e) { toast('\u2717 Errore: ' + e); });
 }
@@ -2006,11 +1918,17 @@ function costruisciFormAllergeni() {
         });
       });
     }
-    // Ricostruisce datiAllergeni dai piatti del menu carta (esclude Crudi)
+    // Ricostruisce datiAllergeni dai piatti del menu carta + dolci.
+    // v 2026.09.30.02 — Crudi INCLUSI (prima esclusi per costruzione: ostriche = molluschi, scampi
+    // e gamberi = crostacei, pesce crudo = pesce sono allergeni UE e la carta rimanda a questo elenco)
+    // + sezione "Menù Degustazione" coi soli piatti del percorso che non sono già in carta/dolci.
     var sezioniAllergeni = [];
+    var nomiInCarta = {};
     sezioniMenu.forEach(function(sez) {
-      if (sez.titolo === 'Crudi') return; // Crudi senza allergeni
-      var piatti = sez.piatti.map(function(p) {
+      (sez.piatti || []).forEach(function(p) { if (p && p.nome) nomiInCarta[_pdNorm(p.nome)] = true; });
+    });
+    sezioniMenu.forEach(function(sez) {
+      var piatti = (sez.piatti || []).filter(function(p) { return p && String(p.nome || '').trim(); }).map(function(p) {
         // Ripulisce il nome dal tag <em>
         var nomeClean = p.nome.replace(/<[^>]+>/g, '');
         return {
@@ -2023,6 +1941,21 @@ function costruisciFormAllergeni() {
         piatti: piatti
       });
     });
+    var degu = datiMenuPerAllergeni.degustazione;
+    if (degu && degu.percorsi) {
+      var soloDegu = [];
+      Object.keys(degu.percorsi).forEach(function(k) {
+        var perc = degu.percorsi[k];
+        if (!Array.isArray(perc)) return;
+        perc.forEach(function(p) {
+          var nome = String((p && p.nome) || '').replace(/<[^>]+>/g, '').trim();
+          if (!nome || nomiInCarta[_pdNorm(nome)]) return;
+          nomiInCarta[_pdNorm(nome)] = true;
+          soloDegu.push({ nome: nome, allergeni: mapExisting[nome] || [] });
+        });
+      });
+      if (soloDegu.length) sezioniAllergeni.push({ titolo: 'Menù Degustazione', piatti: soloDegu });
+    }
     datiAllergeni = { sezioni: sezioniAllergeni };
   }
 
@@ -2041,7 +1974,7 @@ function costruisciFormAllergeni() {
   // Nota
   var nota = document.createElement('div');
   nota.className = 'sub';
-  nota.innerHTML = 'Spunta gli allergeni presenti in ciascun piatto. I piatti della sezione Crudi non vengono inclusi.';
+  nota.innerHTML = 'Spunta gli allergeni presenti in ciascun piatto (carta, Crudi compresi, dolci e piatti presenti solo nel Menù Degustazione). Un piatto senza spunte verrà pubblicato come "nessun allergene dichiarato": alla pubblicazione ti viene chiesta conferma.';
   nota.style.cssText = 'margin-bottom:.8rem;font-style:italic;color:var(--stone)';
   body.appendChild(nota);
 
@@ -2219,6 +2152,14 @@ function pubblicaAllergeni(token) {
 // ── Entry point pubblicazione allergeni ───────────────
 function traduciEPubblicaAllergeni() {
   if (!datiAllergeni) { alert('Prima carica gli allergeni'); return; }
+  // v 2026.09.30.02 — dato di sicurezza alimentare: un piatto senza spunte esce come "nessun
+  // allergene dichiarato" (anche in EN/FR). Si chiede conferma esplicita elencandoli.
+  var mCheck = leggiFormAllergeni();
+  var senza = [];
+  (mCheck && mCheck.sezioni || []).forEach(function(sez) {
+    (sez.piatti || []).forEach(function(p) { if (!p.allergeni || !p.allergeni.length) senza.push(sez.titolo + ' — ' + p.nome); });
+  });
+  if (senza.length && !confirm('Questi piatti verranno pubblicati come "NESSUN ALLERGENE DICHIARATO" (' + senza.length + '):\n\n' + senza.join('\n') + '\n\nÈ corretto? OK = pubblica, Annulla = torno a completarli.')) return;
   var token = localStorage.getItem('gh_token') || '';
   if (token) {
     pubblicaAllergeni(token);
@@ -2230,251 +2171,6 @@ function traduciEPubblicaAllergeni() {
   }
 }
 
-
-// ═══════════════════════════════════════════════════════
-// MENU VINI — funzioni admin
-// ═══════════════════════════════════════════════════════
-
-var VINI_PATH = 'menu-vini.html';
-var VINI_URL  = BASE_FETCH_URL + '/menu-vini.html';
-var _viniPrint = { fs: 1, lh: 1, gap: 1 };   // default = dimensioni attuali
-function _viniStyleAttr() {
-  var p = _viniPrint;
-  if (p.fs === 1 && p.lh === 1 && p.gap === 1) return '';
-  return ' style="--fs:' + p.fs + ';--lh:' + p.lh + ';--gap:' + p.gap + '"';
-}
-function _viniMontaPannello() {
-  var vs = document.getElementById('vini-section');
-  if (!vs || document.getElementById('vini-print-panel')) return;
-  var box = el('div','fs'); box.id = 'vini-print-panel'; box.style.marginBottom = '1.5rem';
-  box.appendChild(el('div','fs-head','Impostazioni stampa carta vini'));
-  var body = el('div','fs-body');
-  var ctrls = [];
-  function slider(label, key, mn, mx, st){
-    var lab = el('div','', label); lab.style.cssText = 'font-size:.72rem;color:var(--stone);margin-bottom:.2rem';
-    var row = el('div'); row.style.cssText = 'display:flex;align-items:center;gap:1rem;margin-bottom:.9rem';
-    var rng = document.createElement('input'); rng.type='range'; rng.min=mn; rng.max=mx; rng.step=st; rng.value=_viniPrint[key];
-    rng.style.cssText = 'flex:1;min-width:200px';
-    var out = el('span','', Math.round(_viniPrint[key]*100)+'%'); out.style.cssText = 'font-weight:500;min-width:60px;text-align:right';
-    rng.addEventListener('input', function(){ _viniPrint[key] = +rng.value; out.textContent = Math.round(rng.value*100)+'%'; });
-    row.appendChild(rng); row.appendChild(out); body.appendChild(lab); body.appendChild(row);
-    ctrls.push({ rng: rng, out: out, key: key });
-  }
-  slider('Dimensione caratteri', 'fs', '0.8', '1.4', '0.05');
-  slider('Interlinea (spazio tra le righe)', 'lh', '0.8', '1.5', '0.05');
-  slider('Spazio tra le voci', 'gap', '0.6', '1.6', '0.05');
-  var rb = document.createElement('button'); rb.type='button'; rb.textContent = '↺ Ripristina valori predefiniti';
-  rb.style.cssText = "margin:.2rem 0 .6rem;padding:.4rem 1rem;background:transparent;border:1px solid var(--rule);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;color:var(--ink)";
-  rb.addEventListener('click', function(){ ctrls.forEach(function(c){ _viniPrint[c.key]=1; c.rng.value=1; c.out.textContent='100%'; }); });
-  body.appendChild(rb);
-  var hint = el('div','', 'Valgono per la carta vini stampata (100% = base). Si applicano alla prossima Converti e Pubblica.');
-  hint.style.cssText = 'font-size:.72rem;color:var(--stone);margin-top:.2rem;line-height:1.5';
-  body.appendChild(hint);
-  box.appendChild(body);
-  vs.insertBefore(box, vs.firstChild);
-}
-
-function apriSezioneVini() {
-  document.getElementById('carica-menu').classList.remove('open');
-  document.getElementById('intro').style.display = 'none';
-  _pulisciViste();
-  var vs = document.getElementById('vini-section');
-  if (vs) vs.style.display = 'block';
-}
-
-function chiudiSezioneVini() {
-  var vs = document.getElementById('vini-section');
-  if (vs) vs.style.display = 'none';
-  if (!document.getElementById('wrap').classList.contains('on')) {
-    document.getElementById('intro').style.display = '';
-  }
-}
-
-function convertiEPubblicaVini() {
-  var fileInput = document.getElementById('vini-pdf-input');
-  var file = fileInput && fileInput.files[0];
-  if (!file) { alert('Seleziona un file PDF'); return; }
-  var statusEl = document.getElementById('vini-status');
-  statusEl.style.color = 'var(--stone)';
-  statusEl.textContent = '⏳ Caricamento PDF.js…';
-
-  function avviaConversione() {
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    _leggiEConvertiVini(file, statusEl);
-  }
-
-  if (typeof pdfjsLib === 'undefined') {
-    var s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-    s.onload = avviaConversione;
-    s.onerror = function() { statusEl.textContent = '✗ Impossibile caricare PDF.js'; };
-    document.head.appendChild(s);
-  } else {
-    avviaConversione();
-  }
-}
-
-async function _leggiEConvertiVini(file, statusEl) {
-  try {
-    var ab = await file.arrayBuffer();
-    var pdf = await pdfjsLib.getDocument({ data: ab }).promise;
-    var SCALE = 2.2;                       // ~150 dpi: nitido in stampa, peso contenuto
-    var imgs = [];
-    for (var i = 1; i <= pdf.numPages; i++) {
-      statusEl.textContent = '⏳ Rendering pagina ' + i + ' / ' + pdf.numPages + '…';
-      var page = await pdf.getPage(i);
-      var viewport = page.getViewport({ scale: SCALE });
-      var canvas = document.createElement('canvas');
-      canvas.width = Math.round(viewport.width);
-      canvas.height = Math.round(viewport.height);
-      var ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-      await page.render({ canvasContext: ctx, viewport: viewport }).promise;
-      imgs.push(canvas.toDataURL('image/jpeg', 0.92));
-    }
-
-    statusEl.textContent = '⏳ Generazione HTML…';
-    var html = _generaHtmlViniImmagini(imgs);
-
-    // Preview
-    var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-    window.open(URL.createObjectURL(blob), '_blank');
-
-    // Pubblica
-    var token = localStorage.getItem('gh_token') || '';
-    if (token) {
-      _pubblicaMenuVini(token, html, statusEl);
-    } else {
-      window._pendingViniHtml = html;
-      window._pendingViniPublish = true;
-      document.getElementById('token-input').value = '';
-      document.getElementById('modal-token').classList.add('on');
-    }
-  } catch(e) {
-    statusEl.style.color = 'var(--rust)';
-    statusEl.textContent = '✗ Errore: ' + e.message;
-  }
-}
-
-// Carta vini = immagini fedeli del PDF (1 pagina PDF = 1 foglio A4). Copertina inclusa.
-function _generaHtmlViniImmagini(imgs) {
-  var now = new Date();
-  var ver = 'v ' + now.getFullYear() + '.' + String(now.getMonth()+1).padStart(2,'0') + '.' +
-    String(now.getDate()).padStart(2,'0') + '.01';
-  var pages = imgs.map(function(src, i){
-    return '<div class="pg"><img src="' + src + '" alt="Carta dei vini Santamonica — pagina ' + (i+1) + '"/></div>';
-  }).join('\n');
-  return [
-    '<!DOCTYPE html>',
-    '<!-- ' + ver + ' -->',
-    '<html lang="it"><head>',
-    '<meta charset="UTF-8"/>',
-    '<meta name="viewport" content="width=device-width,initial-scale=1.0"/>',
-    '<title>Carta dei Vini | Ristorante Santamonica Genova</title>',
-    '<meta name="description" content="La carta dei vini del ristorante Santamonica a Genova: bollicine e Champagne, bianchi liguri e cantine da tutta Italia. Selezione della sommelier Monica Capurro."/>',
-    '<style>',
-    '*{margin:0;padding:0;box-sizing:border-box;}',
-    'body{background:#3a3a3a;padding:12px 0;}',
-    '.pg{width:210mm;max-width:96%;margin:0 auto 10px;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.35);}',
-    '.pg img{display:block;width:100%;height:auto;}',
-    '.ver{text-align:center;color:#bbb;font-family:sans-serif;font-size:10px;letter-spacing:.1em;padding:6px 0 2px;}',
-    '@media print{',
-    '  @page{size:A4 portrait;margin:0;}',
-    '  body{background:#fff;padding:0;}',
-    '  .pg{width:210mm;height:297mm;max-width:none;margin:0;box-shadow:none;page-break-after:always;overflow:hidden;display:flex;align-items:center;justify-content:center;}',
-    '  .pg:last-child{page-break-after:avoid;}',
-    '  .pg img{width:210mm;height:297mm;object-fit:contain;}',
-    '  .ver{display:none;}',
-    '}',
-    '</style>',
-    '</head><body>',
-    pages,
-    '<div class="ver">' + ver + '</div>',
-    '</body></html>'
-  ].join('\n');
-}
-
-function _ricostruisciPagina(items) {
-  var righe = [], TOL = 3;
-  items.forEach(function(it) {
-    if (!it.str || !it.str.trim()) return;
-    var y = it.transform[5], x = it.transform[4];
-    var riga = righe.find(function(r) { return Math.abs(r.y - y) < TOL; });
-    if (riga) { riga.items.push({ x: x, t: it.str }); }
-    else       { righe.push({ y: y, items: [{ x: x, t: it.str }] }); }
-  });
-  righe.sort(function(a, b) { return b.y - a.y; });
-  return righe.map(function(r) {
-    r.items.sort(function(a, b) { return a.x - b.x; });
-    return r.items.map(function(i) { return i.t; }).join(' ').trim();
-  }).filter(Boolean);
-}
-
-function _esc(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function _generaHtmlVini(pagine) {
-  // Salta pagina 1 (copertina)
-  var linee = [];
-  for (var p = 1; p < pagine.length; p++) {
-    pagine[p].forEach(function(l) { linee.push(l); });
-    linee.push('---PAGINA---');
-  }
-
-  var content = '';
-  var inPagina = false;
-  linee.forEach(function(linea) {
-    if (linea === '---PAGINA---') { return; }
-    var t = linea.trim();
-    if (!t) return;
-
-    // Rimuovi simboli bottiglia/calice (font custom del PDF)
-    t = t.replace(/[\u0000-\u001F\u0080-\u009F]/g, '');
-    // Normalizza simboli comuni
-    t = t.replace(/\u25ba/g, '').replace(/\u03aa/g, '').trim();
-    if (!t) return;
-
-    var isGrandeSez = /^[A-ZÀÈÌÒÙÉËÏ\s\-\/]{4,}$/.test(t) && t.length < 40 && t.length > 3;
-    var isSottosez  = /^[A-ZÀÈÌÒÙÉËÏ\s\-\/\(\)0-9]{3,}$/.test(t) && t.length < 35 && !t.match(/[€°\.]/);
-
-    if (isGrandeSez && t.length < 20) {
-      content += '<h2 class="sez-titolo">' + _esc(t) + '</h2>\n';
-    } else if (isSottosez && t.length < 30) {
-      content += '<h3 class="sottosez-titolo">' + _esc(t) + '</h3>\n';
-    } else {
-      content += '<p class="vino">' + _esc(t) + '</p>\n';
-    }
-  });
-
-  var now = new Date();
-  var ver = 'v ' + now.getFullYear() + '.' +
-    String(now.getMonth()+1).padStart(2,'0') + '.' +
-    String(now.getDate()).padStart(2,'0') + '.01';
-
-  return _VINI_TPL.replace('{{CONTENT}}', content).replace('{{VINISTYLE}}', _viniStyleAttr()).replace(/\{\{VER\}\}/g, ver);
-}
-
-var _VINI_TPL = '<!DOCTYPE html>\n<!-- {{VER}} -->\n<html lang="it">\n<head>\n<meta charset="UTF-8"/>\n<meta name="viewport" content="width=device-width,initial-scale=1.0"/>\n<title>Carta dei Vini | Ristorante Santamonica Genova</title>\n<meta name="description" content="La carta dei vini del Santamonica a Genova: bollicine e Champagne, bianchi liguri, cantine da tutta Italia. Selezione della sommelier Monica Capurro."/>\n<link rel="preconnect" href="https://fonts.googleapis.com"/>\n<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>\n<style>\n:root{--cream:#faf7f2;--ink:#1a1714;--stone:#8c7e6e;--rust:#9e4a2a;--rule:#d4c9b8;}\n@media (max-width:640px){.pg{width:auto!important;max-width:100%!important;min-height:0!important;margin:0!important;padding:26px 16px!important;box-shadow:none!important;}.logo{font-size:1.9rem!important;letter-spacing:.1em!important;}.logo-sub{font-size:.6rem!important;}.lista-titolo{font-size:1.05rem!important;letter-spacing:.12em!important;}.sez-titolo{font-size:1.3rem!important;letter-spacing:.08em!important;}.sommelier{font-size:.62rem!important;}html,body{overflow-x:hidden!important;}}\n*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}\nbody{background:var(--cream);color:var(--ink);font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:400;}\n.pg{width:210mm;margin:2rem auto;padding:14mm 22mm 14mm;background:#fff;box-shadow:0 2px 24px rgba(0,0,0,.10);}\n.pg-header{text-align:center;margin-bottom:8mm;padding-bottom:5mm;border-bottom:1px solid var(--rule);}\n.logo{font-size:3.3rem;font-weight:300;letter-spacing:.22em;text-transform:uppercase;line-height:1;}\n.logo em{font-style:italic;color:var(--stone);}\n.logo-sub{margin-top:.45rem;font-family:\'Jost\',sans-serif;font-size:.67rem;letter-spacing:.22em;text-transform:uppercase;color:var(--stone);}\n.lista-titolo{font-size:calc(1.5rem*var(--fs,1));font-weight:600;letter-spacing:.22em;text-transform:uppercase;text-align:center;margin:4mm 0 1mm;}\n.sommelier{font-family:\'Jost\',sans-serif;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--stone);text-align:center;margin-bottom:6mm;}\n.sez-titolo{font-size:calc(1.98rem*var(--fs,1));font-weight:600;letter-spacing:.16em;text-transform:uppercase;text-align:center;margin:calc(7mm*var(--gap,1)) 0 calc(4mm*var(--gap,1));padding-bottom:2mm;border-bottom:1px solid var(--rule);}\n.sottosez-titolo{font-family:\'Jost\',sans-serif;font-size:calc(.72rem*var(--fs,1));letter-spacing:.18em;text-transform:uppercase;color:var(--stone);margin:calc(5mm*var(--gap,1)) 0 calc(3mm*var(--gap,1));}\n.vino{margin-bottom:calc(3.5mm*var(--gap,1));text-align:justify;text-align-last:justify;font-size:calc(1.0rem*var(--fs,1));line-height:calc(1.52*var(--lh,1));}\n.version{text-align:center;padding:6px 0;font-family:\'Jost\',sans-serif;font-size:.55rem;color:#888;letter-spacing:.1em;}\n@media print{@page{size:A4 portrait;margin:8mm;}body{background:white;}.pg{width:auto;margin:0;box-shadow:none;page-break-after:always;}}\n</style>\n</head>\n<body{{VINISTYLE}}>\n<div class="pg">\n<div class="pg-header"><div class="logo">Santa<em>monica</em></div><div class="logo-sub">Lungomare Lombardo 27 \u2014 Genova</div></div>\n<div class="lista-titolo">Lista Vini &mdash; Wine List</div>\n<div class="sommelier">Sommelier Professionista Monica Capurro</div>\n{{CONTENT}}\n</div>\n<div class="version">{{VER}}</div>\n</body>\n</html>';
-
-function _pubblicaMenuVini(token, html, statusEl) {
-  var headers = { 'Authorization':'token '+token, 'Accept':'application/vnd.github.v3+json', 'Content-Type':'application/json' };
-  statusEl.style.color = 'var(--stone)';
-  statusEl.textContent = '⏳ Pubblicazione menù vini…';
-  pubblicaFile(token, headers, VINI_PATH, html)
-    .then(function(r) {
-      if (!r.ok) return r.json().then(function(e){ throw new Error(e.message); });
-      statusEl.style.color = 'var(--green)';
-      statusEl.textContent = '✓ Menù vini pubblicato! Attendi ~90 secondi.';
-      toast('\u2713 Men\u00f9 vini pubblicato!');
-      window._pendingViniHtml = null;
-    })
-    .catch(function(e) {
-      statusEl.style.color = 'var(--rust)';
-      statusEl.textContent = '\u2717 Errore: ' + e.message;
-    });
-}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // DOCUMENTO GENERICO (PDF/DOCX/TXT → HTML stile carta) — v 2026.05.15.01

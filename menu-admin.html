@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.30.02 (bump ?v= admin-core.js a 2026.09.30.02 + footer-version) — Secondo audit, punti approvati da Andrea: Allergeni carta con Crudi e piatti solo in degustazione + conferma dei piatti senza allergeni (admin-core); avviso in Dettagli piatti che gli allergeni pubblici si cambiano da «Allergeni carta»; voucher: listino dal voucher-config.json (via i prezzi scritti nel codice, ormai vecchi) e avviso/conferma se il percorso non è in carta; tendine orario di chiusure/aperture/limiti prese dai periodi; nuovo pannello Setup «Chiavi di accesso»; sezione carta rinominata = righe Dettagli piatti spostate, non duplicate (admin-core); tolto il pannello morto «Menù Vini». -->
 <!-- v 2026.09.30.01 (bump ?v= admin-templates-shared.js a 2026.09.30.01 + footer-version; edge function reminder-settings-status v3 e reservations-status v9) — Secondo audit: (1) PRIVACY Reminder prenotazioni: l'elenco (nome/telefono) si legge solo col token GitHub (POST), il servizio non lo dà più a chiunque; (2) Prenotazioni — Setup: i testi del ringraziamento ora arrivano davvero dal server (prima campi vuoti, rischio di sovrascriverli) e i valori di ripiego del servizio in errore non vengono più mostrati come salvati; (3) avviso dopo "Salva periodi" corretto (rimanda a Genera/Pubblica FAQ orari, non più al commit a mano); (4) QR del foglio orario dal sito invece che da GitHub Pages. -->
 <!-- v 2026.09.29.09 (+ footer-version; backend foodcost-admin v17 + migration fc_piatti_costo_porzione_pct) — Menù Degustazione: richiesto da Andrea, le porzioni sono più piccole di quelle alla carta → il costo del percorso = somma dei costi dei piatti alla carta × "% porzione" (campo in Costo piatti, 1–200, default 100) al posto del "costo extra"; percorso a testo libero: somma dei piatti della carta nominati nel testo. admin-core.js invariato. -->
 <!-- v 2026.09.29.08 (bump ?v= admin-core.js a 2026.09.29.08 + footer-version; backend foodcost-admin v16 + migration fc_piatti_costo_degustazione_e_archivio) — Decisioni di Andrea sull'audit: (1) Menù Degustazione nel Food Cost: schede per percorso allineate al menù pubblicato (_fcAllineaDegustazione, costo = somma piatti + costo extra), tabella in Costo piatti, righe in Vendite (persone), riepilogo in Dashboard, fuori dal Menu Engineering; (2) Andamento sugli ultimi periodi di inventario chiusi, Teorico '—' dove mancano le vendite; (3) piatti tolti dalla carta: la scheda Food Cost resta come storico spenta (trigger DB), niente più cancellazioni bloccate. Guida aggiornata. -->
@@ -1188,6 +1189,7 @@
     <button class="qa-btn qa-setup" onclick="apriSezioneReminder()">Reminder prenotazioni</button>
     <button class="qa-btn qa-setup" onclick="apriSezionePrenotazioniSetup()">Prenotazioni — Setup</button>
     <button class="qa-btn qa-setup" onclick="apriSezioneVoucherSetup()">Voucher — Setup</button>
+    <button class="qa-btn qa-setup" onclick="apriSezioneChiavi()">Chiavi di accesso</button>
     <button class="qa-btn qa-setup" onclick="apriGestoreFoto()">Foto cucina</button>
     <button class="qa-btn qa-setup" onclick="apriGestoreFotoSito()">Foto sito</button>
   </div>
@@ -1252,7 +1254,7 @@
 
       <h3 style="margin:1rem 0 .25rem;font-size:.86rem">⚠️ Allergeni</h3>
       <ol style="margin:.2rem 0 .2rem 1.2rem;padding:0">
-        <li>Clicca <strong>«Allergeni carta»</strong> (elenca i piatti della carta <em>e</em> dei dolci <em>già pubblicati</em>; i Crudi sono esclusi)</li>
+        <li>Clicca <strong>«Allergeni carta»</strong> (elenca i piatti della carta — Crudi compresi —, dei dolci e quelli presenti solo nel Menù Degustazione, <em>già pubblicati</em>)</li>
         <li>Spunta gli allergeni di ogni piatto</li>
         <li><strong>✦ Traduci e Pubblica</strong> → pubblica la pagina allergeni in italiano e aggiorna da sola gli allergeni in <strong>«Dettagli piatti»</strong></li>
         <li>⚠️ <strong>Per aggiornarla in EN/FR</strong>: aspetta ~1–2 min, poi <strong>Carica la carta → Traduci e Pubblica</strong> (la pagina allergeni tradotta è in coda alla carta EN/FR)</li>
@@ -1356,27 +1358,6 @@
   </div>
 </div>
 
-<div id="vini-section" style="max-width:700px;margin:1.5rem auto;padding:0 1rem;display:none;">
-  <div class="fs">
-    <div class="fs-head">Menù Vini — Converti da PDF</div>
-    <div class="fs-body">
-      <p style="font-size:.82rem;color:var(--stone);margin-bottom:1.2rem;line-height:1.6;">
-        Seleziona il PDF della lista vini: ogni pagina viene riprodotta <strong>fedelmente come immagine</strong> ad alta risoluzione (copertina inclusa), impaginata su A4 e pubblicata sul sito.
-        Una preview si aprirà automaticamente prima della pubblicazione.
-      </p>
-      <div style="margin-bottom:1rem;">
-        <span class="opt-lbl" style="display:block;margin-bottom:.4rem;">File PDF</span>
-        <input type="file" id="vini-pdf-input" accept=".pdf"
-          style="font-family:Inter,sans-serif;font-size:.78rem;cursor:pointer" />
-      </div>
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1rem;">
-        <button class="btn btn-publish" onclick="convertiEPubblicaVini()">✦ Converti e Pubblica</button>
-        <button class="btn btn-load" onclick="chiudiSezioneVini()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
-        <span id="vini-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div id="doc-section" style="max-width:700px;margin:1.5rem auto;padding:0 1rem;display:none;">
   <div class="fs">
@@ -1405,6 +1386,17 @@
   </div>
 </div>
 
+<div id="chiavi-section" style="max-width:700px;margin:1.5rem auto;padding:0 1rem;display:none;">
+  <div class="fs">
+    <div class="fs-head">Chiavi di accesso</div>
+    <div class="fs-body">
+      <p style="font-size:.8rem;color:var(--stone);margin-bottom:1rem;line-height:1.55;">Le chiavi sono salvate solo in questo browser. Qui vedi quali sono impostate e puoi cambiarle o toglierle (es. dopo averle rigenerate).</p>
+      <div id="chiavi-list" style="font-size:.85rem;"></div>
+      <div style="margin-top:1rem;"><button class="btn btn-load" onclick="chiudiSezioneChiavi()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button></div>
+    </div>
+  </div>
+</div>
+
 <div id="piatti-dettagli-section" style="max-width:900px;margin:1.5rem auto;padding:0 1rem;display:none;">
   <div class="fs">
     <div class="fs-head">Dettagli piatti — Allergeni &amp; info cucina</div>
@@ -1414,6 +1406,10 @@
         contaminazione, allergeni eliminabili su richiesta, indicazioni in gravidanza, modifiche consentite.
         Salvato qui su un database dedicato — <strong>non</strong> sul sito pubblico. Usa "🖨 Stampa" per il
         foglio da tenere in cucina/sala, sempre aggiornato con l'ultimo salvato.
+      </p>
+      <p style="font-size:.8rem;margin:-.6rem 0 1.2rem;padding:.55rem .85rem;border-left:3px solid var(--rust);background:var(--field);line-height:1.55;">
+        <strong>Allergeni che vede il cliente</strong> (pagina Allergeni, carta EN/FR, stampa dei dolci): si cambiano da
+        <strong>«Allergeni carta»</strong> → Pubblica, che li copia anche qui. Correggerli solo qui cambia questa scheda interna, <strong>non</strong> il sito.
       </p>
 
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:1.2rem;">
@@ -2423,7 +2419,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.09.30.01"></script>
-<script src="admin-core.js?v=2026.09.29.08"></script>
+<script src="admin-core.js?v=2026.09.30.02"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
@@ -2956,11 +2952,51 @@ function loadOrariPeriods() {
     .then(function (d) {
       orariPeriods = (d && Array.isArray(d.periods)) ? d.periods : [];
       renderOrariPeriodiList();
+      _orariPopolaTendine();
       if (st) st.textContent = '';
     })
     .catch(function () {
       if (st) { st.textContent = 'Errore nel caricamento dei periodi.'; st.style.color = 'var(--rust)'; }
     });
+}
+
+// v 2026.09.30.02 — Le tendine "orario" di chiusure/aperture/limiti per singolo orario si
+// riempiono dai periodi configurati (prima erano scritte fisse nel codice, con orari non
+// prenotabili come le 22:30). Chiusure e limiti: solo gli slot dei servizi attivi quel giorno;
+// aperture extra: tutti gli slot del periodo (anche in un giorno chiuso).
+function _orariPeriodoPerData(date) {
+  if (!orariPeriods.length) return null;
+  if (!date) return null;
+  var trovati = orariPeriods.filter(function (p) { return p.from && date >= p.from && (!p.to || date <= p.to); });
+  return trovati.length ? trovati[trovati.length - 1] : null;
+}
+function _orariSlotsPer(date, soloAttivi) {
+  var set = {};
+  var aggiungi = function (arr) { (arr || []).forEach(function (s) { if (s) set[s] = true; }); };
+  var p = _orariPeriodoPerData(date);
+  if (p) {
+    var wd = String(new Date(date + 'T12:00:00').getDay());
+    var svc = (p.day_services && p.day_services[wd]) || [];
+    if (soloAttivi && svc.length) svc.forEach(function (s) { aggiungi(p[s + '_slots']); });
+    else { aggiungi(p.pranzo_slots); aggiungi(p.cena_slots); }
+  } else {
+    orariPeriods.forEach(function (q) { aggiungi(q.pranzo_slots); aggiungi(q.cena_slots); });
+  }
+  return Object.keys(set).sort();
+}
+function _orariPopolaTendine() {
+  [['pren-slot-closure-date', 'pren-slot-closure-time', true],
+   ['pren-slot-opening-date', 'pren-slot-opening-time', false],
+   ['pren-slot-cap-date', 'pren-slot-cap-time', true]].forEach(function (c) {
+    var d = document.getElementById(c[0]), sel = document.getElementById(c[1]);
+    if (!d || !sel) return;
+    if (!d.dataset.orariHook) { d.addEventListener('change', _orariPopolaTendine); d.dataset.orariHook = '1'; }
+    var slots = _orariSlotsPer(d.value, c[2]);
+    if (!slots.length) return; // periodi non caricati: restano le opzioni attuali
+    var prima = sel.value;
+    sel.innerHTML = slots.map(function (s) { return '<option value="' + s + '">' + s + '</option>'; }).join('');
+    if (slots.indexOf(prima) >= 0) sel.value = prima;
+  });
 }
 
 function _orariEmptyPeriodo() {
@@ -6558,6 +6594,7 @@ function resetVoucherSecret() {
 }
 
 function apriSezioneVoucher() {
+  _vcListino = null; _vcCaricaListino();
   document.getElementById('carica-menu').classList.remove('open');
   document.getElementById('intro').style.display = 'none';
   _pulisciViste();
@@ -6575,6 +6612,53 @@ function chiudiSezioneVoucher() {
 // Gestione", spostata in Setup su richiesta Andrea. vb-1/2/3 e vs-anno/vs-ultimo vivono SOLO
 // qui ora: caricaVoucherBuoni()/pubblicaVoucherBuoni()/azzeraContatoreVoucher() non sono
 // null-safe su quegli ID, quindi vanno chiamati/popolati solo quando questa sezione è aperta.
+// v 2026.09.30.02 — Pannello unico "Chiavi di accesso": token GitHub (pubblicazioni, prenotazioni,
+// Food Cost, Dettagli piatti…), chiave SafeTable (Cauzioni) e chiave voucher. Prima il 🔑
+// cambiava solo il token GitHub e le altre due si potevano rimuovere solo da dentro le sezioni.
+var CHIAVI = [
+  { k: 'gh_token', nome: 'Token GitHub', uso: 'pubblicazione menù/foto/FAQ, prenotazioni, reminder, Dettagli piatti, Food Cost, rubrica' },
+  { k: 'menuadmin.cauzioni.secret.v1', nome: 'Chiave SafeTable', uso: 'Cauzioni (storico e link garanzia)' },
+  { k: 'menuadmin.voucher.secret.v1', nome: 'Chiave voucher', uso: 'Voucher — emissione, riscatto, contatore' }
+];
+function apriSezioneChiavi() {
+  document.getElementById('carica-menu').classList.remove('open');
+  document.getElementById('intro').style.display = 'none';
+  _pulisciViste();
+  document.getElementById('chiavi-section').style.display = 'block';
+  renderChiavi();
+}
+function chiudiSezioneChiavi() {
+  document.getElementById('chiavi-section').style.display = 'none';
+  _riapriIntroSeAppropriato();
+}
+function _chiaveGet(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+function renderChiavi() {
+  var box = document.getElementById('chiavi-list');
+  box.innerHTML = CHIAVI.map(function (c, i) {
+    var v = _chiaveGet(c.k);
+    return '<div style="display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;padding:.6rem 0;border-bottom:1px dotted var(--rule);">' +
+      '<div style="flex:1;min-width:14rem;"><strong>' + c.nome + '</strong> ' +
+      (v ? '<span style="color:var(--green);font-size:.75rem;">✓ impostata (…' + v.slice(-4).replace(/[<>&"]/g, '') + ')</span>' : '<span style="color:var(--rust);font-size:.75rem;">non impostata</span>') +
+      '<div style="font-size:.72rem;color:var(--stone);">' + c.uso + '</div></div>' +
+      '<button class="btn btn-load" style="font-size:.7rem;padding:.3rem .8rem;border:1px solid var(--ink);color:var(--ink);" onclick="cambiaChiave(' + i + ')">Cambia</button>' +
+      (v ? '<button class="btn btn-load" style="font-size:.7rem;padding:.3rem .8rem;border:1px solid var(--rust);color:var(--rust);" onclick="togliChiave(' + i + ')">Togli</button>' : '') +
+      '</div>';
+  }).join('');
+}
+function cambiaChiave(i) {
+  var c = CHIAVI[i];
+  var v = (window.prompt('Nuovo valore per: ' + c.nome) || '').trim();
+  if (!v) return;
+  try { localStorage.setItem(c.k, v); } catch (e) {}
+  renderChiavi();
+}
+function togliChiave(i) {
+  var c = CHIAVI[i];
+  if (!confirm('Togliere ' + c.nome + ' da questo browser? Ti verrà richiesta al prossimo uso.')) return;
+  try { localStorage.removeItem(c.k); } catch (e) {}
+  renderChiavi();
+}
+
 function apriSezioneVoucherSetup() {
   document.getElementById('carica-menu').classList.remove('open');
   document.getElementById('intro').style.display = 'none';
@@ -6593,6 +6677,55 @@ function _vcEmitToggle() {
   var isExp = (tipo === 'deg6' || tipo === 'deg7');
   document.getElementById('vc-e-vini-row').style.display = isExp ? 'flex' : 'none';
   document.getElementById('vc-e-valore-row').style.display = isExp ? 'none' : 'flex';
+  _vcAggiornaListino();
+}
+
+// v 2026.09.30.02 — Listino voucher Degustazione = voucher-config.json (lo stesso che usano
+// regala.html e Stripe, allineato al Menù Degustazione a ogni pubblicazione della carta).
+// Prima: prezzi scritti nel codice (VR_TIPO_LABELS 170/290 e 220/360) ormai diversi dal listino,
+// e nessun avviso se si emetteva un buono per un percorso che oggi non è in carta.
+var _vcListino = null;
+function _vcCaricaListino() {
+  if (_vcListino) return Promise.resolve(_vcListino);
+  return fetch('/voucher-config.json?nc=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (j) { _vcListino = (j && j.degustazione) || null; return _vcListino; })
+    .catch(function () { return null; });
+}
+function _vcBloccoListino(tipo) {
+  if (!_vcListino) return null;
+  return tipo === 'deg6' ? _vcListino.sei : tipo === 'deg7' ? _vcListino.sette : null;
+}
+function _vcPrezzoListino(tipo, vini) {
+  var b = _vcBloccoListino(tipo);
+  if (!b) return null;
+  return vini ? b.vini : b.base;
+}
+function _vcAggiornaListino() {
+  _vcCaricaListino().then(function () {
+    var tipo = document.getElementById('vc-e-tipo').value;
+    var nota = document.getElementById('vc-e-listino-nota');
+    if (!nota) {
+      nota = document.createElement('div');
+      nota.id = 'vc-e-listino-nota';
+      nota.style.cssText = 'font-size:.74rem;margin:.2rem 0 .4rem;';
+      var row = document.getElementById('vc-e-vini-row');
+      row.parentNode.insertBefore(nota, row.nextSibling);
+      var cb = document.getElementById('vc-e-vini');
+      if (cb) cb.addEventListener('change', _vcAggiornaListino);
+      var pr = document.getElementById('vc-e-prezzo');
+      if (pr) pr.addEventListener('input', function () { pr.dataset.auto = '0'; });
+    }
+    var b = _vcBloccoListino(tipo);
+    if (!b) { nota.textContent = ''; return; }
+    nota.style.color = b.attivo ? 'var(--stone)' : 'var(--rust)';
+    nota.textContent = b.attivo
+      ? 'Listino: ' + b.base + ' € (con vini ' + b.vini + ' €) — preso dal Menù Degustazione pubblicato.'
+      : '⚠ Questo percorso oggi NON è in carta (percorso vuoto nel Menù Degustazione): il buono non è in vendita sul sito.';
+    var pr2 = document.getElementById('vc-e-prezzo');
+    var prezzo = _vcPrezzoListino(tipo, document.getElementById('vc-e-vini').checked);
+    if (pr2 && prezzo != null && (pr2.value === '' || pr2.dataset.auto === '1')) { pr2.value = prezzo; pr2.dataset.auto = '1'; }
+  });
 }
 
 function _vcSetEmitStatus(msg, isErr) {
@@ -6607,6 +6740,11 @@ function emettiVoucherAdmin() {
   var tipoSel = document.getElementById('vc-e-tipo').value;
   var isExp = (tipoSel === 'deg6' || tipoSel === 'deg7');
   var vini = document.getElementById('vc-e-vini').checked;
+  var bListino = _vcBloccoListino(tipoSel);
+  if (isExp && bListino && !bListino.attivo &&
+      !confirm('Il percorso ' + (tipoSel === 'deg7' ? '7' : '6') + ' portate oggi NON è in carta (percorso vuoto nel Menù Degustazione).\n\nEmettere comunque il buono?')) {
+    _vcSetEmitStatus('Emissione annullata: percorso non in carta.', true); return;
+  }
 
   // NOTA (debito accettato, segnalato in Revisione Oppositiva P3 15/7/2026): il DB salva solo
   // `descrizione` come testo libero; il numero di portate del cartoncino/PDF (_vpRender più
@@ -7216,12 +7354,9 @@ function _vrPrefill(r) {
   // al cliente sul form regala.html) per le esperienze, dal valore scelto per i buoni liberi.
   var prezzoAuto = null;
   if (r.tipo === 'valore') prezzoAuto = r.valore_eur;
-  else {
-    var tLbl = VR_TIPO_LABELS[r.tipo];
-    if (tLbl) prezzoAuto = r.abbinamento_vini ? tLbl.prezzoVini : tLbl.prezzoBase;
-  }
+  else prezzoAuto = _vcPrezzoListino(r.tipo, !!r.abbinamento_vini); // v 2026.09.30.02: dal listino vero (voucher-config.json)
   var prezzoEl = document.getElementById('vc-e-prezzo');
-  if (prezzoEl && prezzoAuto != null) prezzoEl.value = prezzoAuto;
+  if (prezzoEl && prezzoAuto != null) { prezzoEl.value = prezzoAuto; prezzoEl.dataset.auto = '0'; }
 
   window._vcActiveRichiestaId = r.id;
   var badge = document.getElementById('vc-e-richiesta-badge');
@@ -7659,7 +7794,6 @@ async function _eseguiPubblicaFotoSito(token) {
     chiudiModal();
     if (window._pendingFotoPublish) { window._pendingFotoPublish=false; _eseguiPubblicaFoto(token); return; }
     if (window._pendingFotoSitoPublish) { window._pendingFotoSitoPublish=false; _eseguiPubblicaFotoSito(token); return; }
-    if (window._pendingViniPublish && window._pendingViniHtml) { window._pendingViniPublish=false; var vh=window._pendingViniHtml; window._pendingViniHtml=null; _pubblicaMenuVini(token, vh, document.getElementById('vini-status')); return; }
     if (window._pendingAllergeniPublish) { window._pendingAllergeniPublish=false; pubblicaAllergeni(token); return; }
     var btn=document.getElementById('btn-pubblica');
     if (dati) {
@@ -7891,7 +8025,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.30.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.30.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

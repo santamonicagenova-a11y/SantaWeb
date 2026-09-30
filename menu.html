@@ -688,17 +688,17 @@ const MENU = {
 /* ═════════════════════════════════════════════════════════ */
 
 /* ── helpers condivisi ── */
-const NOTE_CARTA = `
+const NOTE_CARTA =  BT 
   <span class="note-ospite-titolo">Note per l'ospite</span>
   Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche delle materie prime i prodotti ittici
   acquistati freschi vengono abbattuti e congelati. Tali prodotti vengono contrassegnati con il simbolo * per una
   chiara e trasparente informazione alla clientela.<br>
   L'elenco degli <u>allergeni</u> è consultabile nell'ultima pagina di questo menù.
-`;
+ BT ;
 
-const NOTE_ORARIO = `Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche
+const NOTE_ORARIO =  BT Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche
 delle materie prime i prodotti acquistati freschi vengono abbattuti e congelati.
-Questi prodotti vengono contrassegnati con il simbolo: *`;
+Questi prodotti vengono contrassegnati con il simbolo: * BT ;
 
 function getSez(titolo) {
   var found = MENU.sezioni.find(s => s.titolo === titolo);
@@ -713,21 +713,21 @@ function getSez(titolo) {
 function buildPiatto(p) {
   const eco = p.sostenibile ? ' eco' : '';
   const staccato = p.staccato ? ' piatto-staccato' : '';
-  const unitaHtml = p.unita ? `<span class="piatto-unita">${p.unita}</span>` : '';
+  const unitaHtml = p.unita ?  BT <span class="piatto-unita">${p.unita}</span> BT  : '';
   const prezzoHtml = p.prezzo != null
-    ? `<span class="piatto-prezzo">${p.prezzo}${unitaHtml}</span>` : '';
+    ?  BT <span class="piatto-prezzo">${p.prezzo}${unitaHtml}</span> BT  : '';
   const descHtml = p.descrizione
-    ? `<span class="piatto-desc">${p.descrizione}</span>` : '';
-  return `<div class="piatto${staccato}"><span class="piatto-riga${eco}">${p.nome}</span>${prezzoHtml}${descHtml}</div>`;
+    ?  BT <span class="piatto-desc">${p.descrizione}</span> BT  : '';
+  return  BT <div class="piatto${staccato}"><span class="piatto-riga${eco}">${p.nome}</span>${prezzoHtml}${descHtml}</div> BT ;
 }
 
 function buildSezione(s) {
   const label = s.titolo_display || s.titolo;
-  return `
+  return  BT 
     <div class="sezione">
       <div class="sezione-titolo">${label}</div>
       ${s.piatti.map(buildPiatto).join('')}
-    </div>`;
+    </div> BT ;
 }
 
 function buildDegu(degu) {
@@ -741,7 +741,7 @@ function buildDegu(degu) {
     if (o.portate === 7) return !percorso7Vuoto;
     return true;
   }).map(o =>
-    `${o.portate} portate &nbsp;${o.prezzo}, eventuale abbinamento vini ${o.vini}`
+     BT ${o.portate} portate &nbsp;${o.prezzo}, eventuale abbinamento vini ${o.vini} BT 
   ).join('<br>');
 
   let percorsiHtml = '';
@@ -751,31 +751,31 @@ function buildDegu(degu) {
     const escl = typeof piatti === 'string' ? !!degu.escludi_stampa_7 : !!degu.escludi_stampa_6;
     const printCls = escl ? ' no-print' : '';
     if (typeof piatti === 'string') {
-      percorsiHtml += `
+      percorsiHtml +=  BT 
         <div class="percorso${printCls}">
           <div class="percorso-label">&ldquo;${n}&rdquo;</div>
           <div class="percorso-piatto percorso-libero">${piatti}</div>
-        </div>`;
+        </div> BT ;
     } else {
       const righe = piatti.map(p => {
-        const descHtml = p.descrizione ? `<span class="percorso-desc">${p.descrizione}</span>` : '';
-        return `<div class="percorso-piatto${p.sostenibile ? ' eco' : ''}">${p.nome}${descHtml}</div>`;
+        const descHtml = p.descrizione ?  BT <span class="percorso-desc">${p.descrizione}</span> BT  : '';
+        return  BT <div class="percorso-piatto${p.sostenibile ? ' eco' : ''}">${p.nome}${descHtml}</div> BT ;
       }).join('');
-      percorsiHtml += `
+      percorsiHtml +=  BT 
         <div class="percorso${printCls}">
           <div class="percorso-label">&ldquo;${n}&rdquo;</div>
           ${righe}
-        </div>`;
+        </div> BT ;
     }
   }
 
-  return `
+  return  BT 
     <div class="degu">
       <h1 class="degu-titolo">Men&ugrave; Degustazione</h1>
       <div class="degu-prezzi">${optsHtml}</div>
       <div class="degu-nota">${degu.nota.replace("l'intero tavolo", "<strong>l\u2019intero tavolo</strong>")}</div>
       ${percorsiHtml}
-    </div>`;
+    </div> BT ;
 }
 
 /* ══════════════════════════════════════
@@ -792,22 +792,22 @@ function renderCarta() {
   // Pag 1: intestazione + degustazione
   const pag1 = document.createElement('div');
   pag1.className = 'pg';
-  pag1.innerHTML = `
+  pag1.innerHTML =  BT 
     ${buildDegu(MENU.degustazione)}
     <div class="note-ospite">${NOTE_CARTA}</div>
-  `;
+   BT ;
   root.appendChild(pag1);
 
   // Pag 2 e 3: sezioni
   MENU.pagine.forEach(pg => {
     const div = document.createElement('div');
     div.className = 'pg';
-    div.innerHTML = `
+    div.innerHTML =  BT 
       <div class="pg-content">
         ${pg.sezioni.map(t => buildSezione(getSez(t))).join('')}
       </div>
       <div class="note-ospite">${NOTE_CARTA}</div>
-    `;
+     BT ;
     root.appendChild(div);
   });
 }
@@ -820,20 +820,20 @@ function buildOrarioColonna(titoli, sepDopo) {
     const s = getSez(titolo);
     const piatti = s.piatti.map(p => {
       const eco = p.sostenibile ? ' eco' : '';
-      const unitaHtml = p.unita ? ` ${p.unita}` : '';
-      const prezzoHtml = p.prezzo != null ? ` ${p.prezzo}${unitaHtml}` : '';
-      return `<div class="orario-piatto"><span class="${'piatto-riga' + eco}">${p.nome}${prezzoHtml}</span>${p.descrizione ? '<span class="orario-desc">' + p.descrizione + '</span>' : ''}</div>`;
+      const unitaHtml = p.unita ?  BT  ${p.unita} BT  : '';
+      const prezzoHtml = p.prezzo != null ?  BT  ${p.prezzo}${unitaHtml} BT  : '';
+      return  BT <div class="orario-piatto"><span class="${'piatto-riga' + eco}">${p.nome}${prezzoHtml}</span>${p.descrizione ? '<span class="orario-desc">' + p.descrizione + '</span>' : ''}</div> BT ;
     }).join('');
 
     const sep = (titolo === sepDopo) ? '<hr class="orario-sep">' : '';
     // ogni sezione in uno slot flex:1 centrato verticalmente
-    return `
+    return  BT 
       <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
         <div class="orario-sez">
           <div class="orario-sez-titolo">${s.titolo_display || s.titolo}</div>
           ${piatti}
         </div>
-      </div>${sep}`;
+      </div>${sep} BT ;
   }).join('');
 }
 
@@ -843,12 +843,12 @@ function renderOrario() {
   const cfg = MENU.orario;
 
   const orarioHtml = cfg.orarioServizio.map(o =>
-    o.fasce.map(f => `<div>${f}</div>`).join('') + `<div><em>${o.giorno}</em></div>`
+    o.fasce.map(f =>  BT <div>${f}</div> BT ).join('') +  BT <div><em>${o.giorno}</em></div> BT 
   ).join('');
 
   const pg = document.createElement('div');
   pg.className = 'pg pg-orario';
-  pg.innerHTML = `
+  pg.innerHTML =  BT 
     <div class="orario-logo">Santamonica</div>
     <div class="orario-grid" style="flex:1">
 
@@ -863,7 +863,7 @@ function renderOrario() {
             English Menu<br>
             Carte en Française
           </div>
-          <img src="https://santamonicagenova-a11y.github.io/SantaWeb/orario-qr.png" alt="QR code" style="width:45mm;height:45mm;display:block;margin:0 auto;" />
+          <img src="https://santamonicagenova.it/orario-qr.png" alt="QR code" style="width:45mm;height:45mm;display:block;margin:0 auto;" />
         </div>
       </div>
 
@@ -883,7 +883,7 @@ function renderOrario() {
       </div>
 
     </div>
-  `;
+   BT ;
   root.appendChild(pg);
 }
 
@@ -910,6 +910,135 @@ renderCarta();
 renderOrario();
 showLayout('carta');
 _szApply();
+/* ── Filtro allergeni per l'ospite (solo schermo, v 2026.09.30.04) ──
+   Barra coi 14 allergeni UE: i piatti che contengono quelli scelti si attenuano con
+   "contiene: …"; i piatti senza dati allergeni NON vengono mai presentati come adatti
+   ("chiedi al personale"). Dati: IT = pagina Allergeni pubblicata (/menu-allergeni.html);
+   EN/FR = MENU.allergeni già incluso in questa pagina. Non compare nella versione admin
+   (con barra di stampa) né in stampa. */
+function _algNorm(s) {
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+var _ALG_CANON = ['glutine','crostacei','uova','pesce','arachidi','soia','latte','frutta a guscio','sedano','senape','sesamo','solfiti','lupini','molluschi'];
+var _ALG_TESTI = {
+  it: { titolo: 'Allergie o intolleranze? Tocca gli allergeni da evitare:', reset: 'Mostra tutto', contiene: 'contiene', ignoto: 'allergeni non indicati: chiedi al personale',
+        nota: 'Filtro indicativo sugli allergeni dichiarati per ogni piatto. In cucina possono esserci tracce (contaminazione): in caso di allergia grave parla sempre con il personale.' },
+  en: { titolo: 'Allergies or intolerances? Tap the allergens to avoid:', reset: 'Show all', contiene: 'contains', ignoto: 'allergens not listed: please ask our staff',
+        nota: 'Indicative filter based on the allergens declared for each dish. Traces may be present in the kitchen (cross-contamination): with a severe allergy, always speak to our staff.' },
+  fr: { titolo: 'Allergies ou intolérances ? Touchez les allergènes à éviter :', reset: 'Tout afficher', contiene: 'contient', ignoto: 'allergènes non indiqués : demandez à notre personnel',
+        nota: 'Filtre indicatif basé sur les allergènes déclarés pour chaque plat. Des traces peuvent être présentes en cuisine (contamination croisée) : en cas d’allergie grave, adressez-vous toujours à notre personnel.' }
+};
+var _algMappa = null, _algScelti = {};
+function _algCanonDa(voce) {
+  var k = String(voce || '').trim().toLowerCase();
+  var alias = { 'latticini': 'latte', 'latte e derivati': 'latte', 'uovo': 'uova', 'solforosa': 'solfiti', 'anidride solforosa': 'solfiti' };
+  return alias[k] || k;
+}
+function _algApplica() {
+  var lang = (document.documentElement.lang || 'it').slice(0, 2);
+  var T = _ALG_TESTI[lang] || _ALG_TESTI.it;
+  var scelti = Object.keys(_algScelti).filter(function (k) { return _algScelti[k]; });
+  var root = document.getElementById('layout-carta');
+  if (!root) return;
+  var voci = root.querySelectorAll('.piatto, .percorso-piatto');
+  Array.prototype.forEach.call(voci, function (el) {
+    if (el.closest && el.closest('.alg-pg')) return;
+    var vecchio = el.querySelector('.alg-tag'); if (vecchio) vecchio.parentNode.removeChild(vecchio);
+    el.classList.remove('alg-escluso'); el.classList.remove('alg-ignoto');
+    if (!scelti.length) return;
+    var nomeEl = el.classList.contains('piatto') ? el.querySelector('.piatto-riga') : el;
+    var nome = nomeEl ? (nomeEl.childNodes[0] ? nomeEl.childNodes[0].textContent : nomeEl.textContent) : '';
+    var dati = _algMappa[_algNorm(nome)];
+    var tag = document.createElement('span'); tag.className = 'alg-tag';
+    if (!dati) {
+      el.classList.add('alg-ignoto'); tag.textContent = T.ignoto;
+    } else {
+      var presenti = scelti.filter(function (k) { return dati.indexOf(k) >= 0; });
+      if (!presenti.length) return;
+      el.classList.add('alg-escluso');
+      tag.textContent = T.contiene + ': ' + presenti.map(function (k) { return _algEtichetta(k, lang); }).join(', ');
+    }
+    el.appendChild(tag);
+  });
+  var chips = document.querySelectorAll('.alg-chip');
+  Array.prototype.forEach.call(chips, function (c) { c.classList.toggle('on', !!_algScelti[c.getAttribute('data-k')]); });
+}
+var _algEtichette = null;
+function _algEtichetta(k, lang) {
+  if (_algEtichette && _algEtichette[k]) return _algEtichette[k];
+  return k;
+}
+function _algCostruisciBarra(etichette) {
+  var lang = (document.documentElement.lang || 'it').slice(0, 2);
+  var T = _ALG_TESTI[lang] || _ALG_TESTI.it;
+  _algEtichette = etichette;
+  var st = document.createElement('style');
+  st.textContent =
+    '.alg-filtro{position:sticky;top:0;z-index:50;max-width:210mm;margin:0 auto 10px;padding:10px 12px;background:rgba(250,247,242,.97);border-bottom:1px solid #d4c9b8;font-family:inherit;}' +
+    '.alg-filtro .alg-tit{font-size:16px;margin-bottom:8px;color:#1a1714;}' +
+    '.alg-filtro .alg-chips{display:flex;flex-wrap:wrap;gap:6px;}' +
+    '.alg-chip{font:inherit;font-size:15px;padding:5px 12px;border:1px solid #8c7e6e;border-radius:999px;background:#fff;color:#1a1714;cursor:pointer;}' +
+    '.alg-chip.on{background:#1a1714;color:#fff;border-color:#1a1714;}' +
+    '.alg-chip.alg-reset{border-style:dashed;color:#8c7e6e;}' +
+    '.alg-filtro .alg-nota{font-size:13px;color:#8c7e6e;margin-top:6px;font-style:italic;line-height:1.4;}' +
+    '.alg-escluso,.alg-escluso *{color:#c4bbb0!important;}' +
+    '.alg-tag,.alg-escluso .alg-tag{display:block;font-size:14px;font-style:normal;font-weight:600;color:#9a3b1e!important;margin-top:2px;}' +
+    '.alg-ignoto .alg-tag{color:#8c6d00!important;}' +
+    '@media (max-width:640px){.alg-filtro{position:static;margin:0 0 10px;}}' +
+    '@media print{.alg-filtro,.alg-tag{display:none!important}.alg-escluso,.alg-escluso *{color:inherit!important}}';
+  document.head.appendChild(st);
+  var bar = document.createElement('div'); bar.className = 'alg-filtro';
+  var tit = document.createElement('div'); tit.className = 'alg-tit'; tit.textContent = T.titolo; bar.appendChild(tit);
+  var box = document.createElement('div'); box.className = 'alg-chips';
+  _ALG_CANON.forEach(function (k) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'alg-chip'; b.setAttribute('data-k', k);
+    var lab = etichette[k] || k; b.textContent = lab.charAt(0).toUpperCase() + lab.slice(1);
+    b.onclick = function () { _algScelti[k] = !_algScelti[k]; _algApplica(); };
+    box.appendChild(b);
+  });
+  var r = document.createElement('button'); r.type = 'button'; r.className = 'alg-chip alg-reset'; r.textContent = T.reset;
+  r.onclick = function () { _algScelti = {}; _algApplica(); };
+  box.appendChild(r);
+  bar.appendChild(box);
+  var nota = document.createElement('div'); nota.className = 'alg-nota'; nota.textContent = T.nota; bar.appendChild(nota);
+  var root = document.getElementById('layout-carta');
+  root.parentNode.insertBefore(bar, root);
+}
+function _algInit() {
+  if (document.querySelector('.ctrl-bar')) return; /* versione admin/stampa: niente filtro */
+  if (!document.getElementById('layout-carta')) return;
+  var lang = (document.documentElement.lang || 'it').slice(0, 2);
+  if (lang !== 'it' && typeof MENU !== 'undefined' && MENU.allergeni && MENU.allergeni.sezioni) {
+    var A = MENU.allergeni, etich = {}, rev = {};
+    _ALG_CANON.forEach(function (k, i) { var t = (A.legenda || [])[i] || k; etich[k] = t; rev[_algNorm(t)] = k; });
+    _algMappa = {};
+    A.sezioni.forEach(function (s) { (s.piatti || []).forEach(function (p) {
+      var nome = String(p.nome || '').replace(/<[^>]+>/g, '');
+      _algMappa[_algNorm(nome)] = (p.allergeni || []).map(function (a) { return rev[_algNorm(a)] || _algCanonDa(a); });
+    }); });
+    _algCostruisciBarra(etich);
+    return;
+  }
+  if (lang !== 'it') return;
+  fetch('/menu-allergeni.html', { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.text() : Promise.reject(r.status); })
+    .then(function (src) {
+      var i1 = src.indexOf('const ALLERGENI_DATA = ');
+      if (i1 < 0) return;
+      var a = src.indexOf('{', i1), fine = src.indexOf('\n/* ', a), b = src.lastIndexOf('}', fine > 0 ? fine : src.length);
+      var dati = JSON.parse(src.slice(a, b + 1));
+      _algMappa = {};
+      (dati.sezioni || []).forEach(function (s) { (s.piatti || []).forEach(function (p) {
+        _algMappa[_algNorm(p.nome)] = (p.allergeni || []).map(_algCanonDa);
+      }); });
+      var etich = {}; _ALG_CANON.forEach(function (k) { etich[k] = k; });
+      _algCostruisciBarra(etich);
+    })
+    .catch(function () { /* senza dati allergeni non si mostra il filtro */ });
+}
+_algInit();
+
 </script>
 </body>
 </html>

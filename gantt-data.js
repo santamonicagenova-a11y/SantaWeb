@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.09.30.01",
+  version: "2026.09.30.02",
   updated: "2026-09-30",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -118,8 +118,8 @@ window.SANTAMONICA_GANTT = {
       {t:'menu-admin — audit flussi 29/9: ricarica sicura dopo Pubblica, guida corretta, FC % e Menu Engineering su prezzo netto, avviso vendite mancanti', s:'2026-09-29', e:'2026-09-29', st:'done'},
       {t:'menu-admin — decisioni aperte dall\'audit: degustazione nel Food Cost, grafico Andamento, piatti tolti dalla carta', s:'2026-09-29', e:'2026-09-29', st:'done'},
       {t:'Allergeni — completare Crudi e piatti solo in degustazione (pagina pubblica + Dettagli piatti)', s:'2026-09-30', st:'up'},
-      {t:'menu-admin — secondo audit: migliorie aperte (voucher degustazione, orari a tendina, allergeni in Dettagli piatti, pannello chiavi, pulizia codice)', s:'2026-09-30', st:'up'},
-      {t:'Pubblicare FAQ orari il 1/10 (nuovo periodo: venerdì pranzo, domenica solo pranzo) — allinea FAQ, JSON-LD e foglio orario', s:'2026-10-01', e:'2026-10-01', st:'up'},
+      {t:'menu-admin — secondo audit: migliorie aperte (voucher degustazione, orari a tendina, allergeni in Dettagli piatti, pannello chiavi, pulizia codice)', s:'2026-09-30', e:'2026-09-30', st:'done'},
+      {t:'Pubblicare FAQ orari il 1/10 (nuovo periodo: venerdì pranzo, domenica solo pranzo) — allinea FAQ, JSON-LD e foglio orario', s:'2026-10-01', e:'2026-09-30', st:'done'},
     ]},
     { key:'seo', name:'SEO & GEO', badge:'progetto-seo', tasks:[
       {t:'Migrazione Cloudflare + fix Schema @type', s:'2026-05-25', e:'2026-05-31', st:'done'},

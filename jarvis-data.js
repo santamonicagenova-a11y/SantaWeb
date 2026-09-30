@@ -1,15 +1,15 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-09-30",
- "versione": "2026.09.30.01",
- "briefing": "**Briefing 30/9/2026** — **Sito** (live, menu-admin v 2026.09.30.01): secondo audit completo di menu-admin. Sistemati subito: elenco prenotazioni del Reminder ora protetto da chiave, testi della mail di ringraziamento che si caricano davvero, avviso corretto dopo il cambio orari, QR del foglio orario dal sito. Il 29/9: Food Cost con Degustazione (% porzione), Andamento sui periodi chiusi, prezzo senza IVA. **Aspetta te**: **domani 1/10 pubblicare la FAQ orari** (nuovo periodo); dati allergeni di Crudi e piatti solo in degustazione; % porzione della degustazione; ok sulle migliorie aperte. **Prossimo**: allergeni completi, poi le migliorie di menu-admin.",
+ "versione": "2026.09.30.02",
+ "briefing": "**Briefing 30/9/2026 (sera)** — **Sito** (live, menu-admin v 2026.09.30.03 + Food Cost server v18): secondo audit di menu-admin chiuso. Sistemati: elenco prenotazioni del Reminder protetto, testi ringraziamento, avviso orari, QR dal sito, listino voucher (i prezzi nel codice erano vecchi), tendine orari dai periodi, pannello «Chiavi di accesso», sezioni rinominate senza doppioni, costi Food Cost fissati per periodo, Allergeni carta con i Crudi. FAQ orari dal 1/10 pubblicata. **Aspetta te**: spuntare gli allergeni dei 6 Crudi in «Allergeni carta» e pubblicare (poi Traduci e Pubblica della carta); % porzione della degustazione. **Prossimo**: primo uso reale del Food Cost (Costo piatti, Vendite, Dashboard).",
  "kpi": {
-  "aperte": 55,
+  "aperte": 53,
   "scadute": 3,
   "bloccate": 1,
-  "andrea": 17,
+  "andrea": 15,
   "debiti": 10,
-  "chiuse30": 41
+  "chiuse30": 43
  },
  "subs": {
   "SEO": {
@@ -36,13 +36,13 @@ window.JARVIS_DATA = {
   },
   "Sito": {
    "tot": 102,
-   "done": 85,
+   "done": 87,
    "prog": 2,
-   "up": 6,
+   "up": 4,
    "future": 9,
    "bloccato": 0,
    "scadute": 0,
-   "andrea": 7,
+   "andrea": 5,
    "debiti": 8
   },
   "Marketing": {
@@ -117,18 +117,6 @@ window.JARVIS_DATA = {
    "agg": "2026-09-25"
   },
   {
-   "t": "Pubblicare FAQ orari il 1/10 (nuovo periodo: venerdì pranzo, domenica solo pranzo) — allinea FAQ, JSON-LD e foglio orario",
-   "sub": "Sito",
-   "st": "up",
-   "s": "2026-10-01",
-   "e": "2026-10-01",
-   "own": "Andrea",
-   "az": "Il 1/10: menu-admin → Setup → Orari di Apertura → Genera bozza FAQ → rivedi → Pubblica",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-30"
-  },
-  {
    "t": "Sponsorizzata Salone Nautico",
    "sub": "Marketing",
    "st": "prog",
@@ -195,7 +183,7 @@ window.JARVIS_DATA = {
    "s": "2026-09-30",
    "e": null,
    "own": "Andrea",
-   "az": "Fornire gli allergeni dei Crudi (ostriche, scampi, gamberi, crudi misti) e dei piatti solo in degustazione (es. Insalata di panissa); poi decidere con Claude come includerli nella pagina allergeni",
+   "az": "Menu-admin → Allergeni carta: spuntare gli allergeni dei 6 Crudi e pubblicare (poi Traduci e Pubblica della carta per EN/FR)",
    "bl": null,
    "deb": false,
    "agg": "2026-09-30"
@@ -223,18 +211,6 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
-  },
-  {
-   "t": "menu-admin — secondo audit: migliorie aperte (voucher degustazione, orari a tendina, allergeni in Dettagli piatti, pannello chiavi, pulizia codice)",
-   "sub": "Sito",
-   "st": "up",
-   "s": "2026-09-30",
-   "e": null,
-   "own": "Andrea",
-   "az": "Dare l'ok ai punti da fare",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-30"
   },
   {
    "t": "NoShowApp F6 — acquisire 10 beta tester (WhatsApp + demo dal vivo con carta test) e guida onboarding",
@@ -347,18 +323,6 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-26"
-  },
-  {
-   "t": "Pubblicare FAQ orari il 1/10 (nuovo periodo: venerdì pranzo, domenica solo pranzo) — allinea FAQ, JSON-LD e foglio orario",
-   "sub": "Sito",
-   "st": "up",
-   "s": "2026-10-01",
-   "e": "2026-10-01",
-   "own": "Andrea",
-   "az": "Il 1/10: menu-admin → Setup → Orari di Apertura → Genera bozza FAQ → rivedi → Pubblica",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-30"
   },
   {
    "t": "Sponsorizzata Salone Nautico",
@@ -553,7 +517,7 @@ window.JARVIS_DATA = {
    "s": "2026-09-30",
    "e": null,
    "own": "Andrea",
-   "az": "Fornire gli allergeni dei Crudi (ostriche, scampi, gamberi, crudi misti) e dei piatti solo in degustazione (es. Insalata di panissa); poi decidere con Claude come includerli nella pagina allergeni",
+   "az": "Menu-admin → Allergeni carta: spuntare gli allergeni dei 6 Crudi e pubblicare (poi Traduci e Pubblica della carta per EN/FR)",
    "bl": null,
    "deb": false,
    "agg": "2026-09-30"
@@ -569,18 +533,6 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": true,
    "agg": "2026-09-28"
-  },
-  {
-   "t": "menu-admin — secondo audit: migliorie aperte (voucher degustazione, orari a tendina, allergeni in Dettagli piatti, pannello chiavi, pulizia codice)",
-   "sub": "Sito",
-   "st": "up",
-   "s": "2026-09-30",
-   "e": null,
-   "own": "Andrea",
-   "az": "Dare l'ok ai punti da fare",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-30"
   },
   {
    "t": "Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)",

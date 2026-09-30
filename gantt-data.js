@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.09.30.05",
+  version: "2026.09.30.06",
   updated: "2026-09-30",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -28,7 +28,7 @@ window.SANTAMONICA_GANTT = {
     { key:'sito', name:'Sito (SantaWeb + SafeTable)', badge:'progetto-sito', tasks:[
       {t:'Menu online — allergeni accanto a ogni piatto nella carta EN/FR (idea 9)', s:'2026-09-30', e:'2026-09-30', st:'done'},
       {t:'Voucher — quadro dei buoni venduti e non ancora usati, valore e scadenze (idea 15)', s:'2026-09-30', e:'2026-09-30', st:'done'},
-      {t:'Prenotazioni — lista d\'attesa digitale per orari pieni (idea 10)', s:'2026-09-30', st:'up'},
+      {t:'Prenotazioni — lista d\'attesa digitale per orari pieni (idea 10)', s:'2026-09-30', e:'2026-09-30', st:'done'},
       {t:'Prenotazioni — garanzia carta mirata: gruppi ≥6, serate a tema, Menù Degustazione (idea 11)', s:'2026-09-30', st:'up'},
       {t:'Gestionale — note ospite dal CRM (allergie, occasioni) e auguri compleanno/anniversario (idea 12)', s:'2026-09-30', st:'up'},
       {t:'Food Cost — avviso sui rincari dei fornitori dai carichi di Tracciabilità (idea 1)', s:'2026-09-30', st:'future'},

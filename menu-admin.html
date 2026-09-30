@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.30.04 (bump ?v= admin-templates-shared.js a 2026.09.30.04 + footer-version) — Filtro allergeni per l'ospite nei menu pubblici IT/EN/FR (codice nel template carta, admin-templates-shared.js v 2026.09.30.04): attivo dalla prossima pubblicazione della carta. Guida Procedure: nota sul filtro. -->
 <!-- v 2026.09.30.03 (+ footer-version; backend foodcost-admin v18 + migration fc_vendite_periodo_costo_unitario) — Food Cost: costi storicizzati. Al salvataggio delle Vendite il costo di ogni piatto resta fissato per quel periodo (i periodi chiusi non cambiano se si modificano ricette/prezzi); in Vendite, se il costo fissato differisce da quello attuale, si vede "oggi € X" sotto; risalvare aggiorna. admin-core.js invariato. -->
 <!-- v 2026.09.30.02 (bump ?v= admin-core.js a 2026.09.30.02 + footer-version) — Secondo audit, punti approvati da Andrea: Allergeni carta con Crudi e piatti solo in degustazione + conferma dei piatti senza allergeni (admin-core); avviso in Dettagli piatti che gli allergeni pubblici si cambiano da «Allergeni carta»; voucher: listino dal voucher-config.json (via i prezzi scritti nel codice, ormai vecchi) e avviso/conferma se il percorso non è in carta; tendine orario di chiusure/aperture/limiti prese dai periodi; nuovo pannello Setup «Chiavi di accesso»; sezione carta rinominata = righe Dettagli piatti spostate, non duplicate (admin-core); tolto il pannello morto «Menù Vini». -->
 <!-- v 2026.09.30.01 (bump ?v= admin-templates-shared.js a 2026.09.30.01 + footer-version; edge function reminder-settings-status v3 e reservations-status v9) — Secondo audit: (1) PRIVACY Reminder prenotazioni: l'elenco (nome/telefono) si legge solo col token GitHub (POST), il servizio non lo dà più a chiunque; (2) Prenotazioni — Setup: i testi del ringraziamento ora arrivano davvero dal server (prima campi vuoti, rischio di sovrascriverli) e i valori di ripiego del servizio in errore non vengono più mostrati come salvati; (3) avviso dopo "Salva periodi" corretto (rimanda a Genera/Pubblica FAQ orari, non più al commit a mano); (4) QR del foglio orario dal sito invece che da GitHub Pages. -->
@@ -1241,7 +1242,7 @@
         <li>Clicca <strong>«Menù alla carta»</strong></li>
         <li>Modifica i piatti (usa <strong>"+ Aggiungi piatto"</strong> per una riga nuova; le righe lasciate vuote non vengono pubblicate)</li>
         <li><strong>Preview 🇮🇹</strong> per controllare; se vuoi, regola caratteri/interlinea/spazio/posizione coi pulsanti (vedi i valori accanto) e premi <strong>"✔ Fissa come default"</strong></li>
-        <li><strong>✦ Traduci e Pubblica</strong> → pubblica IT + EN + FR</li>
+        <li><strong>✦ Traduci e Pubblica</strong> → pubblica IT + EN + FR (nel menù online compare anche il <strong>filtro allergeni</strong> per l'ospite, coi dati di «Allergeni carta»)</li>
       </ol>
 
       <h3 style="margin:1rem 0 .25rem;font-size:.86rem">🍰 Dolci</h3>
@@ -2419,7 +2420,7 @@
 <div class="toast" id="toast">✓ Scaricato!</div>
 
 <script src="admin-translations.js"></script>
-<script src="admin-templates-shared.js?v=2026.09.30.01"></script>
+<script src="admin-templates-shared.js?v=2026.09.30.04"></script>
 <script src="admin-core.js?v=2026.09.30.02"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 <script>
@@ -8028,7 +8029,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.30.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.30.04</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

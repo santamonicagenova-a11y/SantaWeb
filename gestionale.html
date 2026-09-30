@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!-- v 2026.10.01.01 — note ospite dal CRM sotto ogni prenotazione (idea 12 approvata da Andrea): tag,
+     note dell'anagrafica e compleanno/anniversario se cadono entro 7 giorni dalla data della
+     prenotazione. Caricate col token (clienti-crm v6, azione notes_for) DOPO la vista giorno, così le
+     note private non passano da gestionale-day (pubblico). Senza token salvato la riga non compare.
+     Promemoria settimanale delle ricorrenze: edge function ricorrenze-digest (lunedì mattina). -->
 <!-- v 2026.09.18.01 — nuova colonna "Richieste particolari" nello storico prenotazioni del modal
      Anagrafica (richiesta Andrea: vederle anche qui, non solo in clienti.html). `s.note` era già
      selezionato dal backend clienti-crm (azione detail), mancava solo la colonna in tabella —
@@ -256,6 +261,10 @@
     .res-info .gz-match.missing { color:var(--stone); font-style:italic; }
 
     .res-info .storico-badge { font-size:.68rem; color:var(--ok); margin-top:.15rem; }
+    .res-info .crm-note { font-size:.72rem; color:var(--ink); margin-top:.2rem; line-height:1.4; }
+    .res-info .crm-note:empty { display:none; }
+    .res-info .crm-note .crm-tag { display:inline-block; border:1px solid var(--rule); padding:0 .35rem; margin-right:.25rem; font-size:.66rem; }
+    .res-info .crm-note .crm-ric { color:#a0522d; font-weight:600; }
     .res-actions-row { display:flex; gap:.4rem; }
 
     .modal-overlay { display:none; position:fixed; inset:0; background:rgba(26,23,20,.55); z-index:200; align-items:flex-start; justify-content:center; padding:3rem 1rem; overflow-y:auto; }
@@ -428,7 +437,7 @@
   <div class="status-line" id="garanzie-status"></div>
 </div>
 
-<footer class="ver">v 2026.09.18.01</footer>
+<footer class="ver">v 2026.10.01.01</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';
@@ -749,6 +758,7 @@ function renderDay(rows) {
           (r.occasione ? ' · ' + escapeHtml(r.occasione) : '') +
           (r.intolleranze ? ' · ' + escapeHtml(r.intolleranze) : '') + '</div>' +
         storicoClienteHtml(r) +
+        '<div class="crm-note" data-tel="' + escapeHtml(normPhoneJs(r.telefono)) + '"></div>' +
         garanziaDetailHtml(r) +
       '</div>' +
       '<div>' + statusBadge(r) + ' ' + confermaBadge(r) + ' ' + garanziaBadge(r) + ' ' + mailRingraziamentoBadge(r) + '</div>';
@@ -758,6 +768,51 @@ function renderDay(rows) {
     row.appendChild(buildCrmControls(r));
     list.appendChild(row);
   });
+  caricaNoteCrm(rows);
+}
+
+// v 2026.10.01.01 — Note ospite dal CRM (idea 12): dopo aver disegnato il giorno chiede a
+// clienti-crm (azione notes_for, col token già salvato — nessun prompt qui) tag, note e ricorrenze
+// dei clienti del giorno e riempie la riga .crm-note di ogni prenotazione.
+var _crmNoteSeq = 0;
+function caricaNoteCrm(rows) {
+  var token = localStorage.getItem('gh_token') || '';
+  var tels = rows.map(function (r) { return normPhoneJs(r.telefono); }).filter(function (t) { return t.length >= 6; });
+  if (!token || !tels.length) return;
+  var seq = ++_crmNoteSeq, giorno = curDate;
+  fetch(CRM_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ github_token: token, action: 'notes_for', telefoni: tels }) })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (seq !== _crmNoteSeq || !d || !d.ok) return;
+      document.querySelectorAll('#day-list .crm-note').forEach(function (el) {
+        var c = d.clienti[el.getAttribute('data-tel')];
+        if (c) el.innerHTML = noteCrmHtml(c, giorno);
+      });
+    })
+    .catch(function () {});
+}
+// Ricorrenza (compleanno/anniversario) che cade entro 7 giorni prima o dopo la data della
+// prenotazione: ritorna "oggi", "il 3/10" ecc., altrimenti null.
+function _ricorrenzaVicina(dataOrig, giorno) {
+  if (!dataOrig || !/^\d{4}-\d{2}-\d{2}$/.test(dataOrig)) return null;
+  var g = new Date(giorno + 'T00:00:00'), best = null;
+  [g.getFullYear() - 1, g.getFullYear(), g.getFullYear() + 1].forEach(function (y) {
+    var d = new Date(y, Number(dataOrig.slice(5, 7)) - 1, Number(dataOrig.slice(8, 10)));
+    var diff = Math.round((d - g) / 86400000);
+    if (Math.abs(diff) <= 7 && (best === null || Math.abs(diff) < Math.abs(best.diff))) best = { diff: diff, d: d };
+  });
+  if (!best) return null;
+  if (best.diff === 0) return 'oggi';
+  return (best.diff < 0 ? 'è stato il ' : 'il ') + best.d.getDate() + '/' + (best.d.getMonth() + 1);
+}
+function noteCrmHtml(c, giorno) {
+  var parti = [];
+  var comp = _ricorrenzaVicina(c.data_nascita, giorno), anniv = _ricorrenzaVicina(c.data_anniversario, giorno);
+  if (comp) parti.push('<span class="crm-ric">🎂 Compleanno ' + comp + '</span>');
+  if (anniv) parti.push('<span class="crm-ric">💍 Anniversario ' + anniv + '</span>');
+  (c.tags || []).forEach(function (t) { parti.push('<span class="crm-tag">' + escapeHtml(t) + '</span>'); });
+  if (c.note) parti.push('<span>📝 ' + escapeHtml(c.note) + '</span>');
+  return parti.join(' ');
 }
 
 // Badge "cliente abituale" — integrazione CRM (richiesta Andrea, 1/9/2026): visite_precedenti
@@ -923,6 +978,7 @@ function salvaAnagrafica() {
   }).then(function (res) {
     if (res.status === 200 && res.body && res.body.ok) {
       statusEl.textContent = 'Salvato.'; statusEl.className = 'status-line';
+      loadDay(); // aggiorna la riga note ospite nella vista giorno
     } else {
       statusEl.textContent = (res.body && res.body.error) || 'Errore.'; statusEl.className = 'status-line err';
     }

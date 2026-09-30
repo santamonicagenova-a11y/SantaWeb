@@ -955,17 +955,17 @@ const MENU = {
 /* ═════════════════════════════════════════════════════════ */
 
 /* ── helpers condivisi ── */
-const NOTE_CARTA =  BT 
+const NOTE_CARTA = `
   <span class="note-ospite-titolo">Note per l'ospite</span>
   Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche delle materie prime i prodotti ittici
   acquistati freschi vengono abbattuti e congelati. Tali prodotti vengono contrassegnati con il simbolo * per una
   chiara e trasparente informazione alla clientela.<br>
   L'elenco degli <u>allergeni</u> è consultabile nell'ultima pagina di questo menù.
- BT ;
+`;
 
-const NOTE_ORARIO =  BT Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche
+const NOTE_ORARIO = `Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche
 delle materie prime i prodotti acquistati freschi vengono abbattuti e congelati.
-Questi prodotti vengono contrassegnati con il simbolo: * BT ;
+Questi prodotti vengono contrassegnati con il simbolo: *`;
 
 function getSez(titolo) {
   var found = MENU.sezioni.find(s => s.titolo === titolo);
@@ -980,21 +980,21 @@ function getSez(titolo) {
 function buildPiatto(p) {
   const eco = p.sostenibile ? ' eco' : '';
   const staccato = p.staccato ? ' piatto-staccato' : '';
-  const unitaHtml = p.unita ?  BT <span class="piatto-unita">${p.unita}</span> BT  : '';
+  const unitaHtml = p.unita ? `<span class="piatto-unita">${p.unita}</span>` : '';
   const prezzoHtml = p.prezzo != null
-    ?  BT <span class="piatto-prezzo">${p.prezzo}${unitaHtml}</span> BT  : '';
+    ? `<span class="piatto-prezzo">${p.prezzo}${unitaHtml}</span>` : '';
   const descHtml = p.descrizione
-    ?  BT <span class="piatto-desc">${p.descrizione}</span> BT  : '';
-  return  BT <div class="piatto${staccato}"><span class="piatto-riga${eco}">${p.nome}</span>${prezzoHtml}${descHtml}</div> BT ;
+    ? `<span class="piatto-desc">${p.descrizione}</span>` : '';
+  return `<div class="piatto${staccato}"><span class="piatto-riga${eco}">${p.nome}</span>${prezzoHtml}${descHtml}</div>`;
 }
 
 function buildSezione(s) {
   const label = s.titolo_display || s.titolo;
-  return  BT 
+  return `
     <div class="sezione">
       <div class="sezione-titolo">${label}</div>
       ${s.piatti.map(buildPiatto).join('')}
-    </div> BT ;
+    </div>`;
 }
 
 function buildDegu(degu) {
@@ -1008,7 +1008,7 @@ function buildDegu(degu) {
     if (o.portate === 7) return !percorso7Vuoto;
     return true;
   }).map(o =>
-     BT ${o.portate} plats &nbsp;${o.prezzo}, accord mets-vins ${o.vini} BT 
+    `${o.portate} plats &nbsp;${o.prezzo}, accord mets-vins ${o.vini}`
   ).join('<br>');
 
   let percorsiHtml = '';
@@ -1018,31 +1018,31 @@ function buildDegu(degu) {
     const escl = typeof piatti === 'string' ? !!degu.escludi_stampa_7 : !!degu.escludi_stampa_6;
     const printCls = escl ? ' no-print' : '';
     if (typeof piatti === 'string') {
-      percorsiHtml +=  BT 
+      percorsiHtml += `
         <div class="percorso${printCls}">
           <div class="percorso-label">&ldquo;${n}&rdquo;</div>
           <div class="percorso-piatto percorso-libero">${piatti}</div>
-        </div> BT ;
+        </div>`;
     } else {
       const righe = piatti.map(p => {
-        const descHtml = p.descrizione ?  BT <span class="percorso-desc">${p.descrizione}</span> BT  : '';
-        return  BT <div class="percorso-piatto${p.sostenibile ? ' eco' : ''}">${p.nome}${descHtml}</div> BT ;
+        const descHtml = p.descrizione ? `<span class="percorso-desc">${p.descrizione}</span>` : '';
+        return `<div class="percorso-piatto${p.sostenibile ? ' eco' : ''}">${p.nome}${descHtml}</div>`;
       }).join('');
-      percorsiHtml +=  BT 
+      percorsiHtml += `
         <div class="percorso${printCls}">
           <div class="percorso-label">&ldquo;${n}&rdquo;</div>
           ${righe}
-        </div> BT ;
+        </div>`;
     }
   }
 
-  return  BT 
+  return `
     <div class="degu">
       <h1 class="degu-titolo">Menu Dégustation</h1>
       <div class="degu-prezzi">${optsHtml}</div>
       <div class="degu-nota">${degu.nota.replace("l'intero tavolo", "<strong>l\u2019intero tavolo</strong>")}</div>
       ${percorsiHtml}
-    </div> BT ;
+    </div>`;
 }
 
 /* ══════════════════════════════════════
@@ -1059,22 +1059,22 @@ function renderCarta() {
   // Pag 1: intestazione + degustazione
   const pag1 = document.createElement('div');
   pag1.className = 'pg';
-  pag1.innerHTML =  BT 
+  pag1.innerHTML = `
     ${buildDegu(MENU.degustazione)}
     <div class="note-ospite">${NOTE_CARTA}</div>
-   BT ;
+  `;
   root.appendChild(pag1);
 
   // Pag 2 e 3: sezioni
   MENU.pagine.forEach(pg => {
     const div = document.createElement('div');
     div.className = 'pg';
-    div.innerHTML =  BT 
+    div.innerHTML = `
       <div class="pg-content">
         ${pg.sezioni.map(t => buildSezione(getSez(t))).join('')}
       </div>
       <div class="note-ospite">${NOTE_CARTA}</div>
-     BT ;
+    `;
     root.appendChild(div);
   });
 }
@@ -1087,20 +1087,20 @@ function buildOrarioColonna(titoli, sepDopo) {
     const s = getSez(titolo);
     const piatti = s.piatti.map(p => {
       const eco = p.sostenibile ? ' eco' : '';
-      const unitaHtml = p.unita ?  BT  ${p.unita} BT  : '';
-      const prezzoHtml = p.prezzo != null ?  BT  ${p.prezzo}${unitaHtml} BT  : '';
-      return  BT <div class="orario-piatto"><span class="${'piatto-riga' + eco}">${p.nome}${prezzoHtml}</span>${p.descrizione ? '<span class="orario-desc">' + p.descrizione + '</span>' : ''}</div> BT ;
+      const unitaHtml = p.unita ? ` ${p.unita}` : '';
+      const prezzoHtml = p.prezzo != null ? ` ${p.prezzo}${unitaHtml}` : '';
+      return `<div class="orario-piatto"><span class="${'piatto-riga' + eco}">${p.nome}${prezzoHtml}</span>${p.descrizione ? '<span class="orario-desc">' + p.descrizione + '</span>' : ''}</div>`;
     }).join('');
 
     const sep = (titolo === sepDopo) ? '<hr class="orario-sep">' : '';
     // ogni sezione in uno slot flex:1 centrato verticalmente
-    return  BT 
+    return `
       <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
         <div class="orario-sez">
           <div class="orario-sez-titolo">${s.titolo_display || s.titolo}</div>
           ${piatti}
         </div>
-      </div>${sep} BT ;
+      </div>${sep}`;
   }).join('');
 }
 
@@ -1110,12 +1110,12 @@ function renderOrario() {
   const cfg = MENU.orario;
 
   const orarioHtml = cfg.orarioServizio.map(o =>
-    o.fasce.map(f =>  BT <div>${f}</div> BT ).join('') +  BT <div><em>${o.giorno}</em></div> BT 
+    o.fasce.map(f => `<div>${f}</div>`).join('') + `<div><em>${o.giorno}</em></div>`
   ).join('');
 
   const pg = document.createElement('div');
   pg.className = 'pg pg-orario';
-  pg.innerHTML =  BT 
+  pg.innerHTML = `
     <div class="orario-logo">Santamonica</div>
     <div class="orario-grid" style="flex:1">
 
@@ -1149,7 +1149,7 @@ function renderOrario() {
       </div>
 
     </div>
-   BT ;
+  `;
   root.appendChild(pg);
 }
 

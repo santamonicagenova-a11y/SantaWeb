@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.30.06 (+ footer-version) — Voucher — Gestione: quadro dei buoni venduti e non ancora usati (valore in sospeso, scadenze a 30/90 giorni con elenco, scaduti mai usati) — idea 15 approvata da Andrea. admin-core invariato. -->
 <!-- v 2026.09.30.05 (bump ?v= admin-core.js e admin-templates-shared.js a 2026.09.30.05 + footer-version) — Carta EN/FR: allergeni sotto ogni piatto, solo a schermo (idea 9 approvata da Andrea). + FIX admin-templates-shared.js v.05: la v.04 generava pagine carta con script non valido (segnaposto non sostituiti) — mai pubblicate. -->
 <!-- v 2026.09.30.04 (bump ?v= admin-templates-shared.js a 2026.09.30.04 + footer-version) — Filtro allergeni per l'ospite nei menu pubblici IT/EN/FR (codice nel template carta, admin-templates-shared.js v 2026.09.30.04): attivo dalla prossima pubblicazione della carta. Guida Procedure: nota sul filtro. -->
 <!-- v 2026.09.30.03 (+ footer-version; backend foodcost-admin v18 + migration fc_vendite_periodo_costo_unitario) — Food Cost: costi storicizzati. Al salvataggio delle Vendite il costo di ogni piatto resta fissato per quel periodo (i periodi chiusi non cambiano se si modificano ricette/prezzi); in Vendite, se il costo fissato differisce da quello attuale, si vede "oggi € X" sotto; risalvare aggiorna. admin-core.js invariato. -->
@@ -2330,6 +2331,8 @@
         </div>
       </details>
 
+
+      <div id="vu-riepilogo" style="margin-bottom:1rem;"></div>
 
       <div style="margin-bottom:.8rem;">
         <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:.6rem;">
@@ -7082,8 +7085,63 @@ function caricaVoucherUnificato() {
     window._vrRows = resRichieste.j.rows || [];
     window._vuAllRows = { pendenti: pendenti, vouchers: vouchers };
     _vuRenderList();
+    _vuRenderRiepilogo(vouchers);
     _vuSetStatus(pendenti.length + ' da evadere · ' + vouchers.length + ' voucher');
   }).catch(function (ex) { _vuSetStatus(ex.message, true); });
+}
+
+// v 2026.09.30.06 — Quadro dei buoni venduti e non ancora usati (idea 15 approvata da Andrea):
+// valore in sospeso (debito verso i clienti), scadenze a 30/90 giorni, scaduti mai usati.
+// Valore: buoni liberi = residuo; esperienze = prezzo pagato (se mancante il buono è contato ma
+// segnalato "senza prezzo"). Un buono "emesso/parziale" con data di scadenza passata è contato
+// come scaduto anche se lo stato non è ancora stato aggiornato.
+function _vuRenderRiepilogo(vouchers) {
+  var box = document.getElementById('vu-riepilogo');
+  if (!box) return;
+  var oggi = _fcOggiLocale ? _fcOggiLocale() : new Date().toISOString().slice(0, 10);
+  var addGiorni = function (iso, n) { var d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
+  var t30 = addGiorni(oggi, 30), t90 = addGiorni(oggi, 90);
+  var valore = function (v) {
+    if (v.tipo === 'valore') return v.residuo_eur != null ? Number(v.residuo_eur) : Number(v.valore_eur || 0);
+    return v.prezzo_pagato_eur != null ? Number(v.prezzo_pagato_eur) : null;
+  };
+  var aperti = [], scaduti = [];
+  (vouchers || []).forEach(function (v) {
+    var inUso = v.stato === 'emesso' || v.stato === 'parziale';
+    var scad = v.data_scadenza || '';
+    if (v.stato === 'scaduto' || (inUso && scad && scad < oggi)) scaduti.push(v);
+    else if (inUso) aperti.push(v);
+  });
+  var somma = function (lista) {
+    var tot = 0, senza = 0;
+    lista.forEach(function (v) { var x = valore(v); if (x == null) senza++; else tot += x; });
+    return { n: lista.length, tot: tot, senza: senza };
+  };
+  var entro30 = aperti.filter(function (v) { return v.data_scadenza && v.data_scadenza <= t30; });
+  var entro90 = aperti.filter(function (v) { return v.data_scadenza && v.data_scadenza > t30 && v.data_scadenza <= t90; });
+  var tile = function (titolo, r, colore, nota) {
+    return '<div style="flex:1;min-width:10rem;border:1px solid var(--rule);border-left:3px solid ' + colore + ';border-radius:var(--radius);padding:.6rem .8rem;background:var(--field);">' +
+      '<div class="opt-lbl">' + titolo + '</div>' +
+      '<div style="font-size:1.15rem;font-weight:700;color:' + colore + ';">' + _czEuro(r.tot) + '</div>' +
+      '<div style="font-size:.72rem;color:var(--stone);">' + r.n + ' buon' + (r.n === 1 ? 'o' : 'i') + (r.senza ? ' · ' + r.senza + ' senza prezzo' : '') + (nota ? ' · ' + nota : '') + '</div></div>';
+  };
+  var elenco = function (lista) {
+    if (!lista.length) return '';
+    return '<div style="font-size:.76rem;margin-top:.5rem;">' + lista.slice().sort(function (a, b) { return (a.data_scadenza || '').localeCompare(b.data_scadenza || ''); }).map(function (v) {
+      var x = valore(v);
+      return '<div style="padding:.2rem 0;border-bottom:1px dotted var(--rule);"><strong>' + _czEsc(v.codice) + '</strong> — scade il ' + _prenFormatDate(v.data_scadenza) +
+        ' — ' + (x == null ? 'senza prezzo' : _czEuro(x)) + (v.destinatario ? ' — per ' + _czEsc(v.destinatario) : '') + '</div>';
+    }).join('') + '</div>';
+  };
+  box.innerHTML = '<div class="sub" style="margin-top:0;">Buoni venduti e non ancora usati</div>' +
+    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;">' +
+    tile('Da usare (in sospeso)', somma(aperti), 'var(--ink)', '') +
+    tile('Scadono entro 30 giorni', somma(entro30), 'var(--rust)', '') +
+    tile('Scadono tra 30 e 90 giorni', somma(entro90), '#c98500', '') +
+    tile('Scaduti mai usati', somma(scaduti), 'var(--stone)', '') +
+    '</div>' +
+    (entro30.length || entro90.length ? '<details style="margin-top:.4rem;"><summary style="cursor:pointer;font-size:.78rem;">Elenco dei buoni in scadenza (' + (entro30.length + entro90.length) + ')</summary>' + elenco(entro30.concat(entro90)) + '</details>' : '') +
+    (scaduti.length ? '<details style="margin-top:.2rem;"><summary style="cursor:pointer;font-size:.78rem;">Elenco dei buoni scaduti (' + scaduti.length + ')</summary>' + elenco(scaduti) + '</details>' : '');
 }
 
 function _vuFilter() { _vuRenderList(); }
@@ -8030,7 +8088,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.30.05</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.30.06</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

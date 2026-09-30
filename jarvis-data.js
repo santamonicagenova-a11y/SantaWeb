@@ -1,13 +1,13 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
- "generato": "2026-09-29",
- "versione": "2026.09.29.05",
- "briefing": "**Briefing 29/9/2026** — **Sito** (live, menu-admin v 2026.09.29.09 + Food Cost server v17): audit completo dei flussi di menu-admin, 12 incongruenze trovate e sistemate le principali — ricarica dopo Pubblica che non cancella più la vista aperta, guida \"Procedure\" riallineata, FC % e Menu Engineering su prezzo senza IVA, avviso vendite mancanti; poi, su tua approvazione, **Menù Degustazione nel Food Cost** (costo = somma piatti × % porzione), **Andamento sui periodi di inventario chiusi**, **piatti tolti dalla carta conservati come storico**. **Aspetta te**: in Costo piatti impostare la % porzione dei percorsi degustazione; ricompilare e pubblicare Allergeni carta; post orari dal 1/10. **Prossimo**: primo uso reale di Costo piatti/Vendite/Dashboard come verifica; restano da valutare rinomina sezioni (duplicati in Dettagli piatti) e costi storicizzati.",
+ "generato": "2026-09-30",
+ "versione": "2026.09.30.01",
+ "briefing": "**Briefing 30/9/2026** — **Sito** (live, menu-admin v 2026.09.30.01): secondo audit completo di menu-admin. Sistemati subito: elenco prenotazioni del Reminder ora protetto da chiave, testi della mail di ringraziamento che si caricano davvero, avviso corretto dopo il cambio orari, QR del foglio orario dal sito. Il 29/9: Food Cost con Degustazione (% porzione), Andamento sui periodi chiusi, prezzo senza IVA. **Aspetta te**: **domani 1/10 pubblicare la FAQ orari** (nuovo periodo); dati allergeni di Crudi e piatti solo in degustazione; % porzione della degustazione; ok sulle migliorie aperte. **Prossimo**: allergeni completi, poi le migliorie di menu-admin.",
  "kpi": {
-  "aperte": 52,
+  "aperte": 55,
   "scadute": 3,
   "bloccate": 1,
-  "andrea": 14,
+  "andrea": 17,
   "debiti": 10,
   "chiuse30": 41
  },
@@ -35,14 +35,14 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 99,
+   "tot": 102,
    "done": 85,
    "prog": 2,
-   "up": 3,
+   "up": 6,
    "future": 9,
    "bloccato": 0,
    "scadute": 0,
-   "andrea": 4,
+   "andrea": 7,
    "debiti": 8
   },
   "Marketing": {
@@ -117,6 +117,18 @@ window.JARVIS_DATA = {
    "agg": "2026-09-25"
   },
   {
+   "t": "Pubblicare FAQ orari il 1/10 (nuovo periodo: venerdì pranzo, domenica solo pranzo) — allinea FAQ, JSON-LD e foglio orario",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-10-01",
+   "e": "2026-10-01",
+   "own": "Andrea",
+   "az": "Il 1/10: menu-admin → Setup → Orari di Apertura → Genera bozza FAQ → rivedi → Pubblica",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-30"
+  },
+  {
    "t": "Sponsorizzata Salone Nautico",
    "sub": "Marketing",
    "st": "prog",
@@ -177,6 +189,18 @@ window.JARVIS_DATA = {
    "agg": "2026-09-29"
   },
   {
+   "t": "Allergeni — completare Crudi e piatti solo in degustazione (pagina pubblica + Dettagli piatti)",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-09-30",
+   "e": null,
+   "own": "Andrea",
+   "az": "Fornire gli allergeni dei Crudi (ostriche, scampi, gamberi, crudi misti) e dei piatti solo in degustazione (es. Insalata di panissa); poi decidere con Claude come includerli nella pagina allergeni",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-30"
+  },
+  {
    "t": "Calcolo Food Cost ricette da ingredienti: anagrafica ingredienti in Setup + tab Calcolo Food Cost che valorizza Costo Ricetta in Costo piatti",
    "sub": "Sito",
    "st": "prog",
@@ -199,6 +223,18 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
+  },
+  {
+   "t": "menu-admin — secondo audit: migliorie aperte (voucher degustazione, orari a tendina, allergeni in Dettagli piatti, pannello chiavi, pulizia codice)",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-09-30",
+   "e": null,
+   "own": "Andrea",
+   "az": "Dare l'ok ai punti da fare",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-30"
   },
   {
    "t": "NoShowApp F6 — acquisire 10 beta tester (WhatsApp + demo dal vivo con carta test) e guida onboarding",
@@ -311,6 +347,18 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-26"
+  },
+  {
+   "t": "Pubblicare FAQ orari il 1/10 (nuovo periodo: venerdì pranzo, domenica solo pranzo) — allinea FAQ, JSON-LD e foglio orario",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-10-01",
+   "e": "2026-10-01",
+   "own": "Andrea",
+   "az": "Il 1/10: menu-admin → Setup → Orari di Apertura → Genera bozza FAQ → rivedi → Pubblica",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-30"
   },
   {
    "t": "Sponsorizzata Salone Nautico",
@@ -499,6 +547,18 @@ window.JARVIS_DATA = {
    "agg": "2026-09-25"
   },
   {
+   "t": "Allergeni — completare Crudi e piatti solo in degustazione (pagina pubblica + Dettagli piatti)",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-09-30",
+   "e": null,
+   "own": "Andrea",
+   "az": "Fornire gli allergeni dei Crudi (ostriche, scampi, gamberi, crudi misti) e dei piatti solo in degustazione (es. Insalata di panissa); poi decidere con Claude come includerli nella pagina allergeni",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-30"
+  },
+  {
    "t": "Dettagli piatti: la sync con Carta/Dolci non segnala quando un'intera sezione cambia nome — piatti orfani silenziosi (visto coi dolci 28/9)",
    "sub": "Sito",
    "st": "up",
@@ -509,6 +569,18 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": true,
    "agg": "2026-09-28"
+  },
+  {
+   "t": "menu-admin — secondo audit: migliorie aperte (voucher degustazione, orari a tendina, allergeni in Dettagli piatti, pannello chiavi, pulizia codice)",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-09-30",
+   "e": null,
+   "own": "Andrea",
+   "az": "Dare l'ok ai punti da fare",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-30"
   },
   {
    "t": "Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)",
@@ -524,6 +596,11 @@ window.JARVIS_DATA = {
   }
  ],
  "sessioni": [
+  {
+   "d": "2026-09-30",
+   "sub": "Sito",
+   "t": "Secondo audit menu-admin"
+  },
   {
    "d": "2026-09-29",
    "sub": "Sito",
@@ -558,11 +635,6 @@ window.JARVIS_DATA = {
    "d": "2026-09-28",
    "sub": "Sito",
    "t": "Food Cost Dashboard default + pulizia dolci orfani"
-  },
-  {
-   "d": "2026-09-28",
-   "sub": "Sito",
-   "t": "Importo per data nello storico conteggi Inventario"
   }
  ],
  "perWeek": [
@@ -612,7 +684,7 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-28",
-   "n": 11
+   "n": 12
   }
  ],
  "perDay": [
@@ -626,7 +698,7 @@ window.JARVIS_DATA = {
   },
   {
    "g": "mer",
-   "n": 11
+   "n": 12
   },
   {
    "g": "gio",

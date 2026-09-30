@@ -440,6 +440,8 @@
     .alg-all.vuoto{color:var(--stone,#8c7e6e);}
     .alg-legenda{margin-top:auto;padding-top:4mm;border-top:1px solid var(--rule,#d4c9b8);font-size:.66rem;color:var(--stone,#8c7e6e);font-style:italic;line-height:1.6;text-align:center;}
     .alg-legenda strong{font-style:normal;font-weight:600;color:var(--ink,#1a1714);}
+    .alg-inline{display:block;font-size:.74rem;font-style:italic;color:var(--stone,#8c7e6e);margin-top:1px;line-height:1.3;letter-spacing:.01em;}
+    @media print{.alg-inline{display:none!important}}
   </style>
 </head>
 <body>
@@ -531,7 +533,7 @@ const MENU = {
           "staccato": true
         },
         {
-          "nome": "Assortiment de fruits de mer (poisson, crustacés, huîtres)",
+          "nome": "Assortiment de produits crus (poisson, crustacés, huîtres)",
           "prezzo": 75,
           "sostenibile": true,
           "staccato": true
@@ -546,13 +548,13 @@ const MENU = {
           "nome": "« Macchetto, je le dis juste comme ça… »",
           "prezzo": 14,
           "sostenibile": true,
-          "descrizione": "Petites laitues farcies, poivrons et macchetto aux anchois"
+          "descrizione": "Petites laitues farcies, poivrons et macchetto d&#x27;anchois"
         },
         {
           "nome": "« Chaque ricciola a ses caprices »",
           "prezzo": 19,
           "sostenibile": true,
-          "descrizione": "Sériole, sauge, betterave au vinaigre, poireaux, raifort"
+          "descrizione": "Sériole, sauge, betterave marinée, poireaux, raifort"
         },
         {
           "nome": "« Sanna »",
@@ -564,7 +566,7 @@ const MENU = {
           "nome": "« Huître des bois »",
           "prezzo": 25,
           "sostenibile": true,
-          "descrizione": "Huîtres en tempura, cèpes, coings, concombres"
+          "descrizione": "Huître en tempura, cèpes, coings, concombres"
         },
         {
           "nome": "« Pas de fromages »",
@@ -587,7 +589,7 @@ const MENU = {
           "nome": "« Tomamilla »",
           "prezzo": 18,
           "sostenibile": true,
-          "descrizione": "Spaghetti, beurre à la camomille, toma de brebis de Brigas, poivre noir torréfié"
+          "descrizione": "Spaghetti, beurre à la camomille, toma de brebis de Brigasca, poivre noir torréfié"
         },
         {
           "nome": "« Ganbou au navet »",
@@ -616,7 +618,7 @@ const MENU = {
         {
           "nome": "« Buridda chaperon »",
           "prezzo": 32,
-          "descrizione": "Sériole, buridda de seiches, mangue",
+          "descrizione": "Sériole, salade de seiches, mangue",
           "sostenibile": true
         },
         {
@@ -768,7 +770,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "Assortiment de fruits de mer (poisson, crustacés, huîtres)",
+            "nome": "Assortiment de produits crus (poisson, crustacés, huîtres)",
             "allergeni": [
               "crustacés",
               "poisson",
@@ -956,16 +958,12 @@ const MENU = {
 
 /* ── helpers condivisi ── */
 const NOTE_CARTA = `
-  <span class="note-ospite-titolo">Note per l'ospite</span>
-  Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche delle materie prime i prodotti ittici
-  acquistati freschi vengono abbattuti e congelati. Tali prodotti vengono contrassegnati con il simbolo * per una
-  chiara e trasparente informazione alla clientela.<br>
-  L'elenco degli <u>allergeni</u> è consultabile nell'ultima pagina di questo menù.
+  <span class="note-ospite-titolo">Note pour nos hôtes</span>
+  Pour maintenir constants le niveau qualitatif et les caractéristiques organoleptiques des matières premières, les produits de la mer achetés frais sont surgelés à basse température. Ces produits sont signalés par le symbole * pour une information claire et transparente à la clientèle.<br>
+  La liste des allergènes est consultable à la dernière page de ce menu.
 `;
 
-const NOTE_ORARIO = `Per mantenere costanti il livello qualitativo e le caratteristiche organolettiche
-delle materie prime i prodotti acquistati freschi vengono abbattuti e congelati.
-Questi prodotti vengono contrassegnati con il simbolo: *`;
+const NOTE_ORARIO = `Pour maintenir constants le niveau qualitatif et les caractéristiques organoleptiques, les produits frais sont surgelés à basse température. Ces produits sont signalés par le symbole : *`;
 
 function getSez(titolo) {
   var found = MENU.sezioni.find(s => s.titolo === titolo);
@@ -1193,8 +1191,27 @@ function renderAllergeniPage(){
   h += "<div class=\"alg-legenda\"><strong>"+esc(A.legendaTitolo)+"</strong><br>"+A.legenda.map(esc).join(" &bull; ")+"</div>";
   pg.innerHTML = h; root.appendChild(pg);
 }
+
+/* allergeni sotto ogni piatto (EN/FR, solo schermo) */
+function renderAllergeniInline(){
+  if (typeof MENU === "undefined" || !MENU.allergeni || !MENU.allergeni.sezioni) return;
+  var norm = function(x){ return String(x||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9 ]+/g," ").replace(/\s+/g," ").trim(); };
+  var mappa = {};
+  MENU.allergeni.sezioni.forEach(function(s){ (s.piatti||[]).forEach(function(p){ mappa[norm(String(p.nome||"").replace(/<[^>]+>/g,""))] = p.allergeni||[]; }); });
+  var root = document.getElementById("layout-carta"); if(!root) return;
+  Array.prototype.forEach.call(root.querySelectorAll(".piatto, .percorso-piatto"), function(el){
+    if (el.closest && el.closest(".alg-pg")) return;
+    var nomeEl = el.classList.contains("piatto") ? el.querySelector(".piatto-riga") : el;
+    var nome = nomeEl ? (nomeEl.childNodes[0] ? nomeEl.childNodes[0].textContent : nomeEl.textContent) : "";
+    var lista = mappa[norm(nome)];
+    if (!lista || !lista.length) return;
+    var sp = document.createElement("span"); sp.className = "alg-inline"; sp.textContent = lista.join(", ");
+    el.appendChild(sp);
+  });
+}
 renderCarta();
 renderAllergeniPage();
+renderAllergeniInline();
 renderOrario();
 showLayout('carta');
 _szApply();

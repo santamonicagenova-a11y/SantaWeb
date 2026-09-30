@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.30.08 (+ footer-version; set-reservations-config v11, reservations-status v10, create-reservation-checkout v10, prenota.html v 2026.09.30.02) — Prenotazioni online: carta a garanzia anche per i tavoli da N persone in su (impostato 6) e nelle date speciali scelte qui, oltre ai giorni della settimana. Idea 11 approvata da Andrea. admin-core invariato. -->
 <!-- v 2026.09.30.07 (bump ?v= admin-core.js a 2026.09.30.06 + footer-version) — Nuovo pannello «Lista d'attesa» (Prenotazioni e voucher): iscrizioni dal sito (prenota.html v 2026.09.30.01, edge function lista-attesa), stato In attesa/Contattato/Prenotato/Annullato; alla disdetta arriva la mail ad Andrea (pg_cron waitlist-tick). Idea 10 approvata da Andrea. -->
 <!-- v 2026.09.30.06 (+ footer-version) — Voucher — Gestione: quadro dei buoni venduti e non ancora usati (valore in sospeso, scadenze a 30/90 giorni con elenco, scaduti mai usati) — idea 15 approvata da Andrea. admin-core invariato. -->
 <!-- v 2026.09.30.05 (bump ?v= admin-core.js e admin-templates-shared.js a 2026.09.30.05 + footer-version) — Carta EN/FR: allergeni sotto ogni piatto, solo a schermo (idea 9 approvata da Andrea). + FIX admin-templates-shared.js v.05: la v.04 generava pagine carta con script non valido (segnaposto non sostituiti) — mai pubblicate. -->
@@ -1754,9 +1755,9 @@
 
       <div class="sub" style="margin-top:0;">Carta a garanzia — giorni della settimana</div>
       <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
-        Il wizard <code>/prenota.html</code> chiede la carta a garanzia SOLO nei giorni selezionati.
-        Nei giorni non selezionati la prenotazione va in revisione manuale come il vecchio sistema
-        (arriva la mail da confermare, come oggi) — nessuna carta richiesta automaticamente.
+        Il wizard <code>/prenota.html</code> chiede la carta a garanzia nei giorni selezionati (e, in più,
+        per i gruppi e le date speciali qui sotto). Negli altri casi la prenotazione va in revisione manuale
+        come il vecchio sistema (arriva la mail da confermare) — nessuna carta richiesta automaticamente.
       </p>
       <div id="pren-card-days" style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
         <label style="display:flex;align-items:center;gap:.35rem;font-size:.8rem;"><input type="checkbox" class="pren-card-day-cb" data-day="1" /> Lun</label>
@@ -1768,6 +1769,24 @@
         <label style="display:flex;align-items:center;gap:.35rem;font-size:.8rem;"><input type="checkbox" class="pren-card-day-cb" data-day="0" /> Dom</label>
       </div>
       <button class="btn btn-publish" onclick="saveCardRequiredDays()">💾 Salva giorni carta</button>
+
+      <div class="sub" style="margin-top:1.4rem;">Carta a garanzia — gruppi e date speciali</div>
+      <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
+        In più ai giorni sopra, il sito chiede la carta anche per i tavoli da tante persone e nelle date che segni qui
+        (es. San Valentino, Capodanno, serate a tema). Lascia vuoto il numero per spegnere la regola sui gruppi.
+      </p>
+      <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:.8rem;font-size:.82rem;">
+        <label for="pren-card-min-persone">Carta per tavoli da</label>
+        <input type="number" id="pren-card-min-persone" min="1" max="20" step="1" style="width:5rem;" />
+        <span>persone in su</span>
+      </div>
+      <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:.6rem;font-size:.82rem;">
+        <label for="pren-card-special-date">Data speciale</label>
+        <input type="date" id="pren-card-special-date" style="width:auto;" />
+        <button class="btn btn-load" onclick="aggiungiDataSpecialeCarta()" style="border:1px solid var(--ink);color:var(--ink);">+ Aggiungi</button>
+      </div>
+      <div id="pren-card-special-list" style="font-size:.82rem;margin-bottom:1rem;"></div>
+      <button class="btn btn-publish" onclick="saveCardRules()">💾 Salva gruppi e date</button>
 
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
         <button class="btn btn-load" onclick="chiudiSezionePrenotazioni()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
@@ -2452,7 +2471,7 @@
 // usato per la pubblicazione. Vedi progetto-sito CLAUDE.md sessione 13.
 var PREN_STATUS_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/reservations-status';
 var PREN_CONFIG_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/set-reservations-config';
-var prenState = { online_open: true, card_required_days: [0,1,2,3,4,5,6], penale_eur: 25, ore_disdetta_default: 24, m1_subject: '', m1_intro: '', m1_closing: '', confirm_subject: '', confirm_intro: '', confirm_closing: '', reply_subject: '', reply_intro: '', reply_closing: '', closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [] };
+var prenState = { online_open: true, card_required_days: [0,1,2,3,4,5,6], card_min_persone: null, card_special_dates: [], penale_eur: 25, ore_disdetta_default: 24, m1_subject: '', m1_intro: '', m1_closing: '', confirm_subject: '', confirm_intro: '', confirm_closing: '', reply_subject: '', reply_intro: '', reply_closing: '', closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [] };
 
 function apriSezionePrenotazioni() {
   document.getElementById('carica-menu').classList.remove('open');
@@ -2636,6 +2655,10 @@ function renderPrenUI() {
   document.querySelectorAll('.pren-card-day-cb').forEach(function (cb) {
     cb.checked = cardDays.indexOf(Number(cb.getAttribute('data-day'))) !== -1;
   });
+  var minPersEl = document.getElementById('pren-card-min-persone');
+  if (minPersEl) minPersEl.value = prenState.card_min_persone != null ? prenState.card_min_persone : '';
+  _cardDateSpeciali = (prenState.card_special_dates || []).slice();
+  _renderDateSpecialiCarta();
   var penaleEl = document.getElementById('pren-guarantee-penale');
   var oreEl = document.getElementById('pren-guarantee-ore');
   if (penaleEl) penaleEl.value = prenState.penale_eur != null ? prenState.penale_eur : 25;
@@ -2688,6 +2711,8 @@ function loadPrenStatus() {
       }
       prenState.online_open = !(d && d.online_open === false);
       prenState.card_required_days = (d && Array.isArray(d.card_required_days)) ? d.card_required_days : [0,1,2,3,4,5,6];
+      prenState.card_min_persone = (d && d.card_min_persone != null) ? Number(d.card_min_persone) : null;
+      prenState.card_special_dates = (d && Array.isArray(d.card_special_dates)) ? d.card_special_dates : [];
       prenState.penale_eur = (d && d.penale_eur != null) ? d.penale_eur : 25;
       prenState.ore_disdetta_default = (d && d.ore_disdetta_default != null) ? d.ore_disdetta_default : 24;
       prenState.m1_subject = (d && d.m1_subject) || '';
@@ -2804,6 +2829,44 @@ function saveCardRequiredDays() {
   });
   if (days.length === 0 && !window.confirm('Nessun giorno selezionato: TUTTE le prenotazioni andranno in revisione manuale, mai carta automatica. Confermi?')) return;
   _prenConfig({ action: 'set_card_required_days', days: days }, 'Giorni carta a garanzia salvati.');
+}
+
+// v 2026.09.30.08 — Carta a garanzia anche per i gruppi (da N persone in su) e nelle date
+// speciali (idea 11 approvata da Andrea). La lista delle date si modifica qui e si salva col
+// pulsante, insieme alla soglia (azione set_card_rules su set-reservations-config v11).
+var _cardDateSpeciali = [];
+function _renderDateSpecialiCarta() {
+  var box = document.getElementById('pren-card-special-list');
+  if (!box) return;
+  var oggi = new Date().toISOString().slice(0, 10);
+  var future = _cardDateSpeciali.filter(function (d) { return d >= oggi; }).sort();
+  if (!future.length) { box.innerHTML = '<span style="color:var(--stone);">Nessuna data speciale.</span>'; return; }
+  box.innerHTML = future.map(function (d) {
+    return '<span style="display:inline-flex;align-items:center;gap:.35rem;border:1px solid var(--rule);padding:.2rem .5rem;margin:0 .4rem .4rem 0;">' +
+      _prenFormatDate(d) + ' <button onclick="togliDataSpecialeCarta(\'' + d + '\')" style="background:none;border:none;color:var(--rust);cursor:pointer;font-size:.9rem;" title="Togli">✕</button></span>';
+  }).join('');
+}
+function aggiungiDataSpecialeCarta() {
+  var el = document.getElementById('pren-card-special-date');
+  var d = el.value;
+  if (!d) { _prenSetStatus('Scegli una data da aggiungere.', true); return; }
+  if (_cardDateSpeciali.indexOf(d) === -1) _cardDateSpeciali.push(d);
+  el.value = '';
+  _renderDateSpecialiCarta();
+  _prenSetStatus('Data aggiunta: ricordati di premere «Salva gruppi e date».');
+}
+function togliDataSpecialeCarta(d) {
+  _cardDateSpeciali = _cardDateSpeciali.filter(function (x) { return x !== d; });
+  _renderDateSpecialiCarta();
+  _prenSetStatus('Data tolta: ricordati di premere «Salva gruppi e date».');
+}
+function saveCardRules() {
+  var raw = document.getElementById('pren-card-min-persone').value.trim();
+  var min = raw === '' ? null : Number(raw);
+  if (min !== null && (!Number.isInteger(min) || min < 1 || min > 20)) { _prenSetStatus('Numero di persone non valido (da 1 a 20, o vuoto).', true); return; }
+  var oggi = new Date().toISOString().slice(0, 10);
+  var date = _cardDateSpeciali.filter(function (d) { return d >= oggi; });
+  _prenConfig({ action: 'set_card_rules', card_min_persone: min, card_special_dates: date }, 'Regole carta per gruppi e date speciali salvate.');
 }
 
 // Penale (€/persona) e ore di disdetta gratuita: default usati ovunque si generi una garanzia
@@ -8175,7 +8238,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.30.07</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.30.08</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

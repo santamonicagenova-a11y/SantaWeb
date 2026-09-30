@@ -2,7 +2,11 @@
 <!--
   prenota.html — Wizard prenotazioni con carta a garanzia obbligatoria
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.09.30.01
+  Versione: v 2026.09.30.02
+  v 2026.09.30.02 — GARANZIA CARTA MIRATA (idea 11 approvata da Andrea): la carta è chiesta se il
+  giorno è tra card_required_days OPPURE i coperti sono >= card_min_persone OPPURE la data è in
+  card_special_dates (reservations-status v10, stessa regola lato server in
+  create-reservation-checkout v10). Al passo 5 una riga spiega il motivo (gruppo / data speciale).
   v 2026.09.30.01 — LISTA D'ATTESA (idea 10 approvata da Andrea): i giorni al completo nel
   calendario diventano cliccabili e nel passo 3 compare "Mettiti in lista d'attesa" quando un
   orario è pieno; schermata dedicata (step-wl, fuori dallo stepper) con giorno, pranzo/cena,
@@ -389,7 +393,9 @@
           <div class="rule"><span class="dot"></span><span>I dati della carta sono <b>cifrati e non visibili</b> al ristorante: la registrazione avviene sulla pagina sicura di Stripe.</span></div>
         </div>
 
-        <p class="hint" id="step5-nocard-note" style="display:none;">Per questo giorno non chiediamo la carta di credito: la sua richiesta sarà confermata a mano dal ristorante, che la ricontatterà a breve.</p>
+        <p class="hint" id="step5-card-why" style="display:none;"></p>
+
+        <p class="hint" id="step5-nocard-note" style="display:none;">Per questa prenotazione non chiediamo la carta di credito: la sua richiesta sarà confermata a mano dal ristorante, che la ricontatterà a breve.</p>
 
         <div class="btn-row">
           <button type="button" class="btn btn-ghost" data-back="4">Indietro</button>
@@ -466,6 +472,8 @@
   var state = {
     online_open: true,
     card_required_days: [0,1,2,3,4,5,6],
+    card_min_persone: null,
+    card_special_dates: [],
     penale_eur: 25,
     ore_disdetta_default: 24,
     closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [],
@@ -476,13 +484,20 @@
     step: 1,
   };
 
-  // Giorno della settimana (0=domenica..6=sabato, come Date.getDay()) in cui il ristorante
-  // chiede la carta a garanzia — impostabile da menu-admin.html sotto "Prenotazioni online".
-  // Default = tutti i 7 giorni finché reservations-status non dice altro.
-  function cardRequiredForDate(dateStr) {
-    if (!dateStr) return true;
+  // Il ristorante chiede la carta a garanzia se: il giorno della settimana (0=domenica..6=sabato,
+  // come Date.getDay()) è tra card_required_days, OPPURE i coperti sono >= card_min_persone,
+  // OPPURE la data è tra card_special_dates (v 2026.09.30.02). Tutto impostabile da
+  // menu-admin.html sotto "Prenotazioni online". Stessa regola in create-reservation-checkout.
+  function cardReasonFor(dateStr, persone) {
+    if (!dateStr) return 'giorno';
     var day = new Date(dateStr + 'T00:00:00').getDay();
-    return state.card_required_days.indexOf(day) !== -1;
+    if (state.card_special_dates.indexOf(dateStr) !== -1) return 'data';
+    if (state.card_min_persone != null && persone && persone >= state.card_min_persone) return 'gruppo';
+    if (state.card_required_days.indexOf(day) !== -1) return 'giorno';
+    return null;
+  }
+  function cardRequiredForDate(dateStr, persone) {
+    return cardReasonFor(dateStr, persone) !== null;
   }
 
   var MESI = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
@@ -567,6 +582,8 @@
       .then(function(d){
         state.online_open = !(d && d.online_open === false);
         state.card_required_days = (d && Array.isArray(d.card_required_days)) ? d.card_required_days : [0,1,2,3,4,5,6];
+        state.card_min_persone = (d && d.card_min_persone != null) ? Number(d.card_min_persone) : null;
+        state.card_special_dates = (d && Array.isArray(d.card_special_dates)) ? d.card_special_dates : [];
         state.penale_eur = (d && d.penale_eur != null) ? Number(d.penale_eur) : 25;
         state.ore_disdetta_default = (d && d.ore_disdetta_default != null) ? Number(d.ore_disdetta_default) : 24;
         document.getElementById('step5-ore-disdetta').textContent = state.ore_disdetta_default + ' ore';
@@ -825,7 +842,12 @@
 
     // Il giorno scelto determina se questo passo chiede la carta (Stripe) o se la
     // prenotazione va semplicemente in revisione manuale (vedi cardRequiredForDate).
-    var needsCard = cardRequiredForDate(state.selectedDate);
+    var needsCard = cardRequiredForDate(state.selectedDate, state.selectedPersone);
+    var motivo = cardReasonFor(state.selectedDate, state.selectedPersone);
+    var why = document.getElementById('step5-card-why');
+    why.textContent = motivo === 'gruppo' ? 'Per i tavoli da ' + state.card_min_persone + ' persone in su chiediamo la carta a garanzia.'
+      : motivo === 'data' ? 'Per questa data chiediamo la carta a garanzia.' : '';
+    why.style.display = why.textContent ? '' : 'none';
     document.getElementById('step5-title').textContent = needsCard ? 'Ultimo passo: la carta a garanzia' : 'Ultimo passo: conferma la richiesta';
     document.getElementById('step5-rules').style.display = needsCard ? '' : 'none';
     document.getElementById('step5-nocard-note').style.display = needsCard ? 'none' : '';
@@ -874,7 +896,7 @@
         confirmStatus.textContent = msg;
         confirmStatus.className = 'status-msg error show';
         confirmBtn.disabled = false;
-        confirmBtn.textContent = cardRequiredForDate(state.selectedDate) ? 'Registra la carta e conferma' : 'Invia la richiesta';
+        confirmBtn.textContent = cardRequiredForDate(state.selectedDate, state.selectedPersone) ? 'Registra la carta e conferma' : 'Invia la richiesta';
         if (r.status === 403 || r.status === 409) { loadStatus().then(function(){ renderOrario(); }); }
       })
       .catch(function(){

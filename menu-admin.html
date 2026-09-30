@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.09.30.01 (bump ?v= admin-templates-shared.js a 2026.09.30.01 + footer-version; edge function reminder-settings-status v3 e reservations-status v9) — Secondo audit: (1) PRIVACY Reminder prenotazioni: l'elenco (nome/telefono) si legge solo col token GitHub (POST), il servizio non lo dà più a chiunque; (2) Prenotazioni — Setup: i testi del ringraziamento ora arrivano davvero dal server (prima campi vuoti, rischio di sovrascriverli) e i valori di ripiego del servizio in errore non vengono più mostrati come salvati; (3) avviso dopo "Salva periodi" corretto (rimanda a Genera/Pubblica FAQ orari, non più al commit a mano); (4) QR del foglio orario dal sito invece che da GitHub Pages. -->
 <!-- v 2026.09.29.09 (+ footer-version; backend foodcost-admin v17 + migration fc_piatti_costo_porzione_pct) — Menù Degustazione: richiesto da Andrea, le porzioni sono più piccole di quelle alla carta → il costo del percorso = somma dei costi dei piatti alla carta × "% porzione" (campo in Costo piatti, 1–200, default 100) al posto del "costo extra"; percorso a testo libero: somma dei piatti della carta nominati nel testo. admin-core.js invariato. -->
 <!-- v 2026.09.29.08 (bump ?v= admin-core.js a 2026.09.29.08 + footer-version; backend foodcost-admin v16 + migration fc_piatti_costo_degustazione_e_archivio) — Decisioni di Andrea sull'audit: (1) Menù Degustazione nel Food Cost: schede per percorso allineate al menù pubblicato (_fcAllineaDegustazione, costo = somma piatti + costo extra), tabella in Costo piatti, righe in Vendite (persone), riepilogo in Dashboard, fuori dal Menu Engineering; (2) Andamento sugli ultimi periodi di inventario chiusi, Teorico '—' dove mancano le vendite; (3) piatti tolti dalla carta: la scheda Food Cost resta come storico spenta (trigger DB), niente più cancellazioni bloccate. Guida aggiornata. -->
 <!-- v 2026.09.29.07 (bump ?v= admin-core.js a 2026.09.29.07 + footer-version) — Audit flussi menu-admin: guida "Procedure" corretta (dolci PRIMA degli allergeni; Allergeni carta = carta + dolci pubblicati e aggiorna Dettagli piatti; tolto il pulsante «Menù Vini» inesistente → Gestionale Cantina; nuova sezione "Menù e Food Cost: come sono collegati"). Food Cost: FC % per piatto e Menu Engineering (margine, ricavo, classi) calcolati sul prezzo in carta SENZA IVA (_fcPrezzoNetto/_fcMenuEngNetto — prima prezzo lordo vs costi netti); Dashboard avvisa quando non ci sono vendite salvate con lo stesso Dal/Al (Teorico/GAP non significativi). -->
@@ -2421,7 +2422,7 @@
 <div class="toast" id="toast">✓ Scaricato!</div>
 
 <script src="admin-translations.js"></script>
-<script src="admin-templates-shared.js?v=2026.09.29.09"></script>
+<script src="admin-templates-shared.js?v=2026.09.30.01"></script>
 <script src="admin-core.js?v=2026.09.29.08"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 <script>
@@ -2658,6 +2659,13 @@ function loadPrenStatus() {
   fetch(PREN_STATUS_URL, { cache: 'no-store' })
     .then(function (r) { return r.json(); })
     .then(function (d) {
+      // v 2026.09.30.01 — reservations-status in errore risponde con valori di ripiego
+      // (fallback:true): non mostrarli come impostazioni salvate, altrimenti "Salva testi
+      // mail" sovrascriverebbe i testi veri con quelli vuoti.
+      if (d && d.fallback) {
+        _prenSetStatus('Impostazioni non caricate (servizio in errore): non salvare nulla, riprova tra poco.', true);
+        return;
+      }
       prenState.online_open = !(d && d.online_open === false);
       prenState.card_required_days = (d && Array.isArray(d.card_required_days)) ? d.card_required_days : [0,1,2,3,4,5,6];
       prenState.penale_eur = (d && d.penale_eur != null) ? d.penale_eur : 25;
@@ -3109,7 +3117,7 @@ function saveOrariPeriodi() {
         // Alert esplicito (richiesta Andrea): la FAQ orari resta testo libero, va aggiornata a
         // mano — non basta il banner fisso in cima alla sezione, serve un promemoria che non si
         // possa ignorare al momento giusto (subito dopo aver cambiato gli orari).
-        window.alert('Periodi salvati.\n\nRICORDATI: la FAQ orari sul sito (index.html + translations.json) NON si aggiorna da sola — se questo cambio la riguarda, aggiornala a mano e committala su GitHub come sempre.');
+        window.alert('Periodi salvati: le prenotazioni online li usano da subito.\n\nRICORDATI: FAQ orari, orari per Google (JSON-LD) e foglio orario stampabile NON si aggiornano da soli. Qui sotto usa «Genera bozza» e poi «Pubblica» della FAQ orari — il giorno in cui il nuovo periodo entra in vigore, perché si allineano al periodo valido in quel momento.');
       } else if (res.status === 401) {
         if (st) { st.textContent = 'Token GitHub non valido o senza permessi. Reimpostalo col tasto 🔑.'; st.style.color = 'var(--rust)'; }
       } else {
@@ -6236,12 +6244,22 @@ function renderReminderUI() {
   _remRenderUpcoming(remState.pending || [], remState.confirmed || []);
 }
 
+// v 2026.09.30.01 — PRIVACY: l'elenco prenotazioni (nome/telefono) non è più pubblico. Si chiede
+// a reminder-settings-status v3 in POST col token GitHub; senza token il servizio dà solo le
+// impostazioni del messaggio (quelle che usa gestionale.html).
 function loadReminderStatus() {
   _remSetStatus('Caricamento…');
   var showPast = document.getElementById('rem-show-past') && document.getElementById('rem-show-past').checked;
-  var url = REM_STATUS_URL + (showPast ? '?show_past=1' : '');
-  fetch(url, { cache: 'no-store' })
-    .then(function (r) { return r.json(); })
+  var token = _prenGhToken();
+  if (!token) { _remSetStatus('Operazione annullata: serve il token GitHub per vedere le prenotazioni.', true); return; }
+  fetch(REM_STATUS_URL, {
+    method: 'POST', cache: 'no-store', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ github_token: token, show_past: !!showPast })
+  })
+    .then(function (r) {
+      if (r.status === 401) throw new Error('token');
+      return r.json();
+    })
     .then(function (d) {
       remState.settings = (d && d.settings) || {};
       remState.pending = (d && d.pending) || [];
@@ -6250,7 +6268,10 @@ function loadReminderStatus() {
       renderReminderUI();
       _remSetStatus('');
     })
-    .catch(function () { _remSetStatus('Errore nel caricamento dello stato.', true); });
+    .catch(function (e) {
+      if (e && e.message === 'token') _remSetStatus('Token GitHub non valido o senza permessi. Reimpostalo col tasto 🔑.', true);
+      else _remSetStatus('Errore nel caricamento dello stato.', true);
+    });
 }
 
 function _remFetch(payload) {
@@ -7870,7 +7891,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.29.09</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.30.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

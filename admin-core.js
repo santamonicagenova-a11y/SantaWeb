@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.09.30.05 — Carta EN/FR: allergeni scritti sotto ogni piatto (riga piccola in corsivo, es. "gluten, milk"), solo a schermo — in stampa resta la pagina allergeni finale (la pagina A4 ha altezza fissa). Nuova renderAllergeniInline() iniettata con renderAllergeniPage(), stessi dati MENU.allergeni. Italiano invariato (scelta di Andrea). Attivo dalla prossima pubblicazione della carta.
 // v 2026.09.30.02 — Secondo audit: (1) Allergeni carta: Crudi inclusi (prima esclusi per costruzione) + sezione "Menù Degustazione" coi piatti del percorso non presenti in carta/dolci; conferma esplicita dei piatti pubblicati senza allergeni; titoli sezione EN/FR anche dal dizionario piatti. (2) Sync Dettagli piatti: una sezione rinominata nella carta sposta le righe esistenti (dati di sicurezza, ricette e costi mantenuti) invece di creare doppioni. (3) Tolto il codice morto del vecchio pannello «Menù Vini» (la carta vini si fa dal Gestionale Cantina) e la vecchia traduci() senza pubblicazione; 'chiavi-section' in _pulisciViste.
 // v 2026.09.29.08 — Sync Dettagli piatti: la cancellazione di un piatto tolto dalla carta non è più bloccata dalla sua scheda Food Cost (trigger DB: la scheda resta come storico, spenta). Testi del riepilogo e dell'avviso errori aggiornati.
 // v 2026.09.29.07 — Audit flussi menu-admin (29/9): (1) dopo "Pubblica" la ricarica a 90s avviene solo se sei ancora sullo stesso menù e non l'hai toccato (_vistaSeq in _pulisciViste + confronto del form); prima ricaricava sempre la carta, anche dopo i dolci, e cancellava la vista aperta nel frattempo (es. le spunte di «Allergeni carta»). (2) Promemoria laterali carta/dolci/allergeni aggiornati: allergeni = carta + dolci pubblicati, dolci da pubblicare prima degli allergeni, la pubblicazione allergeni aggiorna Dettagli piatti.
@@ -1093,7 +1094,9 @@ function eseguiPubblicazione(token) {
       '    .alg-all{flex:1;font-style:italic;font-size:.8rem;line-height:1.4;}\n' +
       '    .alg-all.vuoto{color:var(--stone,#8c7e6e);}\n' +
       '    .alg-legenda{margin-top:auto;padding-top:4mm;border-top:1px solid var(--rule,#d4c9b8);font-size:.66rem;color:var(--stone,#8c7e6e);font-style:italic;line-height:1.6;text-align:center;}\n' +
-      '    .alg-legenda strong{font-style:normal;font-weight:600;color:var(--ink,#1a1714);}\n  ';
+      '    .alg-legenda strong{font-style:normal;font-weight:600;color:var(--ink,#1a1714);}\n' +
+      '    .alg-inline{display:block;font-size:.74rem;font-style:italic;color:var(--stone,#8c7e6e);margin-top:1px;line-height:1.3;letter-spacing:.01em;}\n' +
+      '    @media print{.alg-inline{display:none!important}}\n  ';
     html = html.replace('</style>', algCss + '</style>');
     var algFn = '\n/* F0.21-e: pagina allergeni (carta+dolci) */\n' +
       'function renderAllergeniPage(){\n' +
@@ -1115,8 +1118,27 @@ function eseguiPubblicazione(token) {
       '  h += "<div class=\\"alg-legenda\\"><strong>"+esc(A.legendaTitolo)+"</strong><br>"+A.legenda.map(esc).join(" &bull; ")+"</div>";\n' +
       '  pg.innerHTML = h; root.appendChild(pg);\n' +
       '}\n';
+    // v 2026.09.30.05 — allergeni sotto ogni piatto (solo a schermo: in stampa la pagina .pg ha altezza
+    // fissa e resta la pagina allergeni finale). Stessi dati di renderAllergeniPage (MENU.allergeni).
+    algFn += '\n/* allergeni sotto ogni piatto (EN/FR, solo schermo) */\n' +
+      'function renderAllergeniInline(){\n' +
+      '  if (typeof MENU === "undefined" || !MENU.allergeni || !MENU.allergeni.sezioni) return;\n' +
+      '  var norm = function(x){ return String(x||"").toLowerCase().normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9 ]+/g," ").replace(/\\s+/g," ").trim(); };\n' +
+      '  var mappa = {};\n' +
+      '  MENU.allergeni.sezioni.forEach(function(s){ (s.piatti||[]).forEach(function(p){ mappa[norm(String(p.nome||"").replace(/<[^>]+>/g,""))] = p.allergeni||[]; }); });\n' +
+      '  var root = document.getElementById("layout-carta"); if(!root) return;\n' +
+      '  Array.prototype.forEach.call(root.querySelectorAll(".piatto, .percorso-piatto"), function(el){\n' +
+      '    if (el.closest && el.closest(".alg-pg")) return;\n' +
+      '    var nomeEl = el.classList.contains("piatto") ? el.querySelector(".piatto-riga") : el;\n' +
+      '    var nome = nomeEl ? (nomeEl.childNodes[0] ? nomeEl.childNodes[0].textContent : nomeEl.textContent) : "";\n' +
+      '    var lista = mappa[norm(nome)];\n' +
+      '    if (!lista || !lista.length) return;\n' +
+      '    var sp = document.createElement("span"); sp.className = "alg-inline"; sp.textContent = lista.join(", ");\n' +
+      '    el.appendChild(sp);\n' +
+      '  });\n' +
+      '}\n';
     // inserisci la funzione subito prima della init "renderCarta();" e aggiungi la chiamata dopo renderCarta()
-    html = html.replace('renderCarta();\n', algFn + 'renderCarta();\nrenderAllergeniPage();\n');
+    html = html.replace('renderCarta();\n', algFn + 'renderCarta();\nrenderAllergeniPage();\nrenderAllergeniInline();\n');
     files.push({ path: 'menu-' + lang + '.html', content: html, label: lang.toUpperCase() });
     });
   }

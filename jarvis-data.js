@@ -1,15 +1,15 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-09-30",
- "versione": "2026.09.30.04",
+ "versione": "2026.09.30.05",
  "briefing": "**Briefing 30/9/2026 (sera)** — **Sito** (live, menu-admin v 2026.09.30.03 + Food Cost server v18): secondo audit di menu-admin chiuso. Sistemati: elenco prenotazioni del Reminder protetto, testi ringraziamento, avviso orari, QR dal sito, listino voucher (i prezzi nel codice erano vecchi), tendine orari dai periodi, pannello «Chiavi di accesso», sezioni rinominate senza doppioni, costi Food Cost fissati per periodo, Allergeni carta con i Crudi. FAQ orari dal 1/10 pubblicata. **Aspetta te**: spuntare gli allergeni dei 6 Crudi in «Allergeni carta» e pubblicare (poi Traduci e Pubblica della carta); % porzione della degustazione. **Prossimo**: primo uso reale del Food Cost (Costo piatti, Vendite, Dashboard).",
  "kpi": {
-  "aperte": 61,
+  "aperte": 60,
   "scadute": 3,
   "bloccate": 1,
   "andrea": 15,
   "debiti": 10,
-  "chiuse30": 45
+  "chiuse30": 46
  },
  "subs": {
   "SEO": {
@@ -36,9 +36,9 @@ window.JARVIS_DATA = {
   },
   "Sito": {
    "tot": 112,
-   "done": 89,
+   "done": 90,
    "prog": 2,
-   "up": 8,
+   "up": 7,
    "future": 13,
    "bloccato": 0,
    "scadute": 0,
@@ -581,18 +581,6 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-28"
-  },
-  {
-   "t": "Voucher — quadro dei buoni venduti e non ancora usati, valore e scadenze (idea 15)",
-   "sub": "Sito",
-   "st": "up",
-   "s": "2026-09-30",
-   "e": null,
-   "own": "Claude",
-   "az": null,
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-30"
   }
  ],
  "sessioni": [

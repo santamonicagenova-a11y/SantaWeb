@@ -426,6 +426,24 @@
       #layout-orario .orario-servizio { font-size: .82rem; line-height: 1.65; }
       #layout-orario .orario-nota { font-size: .56rem; padding-top: 2mm; line-height: 1.45; }
     }
+    /* v 2026.10.02.03: dimensioni per tipologia (MENU.tipoScale -> --k-*), pt riferiti alla stampa */
+    #layout-carta .sezione-titolo { font-size: calc(1.5rem * var(--fs, 1.12) * var(--k-tit, 1)); }
+    #layout-carta .piatto, #layout-carta .percorso-piatto, #layout-carta .percorso-libero { font-size: calc(.96rem * var(--fs, 1.12) * var(--k-piatto, 1)); }
+    #layout-carta .piatto-desc, #layout-carta .percorso-desc { font-size: calc(.672rem * var(--fs, 1.12) * var(--k-desc, 1)); }
+    #layout-carta .piatto-prezzo { font-size: calc(.8rem * var(--fs, 1.12) * var(--k-prezzo, 1)); }
+    #layout-carta .piatto-unita { font-size: calc(.76rem * var(--fs, 1.12) * var(--k-prezzo, 1)); }
+    #layout-carta .degu-titolo { font-size: calc(1.4rem * var(--fs, 1.12) * var(--k-degu, 1)); }
+    #layout-carta .degu-prezzi, #layout-carta .degu-nota { font-size: calc(.98rem * var(--fs, 1.12) * var(--k-degu, 1)); }
+    #layout-carta .percorso-label { font-size: calc(1.25rem * var(--fs, 1.12) * var(--k-degu, 1)); }
+    #layout-carta .note-ospite { font-size: calc(.73rem * var(--k-note, 1)); }
+    .tipo-grp { display: inline-flex; align-items: center; gap: .3rem; }
+    .tipo-lbl { font-family: 'Jost', sans-serif; font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--stone); }
+    .tipo-grp .ctrl-btn { padding: .25rem .7rem; }
+    .tipo-grp .sz-val { min-width: 4.2em; color: var(--ink); font-weight: 500; }
+    @media print {
+      #layout-carta .piatto { font-size: calc(18pt * var(--fs, .97) / .97 * var(--k-piatto, 1)); }
+      #layout-carta .piatto-desc { font-size: calc(15pt * var(--fs, .97) / .97 * var(--k-desc, 1)); }
+    }
   
     /* F0.21-e allergeni */
     #layout-carta .pg.alg-pg { }
@@ -472,7 +490,7 @@ const MENU = {
       "7": "",
       "A tôa no se ven vëgi": [
         {
-          "nome": "&quot;Macchetto, what&#x27;s the point in me saying that...&quot;",
+          "nome": "&quot;Macchetto, what’s the point in me saying that...&quot;",
           "sostenibile": true
         },
         {
@@ -554,7 +572,13 @@ const MENU = {
       "titolo": "Sfiziosi",
       "piatti": [
         {
-          "nome": "&quot;Macchetto, what&#x27;s the point in me saying that...&quot;",
+          "nome": "&quot;Forest oyster&quot;",
+          "prezzo": 25,
+          "sostenibile": true,
+          "descrizione": "Tempura-fried oyster, porcini mushrooms, quinces, cucumbers"
+        },
+        {
+          "nome": "&quot;Macchetto, what’s the point in me saying that...&quot;",
           "prezzo": 14,
           "sostenibile": true,
           "descrizione": "Stuffed baby lettuce, peppers and a dish of anchovies"
@@ -563,19 +587,13 @@ const MENU = {
           "nome": "&quot;Every curl is a whim&quot;",
           "prezzo": 19,
           "sostenibile": true,
-          "descrizione": "Yellowtail, sage, pickled beetroot, leeks, horseradish"
+          "descrizione": "Yellowtail, sage, beetroot in a tangy sauce, leeks, horseradish"
         },
         {
           "nome": "&quot;Sanna&quot;",
           "prezzo": 16,
           "sostenibile": true,
           "descrizione": "Squid, pink prawns, aubergine, black cabbage, red onion"
-        },
-        {
-          "nome": "&quot;Forest oyster&quot;",
-          "prezzo": 25,
-          "sostenibile": true,
-          "descrizione": "Tempura-fried oyster, porcini mushrooms, quinces, cucumbers"
         },
         {
           "nome": "“Not cheeses”",
@@ -589,10 +607,10 @@ const MENU = {
       "titolo": "Amidi e Carboidrati",
       "piatti": [
         {
-          "nome": "&quot;Noble waste&quot;",
-          "prezzo": 24,
+          "nome": "&quot;Turnip Ganbou&quot;",
+          "prezzo": 26,
           "sostenibile": true,
-          "descrizione": "Tortelli with yellowtail and red sea bream, saffron, grapes and parsley"
+          "descrizione": "<em>San Massimo Riserva</em> rice, scampi and prawns, turnip greens"
         },
         {
           "nome": "&quot;Tomamilla&quot;",
@@ -601,10 +619,10 @@ const MENU = {
           "descrizione": "Spaghetti, chamomile butter, Brigasca sheep’s milk toma, toasted black pepper"
         },
         {
-          "nome": "&quot;Turnip Ganbou&quot;",
-          "prezzo": 26,
+          "nome": "&quot;Noble waste&quot;",
+          "prezzo": 24,
           "sostenibile": true,
-          "descrizione": "<em>San Massimo Riserva</em> rice, scampi and prawns, turnip greens"
+          "descrizione": "Tortelli with yellowtail and red sea bream, saffron, grapes and parsley"
         },
         {
           "nome": "&quot;Itosnap&quot;",
@@ -627,7 +645,7 @@ const MENU = {
         {
           "nome": "&quot;Buridda chaperon&quot;",
           "prezzo": 32,
-          "descrizione": "Yellowtail, cuttlefish salad, mango",
+          "descrizione": "Yellowtail, cuttlefish buridda, mango",
           "sostenibile": true
         },
         {
@@ -651,7 +669,7 @@ const MENU = {
         {
           "nome": "&quot;Panissa salad&quot;",
           "prezzo": 10,
-          "descrizione": "Chickpea cannoli, prescinseua, Taggiasca olives, chocolate"
+          "descrizione": "Chickpea cannolo, prescinseua, Taggiasca olives, chocolate"
         },
         {
           "nome": "&quot;Tradizionello&quot;",
@@ -792,7 +810,7 @@ const MENU = {
         "titolo_display": "Antipasti",
         "piatti": [
           {
-            "nome": "&quot;Macchetto, what&#x27;s the point in me saying that...&quot;",
+            "nome": "&quot;Macchetto, what’s the point in me saying that...&quot;",
             "allergeni": [
               "fish",
               "milk",
@@ -1171,14 +1189,19 @@ function showLayout(which) {
 }
 
 /* ── init ── */
-var _sz={fs:(MENU.fontScale!=null?MENU.fontScale:1.12),lh:(MENU.lineScale!=null?MENU.lineScale:1),gap:(MENU.gapScale!=null?MENU.gapScale:1),shift:(MENU.shift!=null?MENU.shift:0)};
-function _szApply(){var r=document.getElementById('layout-carta');if(!r)return;r.style.setProperty('--fs',_sz.fs);r.style.setProperty('--lh',_sz.lh);r.style.setProperty('--gap',_sz.gap);r.style.setProperty('--shift',_sz.shift+'mm');var vf=document.getElementById('szValFs');if(vf)vf.textContent=Math.round(_sz.fs*100)+'%';var vl=document.getElementById('szValLh');if(vl)vl.textContent=Math.round(_sz.lh*100)+'%';var vg=document.getElementById('szValGap');if(vg)vg.textContent=Math.round(_sz.gap*100)+'%';var vs=document.getElementById('szValShift');if(vs)vs.textContent=_sz.shift+'mm';}
+var _sz={fs:(MENU.fontScale!=null?MENU.fontScale:1.12),lh:(MENU.lineScale!=null?MENU.lineScale:1),gap:(MENU.gapScale!=null?MENU.gapScale:1),shift:(MENU.shift!=null?MENU.shift:0),k:Object.assign({tit:1,piatto:1,desc:1,prezzo:1,degu:1,note:1},MENU.tipoScale||{})};
+/* dimensioni per tipologia: [pt di stampa a scala 1, dipende da fontScale?] */
+var _SZT={tit:[22.5,1],piatto:[18/0.97,1],desc:[15/0.97,1],prezzo:[12,1],degu:[21,1],note:[10.95,0]};
+function _szTbase(key){var t=_SZT[key];return t[0]*(t[1]?_sz.fs:1);}
+function _szTipi(){var r=document.getElementById('layout-carta');Object.keys(_SZT).forEach(function(key){if(r)r.style.setProperty('--k-'+key,_sz.k[key]);var el=document.getElementById('szT-'+key);if(el)el.textContent=(Math.round(_szTbase(key)*_sz.k[key]*2)/2)+' pt';});}
+function _szT(key,dpt){var b=_szTbase(key);var cur=Math.round(b*_sz.k[key]*2)/2;_sz.k[key]=Math.max(0.4,Math.min(2.5,Math.round(((cur+dpt)/b)*1000)/1000));_szApply();}
+function _szApply(){var r=document.getElementById('layout-carta');if(!r)return;r.style.setProperty('--fs',_sz.fs);r.style.setProperty('--lh',_sz.lh);r.style.setProperty('--gap',_sz.gap);r.style.setProperty('--shift',_sz.shift+'mm');var vf=document.getElementById('szValFs');if(vf)vf.textContent=Math.round(_sz.fs*100)+'%';var vl=document.getElementById('szValLh');if(vl)vl.textContent=Math.round(_sz.lh*100)+'%';var vg=document.getElementById('szValGap');if(vg)vg.textContent=Math.round(_sz.gap*100)+'%';var vs=document.getElementById('szValShift');if(vs)vs.textContent=_sz.shift+'mm';_szTipi();}
 function _szF(d){_sz.fs=Math.max(0.85,Math.min(1.4,Math.round((_sz.fs+d)*100)/100));_szApply();}
 function _szL(d){_sz.lh=Math.max(0.8,Math.min(1.5,Math.round((_sz.lh+d)*100)/100));_szApply();}
 function _szG(d){_sz.gap=Math.max(0.6,Math.min(1.7,Math.round((_sz.gap+d)*100)/100));_szApply();}
 function _szS(d){_sz.shift=Math.max(-25,Math.min(25,_sz.shift+d));_szApply();}
-function _szR(){_sz={fs:1.12,lh:1,gap:1,shift:0};_szApply();}
-function _szSave(){if(window.opener&&window.opener.salvaImpostazioniStampa){window.opener.salvaImpostazioniStampa({fs:_sz.fs,lh:_sz.lh,gap:_sz.gap,shift:_sz.shift});}}
+function _szR(){_sz={fs:1.12,lh:1,gap:1,shift:0,k:{tit:1,piatto:1,desc:1,prezzo:1,degu:1,note:1}};_szApply();}
+function _szSave(){if(window.opener&&window.opener.salvaImpostazioniStampa){window.opener.salvaImpostazioniStampa({fs:_sz.fs,lh:_sz.lh,gap:_sz.gap,shift:_sz.shift,k:_sz.k});}}
 
 /* F0.21-e: pagina allergeni (carta+dolci) */
 function renderAllergeniPage(){

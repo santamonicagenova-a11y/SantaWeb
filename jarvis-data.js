@@ -1,15 +1,15 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-10-02",
- "versione": "2026.10.02.15",
- "briefing": "**Briefing 2/10/2026 (sera)** — **Sito** (live): nuove **cene a tema**. Pagina `/cene-a-tema` (IT/EN/FR) con voce «Serate» nel menu, banner overlay in home con la foto di Anna e Riku, loghi Bellenda e Château Puybarbe con link. In menu-admin → Prenotazioni — Setup nuovo box **Serate speciali** (data, orario, posti, titolo con tendina dei titoli già usati, carta a garanzia sì/no): il sito resta prenotabile solo all'orario della serata, con avviso nel wizard; Setup ora a riquadri colorati e con le eccezioni di date/orari spostate dagli Orari di Apertura. Cena del 16/10: ore 20, 60 € tutto compreso, 16 posti, carta a garanzia. Il codice del banner resta per le prossime serate. **Aspetta te**: provare dal pannello «Salva serata speciale» (non provato da Claude), mandare menù e abbinamenti dei vini; restano compleanni/anniversari e le altre voci di ieri. **Prossimo**: menù della serata in pagina, poi idee 1, 7 e 14.",
+ "versione": "2026.10.02.16",
+ "briefing": "**Briefing 2/10/2026 (notte)** — **Sito** (live): filtro allergeni del menù più leggibile (testo +50%, piatto e allergene in due riquadri marrone), frecce ▲▼ per riordinare i piatti in menu-admin, stampa carta con le note sul fondo e dimensione caratteri per tipologia (con pt), e **lettura obbligatoria del menù** al passo 4 della prenotazione (finestra interna; header allentati solo per /menu e /prenota). **Aspetta te**: stampare la carta e provare i controlli per tipologia («Fissa come default» + Pubblica). Sotto, il briefing di prima sulle cene a tema.\n**Briefing 2/10/2026 (sera)** — **Sito** (live): nuove **cene a tema**. Pagina `/cene-a-tema` (IT/EN/FR) con voce «Serate» nel menu, banner overlay in home con la foto di Anna e Riku, loghi Bellenda e Château Puybarbe con link. In menu-admin → Prenotazioni — Setup nuovo box **Serate speciali** (data, orario, posti, titolo con tendina dei titoli già usati, carta a garanzia sì/no): il sito resta prenotabile solo all'orario della serata, con avviso nel wizard; Setup ora a riquadri colorati e con le eccezioni di date/orari spostate dagli Orari di Apertura. Cena del 16/10: ore 20, 60 € tutto compreso, 16 posti, carta a garanzia. Il codice del banner resta per le prossime serate. **Aspetta te**: provare dal pannello «Salva serata speciale» (non provato da Claude), mandare menù e abbinamenti dei vini; restano compleanni/anniversari e le altre voci di ieri. **Prossimo**: menù della serata in pagina, poi idee 1, 7 e 14.",
  "kpi": {
-  "aperte": 60,
+  "aperte": 61,
   "scadute": 4,
   "bloccate": 1,
-  "andrea": 18,
+  "andrea": 19,
   "debiti": 11,
-  "chiuse30": 50
+  "chiuse30": 53
  },
  "subs": {
   "SEO": {
@@ -35,14 +35,14 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 119,
-   "done": 98,
-   "prog": 2,
+   "tot": 123,
+   "done": 101,
+   "prog": 3,
    "up": 6,
    "future": 13,
    "bloccato": 0,
    "scadute": 0,
-   "andrea": 8,
+   "andrea": 9,
    "debiti": 9
   },
   "Marketing": {
@@ -115,6 +115,18 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
+  },
+  {
+   "t": "Stampa carta — note per l'ospite sul fondo pagina e dimensione caratteri per tipologia (con pt)",
+   "sub": "Sito",
+   "st": "prog",
+   "s": "2026-10-02",
+   "e": "2026-10-02",
+   "own": "Andrea",
+   "az": "Stampare la carta e controllare: note ospite sul fondo con una riga di stacco; poi provare i controlli −/+ per tipologia, «Fissa come default» e Pubblica",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-10-02"
   },
   {
    "t": "Sponsorizzata Salone Nautico",
@@ -349,6 +361,18 @@ window.JARVIS_DATA = {
  ],
  "prossime": [
   {
+   "t": "Stampa carta — note per l'ospite sul fondo pagina e dimensione caratteri per tipologia (con pt)",
+   "sub": "Sito",
+   "st": "prog",
+   "s": "2026-10-02",
+   "e": "2026-10-02",
+   "own": "Andrea",
+   "az": "Stampare la carta e controllare: note ospite sul fondo con una riga di stacco; poi provare i controlli −/+ per tipologia, «Fissa come default» e Pubblica",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-10-02"
+  },
+  {
    "t": "Sponsorizzata Salone Nautico",
    "sub": "Marketing",
    "st": "prog",
@@ -541,6 +565,18 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-29"
+  },
+  {
+   "t": "Stampa carta — note per l'ospite sul fondo pagina e dimensione caratteri per tipologia (con pt)",
+   "sub": "Sito",
+   "st": "prog",
+   "s": "2026-10-02",
+   "e": "2026-10-02",
+   "own": "Andrea",
+   "az": "Stampare la carta e controllare: note ospite sul fondo con una riga di stacco; poi provare i controlli −/+ per tipologia, «Fissa come default» e Pubblica",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-10-02"
   }
  ],
  "bloccate": [
@@ -657,6 +693,11 @@ window.JARVIS_DATA = {
   {
    "d": "2026-10-02",
    "sub": "Sito",
+   "t": "Menu allergeni, riordino piatti, stampa e lettura menu in prenotazione"
+  },
+  {
+   "d": "2026-10-02",
+   "sub": "Sito",
    "t": "Tracciabilità, codice progressivo globale"
   },
   {
@@ -678,11 +719,6 @@ window.JARVIS_DATA = {
    "d": "2026-09-29",
    "sub": "Sito",
    "t": "Stampa dolci e carta"
-  },
-  {
-   "d": "2026-09-28",
-   "sub": "Marketing",
-   "t": "Post Instagram orari di apertura (grafica Canva)"
   }
  ],
  "perWeek": [
@@ -732,7 +768,7 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-28",
-   "n": 15
+   "n": 16
   }
  ],
  "perDay": [
@@ -754,7 +790,7 @@ window.JARVIS_DATA = {
   },
   {
    "g": "ven",
-   "n": 12
+   "n": 13
   },
   {
    "g": "sab",

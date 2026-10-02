@@ -430,11 +430,13 @@ async function tracciabilitaConfigGet() {
 // dove si era arrivati a mano su carta, senza rischiare di tornare indietro rispetto
 // a righe già inserite digitalmente in questo mese.
 async function nextProgressivoMese(anno: number, mese: number): Promise<number> {
+  // v19 (2026-10-02) — fix: il progressivo deve essere GLOBALE e incrementale, non
+  // resettato ogni mese. Cerca il massimo progressivo su TUTTI gli anni/mesi (rimosse
+  // le clausole .eq("anno", anno).eq("mese", mese)), poi applica il floor da config.
   const [maxRes, cfg] = await Promise.all([
     supabase
       .from("fc_tracciabilita_prodotti")
       .select("progressivo")
-      .eq("anno", anno).eq("mese", mese)
       .order("progressivo", { ascending: false })
       .limit(1),
     tracciabilitaConfigGet(),

@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!-- v 2026.10.02.01 — PRIVACY: vista giorno e ricerca ora mandano il token GitHub (_ghToken) in POST
+     a gestionale-day v17 / gestionale-search v7, che senza token valido rispondono 401 senza dati
+     (prima erano GET pubblici con nomi, telefoni, email, intolleranze e note). Token mancante o
+     rifiutato: messaggio chiaro e token salvato cancellato, così al tentativo dopo viene richiesto.
+     Calendario mese invariato (gestionale-calendar-status dà solo conteggi, nessun dato personale). -->
 <!-- v 2026.10.01.01 — note ospite dal CRM sotto ogni prenotazione (idea 12 approvata da Andrea): tag,
      note dell'anagrafica e compleanno/anniversario se cadono entro 7 giorni dalla data della
      prenotazione. Caricate col token (clienti-crm v6, azione notes_for) DOPO la vista giorno, così le
@@ -437,7 +442,7 @@
   <div class="status-line" id="garanzie-status"></div>
 </div>
 
-<footer class="ver">v 2026.10.01.01</footer>
+<footer class="ver">v 2026.10.02.01</footer>
 
 <script>
 var CAL_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/gestionale-calendar-status';
@@ -634,13 +639,33 @@ function _daySetStatus(msg, isErr) {
   el.className = 'status-line' + (isErr ? ' err' : '');
 }
 
+// v 2026.10.02.01 — POST col token: gestionale-day v17 non risponde più senza token valido.
+function _postWithToken(url, payload) {
+  var token = _ghToken();
+  if (!token) return Promise.resolve({ status: 401, body: { error: 'Serve il token GitHub per vedere le prenotazioni.' } });
+  payload.github_token = token;
+  return fetch(url, { method: 'POST', cache: 'no-store', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+    .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { status: r.status, body: j }; }); })
+    .then(function (res) {
+      // Token rifiutato: lo dimentico, così al prossimo caricamento viene richiesto di nuovo.
+      if (res.status === 401) localStorage.removeItem('gh_token');
+      return res;
+    });
+}
+
 function loadDay() {
   _daySetStatus('Caricamento…');
-  fetch(DAY_URL + '?date=' + curDate, { cache: 'no-store' })
-    .then(function (r) { return r.json(); })
-    .then(function (d) {
-      renderSlots(d.slots || []);
-      renderDay(d.reservations || []);
+  _postWithToken(DAY_URL, { date: curDate })
+    .then(function (res) {
+      if (res.status !== 200) {
+        renderSlots([]);
+        document.getElementById('day-list').innerHTML = '';
+        document.getElementById('day-sub').textContent = '';
+        _daySetStatus((res.body && res.body.error) || 'Errore nel caricamento delle prenotazioni.', true);
+        return;
+      }
+      renderSlots(res.body.slots || []);
+      renderDay(res.body.reservations || []);
       _daySetStatus('');
     })
     .catch(function () { _daySetStatus('Errore nel caricamento delle prenotazioni.', true); });
@@ -1090,8 +1115,7 @@ function doSearch() {
   document.getElementById('search-title').textContent = 'Risultati per «' + q + '»';
   _searchSetStatus('Ricerca…');
 
-  fetch(SEARCH_URL + '?q=' + encodeURIComponent(q), { cache: 'no-store' })
-    .then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); })
+  _postWithToken(SEARCH_URL, { q: q })
     .then(function (res) {
       if (res.status === 200) { renderSearch(res.body.reservations || []); _searchSetStatus(''); }
       else _searchSetStatus((res.body && res.body.error) || 'Errore nella ricerca.', true);

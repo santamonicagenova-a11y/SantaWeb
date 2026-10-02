@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.02.01",
+  version: "2026.10.02.02",
   updated: "2026-10-02",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -99,6 +99,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Food Cost — rifiniture 26/9: righe Tracciabilità modificabili, note nelle Spese, ordine cronologico crescente', s:'2026-09-26', e:'2026-09-26', st:'done'},
       {t:'Food Cost giornaliero — tool costruito in menu-admin (date-range, dashboard Chart.js, sezione Beverage speculare, 4 KPI dedicate)', s:'2026-09-11', e:'2026-09-13', st:'done', ms:true},
       {t:'Food Cost — Costo piatti: prezzo vendita dalla carta pubblicata (carta + dolci)', s:'2026-09-26', e:'2026-09-26', st:'done'},
+      {t:'Tracciabilità: il codice NN-MMAA prosegue senza ripartire ogni mese', s:'2026-10-02', e:'2026-10-02', st:'done'},
       {t:'Food Cost — redesign inventario da range Dal/Al a conteggio puntuale per data (fc_inventario_conteggi), niente più doppia digitazione tra periodi consecutivi', s:'2026-09-13', st:'done', ms:true},
       {t:'Calcolo Food Cost ricette da ingredienti: anagrafica ingredienti in Setup + tab Calcolo Food Cost che valorizza Costo Ricetta in Costo piatti', s:'2026-09-26', st:'prog'},
       {t:'Food Cost → Inventario: storico conteggi (heatmap) mostra anche l\'importo totale per ogni data, non solo il giorno', s:'2026-09-28', e:'2026-09-28', st:'done'},

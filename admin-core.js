@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.10.02.02 — Carta: dimensione per tipologia (_TIPI_BTNS, dati.tipoScale; salvaImpostazioniStampa accetta vals.k).
 // v 2026.10.02.01 — Carta/Dolci: frecce ▲▼ per cambiare l'ordine dei piatti in ogni sezione (spostaPiatto).
 // v 2026.09.30.06 — 'lista-attesa-section' in _pulisciViste (nuovo pannello Lista d'attesa in menu-admin.html).
 // v 2026.09.30.05 — Carta EN/FR: allergeni scritti sotto ogni piatto (riga piccola in corsivo, es. "gluten, milk"), solo a schermo — in stampa resta la pagina allergeni finale (la pagina A4 ha altezza fissa). Nuova renderAllergeniInline() iniettata con renderAllergeniPage(), stessi dati MENU.allergeni. Italiano invariato (scelta di Andrea). Attivo dalla prossima pubblicazione della carta.
@@ -674,6 +675,7 @@ function costruisciOutput() {
       + '  <button class="ctrl-btn" onclick="window.print()">\u26a1 Stampa</button>\n'
       + '  <div class="ctrl-sep"></div>\n'
       + _SIZE_BTNS
+      + _TIPI_BTNS
       + '</div>\n'
       + _STAMPA_HINT;
     html = html.replace('<body>\n', '<body>\n' + CTRL_BAR);
@@ -700,6 +702,18 @@ var _qrBase64 = null;   // base64 del nuovo QR selezionato (separato dal MENU)
 
 // Pulsanti dimensione/spaziatura per la barra della preview (carta + dolci).
 // Chiamano le funzioni _sz* definite nello <script> della pagina (CARTA_TPL_A / menu-dolci.html).
+// Dimensione per tipologia (solo carta): −/+ da 0,5 pt, valore in pt di stampa. Funzioni _szT/_szTipi nello script della pagina (CARTA_TPL_A).
+var _TIPI_BTNS = (function () {
+  var tipi = [['tit', 'Titoli sezione'], ['piatto', 'Nome piatto'], ['desc', 'Descrizione'], ['prezzo', 'Prezzo'], ['degu', 'Degustazione'], ['note', 'Note ospite']];
+  var h = '  <div style="flex-basis:100%;height:0"></div>\n';
+  tipi.forEach(function (t) {
+    h += '  <span class="tipo-grp"><span class="tipo-lbl">' + t[1] + '</span>'
+      + '<button class="ctrl-btn" onclick="_szT(\'' + t[0] + '\',-0.5)" title="' + t[1] + ' pi\u00f9 piccolo">\u2212</button>'
+      + '<span class="sz-val" id="szT-' + t[0] + '"></span>'
+      + '<button class="ctrl-btn" onclick="_szT(\'' + t[0] + '\',0.5)" title="' + t[1] + ' pi\u00f9 grande">+</button></span>\n';
+  });
+  return h;
+})();
 var _SIZE_BTNS =
     '  <button class="ctrl-btn" onclick="_szF(0.03)" title="Caratteri piu grandi">A+</button>\n'
   + '  <button class="ctrl-btn" onclick="_szF(-0.03)" title="Caratteri piu piccoli">A−</button>\n'
@@ -726,6 +740,7 @@ function salvaImpostazioniStampa(vals) {
   dati.lineScale = vals.lh;
   dati.gapScale  = vals.gap;
   dati.shift     = vals.shift;
+  if (vals.k) dati.tipoScale = vals.k; // dimensioni per tipologia (solo carta)
   alert('Impostazioni di stampa fissate come predefinite. Premi "Pubblica" per renderle permanenti sul sito.');
 }
 
@@ -1071,6 +1086,7 @@ function eseguiPubblicazione(token) {
       if (dati.lineScale != null) m.lineScale = dati.lineScale;
       if (dati.gapScale  != null) m.gapScale  = dati.gapScale;
       if (dati.shift     != null) m.shift     = dati.shift;
+      if (dati.tipoScale != null) m.tipoScale = dati.tipoScale;
     }
     // F0.21-d: accorpa i dolci nella carta SOLO per le lingue (IT resta separato/stampato).
     var mDolci = costruisciDolciPerCarta(lang);

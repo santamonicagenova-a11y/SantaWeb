@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.10.02.04 (+ footer-version) — Chiusure/aperture di giorno e di singolo orario e limiti posti spostati da «Orari di Apertura» a «Prenotazioni — Setup» (riquadri colorati; stessi campi, stesse funzioni). -->
 <!-- v 2026.10.02.03 (+ footer-version) — Prenotazioni — Setup: gli argomenti (Garanzia, Serate speciali, mail M1-M4) in riquadri di colore diverso, come in Food Cost. Solo grafica. -->
 <!-- v 2026.10.02.02 (+ footer-version; set-reservations-config v12, reservations-status v11, prenota.html v 2026.10.02.01) — Prenotazioni — Setup: nuovo box «Serate speciali (cene a tema)»: data, orario, posti, titolo, pagina dedicata, carta a garanzia sì/no. Il sito resta prenotabile solo per quell'orario con un avviso nel wizard (serata particolare, senza menù alla carta, link alla pagina); i controlli server restano quelli esistenti (apertura orario, limite posti, data carta). -->
 <!-- v 2026.10.02.01 (+ footer-version; backend foodcost-admin v19) — Food Cost → Tracciabilità: il codice NN-MMAA non riparte più da 01 a ogni mese ma prosegue la numerazione (465-0926 → 466-1026). Corrette a mano le due righe del 2/10 (Seppie 466-1026, Baccalà 467-1026). admin-core.js invariato. -->
@@ -1922,6 +1923,131 @@
 
       <button class="btn btn-publish" style="margin-top:1rem;" onclick="saveMailTexts()">💾 Salva testi mail</button>
 
+      <div class="sub" style="margin-top:2rem;font-size:1rem;">📅 Eccezioni su date e orari</div>
+      <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .4rem;line-height:1.5;">Chiusure, aperture straordinarie e limiti posti su una singola data o su un singolo orario. Spostate qui dagli "Orari di Apertura": funzionano come prima.</p>
+      <div class="pset-box" style="--c:var(--rust);">
+      <div class="sub">⛔ Chiudi un giorno specifico</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
+        <div>
+          <span class="opt-lbl">Data</span>
+          <input type="date" id="pren-closure-date" style="width:auto;" />
+        </div>
+        <div>
+          <span class="opt-lbl">Servizio</span>
+          <select id="pren-closure-service" style="padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);">
+            <option value="tutto">Tutto il giorno</option>
+            <option value="pranzo">Solo pranzo</option>
+            <option value="cena">Solo cena</option>
+          </select>
+        </div>
+        <button class="btn btn-publish" onclick="addPrenClosure()">+ Aggiungi chiusura</button>
+      </div>
+
+      <div class="sub">Chiusure attive (da oggi in poi)</div>
+      <div id="pren-closures-list" style="font-size:.85rem;">&hellip;</div>
+      </div>
+
+      <div class="pset-box" style="--c:var(--green);">
+      <div class="sub">✅ Aperture straordinarie (apri un giorno/servizio normalmente chiuso)</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
+        <div>
+          <span class="opt-lbl">Data</span>
+          <input type="date" id="pren-opening-date" style="width:auto;" />
+        </div>
+        <div>
+          <span class="opt-lbl">Servizio</span>
+          <select id="pren-opening-service" style="padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);">
+            <option value="tutto">Tutto il giorno</option>
+            <option value="pranzo">Solo pranzo</option>
+            <option value="cena">Solo cena</option>
+          </select>
+        </div>
+        <button class="btn btn-publish" onclick="addPrenOpening()" style="background:var(--green);">+ Aggiungi apertura</button>
+      </div>
+      <div class="sub">Aperture attive (da oggi in poi)</div>
+      <div id="pren-openings-list" style="font-size:.85rem;">&hellip;</div>
+      </div>
+
+      <div class="pset-box" style="--c:#c0587a;">
+      <div class="sub">🕐 Chiudi un singolo orario (lasciando aperti gli altri)</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
+        <div>
+          <span class="opt-lbl">Data</span>
+          <input type="date" id="pren-slot-closure-date" style="width:auto;" />
+        </div>
+        <div>
+          <span class="opt-lbl">Orario</span>
+          <select id="pren-slot-closure-time" style="padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);">
+            <optgroup label="Pranzo">
+              <option value="12:30">12:30</option><option value="13:00">13:00</option><option value="13:30">13:30</option><option value="14:00">14:00</option>
+            </optgroup>
+            <optgroup label="Cena">
+              <option value="19:30">19:30</option><option value="20:00">20:00</option><option value="20:30">20:30</option><option value="21:00">21:00</option><option value="21:30">21:30</option><option value="22:00">22:00</option><option value="22:30">22:30</option>
+            </optgroup>
+          </select>
+        </div>
+        <button class="btn btn-publish" onclick="addPrenSlotClosure()">+ Chiudi orario</button>
+      </div>
+      <div class="sub">Orari chiusi (da oggi in poi)</div>
+      <div id="pren-slot-closures-list" style="font-size:.85rem;">&hellip;</div>
+      </div>
+
+      <div class="pset-box" style="--c:var(--blue);">
+      <div class="sub">➕ Apri un singolo orario extra (fuori dagli orari normali)</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
+        <div>
+          <span class="opt-lbl">Data</span>
+          <input type="date" id="pren-slot-opening-date" style="width:auto;" />
+        </div>
+        <div>
+          <span class="opt-lbl">Orario</span>
+          <select id="pren-slot-opening-time" style="padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);">
+            <optgroup label="Pranzo">
+              <option value="12:30">12:30</option><option value="13:00">13:00</option><option value="13:30">13:30</option><option value="14:00">14:00</option>
+            </optgroup>
+            <optgroup label="Cena">
+              <option value="19:30">19:30</option><option value="20:00">20:00</option><option value="20:30">20:30</option><option value="21:00">21:00</option><option value="21:30">21:30</option><option value="22:00">22:00</option><option value="22:30">22:30</option>
+            </optgroup>
+          </select>
+        </div>
+        <button class="btn btn-publish" onclick="addPrenSlotOpening()" style="background:var(--green);">+ Apri orario</button>
+      </div>
+      <div class="sub">Orari aperti extra (da oggi in poi)</div>
+      <div id="pren-slot-openings-list" style="font-size:.85rem;">&hellip;</div>
+      </div>
+
+      <div class="pset-box" style="--c:var(--violet);">
+      <div class="sub">👥 Limita i posti su un orario già aperto</div>
+      <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
+        Imposta un numero massimo di coperti (somma persone) per una data+orario specifici.
+        Quando viene raggiunto, il form del sito rifiuta nuove richieste per quello slot — gli altri orari restano regolari.
+      </p>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
+        <div>
+          <span class="opt-lbl">Data</span>
+          <input type="date" id="pren-slot-cap-date" style="width:auto;" />
+        </div>
+        <div>
+          <span class="opt-lbl">Orario</span>
+          <select id="pren-slot-cap-time" style="padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);">
+            <optgroup label="Pranzo">
+              <option value="12:30">12:30</option><option value="13:00">13:00</option><option value="13:30">13:30</option><option value="14:00">14:00</option>
+            </optgroup>
+            <optgroup label="Cena">
+              <option value="19:30">19:30</option><option value="20:00">20:00</option><option value="20:30">20:30</option><option value="21:00">21:00</option><option value="21:30">21:30</option><option value="22:00">22:00</option><option value="22:30">22:30</option>
+            </optgroup>
+          </select>
+        </div>
+        <div>
+          <span class="opt-lbl">Max posti</span>
+          <input type="number" id="pren-slot-cap-max" min="1" max="500" step="1" placeholder="es. 20" style="width:6rem;" />
+        </div>
+        <button class="btn btn-publish" onclick="addPrenSlotCap()">+ Imposta limite</button>
+      </div>
+      <div class="sub">Limiti impostati (solo quelli non ancora passati; ognuno vale SOLO per la sua data+orario specifici, non si ripete sui giorni successivi)</div>
+      <div id="pren-slot-caps-list" style="font-size:.85rem;">&hellip;</div>
+      </div>
+
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
         <button class="btn btn-load" onclick="chiudiSezionePrenotazioniSetup()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
         <span id="pren-setup-status" style="font-size:.75rem;color:var(--stone);margin-left:.5rem;"></span>
@@ -1945,8 +2071,8 @@
     <div class="fs-body">
       <p style="font-size:.82rem;color:var(--stone);margin-bottom:1rem;line-height:1.6;">
         Qui vivono TUTTI gli orari del ristorante: i <strong>periodi ricorrenti</strong> (es. "orario estivo",
-        "da ottobre in poi") e le <strong>eccezioni puntuali</strong> su una singola data (chiusure, aperture
-        straordinarie, limiti posti). Da qui li legge sia il sito pubblico (orari mostrati, JSON-LD,
+        "da ottobre in poi") mentre le <strong>eccezioni puntuali</strong> su una singola data (chiusure, aperture
+        straordinarie, limiti posti) sono in <strong>Prenotazioni — Setup</strong>. Da qui li legge sia il sito pubblico (orari mostrati, JSON-LD,
         disponibilità del wizard di prenotazione) sia il motore che valida le prenotazioni — un solo posto,
         niente file da tenere allineati a mano. Le modifiche usano il tuo token GitHub (lo stesso della
         pubblicazione).
@@ -2001,122 +2127,6 @@
       </div>
       <div id="faq-orari-status" style="margin-top:.6rem;font-size:.78rem;color:var(--stone);min-height:1.2em;"></div>
 
-      <hr style="border:none;border-top:1px solid var(--rule);margin:1.6rem 0 1.4rem;">
-
-      <div class="sub" style="margin-top:0;">Chiudi un giorno specifico</div>
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
-        <div>
-          <span class="opt-lbl">Data</span>
-          <input type="date" id="pren-closure-date" style="width:auto;" />
-        </div>
-        <div>
-          <span class="opt-lbl">Servizio</span>
-          <select id="pren-closure-service" style="padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);">
-            <option value="tutto">Tutto il giorno</option>
-            <option value="pranzo">Solo pranzo</option>
-            <option value="cena">Solo cena</option>
-          </select>
-        </div>
-        <button class="btn btn-publish" onclick="addPrenClosure()">+ Aggiungi chiusura</button>
-      </div>
-
-      <div class="sub">Chiusure attive (da oggi in poi)</div>
-      <div id="pren-closures-list" style="font-size:.85rem;">&hellip;</div>
-
-      <div class="sub" style="margin-top:1.4rem;">Aperture straordinarie (apri un giorno/servizio normalmente chiuso)</div>
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
-        <div>
-          <span class="opt-lbl">Data</span>
-          <input type="date" id="pren-opening-date" style="width:auto;" />
-        </div>
-        <div>
-          <span class="opt-lbl">Servizio</span>
-          <select id="pren-opening-service" style="padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);">
-            <option value="tutto">Tutto il giorno</option>
-            <option value="pranzo">Solo pranzo</option>
-            <option value="cena">Solo cena</option>
-          </select>
-        </div>
-        <button class="btn btn-publish" onclick="addPrenOpening()" style="background:var(--green);">+ Aggiungi apertura</button>
-      </div>
-      <div class="sub">Aperture attive (da oggi in poi)</div>
-      <div id="pren-openings-list" style="font-size:.85rem;">&hellip;</div>
-
-      <hr style="border:none;border-top:1px solid var(--rule);margin:1.6rem 0 0;">
-      <div class="sub" style="margin-top:1rem;">Chiudi un singolo orario (lasciando aperti gli altri)</div>
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
-        <div>
-          <span class="opt-lbl">Data</span>
-          <input type="date" id="pren-slot-closure-date" style="width:auto;" />
-        </div>
-        <div>
-          <span class="opt-lbl">Orario</span>
-          <select id="pren-slot-closure-time" style="padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);">
-            <optgroup label="Pranzo">
-              <option value="12:30">12:30</option><option value="13:00">13:00</option><option value="13:30">13:30</option><option value="14:00">14:00</option>
-            </optgroup>
-            <optgroup label="Cena">
-              <option value="19:30">19:30</option><option value="20:00">20:00</option><option value="20:30">20:30</option><option value="21:00">21:00</option><option value="21:30">21:30</option><option value="22:00">22:00</option><option value="22:30">22:30</option>
-            </optgroup>
-          </select>
-        </div>
-        <button class="btn btn-publish" onclick="addPrenSlotClosure()">+ Chiudi orario</button>
-      </div>
-      <div class="sub">Orari chiusi (da oggi in poi)</div>
-      <div id="pren-slot-closures-list" style="font-size:.85rem;">&hellip;</div>
-
-      <hr style="border:none;border-top:1px solid var(--rule);margin:1.6rem 0 0;">
-      <div class="sub" style="margin-top:1rem;">Apri un singolo orario extra (fuori dagli orari normali)</div>
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
-        <div>
-          <span class="opt-lbl">Data</span>
-          <input type="date" id="pren-slot-opening-date" style="width:auto;" />
-        </div>
-        <div>
-          <span class="opt-lbl">Orario</span>
-          <select id="pren-slot-opening-time" style="padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);">
-            <optgroup label="Pranzo">
-              <option value="12:30">12:30</option><option value="13:00">13:00</option><option value="13:30">13:30</option><option value="14:00">14:00</option>
-            </optgroup>
-            <optgroup label="Cena">
-              <option value="19:30">19:30</option><option value="20:00">20:00</option><option value="20:30">20:30</option><option value="21:00">21:00</option><option value="21:30">21:30</option><option value="22:00">22:00</option><option value="22:30">22:30</option>
-            </optgroup>
-          </select>
-        </div>
-        <button class="btn btn-publish" onclick="addPrenSlotOpening()" style="background:var(--green);">+ Apri orario</button>
-      </div>
-      <div class="sub">Orari aperti extra (da oggi in poi)</div>
-      <div id="pren-slot-openings-list" style="font-size:.85rem;">&hellip;</div>
-
-      <div class="sub" style="margin-top:1.4rem;">Limita i posti su un orario già aperto</div>
-      <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
-        Imposta un numero massimo di coperti (somma persone) per una data+orario specifici.
-        Quando viene raggiunto, il form del sito rifiuta nuove richieste per quello slot — gli altri orari restano regolari.
-      </p>
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:1rem;">
-        <div>
-          <span class="opt-lbl">Data</span>
-          <input type="date" id="pren-slot-cap-date" style="width:auto;" />
-        </div>
-        <div>
-          <span class="opt-lbl">Orario</span>
-          <select id="pren-slot-cap-time" style="padding:.3rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);font-family:Inter,sans-serif;font-size:.82rem;color:var(--ink);">
-            <optgroup label="Pranzo">
-              <option value="12:30">12:30</option><option value="13:00">13:00</option><option value="13:30">13:30</option><option value="14:00">14:00</option>
-            </optgroup>
-            <optgroup label="Cena">
-              <option value="19:30">19:30</option><option value="20:00">20:00</option><option value="20:30">20:30</option><option value="21:00">21:00</option><option value="21:30">21:30</option><option value="22:00">22:00</option><option value="22:30">22:30</option>
-            </optgroup>
-          </select>
-        </div>
-        <div>
-          <span class="opt-lbl">Max posti</span>
-          <input type="number" id="pren-slot-cap-max" min="1" max="500" step="1" placeholder="es. 20" style="width:6rem;" />
-        </div>
-        <button class="btn btn-publish" onclick="addPrenSlotCap()">+ Imposta limite</button>
-      </div>
-      <div class="sub">Limiti impostati (solo quelli non ancora passati; ognuno vale SOLO per la sua data+orario specifici, non si ripete sui giorni successivi)</div>
-      <div id="pren-slot-caps-list" style="font-size:.85rem;">&hellip;</div>
 
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
         <button class="btn btn-load" onclick="chiudiSezioneOrariApertura()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
@@ -2575,6 +2585,11 @@ function apriSezionePrenotazioniSetup() {
   document.getElementById('intro').style.display = 'none';
   _pulisciViste();
   document.getElementById('prenotazioni-setup-section').style.display = 'block';
+  var oggiSetup = new Date().toISOString().slice(0, 10);
+  ['pren-closure-date', 'pren-opening-date', 'pren-slot-closure-date', 'pren-slot-opening-date', 'pren-slot-cap-date', 'pren-se-date'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.min = oggiSetup;
+  });
   loadPrenStatus();
 }
 
@@ -8340,7 +8355,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.02.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.02.04</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

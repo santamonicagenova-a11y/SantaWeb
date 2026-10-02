@@ -2,7 +2,8 @@
 <!--
   prenota.html — Wizard prenotazioni con carta a garanzia obbligatoria
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.10.02.01
+  Versione: v 2026.10.02.02
+  v 2026.10.02.02 — Parametro ?data=YYYY-MM-DD: il wizard si apre con la data già scelta, dal passo 2.
   v 2026.10.02.01 — SERATE SPECIALI (cene a tema): reservations-status v11 espone special_evenings
   ([{date,time,title,url,card}]). Se la data scelta è una serata speciale il wizard mostra, dal
   passo 2 al 5, un avviso: «serata particolare, senza menù alla carta» col titolo e il link alla
@@ -990,6 +991,15 @@
       if (resumeId) { initResume(resumeId); return; }
       renderCalendar();
       renderPersone();
+      // ?data=YYYY-MM-DD (v 2026.10.02.02): arrivo da un link con la data già scelta (es. pagina
+      // cene a tema) → si parte dal passo 2 «In quanti sarete?». Data non valida/chiusa/al
+      // completo: si resta al passo 1.
+      var dataParam = params.get('data');
+      if (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam) && dayStatus(dataParam) === 'selectable') {
+        var pd = dataParam.split('-');
+        state.calMonth = new Date(Number(pd[0]), Number(pd[1]) - 1, 1);
+        selectDate(dataParam);
+      }
     });
   }
   init();

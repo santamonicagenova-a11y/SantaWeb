@@ -1,14 +1,14 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-10-02",
- "versione": "2026.10.02.13",
- "briefing": "**Briefing 2/10/2026** — **Sito** (live): chiusa la serie di idee 8 → 9 → 15 → 10 → 11 → 12. Nuovi: filtro allergeni per l'ospite nei menu online, allergeni sotto i piatti in EN/FR, quadro dei buoni regalo non ancora usati, lista d'attesa da /prenota con avviso delle disdette, carta a garanzia per i tavoli da 6 e per le date speciali, note dell'ospite nel gestionale e mail del lunedì con compleanni e anniversari. Oggi (2/10) il gestionale chiede il token GitHub anche per la vista giorno e la ricerca, come già per Arrivato/No-show; e nella Tracciabilità del pesce il codice non riparte più da 01 a ogni mese (Seppie 466-1026, Baccalà 467-1026): provato da te, tutto ok. **Aspetta te**: inserire compleanni/anniversari in anagrafica (senza date la mail non parte), % porzione della degustazione, risalvare le vendite di settembre, valutare una riga privacy per la lista d'attesa; al prossimo carico di pesce il codice deve essere 468-1026. **Prossimo**: idee 1, 7 e 14.",
+ "versione": "2026.10.02.14",
+ "briefing": "**Briefing 2/10/2026 (sera)** — **Sito** (live): nuove **cene a tema**. Pagina `/cene-a-tema` (IT/EN/FR) con voce «Serate» nel menu, banner overlay in home con la foto di Anna e Riku, loghi Bellenda e Château Puybarbe con link. In menu-admin → Prenotazioni — Setup nuovo box **Serate speciali** (data, orario, posti, titolo con tendina dei titoli già usati, carta a garanzia sì/no): il sito resta prenotabile solo all'orario della serata, con avviso nel wizard; Setup ora a riquadri colorati e con le eccezioni di date/orari spostate dagli Orari di Apertura. Cena del 16/10: ore 20, 60 € tutto compreso, 16 posti, carta a garanzia. Il codice del banner resta per le prossime serate. **Aspetta te**: provare dal pannello «Salva serata speciale» (non provato da Claude), mandare menù e abbinamenti dei vini; restano compleanni/anniversari, % porzione degustazione e le altre voci di ieri. **Prossimo**: menù della serata in pagina, poi idee 1, 7 e 14.",
  "kpi": {
-  "aperte": 59,
+  "aperte": 60,
   "scadute": 4,
   "bloccate": 1,
-  "andrea": 17,
-  "debiti": 10,
+  "andrea": 18,
+  "debiti": 11,
   "chiuse30": 50
  },
  "subs": {
@@ -35,15 +35,15 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 118,
+   "tot": 119,
    "done": 98,
    "prog": 2,
-   "up": 5,
+   "up": 6,
    "future": 13,
    "bloccato": 0,
    "scadute": 0,
-   "andrea": 7,
-   "debiti": 8
+   "andrea": 8,
+   "debiti": 9
   },
   "Marketing": {
    "tot": 36,
@@ -174,6 +174,18 @@ window.JARVIS_DATA = {
    "az": "Mandare a Claude il menù con i vini in abbinamento: lo aggiungo alla pagina /cene-a-tema",
    "bl": null,
    "deb": false,
+   "agg": "2026-10-02"
+  },
+  {
+   "t": "Serate speciali: provare dal pannello «Salva serata speciale» e «Modifica» sulla cena del 16/10",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-10-02",
+   "e": "2026-10-09",
+   "own": "Andrea",
+   "az": "menu-admin → Prenotazioni — Setup → Serate speciali: aprire la serata del 16/10 con «Modifica», salvarla e controllare che nel wizard /prenota compaia l'avviso e solo il 20:00 con 16 posti",
+   "bl": null,
+   "deb": true,
    "agg": "2026-10-02"
   },
   {
@@ -394,6 +406,18 @@ window.JARVIS_DATA = {
    "az": "Mandare a Claude il menù con i vini in abbinamento: lo aggiungo alla pagina /cene-a-tema",
    "bl": null,
    "deb": false,
+   "agg": "2026-10-02"
+  },
+  {
+   "t": "Serate speciali: provare dal pannello «Salva serata speciale» e «Modifica» sulla cena del 16/10",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-10-02",
+   "e": "2026-10-09",
+   "own": "Andrea",
+   "az": "menu-admin → Prenotazioni — Setup → Serate speciali: aprire la serata del 16/10 con «Modifica», salvarla e controllare che nel wizard /prenota compaia l'avviso e solo il 20:00 con 16 posti",
+   "bl": null,
+   "deb": true,
    "agg": "2026-10-02"
   },
   {

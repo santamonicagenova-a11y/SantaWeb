@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.02.13",
+  version: "2026.10.02.14",
   updated: "2026-10-02",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -135,6 +135,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Cena 16/10: impostare in menu-admin la data speciale con carta a garanzia e il limite di 16 posti', s:'2026-10-02', e:'2026-10-09', st:'done'},
       {t:'Cena 16/10: menu e vini in abbinamento da inserire nella pagina (orario e quota già confermati)', s:'2026-10-02', e:'2026-10-09', st:'up'},
       {t:'Cena a tema 16/10 (Santamonica × Bellenda, Château Puybarbe): pagina /cene-a-tema IT/EN/FR + banner temporaneo in home', s:'2026-10-02', e:'2026-10-02', st:'done'},
+      {t:'Serate speciali: provare dal pannello «Salva serata speciale» e «Modifica» sulla cena del 16/10', s:'2026-10-02', e:'2026-10-09', st:'up'},
       {t:'Serate speciali (cene a tema): setup in menu-admin e avviso nel wizard di prenotazione', s:'2026-10-02', e:'2026-10-02', st:'done'},
     ]},
     { key:'seo', name:'SEO & GEO', badge:'progetto-seo', tasks:[

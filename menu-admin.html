@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.10.02.05 (+ footer-version; reservations-status v12) — Serate speciali: tendina con i titoli già usati (compila titolo, pagina, orario, posti, carta; resta da scegliere la data) e casella carta a garanzia allineata col testo. -->
 <!-- v 2026.10.02.04 (+ footer-version) — Chiusure/aperture di giorno e di singolo orario e limiti posti spostati da «Orari di Apertura» a «Prenotazioni — Setup» (riquadri colorati; stessi campi, stesse funzioni). -->
 <!-- v 2026.10.02.03 (+ footer-version) — Prenotazioni — Setup: gli argomenti (Garanzia, Serate speciali, mail M1-M4) in riquadri di colore diverso, come in Food Cost. Solo grafica. -->
 <!-- v 2026.10.02.02 (+ footer-version; set-reservations-config v12, reservations-status v11, prenota.html v 2026.10.02.01) — Prenotazioni — Setup: nuovo box «Serate speciali (cene a tema)»: data, orario, posti, titolo, pagina dedicata, carta a garanzia sì/no. Il sito resta prenotabile solo per quell'orario con un avviso nel wizard (serata particolare, senza menù alla carta, link alla pagina); i controlli server restano quelli esistenti (apertura orario, limite posti, data carta). -->
@@ -1852,10 +1853,10 @@
         <div><span class="opt-lbl">Posti</span><input type="number" id="pren-se-seats" min="1" max="500" step="1" placeholder="es. 16" style="width:6rem;" /></div>
       </div>
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:.8rem;">
-        <div style="flex:1;min-width:14rem;"><span class="opt-lbl">Titolo della serata (appare nell'avviso)</span><input type="text" id="pren-se-title" maxlength="120" placeholder="es. Cena con Bellenda · Château Peyral" style="width:100%;" /></div>
+        <div style="flex:1;min-width:14rem;"><span class="opt-lbl">Titolo della serata (appare nell'avviso)</span><select id="pren-se-preset" onchange="scegliTitoloSerata()" style="width:100%;margin-bottom:.4rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);color:var(--ink);border-radius:var(--radius);font-family:Inter,sans-serif;"><option value="">— scegli un titolo già usato —</option></select><input type="text" id="pren-se-title" maxlength="120" placeholder="es. Cena con Bellenda · Château Peyral" style="width:100%;" /></div>
         <div style="flex:1;min-width:10rem;"><span class="opt-lbl">Pagina dedicata</span><input type="text" id="pren-se-url" maxlength="200" value="/cene-a-tema" style="width:100%;" /></div>
       </div>
-      <label style="display:flex;align-items:center;gap:.4rem;font-size:.82rem;margin-bottom:.8rem;"><input type="checkbox" id="pren-se-card" checked /> Chiedi la carta di credito a garanzia per questa serata</label>
+      <label style="display:flex;align-items:center;justify-content:flex-start;gap:.5rem;font-size:.82rem;margin-bottom:.8rem;text-align:left;"><input type="checkbox" id="pren-se-card" checked style="width:auto;margin:0;flex:none;" /> <span>Chiedi la carta di credito a garanzia per questa serata</span></label>
       <button class="btn btn-publish" onclick="saveSpecialEvening()">💾 Salva serata speciale</button>
       <div id="pren-se-list" style="font-size:.82rem;margin:1rem 0 0;"></div>
       </div>
@@ -2793,6 +2794,7 @@ function loadPrenStatus() {
       prenState.slot_openings = (d && d.slot_openings) || [];
       prenState.slot_caps = (d && d.slot_caps) || [];
       prenState.special_evenings = (d && Array.isArray(d.special_evenings)) ? d.special_evenings : [];
+      prenState.special_templates = (d && Array.isArray(d.special_templates)) ? d.special_templates : [];
       renderPrenUI();
       _prenSetStatus('');
     })
@@ -2934,7 +2936,30 @@ function saveCardRules() {
 // v 2026.10.02.02 — Serate speciali (cene a tema): set-reservations-config v12 (azioni
 // set_special_evening / remove_special_evening), reservations-status v11 (special_evenings),
 // avviso nel wizard prenota.html v 2026.10.02.01.
+function _riempiTendinaTitoli() {
+  var sel = document.getElementById('pren-se-preset');
+  if (!sel) return;
+  var visti = {};
+  var tpl = (prenState.special_templates || []).filter(function (t) { if (!t.title || visti[t.title]) return false; visti[t.title] = 1; return true; });
+  sel.innerHTML = '<option value="">— scegli un titolo già usato —</option>' + tpl.map(function (t, i) {
+    return '<option value="' + i + '">' + _escHtmlSe(t.title) + '</option>';
+  }).join('');
+  sel._tpl = tpl;
+}
+function scegliTitoloSerata() {
+  var sel = document.getElementById('pren-se-preset');
+  if (!sel || sel.value === '') return;
+  var t = (sel._tpl || [])[Number(sel.value)];
+  if (!t) return;
+  document.getElementById('pren-se-title').value = t.title || '';
+  document.getElementById('pren-se-url').value = t.url || '/cene-a-tema';
+  if (t.time) document.getElementById('pren-se-time').value = t.time;
+  document.getElementById('pren-se-seats').value = t.seats != null ? t.seats : '';
+  document.getElementById('pren-se-card').checked = t.card === true;
+  _prenSetStatus('Titolo e impostazioni caricati: scegli la data e premi «Salva serata speciale».');
+}
 function _renderSpecialEvenings() {
+  _riempiTendinaTitoli();
   var box = document.getElementById('pren-se-list');
   if (!box) return;
   var oggi = new Date().toISOString().slice(0, 10);
@@ -8355,7 +8380,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.02.04</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.02.05</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

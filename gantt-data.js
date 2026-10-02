@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.02.02",
+  version: "2026.10.02.03",
   updated: "2026-10-02",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -67,7 +67,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Pannello "Pacchi No-show" in sola lettura in menu-admin (elenco pacchi da NoShowApp)', s:'2026-07-26', st:'done', ms:true},
       {t:'Cliente segnalato (pacchi No-show) in mail M1bis + gestionale (nome rosso→arancione dopo redenzione)', s:'2026-07-27', st:'done', ms:true},
       {t:'Ripristino orari pre-estivi dal 1/9 (contenuti statici JSON-LD/FAQ aggiornati dal task schedulato 28/8; foglio stampa menu.html/menu-it.html già corretto sul live; disponibilità prenotazioni già corretta da prima)', s:'2026-08-28', e:'2026-09-01', st:'done', ms:true},
-      {t:'Chiusura cena domenica dal 1/10, senza data di ripristino (contenuti statici — disponibilità già corretta) — task schedulato 27/9', s:'2026-10-01', e:'2026-10-01', st:'up', ms:true},
+      {t:'Chiusura cena domenica dal 1/10, senza data di ripristino (contenuti statici — disponibilità già corretta) — task schedulato 27/9', s:'2026-10-01', e:'2026-10-01', st:'done', ms:true},
       {t:'Gestionale — Fase 2 CRM ospiti: clienti.html LIVE (storico da reservations + note/tag + clienti manuali)', s:'2026-09-01', st:'done', ms:true},
       {t:'CRM: dati per newsletter/marketing (colonna consenso, filtro, export CSV) + verifica reale iscrizione Brevo', s:'2026-09-01', st:'done', ms:true},
       {t:'CRM integrato nel gestionale prenotazioni: badge cliente abituale + modifica prenotazione + link anagrafica', s:'2026-09-01', st:'done', ms:true},

@@ -47,6 +47,17 @@
 //   quando i coperti sono >= soglia. card_special_dates (array di YYYY-MM-DD): date speciali in
 //   cui la carta è sempre chiesta. Entrambe nello stato. Lette da create-reservation-checkout
 //   (v10) e reservations-status (v10). Primo sorgente di questa funzione messo nel repo.
+// v12 (2026-10-02): NUOVO — SERATE SPECIALI (cene a tema). Azioni set_special_evening /
+//   remove_special_evening. Una serata speciale è una data in cui il sito resta prenotabile ma
+//   SOLO per un orario e con un avviso nel wizard (niente menù alla carta, link alla pagina
+//   dedicata). Dati in reservation_settings.special_evenings (jsonb: [{date,time,title,url,card,
+//   seats}]). Per riusare i controlli già presenti lato server (create-reservation-checkout /
+//   submit-reservation, che NON cambiano) il salvataggio scrive anche: reservation_slot_openings
+//   (date,time) = l'orario evento è prenotabile anche se il servizio è chiuso; chiusura del
+//   servizio (cena/pranzo) per quella data se manca = gli altri orari non sono offerti;
+//   reservation_slot_caps (date,time,seats) se i posti sono indicati; card_special_dates += date
+//   se card=true (carta a garanzia). remove_special_evening toglie avviso, apertura orario, limite
+//   posti e data carta; NON riapre il servizio chiuso (decisione dell'admin).
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
@@ -129,7 +140,7 @@ async function verifyGithubToken(token: string): Promise<boolean> {
 async function currentState() {
   const today = new Date().toISOString().slice(0, 10);
   const [s, c, o, sc, so, caps] = await Promise.all([
-    supabase.from("reservation_settings").select("online_open, card_required_days, card_min_persone, card_special_dates, penale_eur, ore_disdetta_default, m1_subject, m1_intro, m1_closing, confirm_subject, confirm_intro, confirm_closing, reply_subject, reply_intro, reply_closing, thankyou_enabled, thankyou_subject, thankyou_intro, thankyou_closing, opening_periods").eq("id", 1).single(),
+    supabase.from("reservation_settings").select("online_open, card_required_days, card_min_persone, card_special_dates, penale_eur, ore_disdetta_default, m1_subject, m1_intro, m1_closing, confirm_subject, confirm_intro, confirm_closing, reply_subject, reply_intro, reply_closing, thankyou_enabled, thankyou_subject, thankyou_intro, thankyou_closing, opening_periods, special_evenings").eq("id", 1).single(),
     supabase.from("reservation_closures").select("closure_date, service").gte("closure_date", today).order("closure_date"),
     supabase.from("reservation_openings").select("opening_date, service").gte("opening_date", today).order("opening_date"),
     supabase.from("reservation_slot_closures").select("slot_date, slot_time").gte("slot_date", today).order("slot_date"),
@@ -176,6 +187,7 @@ async function currentState() {
     thankyou_intro: (s.data && s.data.thankyou_intro) || MAIL_TEXT_DEFAULTS.thankyou_intro,
     thankyou_closing: (s.data && s.data.thankyou_closing) || MAIL_TEXT_DEFAULTS.thankyou_closing,
     opening_periods: (s.data && s.data.opening_periods) || [],
+    special_evenings: s.data && Array.isArray(s.data.special_evenings) ? s.data.special_evenings : [],
     closures: (c.data || []).map((x: any) => ({ date: x.closure_date, service: x.service })),
     openings: (o.data || []).map((x: any) => ({ date: x.opening_date, service: x.service })),
     slot_closures: (sc.data || []).map((x: any) => ({ date: x.slot_date, time: x.slot_time })),
@@ -487,6 +499,75 @@ Deno.serve(async (req) => {
         .eq("slot_date", date)
         .eq("slot_time", time);
       if (error) throw error;
+
+    } else if (action === "set_special_evening") {
+      const date = String(body.date || "").trim();
+      const time = String(body.time || "").trim();
+      const title = String(body.title || "").trim();
+      const url = String(body.url || "").trim() || "/cene-a-tema";
+      const card = body.card === true;
+      let seats: number | null = null;
+      if (body.seats !== null && body.seats !== undefined && String(body.seats).trim() !== "") {
+        seats = Number(body.seats);
+        if (!Number.isInteger(seats) || seats < 1 || seats > 500) return json({ error: "Numero di posti non valido (1-500, o vuoto per nessun limite)" }, 400);
+      }
+      if (!DATE_RE.test(date)) return json({ error: "Data non valida (atteso YYYY-MM-DD)" }, 400);
+      if (date < new Date().toISOString().slice(0, 10)) return json({ error: "La data è già passata" }, 400);
+      const knownSlots = await getKnownSlots();
+      if (!knownSlots.includes(time)) return json({ error: "Orario non valido" }, 400);
+      if (title.length < 3 || title.length > 120) return json({ error: "Titolo della serata obbligatorio (3-120 caratteri)" }, 400);
+      if (!(url.startsWith("/") && !url.startsWith("//")) && !url.startsWith("https://santamonicagenova.it")) {
+        return json({ error: "Il link deve essere una pagina del sito (es. /cene-a-tema)" }, 400);
+      }
+      if (url.length > 200) return json({ error: "Link troppo lungo" }, 400);
+
+      const { data: st, error: stErr } = await supabase.from("reservation_settings").select("special_evenings, card_special_dates").eq("id", 1).single();
+      if (stErr) throw stErr;
+      const list: any[] = Array.isArray(st?.special_evenings) ? st.special_evenings : [];
+      const prev = list.find((e: any) => e.date === date);
+      if (prev && prev.time && prev.time !== time) {
+        await supabase.from("reservation_slot_openings").delete().eq("slot_date", date).eq("slot_time", prev.time);
+        await supabase.from("reservation_slot_caps").delete().eq("slot_date", date).eq("slot_time", prev.time);
+      }
+      const next = list.filter((e: any) => e.date !== date).concat([{ date, time, title, url, card, seats }]).sort((a: any, b: any) => (a.date < b.date ? -1 : 1));
+      const cardDates: string[] = (Array.isArray(st?.card_special_dates) ? st.card_special_dates : []).map((x: any) => String(x).slice(0, 10)).filter((d: string) => d !== date);
+      if (card) cardDates.push(date);
+      cardDates.sort();
+      const { error: upErr } = await supabase.from("reservation_settings")
+        .update({ special_evenings: next, card_special_dates: cardDates, updated_at: new Date().toISOString() }).eq("id", 1);
+      if (upErr) throw upErr;
+
+      const { error: opErr } = await supabase.from("reservation_slot_openings").upsert({ slot_date: date, slot_time: time }, { onConflict: "slot_date,slot_time" });
+      if (opErr) throw opErr;
+      const service = time < "15:00" ? "pranzo" : "cena";
+      const { data: clRows } = await supabase.from("reservation_closures").select("service").eq("closure_date", date).in("service", ["tutto", service]);
+      if (!clRows || clRows.length === 0) {
+        const { error: clErr } = await supabase.from("reservation_closures").upsert({ closure_date: date, service }, { onConflict: "closure_date,service" });
+        if (clErr) throw clErr;
+      }
+      if (seats !== null) {
+        const { error: capErr } = await supabase.from("reservation_slot_caps").upsert({ slot_date: date, slot_time: time, max_covers: seats }, { onConflict: "slot_date,slot_time" });
+        if (capErr) throw capErr;
+      } else {
+        await supabase.from("reservation_slot_caps").delete().eq("slot_date", date).eq("slot_time", time);
+      }
+
+    } else if (action === "remove_special_evening") {
+      const date = String(body.date || "").trim();
+      if (!DATE_RE.test(date)) return json({ error: "Data non valida (atteso YYYY-MM-DD)" }, 400);
+      const { data: st, error: stErr } = await supabase.from("reservation_settings").select("special_evenings, card_special_dates").eq("id", 1).single();
+      if (stErr) throw stErr;
+      const list: any[] = Array.isArray(st?.special_evenings) ? st.special_evenings : [];
+      const prev = list.find((e: any) => e.date === date);
+      if (!prev) return json({ error: "Serata non trovata" }, 404);
+      const cardDates = (Array.isArray(st?.card_special_dates) ? st.card_special_dates : []).map((x: any) => String(x).slice(0, 10)).filter((d: string) => d !== date);
+      const { error: upErr } = await supabase.from("reservation_settings")
+        .update({ special_evenings: list.filter((e: any) => e.date !== date), card_special_dates: cardDates, updated_at: new Date().toISOString() }).eq("id", 1);
+      if (upErr) throw upErr;
+      if (prev.time) {
+        await supabase.from("reservation_slot_openings").delete().eq("slot_date", date).eq("slot_time", prev.time);
+        await supabase.from("reservation_slot_caps").delete().eq("slot_date", date).eq("slot_time", prev.time);
+      }
 
     } else {
       return json({ error: "Azione non riconosciuta" }, 400);

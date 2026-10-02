@@ -3,6 +3,9 @@
 //   regola spenta) e card_special_dates (date in cui la carta è sempre chiesta) — garanzia
 //   carta mirata, letti da /prenota.html e dal pannello admin. Stessa regola lato server in
 //   create-reservation-checkout v10.
+// v11 (2026-10-02): aggiunto special_evenings ([{date,time,title,url,card}], solo date future) —
+//   serate speciali/cene a tema: il wizard /prenota.html mostra l'avviso con link alla pagina
+//   dedicata. Impostate da menu-admin (set-reservations-config v12).
 // v9 (2026-09-30): aggiunti thankyou_enabled/subject/intro/closing (mail di ringraziamento
 //   post-visita). menu-admin.html li leggeva già da qui ma non c'erano: il pannello
 //   "Prenotazioni — Setup" mostrava i campi vuoti e "Salva testi mail" rischiava di
@@ -56,7 +59,7 @@ Deno.serve(async (req) => {
   try {
     const today = new Date().toISOString().slice(0, 10);
     const [settingsRes, closuresRes, openingsRes, slotClosRes, slotOpenRes, slotCapsRes] = await Promise.all([
-      supabase.from("reservation_settings").select("online_open, card_required_days, card_min_persone, card_special_dates, penale_eur, ore_disdetta_default, m1_subject, m1_intro, m1_closing, confirm_subject, confirm_intro, confirm_closing, reply_subject, reply_intro, reply_closing, thankyou_enabled, thankyou_subject, thankyou_intro, thankyou_closing").eq("id", 1).single(),
+      supabase.from("reservation_settings").select("online_open, card_required_days, card_min_persone, card_special_dates, penale_eur, ore_disdetta_default, m1_subject, m1_intro, m1_closing, confirm_subject, confirm_intro, confirm_closing, reply_subject, reply_intro, reply_closing, thankyou_enabled, thankyou_subject, thankyou_intro, thankyou_closing, special_evenings").eq("id", 1).single(),
       supabase.from("reservation_closures").select("closure_date, service").gte("closure_date", today).order("closure_date"),
       supabase.from("reservation_openings").select("opening_date, service").gte("opening_date", today).order("opening_date"),
       supabase.from("reservation_slot_closures").select("slot_date, slot_time").gte("slot_date", today).order("slot_date"),
@@ -73,6 +76,9 @@ Deno.serve(async (req) => {
     const card_special_dates = settingsRes.data && Array.isArray(settingsRes.data.card_special_dates)
       ? settingsRes.data.card_special_dates.map((x: any) => String(x).slice(0, 10)).sort()
       : [];
+    const special_evenings = (settingsRes.data && Array.isArray(settingsRes.data.special_evenings) ? settingsRes.data.special_evenings : [])
+      .filter((e: any) => e && String(e.date) >= today)
+      .map((e: any) => ({ date: String(e.date).slice(0, 10), time: e.time, title: e.title, url: e.url, card: e.card === true }));
     const penale_eur = settingsRes.data && settingsRes.data.penale_eur != null ? Number(settingsRes.data.penale_eur) : 25;
     const ore_disdetta_default = settingsRes.data && settingsRes.data.ore_disdetta_default != null ? Number(settingsRes.data.ore_disdetta_default) : 24;
     const sd = settingsRes.data || {};
@@ -112,7 +118,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(JSON.stringify({
-      online_open, card_required_days, card_min_persone, card_special_dates, penale_eur, ore_disdetta_default,
+      online_open, card_required_days, card_min_persone, card_special_dates, special_evenings, penale_eur, ore_disdetta_default,
       m1_subject, m1_intro, m1_closing, confirm_subject, confirm_intro, confirm_closing,
       reply_subject, reply_intro, reply_closing,
       thankyou_enabled, thankyou_subject, thankyou_intro, thankyou_closing,
@@ -123,7 +129,7 @@ Deno.serve(async (req) => {
     });
   } catch (err) {
     console.error("reservations-status error (fail-open):", err);
-    return new Response(JSON.stringify({ fallback: true, online_open: true, card_required_days: [0,1,2,3,4,5,6], card_min_persone: null, card_special_dates: [], penale_eur: 25, ore_disdetta_default: 24, closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [] }), {
+    return new Response(JSON.stringify({ fallback: true, online_open: true, card_required_days: [0,1,2,3,4,5,6], card_min_persone: null, card_special_dates: [], special_evenings: [], penale_eur: 25, ore_disdetta_default: 24, closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [] }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "no-store" },
     });

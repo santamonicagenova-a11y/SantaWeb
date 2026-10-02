@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.10.02.02 (+ footer-version; set-reservations-config v12, reservations-status v11, prenota.html v 2026.10.02.01) — Prenotazioni — Setup: nuovo box «Serate speciali (cene a tema)»: data, orario, posti, titolo, pagina dedicata, carta a garanzia sì/no. Il sito resta prenotabile solo per quell'orario con un avviso nel wizard (serata particolare, senza menù alla carta, link alla pagina); i controlli server restano quelli esistenti (apertura orario, limite posti, data carta). -->
 <!-- v 2026.10.02.01 (+ footer-version; backend foodcost-admin v19) — Food Cost → Tracciabilità: il codice NN-MMAA non riparte più da 01 a ogni mese ma prosegue la numerazione (465-0926 → 466-1026). Corrette a mano le due righe del 2/10 (Seppie 466-1026, Baccalà 467-1026). admin-core.js invariato. -->
 <!-- v 2026.09.30.08 (+ footer-version; set-reservations-config v11, reservations-status v10, create-reservation-checkout v10, prenota.html v 2026.09.30.02) — Prenotazioni online: carta a garanzia anche per i tavoli da N persone in su (impostato 6) e nelle date speciali scelte qui, oltre ai giorni della settimana. Idea 11 approvata da Andrea. admin-core invariato. -->
 <!-- v 2026.09.30.07 (bump ?v= admin-core.js a 2026.09.30.06 + footer-version) — Nuovo pannello «Lista d'attesa» (Prenotazioni e voucher): iscrizioni dal sito (prenota.html v 2026.09.30.01, edge function lista-attesa), stato In attesa/Contattato/Prenotato/Annullato; alla disdetta arriva la mail ad Andrea (pg_cron waitlist-tick). Idea 10 approvata da Andrea. -->
@@ -1826,6 +1827,31 @@
       </div>
 
       <hr style="border:none;border-top:1px solid var(--rule);margin:1.6rem 0 0;">
+      <div class="sub" style="margin-top:1rem;">Serate speciali (cene a tema)</div>
+      <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
+        Per le serate come una cena a tema: il sito resta prenotabile online <strong>solo per l'orario che indichi</strong>,
+        e nel wizard <code>/prenota.html</code> compare un avviso («serata particolare, senza menù alla carta») con il link
+        alla pagina dedicata. Salvando, il servizio di quella sera viene chiuso agli altri orari, l'orario della serata resta
+        prenotabile, e se indichi i posti il sito si ferma a quel numero. Spunta la carta a garanzia se la vuoi per questa serata.
+        Se ripeti la stessa data, la serata viene aggiornata.
+      </p>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:.8rem;">
+        <div><span class="opt-lbl">Data</span><input type="date" id="pren-se-date" style="width:auto;" /></div>
+        <div><span class="opt-lbl">Orario</span>
+          <select id="pren-se-time" style="width:auto;">
+            <option>19:30</option><option selected>20:00</option><option>20:30</option><option>21:00</option><option>21:30</option>
+          </select></div>
+        <div><span class="opt-lbl">Posti</span><input type="number" id="pren-se-seats" min="1" max="500" step="1" placeholder="es. 16" style="width:6rem;" /></div>
+      </div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end;margin-bottom:.8rem;">
+        <div style="flex:1;min-width:14rem;"><span class="opt-lbl">Titolo della serata (appare nell'avviso)</span><input type="text" id="pren-se-title" maxlength="120" placeholder="es. Cena con Bellenda · Château Peyral" style="width:100%;" /></div>
+        <div style="flex:1;min-width:10rem;"><span class="opt-lbl">Pagina dedicata</span><input type="text" id="pren-se-url" maxlength="200" value="/cene-a-tema" style="width:100%;" /></div>
+      </div>
+      <label style="display:flex;align-items:center;gap:.4rem;font-size:.82rem;margin-bottom:.8rem;"><input type="checkbox" id="pren-se-card" checked /> Chiedi la carta di credito a garanzia per questa serata</label>
+      <button class="btn btn-publish" onclick="saveSpecialEvening()">💾 Salva serata speciale</button>
+      <div id="pren-se-list" style="font-size:.82rem;margin:1rem 0 0;"></div>
+
+      <hr style="border:none;border-top:1px solid var(--rule);margin:1.6rem 0 0;">
       <div class="sub" style="margin-top:1rem;">Testi delle mail ai clienti</div>
       <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
         Puoi modificare solo <strong>oggetto, frase di apertura e frase di chiusura</strong> di ciascuna mail — la
@@ -2472,7 +2498,7 @@
 // usato per la pubblicazione. Vedi progetto-sito CLAUDE.md sessione 13.
 var PREN_STATUS_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/reservations-status';
 var PREN_CONFIG_URL = 'https://xbksultfskvzgncncada.supabase.co/functions/v1/set-reservations-config';
-var prenState = { online_open: true, card_required_days: [0,1,2,3,4,5,6], card_min_persone: null, card_special_dates: [], penale_eur: 25, ore_disdetta_default: 24, m1_subject: '', m1_intro: '', m1_closing: '', confirm_subject: '', confirm_intro: '', confirm_closing: '', reply_subject: '', reply_intro: '', reply_closing: '', closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [] };
+var prenState = { special_evenings: [], online_open: true, card_required_days: [0,1,2,3,4,5,6], card_min_persone: null, card_special_dates: [], penale_eur: 25, ore_disdetta_default: 24, m1_subject: '', m1_intro: '', m1_closing: '', confirm_subject: '', confirm_intro: '', confirm_closing: '', reply_subject: '', reply_intro: '', reply_closing: '', closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [] };
 
 function apriSezionePrenotazioni() {
   document.getElementById('carica-menu').classList.remove('open');
@@ -2660,6 +2686,7 @@ function renderPrenUI() {
   if (minPersEl) minPersEl.value = prenState.card_min_persone != null ? prenState.card_min_persone : '';
   _cardDateSpeciali = (prenState.card_special_dates || []).slice();
   _renderDateSpecialiCarta();
+  _renderSpecialEvenings();
   var penaleEl = document.getElementById('pren-guarantee-penale');
   var oreEl = document.getElementById('pren-guarantee-ore');
   if (penaleEl) penaleEl.value = prenState.penale_eur != null ? prenState.penale_eur : 25;
@@ -2734,6 +2761,7 @@ function loadPrenStatus() {
       prenState.slot_closures = (d && d.slot_closures) || [];
       prenState.slot_openings = (d && d.slot_openings) || [];
       prenState.slot_caps = (d && d.slot_caps) || [];
+      prenState.special_evenings = (d && Array.isArray(d.special_evenings)) ? d.special_evenings : [];
       renderPrenUI();
       _prenSetStatus('');
     })
@@ -2782,6 +2810,8 @@ function _prenApply(res, okMsg) {
     prenState.slot_closures = res.body.slot_closures || [];
     prenState.slot_openings = res.body.slot_openings || [];
     prenState.slot_caps = res.body.slot_caps || [];
+    prenState.special_evenings = Array.isArray(res.body.special_evenings) ? res.body.special_evenings : prenState.special_evenings;
+    if (Array.isArray(res.body.card_special_dates)) prenState.card_special_dates = res.body.card_special_dates;
     renderPrenUI();
     _prenSetStatus(okMsg || 'Fatto.');
   } else if (res.status === 401) {
@@ -2868,6 +2898,61 @@ function saveCardRules() {
   var oggi = new Date().toISOString().slice(0, 10);
   var date = _cardDateSpeciali.filter(function (d) { return d >= oggi; });
   _prenConfig({ action: 'set_card_rules', card_min_persone: min, card_special_dates: date }, 'Regole carta per gruppi e date speciali salvate.');
+}
+
+// v 2026.10.02.02 — Serate speciali (cene a tema): set-reservations-config v12 (azioni
+// set_special_evening / remove_special_evening), reservations-status v11 (special_evenings),
+// avviso nel wizard prenota.html v 2026.10.02.01.
+function _renderSpecialEvenings() {
+  var box = document.getElementById('pren-se-list');
+  if (!box) return;
+  var oggi = new Date().toISOString().slice(0, 10);
+  var list = (prenState.special_evenings || []).filter(function (e) { return e.date >= oggi; });
+  if (!list.length) { box.innerHTML = '<span style="color:var(--stone);">Nessuna serata speciale in programma.</span>'; return; }
+  var cap = function (e) {
+    var c = (prenState.slot_caps || []).filter(function (x) { return x.date === e.date && x.time === e.time; })[0];
+    return c ? ' · ' + c.current_covers + '/' + c.max_covers + ' posti prenotati' : '';
+  };
+  box.innerHTML = list.map(function (e) {
+    return '<div style="border:1px solid var(--rule);padding:.5rem .7rem;margin-bottom:.5rem;display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">' +
+      '<div style="flex:1;min-width:12rem;"><strong>' + _prenFormatDate(e.date) + ' · ' + e.time + '</strong> — ' + _escHtmlSe(e.title) +
+      '<br><span style="color:var(--stone);">' + (e.card ? 'carta a garanzia' : 'senza carta') + cap(e) + ' · ' + _escHtmlSe(e.url) + '</span></div>' +
+      '<button class="btn btn-load" style="border:1px solid var(--ink);color:var(--ink);" onclick="modificaSerataSpeciale(\'' + e.date + '\')">Modifica</button>' +
+      '<button class="btn btn-load" style="border:1px solid var(--rust);color:var(--rust);" onclick="togliSerataSpeciale(\'' + e.date + '\')">Togli</button></div>';
+  }).join('');
+}
+function _escHtmlSe(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function saveSpecialEvening() {
+  var date = document.getElementById('pren-se-date').value;
+  var time = document.getElementById('pren-se-time').value;
+  var title = document.getElementById('pren-se-title').value.trim();
+  var url = document.getElementById('pren-se-url').value.trim() || '/cene-a-tema';
+  var seatsRaw = document.getElementById('pren-se-seats').value.trim();
+  var seats = seatsRaw === '' ? null : Number(seatsRaw);
+  var card = document.getElementById('pren-se-card').checked;
+  if (!date) { _prenSetStatus('Scegli la data della serata.', true); return; }
+  if (title.length < 3) { _prenSetStatus('Scrivi il titolo della serata.', true); return; }
+  if (seats !== null && (!Number.isInteger(seats) || seats < 1 || seats > 500)) { _prenSetStatus('Posti non validi (da 1 a 500, o vuoto).', true); return; }
+  var giaPresente = (prenState.special_evenings || []).some(function (e) { return e.date === date; });
+  if (!giaPresente && !window.confirm('Salvando, il ' + _prenFormatDate(date) + ' resterà prenotabile online SOLO alle ' + time + ' (gli altri orari della sera vengono chiusi). Confermi?')) return;
+  _prenConfig({ action: 'set_special_evening', date: date, time: time, title: title, url: url, seats: seats, card: card },
+    'Serata speciale salvata: nel wizard compare l\'avviso.');
+}
+function modificaSerataSpeciale(d) {
+  var e = (prenState.special_evenings || []).filter(function (x) { return x.date === d; })[0];
+  if (!e) return;
+  document.getElementById('pren-se-date').value = e.date;
+  document.getElementById('pren-se-time').value = e.time;
+  document.getElementById('pren-se-title').value = e.title || '';
+  document.getElementById('pren-se-url').value = e.url || '/cene-a-tema';
+  document.getElementById('pren-se-card').checked = e.card === true;
+  var c = (prenState.slot_caps || []).filter(function (x) { return x.date === e.date && x.time === e.time; })[0];
+  document.getElementById('pren-se-seats').value = c ? c.max_covers : '';
+  _prenSetStatus('Modifica i campi e premi «Salva serata speciale».');
+}
+function togliSerataSpeciale(d) {
+  if (!window.confirm('Togliere la serata speciale del ' + _prenFormatDate(d) + '? Spariscono avviso, limite posti e carta obbligatoria. Il servizio chiuso resta chiuso: riaprilo da "Prenotazioni online" se serve.')) return;
+  _prenConfig({ action: 'remove_special_evening', date: d }, 'Serata speciale tolta.');
 }
 
 // Penale (€/persona) e ore di disdetta gratuita: default usati ovunque si generi una garanzia
@@ -8239,7 +8324,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.02.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.02.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

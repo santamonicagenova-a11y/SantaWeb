@@ -2,7 +2,12 @@
 <!--
   prenota.html — Wizard prenotazioni con carta a garanzia obbligatoria
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.09.30.02
+  Versione: v 2026.10.02.01
+  v 2026.10.02.01 — SERATE SPECIALI (cene a tema): reservations-status v11 espone special_evenings
+  ([{date,time,title,url,card}]). Se la data scelta è una serata speciale il wizard mostra, dal
+  passo 2 al 5, un avviso: «serata particolare, senza menù alla carta» col titolo e il link alla
+  pagina dedicata; nel calendario la data ha un segno dorato. Gli orari offerti e la carta a
+  garanzia seguono le regole server già esistenti (apertura orario, limite posti, data speciale).
   v 2026.09.30.02 — GARANZIA CARTA MIRATA (idea 11 approvata da Andrea): la carta è chiesta se il
   giorno è tra card_required_days OPPURE i coperti sono >= card_min_persone OPPURE la data è in
   card_special_dates (reservations-status v10, stessa regola lato server in
@@ -207,6 +212,9 @@
   .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--oro); }
   .field textarea { min-height: 70px; resize: vertical; }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+  .special-notice { border-left: 3px solid #b89d6a; background: rgba(184,157,106,0.12); padding: 0.8rem 1rem; margin: -0.6rem 0 1.2rem; font-size: 0.88rem; line-height: 1.5; border-radius: 2px; }
+  .special-notice a { color: inherit; border-bottom: 1px solid #b89d6a; text-decoration: none; }
+  .cal-day.special { box-shadow: inset 0 -3px 0 #b89d6a; }
   .hint { font-size: 0.78rem; color: var(--secondario); margin: -0.6rem 0 1rem; }
   .checkbox-row { display: flex; gap: 0.6rem; align-items: flex-start; margin-bottom: 1.3rem; }
   .checkbox-row input { width: auto; margin-top: 3px; }
@@ -320,6 +328,7 @@
       <section class="step" id="step-2">
         <p class="step-label">Passo 2 di 5</p>
         <h2 class="step-title">In quanti sarete?</h2>
+        <div class="special-notice" style="display:none;"></div>
         <div class="persone-grid" id="persone-grid"></div>
         <div class="btn-row">
           <button type="button" class="btn btn-ghost" data-back="1">Indietro</button>
@@ -330,6 +339,7 @@
       <section class="step" id="step-3">
         <p class="step-label">Passo 3 di 5</p>
         <h2 class="step-title">A che ora?</h2>
+        <div class="special-notice" style="display:none;"></div>
         <div id="orario-grid"></div>
         <div class="btn-row">
           <button type="button" class="btn btn-ghost" data-back="2">Indietro</button>
@@ -340,6 +350,7 @@
       <section class="step" id="step-4">
         <p class="step-label">Passo 4 di 5</p>
         <h2 class="step-title">I tuoi dati</h2>
+        <div class="special-notice" style="display:none;"></div>
         <form id="contatti-form" novalidate>
           <input type="text" name="_hp" id="p-hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" aria-hidden="true">
           <div class="field-row">
@@ -383,6 +394,7 @@
       <section class="step" id="step-5">
         <p class="step-label">Passo 5 di 5</p>
         <h2 class="step-title" id="step5-title">Ultimo passo: la carta a garanzia</h2>
+        <div class="special-notice" style="display:none;"></div>
 
         <div class="riepilogo" id="riepilogo"></div>
 
@@ -474,6 +486,7 @@
     card_required_days: [0,1,2,3,4,5,6],
     card_min_persone: null,
     card_special_dates: [],
+    special_evenings: [],
     penale_eur: 25,
     ore_disdetta_default: 24,
     closures: [], openings: [], slot_closures: [], slot_openings: [], slot_caps: [],
@@ -510,6 +523,23 @@
   function fmtDateStr(y,m,d) { return y + '-' + String(m+1).padStart(2,'0') + '-' + String(d).padStart(2,'0'); }
 
   /* ── disponibilità (stessa logica già in uso nel vecchio form embedded) ── */
+  function specialFor(dateStr) {
+    for (var i = 0; i < state.special_evenings.length; i++) { if (state.special_evenings[i].date === dateStr) return state.special_evenings[i]; }
+    return null;
+  }
+  function escSp(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function renderSpecialNotice() {
+    var sp = state.selectedDate ? specialFor(state.selectedDate) : null;
+    var html = '';
+    if (sp) {
+      var link = (sp.url && (sp.url.charAt(0) === '/' || sp.url.indexOf('https://santamonicagenova.it') === 0)) ? sp.url : '/cene-a-tema';
+      html = '<strong>Serata particolare</strong> — ' + escSp(sp.title) + '. A cena non c\'è il menù alla carta: si cena con il menù della serata. ' +
+        '<a href="' + escSp(link) + '" target="_blank" rel="noopener">Scopri la serata</a>';
+    }
+    document.querySelectorAll('.special-notice').forEach(function(el){
+      el.innerHTML = html; el.style.display = html ? '' : 'none';
+    });
+  }
   function slotClosedFor(dateStr, time) { return state.slot_closures.some(function(s){ return s.date===dateStr && s.time===time; }); }
   function slotOpenFor(dateStr, time) { return state.slot_openings.some(function(s){ return s.date===dateStr && s.time===time; }); }
   function closuresForDate(dateStr) {
@@ -584,6 +614,7 @@
         state.card_required_days = (d && Array.isArray(d.card_required_days)) ? d.card_required_days : [0,1,2,3,4,5,6];
         state.card_min_persone = (d && d.card_min_persone != null) ? Number(d.card_min_persone) : null;
         state.card_special_dates = (d && Array.isArray(d.card_special_dates)) ? d.card_special_dates : [];
+        state.special_evenings = (d && Array.isArray(d.special_evenings)) ? d.special_evenings : [];
         state.penale_eur = (d && d.penale_eur != null) ? Number(d.penale_eur) : 25;
         state.ore_disdetta_default = (d && d.ore_disdetta_default != null) ? Number(d.ore_disdetta_default) : 24;
         document.getElementById('step5-ore-disdetta').textContent = state.ore_disdetta_default + ' ore';
@@ -638,6 +669,8 @@
       cell.className = 'cal-day ' + (status === 'selectable' ? 'selectable' : status);
       cell.textContent = d;
       if (state.selectedDate === dateStr) cell.classList.add('selected');
+      var spCell = specialFor(dateStr);
+      if (spCell) { cell.classList.add('special'); cell.title = 'Serata particolare: ' + spCell.title; }
       if (status === 'selectable') {
         cell.addEventListener('click', function(ds){ return function(){ selectDate(ds); }; }(dateStr));
       } else if (status === 'full') {
@@ -652,6 +685,7 @@
     state.selectedDate = dateStr;
     state.selectedOrario = null;
     renderCalendar();
+    renderSpecialNotice();
     goToStep(2);
   }
   document.getElementById('cal-prev').addEventListener('click', function(){

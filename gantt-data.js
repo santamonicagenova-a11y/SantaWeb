@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.02.03",
+  version: "2026.10.02.04",
   updated: "2026-10-02",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -132,6 +132,9 @@ window.SANTAMONICA_GANTT = {
       {t:'Menu online — filtro allergeni per l\'ospite (IT/EN/FR)', s:'2026-09-30', e:'2026-09-30', st:'done'},
       {t:'menu-admin — secondo audit: migliorie aperte (voucher degustazione, orari a tendina, allergeni in Dettagli piatti, pannello chiavi, pulizia codice)', s:'2026-09-30', e:'2026-09-30', st:'done'},
       {t:'Pubblicare FAQ orari il 1/10 (nuovo periodo: venerdì pranzo, domenica solo pranzo) — allinea FAQ, JSON-LD e foglio orario', s:'2026-10-01', e:'2026-09-30', st:'done'},
+      {t:'Cena 16/10: impostare in menu-admin la data speciale con carta a garanzia e il limite di 16 posti', s:'2026-10-02', e:'2026-10-09', st:'up'},
+      {t:'Cena 16/10: confermare orario di inizio, menu e se i vini sono inclusi nei 60 €', s:'2026-10-02', e:'2026-10-09', st:'up'},
+      {t:'Cena a tema 16/10 (Santamonica × Bellenda, Château Peyral): pagina /cene-a-tema IT/EN/FR + banner temporaneo in home', s:'2026-10-02', e:'2026-10-02', st:'done'},
     ]},
     { key:'seo', name:'SEO & GEO', badge:'progetto-seo', tasks:[
       {t:'Migrazione Cloudflare + fix Schema @type', s:'2026-05-25', e:'2026-05-31', st:'done'},

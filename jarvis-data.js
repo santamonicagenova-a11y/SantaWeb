@@ -1,15 +1,15 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-10-02",
- "versione": "2026.10.02.03",
+ "versione": "2026.10.02.04",
  "briefing": "**Briefing 2/10/2026** — **Sito** (live): chiusa la serie di idee 8 → 9 → 15 → 10 → 11 → 12. Nuovi: filtro allergeni per l'ospite nei menu online, allergeni sotto i piatti in EN/FR, quadro dei buoni regalo non ancora usati, lista d'attesa da /prenota con avviso delle disdette, carta a garanzia per i tavoli da 6 e per le date speciali, note dell'ospite nel gestionale e mail del lunedì con compleanni e anniversari. Oggi (2/10) il gestionale chiede il token GitHub anche per la vista giorno e la ricerca, come già per Arrivato/No-show; e nella Tracciabilità del pesce il codice non riparte più da 01 a ogni mese (Seppie 466-1026, Baccalà 467-1026): provato da te, tutto ok. **Aspetta te**: inserire compleanni/anniversari in anagrafica (senza date la mail non parte), % porzione della degustazione, risalvare le vendite di settembre, valutare una riga privacy per la lista d'attesa; al prossimo carico di pesce il codice deve essere 468-1026. **Prossimo**: idee 1, 7 e 14.",
  "kpi": {
-  "aperte": 58,
+  "aperte": 60,
   "scadute": 4,
   "bloccate": 1,
-  "andrea": 16,
+  "andrea": 18,
   "debiti": 10,
-  "chiuse30": 48
+  "chiuse30": 49
  },
  "subs": {
   "SEO": {
@@ -35,14 +35,14 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 114,
-   "done": 95,
+   "tot": 117,
+   "done": 96,
    "prog": 2,
-   "up": 4,
+   "up": 6,
    "future": 13,
    "bloccato": 0,
    "scadute": 0,
-   "andrea": 6,
+   "andrea": 8,
    "debiti": 8
   },
   "Marketing": {
@@ -163,6 +163,30 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-27"
+  },
+  {
+   "t": "Cena 16/10: impostare in menu-admin la data speciale con carta a garanzia e il limite di 16 posti",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-10-02",
+   "e": "2026-10-09",
+   "own": "Andrea",
+   "az": "Prenotazioni — Setup: aggiungere 16/10 alle date speciali con carta a garanzia e limitare i posti della serata a 16 (24 in sala, 16 vendibili)",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-10-02"
+  },
+  {
+   "t": "Cena 16/10: confermare orario di inizio, menu e se i vini sono inclusi nei 60 €",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-10-02",
+   "e": "2026-10-09",
+   "own": "Andrea",
+   "az": "Mandare a Claude orario, menu (anche provvisorio) e se i vini sono inclusi nei 60 €: poi li aggiungo alla pagina",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-10-02"
   },
   {
    "t": "Allergeni carta: il form parte sempre da carta + dolci pubblicati (bug perdita allergeni), la pubblicazione aggiorna Dettagli piatti, niente doppia sezione dolci in EN/FR",
@@ -371,6 +395,30 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-27"
+  },
+  {
+   "t": "Cena 16/10: impostare in menu-admin la data speciale con carta a garanzia e il limite di 16 posti",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-10-02",
+   "e": "2026-10-09",
+   "own": "Andrea",
+   "az": "Prenotazioni — Setup: aggiungere 16/10 alle date speciali con carta a garanzia e limitare i posti della serata a 16 (24 in sala, 16 vendibili)",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-10-02"
+  },
+  {
+   "t": "Cena 16/10: confermare orario di inizio, menu e se i vini sono inclusi nei 60 €",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-10-02",
+   "e": "2026-10-09",
+   "own": "Andrea",
+   "az": "Mandare a Claude orario, menu (anche provvisorio) e se i vini sono inclusi nei 60 €: poi li aggiungo alla pagina",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-10-02"
   },
   {
    "t": "GEO giro 5 (verifica ricrawl orari ChatGPT/Claude)",
@@ -599,6 +647,11 @@ window.JARVIS_DATA = {
   {
    "d": "2026-10-02",
    "sub": "Sito",
+   "t": "Cena a tema 16 ottobre, pagina e banner"
+  },
+  {
+   "d": "2026-10-02",
+   "sub": "Sito",
    "t": "Gestionale, accesso col token a vista giorno e ricerca"
   },
   {
@@ -630,11 +683,6 @@ window.JARVIS_DATA = {
    "d": "2026-09-28",
    "sub": "Marketing",
    "t": "Post Instagram orari di apertura (grafica Canva)"
-  },
-  {
-   "d": "2026-09-28",
-   "sub": "Sito",
-   "t": "Checkbox escludi dalla stampa per percorso degustazione"
   }
  ],
  "perWeek": [
@@ -684,7 +732,7 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-28",
-   "n": 14
+   "n": 15
   }
  ],
  "perDay": [
@@ -706,7 +754,7 @@ window.JARVIS_DATA = {
   },
   {
    "g": "ven",
-   "n": 11
+   "n": 12
   },
   {
    "g": "sab",

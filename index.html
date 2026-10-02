@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v 2026.10.02.04 — Banner cena: produttore Château Puybarbe, Bordeaux. v 2026.10.02.03 — Menu: nuova voce «Serate» (desktop e mobile) verso /cene-a-tema; chiave nav_serate in translations.json IT/EN/FR. v 2026.10.02.02 — Banner cena 16/10 rifatto come overlay in stile "Vacanzina" (richiesta Andrea). v 2026.10.02.01 — Banner temporaneo "cena a tema 16 ottobre" (Santamonica × Bellenda): overlay con scheda (stile "Vacanzina": una volta per sessione, si chiude dopo 8s/click/×), si spegne da solo dal 17/10/2026 (data nel script, BANNER_FINE). Da RIMUOVERE dopo la serata: div#banner-cena, stile "banner-cena", blocco script "BANNER CENA", testi banner_cena in BANNER_T. Link a /cene-a-tema (nuova pagina). -->
+<!-- v 2026.10.02.05 — Banner cena: foto di Anna e Riku (Château Puybarbe) in cima alla scheda. v 2026.10.02.04 — Banner cena: produttore Château Puybarbe, Bordeaux. v 2026.10.02.03 — Menu: nuova voce «Serate» (desktop e mobile) verso /cene-a-tema; chiave nav_serate in translations.json IT/EN/FR. v 2026.10.02.02 — Banner cena 16/10 rifatto come overlay in stile "Vacanzina" (richiesta Andrea). v 2026.10.02.01 — Banner temporaneo "cena a tema 16 ottobre" (Santamonica × Bellenda): overlay con scheda (stile "Vacanzina": una volta per sessione, si chiude dopo 8s/click/×), si spegne da solo dal 17/10/2026 (data nel script, BANNER_FINE). Da RIMUOVERE dopo la serata: div#banner-cena, stile "banner-cena", blocco script "BANNER CENA", testi banner_cena in BANNER_T. Link a /cene-a-tema (nuova pagina). -->
 <!-- v 2026.09.28.01 — Rimosso il banner overlay "Vacanzina" (chiusura 21/09-28/09, introdotto
      v 2026.09.20.01/.02): la chiusura è finita, richiesto da Andrea di toglierlo. Rimossi il div,
      lo style e lo script associati (nessun altro file lo referenzia). -->
@@ -387,13 +387,17 @@
   /* ── BANNER CENA 16/10 (temporaneo, vedi nota in testa): overlay come il vecchio "Vacanzina" ── */
   #banner-cena { position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center; padding: 1rem; background: rgba(0,0,0,.55); opacity: 1; transition: opacity .4s ease; cursor: pointer; }
   #banner-cena.is-hidden { opacity: 0; pointer-events: none; }
-  #banner-cena .bc-card { position: relative; max-width: min(90vw, 400px); text-align: center; background: #1a1612; color: #f5f0e8; border: 1px solid var(--gold); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.35); padding: 2.2rem 1.8rem 1.9rem; }
+  #banner-cena .bc-card { position: relative; max-width: min(90vw, 400px); text-align: center; background: #1a1612; color: #f5f0e8; border: 1px solid var(--gold); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.35); padding: 0 0 1.9rem; overflow: hidden; }
+  #banner-cena .bc-foto { position: relative; margin: 0 0 1.6rem; }
+  #banner-cena .bc-foto img { display: block; width: 100%; height: auto; max-height: 38vh; object-fit: cover; object-position: center 30%; }
+  #banner-cena .bc-foto figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 1.6rem 1rem .6rem; font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; color: #f5f0e8; background: linear-gradient(to top, rgba(0,0,0,.65), transparent); }
+  #banner-cena .bc-testo { padding: 0 1.8rem; }
   #banner-cena .bc-eyebrow { font-size: .68rem; letter-spacing: .32em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
   #banner-cena .bc-date { font-family: 'Cormorant Garamond', serif; font-size: 2.1rem; font-weight: 300; line-height: 1.1; margin-bottom: .9rem; }
   #banner-cena .bc-title { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.2rem; line-height: 1.35; color: #e9e2d4; margin-bottom: 1rem; }
   #banner-cena .bc-info { font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: rgba(245,240,232,.7); margin-bottom: 1.5rem; }
   #banner-cena .bc-cta { display: inline-block; font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; color: #1a1612; background: #f5f0e8; text-decoration: none; padding: .85rem 1.8rem; border-radius: 3px; }
-  #banner-cena .bc-x { position: absolute; top: .4rem; right: .6rem; background: none; border: 0; color: #f5f0e8; font-size: 1.3rem; line-height: 1; cursor: pointer; padding: .4rem .6rem; }
+  #banner-cena .bc-x { position: absolute; z-index: 2; top: .5rem; right: .6rem; background: rgba(0,0,0,.45); border-radius: 50%; width: 2rem; height: 2rem; padding: 0; text-align: center; border: 0; color: #f5f0e8; font-size: 1.3rem; line-height: 1; cursor: pointer; padding: .4rem .6rem; }
   nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 2rem; background: transparent; transition: background 0.4s, backdrop-filter 0.4s; }
   nav.scrolled { background: rgba(var(--warm-white-rgb),0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--divider); }
   .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
@@ -626,11 +630,14 @@
 <div id="banner-cena" role="dialog" aria-label="Cena a tema del 16 ottobre">
   <div class="bc-card">
     <button type="button" class="bc-x" id="banner-cena-x" aria-label="Chiudi">&times;</button>
+    <figure class="bc-foto"><img src="/img/sito/cena-puybarbe-anna-riku.jpg" alt="Anna e Riku di Château Puybarbe" width="640" height="530"><figcaption>Anna e Riku &middot; Château Puybarbe</figcaption></figure>
+    <div class="bc-testo">
     <div class="bc-eyebrow" data-i18n="banner_eyebrow">Cena a tema</div>
     <div class="bc-date" data-i18n="banner_date">Venerdì 16 ottobre</div>
     <div class="bc-title" data-i18n="banner_title">Con Bellenda, i vini di Château Puybarbe, Bordeaux</div>
     <div class="bc-info" data-i18n="banner_info">Ore 20 · 60 € tutto compreso</div>
     <a class="bc-cta" id="banner-cena-link" href="/cene-a-tema" data-i18n="banner_cena_cta">Scopri la serata</a>
+    </div>
   </div>
 </div>
 

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<!-- Santamonica · Cene a tema · v 2026.10.02.04 -->
-<!-- v2026.10.02.04: produttore Château Puybarbe (Côtes de Bourg, Bordeaux): link a Bellenda e al sito di Château Puybarbe.
+<!-- Santamonica · Cene a tema · v 2026.10.02.05 -->
+<!-- v2026.10.02.05: loghi Bellenda e Château Puybarbe in basso a destra della scheda (PNG leggeri ricavati dai PDF dei marchi, link ai siti).
+     v2026.10.02.04: produttore Château Puybarbe (Côtes de Bourg, Bordeaux): link a Bellenda e al sito di Château Puybarbe.
      v2026.10.02.03: «Prenota online» apre il wizard con la data della serata già scelta (?data=2026-10-16, dal passo 2).
      v2026.10.02.02: orario ore 20, quota 60 € tutto compreso (cibo e vini), nota «niente menù alla carta».
      v2026.10.02.01: prima versione. Pagina cene a tema con la serata del 16/10/2026
@@ -34,6 +35,11 @@
   a{color:inherit}
   p a{border-bottom:1px solid var(--gold);text-decoration:none}
   p a:hover{color:var(--gold)}
+  .partners{display:flex;align-items:center;gap:22px;margin-left:auto}
+  .partners a{display:block;opacity:.85;transition:opacity .25s}
+  .partners a:hover{opacity:1}
+  .partners img{display:block;height:46px;width:auto}
+  @media(max-width:620px){.partners{margin:10px 0 0 auto}}
 
   header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 28px;border-bottom:1px solid var(--line)}
   .logo{font-family:var(--serif);font-size:1.5rem;text-decoration:none;letter-spacing:.02em}
@@ -109,6 +115,10 @@
         <div class="actions">
           <a class="btn" href="/prenota.html?data=2026-10-16" data-i18n="cta_book">Prenota online</a>
           <a class="btn ghost" href="tel:+390105533155" data-i18n="cta_call">Telefona: 010 5533155</a>
+          <div class="partners">
+            <a href="https://www.bellenda.it" target="_blank" rel="noopener" aria-label="Bellenda"><img src="/assets/bellenda-logo.png" alt="Bellenda" width="81" height="46"></a>
+            <a href="https://www.chateaupuybarbe.com" target="_blank" rel="noopener" aria-label="Château Puybarbe"><img src="/assets/puybarbe-logo.png" alt="Château Puybarbe" width="39" height="46"></a>
+          </div>
         </div>
       </div>
     </div>
@@ -128,7 +138,7 @@
   <div class="wrap">
     <div>Santamonica · Genova · <a href="mailto:info@santamonicagenova.it">info@santamonicagenova.it</a></div>
     <div><a href="/">Santamonica</a> · <a href="/privacy.html">Privacy</a> · <a href="/cookies.html">Cookie</a></div>
-    <div style="opacity:.6">v 2026.10.02.04</div>
+    <div style="opacity:.6">v 2026.10.02.05</div>
   </div>
 </footer>
 

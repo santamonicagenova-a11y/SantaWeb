@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v 2026.10.02.01 — Banner temporaneo "cena a tema 16 ottobre" (Santamonica × Bellenda): striscia fissa in alto, chiudibile, si spegne da sola dal 17/10/2026 (data nel script, BANNER_FINE). Da RIMUOVERE dopo la serata: div#banner-cena, stile "banner-cena", blocco script "BANNER CENA", testi banner_cena in BANNER_T. Link a /cene-a-tema (nuova pagina). -->
+<!-- v 2026.10.02.02 — Banner cena 16/10 rifatto come overlay in stile "Vacanzina" (richiesta Andrea). v 2026.10.02.01 — Banner temporaneo "cena a tema 16 ottobre" (Santamonica × Bellenda): overlay con scheda (stile "Vacanzina": una volta per sessione, si chiude dopo 8s/click/×), si spegne da solo dal 17/10/2026 (data nel script, BANNER_FINE). Da RIMUOVERE dopo la serata: div#banner-cena, stile "banner-cena", blocco script "BANNER CENA", testi banner_cena in BANNER_T. Link a /cene-a-tema (nuova pagina). -->
 <!-- v 2026.09.28.01 — Rimosso il banner overlay "Vacanzina" (chiusura 21/09-28/09, introdotto
      v 2026.09.20.01/.02): la chiusura è finita, richiesto da Andrea di toglierlo. Rimossi il div,
      lo style e lo script associati (nessun altro file lo referenzia). -->
@@ -384,13 +384,16 @@
   html { scroll-behavior: smooth; font-size: 16px; }
   body { background: var(--warm-white); color: var(--ink); font-family: 'Jost', sans-serif; font-weight: 300; overflow-x: hidden; }
 
-  /* ── BANNER CENA 16/10 (temporaneo, vedi nota in testa) ── */
-  #banner-cena { position: fixed; top: 0; left: 0; right: 0; z-index: 110; display: none; align-items: center; justify-content: center; gap: .9rem; min-height: 2.5rem; padding: .4rem 2.6rem .4rem 1rem; background: #1a1612; border-bottom: 1px solid var(--gold); font-size: .78rem; letter-spacing: .04em; color: #f5f0e8; text-align: center; }
-  #banner-cena a { color: #f5f0e8; text-decoration: none; border-bottom: 1px solid var(--gold); padding-bottom: 1px; }
-  #banner-cena button { position: absolute; right: .6rem; top: 50%; transform: translateY(-50%); background: none; border: 0; color: #f5f0e8; font-size: 1.1rem; line-height: 1; cursor: pointer; padding: .4rem .6rem; }
-  html.con-banner-cena nav { top: 2.5rem; }
-  html.con-banner-cena .mobile-menu { padding-top: 2.5rem; }
-  @media (max-width: 600px) { #banner-cena { font-size: .72rem; min-height: 3rem; } html.con-banner-cena nav { top: 3rem; } }
+  /* ── BANNER CENA 16/10 (temporaneo, vedi nota in testa): overlay come il vecchio "Vacanzina" ── */
+  #banner-cena { position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center; padding: 1rem; background: rgba(0,0,0,.55); opacity: 1; transition: opacity .4s ease; cursor: pointer; }
+  #banner-cena.is-hidden { opacity: 0; pointer-events: none; }
+  #banner-cena .bc-card { position: relative; max-width: min(90vw, 400px); text-align: center; background: #1a1612; color: #f5f0e8; border: 1px solid var(--gold); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.35); padding: 2.2rem 1.8rem 1.9rem; }
+  #banner-cena .bc-eyebrow { font-size: .68rem; letter-spacing: .32em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+  #banner-cena .bc-date { font-family: 'Cormorant Garamond', serif; font-size: 2.1rem; font-weight: 300; line-height: 1.1; margin-bottom: .9rem; }
+  #banner-cena .bc-title { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.2rem; line-height: 1.35; color: #e9e2d4; margin-bottom: 1rem; }
+  #banner-cena .bc-info { font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: rgba(245,240,232,.7); margin-bottom: 1.5rem; }
+  #banner-cena .bc-cta { display: inline-block; font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; color: #1a1612; background: #f5f0e8; text-decoration: none; padding: .85rem 1.8rem; border-radius: 3px; }
+  #banner-cena .bc-x { position: absolute; top: .4rem; right: .6rem; background: none; border: 0; color: #f5f0e8; font-size: 1.3rem; line-height: 1; cursor: pointer; padding: .4rem .6rem; }
   nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 2rem; background: transparent; transition: background 0.4s, backdrop-filter 0.4s; }
   nav.scrolled { background: rgba(var(--warm-white-rgb),0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--divider); }
   .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
@@ -620,7 +623,16 @@
 </head>
 <body>
 
-<div id="banner-cena" role="note"><span data-i18n="banner_cena">Venerdì 16 ottobre, cena con Bellenda e i vini di Château Peyral</span><a id="banner-cena-link" href="/cene-a-tema" data-i18n="banner_cena_cta">Scopri la serata</a><button type="button" id="banner-cena-x" aria-label="Chiudi">&times;</button></div>
+<div id="banner-cena" role="dialog" aria-label="Cena a tema del 16 ottobre">
+  <div class="bc-card">
+    <button type="button" class="bc-x" id="banner-cena-x" aria-label="Chiudi">&times;</button>
+    <div class="bc-eyebrow" data-i18n="banner_eyebrow">Cena a tema</div>
+    <div class="bc-date" data-i18n="banner_date">Venerdì 16 ottobre</div>
+    <div class="bc-title" data-i18n="banner_title">Con Bellenda, i vini di Château Peyral, Bordeaux</div>
+    <div class="bc-info" data-i18n="banner_info">Ore 20 · 60 € tutto compreso</div>
+    <a class="bc-cta" id="banner-cena-link" href="/cene-a-tema" data-i18n="banner_cena_cta">Scopri la serata</a>
+  </div>
+</div>
 
 <nav id="main-nav">
   <a href="#" class="nav-logo">Santamonica <span class="sub">sul mare</span></a>
@@ -901,24 +913,31 @@
   var T = {};
   var currentLang = 'it';
 
-  // ── BANNER CENA 16/10 (temporaneo) ──
+  // ── BANNER CENA 16/10 (temporaneo): overlay una volta per sessione, chiusura dopo 8s, al click o con la × ──
   var BANNER_FINE = new Date('2026-10-17T00:00:00+02:00');
   var BANNER_T = {
-    it: { banner_cena: 'Venerdì 16 ottobre, cena con Bellenda e i vini di Château Peyral', banner_cena_cta: 'Scopri la serata' },
-    en: { banner_cena: 'Friday 16 October, dinner with Bellenda and the wines of Château Peyral', banner_cena_cta: 'Discover the evening' },
-    fr: { banner_cena: 'Vendredi 16 octobre, dîner avec Bellenda et les vins du Château Peyral', banner_cena_cta: 'Découvrir la soirée' }
+    it: { banner_eyebrow: 'Cena a tema', banner_date: 'Venerdì 16 ottobre', banner_title: 'Con Bellenda, i vini di Château Peyral, Bordeaux', banner_info: 'Ore 20 · 60 € tutto compreso', banner_cena_cta: 'Scopri la serata' },
+    en: { banner_eyebrow: 'Themed dinner', banner_date: 'Friday 16 October', banner_title: 'With Bellenda, the wines of Château Peyral, Bordeaux', banner_info: '8 pm · €60 all inclusive', banner_cena_cta: 'Discover the evening' },
+    fr: { banner_eyebrow: 'Dîner à thème', banner_date: 'Vendredi 16 octobre', banner_title: 'Avec Bellenda, les vins du Château Peyral, Bordeaux', banner_info: '20h · 60 € tout compris', banner_cena_cta: 'Découvrir la soirée' }
   };
   function BANNER_MERGE(data) { for (var l in BANNER_T) { if (data[l]) for (var k in BANNER_T[l]) data[l][k] = BANNER_T[l][k]; } }
   (function() {
     var el = document.getElementById('banner-cena'); if (!el) return;
-    var chiuso = false; try { chiuso = sessionStorage.getItem('banner-cena-chiuso') === '1'; } catch (e) {}
-    if (new Date() >= BANNER_FINE || chiuso) return;
-    el.style.display = 'flex'; document.documentElement.classList.add('con-banner-cena');
-    document.getElementById('banner-cena-x').addEventListener('click', function() {
-      el.style.display = 'none'; document.documentElement.classList.remove('con-banner-cena');
-      try { sessionStorage.setItem('banner-cena-chiuso', '1'); } catch (e) {}
-    });
+    var KEY = 'bannerCena_2026-10-16';
+    var visto = false; try { visto = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
+    if (new Date() >= BANNER_FINE || visto) { el.remove(); return; }
+    function hide() { el.classList.add('is-hidden'); setTimeout(function() { el.remove(); }, 400); }
+    el.addEventListener('click', function(ev) { if (ev.target.id !== 'banner-cena-link') hide(); });
     document.getElementById('banner-cena-link').addEventListener('click', function() { this.href = '/cene-a-tema?lang=' + currentLang; });
+    // Al primo accesso compare il pannello cookie: il banner aspetta che sia chiuso (classe show--consent su <html>).
+    var tentativi = 0;
+    function mostra() {
+      if (document.documentElement.classList.contains('show--consent') && tentativi++ < 240) { setTimeout(mostra, 500); return; }
+      try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
+      el.style.display = 'flex';
+      setTimeout(hide, 8000);
+    }
+    setTimeout(mostra, 900);
   })();
 
 

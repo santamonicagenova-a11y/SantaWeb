@@ -1,15 +1,15 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
- "generato": "2026-09-30",
- "versione": "2026.09.30.06",
- "briefing": "**Briefing 30/9/2026 (sera)** — **Sito** (live, menu-admin v 2026.09.30.03 + Food Cost server v18): secondo audit di menu-admin chiuso. Sistemati: elenco prenotazioni del Reminder protetto, testi ringraziamento, avviso orari, QR dal sito, listino voucher (i prezzi nel codice erano vecchi), tendine orari dai periodi, pannello «Chiavi di accesso», sezioni rinominate senza doppioni, costi Food Cost fissati per periodo, Allergeni carta con i Crudi. FAQ orari dal 1/10 pubblicata. **Aspetta te**: spuntare gli allergeni dei 6 Crudi in «Allergeni carta» e pubblicare (poi Traduci e Pubblica della carta); % porzione della degustazione. **Prossimo**: primo uso reale del Food Cost (Costo piatti, Vendite, Dashboard).",
+ "generato": "2026-10-02",
+ "versione": "2026.10.02.01",
+ "briefing": "**Briefing 2/10/2026** — **Sito** (live): chiusa la serie di idee 8 → 9 → 15 → 10 → 11 → 12. Nuovi: filtro allergeni per l'ospite nei menu online, allergeni sotto i piatti in EN/FR, quadro dei buoni regalo non ancora usati, lista d'attesa da /prenota con avviso delle disdette, carta a garanzia per i tavoli da 6 e per le date speciali, note dell'ospite nel gestionale e mail del lunedì con compleanni e anniversari. **Aspetta te**: inserire compleanni/anniversari in anagrafica (senza date la mail non parte), % porzione della degustazione, risalvare le vendite di settembre, valutare una riga privacy per la lista d'attesa. **Prossimo**: idee 1, 7 e 14.",
  "kpi": {
-  "aperte": 59,
-  "scadute": 3,
+  "aperte": 58,
+  "scadute": 5,
   "bloccate": 1,
-  "andrea": 15,
+  "andrea": 16,
   "debiti": 10,
-  "chiuse30": 47
+  "chiuse30": 46
  },
  "subs": {
   "SEO": {
@@ -35,14 +35,14 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 112,
-   "done": 91,
+   "tot": 113,
+   "done": 93,
    "prog": 2,
-   "up": 6,
+   "up": 5,
    "future": 13,
    "bloccato": 0,
-   "scadute": 0,
-   "andrea": 5,
+   "scadute": 1,
+   "andrea": 6,
    "debiti": 8
   },
   "Marketing": {
@@ -52,7 +52,7 @@ window.JARVIS_DATA = {
    "up": 2,
    "future": 13,
    "bloccato": 1,
-   "scadute": 3,
+   "scadute": 4,
    "andrea": 5,
    "debiti": 2
   },
@@ -213,6 +213,18 @@ window.JARVIS_DATA = {
    "agg": "2026-09-25"
   },
   {
+   "t": "Inserire compleanni e anniversari degli ospiti in anagrafica (serve al promemoria del lunedì)",
+   "sub": "Sito",
+   "st": "up",
+   "s": "2026-10-01",
+   "e": null,
+   "own": "Andrea",
+   "az": "Dall'anagrafica (👤 nel gestionale o clienti.html) compilare compleanno/anniversario degli ospiti abituali: oggi nessun cliente ha date, quindi la mail del lunedì non parte",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-10-01"
+  },
+  {
    "t": "NoShowApp F6 — acquisire 10 beta tester (WhatsApp + demo dal vivo con carta test) e guida onboarding",
    "sub": "NoShowApp",
    "st": "up",
@@ -297,9 +309,7 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
-  }
- ],
- "prossime": [
+  },
   {
    "t": "Meta budget teaser (set, 300€)",
    "sub": "Marketing",
@@ -323,7 +333,9 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-26"
-  },
+  }
+ ],
+ "prossime": [
   {
    "t": "Sponsorizzata Salone Nautico",
    "sub": "Marketing",
@@ -390,6 +402,30 @@ window.JARVIS_DATA = {
    "st": "up",
    "s": "2026-10-02",
    "e": "2026-10-10",
+   "own": "Claude",
+   "az": null,
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-27"
+  },
+  {
+   "t": "Filone B — rinnovo iscrizione Genova Gourmet (annuale, ferma da mesi)",
+   "sub": "Marketing",
+   "st": "up",
+   "s": "2026-09-01",
+   "e": "2026-10-31",
+   "own": null,
+   "az": null,
+   "bl": null,
+   "deb": false,
+   "agg": "2026-09-21"
+  },
+  {
+   "t": "Pillar #2 /sul-mare-lungomare",
+   "sub": "SEO",
+   "st": "up",
+   "s": "2026-10-01",
+   "e": "2026-10-31",
    "own": "Claude",
    "az": null,
    "bl": null,
@@ -535,28 +571,16 @@ window.JARVIS_DATA = {
    "agg": "2026-09-28"
   },
   {
-   "t": "Gestionale — note ospite dal CRM (allergie, occasioni) e auguri compleanno/anniversario (idea 12)",
+   "t": "Inserire compleanni e anniversari degli ospiti in anagrafica (serve al promemoria del lunedì)",
    "sub": "Sito",
    "st": "up",
-   "s": "2026-09-30",
+   "s": "2026-10-01",
    "e": null,
-   "own": "Claude",
-   "az": null,
+   "own": "Andrea",
+   "az": "Dall'anagrafica (👤 nel gestionale o clienti.html) compilare compleanno/anniversario degli ospiti abituali: oggi nessun cliente ha date, quindi la mail del lunedì non parte",
    "bl": null,
    "deb": false,
-   "agg": "2026-09-30"
-  },
-  {
-   "t": "Prenotazioni — garanzia carta mirata: gruppi ≥6, serate a tema, Menù Degustazione (idea 11)",
-   "sub": "Sito",
-   "st": "up",
-   "s": "2026-09-30",
-   "e": null,
-   "own": "Claude",
-   "az": null,
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-30"
+   "agg": "2026-10-01"
   },
   {
    "t": "Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)",
@@ -682,7 +706,7 @@ window.JARVIS_DATA = {
   },
   {
    "g": "ven",
-   "n": 10
+   "n": 9
   },
   {
    "g": "sab",

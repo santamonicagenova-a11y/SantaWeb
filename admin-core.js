@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.10.02.01 — Carta/Dolci: frecce ▲▼ per cambiare l'ordine dei piatti in ogni sezione (spostaPiatto).
 // v 2026.09.30.06 — 'lista-attesa-section' in _pulisciViste (nuovo pannello Lista d'attesa in menu-admin.html).
 // v 2026.09.30.05 — Carta EN/FR: allergeni scritti sotto ogni piatto (riga piccola in corsivo, es. "gluten, milk"), solo a schermo — in stampa resta la pagina allergeni finale (la pagina A4 ha altezza fissa). Nuova renderAllergeniInline() iniettata con renderAllergeniPage(), stessi dati MENU.allergeni. Italiano invariato (scelta di Andrea). Attivo dalla prossima pubblicazione della carta.
 // v 2026.09.30.02 — Secondo audit: (1) Allergeni carta: Crudi inclusi (prima esclusi per costruzione) + sezione "Menù Degustazione" coi piatti del percorso non presenti in carta/dolci; conferma esplicita dei piatti pubblicati senza allergeni; titoli sezione EN/FR anche dal dizionario piatti. (2) Sync Dettagli piatti: una sezione rinominata nella carta sposta le righe esistenti (dati di sicurezza, ricette e costi mantenuti) invece di creare doppioni. (3) Tolto il codice morto del vecchio pannello «Menù Vini» (la carta vini si fa dal Gestionale Cantina) e la vecchia traduci() senza pubblicazione; 'chiavi-section' in _pulisciViste.
@@ -432,7 +433,7 @@ function costruisci() {
     var body = el('div','fs-body');
 
     var hdr = el('div','grid-hdr');
-    ['Nome piatto','Prezzo','Unità','Descrizione','*'].forEach(function(t){ hdr.appendChild(el('div','col-lbl',t)); });
+    ['Nome piatto','Prezzo','Unità','Descrizione','*','Ordine'].forEach(function(t){ hdr.appendChild(el('div','col-lbl',t)); });
     body.appendChild(hdr);
 
     sez.piatti.forEach(function(p, pi) {
@@ -442,6 +443,15 @@ function costruisci() {
       row.appendChild(inp('text',   's'+si+'p'+pi+'-unita',  p.unita||'', 'cad.'));
       row.appendChild(inp('text',   's'+si+'p'+pi+'-desc',   p.descrizione||''));
       row.appendChild(chk('s'+si+'p'+pi+'-eco', p.sostenibile));
+      // v 2026.10.02.01: frecce su/giù per cambiare l'ordine dei piatti nella sezione
+      var ord = el('div','ord-btns');
+      [['\u25B2',-1,'Sposta su'],['\u25BC',1,'Sposta giù']].forEach(function(d){
+        var bt = el('button','ord-btn',d[0]); bt.type='button'; bt.title=d[2];
+        bt.disabled = (d[1] < 0 && pi === 0) || (d[1] > 0 && pi === sez.piatti.length - 1);
+        bt.onclick = function(e){ e.preventDefault(); spostaPiatto(si, pi, d[1]); };
+        ord.appendChild(bt);
+      });
+      row.appendChild(ord);
       body.appendChild(row);
     });
 
@@ -489,6 +499,18 @@ function costruisci() {
     qrRow.appendChild(qrReset);
     bdo.appendChild(qrRow); fso.appendChild(bdo); wrap.appendChild(fso);
   }
+}
+
+// Sposta un piatto su/giù dentro la sezione (cattura prima lo stato del form, poi ri-renderizza).
+function spostaPiatto(si, pi, dir) {
+  if (!dati || !dati.sezioni || !dati.sezioni[si]) return;
+  dati = leggi(true);
+  var arr = dati.sezioni[si].piatti, j = pi + dir;
+  if (!Array.isArray(arr) || j < 0 || j >= arr.length) return;
+  var t = arr[pi]; arr[pi] = arr[j]; arr[j] = t;
+  costruisci();
+  var f = document.getElementById('s' + si + 'p' + j + '-nome');
+  if (f) f.scrollIntoView({ block: 'center' });
 }
 
 // Accoda un piatto vuoto alla sezione indicata e ri-renderizza il form.

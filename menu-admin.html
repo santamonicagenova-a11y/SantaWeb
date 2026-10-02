@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- v 2026.10.02.06 (bump ?v= admin-templates-shared.js a 2026.10.02.01 + footer-version) — Menu carta a schermo +50% e colori del filtro allergeni piu chiari (barra in alto invariata). -->
+<!-- v 2026.10.02.07 (bump ?v= admin-core.js a 2026.10.02.01 + footer-version) — Carta/Dolci: frecce ▲▼ per cambiare l'ordine dei piatti. -->
 <!-- v 2026.10.02.05 (+ footer-version; reservations-status v12) — Serate speciali: tendina con i titoli già usati (compila titolo, pagina, orario, posti, carta; resta da scegliere la data) e casella carta a garanzia allineata col testo. -->
 <!-- v 2026.10.02.04 (+ footer-version) — Chiusure/aperture di giorno e di singolo orario e limiti posti spostati da «Orari di Apertura» a «Prenotazioni — Setup» (riquadri colorati; stessi campi, stesse funzioni). -->
 <!-- v 2026.10.02.03 (+ footer-version) — Prenotazioni — Setup: gli argomenti (Garanzia, Serate speciali, mail M1-M4) in riquadri di colore diverso, come in Food Cost. Solo grafica. -->
@@ -1124,11 +1125,15 @@
     .pset-box { border:1px solid color-mix(in srgb, var(--c) 45%, transparent); border-left:4px solid var(--c); background:color-mix(in srgb, var(--c) 8%, transparent); border-radius:var(--radius); padding:1rem 1.2rem 1.2rem; margin-top:1.4rem; }
     .pset-box > .sub:first-child { margin-top:0; color:var(--c); font-weight:600; }
 
-    .grid-hdr { display:grid; grid-template-columns:1fr 80px 70px 1fr 30px; gap:.4rem; padding:.3rem 0; border-bottom:1px solid var(--rule); margin-bottom:.3rem; }
-    .grid-row { display:grid; grid-template-columns:1fr 80px 70px 1fr 30px; gap:.4rem; padding:.35rem 0; border-bottom:1px dotted var(--rule); align-items:center; }
+    .grid-hdr { display:grid; grid-template-columns:1fr 80px 70px 1fr 30px 54px; gap:.4rem; padding:.3rem 0; border-bottom:1px solid var(--rule); margin-bottom:.3rem; }
+    .grid-row { display:grid; grid-template-columns:1fr 80px 70px 1fr 30px 54px; gap:.4rem; padding:.35rem 0; border-bottom:1px dotted var(--rule); align-items:center; }
     .grid-row:last-child { border-bottom:none; }
     /* v 2026.08.08.03: solo su "Menù alla carta" — Nome piatto allargato (3fr), Descrizione dimezzata rispetto a prima (1fr invece di 3fr equivalenti, cioè 1/4 dello spazio flessibile invece di 1/2). I dolci (stessa griglia, wrap senza .is-carta) restano 1fr/1fr come prima. */
-    .wrap.is-carta .grid-hdr, .wrap.is-carta .grid-row { grid-template-columns:3fr 80px 70px 1fr 30px; }
+    .wrap.is-carta .grid-hdr, .wrap.is-carta .grid-row { grid-template-columns:3fr 80px 70px 1fr 30px 54px; }
+    .ord-btns { display:flex; gap:.2rem; }
+    .ord-btn { width:24px; height:28px; padding:0; border:1px solid var(--rule); background:var(--surface); color:var(--stone); border-radius:var(--radius); cursor:pointer; font-size:.6rem; line-height:1; }
+    .ord-btn:hover:not(:disabled) { color:var(--ink); border-color:var(--rust); }
+    .ord-btn:disabled { opacity:.25; cursor:default; }
     .col-lbl { font-size:.6rem; color:var(--stone); letter-spacing:.08em; text-transform:uppercase; }
 
     .degu-row { display:grid; grid-template-columns:1fr 30px; gap:.4rem; padding:.35rem 0; border-bottom:1px dotted var(--rule); align-items:center; }
@@ -2517,7 +2522,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.10.02.01"></script>
-<script src="admin-core.js?v=2026.09.30.06"></script>
+<script src="admin-core.js?v=2026.10.02.01"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
@@ -8381,7 +8386,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.02.06</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.02.07</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

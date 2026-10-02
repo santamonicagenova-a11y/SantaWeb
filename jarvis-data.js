@@ -1,7 +1,7 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-10-02",
- "versione": "2026.10.02.09",
+ "versione": "2026.10.02.10",
  "briefing": "**Briefing 2/10/2026** — **Sito** (live): chiusa la serie di idee 8 → 9 → 15 → 10 → 11 → 12. Nuovi: filtro allergeni per l'ospite nei menu online, allergeni sotto i piatti in EN/FR, quadro dei buoni regalo non ancora usati, lista d'attesa da /prenota con avviso delle disdette, carta a garanzia per i tavoli da 6 e per le date speciali, note dell'ospite nel gestionale e mail del lunedì con compleanni e anniversari. Oggi (2/10) il gestionale chiede il token GitHub anche per la vista giorno e la ricerca, come già per Arrivato/No-show; e nella Tracciabilità del pesce il codice non riparte più da 01 a ogni mese (Seppie 466-1026, Baccalà 467-1026): provato da te, tutto ok. **Aspetta te**: inserire compleanni/anniversari in anagrafica (senza date la mail non parte), % porzione della degustazione, risalvare le vendite di settembre, valutare una riga privacy per la lista d'attesa; al prossimo carico di pesce il codice deve essere 468-1026. **Prossimo**: idee 1, 7 e 14.",
  "kpi": {
   "aperte": 59,

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v 2026.10.02.02 — Banner cena 16/10 rifatto come overlay in stile "Vacanzina" (richiesta Andrea). v 2026.10.02.01 — Banner temporaneo "cena a tema 16 ottobre" (Santamonica × Bellenda): overlay con scheda (stile "Vacanzina": una volta per sessione, si chiude dopo 8s/click/×), si spegne da solo dal 17/10/2026 (data nel script, BANNER_FINE). Da RIMUOVERE dopo la serata: div#banner-cena, stile "banner-cena", blocco script "BANNER CENA", testi banner_cena in BANNER_T. Link a /cene-a-tema (nuova pagina). -->
+<!-- v 2026.10.02.03 — Menu: nuova voce «Serate» (desktop e mobile) verso /cene-a-tema; chiave nav_serate in translations.json IT/EN/FR. v 2026.10.02.02 — Banner cena 16/10 rifatto come overlay in stile "Vacanzina" (richiesta Andrea). v 2026.10.02.01 — Banner temporaneo "cena a tema 16 ottobre" (Santamonica × Bellenda): overlay con scheda (stile "Vacanzina": una volta per sessione, si chiude dopo 8s/click/×), si spegne da solo dal 17/10/2026 (data nel script, BANNER_FINE). Da RIMUOVERE dopo la serata: div#banner-cena, stile "banner-cena", blocco script "BANNER CENA", testi banner_cena in BANNER_T. Link a /cene-a-tema (nuova pagina). -->
 <!-- v 2026.09.28.01 — Rimosso il banner overlay "Vacanzina" (chiusura 21/09-28/09, introdotto
      v 2026.09.20.01/.02): la chiusura è finita, richiesto da Andrea di toglierlo. Rimossi il div,
      lo style e lo script associati (nessun altro file lo referenzia). -->
@@ -639,6 +639,7 @@
   <ul class="nav-links">
     <li><a href="#cucina" data-i18n="nav_cucina">Cucina</a></li>
     <li><a href="#cantina" data-i18n="nav_cantina">Cantina</a></li>
+    <li><a href="/cene-a-tema" class="link-serate" data-i18n="nav_serate">Serate</a></li>
     <li><a href="#galleria" data-i18n="nav_galleria">Galleria</a></li>
     <li><a href="/prenota.html" data-i18n="nav_prenota">Prenota</a></li>
     <li><a href="#info" data-i18n="nav_contatti">Contatti</a></li>
@@ -658,6 +659,7 @@
   <button class="menu-close" id="menu-close">&#x2715;</button>
   <a href="#cucina" class="mobile-link" data-i18n="nav_cucina">Cucina</a>
   <a href="#cantina" class="mobile-link" data-i18n="nav_cantina">Cantina</a>
+  <a href="/cene-a-tema" class="mobile-link link-serate" data-i18n="nav_serate">Serate</a>
   <a href="#galleria" class="mobile-link" data-i18n="nav_galleria">Galleria</a>
   <a href="/prenota.html" class="mobile-link" data-i18n="nav_evento_mobile">Evento speciale</a>
   <a href="#info" class="mobile-link" data-i18n="nav_contatti">Contatti</a>
@@ -939,6 +941,8 @@
     }
     setTimeout(mostra, 900);
   })();
+  // Voce di menu «Serate»: porta alla pagina cene a tema nella lingua corrente
+  document.querySelectorAll('.link-serate').forEach(function(a) { a.addEventListener('click', function() { this.href = '/cene-a-tema?lang=' + currentLang; }); });
 
 
   fetch('translations.json')

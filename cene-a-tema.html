@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<!-- Santamonica · Cene a tema · v 2026.10.02.03 -->
-<!-- v2026.10.02.03: «Prenota online» apre il wizard con la data della serata già scelta (?data=2026-10-16, dal passo 2).
+<!-- Santamonica · Cene a tema · v 2026.10.02.04 -->
+<!-- v2026.10.02.04: produttore Château Puybarbe (Côtes de Bourg, Bordeaux): link a Bellenda e al sito di Château Puybarbe.
+     v2026.10.02.03: «Prenota online» apre il wizard con la data della serata già scelta (?data=2026-10-16, dal passo 2).
      v2026.10.02.02: orario ore 20, quota 60 € tutto compreso (cibo e vini), nota «niente menù alla carta».
      v2026.10.02.01: prima versione. Pagina cene a tema con la serata del 16/10/2026
-     (Santamonica × Bellenda, vini Château Peyral di Bordeaux). Contenuti IT/EN/FR inline (dizionario D
+     (Santamonica × Bellenda, vini Château Puybarbe, Bordeaux). Contenuti IT/EN/FR inline (dizionario D
      nello script): lingua da ?lang= oppure IT. Noindex finché c'è una sola serata (decisione 2/10),
      non in sitemap. Le serate passate si spostano in "Le serate passate". Prenotazione = wizard
      /prenota.html (carta a garanzia sulla data speciale impostata in menu-admin) o telefono. -->
@@ -13,7 +14,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, follow">
 <title>Cene a tema · Santamonica Genova</title>
-<meta name="description" content="Le cene a tema del Ristorante Santamonica a Genova. Venerdì 16 ottobre 2026: una cena con Bellenda e i vini di Château Peyral, Bordeaux.">
+<meta name="description" content="Le cene a tema del Ristorante Santamonica a Genova. Venerdì 16 ottobre 2026: una cena con Bellenda e i vini di Château Puybarbe, Bordeaux.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,6 +32,8 @@
   body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-weight:300;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
   .wrap{max-width:900px;margin:0 auto;padding:0 28px}
   a{color:inherit}
+  p a{border-bottom:1px solid var(--gold);text-decoration:none}
+  p a:hover{color:var(--gold)}
 
   header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 28px;border-bottom:1px solid var(--line)}
   .logo{font-family:var(--serif);font-size:1.5rem;text-decoration:none;letter-spacing:.02em}
@@ -93,14 +96,14 @@
     <div class="wrap">
       <p class="eyebrow" data-i18n="next">La prossima serata</p>
       <div class="card">
-        <h2 data-i18n="t_title">Santamonica &times; Bellenda &middot; Château Peyral, Bordeaux</h2>
+        <h2 data-i18n="t_title">Santamonica &times; Bellenda &middot; Château Puybarbe, Bordeaux</h2>
         <div class="meta">
           <div><div class="lab" data-i18n="l_when">Quando</div><div class="val" data-i18n="v_when">Venerdì 16 ottobre 2026 · ore 20</div></div>
           <div><div class="lab" data-i18n="l_where">Dove</div><div class="val">Lungomare Lombardo 27 · Genova</div></div>
           <div><div class="lab" data-i18n="l_price">Quota</div><div class="val" data-i18n="v_price">60 € a persona, tutto compreso</div></div>
           <div><div class="lab" data-i18n="l_seats">Posti</div><div class="val" data-i18n="v_seats">16 posti</div></div>
         </div>
-        <p class="k" data-i18n="p1">Una cena insieme a Bellenda, che porta in tavola i vini di Château Peyral, la tenuta di Bordeaux che importa. A raccontarli ci saranno il titolare di Bellenda e l&rsquo;agente per la Liguria.</p>
+        <p class="k" data-i18n="p1">Una cena insieme a <a href="https://www.bellenda.it" target="_blank" rel="noopener">Bellenda</a>, che porta in tavola i vini di <a href="https://www.chateaupuybarbe.com" target="_blank" rel="noopener">Château Puybarbe</a>, la tenuta di Bordeaux che importa. A raccontarli ci saranno il titolare di Bellenda e l&rsquo;agente per la Liguria.</p>
         <p data-i18n="p2">La cucina del Santamonica accompagna i vini, la sommelier Monica Capurro li presenta in sala. Una serata a tavola, senza fretta. Nei 60 € sono compresi il menù e i vini in abbinamento.</p>
         <p class="note" data-i18n="p3">Sedici posti in tutto. Per questa serata non c&rsquo;è il menù alla carta e chiediamo la carta a garanzia: si registra al momento della prenotazione.</p>
         <div class="actions">
@@ -125,7 +128,7 @@
   <div class="wrap">
     <div>Santamonica · Genova · <a href="mailto:info@santamonicagenova.it">info@santamonicagenova.it</a></div>
     <div><a href="/">Santamonica</a> · <a href="/privacy.html">Privacy</a> · <a href="/cookies.html">Cookie</a></div>
-    <div style="opacity:.6">v 2026.10.02.03</div>
+    <div style="opacity:.6">v 2026.10.02.04</div>
   </div>
 </footer>
 
@@ -136,10 +139,10 @@
   var D = {
     it:{ book:'Prenota', eyebrow:'Cene a tema', h1:'Una sera, <em>un vino</em>, una storia',
       lede:'Ogni tanto la cucina si ferma ad ascoltare chi il vino lo fa o lo racconta.',
-      next:'La prossima serata', t_title:'Santamonica &times; Bellenda &middot; Château Peyral, Bordeaux',
+      next:'La prossima serata', t_title:'Santamonica &times; Bellenda &middot; Château Puybarbe, Bordeaux',
       l_when:'Quando', v_when:'Venerdì 16 ottobre 2026 · ore 20', l_where:'Dove', l_price:'Quota', v_price:'60 € a persona, tutto compreso',
       l_seats:'Posti', v_seats:'16 posti',
-      p1:'Una cena insieme a Bellenda, che porta in tavola i vini di Château Peyral, la tenuta di Bordeaux che importa. A raccontarli ci saranno il titolare di Bellenda e l&rsquo;agente per la Liguria.',
+      p1:'Una cena insieme a <a href="https://www.bellenda.it" target="_blank" rel="noopener">Bellenda</a>, che porta in tavola i vini di <a href="https://www.chateaupuybarbe.com" target="_blank" rel="noopener">Château Puybarbe</a>, la tenuta di Bordeaux che importa. A raccontarli ci saranno il titolare di Bellenda e l&rsquo;agente per la Liguria.',
       p2:'La cucina del Santamonica accompagna i vini, la sommelier Monica Capurro li presenta in sala. Una serata a tavola, senza fretta. Nei 60 € sono compresi il menù e i vini in abbinamento.',
       p3:'Sedici posti in tutto. Per questa serata non c&rsquo;è il menù alla carta e chiediamo la carta a garanzia: si registra al momento della prenotazione.',
       cta_book:'Prenota online', cta_call:'Telefona: 010 5533155',
@@ -147,10 +150,10 @@
       h_past:'Le serate passate', p_past:'Questa è la prima.' },
     en:{ book:'Book', eyebrow:'Themed dinners', h1:'One evening, <em>one wine</em>, one story',
       lede:'Now and then the kitchen stops to listen to those who make wine, or tell its story.',
-      next:'The next evening', t_title:'Santamonica &times; Bellenda &middot; Château Peyral, Bordeaux',
+      next:'The next evening', t_title:'Santamonica &times; Bellenda &middot; Château Puybarbe, Bordeaux',
       l_when:'When', v_when:'Friday 16 October 2026 · 8 pm', l_where:'Where', l_price:'Price', v_price:'€60 per person, all inclusive',
       l_seats:'Seats', v_seats:'16 seats',
-      p1:'A dinner with Bellenda, who brings the wines of Château Peyral, the Bordeaux estate they import. The owner of Bellenda and their agent for Liguria will be there to talk about them.',
+      p1:'A dinner with <a href="https://www.bellenda.it" target="_blank" rel="noopener">Bellenda</a>, who brings the wines of <a href="https://www.chateaupuybarbe.com" target="_blank" rel="noopener">Château Puybarbe</a>, the Bordeaux estate they import. The owner of Bellenda and their agent for Liguria will be there to talk about them.',
       p2:'Santamonica&rsquo;s kitchen follows the wines, and our sommelier Monica Capurro presents them at the table. An unhurried evening at the table. The €60 includes the menu and the paired wines.',
       p3:'Sixteen seats in all. There is no à la carte menu this evening, and we ask for a card guarantee, registered when you book.',
       cta_book:'Book online', cta_call:'Call: +39 010 5533155',
@@ -158,10 +161,10 @@
       h_past:'Past evenings', p_past:'This is the first one.' },
     fr:{ book:'Réserver', eyebrow:'Dîners à thème', h1:'Un soir, <em>un vin</em>, une histoire',
       lede:'De temps en temps, la cuisine s&rsquo;arrête pour écouter ceux qui font le vin, ou le racontent.',
-      next:'La prochaine soirée', t_title:'Santamonica &times; Bellenda &middot; Château Peyral, Bordeaux',
+      next:'La prochaine soirée', t_title:'Santamonica &times; Bellenda &middot; Château Puybarbe, Bordeaux',
       l_when:'Quand', v_when:'Vendredi 16 octobre 2026 · 20h', l_where:'Où', l_price:'Tarif', v_price:'60 € par personne, tout compris',
       l_seats:'Places', v_seats:'16 places',
-      p1:'Un dîner avec Bellenda, qui apporte à table les vins du Château Peyral, le domaine bordelais qu&rsquo;elle importe. Le propriétaire de Bellenda et l&rsquo;agent pour la Ligurie seront là pour les raconter.',
+      p1:'Un dîner avec <a href="https://www.bellenda.it" target="_blank" rel="noopener">Bellenda</a>, qui apporte à table les vins du <a href="https://www.chateaupuybarbe.com" target="_blank" rel="noopener">Château Puybarbe</a>, le domaine bordelais qu&rsquo;elle importe. Le propriétaire de Bellenda et l&rsquo;agent pour la Ligurie seront là pour les raconter.',
       p2:'La cuisine du Santamonica accompagne les vins, et notre sommelière Monica Capurro les présente en salle. Une soirée à table, sans se presser. Les 60 € comprennent le menu et les vins en accord.',
       p3:'Seize places en tout. Pas de menu à la carte ce soir-là, et nous demandons une carte en garantie, enregistrée au moment de la réservation.',
       cta_book:'Réserver en ligne', cta_call:'Appeler : +39 010 5533155',

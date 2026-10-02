@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v 2026.10.02.03 — Menu: nuova voce «Serate» (desktop e mobile) verso /cene-a-tema; chiave nav_serate in translations.json IT/EN/FR. v 2026.10.02.02 — Banner cena 16/10 rifatto come overlay in stile "Vacanzina" (richiesta Andrea). v 2026.10.02.01 — Banner temporaneo "cena a tema 16 ottobre" (Santamonica × Bellenda): overlay con scheda (stile "Vacanzina": una volta per sessione, si chiude dopo 8s/click/×), si spegne da solo dal 17/10/2026 (data nel script, BANNER_FINE). Da RIMUOVERE dopo la serata: div#banner-cena, stile "banner-cena", blocco script "BANNER CENA", testi banner_cena in BANNER_T. Link a /cene-a-tema (nuova pagina). -->
+<!-- v 2026.10.02.04 — Banner cena: produttore Château Puybarbe, Bordeaux. v 2026.10.02.03 — Menu: nuova voce «Serate» (desktop e mobile) verso /cene-a-tema; chiave nav_serate in translations.json IT/EN/FR. v 2026.10.02.02 — Banner cena 16/10 rifatto come overlay in stile "Vacanzina" (richiesta Andrea). v 2026.10.02.01 — Banner temporaneo "cena a tema 16 ottobre" (Santamonica × Bellenda): overlay con scheda (stile "Vacanzina": una volta per sessione, si chiude dopo 8s/click/×), si spegne da solo dal 17/10/2026 (data nel script, BANNER_FINE). Da RIMUOVERE dopo la serata: div#banner-cena, stile "banner-cena", blocco script "BANNER CENA", testi banner_cena in BANNER_T. Link a /cene-a-tema (nuova pagina). -->
 <!-- v 2026.09.28.01 — Rimosso il banner overlay "Vacanzina" (chiusura 21/09-28/09, introdotto
      v 2026.09.20.01/.02): la chiusura è finita, richiesto da Andrea di toglierlo. Rimossi il div,
      lo style e lo script associati (nessun altro file lo referenzia). -->
@@ -628,7 +628,7 @@
     <button type="button" class="bc-x" id="banner-cena-x" aria-label="Chiudi">&times;</button>
     <div class="bc-eyebrow" data-i18n="banner_eyebrow">Cena a tema</div>
     <div class="bc-date" data-i18n="banner_date">Venerdì 16 ottobre</div>
-    <div class="bc-title" data-i18n="banner_title">Con Bellenda, i vini di Château Peyral, Bordeaux</div>
+    <div class="bc-title" data-i18n="banner_title">Con Bellenda, i vini di Château Puybarbe, Bordeaux</div>
     <div class="bc-info" data-i18n="banner_info">Ore 20 · 60 € tutto compreso</div>
     <a class="bc-cta" id="banner-cena-link" href="/cene-a-tema" data-i18n="banner_cena_cta">Scopri la serata</a>
   </div>
@@ -918,9 +918,9 @@
   // ── BANNER CENA 16/10 (temporaneo): overlay una volta per sessione, chiusura dopo 8s, al click o con la × ──
   var BANNER_FINE = new Date('2026-10-17T00:00:00+02:00');
   var BANNER_T = {
-    it: { banner_eyebrow: 'Cena a tema', banner_date: 'Venerdì 16 ottobre', banner_title: 'Con Bellenda, i vini di Château Peyral, Bordeaux', banner_info: 'Ore 20 · 60 € tutto compreso', banner_cena_cta: 'Scopri la serata' },
-    en: { banner_eyebrow: 'Themed dinner', banner_date: 'Friday 16 October', banner_title: 'With Bellenda, the wines of Château Peyral, Bordeaux', banner_info: '8 pm · €60 all inclusive', banner_cena_cta: 'Discover the evening' },
-    fr: { banner_eyebrow: 'Dîner à thème', banner_date: 'Vendredi 16 octobre', banner_title: 'Avec Bellenda, les vins du Château Peyral, Bordeaux', banner_info: '20h · 60 € tout compris', banner_cena_cta: 'Découvrir la soirée' }
+    it: { banner_eyebrow: 'Cena a tema', banner_date: 'Venerdì 16 ottobre', banner_title: 'Con Bellenda, i vini di Château Puybarbe, Bordeaux', banner_info: 'Ore 20 · 60 € tutto compreso', banner_cena_cta: 'Scopri la serata' },
+    en: { banner_eyebrow: 'Themed dinner', banner_date: 'Friday 16 October', banner_title: 'With Bellenda, the wines of Château Puybarbe, Bordeaux', banner_info: '8 pm · €60 all inclusive', banner_cena_cta: 'Discover the evening' },
+    fr: { banner_eyebrow: 'Dîner à thème', banner_date: 'Vendredi 16 octobre', banner_title: 'Avec Bellenda, les vins du Château Puybarbe, Bordeaux', banner_info: '20h · 60 € tout compris', banner_cena_cta: 'Découvrir la soirée' }
   };
   function BANNER_MERGE(data) { for (var l in BANNER_T) { if (data[l]) for (var k in BANNER_T[l]) data[l][k] = BANNER_T[l][k]; } }
   (function() {

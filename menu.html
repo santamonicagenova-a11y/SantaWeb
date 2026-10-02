@@ -417,11 +417,12 @@
         height: 281mm;
         min-height: unset;
         margin: 0;
-        padding: 9mm 14mm 8mm;
+        padding: 9mm 14mm 0; /* v 2026.10.02.01: note ospite attaccate in basso, vedi sotto */
         box-shadow: none;
         page-break-after: always;
       }
       #layout-carta .pg:last-child { page-break-after: avoid; }
+      #layout-carta .note-ospite { margin-top: auto; padding-bottom: 1.65em; } /* sempre sul fondo pagina, una riga di stacco dal bordo */
 
       /* orario: 1 pagina */
       #layout-orario .pg {

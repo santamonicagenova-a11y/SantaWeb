@@ -148,6 +148,9 @@
 // margini e consumi interni, così un periodo chiuso non cambia quando si modificano ricette o
 // prezzi. Per aggiornare un periodo ai costi attuali basta risalvare le sue Vendite. null (vendite
 // salvate prima della v18) = costo attuale, come prima. vendite_get restituisce anche costo_unitario.
+// v19 (2026-10-02) — richiesto da Andrea: il progressivo del codice tracciabilità NN-MMAA è
+// incrementale globale (465-0926 -> 466-1026), non riparte da 01 a ogni mese: nextProgressivoMese
+// legge il massimo su tutte le righe, non solo quelle dello stesso mese/anno.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 
@@ -370,8 +373,8 @@ async function nextOrdineReparti(): Promise<number> {
 
 // ---------- Tracciabilità carichi (v8, 2026-09-16) ----------
 // Un "carico" = una fattura del fornitore, una riga per prodotto. Ogni riga genera
-// un codice progressivo "NN-MMAA" (progressivo mensile che riparte da 01 a ogni
-// mese solare + mese/anno di ricezione a 2 cifre, stessa convenzione della
+// un codice progressivo "NN-MMAA" (progressivo globale incrementale, non si azzera
+// a ogni mese + mese/anno di ricezione a 2 cifre, stessa convenzione della
 // procedura cartacea già in uso) e popola in un solo inserimento sia
 // fc_spese_giornaliere (per il Food Cost) sia fc_tracciabilita_prodotti (per la
 // rintracciabilità). Cancellare una riga di tracciabilità cancella anche la spesa
@@ -418,7 +421,7 @@ async function tracciabilitaConfigGet() {
   return data || { anno: null, mese: null, numero_iniziale: null, updated_at: null };
 }
 
-// Codice "NN-MMAA": NN = progressivo del mese/anno di ricezione (riparte da 01 ogni
+// Codice "NN-MMAA": NN = progressivo globale incrementale (non riparte a ogni
 // mese), MM = mese a 2 cifre, AA = ultime 2 cifre dell'anno. Il progressivo massimo
 // già assegnato per quel mese/anno viene letto una volta per l'intero carico e poi
 // incrementato in memoria riga per riga (righe di uno stesso carico condividono di
@@ -430,9 +433,6 @@ async function tracciabilitaConfigGet() {
 // dove si era arrivati a mano su carta, senza rischiare di tornare indietro rispetto
 // a righe già inserite digitalmente in questo mese.
 async function nextProgressivoMese(anno: number, mese: number): Promise<number> {
-  // v19 (2026-10-02) — fix: il progressivo deve essere GLOBALE e incrementale, non
-  // resettato ogni mese. Cerca il massimo progressivo su TUTTI gli anni/mesi (rimosse
-  // le clausole .eq("anno", anno).eq("mese", mese)), poi applica il floor da config.
   const [maxRes, cfg] = await Promise.all([
     supabase
       .from("fc_tracciabilita_prodotti")

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.10.02.01 (+ footer-version; backend foodcost-admin v19) — Food Cost → Tracciabilità: il codice NN-MMAA non riparte più da 01 a ogni mese ma prosegue la numerazione (465-0926 → 466-1026). Corrette a mano le due righe del 2/10 (Seppie 466-1026, Baccalà 467-1026). admin-core.js invariato. -->
 <!-- v 2026.09.30.08 (+ footer-version; set-reservations-config v11, reservations-status v10, create-reservation-checkout v10, prenota.html v 2026.09.30.02) — Prenotazioni online: carta a garanzia anche per i tavoli da N persone in su (impostato 6) e nelle date speciali scelte qui, oltre ai giorni della settimana. Idea 11 approvata da Andrea. admin-core invariato. -->
 <!-- v 2026.09.30.07 (bump ?v= admin-core.js a 2026.09.30.06 + footer-version) — Nuovo pannello «Lista d'attesa» (Prenotazioni e voucher): iscrizioni dal sito (prenota.html v 2026.09.30.01, edge function lista-attesa), stato In attesa/Contattato/Prenotato/Annullato; alla disdetta arriva la mail ad Andrea (pg_cron waitlist-tick). Idea 10 approvata da Andrea. -->
 <!-- v 2026.09.30.06 (+ footer-version) — Voucher — Gestione: quadro dei buoni venduti e non ancora usati (valore in sospeso, scadenze a 30/90 giorni con elenco, scaduti mai usati) — idea 15 approvata da Andrea. admin-core invariato. -->
@@ -8238,7 +8239,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.09.30.08</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.02.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.10.02.03 (+ footer-version) — Prenotazioni — Setup: gli argomenti (Garanzia, Serate speciali, mail M1-M4) in riquadri di colore diverso, come in Food Cost. Solo grafica. -->
 <!-- v 2026.10.02.02 (+ footer-version; set-reservations-config v12, reservations-status v11, prenota.html v 2026.10.02.01) — Prenotazioni — Setup: nuovo box «Serate speciali (cene a tema)»: data, orario, posti, titolo, pagina dedicata, carta a garanzia sì/no. Il sito resta prenotabile solo per quell'orario con un avviso nel wizard (serata particolare, senza menù alla carta, link alla pagina); i controlli server restano quelli esistenti (apertura orario, limite posti, data carta). -->
 <!-- v 2026.10.02.01 (+ footer-version; backend foodcost-admin v19) — Food Cost → Tracciabilità: il codice NN-MMAA non riparte più da 01 a ogni mese ma prosegue la numerazione (465-0926 → 466-1026). Corrette a mano le due righe del 2/10 (Seppie 466-1026, Baccalà 467-1026). admin-core.js invariato. -->
 <!-- v 2026.09.30.08 (+ footer-version; set-reservations-config v11, reservations-status v10, create-reservation-checkout v10, prenota.html v 2026.09.30.02) — Prenotazioni online: carta a garanzia anche per i tavoli da N persone in su (impostato 6) e nelle date speciali scelte qui, oltre ai giorni della settimana. Idea 11 approvata da Andrea. admin-core invariato. -->
@@ -1116,6 +1117,9 @@
     .fs { background:var(--surface); border:1px solid var(--rule); border-radius:var(--radius-lg); margin-bottom:1.5rem; box-shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 8px 24px rgba(0,0,0,.35); overflow:hidden; }
     .fs-head { background:var(--sand); padding:.65rem 1.2rem; font-size:.7rem; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--stone); border-bottom:1px solid var(--rule); }
     .fs-body { padding:1rem 1.2rem; }
+    /* v 2026.10.02.03 — riquadri colorati per argomento (Prenotazioni — Setup): colore in --c */
+    .pset-box { border:1px solid color-mix(in srgb, var(--c) 45%, transparent); border-left:4px solid var(--c); background:color-mix(in srgb, var(--c) 8%, transparent); border-radius:var(--radius); padding:1rem 1.2rem 1.2rem; margin-top:1.4rem; }
+    .pset-box > .sub:first-child { margin-top:0; color:var(--c); font-weight:600; }
 
     .grid-hdr { display:grid; grid-template-columns:1fr 80px 70px 1fr 30px; gap:.4rem; padding:.3rem 0; border-bottom:1px solid var(--rule); margin-bottom:.3rem; }
     .grid-row { display:grid; grid-template-columns:1fr 80px 70px 1fr 30px; gap:.4rem; padding:.35rem 0; border-bottom:1px dotted var(--rule); align-items:center; }
@@ -1806,7 +1810,8 @@
   <div class="fs">
     <div class="fs-head">Prenotazioni — Setup (garanzia e testi mail)</div>
     <div class="fs-body">
-      <div class="sub" style="margin-top:0;">Garanzia — penale e disdetta</div>
+      <div class="pset-box" style="--c:#d99a2b;margin-top:0;">
+      <div class="sub">💶 Garanzia — penale e disdetta</div>
       <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
         Questi due valori sono i default usati ovunque si parli di garanzia: nel passo 5 del wizard
         <code>/prenota.html</code> (giorni con carta obbligatoria), nella Stripe Checkout Session e nella riga
@@ -1826,8 +1831,10 @@
         <button class="btn btn-publish" onclick="saveGuaranteeDefaults()">💾 Salva garanzia</button>
       </div>
 
-      <hr style="border:none;border-top:1px solid var(--rule);margin:1.6rem 0 0;">
-      <div class="sub" style="margin-top:1rem;">Serate speciali (cene a tema)</div>
+      </div>
+
+      <div class="pset-box" style="--c:#2aa7a0;">
+      <div class="sub">✨ Serate speciali (cene a tema)</div>
       <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
         Per le serate come una cena a tema: il sito resta prenotabile online <strong>solo per l'orario che indichi</strong>,
         e nel wizard <code>/prenota.html</code> compare un avviso («serata particolare, senza menù alla carta») con il link
@@ -1850,9 +1857,9 @@
       <label style="display:flex;align-items:center;gap:.4rem;font-size:.82rem;margin-bottom:.8rem;"><input type="checkbox" id="pren-se-card" checked /> Chiedi la carta di credito a garanzia per questa serata</label>
       <button class="btn btn-publish" onclick="saveSpecialEvening()">💾 Salva serata speciale</button>
       <div id="pren-se-list" style="font-size:.82rem;margin:1rem 0 0;"></div>
+      </div>
 
-      <hr style="border:none;border-top:1px solid var(--rule);margin:1.6rem 0 0;">
-      <div class="sub" style="margin-top:1rem;">Testi delle mail ai clienti</div>
+      <div class="sub" style="margin-top:1.8rem;">✉ Testi delle mail ai clienti</div>
       <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
         Puoi modificare solo <strong>oggetto, frase di apertura e frase di chiusura</strong> di ciascuna mail — la
         tabella con data/orario/persone e il footer restano fissi (nessun rischio di rompere il layout). Segnaposto
@@ -1862,21 +1869,26 @@
         al testo predefinito.
       </p>
 
-      <div class="sub" style="margin-top:1rem;font-size:.95rem;color:var(--rust);">M1 — "Richiesta ricevuta" (giorni senza carta automatica)</div>
+      <div class="pset-box" style="--c:var(--rust);">
+      <div class="sub" style="font-size:.95rem;">M1 — "Richiesta ricevuta" (giorni senza carta automatica)</div>
       <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem;">
         <div><span class="opt-lbl">Oggetto</span><input type="text" id="pren-mail-m1-subject" placeholder="Richiesta ricevuta — Ristorante Santamonica" style="width:100%;" /></div>
         <div><span class="opt-lbl">Apertura (dopo "Buongiorno {nome},")</span><textarea id="pren-mail-m1-intro" rows="2" placeholder="grazie per la sua richiesta di prenotazione:" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
         <div><span class="opt-lbl">Chiusura (dopo la tabella dati)</span><textarea id="pren-mail-m1-closing" rows="2" placeholder="Abbiamo ricevuto la sua richiesta e la contatteremo a breve per conferma." style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
       </div>
 
-      <div class="sub" style="margin-top:1rem;font-size:.95rem;color:var(--green);">M2 — Conferma automatica (wizard con carta a garanzia)</div>
+      </div>
+      <div class="pset-box" style="--c:var(--green);">
+      <div class="sub" style="font-size:.95rem;">M2 — Conferma automatica (wizard con carta a garanzia)</div>
       <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem;">
         <div><span class="opt-lbl">Oggetto</span><input type="text" id="pren-mail-confirm-subject" placeholder="La sua prenotazione è confermata — Ristorante Santamonica" style="width:100%;" /></div>
         <div><span class="opt-lbl">Apertura (dopo "Buongiorno {nome},")</span><textarea id="pren-mail-confirm-intro" rows="2" placeholder="la sua prenotazione è confermata:" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
         <div><span class="opt-lbl">Chiusura extra (facoltativa, prima di "A presto,")</span><textarea id="pren-mail-confirm-closing" rows="2" placeholder="(vuoto = nessuna riga aggiuntiva)" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
       </div>
 
-      <div class="sub" style="margin-top:1rem;font-size:.95rem;color:var(--blue);">M3 — La tua risposta di conferma (manuale)</div>
+      </div>
+      <div class="pset-box" style="--c:var(--blue);">
+      <div class="sub" style="font-size:.95rem;">M3 — La tua risposta di conferma (manuale)</div>
       <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
         Non è una mail automatica: è il testo già pronto dietro al bottone <strong>"✉ Rispondi al cliente"</strong> nella
         mail di notifica che ricevi tu — lo controlli e invii a mano quando confermi. Segnaposto disponibili:
@@ -1887,7 +1899,9 @@
         <div><span class="opt-lbl">Apertura (dopo "Buongiorno {nome},")</span><textarea id="pren-mail-reply-intro" rows="2" placeholder="grazie per la sua richiesta di prenotazione:" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
         <div><span class="opt-lbl">Chiusura (dopo la tabella dati, include la firma)</span><textarea id="pren-mail-reply-closing" rows="3" placeholder="Prenotazione confermata, vi aspettiamo&#10;&#10;Andrea Giachino" style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
       </div>
-      <div class="sub" style="margin-top:1.6rem;font-size:.95rem;color:var(--violet);">M4 — Ringraziamento post-visita (cliente segnato "Arrivato")</div>
+      </div>
+      <div class="pset-box" style="--c:var(--violet);">
+      <div class="sub" style="font-size:.95rem;">M4 — Ringraziamento post-visita (cliente segnato "Arrivato")</div>
       <p style="font-size:.78rem;color:var(--stone);margin:-.3rem 0 .8rem;line-height:1.5;">
         Parte in automatico <strong>il giorno dopo la visita alle 11:00</strong> (non subito quando clicchi
         "Arrivato" nel gestionale) — SOLO per chi ha prenotato dal sito (mai per prenotazioni
@@ -1904,7 +1918,9 @@
         <div><span class="opt-lbl">Chiusura (prima di "A presto,")</span><textarea id="pren-mail-thankyou-closing" rows="2" placeholder="È stato un piacere avervi con noi: speriamo di potervi accogliere di nuovo presto." style="width:100%;font-family:Inter,sans-serif;font-size:.82rem;padding:.4rem .5rem;border:1px solid var(--rule);background:var(--field);border-radius:var(--radius);color:var(--ink);"></textarea></div>
       </div>
 
-      <button class="btn btn-publish" onclick="saveMailTexts()">💾 Salva testi mail</button>
+      </div>
+
+      <button class="btn btn-publish" style="margin-top:1rem;" onclick="saveMailTexts()">💾 Salva testi mail</button>
 
       <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.4rem;">
         <button class="btn btn-load" onclick="chiudiSezionePrenotazioniSetup()" style="border:1px solid var(--ink);color:var(--ink)">✕ Chiudi</button>
@@ -8324,7 +8340,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.02.02</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.02.03</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

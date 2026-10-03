@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.10.03.03 — «Fissa come default» (carta) avvia da solo Traduci e Pubblica.
 // v 2026.10.03.02 — Rimossa la nota di stampa «Stampa → Salva come PDF → Foxit Reader 97%» dalla barra della preview (carta e dolci).
 // v 2026.10.03.01 — Carta: controllo «Note dal fondo» (mm, dati.noteBottom) e indicatore di impaginazione nella barra della preview.
 // v 2026.10.02.02 — Carta: dimensione per tipologia (_TIPI_BTNS, dati.tipoScale; salvaImpostazioniStampa accetta vals.k).
@@ -749,7 +750,13 @@ function salvaImpostazioniStampa(vals) {
   dati.shift     = vals.shift;
   if (vals.k) dati.tipoScale = vals.k; // dimensioni per tipologia (solo carta)
   if (vals.nb != null) dati.noteBottom = vals.nb; // posizione note dal fondo (mm, solo carta)
-  alert('Impostazioni di stampa fissate come predefinite. Premi "Pubblica" per renderle permanenti sul sito.');
+  if (tipoMenuCorrente === 'carta') {
+    // v 2026.10.03.03: "Fissa come default" pubblica da solo (come premere Traduci e Pubblica)
+    toast('Impostazioni di stampa fissate: pubblico\u2026');
+    traduciEPubblica();
+  } else {
+    alert('Impostazioni di stampa fissate come predefinite. Premi "Pubblica" per renderle permanenti sul sito.');
+  }
 }
 
 // Promemoria di stampa (schermo, nascosto in @media print): su questa stampante

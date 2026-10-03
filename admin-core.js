@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.10.03.02 — Rimossa la nota di stampa «Stampa → Salva come PDF → Foxit Reader 97%» dalla barra della preview (carta e dolci).
 // v 2026.10.03.01 — Carta: controllo «Note dal fondo» (mm, dati.noteBottom) e indicatore di impaginazione nella barra della preview.
 // v 2026.10.02.02 — Carta: dimensione per tipologia (_TIPI_BTNS, dati.tipoScale; salvaImpostazioniStampa accetta vals.k).
 // v 2026.10.02.01 — Carta/Dolci: frecce ▲▼ per cambiare l'ordine dei piatti in ogni sezione (spostaPiatto).
@@ -753,7 +754,7 @@ function salvaImpostazioniStampa(vals) {
 
 // Promemoria di stampa (schermo, nascosto in @media print): su questa stampante
 // nessuna combinazione di margini/scala del browser elimina l'asimmetria residua.
-var _STAMPA_HINT = '<div class="stampa-hint">Per una stampa senza margini storti: Stampa → Salva come PDF → apri il PDF con Foxit Reader → Stampa con Scala personalizzata 97%.</div>\n';
+var _STAMPA_HINT = ''; // v 2026.10.03.02: nota «Salva come PDF → Foxit 97%» rimossa su richiesta di Andrea (stampa diretta)
 
 // Barra admin per i dolci (Stampa + pulsanti dimensione). Va in menu-dolci-it.html e nella preview.
 function _dolciCtrlBar() {

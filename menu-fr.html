@@ -570,7 +570,7 @@ const MENU = {
           "nome": "« Huître des bois »",
           "prezzo": 25,
           "sostenibile": true,
-          "descrizione": "Huître en tempura, cèpes, coings, concombres"
+          "descrizione": "Huîtres en tempura, cèpes, coings, concombres"
         },
         {
           "nome": "« Macchetto, je le dis juste comme ça… »",
@@ -632,7 +632,7 @@ const MENU = {
       "titolo": "Non Solo Mare",
       "piatti": [
         {
-          "nome": "« Curry curry, mon gars »",
+          "nome": "« Curry curry, les gars ! »",
           "prezzo": 32,
           "sostenibile": true,
           "descrizione": "Dentice, courgettes, curry, ananas, piments « friggitelli », cacahuètes"
@@ -897,7 +897,7 @@ const MENU = {
         "titolo_display": "Pas Seulement la Mer",
         "piatti": [
           {
-            "nome": "« Curry curry, mon gars »",
+            "nome": "« Curry curry, les gars ! »",
             "allergeni": [
               "poisson",
               "arachides",
@@ -1235,7 +1235,7 @@ function _szL(d){_sz.lh=Math.max(0.8,Math.min(1.5,Math.round((_sz.lh+d)*100)/100
 function _szG(d){_sz.gap=Math.max(0.6,Math.min(1.7,Math.round((_sz.gap+d)*100)/100));_szApply();}
 function _szS(d){_sz.shift=Math.max(-25,Math.min(25,_sz.shift+d));_szApply();}
 function _szR(){_sz={fs:1.12,lh:1,gap:1,shift:0,nb:6,k:{tit:1,piatto:1,desc:1,prezzo:1,degu:1,note:1}};_szApply();}
-function _szSave(){if(window.opener&&window.opener.salvaImpostazioniStampa){window.opener.salvaImpostazioniStampa({fs:_sz.fs,lh:_sz.lh,gap:_sz.gap,shift:_sz.shift,nb:_sz.nb,k:_sz.k});}}
+function _szSave(){if(window.opener&&!window.opener.closed&&window.opener.salvaImpostazioniStampa){window.opener.salvaImpostazioniStampa({fs:_sz.fs,lh:_sz.lh,gap:_sz.gap,shift:_sz.shift,nb:_sz.nb,k:_sz.k});alert('Impostazioni fissate. Le sto pubblicando in automatico: guarda lo stato nella scheda Admin Menù (non chiuderla finché non compare la conferma).');}else{alert('Non riesco a salvare: la scheda Admin Menù da cui hai aperto questa preview è chiusa. Riaprila da lì.');}}
 
 /* F0.21-e: pagina allergeni (carta+dolci) */
 function renderAllergeniPage(){

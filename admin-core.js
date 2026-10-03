@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.10.03.04 — Carta: controllo «Peso nome piatto» (dati.pesoPiatto).
 // v 2026.10.03.03 — «Fissa come default» (carta) avvia da solo Traduci e Pubblica.
 // v 2026.10.03.02 — Rimossa la nota di stampa «Stampa → Salva come PDF → Foxit Reader 97%» dalla barra della preview (carta e dolci).
 // v 2026.10.03.01 — Carta: controllo «Note dal fondo» (mm, dati.noteBottom) e indicatore di impaginazione nella barra della preview.
@@ -715,6 +716,10 @@ var _TIPI_BTNS = (function () {
       + '<span class="sz-val" id="szT-' + t[0] + '"></span>'
       + '<button class="ctrl-btn" onclick="_szT(\'' + t[0] + '\',0.5)" title="' + t[1] + ' pi\u00f9 grande">+</button></span>\n';
   });
+  h += '  <span class="tipo-grp"><span class="tipo-lbl">Peso nome piatto</span>'
+    + '<button class="ctrl-btn" onclick="_szW(-100)" title="Nome piatto pi\u00f9 leggero">\u2212</button>'
+    + '<span class="sz-val" id="szWP"></span>'
+    + '<button class="ctrl-btn" onclick="_szW(100)" title="Nome piatto pi\u00f9 grassetto">+</button></span>\n';
   h += '  <span class="tipo-grp"><span class="tipo-lbl">Note dal fondo</span>'
     + '<button class="ctrl-btn" onclick="_szN(-1)" title="Note pi\u00f9 in basso">\u2212</button>'
     + '<span class="sz-val" id="szNB"></span>'
@@ -749,6 +754,7 @@ function salvaImpostazioniStampa(vals) {
   dati.gapScale  = vals.gap;
   dati.shift     = vals.shift;
   if (vals.k) dati.tipoScale = vals.k; // dimensioni per tipologia (solo carta)
+  if (vals.wp != null) dati.pesoPiatto = vals.wp; // peso del nome piatto (400-700, solo carta)
   if (vals.nb != null) dati.noteBottom = vals.nb; // posizione note dal fondo (mm, solo carta)
   if (tipoMenuCorrente === 'carta') {
     // v 2026.10.03.03: "Fissa come default" pubblica da solo (come premere Traduci e Pubblica)
@@ -1103,6 +1109,7 @@ function eseguiPubblicazione(token) {
       if (dati.shift     != null) m.shift     = dati.shift;
       if (dati.tipoScale != null) m.tipoScale = dati.tipoScale;
       if (dati.noteBottom != null) m.noteBottom = dati.noteBottom;
+      if (dati.pesoPiatto != null) m.pesoPiatto = dati.pesoPiatto;
     }
     // F0.21-d: accorpa i dolci nella carta SOLO per le lingue (IT resta separato/stampato).
     var mDolci = costruisciDolciPerCarta(lang);

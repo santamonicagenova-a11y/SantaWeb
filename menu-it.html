@@ -392,7 +392,7 @@
       /* carta: 3 pagine */
       #layout-carta .pg {
         width: auto;
-        height: 281mm;
+        height: 280mm; /* 1mm di scorta sull'area stampabile (281mm): mai una pagina vuota per arrotondamento */
         min-height: unset;
         margin: 0;
         padding: 9mm 14mm 0; /* v 2026.10.02.01: note ospite attaccate in basso, vedi sotto */
@@ -400,7 +400,7 @@
         page-break-after: always;
       }
       #layout-carta .pg:last-child { page-break-after: avoid; }
-      #layout-carta .note-ospite { margin-top: auto; padding-bottom: 1.65em; } /* sempre sul fondo pagina, una riga di stacco dal bordo */
+      #layout-carta .note-ospite { margin-top: auto; padding-bottom: calc(max(var(--note-bottom, 6), 0) * 1mm); transform: translateY(calc(max(-1 * var(--note-bottom, 6), 0) * 1mm)); } /* sempre sul fondo pagina, una riga di stacco dal bordo */
 
       /* orario: 1 pagina */
       #layout-orario .pg {
@@ -474,6 +474,8 @@
   <span class="tipo-grp"><span class="tipo-lbl">Prezzo</span><button class="ctrl-btn" onclick="_szT('prezzo',-0.5)" title="Prezzo più piccolo">−</button><span class="sz-val" id="szT-prezzo"></span><button class="ctrl-btn" onclick="_szT('prezzo',0.5)" title="Prezzo più grande">+</button></span>
   <span class="tipo-grp"><span class="tipo-lbl">Degustazione</span><button class="ctrl-btn" onclick="_szT('degu',-0.5)" title="Degustazione più piccolo">−</button><span class="sz-val" id="szT-degu"></span><button class="ctrl-btn" onclick="_szT('degu',0.5)" title="Degustazione più grande">+</button></span>
   <span class="tipo-grp"><span class="tipo-lbl">Note ospite</span><button class="ctrl-btn" onclick="_szT('note',-0.5)" title="Note ospite più piccolo">−</button><span class="sz-val" id="szT-note"></span><button class="ctrl-btn" onclick="_szT('note',0.5)" title="Note ospite più grande">+</button></span>
+  <span class="tipo-grp"><span class="tipo-lbl">Note dal fondo</span><button class="ctrl-btn" onclick="_szN(-1)" title="Note più in basso">−</button><span class="sz-val" id="szNB"></span><button class="ctrl-btn" onclick="_szN(1)" title="Note più in alto">+</button></span>
+  <span class="tipo-grp" id="szCheck" style="font-family:Jost,sans-serif;font-size:.7rem;margin-left:.6rem"></span>
 </div>
 <div class="stampa-hint">Per una stampa senza margini storti: Stampa → Salva come PDF → apri il PDF con Foxit Reader → Stampa con Scala personalizzata 97%.</div>
 
@@ -716,7 +718,16 @@ const MENU = {
   "fontScale": 0.97,
   "lineScale": 1,
   "gapScale": 1,
-  "shift": 0
+  "shift": 0,
+  "tipoScale": {
+    "tit": 1,
+    "piatto": 1,
+    "desc": 1,
+    "prezzo": 1,
+    "degu": 1,
+    "note": 1
+  },
+  "noteBottom": -13
 };
 /* ═════════════════════════════════════════════════════════ */
 
@@ -931,19 +942,49 @@ function showLayout(which) {
 }
 
 /* ── init ── */
-var _sz={fs:(MENU.fontScale!=null?MENU.fontScale:1.12),lh:(MENU.lineScale!=null?MENU.lineScale:1),gap:(MENU.gapScale!=null?MENU.gapScale:1),shift:(MENU.shift!=null?MENU.shift:0),k:Object.assign({tit:1,piatto:1,desc:1,prezzo:1,degu:1,note:1},MENU.tipoScale||{})};
+var _sz={fs:(MENU.fontScale!=null?MENU.fontScale:1.12),lh:(MENU.lineScale!=null?MENU.lineScale:1),gap:(MENU.gapScale!=null?MENU.gapScale:1),shift:(MENU.shift!=null?MENU.shift:0),nb:(MENU.noteBottom!=null?MENU.noteBottom:6),k:Object.assign({tit:1,piatto:1,desc:1,prezzo:1,degu:1,note:1},MENU.tipoScale||{})};
 /* dimensioni per tipologia: [pt di stampa a scala 1, dipende da fontScale?] */
 var _SZT={tit:[22.5,1],piatto:[18/0.97,1],desc:[15/0.97,1],prezzo:[12,1],degu:[21,1],note:[10.95,0]};
 function _szTbase(key){var t=_SZT[key];return t[0]*(t[1]?_sz.fs:1);}
-function _szTipi(){var r=document.getElementById('layout-carta');Object.keys(_SZT).forEach(function(key){if(r)r.style.setProperty('--k-'+key,_sz.k[key]);var el=document.getElementById('szT-'+key);if(el)el.textContent=(Math.round(_szTbase(key)*_sz.k[key]*2)/2)+' pt';});}
+function _szTipi(){var r=document.getElementById('layout-carta');if(r)r.style.setProperty('--note-bottom',_sz.nb);var nbEl=document.getElementById('szNB');if(nbEl)nbEl.textContent=_sz.nb+' mm';Object.keys(_SZT).forEach(function(key){if(r)r.style.setProperty('--k-'+key,_sz.k[key]);var el=document.getElementById('szT-'+key);if(el)el.textContent=(Math.round(_szTbase(key)*_sz.k[key]*2)/2)+' pt';});}
+function _szN(d){_sz.nb=Math.max(-20,Math.min(40,_sz.nb+d));_szApply();}
+var _szVT=null;
+function _szVerifica(){
+  if(window.name==='verifica-stampa')return;
+  clearTimeout(_szVT);
+  _szVT=setTimeout(function(){
+    var out=document.getElementById('szCheck');if(!out)return;
+    var vecchio=document.getElementById('szVerFrame');if(vecchio)vecchio.parentNode.removeChild(vecchio);
+    var fr=document.createElement('iframe');fr.id='szVerFrame';fr.name='verifica-stampa';
+    fr.style.cssText='position:absolute;left:-99999px;top:0;width:194mm;height:1400px;border:0;visibility:hidden';
+    var html='<!DOCTYPE html>'+document.documentElement.outerHTML.replace(/@media print/g,'@media all');
+    fr.onload=function(){
+      try{
+        var w=fr.contentWindow;w._sz=JSON.parse(JSON.stringify(_sz));w._szApply();
+        var mm=function(px){return Math.round(px/3.7795*10)/10;};
+        var pgs=[].slice.call(w.document.querySelectorAll('#layout-carta .pg')),male=[],liberi=[];
+        pgs.forEach(function(pg,i){
+          var n=pg.querySelector('.note-ospite'),c=pg.querySelector('.pg-content,.degu');
+          var over=pg.scrollHeight-pg.clientHeight;
+          if(over>1)male.push('pag. '+(i+1)+' oltre di '+mm(over)+' mm');
+          else if(n&&c&&c.children.length){var k0=c.children[0].getBoundingClientRect(),k1=c.children[c.children.length-1].getBoundingClientRect();liberi.push(Math.max(0,mm(c.getBoundingClientRect().height-(k1.bottom-k0.top))));}
+        });
+        if(male.length){out.textContent='\u26a0 Impaginazione: '+male.join(', ')+' \u2014 riduci i caratteri';out.style.color='#b3261e';}
+        else{var lib=Math.min.apply(null,liberi);if(lib<6){out.textContent='\u26a0 Impaginazione al limite: solo '+lib+' mm liberi in una pagina \u2014 basta poco per sforare';out.style.color='#b26a00';}else{out.textContent='\u2713 Impaginazione ok (spazio libero minimo: '+lib+' mm)';out.style.color='#2e7d32';}}
+      }catch(e){out.textContent='';}
+      setTimeout(function(){if(fr.parentNode)fr.parentNode.removeChild(fr);},50);
+    };
+    fr.srcdoc=html;document.body.appendChild(fr);
+  },700);
+}
 function _szT(key,dpt){var b=_szTbase(key);var cur=Math.round(b*_sz.k[key]*2)/2;_sz.k[key]=Math.max(0.4,Math.min(2.5,Math.round(((cur+dpt)/b)*1000)/1000));_szApply();}
-function _szApply(){var r=document.getElementById('layout-carta');if(!r)return;r.style.setProperty('--fs',_sz.fs);r.style.setProperty('--lh',_sz.lh);r.style.setProperty('--gap',_sz.gap);r.style.setProperty('--shift',_sz.shift+'mm');var vf=document.getElementById('szValFs');if(vf)vf.textContent=Math.round(_sz.fs*100)+'%';var vl=document.getElementById('szValLh');if(vl)vl.textContent=Math.round(_sz.lh*100)+'%';var vg=document.getElementById('szValGap');if(vg)vg.textContent=Math.round(_sz.gap*100)+'%';var vs=document.getElementById('szValShift');if(vs)vs.textContent=_sz.shift+'mm';_szTipi();}
+function _szApply(){var r=document.getElementById('layout-carta');if(!r)return;r.style.setProperty('--fs',_sz.fs);r.style.setProperty('--lh',_sz.lh);r.style.setProperty('--gap',_sz.gap);r.style.setProperty('--shift',_sz.shift+'mm');var vf=document.getElementById('szValFs');if(vf)vf.textContent=Math.round(_sz.fs*100)+'%';var vl=document.getElementById('szValLh');if(vl)vl.textContent=Math.round(_sz.lh*100)+'%';var vg=document.getElementById('szValGap');if(vg)vg.textContent=Math.round(_sz.gap*100)+'%';var vs=document.getElementById('szValShift');if(vs)vs.textContent=_sz.shift+'mm';_szTipi();_szVerifica();}
 function _szF(d){_sz.fs=Math.max(0.85,Math.min(1.4,Math.round((_sz.fs+d)*100)/100));_szApply();}
 function _szL(d){_sz.lh=Math.max(0.8,Math.min(1.5,Math.round((_sz.lh+d)*100)/100));_szApply();}
 function _szG(d){_sz.gap=Math.max(0.6,Math.min(1.7,Math.round((_sz.gap+d)*100)/100));_szApply();}
 function _szS(d){_sz.shift=Math.max(-25,Math.min(25,_sz.shift+d));_szApply();}
-function _szR(){_sz={fs:1.12,lh:1,gap:1,shift:0,k:{tit:1,piatto:1,desc:1,prezzo:1,degu:1,note:1}};_szApply();}
-function _szSave(){if(window.opener&&window.opener.salvaImpostazioniStampa){window.opener.salvaImpostazioniStampa({fs:_sz.fs,lh:_sz.lh,gap:_sz.gap,shift:_sz.shift,k:_sz.k});}}
+function _szR(){_sz={fs:1.12,lh:1,gap:1,shift:0,nb:6,k:{tit:1,piatto:1,desc:1,prezzo:1,degu:1,note:1}};_szApply();}
+function _szSave(){if(window.opener&&window.opener.salvaImpostazioniStampa){window.opener.salvaImpostazioniStampa({fs:_sz.fs,lh:_sz.lh,gap:_sz.gap,shift:_sz.shift,nb:_sz.nb,k:_sz.k});}}
 renderCarta();
 renderOrario();
 showLayout('carta');

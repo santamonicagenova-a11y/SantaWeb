@@ -32,7 +32,7 @@
   </script>
   
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
 
   <style>
     :root {
@@ -457,6 +457,34 @@
     #layout-carta .degu-prezzi, #layout-carta .degu-nota { font-size: calc(.98rem * var(--fs, 1.12) * var(--k-degu, 1)); }
     #layout-carta .percorso-label { font-size: calc(1.25rem * var(--fs, 1.12) * var(--k-degu, 1)); }
     #layout-carta .note-ospite { font-size: calc(.73rem * var(--k-note, 1)); }
+    /* v 2026.10.03.04: peso del nome piatto regolabile (--w-piatto, default 500 = lieve grassetto) */
+    #layout-carta .piatto, #layout-carta .percorso-piatto, #layout-carta .percorso-libero { font-weight: var(--w-piatto, 500); }
+    #layout-carta .piatto-desc, #layout-carta .percorso-desc, #layout-carta .piatto-unita { font-weight: 400; }
+    #layout-carta .piatto-prezzo { font-weight: var(--w-prezzo, 500); }
+    /* v 2026.10.03.05: barra superiore + barra laterale della preview (stile menu-admin: pulsanti arrotondati, colori per categoria) */
+    .ctrl-bar { background: #12151b; border-bottom: 1px solid #262b34; padding: .65rem 1rem; gap: .5rem; }
+    .ctrl-sep { display: none; }
+    .ctrl-btn { font-family: 'Jost', sans-serif; font-weight: 500; font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; padding: .5rem 1.15rem; border: 1px solid #262b34; border-radius: 10px; background: #1b202a; color: #e9edf3; cursor: pointer; transition: background .15s, border-color .15s; }
+    .ctrl-btn:hover { background: #262b34; border-color: #9aa3b5; color: #e9edf3; }
+    .ctrl-btn.active { background: #e9edf3; color: #12151b; border-color: #e9edf3; }
+    .ctrl-btn.b-stampa { background: #f59e0b; border-color: #f59e0b; color: #1a1208; }
+    .ctrl-btn.b-stampa:hover { background: #f59e0b; opacity: .9; }
+    .ctrl-btn.b-fissa { background: #22c55e; border-color: #22c55e; color: #04220f; }
+    .ctrl-btn.b-fissa:hover { background: #22c55e; opacity: .9; }
+    .ctrl-btn.b-reset { background: transparent; border-color: #9aa3b5; color: #e9edf3; }
+    body:has(.side-bar) #layout-carta, body:has(.side-bar) #layout-orario { padding-left: 285px; }
+    .side-bar { position: fixed; left: 14px; top: 78px; width: 262px; max-height: calc(100vh - 92px); overflow: auto; background: #12151b; border: 1px solid #262b34; border-radius: 16px; padding: .85rem .9rem; z-index: 15; font-family: 'Jost', sans-serif; color: #e9edf3; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+    .side-sec { margin-bottom: .95rem; --c: #9aa3b5; }
+    .side-sec.sec-blue { --c: #3b82f6; } .side-sec.sec-teal { --c: #14b8a6; } .side-sec.sec-violet { --c: #a78bfa; } .side-sec.sec-amber { --c: #f59e0b; }
+    .side-tit { font-size: .64rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--c); border-left: 3px solid var(--c); padding-left: .5rem; margin-bottom: .35rem; }
+    .side-row { display: flex; align-items: center; justify-content: space-between; gap: .35rem; padding: .28rem 0; border-bottom: 1px dotted #262b34; font-size: .76rem; color: #9aa3b5; }
+    .side-row .rl { flex: 1; }
+    .side-row .sz-val { min-width: 3.7em; text-align: center; color: #e9edf3; font-weight: 600; font-size: .74rem; }
+    .side-row .ctrl-btn { padding: .18rem .62rem; border-radius: 8px; font-size: .8rem; letter-spacing: 0; background: #1b202a; border-color: var(--c); color: var(--c); }
+    .side-row .ctrl-btn:hover { background: var(--c); color: #0b0d10; }
+    .side-check { font-size: .74rem; line-height: 1.4; color: #9aa3b5; padding: .2rem 0; }
+    @media (max-width: 1150px) { body:has(.side-bar) #layout-carta, body:has(.side-bar) #layout-orario { padding-left: 0; } .side-bar { position: static; width: auto; margin: .6rem; max-height: none; } }
+    @media print { .side-bar { display: none !important; } body:has(.side-bar) #layout-carta, body:has(.side-bar) #layout-orario { padding-left: 0; } }
     .tipo-grp { display: inline-flex; align-items: center; gap: .3rem; }
     .tipo-lbl { font-family: 'Jost', sans-serif; font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--stone); }
     .tipo-grp .ctrl-btn { padding: .25rem .7rem; }
@@ -468,6 +496,39 @@
   </style>
 </head>
 <body>
+<div class="ctrl-bar">
+  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout('carta')">☞ Menù alla carta (3 pag.)</button>
+  <button class="ctrl-btn" id="btn-orario" onclick="showLayout('orario')">☞ Foglio orario (1 pag.)</button>
+  <button class="ctrl-btn b-stampa" onclick="window.print()">⚡ Stampa</button>
+  <button class="ctrl-btn b-reset" onclick="_szR()" title="Ripristina dimensioni">↺ Ripristina</button>
+  <button class="ctrl-btn b-fissa" onclick="_szSave()" title="Fissa i valori attuali come predefiniti e pubblica">✔ Fissa come default</button>
+</div>
+<aside class="side-bar" id="side-bar">
+<div class="side-sec sec-blue"><div class="side-tit">Dimensione caratteri</div>
+<div class="side-row"><span class="rl">Tutti</span><button class="ctrl-btn" onclick="_szF(-0.03)" title="Caratteri più piccoli">−</button><span class="sz-val" id="szValFs"></span><button class="ctrl-btn" onclick="_szF(0.03)" title="Caratteri più grandi">+</button></div>
+<div class="side-row"><span class="rl">Titoli sezione</span><button class="ctrl-btn" onclick="_szT('tit',-0.5)" title="Meno">−</button><span class="sz-val" id="szT-tit"></span><button class="ctrl-btn" onclick="_szT('tit',0.5)" title="Più">+</button></div>
+<div class="side-row"><span class="rl">Nome piatto</span><button class="ctrl-btn" onclick="_szT('piatto',-0.5)" title="Meno">−</button><span class="sz-val" id="szT-piatto"></span><button class="ctrl-btn" onclick="_szT('piatto',0.5)" title="Più">+</button></div>
+<div class="side-row"><span class="rl">Descrizione</span><button class="ctrl-btn" onclick="_szT('desc',-0.5)" title="Meno">−</button><span class="sz-val" id="szT-desc"></span><button class="ctrl-btn" onclick="_szT('desc',0.5)" title="Più">+</button></div>
+<div class="side-row"><span class="rl">Prezzo</span><button class="ctrl-btn" onclick="_szT('prezzo',-0.5)" title="Meno">−</button><span class="sz-val" id="szT-prezzo"></span><button class="ctrl-btn" onclick="_szT('prezzo',0.5)" title="Più">+</button></div>
+<div class="side-row"><span class="rl">Degustazione</span><button class="ctrl-btn" onclick="_szT('degu',-0.5)" title="Meno">−</button><span class="sz-val" id="szT-degu"></span><button class="ctrl-btn" onclick="_szT('degu',0.5)" title="Più">+</button></div>
+<div class="side-row"><span class="rl">Note ospite</span><button class="ctrl-btn" onclick="_szT('note',-0.5)" title="Meno">−</button><span class="sz-val" id="szT-note"></span><button class="ctrl-btn" onclick="_szT('note',0.5)" title="Più">+</button></div>
+</div>
+<div class="side-sec sec-teal"><div class="side-tit">Grassetto</div>
+<div class="side-row"><span class="rl">Nome piatto</span><button class="ctrl-btn" onclick="_szW(-100)" title="Più leggero">−</button><span class="sz-val" id="szWP"></span><button class="ctrl-btn" onclick="_szW(100)" title="Più grassetto">+</button></div>
+<div class="side-row"><span class="rl">Prezzo</span><button class="ctrl-btn" onclick="_szW2(-100)" title="Più leggero">−</button><span class="sz-val" id="szWPR"></span><button class="ctrl-btn" onclick="_szW2(100)" title="Più grassetto">+</button></div>
+</div>
+<div class="side-sec sec-violet"><div class="side-tit">Spazi e posizione</div>
+<div class="side-row"><span class="rl">Interlinea</span><button class="ctrl-btn" onclick="_szL(-0.05)" title="Meno">−</button><span class="sz-val" id="szValLh"></span><button class="ctrl-btn" onclick="_szL(0.05)" title="Più">+</button></div>
+<div class="side-row"><span class="rl">Spazio tra piatti</span><button class="ctrl-btn" onclick="_szG(-0.05)" title="Meno">−</button><span class="sz-val" id="szValGap"></span><button class="ctrl-btn" onclick="_szG(0.05)" title="Più">+</button></div>
+<div class="side-row"><span class="rl">Posizione (su/giù)</span><button class="ctrl-btn" onclick="_szS(-2)" title="Sposta su">−</button><span class="sz-val" id="szValShift"></span><button class="ctrl-btn" onclick="_szS(2)" title="Sposta giù">+</button></div>
+<div class="side-row"><span class="rl">Note dal fondo</span><button class="ctrl-btn" onclick="_szN(-1)" title="Più in basso">−</button><span class="sz-val" id="szNB"></span><button class="ctrl-btn" onclick="_szN(1)" title="Più in alto">+</button></div>
+</div>
+<div class="side-sec sec-amber"><div class="side-tit">Impaginazione</div>
+<div class="side-check" id="szCheck">Controllo in corso…</div></div>
+</aside>
+
+
+
 <div id="layout-carta"></div>
 <div id="layout-orario"></div>
 
@@ -702,19 +763,21 @@ const MENU = {
       }
     ]
   },
-  "fontScale": 0.97,
+  "fontScale": 0.85,
   "lineScale": 1,
   "gapScale": 1,
-  "shift": 0,
+  "shift": 6,
   "tipoScale": {
     "tit": 1,
     "piatto": 1,
-    "desc": 1,
-    "prezzo": 1,
+    "desc": 1.141,
+    "prezzo": 1.225,
     "degu": 1,
-    "note": 1
+    "note": 0.913
   },
-  "noteBottom": -13
+  "noteBottom": -13,
+  "pesoPiatto": 500,
+  "pesoPrezzo": 700
 };
 /* ═════════════════════════════════════════════════════════ */
 
@@ -929,11 +992,13 @@ function showLayout(which) {
 }
 
 /* ── init ── */
-var _sz={fs:(MENU.fontScale!=null?MENU.fontScale:1.12),lh:(MENU.lineScale!=null?MENU.lineScale:1),gap:(MENU.gapScale!=null?MENU.gapScale:1),shift:(MENU.shift!=null?MENU.shift:0),nb:(MENU.noteBottom!=null?MENU.noteBottom:6),k:Object.assign({tit:1,piatto:1,desc:1,prezzo:1,degu:1,note:1},MENU.tipoScale||{})};
+var _sz={fs:(MENU.fontScale!=null?MENU.fontScale:1.12),lh:(MENU.lineScale!=null?MENU.lineScale:1),gap:(MENU.gapScale!=null?MENU.gapScale:1),shift:(MENU.shift!=null?MENU.shift:0),nb:(MENU.noteBottom!=null?MENU.noteBottom:6),wp:(MENU.pesoPiatto!=null?MENU.pesoPiatto:500),wpr:(MENU.pesoPrezzo!=null?MENU.pesoPrezzo:500),k:Object.assign({tit:1,piatto:1,desc:1,prezzo:1,degu:1,note:1},MENU.tipoScale||{})};
 /* dimensioni per tipologia: [pt di stampa a scala 1, dipende da fontScale?] */
 var _SZT={tit:[22.5,1],piatto:[18/0.97,1],desc:[15/0.97,1],prezzo:[12,1],degu:[21,1],note:[10.95,0]};
 function _szTbase(key){var t=_SZT[key];return t[0]*(t[1]?_sz.fs:1);}
-function _szTipi(){var r=document.getElementById('layout-carta');if(r)r.style.setProperty('--note-bottom',_sz.nb);var nbEl=document.getElementById('szNB');if(nbEl)nbEl.textContent=_sz.nb+' mm';Object.keys(_SZT).forEach(function(key){if(r)r.style.setProperty('--k-'+key,_sz.k[key]);var el=document.getElementById('szT-'+key);if(el)el.textContent=(Math.round(_szTbase(key)*_sz.k[key]*2)/2)+' pt';});}
+function _szTipi(){var r=document.getElementById('layout-carta');if(r)r.style.setProperty('--note-bottom',_sz.nb);var nbEl=document.getElementById('szNB');if(nbEl)nbEl.textContent=_sz.nb+' mm';if(r)r.style.setProperty('--w-piatto',_sz.wp);var wpEl=document.getElementById('szWP');if(wpEl)wpEl.textContent=_sz.wp;if(r)r.style.setProperty('--w-prezzo',_sz.wpr);var wprEl=document.getElementById('szWPR');if(wprEl)wprEl.textContent=_sz.wpr;Object.keys(_SZT).forEach(function(key){if(r)r.style.setProperty('--k-'+key,_sz.k[key]);var el=document.getElementById('szT-'+key);if(el)el.textContent=(Math.round(_szTbase(key)*_sz.k[key]*2)/2)+' pt';});}
+function _szW2(d){_sz.wpr=Math.max(400,Math.min(700,_sz.wpr+d));_szApply();}
+function _szW(d){_sz.wp=Math.max(400,Math.min(700,_sz.wp+d));_szApply();}
 function _szN(d){_sz.nb=Math.max(-20,Math.min(40,_sz.nb+d));_szApply();}
 var _szVT=null;
 function _szVerifica(){
@@ -946,20 +1011,24 @@ function _szVerifica(){
     fr.style.cssText='position:absolute;left:-99999px;top:0;width:194mm;height:1400px;border:0;visibility:hidden';
     var html='<!DOCTYPE html>'+document.documentElement.outerHTML.replace(/@media print/g,'@media all');
     fr.onload=function(){
-      try{
-        var w=fr.contentWindow;w._sz=JSON.parse(JSON.stringify(_sz));w._szApply();
-        var mm=function(px){return Math.round(px/3.7795*10)/10;};
-        var pgs=[].slice.call(w.document.querySelectorAll('#layout-carta .pg')),male=[],liberi=[];
-        pgs.forEach(function(pg,i){
-          var n=pg.querySelector('.note-ospite'),c=pg.querySelector('.pg-content,.degu');
-          var over=pg.scrollHeight-pg.clientHeight;
-          if(over>1)male.push('pag. '+(i+1)+' oltre di '+mm(over)+' mm');
-          else if(n&&c&&c.children.length){var k0=c.children[0].getBoundingClientRect(),k1=c.children[c.children.length-1].getBoundingClientRect();liberi.push(Math.max(0,mm(c.getBoundingClientRect().height-(k1.bottom-k0.top))));}
-        });
-        if(male.length){out.textContent='\u26a0 Impaginazione: '+male.join(', ')+' \u2014 riduci i caratteri';out.style.color='#b3261e';}
-        else{var lib=Math.min.apply(null,liberi);if(lib<6){out.textContent='\u26a0 Impaginazione al limite: solo '+lib+' mm liberi in una pagina \u2014 basta poco per sforare';out.style.color='#b26a00';}else{out.textContent='\u2713 Impaginazione ok (spazio libero minimo: '+lib+' mm)';out.style.color='#2e7d32';}}
-      }catch(e){out.textContent='';}
-      setTimeout(function(){if(fr.parentNode)fr.parentNode.removeChild(fr);},50);
+      var w=fr.contentWindow;
+      try{w._sz=JSON.parse(JSON.stringify(_sz));w._szApply();void w.document.body.offsetHeight;}catch(e){}
+      var pronto=(w.document.fonts&&w.document.fonts.ready)?w.document.fonts.ready:Promise.resolve();
+      pronto.then(function(){
+        try{
+          var mm=function(px){return Math.round(px/3.7795*10)/10;};
+          var pgs=[].slice.call(w.document.querySelectorAll('#layout-carta .pg')),male=[],liberi=[];
+          pgs.forEach(function(pg,i){
+            var n=pg.querySelector('.note-ospite'),c=pg.querySelector('.pg-content,.degu');
+            var over=pg.scrollHeight-pg.clientHeight-Math.max(-w._sz.nb,0)*3.7795; /* lo spostamento voluto delle note (nb negativo) non e' un'eccedenza */
+            if(over>1)male.push('pag. '+(i+1)+' oltre di '+mm(over)+' mm');
+            else if(n&&c&&c.children.length){var k0=c.children[0].getBoundingClientRect(),k1=c.children[c.children.length-1].getBoundingClientRect();liberi.push(Math.max(0,mm(c.getBoundingClientRect().height-(k1.bottom-k0.top))));}
+          });
+          if(male.length){out.textContent='\u26a0 Impaginazione: '+male.join(', ')+' \u2014 riduci i caratteri';out.style.color='#b3261e';}
+          else{var lib=Math.min.apply(null,liberi);if(lib<6){out.textContent='\u26a0 Impaginazione al limite: solo '+lib+' mm liberi in una pagina \u2014 basta poco per sforare';out.style.color='#b26a00';}else{out.textContent='\u2713 Impaginazione ok (spazio libero minimo: '+lib+' mm)';out.style.color='#2e7d32';}}
+        }catch(e){out.textContent='';}
+        setTimeout(function(){if(fr.parentNode)fr.parentNode.removeChild(fr);},50);
+      });
     };
     fr.srcdoc=html;document.body.appendChild(fr);
   },700);
@@ -970,8 +1039,8 @@ function _szF(d){_sz.fs=Math.max(0.85,Math.min(1.4,Math.round((_sz.fs+d)*100)/10
 function _szL(d){_sz.lh=Math.max(0.8,Math.min(1.5,Math.round((_sz.lh+d)*100)/100));_szApply();}
 function _szG(d){_sz.gap=Math.max(0.6,Math.min(1.7,Math.round((_sz.gap+d)*100)/100));_szApply();}
 function _szS(d){_sz.shift=Math.max(-25,Math.min(25,_sz.shift+d));_szApply();}
-function _szR(){_sz={fs:1.12,lh:1,gap:1,shift:0,nb:6,k:{tit:1,piatto:1,desc:1,prezzo:1,degu:1,note:1}};_szApply();}
-function _szSave(){if(window.opener&&!window.opener.closed&&window.opener.salvaImpostazioniStampa){window.opener.salvaImpostazioniStampa({fs:_sz.fs,lh:_sz.lh,gap:_sz.gap,shift:_sz.shift,nb:_sz.nb,k:_sz.k});alert('Impostazioni fissate. Le sto pubblicando in automatico: guarda lo stato nella scheda Admin Menù (non chiuderla finché non compare la conferma).');}else{alert('Non riesco a salvare: la scheda Admin Menù da cui hai aperto questa preview è chiusa. Riaprila da lì.');}}
+function _szR(){_sz={fs:1.12,lh:1,gap:1,shift:0,nb:6,wp:500,wpr:500,k:{tit:1,piatto:1,desc:1,prezzo:1,degu:1,note:1}};_szApply();}
+function _szSave(){if(window.opener&&!window.opener.closed&&window.opener.salvaImpostazioniStampa){window.opener.salvaImpostazioniStampa({fs:_sz.fs,lh:_sz.lh,gap:_sz.gap,shift:_sz.shift,nb:_sz.nb,wp:_sz.wp,wpr:_sz.wpr,k:_sz.k});alert('Impostazioni fissate. Le sto pubblicando in automatico: guarda lo stato nella scheda Admin Menù (non chiuderla finché non compare la conferma).');}else{alert('Non riesco a salvare: la scheda Admin Menù da cui hai aperto questa preview è chiusa. Riaprila da lì.');}}
 renderCarta();
 renderOrario();
 showLayout('carta');

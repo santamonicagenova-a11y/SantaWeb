@@ -492,7 +492,7 @@
   </style>
 </head>
 <body>
-<div class="ctrl-bar">
+<div class="ctrl-bar adm">
   <button class="ctrl-btn active" id="btn-carta" onclick="showLayout('carta')">☞ Menù alla carta (3 pag.)</button>
   <button class="ctrl-btn" id="btn-orario" onclick="showLayout('orario')">☞ Foglio orario (1 pag.)</button>
   <button class="ctrl-btn b-stampa" onclick="window.print()">⚡ Stampa</button>
@@ -551,24 +551,29 @@ const MENU = {
       "7": "",
       "A tôa no se ven vëgi": [
         {
-          "nome": "&quot;Macchetto, what&#x27;s the point in me saying that...&quot;",
-          "sostenibile": true
+          "nome": "&quot;Macchetto, what&#x27;s the point in saying that...&quot;",
+          "sostenibile": true,
+          "descrizione": "Stuffed baby lettuce, peppers and a dish of anchovies"
         },
         {
           "nome": "&quot;Forest oyster&quot;",
-          "sostenibile": true
+          "sostenibile": true,
+          "descrizione": "Tempura-fried oyster, porcini mushrooms, quinces, cucumbers"
         },
         {
           "nome": "&quot;Sanna&quot;",
-          "sostenibile": true
+          "sostenibile": true,
+          "descrizione": "Squid, pink prawns, aubergine, black cabbage, red onion"
         },
         {
           "nome": "&quot;Itosnap&quot;",
-          "sostenibile": true
+          "sostenibile": true,
+          "descrizione": "Pansori stuffed with walnut sauce in porcini mushroom stock"
         },
         {
           "nome": "&quot;Mr Bean&quot;",
-          "sostenibile": true
+          "sostenibile": true,
+          "descrizione": "Salted cod, cannellini beans, lard, aioli sauce"
         },
         {
           "nome": "&quot;Panissa salad&quot;"
@@ -634,7 +639,7 @@ const MENU = {
           "descrizione": "Tempura-fried oyster, porcini mushrooms, quinces, cucumbers"
         },
         {
-          "nome": "&quot;Macchetto, what&#x27;s the point in me saying that...&quot;",
+          "nome": "&quot;Macchetto, what&#x27;s the point in saying that...&quot;",
           "prezzo": 14,
           "sostenibile": true,
           "descrizione": "Stuffed baby lettuce, peppers and a dish of anchovies"
@@ -654,7 +659,7 @@ const MENU = {
         {
           "nome": "“Not cheeses”",
           "prezzo": 22,
-          "descrizione": "Tasting of vegan artisanal ‘cheeses’ made from cashews and almond milk"
+          "descrizione": "Tasting of vegan artisanal cheeses made from cashews and almond milk"
         }
       ],
       "titolo_display": "Starters"
@@ -696,7 +701,7 @@ const MENU = {
           "nome": "&quot;Curry, curry, lad&quot;",
           "prezzo": 32,
           "sostenibile": true,
-          "descrizione": "Red seabream, courgettes, curry, pineapple, friggitelli peppers, peanuts"
+          "descrizione": "Red sea bream, courgettes, curry, pineapple, friggitelli peppers, peanuts"
         },
         {
           "nome": "&quot;Buridda chaperon&quot;",
@@ -735,7 +740,7 @@ const MENU = {
         {
           "nome": "&quot;Ripienamisù&quot;",
           "prezzo": 10,
-          "descrizione": "Ladyfingers, mascarpone, coffee ice cream"
+          "descrizione": "Ladyfinger, mascarpone, coffee ice cream"
         },
         {
           "nome": "Sacripantina",
@@ -877,7 +882,7 @@ const MENU = {
         "titolo_display": "Antipasti",
         "piatti": [
           {
-            "nome": "&quot;Macchetto, what&#x27;s the point in me saying that...&quot;",
+            "nome": "&quot;Macchetto, what&#x27;s the point in saying that...&quot;",
             "allergeni": [
               "fish",
               "milk",

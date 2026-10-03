@@ -464,6 +464,9 @@
     .side-check { font-size: .74rem; line-height: 1.4; color: #9aa3b5; padding: .2rem 0; }
     @media (max-width: 1150px) { body:has(.side-bar) #layout-carta, body:has(.side-bar) #layout-orario { padding-left: 0; } .side-bar { position: static; width: auto; margin: .6rem; max-height: none; } }
     @media print { .side-bar { display: none !important; } body:has(.side-bar) #layout-carta, body:has(.side-bar) #layout-orario { padding-left: 0; } }
+    /* v 2026.10.03.07: piatti del percorso di degustazione con interlinea come la carta */
+    #layout-carta .percorso-piatto:not(.percorso-libero) { line-height: calc(1.4 * var(--lh, 1)); padding: calc(.5mm * var(--gap, 1)) 0; }
+    #layout-carta .percorso-desc { margin-top: .3mm; }
     .tipo-grp { display: inline-flex; align-items: center; gap: .3rem; }
     .tipo-lbl { font-family: 'Jost', sans-serif; font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--stone); }
     .tipo-grp .ctrl-btn { padding: .25rem .7rem; }
@@ -551,7 +554,7 @@ const MENU = {
       "7": "",
       "A tôa no se ven vëgi": [
         {
-          "nome": "&quot;Macchetto, what’s the point in saying that...&quot;",
+          "nome": "&quot;Macchetto, what&#x27;s the point in me saying that...&quot;",
           "sostenibile": true,
           "descrizione": "Stuffed baby lettuce, peppers and a dish of anchovies"
         },
@@ -597,11 +600,13 @@ const MENU = {
         },
         {
           "nome": "Enrico IV Oysters",
-          "prezzo": 8
+          "prezzo": 8,
+          "unita": "ea."
         },
         {
           "nome": "Antilope Oysters",
-          "prezzo": 7
+          "prezzo": 7,
+          "unita": "ea."
         },
         {
           "nome": "Local scampi",
@@ -640,7 +645,7 @@ const MENU = {
           "descrizione": "Tempura-fried oyster, porcini mushrooms, quinces, cucumbers"
         },
         {
-          "nome": "&quot;Macchetto, what’s the point in saying that...&quot;",
+          "nome": "&quot;Macchetto, what&#x27;s the point in me saying that...&quot;",
           "prezzo": 14,
           "sostenibile": true,
           "descrizione": "Stuffed baby lettuce, peppers and a dish of anchovies"
@@ -649,7 +654,7 @@ const MENU = {
           "nome": "&quot;Every curl is a whim&quot;",
           "prezzo": 19,
           "sostenibile": true,
-          "descrizione": "Yellowtail, sage, beetroot in a tangy sauce, leeks, horseradish"
+          "descrizione": "Yellowtail, sage, pickled beetroot, leeks, horseradish"
         },
         {
           "nome": "&quot;Sanna&quot;",
@@ -660,7 +665,7 @@ const MENU = {
         {
           "nome": "“Not cheeses”",
           "prezzo": 22,
-          "descrizione": "Tasting of craft-style ‘cheese’ alternatives made from cashews and almond milk"
+          "descrizione": "Tasting of artisan ‘fake’ cheeses made from cashews and almond milk"
         }
       ],
       "titolo_display": "Starters"
@@ -702,12 +707,12 @@ const MENU = {
           "nome": "&quot;Curry, curry, lad&quot;",
           "prezzo": 32,
           "sostenibile": true,
-          "descrizione": "Red snapper, courgettes, curry, pineapple, friggitelli peppers, peanuts"
+          "descrizione": "Red sea bream, courgettes, curry, pineapple, friggitelli peppers, peanuts"
         },
         {
           "nome": "&quot;Buridda chaperon&quot;",
           "prezzo": 32,
-          "descrizione": "Yellowtail, cuttlefish buridda, mango",
+          "descrizione": "Yellowtail, cuttlefish salad, mango",
           "sostenibile": true
         },
         {
@@ -837,6 +842,7 @@ const MENU = {
     ],
     "sezioni": [
       {
+        "nascosta": false,
         "titolo_display": "Raw",
         "piatti": [
           {
@@ -846,7 +852,13 @@ const MENU = {
             ]
           },
           {
-            "nome": "Gillardeau Oysters",
+            "nome": "Enrico IV Oysters",
+            "allergeni": [
+              "molluscs"
+            ]
+          },
+          {
+            "nome": "Antilope Oysters",
             "allergeni": [
               "molluscs"
             ]
@@ -880,10 +892,19 @@ const MENU = {
         ]
       },
       {
+        "nascosta": false,
         "titolo_display": "Antipasti",
         "piatti": [
           {
-            "nome": "&quot;Macchetto, what’s the point in saying that...&quot;",
+            "nome": "&quot;Forest oyster&quot;",
+            "allergeni": [
+              "gluten",
+              "peanuts",
+              "molluscs"
+            ]
+          },
+          {
+            "nome": "&quot;Macchetto, what&#x27;s the point in me saying that...&quot;",
             "allergeni": [
               "fish",
               "milk",
@@ -906,14 +927,6 @@ const MENU = {
             ]
           },
           {
-            "nome": "&quot;Forest oyster&quot;",
-            "allergeni": [
-              "gluten",
-              "peanuts",
-              "molluscs"
-            ]
-          },
-          {
             "nome": "“Not cheeses”",
             "allergeni": [
               "nuts"
@@ -922,15 +935,17 @@ const MENU = {
         ]
       },
       {
+        "nascosta": false,
         "titolo_display": "Pasta & Grains",
         "piatti": [
           {
-            "nome": "&quot;Noble waste&quot;",
+            "nome": "&quot;Turnip Ganbou&quot;",
             "allergeni": [
-              "gluten",
-              "eggs",
+              "crustaceans",
               "fish",
-              "sulphites"
+              "milk",
+              "celery",
+              "molluscs"
             ]
           },
           {
@@ -941,13 +956,12 @@ const MENU = {
             ]
           },
           {
-            "nome": "&quot;Turnip Ganbou&quot;",
+            "nome": "&quot;Noble waste&quot;",
             "allergeni": [
-              "crustaceans",
+              "gluten",
+              "eggs",
               "fish",
-              "milk",
-              "celery",
-              "molluscs"
+              "sulphites"
             ]
           },
           {
@@ -963,6 +977,7 @@ const MENU = {
         ]
       },
       {
+        "nascosta": false,
         "titolo_display": "Not Only Sea",
         "piatti": [
           {
@@ -1004,6 +1019,7 @@ const MENU = {
         ]
       },
       {
+        "nascosta": true,
         "titolo_display": "Golosità",
         "piatti": [
           {
@@ -1124,7 +1140,7 @@ function buildDegu(degu) {
     } else {
       const righe = piatti.map(p => {
         const descHtml = p.descrizione ? `<span class="percorso-desc">${p.descrizione}</span>` : '';
-        return `<div class="percorso-piatto${p.sostenibile ? ' eco' : ''}">${p.nome}${descHtml}</div>`;
+        return `<div class="percorso-piatto"><span class="${p.sostenibile ? 'eco' : ''}">${p.nome}</span>${descHtml}</div>`;
       }).join('');
       percorsiHtml += `
         <div class="percorso${printCls}">
@@ -1321,6 +1337,7 @@ function renderAllergeniPage(){
   var h = "<div class=\"alg-header\"><div class=\"alg-title\">"+esc(A.header)+"</div></div>";
   h += "<div class=\"alg-nota\">"+esc(A.nota)+"</div>";
   A.sezioni.forEach(function(sez){
+    if (sez.nascosta) return;
     h += "<div class=\"alg-sez\"><div class=\"alg-sez-titolo\">"+esc(sez.titolo_display)+"</div>";
     (sez.piatti||[]).forEach(function(p){
       var has = p.allergeni && p.allergeni.length;

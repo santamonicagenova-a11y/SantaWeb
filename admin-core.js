@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.10.03.05 — Preview carta: barra superiore + barra laterale (_barraCarta), peso del prezzo (dati.pesoPrezzo).
 // v 2026.10.03.04 — Carta: controllo «Peso nome piatto» (dati.pesoPiatto).
 // v 2026.10.03.03 — «Fissa come default» (carta) avvia da solo Traduci e Pubblica.
 // v 2026.10.03.02 — Rimossa la nota di stampa «Stampa → Salva come PDF → Foxit Reader 97%» dalla barra della preview (carta e dolci).
@@ -671,17 +672,7 @@ function costruisciOutput() {
     // Inietta la ctrl-bar (versione admin: switch carta/orario + stampa + scarica).
     // costruisciMenuItPub() rimuove solo BTNS dei bottoni switch per il pubblico;
     // qui aggiungiamo tutta la barra.
-    var CTRL_BAR = '<div class="ctrl-bar">\n'
-      + '  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout(\'carta\')">\u261e Men\u00f9 alla carta (3 pag.)</button>\n'
-      + '  <div class="ctrl-sep"></div>\n'
-      + '  <button class="ctrl-btn" id="btn-orario" onclick="showLayout(\'orario\')">\u261e Foglio orario (1 pag.)</button>\n'
-      + '  <div class="ctrl-sep"></div>\n'
-      + '  <button class="ctrl-btn" onclick="window.print()">\u26a1 Stampa</button>\n'
-      + '  <div class="ctrl-sep"></div>\n'
-      + _SIZE_BTNS
-      + _TIPI_BTNS
-      + '</div>\n'
-      + _STAMPA_HINT;
+    var CTRL_BAR = _barraCarta() + _STAMPA_HINT;
     html = html.replace('<body>\n', '<body>\n' + CTRL_BAR);
     return html;
   }
@@ -706,6 +697,46 @@ var _qrBase64 = null;   // base64 del nuovo QR selezionato (separato dal MENU)
 
 // Pulsanti dimensione/spaziatura per la barra della preview (carta + dolci).
 // Chiamano le funzioni _sz* definite nello <script> della pagina (CARTA_TPL_A / menu-dolci.html).
+// v 2026.10.03.05: barra superiore + barra laterale della preview CARTA (i dolci usano ancora _dolciCtrlBar).
+function _barraCarta() {
+  function riga(label, idVal, fMeno, fPiu, tMeno, tPiu) {
+    return '<div class="side-row"><span class="rl">' + label + '</span>'
+      + '<button class="ctrl-btn" onclick="' + fMeno + '" title="' + (tMeno || 'Meno') + '">\u2212</button>'
+      + '<span class="sz-val" id="' + idVal + '"></span>'
+      + '<button class="ctrl-btn" onclick="' + fPiu + '" title="' + (tPiu || 'Pi\u00f9') + '">+</button></div>\n';
+  }
+  var top = '<div class="ctrl-bar">\n'
+    + '  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout(\'carta\')">\u261e Men\u00f9 alla carta (3 pag.)</button>\n'
+    + '  <button class="ctrl-btn" id="btn-orario" onclick="showLayout(\'orario\')">\u261e Foglio orario (1 pag.)</button>\n'
+    + '  <button class="ctrl-btn b-stampa" onclick="window.print()">\u26a1 Stampa</button>\n'
+    + '  <button class="ctrl-btn b-reset" onclick="_szR()" title="Ripristina dimensioni">\u21ba Ripristina</button>\n'
+    + '  <button class="ctrl-btn b-fissa" onclick="_szSave()" title="Fissa i valori attuali come predefiniti e pubblica">\u2714 Fissa come default</button>\n'
+    + '</div>\n';
+  var side = '<aside class="side-bar" id="side-bar">\n'
+    + '<div class="side-sec sec-blue"><div class="side-tit">Dimensione caratteri</div>\n'
+    + riga('Tutti', 'szValFs', '_szF(-0.03)', '_szF(0.03)', 'Caratteri pi\u00f9 piccoli', 'Caratteri pi\u00f9 grandi')
+    + riga('Titoli sezione', 'szT-tit', "_szT('tit',-0.5)", "_szT('tit',0.5)")
+    + riga('Nome piatto', 'szT-piatto', "_szT('piatto',-0.5)", "_szT('piatto',0.5)")
+    + riga('Descrizione', 'szT-desc', "_szT('desc',-0.5)", "_szT('desc',0.5)")
+    + riga('Prezzo', 'szT-prezzo', "_szT('prezzo',-0.5)", "_szT('prezzo',0.5)")
+    + riga('Degustazione', 'szT-degu', "_szT('degu',-0.5)", "_szT('degu',0.5)")
+    + riga('Note ospite', 'szT-note', "_szT('note',-0.5)", "_szT('note',0.5)")
+    + '</div>\n'
+    + '<div class="side-sec sec-teal"><div class="side-tit">Grassetto</div>\n'
+    + riga('Nome piatto', 'szWP', '_szW(-100)', '_szW(100)', 'Pi\u00f9 leggero', 'Pi\u00f9 grassetto')
+    + riga('Prezzo', 'szWPR', '_szW2(-100)', '_szW2(100)', 'Pi\u00f9 leggero', 'Pi\u00f9 grassetto')
+    + '</div>\n'
+    + '<div class="side-sec sec-violet"><div class="side-tit">Spazi e posizione</div>\n'
+    + riga('Interlinea', 'szValLh', '_szL(-0.05)', '_szL(0.05)')
+    + riga('Spazio tra piatti', 'szValGap', '_szG(-0.05)', '_szG(0.05)')
+    + riga('Posizione (su/gi\u00f9)', 'szValShift', '_szS(-2)', '_szS(2)', 'Sposta su', 'Sposta gi\u00f9')
+    + riga('Note dal fondo', 'szNB', '_szN(-1)', '_szN(1)', 'Note pi\u00f9 in basso', 'Note pi\u00f9 in alto')
+    + '</div>\n'
+    + '<div class="side-sec sec-amber"><div class="side-tit">Impaginazione</div>\n'
+    + '<div class="side-check" id="szCheck">Controllo in corso\u2026</div></div>\n'
+    + '</aside>\n';
+  return top + side;
+}
 // Dimensione per tipologia (solo carta): −/+ da 0,5 pt, valore in pt di stampa. Funzioni _szT/_szTipi nello script della pagina (CARTA_TPL_A).
 var _TIPI_BTNS = (function () {
   var tipi = [['tit', 'Titoli sezione'], ['piatto', 'Nome piatto'], ['desc', 'Descrizione'], ['prezzo', 'Prezzo'], ['degu', 'Degustazione'], ['note', 'Note ospite']];
@@ -755,6 +786,7 @@ function salvaImpostazioniStampa(vals) {
   dati.shift     = vals.shift;
   if (vals.k) dati.tipoScale = vals.k; // dimensioni per tipologia (solo carta)
   if (vals.wp != null) dati.pesoPiatto = vals.wp; // peso del nome piatto (400-700, solo carta)
+  if (vals.wpr != null) dati.pesoPrezzo = vals.wpr; // peso del prezzo (400-700, solo carta)
   if (vals.nb != null) dati.noteBottom = vals.nb; // posizione note dal fondo (mm, solo carta)
   if (tipoMenuCorrente === 'carta') {
     // v 2026.10.03.03: "Fissa come default" pubblica da solo (come premere Traduci e Pubblica)
@@ -1110,6 +1142,7 @@ function eseguiPubblicazione(token) {
       if (dati.tipoScale != null) m.tipoScale = dati.tipoScale;
       if (dati.noteBottom != null) m.noteBottom = dati.noteBottom;
       if (dati.pesoPiatto != null) m.pesoPiatto = dati.pesoPiatto;
+      if (dati.pesoPrezzo != null) m.pesoPrezzo = dati.pesoPrezzo;
     }
     // F0.21-d: accorpa i dolci nella carta SOLO per le lingue (IT resta separato/stampato).
     var mDolci = costruisciDolciPerCarta(lang);

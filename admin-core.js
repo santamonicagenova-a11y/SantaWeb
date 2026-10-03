@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.10.03.09 — Allergeni carta: i dolci restano nei dati (stampa dolci, filtro EN/FR) ma sono marcati nascosta e non compaiono nella pagina (IT ed EN/FR).
 // v 2026.10.03.08 — Degustazione: campo «Descrizione» per ogni piatto del percorso (d6d-*), letto da leggi() e tradotto in EN/FR.
 // v 2026.10.03.07 — Pagina Allergeni carta: preview con barra superiore + laterale (_barraCarta({allergeni:true})), impostazioni di stampa in ALLERGENI_DATA, Fissa come default pubblica.
 // v 2026.10.03.06 — Dolci allineati alla carta: _barraCarta({dolci:true}) come barra della preview, «Fissa come default» pubblica da solo anche i dolci.
@@ -1215,6 +1216,7 @@ function eseguiPubblicazione(token) {
       '  var h = "<div class=\\"alg-header\\"><div class=\\"alg-title\\">"+esc(A.header)+"</div></div>";\n' +
       '  h += "<div class=\\"alg-nota\\">"+esc(A.nota)+"</div>";\n' +
       '  A.sezioni.forEach(function(sez){\n' +
+      '    if (sez.nascosta) return;\n' +
       '    h += "<div class=\\"alg-sez\\"><div class=\\"alg-sez-titolo\\">"+esc(sez.titolo_display)+"</div>";\n' +
       '    (sez.piatti||[]).forEach(function(p){\n' +
       '      var has = p.allergeni && p.allergeni.length;\n' +
@@ -1392,10 +1394,13 @@ function costruisciAllergeniPerCarta(lang) {
   function trNome(n) { var c = String(n).replace(/<[^>]+>/g, ''); return dynPiatti[c] || dynPiatti[n] || c; }
   function trSez(t)  { if (t === 'Menù Degustazione') return T.deguTitolo; return dynSez[t] || dynPiatti[t] || t; }
   var sezioni = [];
+  // v 2026.10.03.09: i dolci non compaiono nella pagina allergeni (restano nei dati: filtro allergeni EN/FR)
+  var _titoliDolciNasc = ((_dolciCartaLive && _dolciCartaLive.sezioni) || (typeof MENU_DOLCI_IT !== 'undefined' && MENU_DOLCI_IT && MENU_DOLCI_IT.sezioni) || []).map(function (x) { return _pdNorm(x.titolo_display || x.titolo); });
   // 1) CARTA (da menu-allergeni.html)
   if (_allergeniCartaLive && _allergeniCartaLive.sezioni) {
     _allergeniCartaLive.sezioni.forEach(function(sez) {
       sezioni.push({
+        nascosta: !!sez.nascosta || _titoliDolciNasc.indexOf(_pdNorm(sez.titolo)) >= 0,
         titolo_display: trSez(sez.titolo),
         piatti: (sez.piatti || []).map(function(p) {
           return { nome: trNome(p.nome), allergeni: _normAllergeni(p.allergeni).map(function(a){ return _trAllergene(a, lang); }) };
@@ -1416,6 +1421,7 @@ function costruisciAllergeniPerCarta(lang) {
   });
   if (dolciAll && dolciAll.length && !dolciGiaInCarta) {
     sezioni.push({
+      nascosta: true,
       titolo_display: (typeof TRADUZIONI_DOLCI !== 'undefined' && TRADUZIONI_DOLCI[lang] && TRADUZIONI_DOLCI[lang].sezione) || T.dolciTitolo,
       piatti: dolciAll.map(function(p) {
         return { nome: trNome(p.nome), allergeni: _normAllergeni(p.allergeni).map(function(a){ return _trAllergene(a, lang); }) };
@@ -1998,7 +2004,7 @@ function caricaAllergeniDalSito() {
       Promise.all([_get(MENU_URL), _get(DOLCI_URL).catch(function () { return null; })])
         .then(function (menus) {
           var sez = [];
-          menus.forEach(function (m) { if (m && Array.isArray(m.sezioni)) sez = sez.concat(m.sezioni); });
+          menus.forEach(function (m, mi) { if (m && Array.isArray(m.sezioni)) sez = sez.concat(mi === 1 ? m.sezioni.map(function (x) { var c = JSON.parse(JSON.stringify(x)); c._dolci = true; return c; }) : m.sezioni); });
           if (!sez.length) throw new Error('menu carta non leggibile');
           datiMenuPerAllergeni = { sezioni: sez, degustazione: menus[0] && menus[0].degustazione };
           costruisciFormAllergeni();
@@ -2066,10 +2072,9 @@ function costruisciFormAllergeni() {
           allergeni: mapExisting[nomeClean] || []
         };
       });
-      sezioniAllergeni.push({
-        titolo: sez.titolo_display || sez.titolo,
-        piatti: piatti
-      });
+      var _vo = { titolo: sez.titolo_display || sez.titolo, piatti: piatti };
+      if (sez._dolci) _vo.nascosta = true; // v 2026.10.03.09: i dolci si compilano qui ma non compaiono nella pagina allergeni
+      sezioniAllergeni.push(_vo);
     });
     var degu = datiMenuPerAllergeni.degustazione;
     if (degu && degu.percorsi) {
@@ -2114,7 +2119,7 @@ function costruisciFormAllergeni() {
 
     var sezTit = document.createElement('div');
     sezTit.className = 'sub';
-    sezTit.textContent = sez.titolo;
+    sezTit.textContent = sez.titolo + (sez.nascosta ? ' \u2014 dolci (non compaiono nella pagina allergeni)' : '');
     sezTit.style.cssText = 'font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.5rem;padding-bottom:.3rem;border-bottom:1px solid var(--rule)';
     sezBlock.appendChild(sezTit);
 

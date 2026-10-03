@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.10.03.02 — I dolci non compaiono nella pagina allergeni: sezioni con "nascosta": true restano nei dati (stampa dolci, filtro EN/FR) ma non si renderizzano. -->
 <!-- v 2026.10.03.01 — Controlli di stampa come carta e dolci (dimensione per tipologia, pesi, interlinea, spazio, posizione, indicatore di impaginazione); aspetto di default invariato; altezza pagina in stampa 296mm. -->
 <!-- v 2026.09.27.01 — SEO: ripristinati title/description approvati il 10/6 (persi), + robots index e canonical /menu-allergeni; titolo "Allergeni" da <div> a <h1> (margin:0, aspetto invariato). Nessuna modifica ai dati allergeni. Head e render sono preservati dalla pubblicazione del pannello. -->
 <!-- v 2026.09.12.03 — Allineamento centrato in orizzontale su richiesta di Andrea: titoli
@@ -442,6 +443,7 @@ const ALLERGENI_DATA = {
     },
     {
       "titolo": "Golosità",
+      "nascosta": true,
       "piatti": [
         {
           "nome": "\"Insalata di panissa\"",
@@ -512,6 +514,7 @@ pg.innerHTML = '<div class="pg-header">' +
 
 // Sezioni
 ALLERGENI_DATA.sezioni.forEach(function(sez) {
+if (sez.nascosta) return; // v 2026.10.03.02: i dolci restano nei dati ma non si mostrano
 var sezDiv = document.createElement('div');
 sezDiv.className = 'sezione';
 

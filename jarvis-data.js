@@ -1,15 +1,15 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-10-03",
- "versione": "2026.10.03.01",
- "briefing": "**Briefing 3/10/2026** — **Sito** (live): stampa del menù rifatta. Note per l'ospite calibrate a −13 mm (sulla tua stampante erano 17 mm troppo in alto), indicatore di impaginazione che avvisa prima che una pagina sfori, nome piatto in lieve grassetto con peso regolabile anche per il prezzo, nuova preview con barra superiore (5 pulsanti) e barra laterale a sezioni colorate. «Fissa come default» ora pubblica da solo. Dolci allineati alla carta. La lettura obbligatoria del menù in prenotazione è **disattivata** (si riattiva con un flag). **Aspetta te**: stampare i dolci con la nuova preview e fissare. Sotto, i briefing di ieri.\n**Briefing 2/10/2026 (notte)** — **Sito** (live): filtro allergeni del menù più leggibile (testo +50%, piatto e allergene in due riquadri marrone), frecce ▲▼ per riordinare i piatti in menu-admin, stampa carta con le note sul fondo e dimensione caratteri per tipologia (con pt), e **lettura obbligatoria del menù** al passo 4 della prenotazione (finestra interna; header allentati solo per /menu e /prenota). **Aspetta te**: stampare la carta e provare i controlli per tipologia («Fissa come default» + Pubblica). Sotto, il briefing di prima sulle cene a tema.\n**Briefing 2/10/2026 (sera)** — **Sito** (live): nuove **cene a tema**. Pagina `/cene-a-tema` (IT/EN/FR) con voce «Serate» nel menu, banner overlay in home con la foto di Anna e Riku, loghi Bellenda e Château Puybarbe con link. In menu-admin → Prenotazioni — Setup nuovo box **Serate speciali** (data, orario, posti, titolo con tendina dei titoli già usati, carta a garanzia sì/no): il sito resta prenotabile solo all'orario della serata, con avviso nel wizard; Setup ora a riquadri colorati e con le eccezioni di date/orari spostate dagli Orari di Apertura. Cena del 16/10: ore 20, 60 € tutto compreso, 16 posti, carta a garanzia. Il codice del banner resta per le prossime serate. **Aspetta te**: provare dal pannello «Salva serata speciale» (non provato da Claude), mandare menù e abbinamenti dei vini; restano compleanni/anniversari e le altre voci di ieri. **Prossimo**: menù della serata in pagina, poi idee 1, 7 e 14.",
+ "versione": "2026.10.03.02",
+ "briefing": "**Briefing 3/10/2026 (sera)** — **Sito**: la pagina **Allergeni carta** ha la stessa preview con barre e controlli di stampa della carta e dei dolci; i piatti del percorso a 6 della **degustazione** hanno ora una descrizione (stampata e tradotta). Un upload web aveva sovrascritto la pagina allergeni con una versione vecchia (piatti non più in carta): ripristinata. **Aspetta te**: ricaricare menu-admin (Ctrl+F5) e rifare «Allergeni carta», compilare le descrizioni della degustazione, stampare. I menu si cambiano solo da menu-admin, mai da upload.\n**Briefing 3/10/2026** — **Sito** (live): stampa del menù rifatta. Note per l'ospite calibrate a −13 mm (sulla tua stampante erano 17 mm troppo in alto), indicatore di impaginazione che avvisa prima che una pagina sfori, nome piatto in lieve grassetto con peso regolabile anche per il prezzo, nuova preview con barra superiore (5 pulsanti) e barra laterale a sezioni colorate. «Fissa come default» ora pubblica da solo. Dolci allineati alla carta. La lettura obbligatoria del menù in prenotazione è **disattivata** (si riattiva con un flag). **Aspetta te**: stampare i dolci con la nuova preview e fissare. Sotto, i briefing di ieri.\n**Briefing 2/10/2026 (notte)** — **Sito** (live): filtro allergeni del menù più leggibile (testo +50%, piatto e allergene in due riquadri marrone), frecce ▲▼ per riordinare i piatti in menu-admin, stampa carta con le note sul fondo e dimensione caratteri per tipologia (con pt), e **lettura obbligatoria del menù** al passo 4 della prenotazione (finestra interna; header allentati solo per /menu e /prenota). **Aspetta te**: stampare la carta e provare i controlli per tipologia («Fissa come default» + Pubblica). Sotto, il briefing di prima sulle cene a tema.\n**Briefing 2/10/2026 (sera)** — **Sito** (live): nuove **cene a tema**. Pagina `/cene-a-tema` (IT/EN/FR) con voce «Serate» nel menu, banner overlay in home con la foto di Anna e Riku, loghi Bellenda e Château Puybarbe con link. In menu-admin → Prenotazioni — Setup nuovo box **Serate speciali** (data, orario, posti, titolo con tendina dei titoli già usati, carta a garanzia sì/no): il sito resta prenotabile solo all'orario della serata, con avviso nel wizard; Setup ora a riquadri colorati e con le eccezioni di date/orari spostate dagli Orari di Apertura. Cena del 16/10: ore 20, 60 € tutto compreso, 16 posti, carta a garanzia. Il codice del banner resta per le prossime serate. **Aspetta te**: provare dal pannello «Salva serata speciale» (non provato da Claude), mandare menù e abbinamenti dei vini; restano compleanni/anniversari e le altre voci di ieri. **Prossimo**: menù della serata in pagina, poi idee 1, 7 e 14.",
  "kpi": {
   "aperte": 61,
   "scadute": 4,
   "bloccate": 1,
   "andrea": 19,
   "debiti": 11,
-  "chiuse30": 53
+  "chiuse30": 56
  },
  "subs": {
   "SEO": {
@@ -35,8 +35,8 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 123,
-   "done": 101,
+   "tot": 126,
+   "done": 104,
    "prog": 2,
    "up": 7,
    "future": 13,
@@ -669,6 +669,11 @@ window.JARVIS_DATA = {
  ],
  "sessioni": [
   {
+   "d": "2026-10-03",
+   "sub": "Sito",
+   "t": "Allergeni, degustazione e ripristino pagina allergeni"
+  },
+  {
    "d": "2026-10-02",
    "sub": "Sito",
    "t": "Cena a tema 16 ottobre, pagina e banner"
@@ -702,11 +707,6 @@ window.JARVIS_DATA = {
    "d": "2026-09-29",
    "sub": "Sito",
    "t": "Food Cost consumi interni, allergeni carta ed elenchi"
-  },
-  {
-   "d": "2026-09-29",
-   "sub": "Sito",
-   "t": "Stampa dolci e carta"
   }
  ],
  "perWeek": [
@@ -756,7 +756,7 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-09-28",
-   "n": 16
+   "n": 17
   }
  ],
  "perDay": [
@@ -782,7 +782,7 @@ window.JARVIS_DATA = {
   },
   {
    "g": "sab",
-   "n": 17
+   "n": 18
   },
   {
    "g": "dom",

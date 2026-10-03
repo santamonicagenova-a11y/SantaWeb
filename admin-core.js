@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.10.03.08 — Degustazione: campo «Descrizione» per ogni piatto del percorso (d6d-*), letto da leggi() e tradotto in EN/FR.
 // v 2026.10.03.07 — Pagina Allergeni carta: preview con barra superiore + laterale (_barraCarta({allergeni:true})), impostazioni di stampa in ALLERGENI_DATA, Fissa come default pubblica.
 // v 2026.10.03.06 — Dolci allineati alla carta: _barraCarta({dolci:true}) come barra della preview, «Fissa come default» pubblica da solo anche i dolci.
 // v 2026.10.03.05 — Preview carta: barra superiore + barra laterale (_barraCarta), peso del prezzo (dati.pesoPrezzo).
@@ -405,12 +406,13 @@ function costruisci() {
   bd.appendChild(s6wrap);
   var s6 = el('div','sub'); s6.innerHTML = 'Percorso \u201c6\u201d \u00a0<span style="color:var(--rust);font-size:.6rem">\u2611 = sostenibile *</span>';
   bd.appendChild(s6);
-  var h6 = el('div'); h6.style.cssText = 'display:grid;grid-template-columns:1fr 30px;gap:.4rem;padding:.3rem 0;border-bottom:1px solid var(--rule);margin-bottom:.3rem';
-  h6.appendChild(el('div','col-lbl','Nome piatto')); h6.appendChild(el('div','col-lbl','*'));
+  var h6 = el('div'); h6.style.cssText = 'display:grid;grid-template-columns:1.1fr 1fr 30px;gap:.4rem;padding:.3rem 0;border-bottom:1px solid var(--rule);margin-bottom:.3rem';
+  h6.appendChild(el('div','col-lbl','Nome piatto')); h6.appendChild(el('div','col-lbl','Descrizione')); h6.appendChild(el('div','col-lbl','*'));
   bd.appendChild(h6);
   m.degustazione.percorsi[_key6].forEach(function(p, i) {
     var row = el('div','degu-row');
     row.appendChild(inp('text','d6p-'+i, p.nome));
+    row.appendChild(inp('text','d6d-'+i, p.descrizione || '')); // v 2026.10.03.08: descrizione del piatto nel percorso
     row.appendChild(chk('d6s-'+i, p.sostenibile));
     bd.appendChild(row);
   });
@@ -557,6 +559,8 @@ function leggi(keepEmpty) {
       perc6.forEach(function(p, i) {
         var ne = document.getElementById('d6p-'+i);
         if (ne) p.nome = ne.value;
+        var de = document.getElementById('d6d-'+i);
+        if (de) { var dv = de.value.trim(); if (dv) p.descrizione = dv; else delete p.descrizione; }
         var eco = document.getElementById('d6s-'+i);
         if (eco && eco.checked) p.sostenibile = true; else delete p.sostenibile;
       });
@@ -1512,7 +1516,7 @@ function traduciEPubblica() {
       });
     }
     if (key6) {
-      m.degustazione.percorsi[key6].forEach(function(p) { if (p.nome) testi.push(p.nome); });
+      m.degustazione.percorsi[key6].forEach(function(p) { if (p.nome) testi.push(p.nome); if (p.descrizione) testi.push(p.descrizione); });
     }
   }
   m.sezioni.forEach(function(sez) {

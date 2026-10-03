@@ -1,3 +1,5 @@
+// admin-templates-shared.js — v 2026.10.03.06
+// v 2026.10.03.06 — Traduzione EN/FR anche della descrizione dei piatti nel percorso di degustazione.
 // admin-templates-shared.js — v 2026.10.03.05
 // v 2026.10.03.05 — Preview carta: barra superiore (carta/orario/stampa/ripristina/fissa) + barra laterale coi controlli, stile menu-admin; peso del prezzo regolabile (MENU.pesoPrezzo, --w-prezzo, default 500).
 // admin-templates-shared.js — v 2026.10.03.04
@@ -143,7 +145,7 @@ function costruisciMenuTradotto(menuForm, t) {
   }
   if (Array.isArray(m.degustazione.percorsi[lbl6])) {
     m.degustazione.percorsi[lbl6].forEach(function(p) {
-      if (p) p.nome = tr(p.nome);
+      if (p) { p.nome = tr(p.nome); if (p.descrizione) p.descrizione = tr(p.descrizione); }
     });
   }
 

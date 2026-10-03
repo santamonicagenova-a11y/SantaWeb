@@ -492,7 +492,7 @@
   </style>
 </head>
 <body>
-<div class="ctrl-bar">
+<div class="ctrl-bar adm">
   <button class="ctrl-btn active" id="btn-carta" onclick="showLayout('carta')">☞ Menù alla carta (3 pag.)</button>
   <button class="ctrl-btn" id="btn-orario" onclick="showLayout('orario')">☞ Foglio orario (1 pag.)</button>
   <button class="ctrl-btn b-stampa" onclick="window.print()">⚡ Stampa</button>
@@ -551,24 +551,29 @@ const MENU = {
       "7": "",
       "A tôa no se ven vëgi": [
         {
-          "nome": "« Macchetto, je le dis juste comme ça… »",
-          "sostenibile": true
+          "nome": "« Macchetto, à quoi bon le dire… »",
+          "sostenibile": true,
+          "descrizione": "Petites laitues farcies, poivrons et macchetto aux anchois"
         },
         {
           "nome": "« Huître des bois »",
-          "sostenibile": true
+          "sostenibile": true,
+          "descrizione": "Huître en tempura, cèpes, coings, concombres"
         },
         {
           "nome": "« Sanna »",
-          "sostenibile": true
+          "sostenibile": true,
+          "descrizione": "calmars, crevettes roses, aubergines, chou noir, oignon rouge"
         },
         {
           "nome": "« Itosnap »",
-          "sostenibile": true
+          "sostenibile": true,
+          "descrizione": "Pansori farcis à la sauce aux noix, dans un bouillon aux cèpes"
         },
         {
           "nome": "« Mr. Bean »",
-          "sostenibile": true
+          "sostenibile": true,
+          "descrizione": "Morue, haricots cannellini, lard, sauce aïoli"
         },
         {
           "nome": "« Salade de panissa »"
@@ -610,7 +615,7 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "Seulement du poisson cru (pas d&#x27;huîtres, pas de crustacés)",
+          "nome": "Uniquement du poisson cru (pas d&#x27;huîtres, pas de crustacés)",
           "prezzo": 35,
           "sostenibile": true,
           "staccato": true
@@ -631,10 +636,10 @@ const MENU = {
           "nome": "« Huître des bois »",
           "prezzo": 25,
           "sostenibile": true,
-          "descrizione": "Huîtres en tempura, cèpes, coings, concombres"
+          "descrizione": "Huître en tempura, cèpes, coings, concombres"
         },
         {
-          "nome": "« Macchetto, je le dis juste comme ça… »",
+          "nome": "« Macchetto, à quoi bon le dire… »",
           "prezzo": 14,
           "sostenibile": true,
           "descrizione": "Petites laitues farcies, poivrons et macchetto aux anchois"
@@ -643,7 +648,7 @@ const MENU = {
           "nome": "« Chaque ricciola a ses caprices »",
           "prezzo": 19,
           "sostenibile": true,
-          "descrizione": "Sériole, sauge, betterave marinée, poireaux, raifort"
+          "descrizione": "Sériole, sauge, betterave au vinaigre, poireaux, raifort"
         },
         {
           "nome": "« Sanna »",
@@ -701,7 +706,7 @@ const MENU = {
         {
           "nome": "« Buridda chaperon »",
           "prezzo": 32,
-          "descrizione": "Sériole, salade de seiches, mangue",
+          "descrizione": "Sériole, buridda de seiches, mangue",
           "sostenibile": true
         },
         {
@@ -858,7 +863,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "Seulement du poisson cru (pas d&#x27;huîtres, pas de crustacés)",
+            "nome": "Uniquement du poisson cru (pas d&#x27;huîtres, pas de crustacés)",
             "allergeni": [
               "poisson"
             ]
@@ -877,7 +882,7 @@ const MENU = {
         "titolo_display": "Antipasti",
         "piatti": [
           {
-            "nome": "« Macchetto, je le dis juste comme ça… »",
+            "nome": "« Macchetto, à quoi bon le dire… »",
             "allergeni": [
               "poisson",
               "lait",

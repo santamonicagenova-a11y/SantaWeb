@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.10.03.06 — Dolci allineati alla carta: _barraCarta({dolci:true}) come barra della preview, «Fissa come default» pubblica da solo anche i dolci.
 // v 2026.10.03.05 — Preview carta: barra superiore + barra laterale (_barraCarta), peso del prezzo (dati.pesoPrezzo).
 // v 2026.10.03.04 — Carta: controllo «Peso nome piatto» (dati.pesoPiatto).
 // v 2026.10.03.03 — «Fissa come default» (carta) avvia da solo Traduci e Pubblica.
@@ -698,7 +699,8 @@ var _qrBase64 = null;   // base64 del nuovo QR selezionato (separato dal MENU)
 // Pulsanti dimensione/spaziatura per la barra della preview (carta + dolci).
 // Chiamano le funzioni _sz* definite nello <script> della pagina (CARTA_TPL_A / menu-dolci.html).
 // v 2026.10.03.05: barra superiore + barra laterale della preview CARTA (i dolci usano ancora _dolciCtrlBar).
-function _barraCarta() {
+function _barraCarta(opt) {
+  opt = opt || {};
   function riga(label, idVal, fMeno, fPiu, tMeno, tPiu) {
     return '<div class="side-row"><span class="rl">' + label + '</span>'
       + '<button class="ctrl-btn" onclick="' + fMeno + '" title="' + (tMeno || 'Meno') + '">\u2212</button>'
@@ -706,8 +708,8 @@ function _barraCarta() {
       + '<button class="ctrl-btn" onclick="' + fPiu + '" title="' + (tPiu || 'Pi\u00f9') + '">+</button></div>\n';
   }
   var top = '<div class="ctrl-bar">\n'
-    + '  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout(\'carta\')">\u261e Men\u00f9 alla carta (3 pag.)</button>\n'
-    + '  <button class="ctrl-btn" id="btn-orario" onclick="showLayout(\'orario\')">\u261e Foglio orario (1 pag.)</button>\n'
+    + (opt.dolci ? '' : '  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout(\'carta\')">\u261e Men\u00f9 alla carta (3 pag.)</button>\n'
+    + '  <button class="ctrl-btn" id="btn-orario" onclick="showLayout(\'orario\')">\u261e Foglio orario (1 pag.)</button>\n')
     + '  <button class="ctrl-btn b-stampa" onclick="window.print()">\u26a1 Stampa</button>\n'
     + '  <button class="ctrl-btn b-reset" onclick="_szR()" title="Ripristina dimensioni">\u21ba Ripristina</button>\n'
     + '  <button class="ctrl-btn b-fissa" onclick="_szSave()" title="Fissa i valori attuali come predefiniti e pubblica">\u2714 Fissa come default</button>\n'
@@ -719,8 +721,8 @@ function _barraCarta() {
     + riga('Nome piatto', 'szT-piatto', "_szT('piatto',-0.5)", "_szT('piatto',0.5)")
     + riga('Descrizione', 'szT-desc', "_szT('desc',-0.5)", "_szT('desc',0.5)")
     + riga('Prezzo', 'szT-prezzo', "_szT('prezzo',-0.5)", "_szT('prezzo',0.5)")
-    + riga('Degustazione', 'szT-degu', "_szT('degu',-0.5)", "_szT('degu',0.5)")
-    + riga('Note ospite', 'szT-note', "_szT('note',-0.5)", "_szT('note',0.5)")
+    + (opt.dolci ? '' : riga('Degustazione', 'szT-degu', "_szT('degu',-0.5)", "_szT('degu',0.5)"))
+    + riga(opt.dolci ? 'Allergeni (testo)' : 'Note ospite', 'szT-note', "_szT('note',-0.5)", "_szT('note',0.5)")
     + '</div>\n'
     + '<div class="side-sec sec-teal"><div class="side-tit">Grassetto</div>\n'
     + riga('Nome piatto', 'szWP', '_szW(-100)', '_szW(100)', 'Pi\u00f9 leggero', 'Pi\u00f9 grassetto')
@@ -730,7 +732,7 @@ function _barraCarta() {
     + riga('Interlinea', 'szValLh', '_szL(-0.05)', '_szL(0.05)')
     + riga('Spazio tra piatti', 'szValGap', '_szG(-0.05)', '_szG(0.05)')
     + riga('Posizione (su/gi\u00f9)', 'szValShift', '_szS(-2)', '_szS(2)', 'Sposta su', 'Sposta gi\u00f9')
-    + riga('Note dal fondo', 'szNB', '_szN(-1)', '_szN(1)', 'Note pi\u00f9 in basso', 'Note pi\u00f9 in alto')
+    + riga(opt.dolci ? 'Allergeni dal fondo' : 'Note dal fondo', 'szNB', '_szN(-1)', '_szN(1)', 'Pi\u00f9 in basso', 'Pi\u00f9 in alto')
     + '</div>\n'
     + '<div class="side-sec sec-amber"><div class="side-tit">Impaginazione</div>\n'
     + '<div class="side-check" id="szCheck">Controllo in corso\u2026</div></div>\n'
@@ -788,7 +790,7 @@ function salvaImpostazioniStampa(vals) {
   if (vals.wp != null) dati.pesoPiatto = vals.wp; // peso del nome piatto (400-700, solo carta)
   if (vals.wpr != null) dati.pesoPrezzo = vals.wpr; // peso del prezzo (400-700, solo carta)
   if (vals.nb != null) dati.noteBottom = vals.nb; // posizione note dal fondo (mm, solo carta)
-  if (tipoMenuCorrente === 'carta') {
+  if (tipoMenuCorrente === 'carta' || tipoMenuCorrente === 'dolci') {
     // v 2026.10.03.03: "Fissa come default" pubblica da solo (come premere Traduci e Pubblica)
     toast('Impostazioni di stampa fissate: pubblico\u2026');
     traduciEPubblica();
@@ -803,12 +805,7 @@ var _STAMPA_HINT = ''; // v 2026.10.03.02: nota «Salva come PDF → Foxit 97%»
 
 // Barra admin per i dolci (Stampa + pulsanti dimensione). Va in menu-dolci-it.html e nella preview.
 function _dolciCtrlBar() {
-  return '<div class="ctrl-bar">\n'
-    + '  <button class="ctrl-btn" onclick="window.print()">⚡ Stampa</button>\n'
-    + '  <div class="ctrl-sep"></div>\n'
-    + _SIZE_BTNS
-    + '</div>\n'
-    + _STAMPA_HINT;
+  return _barraCarta({ dolci: true }) + _STAMPA_HINT;
 }
 
 function apriPreview(lang) {

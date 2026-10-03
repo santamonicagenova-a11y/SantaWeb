@@ -2,7 +2,8 @@
 <!--
   prenota.html — Wizard prenotazioni con carta a garanzia obbligatoria
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.10.02.03
+  Versione: v 2026.10.03.01
+  v 2026.10.03.01 — Lettura del menù DISABILITATA per ora (decisione Andrea): costante LETTURA_MENU_OBBLIGATORIA = false, riquadro nascosto e "Continua" non controlla la casella. Il codice resta: true per riattivarla.
   v 2026.10.02.03 — LETTURA DEL MENÙ prima di prenotare (passo 4): riquadro "Prima di prenotare, leggi il menù" con pulsante che apre
   il menù alla carta in una finestra dentro la pagina; la casella "Ho letto il menù" si abilita solo dopo aver scorso il
   menù fino in fondo (se il menù non si carica, dopo 15 secondi di apertura) e senza la spunta "Continua" non procede.
@@ -399,7 +400,7 @@
             <label for="p-marketing">Acconsento a ricevere comunicazioni sul ristorante (eventi, serate a tema, novità). Facoltativo, revocabile in qualsiasi momento.</label>
           </div>
           <p class="hint" style="margin-top:-0.4rem;">* campo obbligatorio</p>
-          <div class="menu-gate" id="menu-gate">
+          <div class="menu-gate" id="menu-gate" style="display:none">
             <div class="menu-gate-title">Prima di prenotare, leggi il menù</div>
             <p>Così sai cosa ti aspetta a tavola, quanto costa e quali piatti fanno per te (c'è anche il filtro per allergie e intolleranze). Scorri il menù fino in fondo: poi potrai spuntare la casella e continuare.</p>
             <button type="button" class="btn btn-ghost" id="menu-open">Leggi il menù</button>
@@ -901,6 +902,7 @@
   });
 
   /* ── STEP 4: lettura del menù prima di prenotare (v 2026.10.02.03) ── */
+  var LETTURA_MENU_OBBLIGATORIA = false; // v 2026.10.03.01: DISABILITATA (3/10, decisione Andrea). Metti true per riattivarla.
   (function () {
     var modal = document.getElementById('menu-modal'), frame = document.getElementById('menu-frame');
     var chk = document.getElementById('p-menu'), st = document.getElementById('menu-gate-state');
@@ -931,7 +933,7 @@
     // Serate speciali: non hanno il menù alla carta, il passo non chiede la lettura
     window.aggiornaMenuGate = function () {
       var sp = state.selectedDate ? specialFor(state.selectedDate) : null;
-      document.getElementById('menu-gate').style.display = sp ? 'none' : '';
+      document.getElementById('menu-gate').style.display = (sp || !LETTURA_MENU_OBBLIGATORIA) ? 'none' : '';
     };
   })();
 

@@ -485,6 +485,9 @@
     .side-check { font-size: .74rem; line-height: 1.4; color: #9aa3b5; padding: .2rem 0; }
     @media (max-width: 1150px) { body:has(.side-bar) #layout-carta, body:has(.side-bar) #layout-orario { padding-left: 0; } .side-bar { position: static; width: auto; margin: .6rem; max-height: none; } }
     @media print { .side-bar { display: none !important; } body:has(.side-bar) #layout-carta, body:has(.side-bar) #layout-orario { padding-left: 0; } }
+    /* v 2026.10.03.07: piatti del percorso di degustazione con interlinea come la carta */
+    #layout-carta .percorso-piatto:not(.percorso-libero) { line-height: calc(1.4 * var(--lh, 1)); padding: calc(.5mm * var(--gap, 1)) 0; }
+    #layout-carta .percorso-desc { margin-top: .3mm; }
     .tipo-grp { display: inline-flex; align-items: center; gap: .3rem; }
     .tipo-lbl { font-family: 'Jost', sans-serif; font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--stone); }
     .tipo-grp .ctrl-btn { padding: .25rem .7rem; }
@@ -601,11 +604,13 @@ const MENU = {
         },
         {
           "nome": "Ostriche Enrico IV",
-          "prezzo": 8
+          "prezzo": 8,
+          "unita": "cad."
         },
         {
           "nome": "Ostriche Antilope",
-          "prezzo": 7
+          "prezzo": 7,
+          "unita": "cad."
         },
         {
           "nome": "Scampi nostrani",
@@ -859,7 +864,7 @@ function buildDegu(degu) {
     } else {
       const righe = piatti.map(p => {
         const descHtml = p.descrizione ? `<span class="percorso-desc">${p.descrizione}</span>` : '';
-        return `<div class="percorso-piatto${p.sostenibile ? ' eco' : ''}">${p.nome}${descHtml}</div>`;
+        return `<div class="percorso-piatto"><span class="${p.sostenibile ? 'eco' : ''}">${p.nome}</span>${descHtml}</div>`;
       }).join('');
       percorsiHtml += `
         <div class="percorso${printCls}">

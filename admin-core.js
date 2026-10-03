@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.10.03.10 — Menu pubblico (IT/EN/FR): tolte davvero barra superiore e barra laterale dei controlli di stampa (la regex cercava solo `ctrl-bar` senza `adm` e non scattava piu).
 // v 2026.10.03.09 — Allergeni carta: i dolci restano nei dati (stampa dolci, filtro EN/FR) ma sono marcati nascosta e non compaiono nella pagina (IT ed EN/FR).
 // v 2026.10.03.08 — Degustazione: campo «Descrizione» per ogni piatto del percorso (d6d-*), letto da leggi() e tradotto in EN/FR.
 // v 2026.10.03.07 — Pagina Allergeni carta: preview con barra superiore + laterale (_barraCarta({allergeni:true})), impostazioni di stampa in ALLERGENI_DATA, Fissa come default pubblica.
@@ -1008,7 +1009,8 @@ function pubblicaFile(token, headers, path, content, rawBase64) {
 function costruisciMenuItPub() {
   // Menu italiano pubblico: outputCorrente senza la ctrl-bar (switch carta/orario + stampa)
   // La ctrl-bar contiene div interni (ctrl-sep), quindi matchiamo fino al </div> che precede layout-carta
-  var html = outputCorrente.replace(/<div class="ctrl-bar">[\s\S]*?<\/div>\s*<div id="layout-carta">/, '<div id="layout-carta">');
+  // v 2026.10.03.10: la barra ora e' `ctrl-bar adm` + <aside class="side-bar">: si tolgono entrambe (prima la regex non le trovava e finivano nel menu pubblico)
+  var html = outputCorrente.replace(/<div class="ctrl-bar[^"]*">[\s\S]*?(?:<\/aside>\s*)?<div id="layout-carta">/, '<div id="layout-carta">');
   html = html.replace("  document.getElementById('btn-carta').classList.toggle('active',  which === 'carta');\n  document.getElementById('btn-orario').classList.toggle('active', which === 'orario');", "  var bc=document.getElementById('btn-carta'); if(bc) bc.classList.toggle('active',which==='carta');\n  var bo=document.getElementById('btn-orario'); if(bo) bo.classList.toggle('active',which==='orario');");
   return html;
 }

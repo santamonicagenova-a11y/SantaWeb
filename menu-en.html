@@ -495,39 +495,6 @@
   </style>
 </head>
 <body>
-<div class="ctrl-bar adm">
-  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout('carta')">☞ Menù alla carta (3 pag.)</button>
-  <button class="ctrl-btn" id="btn-orario" onclick="showLayout('orario')">☞ Foglio orario (1 pag.)</button>
-  <button class="ctrl-btn b-stampa" onclick="window.print()">⚡ Stampa</button>
-  <button class="ctrl-btn b-reset" onclick="_szR()" title="Ripristina dimensioni">↺ Ripristina</button>
-  <button class="ctrl-btn b-fissa" onclick="_szSave()" title="Fissa i valori attuali come predefiniti e pubblica">✔ Fissa come default</button>
-</div>
-<aside class="side-bar" id="side-bar">
-<div class="side-sec sec-blue"><div class="side-tit">Dimensione caratteri</div>
-<div class="side-row"><span class="rl">Tutti</span><button class="ctrl-btn" onclick="_szF(-0.03)" title="Caratteri più piccoli">−</button><span class="sz-val" id="szValFs"></span><button class="ctrl-btn" onclick="_szF(0.03)" title="Caratteri più grandi">+</button></div>
-<div class="side-row"><span class="rl">Titoli sezione</span><button class="ctrl-btn" onclick="_szT('tit',-0.5)" title="Meno">−</button><span class="sz-val" id="szT-tit"></span><button class="ctrl-btn" onclick="_szT('tit',0.5)" title="Più">+</button></div>
-<div class="side-row"><span class="rl">Nome piatto</span><button class="ctrl-btn" onclick="_szT('piatto',-0.5)" title="Meno">−</button><span class="sz-val" id="szT-piatto"></span><button class="ctrl-btn" onclick="_szT('piatto',0.5)" title="Più">+</button></div>
-<div class="side-row"><span class="rl">Descrizione</span><button class="ctrl-btn" onclick="_szT('desc',-0.5)" title="Meno">−</button><span class="sz-val" id="szT-desc"></span><button class="ctrl-btn" onclick="_szT('desc',0.5)" title="Più">+</button></div>
-<div class="side-row"><span class="rl">Prezzo</span><button class="ctrl-btn" onclick="_szT('prezzo',-0.5)" title="Meno">−</button><span class="sz-val" id="szT-prezzo"></span><button class="ctrl-btn" onclick="_szT('prezzo',0.5)" title="Più">+</button></div>
-<div class="side-row"><span class="rl">Degustazione</span><button class="ctrl-btn" onclick="_szT('degu',-0.5)" title="Meno">−</button><span class="sz-val" id="szT-degu"></span><button class="ctrl-btn" onclick="_szT('degu',0.5)" title="Più">+</button></div>
-<div class="side-row"><span class="rl">Note ospite</span><button class="ctrl-btn" onclick="_szT('note',-0.5)" title="Meno">−</button><span class="sz-val" id="szT-note"></span><button class="ctrl-btn" onclick="_szT('note',0.5)" title="Più">+</button></div>
-</div>
-<div class="side-sec sec-teal"><div class="side-tit">Grassetto</div>
-<div class="side-row"><span class="rl">Nome piatto</span><button class="ctrl-btn" onclick="_szW(-100)" title="Più leggero">−</button><span class="sz-val" id="szWP"></span><button class="ctrl-btn" onclick="_szW(100)" title="Più grassetto">+</button></div>
-<div class="side-row"><span class="rl">Prezzo</span><button class="ctrl-btn" onclick="_szW2(-100)" title="Più leggero">−</button><span class="sz-val" id="szWPR"></span><button class="ctrl-btn" onclick="_szW2(100)" title="Più grassetto">+</button></div>
-</div>
-<div class="side-sec sec-violet"><div class="side-tit">Spazi e posizione</div>
-<div class="side-row"><span class="rl">Interlinea</span><button class="ctrl-btn" onclick="_szL(-0.05)" title="Meno">−</button><span class="sz-val" id="szValLh"></span><button class="ctrl-btn" onclick="_szL(0.05)" title="Più">+</button></div>
-<div class="side-row"><span class="rl">Spazio tra piatti</span><button class="ctrl-btn" onclick="_szG(-0.05)" title="Meno">−</button><span class="sz-val" id="szValGap"></span><button class="ctrl-btn" onclick="_szG(0.05)" title="Più">+</button></div>
-<div class="side-row"><span class="rl">Posizione (su/giù)</span><button class="ctrl-btn" onclick="_szS(-2)" title="Sposta su">−</button><span class="sz-val" id="szValShift"></span><button class="ctrl-btn" onclick="_szS(2)" title="Sposta giù">+</button></div>
-<div class="side-row"><span class="rl">Note dal fondo</span><button class="ctrl-btn" onclick="_szN(-1)" title="Più in basso">−</button><span class="sz-val" id="szNB"></span><button class="ctrl-btn" onclick="_szN(1)" title="Più in alto">+</button></div>
-</div>
-<div class="side-sec sec-amber"><div class="side-tit">Impaginazione</div>
-<div class="side-check" id="szCheck">Controllo in corso…</div></div>
-</aside>
-
-
-
 <div id="layout-carta"></div>
 <div id="layout-orario"></div>
 

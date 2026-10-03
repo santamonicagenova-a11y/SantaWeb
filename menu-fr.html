@@ -464,6 +464,9 @@
     .side-check { font-size: .74rem; line-height: 1.4; color: #9aa3b5; padding: .2rem 0; }
     @media (max-width: 1150px) { body:has(.side-bar) #layout-carta, body:has(.side-bar) #layout-orario { padding-left: 0; } .side-bar { position: static; width: auto; margin: .6rem; max-height: none; } }
     @media print { .side-bar { display: none !important; } body:has(.side-bar) #layout-carta, body:has(.side-bar) #layout-orario { padding-left: 0; } }
+    /* v 2026.10.03.07: piatti del percorso di degustazione con interlinea come la carta */
+    #layout-carta .percorso-piatto:not(.percorso-libero) { line-height: calc(1.4 * var(--lh, 1)); padding: calc(.5mm * var(--gap, 1)) 0; }
+    #layout-carta .percorso-desc { margin-top: .3mm; }
     .tipo-grp { display: inline-flex; align-items: center; gap: .3rem; }
     .tipo-lbl { font-family: 'Jost', sans-serif; font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--stone); }
     .tipo-grp .ctrl-btn { padding: .25rem .7rem; }
@@ -551,9 +554,9 @@ const MENU = {
       "7": "",
       "A tôa no se ven vëgi": [
         {
-          "nome": "« Macchetto, à quoi ça sert de le dire… »",
+          "nome": "« Macchetto, je le dis juste comme ça… »",
           "sostenibile": true,
-          "descrizione": "Petites laitues farcies, poivrons et macchetto aux anchois"
+          "descrizione": "Petites laitues farcies, poivrons et macchetto d&#x27;anchois"
         },
         {
           "nome": "« Huître des bois »",
@@ -571,7 +574,7 @@ const MENU = {
           "descrizione": "Pansori farcis à la sauce aux noix, dans un bouillon aux cèpes"
         },
         {
-          "nome": "« Mr. Bean »",
+          "nome": "« Mr Bean »",
           "sostenibile": true,
           "descrizione": "Morue, haricots cannellini, lard, sauce aïoli"
         },
@@ -597,11 +600,13 @@ const MENU = {
         },
         {
           "nome": "Huîtres Henri IV",
-          "prezzo": 8
+          "prezzo": 8,
+          "unita": "p."
         },
         {
           "nome": "Huîtres Antilope",
-          "prezzo": 7
+          "prezzo": 7,
+          "unita": "p."
         },
         {
           "nome": "Langoustines locales",
@@ -622,7 +627,7 @@ const MENU = {
           "staccato": true
         },
         {
-          "nome": "Assortiment de produits crus (poisson, crustacés, huîtres)",
+          "nome": "Assortiment de fruits de mer crus (poissons, crustacés, huîtres)",
           "prezzo": 75,
           "sostenibile": true,
           "staccato": true
@@ -640,16 +645,16 @@ const MENU = {
           "descrizione": "Huîtres en tempura, cèpes, coings, concombres"
         },
         {
-          "nome": "« Macchetto, à quoi ça sert de le dire… »",
+          "nome": "« Macchetto, je le dis juste comme ça… »",
           "prezzo": 14,
           "sostenibile": true,
-          "descrizione": "Petites laitues farcies, poivrons et macchetto aux anchois"
+          "descrizione": "Petites laitues farcies, poivrons et macchetto d&#x27;anchois"
         },
         {
           "nome": "« Chaque ricciola a ses caprices »",
           "prezzo": 19,
           "sostenibile": true,
-          "descrizione": "Sériole, sauge, betterave marinée, poireaux, raifort"
+          "descrizione": "Sériole, sauge, betterave au vinaigre, poireaux, raifort"
         },
         {
           "nome": "« Sanna »",
@@ -711,7 +716,7 @@ const MENU = {
           "sostenibile": true
         },
         {
-          "nome": "« Mr. Bean »",
+          "nome": "« Mr Bean »",
           "prezzo": 18,
           "sostenibile": true,
           "descrizione": "Morue, haricots cannellini, lard, sauce aïoli"
@@ -837,6 +842,7 @@ const MENU = {
     ],
     "sezioni": [
       {
+        "nascosta": false,
         "titolo_display": "Crus",
         "piatti": [
           {
@@ -846,7 +852,13 @@ const MENU = {
             ]
           },
           {
-            "nome": "Huîtres Gillardeau",
+            "nome": "Huîtres Henri IV",
+            "allergeni": [
+              "mollusques"
+            ]
+          },
+          {
+            "nome": "Huîtres Antilope",
             "allergeni": [
               "mollusques"
             ]
@@ -870,7 +882,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "Assortiment de produits crus (poisson, crustacés, huîtres)",
+            "nome": "Assortiment de fruits de mer crus (poissons, crustacés, huîtres)",
             "allergeni": [
               "crustacés",
               "poisson",
@@ -880,10 +892,19 @@ const MENU = {
         ]
       },
       {
+        "nascosta": false,
         "titolo_display": "Antipasti",
         "piatti": [
           {
-            "nome": "« Macchetto, à quoi ça sert de le dire… »",
+            "nome": "« Huître des bois »",
+            "allergeni": [
+              "gluten",
+              "arachides",
+              "mollusques"
+            ]
+          },
+          {
+            "nome": "« Macchetto, je le dis juste comme ça… »",
             "allergeni": [
               "poisson",
               "lait",
@@ -906,14 +927,6 @@ const MENU = {
             ]
           },
           {
-            "nome": "« Huître des bois »",
-            "allergeni": [
-              "gluten",
-              "arachides",
-              "mollusques"
-            ]
-          },
-          {
             "nome": "« Pas de fromages »",
             "allergeni": [
               "fruits à coque"
@@ -922,15 +935,17 @@ const MENU = {
         ]
       },
       {
+        "nascosta": false,
         "titolo_display": "Pâtes & Céréales",
         "piatti": [
           {
-            "nome": "« Déchet noble »",
+            "nome": "« Ganbou au navet »",
             "allergeni": [
-              "gluten",
-              "œufs",
+              "crustacés",
               "poisson",
-              "sulfites"
+              "lait",
+              "céleri",
+              "mollusques"
             ]
           },
           {
@@ -941,13 +956,12 @@ const MENU = {
             ]
           },
           {
-            "nome": "« Ganbou au navet »",
+            "nome": "« Déchet noble »",
             "allergeni": [
-              "crustacés",
+              "gluten",
+              "œufs",
               "poisson",
-              "lait",
-              "céleri",
-              "mollusques"
+              "sulfites"
             ]
           },
           {
@@ -963,6 +977,7 @@ const MENU = {
         ]
       },
       {
+        "nascosta": false,
         "titolo_display": "Pas Seulement la Mer",
         "piatti": [
           {
@@ -984,7 +999,7 @@ const MENU = {
             ]
           },
           {
-            "nome": "« Mr. Bean »",
+            "nome": "« Mr Bean »",
             "allergeni": [
               "œufs",
               "poisson",
@@ -1004,6 +1019,7 @@ const MENU = {
         ]
       },
       {
+        "nascosta": true,
         "titolo_display": "Golosità",
         "piatti": [
           {
@@ -1124,7 +1140,7 @@ function buildDegu(degu) {
     } else {
       const righe = piatti.map(p => {
         const descHtml = p.descrizione ? `<span class="percorso-desc">${p.descrizione}</span>` : '';
-        return `<div class="percorso-piatto${p.sostenibile ? ' eco' : ''}">${p.nome}${descHtml}</div>`;
+        return `<div class="percorso-piatto"><span class="${p.sostenibile ? 'eco' : ''}">${p.nome}</span>${descHtml}</div>`;
       }).join('');
       percorsiHtml += `
         <div class="percorso${printCls}">
@@ -1321,6 +1337,7 @@ function renderAllergeniPage(){
   var h = "<div class=\"alg-header\"><div class=\"alg-title\">"+esc(A.header)+"</div></div>";
   h += "<div class=\"alg-nota\">"+esc(A.nota)+"</div>";
   A.sezioni.forEach(function(sez){
+    if (sez.nascosta) return;
     h += "<div class=\"alg-sez\"><div class=\"alg-sez-titolo\">"+esc(sez.titolo_display)+"</div>";
     (sez.piatti||[]).forEach(function(p){
       var has = p.allergeni && p.allergeni.length;

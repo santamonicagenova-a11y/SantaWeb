@@ -5,11 +5,11 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.02.15",
-  updated: "2026-10-02",
+  version: "2026.10.03.01",
+  updated: "2026-10-03",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
-  today:     "2026-10-02",
+  today:     "2026-10-03",
 
   sections: [
     { key:'dec', name:'★ Decennale — serata 1 luglio 2026', badge:'evento trasversale', tasks:[
@@ -137,10 +137,10 @@ window.SANTAMONICA_GANTT = {
       {t:'Cena a tema 16/10 (Santamonica × Bellenda, Château Puybarbe): pagina /cene-a-tema IT/EN/FR + banner temporaneo in home', s:'2026-10-02', e:'2026-10-02', st:'done'},
       {t:'Menu online — filtro allergeni leggibile (testo carta +50% a schermo, piatto e allergene in due riquadri marrone)', s:'2026-10-02', e:'2026-10-02', st:'done'},
       {t:'menu-admin — frecce ▲▼ per riordinare i piatti di ogni sezione (carta e dolci)', s:'2026-10-02', e:'2026-10-02', st:'done'},
-      {t:'Prenota — lettura obbligatoria del menù prima di continuare (passo 4)', s:'2026-10-02', e:'2026-10-02', st:'done'},
       {t:'Serate speciali: provare dal pannello «Salva serata speciale» e «Modifica» sulla cena del 16/10', s:'2026-10-02', e:'2026-10-09', st:'up'},
       {t:'Serate speciali (cene a tema): setup in menu-admin e avviso nel wizard di prenotazione', s:'2026-10-02', e:'2026-10-02', st:'done'},
-      {t:'Stampa carta — note per l\'ospite sul fondo pagina e dimensione caratteri per tipologia (con pt)', s:'2026-10-02', e:'2026-10-02', st:'prog'},
+      {t:'Stampa carta — note per l\'ospite sul fondo pagina e dimensione caratteri per tipologia (con pt)', s:'2026-10-02', e:'2026-10-02', st:'done'},
+      {t:'Stampa dolci — provare la nuova preview (allergeni dal fondo, pesi) e fissare', s:'2026-10-03', st:'up'},
     ]},
     { key:'seo', name:'SEO & GEO', badge:'progetto-seo', tasks:[
       {t:'Migrazione Cloudflare + fix Schema @type', s:'2026-05-25', e:'2026-05-31', st:'done'},

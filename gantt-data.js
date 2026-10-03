@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.03.02",
+  version: "2026.10.03.03",
   updated: "2026-10-03",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -140,7 +140,9 @@ window.SANTAMONICA_GANTT = {
       {t:'Serate speciali: provare dal pannello «Salva serata speciale» e «Modifica» sulla cena del 16/10', s:'2026-10-02', e:'2026-10-09', st:'up'},
       {t:'Serate speciali (cene a tema): setup in menu-admin e avviso nel wizard di prenotazione', s:'2026-10-02', e:'2026-10-02', st:'done'},
       {t:'Stampa carta — note per l\'ospite sul fondo pagina e dimensione caratteri per tipologia (con pt)', s:'2026-10-02', e:'2026-10-02', st:'done'},
+      {t:'Allergeni carta — i dolci non compaiono nella pagina allergeni (restano nei dati)', s:'2026-10-03', e:'2026-10-03', st:'done'},
       {t:'Allergeni carta — preview con barra superiore e laterale e controlli di stampa come carta e dolci', s:'2026-10-03', e:'2026-10-03', st:'done'},
+      {t:'Degustazione con descrizioni — asterisco sullo stesso rigo del nome e interlinea come la carta', s:'2026-10-03', e:'2026-10-03', st:'done'},
       {t:'Menu degustazione — descrizione per ogni piatto del percorso (stampata e tradotta)', s:'2026-10-03', e:'2026-10-03', st:'done'},
       {t:'Pagina allergeni sovrascritta da un upload su GitHub: ripristinata la versione corretta', s:'2026-10-03', e:'2026-10-03', st:'done'},
       {t:'Stampa dolci — provare la nuova preview (allergeni dal fondo, pesi) e fissare', s:'2026-10-03', st:'up'},

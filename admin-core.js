@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.10.03.07 — Pagina Allergeni carta: preview con barra superiore + laterale (_barraCarta({allergeni:true})), impostazioni di stampa in ALLERGENI_DATA, Fissa come default pubblica.
 // v 2026.10.03.06 — Dolci allineati alla carta: _barraCarta({dolci:true}) come barra della preview, «Fissa come default» pubblica da solo anche i dolci.
 // v 2026.10.03.05 — Preview carta: barra superiore + barra laterale (_barraCarta), peso del prezzo (dati.pesoPrezzo).
 // v 2026.10.03.04 — Carta: controllo «Peso nome piatto» (dati.pesoPiatto).
@@ -707,8 +708,8 @@ function _barraCarta(opt) {
       + '<span class="sz-val" id="' + idVal + '"></span>'
       + '<button class="ctrl-btn" onclick="' + fPiu + '" title="' + (tPiu || 'Pi\u00f9') + '">+</button></div>\n';
   }
-  var top = '<div class="ctrl-bar">\n'
-    + (opt.dolci ? '' : '  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout(\'carta\')">\u261e Men\u00f9 alla carta (3 pag.)</button>\n'
+  var top = '<div class="ctrl-bar adm">\n'
+    + ((opt.dolci || opt.allergeni) ? '' : '  <button class="ctrl-btn active" id="btn-carta" onclick="showLayout(\'carta\')">\u261e Men\u00f9 alla carta (3 pag.)</button>\n'
     + '  <button class="ctrl-btn" id="btn-orario" onclick="showLayout(\'orario\')">\u261e Foglio orario (1 pag.)</button>\n')
     + '  <button class="ctrl-btn b-stampa" onclick="window.print()">\u26a1 Stampa</button>\n'
     + '  <button class="ctrl-btn b-reset" onclick="_szR()" title="Ripristina dimensioni">\u21ba Ripristina</button>\n'
@@ -717,22 +718,23 @@ function _barraCarta(opt) {
   var side = '<aside class="side-bar" id="side-bar">\n'
     + '<div class="side-sec sec-blue"><div class="side-tit">Dimensione caratteri</div>\n'
     + riga('Tutti', 'szValFs', '_szF(-0.03)', '_szF(0.03)', 'Caratteri pi\u00f9 piccoli', 'Caratteri pi\u00f9 grandi')
+    + (opt.allergeni ? riga('Titolo pagina', 'szT-degu', "_szT('degu',-0.5)", "_szT('degu',0.5)") : '')
     + riga('Titoli sezione', 'szT-tit', "_szT('tit',-0.5)", "_szT('tit',0.5)")
     + riga('Nome piatto', 'szT-piatto', "_szT('piatto',-0.5)", "_szT('piatto',0.5)")
-    + riga('Descrizione', 'szT-desc', "_szT('desc',-0.5)", "_szT('desc',0.5)")
-    + riga('Prezzo', 'szT-prezzo', "_szT('prezzo',-0.5)", "_szT('prezzo',0.5)")
-    + (opt.dolci ? '' : riga('Degustazione', 'szT-degu', "_szT('degu',-0.5)", "_szT('degu',0.5)"))
-    + riga(opt.dolci ? 'Allergeni (testo)' : 'Note ospite', 'szT-note', "_szT('note',-0.5)", "_szT('note',0.5)")
+    + riga(opt.allergeni ? 'Allergeni' : 'Descrizione', 'szT-desc', "_szT('desc',-0.5)", "_szT('desc',0.5)")
+    + (opt.allergeni ? '' : riga('Prezzo', 'szT-prezzo', "_szT('prezzo',-0.5)", "_szT('prezzo',0.5)"))
+    + ((opt.dolci || opt.allergeni) ? '' : riga('Degustazione', 'szT-degu', "_szT('degu',-0.5)", "_szT('degu',0.5)"))
+    + riga(opt.allergeni ? 'Legenda' : (opt.dolci ? 'Allergeni (testo)' : 'Note ospite'), 'szT-note', "_szT('note',-0.5)", "_szT('note',0.5)")
     + '</div>\n'
     + '<div class="side-sec sec-teal"><div class="side-tit">Grassetto</div>\n'
     + riga('Nome piatto', 'szWP', '_szW(-100)', '_szW(100)', 'Pi\u00f9 leggero', 'Pi\u00f9 grassetto')
-    + riga('Prezzo', 'szWPR', '_szW2(-100)', '_szW2(100)', 'Pi\u00f9 leggero', 'Pi\u00f9 grassetto')
+    + riga(opt.allergeni ? 'Allergeni' : 'Prezzo', 'szWPR', '_szW2(-100)', '_szW2(100)', 'Pi\u00f9 leggero', 'Pi\u00f9 grassetto')
     + '</div>\n'
     + '<div class="side-sec sec-violet"><div class="side-tit">Spazi e posizione</div>\n'
     + riga('Interlinea', 'szValLh', '_szL(-0.05)', '_szL(0.05)')
-    + riga('Spazio tra piatti', 'szValGap', '_szG(-0.05)', '_szG(0.05)')
+    + riga(opt.allergeni ? 'Spazio tra righe' : 'Spazio tra piatti', 'szValGap', '_szG(-0.05)', '_szG(0.05)')
     + riga('Posizione (su/gi\u00f9)', 'szValShift', '_szS(-2)', '_szS(2)', 'Sposta su', 'Sposta gi\u00f9')
-    + riga(opt.dolci ? 'Allergeni dal fondo' : 'Note dal fondo', 'szNB', '_szN(-1)', '_szN(1)', 'Pi\u00f9 in basso', 'Pi\u00f9 in alto')
+    + (opt.allergeni ? '' : riga(opt.dolci ? 'Allergeni dal fondo' : 'Note dal fondo', 'szNB', '_szN(-1)', '_szN(1)', 'Pi\u00f9 in basso', 'Pi\u00f9 in alto'))
     + '</div>\n'
     + '<div class="side-sec sec-amber"><div class="side-tit">Impaginazione</div>\n'
     + '<div class="side-check" id="szCheck">Controllo in corso\u2026</div></div>\n'
@@ -781,6 +783,16 @@ var _SIZE_BTNS =
 // aperto (stesso oggetto `dati`, vale sia per carta sia per dolci). Diventa permanente solo
 // dopo "Pubblica" (round-trip già esistente in leggi(): dati.fontScale/lineScale/gapScale/shift).
 function salvaImpostazioniStampa(vals) {
+  if (tipoMenuCorrente === 'allergeni' && vals && datiAllergeni) {
+    // v 2026.10.03.07: pagina allergeni — impostazioni di stampa dentro ALLERGENI_DATA, poi pubblica
+    datiAllergeni.fontScale = vals.fs; datiAllergeni.lineScale = vals.lh; datiAllergeni.gapScale = vals.gap; datiAllergeni.shift = vals.shift;
+    if (vals.k) datiAllergeni.tipoScale = vals.k;
+    if (vals.wp != null) datiAllergeni.pesoPiatto = vals.wp;
+    if (vals.wpr != null) datiAllergeni.pesoPrezzo = vals.wpr;
+    toast('Impostazioni di stampa fissate: pubblico\u2026');
+    traduciEPubblica();
+    return;
+  }
   if (!dati || !vals) return;
   dati.fontScale = vals.fs;
   dati.lineScale = vals.lh;
@@ -2182,6 +2194,8 @@ function costruisciOutputAllergeni() {
 function apriPreviewAllergeni() {
   var html = costruisciOutputAllergeni();
   if (!html) { toast('\u2717 Nessun dato allergeni'); return; }
+  // v 2026.10.03.07: nella preview la barra semplice diventa barra superiore + laterale (come carta e dolci); la pagina pubblicata resta com'e'
+  html = html.replace(/<div class="ctrl-bar">[\s\S]*?<\/div>/, function () { return _barraCarta({ allergeni: true }); });
   var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
   window.open(URL.createObjectURL(blob), '_blank').focus();
 }

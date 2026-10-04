@@ -5,11 +5,11 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.03.03",
-  updated: "2026-10-03",
+  version: "2026.10.04.01",
+  updated: "2026-10-04",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
-  today:     "2026-10-03",
+  today:     "2026-10-04",
 
   sections: [
     { key:'dec', name:'★ Decennale — serata 1 luglio 2026', badge:'evento trasversale', tasks:[
@@ -116,7 +116,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Food Cost: consumi interni (piatti mangiati da noi, prove/staff) esclusi dal Food Cost reale e dal GAP', s:'2026-09-29', e:'2026-09-29', st:'done'},
       {t:'Food Cost — opzione futura (non richiesta come lavoro): Labor Cost % · Prime Cost % · Break-Even Point, serve una fonte dati costo-personale non ancora esistente', s:'2026-09-13', e:'2027-05-01', st:'future'},
       {t:'Food Cost: elenchi Vendite, Costo piatti e Calcolo Food Cost nell\'ordine della carta pubblicata, con un colore per sezione', s:'2026-09-29', e:'2026-09-29', st:'done'},
-      {t:'Allergeni carta: il form parte sempre da carta + dolci pubblicati (bug perdita allergeni), la pubblicazione aggiorna Dettagli piatti, niente doppia sezione dolci in EN/FR', s:'2026-09-29', st:'prog'},
+      {t:'Allergeni carta: il form parte sempre da carta + dolci pubblicati (bug perdita allergeni), la pubblicazione aggiorna Dettagli piatti, niente doppia sezione dolci in EN/FR', s:'2026-09-29', e:'2026-10-04', st:'done'},
       {t:'Aggiornare orari su Google Business Profile e schede esterne (settembre-ottobre)', s:'2026-08-28', e:'2026-09-25', st:'done'},
       {t:'Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)', s:'2026-09-21', st:'up'},
       {t:'Restyling tema scuro del sito (home, menu, prenota, regala, dove-siamo)', s:'2026-09-04', e:'2026-09-04', st:'done'},
@@ -221,8 +221,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Filone B — Transizione: prime serate Mare d’Inverno comunicate/misurate, decisione riserva adv Nord', s:'2026-12-01', e:'2027-02-28', st:'future'},
       {t:'★ Obiettivo +20% infrasettimanale (mis. nov–gen)', s:'2026-11-01', e:'2027-01-31', st:'future', ms:true},
       {t:'Filone B — Picco strategico: adv Nord Italia + push concierge/PR alta stagione (se leading positivi)', s:'2027-03-01', e:'2027-08-31', st:'future'},
-      {t:'Sponsorizzata Salone Nautico', s:'2026-09-25', e:'2026-10-04', st:'prog'},
-      {t:'Post Instagram orari di apertura — grafica Canva rifatta, calendario dal 1/10 (pronto, non pubblicato)', s:'2026-09-28', st:'prog'},
+      {t:'Sponsorizzata Salone Nautico', s:'2026-09-25', e:'2026-10-04', st:'done'},
     ]},
     { key:'nsa', name:'NoShowApp (prodotto SaaS)', badge:'progetto-nsa', tasks:[
       {t:'NoShowApp fasi 1-5 completate (MVP no-show condiviso, accesso a invito, admin, UI + dominio, garanzia carta Stripe in test)', s:'2026-03-20', e:'2026-05-03', st:'done'},

@@ -1,15 +1,15 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
- "generato": "2026-10-03",
- "versione": "2026.10.03.03",
+ "generato": "2026-10-04",
+ "versione": "2026.10.04.01",
  "briefing": "**Briefing 3/10/2026 (tarda sera)** — **Sito**: i **dolci non compaiono più nella pagina Allergeni carta** (restano nei dati per la stampa dei dolci e il filtro EN/FR). Degustazione con descrizioni: asterisco sullo stesso rigo del nome e interlinea come la carta. **Aspetta te**: ricaricare menu-admin (Ctrl+F5), rifare «Allergeni carta», stampare allergeni e degustazione, compilare le descrizioni.\n**Briefing 3/10/2026 (sera)** — **Sito**: la pagina **Allergeni carta** ha la stessa preview con barre e controlli di stampa della carta e dei dolci; i piatti del percorso a 6 della **degustazione** hanno ora una descrizione (stampata e tradotta). Un upload web aveva sovrascritto la pagina allergeni con una versione vecchia (piatti non più in carta): ripristinata. **Aspetta te**: ricaricare menu-admin (Ctrl+F5) e rifare «Allergeni carta», compilare le descrizioni della degustazione, stampare. I menu si cambiano solo da menu-admin, mai da upload.\n**Briefing 3/10/2026** — **Sito** (live): stampa del menù rifatta. Note per l'ospite calibrate a −13 mm (sulla tua stampante erano 17 mm troppo in alto), indicatore di impaginazione che avvisa prima che una pagina sfori, nome piatto in lieve grassetto con peso regolabile anche per il prezzo, nuova preview con barra superiore (5 pulsanti) e barra laterale a sezioni colorate. «Fissa come default» ora pubblica da solo. Dolci allineati alla carta. La lettura obbligatoria del menù in prenotazione è **disattivata** (si riattiva con un flag). **Aspetta te**: stampare i dolci con la nuova preview e fissare. Sotto, i briefing di ieri.\n**Briefing 2/10/2026 (notte)** — **Sito** (live): filtro allergeni del menù più leggibile (testo +50%, piatto e allergene in due riquadri marrone), frecce ▲▼ per riordinare i piatti in menu-admin, stampa carta con le note sul fondo e dimensione caratteri per tipologia (con pt), e **lettura obbligatoria del menù** al passo 4 della prenotazione (finestra interna; header allentati solo per /menu e /prenota). **Aspetta te**: stampare la carta e provare i controlli per tipologia («Fissa come default» + Pubblica). Sotto, il briefing di prima sulle cene a tema.\n**Briefing 2/10/2026 (sera)** — **Sito** (live): nuove **cene a tema**. Pagina `/cene-a-tema` (IT/EN/FR) con voce «Serate» nel menu, banner overlay in home con la foto di Anna e Riku, loghi Bellenda e Château Puybarbe con link. In menu-admin → Prenotazioni — Setup nuovo box **Serate speciali** (data, orario, posti, titolo con tendina dei titoli già usati, carta a garanzia sì/no): il sito resta prenotabile solo all'orario della serata, con avviso nel wizard; Setup ora a riquadri colorati e con le eccezioni di date/orari spostate dagli Orari di Apertura. Cena del 16/10: ore 20, 60 € tutto compreso, 16 posti, carta a garanzia. Il codice del banner resta per le prossime serate. **Aspetta te**: provare dal pannello «Salva serata speciale» (non provato da Claude), mandare menù e abbinamenti dei vini; restano compleanni/anniversari e le altre voci di ieri. **Prossimo**: menù della serata in pagina, poi idee 1, 7 e 14.",
  "kpi": {
-  "aperte": 61,
+  "aperte": 57,
   "scadute": 4,
   "bloccate": 1,
-  "andrea": 19,
-  "debiti": 11,
-  "chiuse30": 58
+  "andrea": 16,
+  "debiti": 9,
+  "chiuse30": 60
  },
  "subs": {
   "SEO": {
@@ -36,25 +36,25 @@ window.JARVIS_DATA = {
   },
   "Sito": {
    "tot": 128,
-   "done": 106,
-   "prog": 2,
+   "done": 107,
+   "prog": 1,
    "up": 7,
    "future": 13,
    "bloccato": 0,
    "scadute": 0,
-   "andrea": 9,
-   "debiti": 9
+   "andrea": 8,
+   "debiti": 8
   },
   "Marketing": {
-   "tot": 36,
-   "done": 17,
-   "prog": 3,
+   "tot": 34,
+   "done": 18,
+   "prog": 1,
    "up": 2,
-   "future": 13,
+   "future": 12,
    "bloccato": 1,
    "scadute": 4,
-   "andrea": 5,
-   "debiti": 2
+   "andrea": 3,
+   "debiti": 1
   },
   "Trasversale": {
    "tot": 7,
@@ -117,18 +117,6 @@ window.JARVIS_DATA = {
    "agg": "2026-09-25"
   },
   {
-   "t": "Sponsorizzata Salone Nautico",
-   "sub": "Marketing",
-   "st": "prog",
-   "s": "2026-09-25",
-   "e": "2026-10-04",
-   "own": "Andrea",
-   "az": null,
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-29"
-  },
-  {
    "t": "Pillar pesce §7 — 2-3 abbinamenti vino con pesce/crudo raccontati da Monica",
    "sub": "SEO",
    "st": "up",
@@ -187,18 +175,6 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": true,
    "agg": "2026-10-02"
-  },
-  {
-   "t": "Allergeni carta: il form parte sempre da carta + dolci pubblicati (bug perdita allergeni), la pubblicazione aggiorna Dettagli piatti, niente doppia sezione dolci in EN/FR",
-   "sub": "Sito",
-   "st": "prog",
-   "s": "2026-09-29",
-   "e": null,
-   "own": "Andrea",
-   "az": "Allergeni carta → ricompilare gli allergeni di tutti i piatti della carta (la pagina online oggi ha solo Golosità: erano stati persi) e pubblicare; poi Traduci e Pubblica della carta per rigenerare EN/FR con gli allergeni in fondo",
-   "bl": null,
-   "deb": true,
-   "agg": "2026-09-29"
   },
   {
    "t": "Allergeni — completare Crudi e piatti solo in degustazione (pagina pubblica + Dettagli piatti)",
@@ -271,18 +247,6 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
-  },
-  {
-   "t": "Post Instagram orari di apertura — grafica Canva rifatta, calendario dal 1/10 (pronto, non pubblicato)",
-   "sub": "Marketing",
-   "st": "prog",
-   "s": "2026-09-28",
-   "e": null,
-   "own": "Andrea",
-   "az": "Pubblicare il post dal 1/10 (il calendario mostrato è quello dal 1/10) e scegliere i canali; opzionale: logo (nessun Brand Kit su Canva)",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-28"
   },
   {
    "t": "Stampa dolci — provare la nuova preview (allergeni dal fondo, pesi) e fissare",
@@ -360,18 +324,6 @@ window.JARVIS_DATA = {
   }
  ],
  "prossime": [
-  {
-   "t": "Sponsorizzata Salone Nautico",
-   "sub": "Marketing",
-   "st": "prog",
-   "s": "2026-09-25",
-   "e": "2026-10-04",
-   "own": "Andrea",
-   "az": null,
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-29"
-  },
   {
    "t": "Pillar pesce §7 — 2-3 abbinamenti vino con pesce/crudo raccontati da Monica",
    "sub": "SEO",
@@ -483,18 +435,6 @@ window.JARVIS_DATA = {
  ],
  "inCorso": [
   {
-   "t": "Allergeni carta: il form parte sempre da carta + dolci pubblicati (bug perdita allergeni), la pubblicazione aggiorna Dettagli piatti, niente doppia sezione dolci in EN/FR",
-   "sub": "Sito",
-   "st": "prog",
-   "s": "2026-09-29",
-   "e": null,
-   "own": "Andrea",
-   "az": "Allergeni carta → ricompilare gli allergeni di tutti i piatti della carta (la pagina online oggi ha solo Golosità: erano stati persi) e pubblicare; poi Traduci e Pubblica della carta per rigenerare EN/FR con gli allergeni in fondo",
-   "bl": null,
-   "deb": true,
-   "agg": "2026-09-29"
-  },
-  {
    "t": "Calcolo Food Cost ricette da ingredienti: anagrafica ingredienti in Setup + tab Calcolo Food Cost che valorizza Costo Ricetta in Costo piatti",
    "sub": "Sito",
    "st": "prog",
@@ -529,30 +469,6 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-27"
-  },
-  {
-   "t": "Post Instagram orari di apertura — grafica Canva rifatta, calendario dal 1/10 (pronto, non pubblicato)",
-   "sub": "Marketing",
-   "st": "prog",
-   "s": "2026-09-28",
-   "e": null,
-   "own": "Andrea",
-   "az": "Pubblicare il post dal 1/10 (il calendario mostrato è quello dal 1/10) e scegliere i canali; opzionale: logo (nessun Brand Kit su Canva)",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-28"
-  },
-  {
-   "t": "Sponsorizzata Salone Nautico",
-   "sub": "Marketing",
-   "st": "prog",
-   "s": "2026-09-25",
-   "e": "2026-10-04",
-   "own": "Andrea",
-   "az": null,
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-29"
   }
  ],
  "bloccate": [
@@ -786,7 +702,7 @@ window.JARVIS_DATA = {
   },
   {
    "g": "dom",
-   "n": 19
+   "n": 12
   }
  ]
 };

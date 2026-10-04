@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.04.05",
+  version: "2026.10.04.06",
   updated: "2026-10-04",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -31,11 +31,6 @@ window.SANTAMONICA_GANTT = {
       {t:'Prenotazioni — lista d\'attesa digitale per orari pieni (idea 10)', s:'2026-09-30', e:'2026-09-30', st:'done'},
       {t:'Prenotazioni — garanzia carta mirata: gruppi da 6 persone e date speciali (idea 11)', s:'2026-09-30', e:'2026-09-30', st:'done'},
       {t:'Gestionale — note ospite dal CRM (tag, note, ricorrenze) e promemoria compleanni/anniversari (idea 12)', s:'2026-09-30', e:'2026-10-01', st:'done'},
-      {t:'Food Cost — avviso sui rincari dei fornitori dai carichi di Tracciabilità (idea 1)', s:'2026-09-30', st:'future'},
-      {t:'Inserire compleanni e anniversari degli ospiti in anagrafica (serve al promemoria del lunedì)', s:'2026-10-01', st:'future'},
-      {t:'HACCP — registro temperature frigo/abbattitore e piano pulizie digitale (idea 7)', s:'2026-09-30', st:'future'},
-      {t:'Voucher — buoni aziendali in blocco (idea 14)', s:'2026-09-30', st:'future'},
-      {t:'Food Cost — registro scarti per spiegare il GAP (idea 2, step futuro)', s:'2026-09-30', st:'future'},
       {t:'Go-live sito Cloudflare Pages', s:'2026-05-22', st:'done', ms:true},
       {t:'GA4 + Meta Pixel attivi', s:'2026-05-27', st:'done', ms:true},
       {t:'Carta-garanzia prenotazioni — Fase 1 LIVE', s:'2026-05-27', e:'2026-05-28', st:'done'},

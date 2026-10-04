@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.04.03",
+  version: "2026.10.04.04",
   updated: "2026-10-04",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -146,6 +146,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Menu degustazione — descrizione per ogni piatto del percorso (stampata e tradotta)', s:'2026-10-03', e:'2026-10-03', st:'done'},
       {t:'Pagina allergeni sovrascritta da un upload su GitHub: ripristinata la versione corretta', s:'2026-10-03', e:'2026-10-03', st:'done'},
       {t:'Stampa dolci — provare la nuova preview (allergeni dal fondo, pesi) e fissare', s:'2026-10-03', st:'done'},
+      {t:'Tracciabilità — lo storico mostra tutte le righe, senza filtro Dal/Al', s:'2026-10-04', e:'2026-10-04', st:'done'},
     ]},
     { key:'seo', name:'SEO & GEO', badge:'progetto-seo', tasks:[
       {t:'Migrazione Cloudflare + fix Schema @type', s:'2026-05-25', e:'2026-05-31', st:'done'},

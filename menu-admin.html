@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!-- v 2026.10.02.06 (bump ?v= admin-templates-shared.js a 2026.10.02.01 + footer-version) — Menu carta a schermo +50% e colori del filtro allergeni piu chiari (barra in alto invariata). -->
+<!-- v 2026.10.04.01 — Food Cost → Tracciabilità: lo storico mostra tutte le righe, senza filtro Dal/Al, con il conteggio. -->
 <!-- v 2026.10.03.12 (bump ?v= admin-core.js a 2026.10.03.10 + footer-version) — Menu pubblico IT/EN/FR: tolte barra superiore e laterale dei controlli di stampa (rimozione rotta dal 3/10).  -->
 <!-- v 2026.10.03.11 (bump ?v= admin-core.js a 2026.10.03.09 + footer-version) — Allergeni carta: i dolci non compaiono nella pagina (restano nei dati). -->
 <!-- v 2026.10.03.10 (bump ?v= admin-templates-shared.js a 2026.10.03.07 + footer-version) — Degustazione: asterisco accanto al nome e interlinea come la carta. -->
@@ -4921,10 +4922,10 @@ function fcSalvaCarico() {
 // ---- Storico tracciabilità ----
 
 function fcLoadTracciabilita() {
-  var r = fcRangeValido();
-  if (!r) { _fcSetStatus('Imposta un intervallo di date valido (Dal/Al).', true); return; }
+  // v 2026.10.04.01 — lo storico mostra TUTTE le righe, senza il filtro Dal/Al del
+  // resto del Food Cost (richiesta Andrea): intervallo ampio fisso.
   _fcSetStatus('Caricamento tracciabilità…');
-  _fcFetch({ action: 'tracciabilita_list', da: r.da, a: r.a })
+  _fcFetch({ action: 'tracciabilita_list', da: '2000-01-01', a: '2099-12-31' })
     .then(function (res) {
       if (!_fcOk(res)) { _fcSetStatus(_fcErrMsg(res), true); return; }
       // v 2026.09.26.06 — più vecchia in alto: data di ricezione, poi codice (anno, mese,
@@ -4942,8 +4943,8 @@ function fcRenderTracciabilita() {
   var list = document.getElementById('fc-tracc-list');
   if (!list) return;
   var righe = fcState.tracciabilita || [];
-  if (!righe.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun carico in questo periodo.</p>'; return; }
-  list.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:.8rem;">' +
+  if (!righe.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun carico registrato.</p>'; return; }
+  list.innerHTML = '<p style="color:var(--stone);font-size:.72rem;margin:0 0 .4rem;">' + righe.length + ' righe (storico completo)</p><table style="width:100%;border-collapse:collapse;font-size:.8rem;">' +
     '<tr style="text-align:left;color:var(--stone);font-size:.68rem;text-transform:uppercase;"><th>Rif. Interno</th><th>Prodotto</th><th>Peso</th><th>Ricezione</th><th>Fattura/Bolla</th><th>Lotto</th><th>Fornitore</th><th>Scadenza</th><th></th></tr>' +
     righe.map(function (r) {
       if (r.id === fcState.traccEditId) return fcTraccRigaEditHtml(r);
@@ -8400,7 +8401,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.03.12</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.04.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

@@ -1,13 +1,13 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
  "generato": "2026-10-04",
- "versione": "2026.10.04.01",
+ "versione": "2026.10.04.02",
  "briefing": "**Briefing 3/10/2026 (tarda sera)** — **Sito**: i **dolci non compaiono più nella pagina Allergeni carta** (restano nei dati per la stampa dei dolci e il filtro EN/FR). Degustazione con descrizioni: asterisco sullo stesso rigo del nome e interlinea come la carta. **Aspetta te**: ricaricare menu-admin (Ctrl+F5), rifare «Allergeni carta», stampare allergeni e degustazione, compilare le descrizioni.\n**Briefing 3/10/2026 (sera)** — **Sito**: la pagina **Allergeni carta** ha la stessa preview con barre e controlli di stampa della carta e dei dolci; i piatti del percorso a 6 della **degustazione** hanno ora una descrizione (stampata e tradotta). Un upload web aveva sovrascritto la pagina allergeni con una versione vecchia (piatti non più in carta): ripristinata. **Aspetta te**: ricaricare menu-admin (Ctrl+F5) e rifare «Allergeni carta», compilare le descrizioni della degustazione, stampare. I menu si cambiano solo da menu-admin, mai da upload.\n**Briefing 3/10/2026** — **Sito** (live): stampa del menù rifatta. Note per l'ospite calibrate a −13 mm (sulla tua stampante erano 17 mm troppo in alto), indicatore di impaginazione che avvisa prima che una pagina sfori, nome piatto in lieve grassetto con peso regolabile anche per il prezzo, nuova preview con barra superiore (5 pulsanti) e barra laterale a sezioni colorate. «Fissa come default» ora pubblica da solo. Dolci allineati alla carta. La lettura obbligatoria del menù in prenotazione è **disattivata** (si riattiva con un flag). **Aspetta te**: stampare i dolci con la nuova preview e fissare. Sotto, i briefing di ieri.\n**Briefing 2/10/2026 (notte)** — **Sito** (live): filtro allergeni del menù più leggibile (testo +50%, piatto e allergene in due riquadri marrone), frecce ▲▼ per riordinare i piatti in menu-admin, stampa carta con le note sul fondo e dimensione caratteri per tipologia (con pt), e **lettura obbligatoria del menù** al passo 4 della prenotazione (finestra interna; header allentati solo per /menu e /prenota). **Aspetta te**: stampare la carta e provare i controlli per tipologia («Fissa come default» + Pubblica). Sotto, il briefing di prima sulle cene a tema.\n**Briefing 2/10/2026 (sera)** — **Sito** (live): nuove **cene a tema**. Pagina `/cene-a-tema` (IT/EN/FR) con voce «Serate» nel menu, banner overlay in home con la foto di Anna e Riku, loghi Bellenda e Château Puybarbe con link. In menu-admin → Prenotazioni — Setup nuovo box **Serate speciali** (data, orario, posti, titolo con tendina dei titoli già usati, carta a garanzia sì/no): il sito resta prenotabile solo all'orario della serata, con avviso nel wizard; Setup ora a riquadri colorati e con le eccezioni di date/orari spostate dagli Orari di Apertura. Cena del 16/10: ore 20, 60 € tutto compreso, 16 posti, carta a garanzia. Il codice del banner resta per le prossime serate. **Aspetta te**: provare dal pannello «Salva serata speciale» (non provato da Claude), mandare menù e abbinamenti dei vini; restano compleanni/anniversari e le altre voci di ieri. **Prossimo**: menù della serata in pagina, poi idee 1, 7 e 14.",
  "kpi": {
-  "aperte": 57,
+  "aperte": 54,
   "scadute": 4,
   "bloccate": 1,
-  "andrea": 16,
+  "andrea": 12,
   "debiti": 9,
   "chiuse30": 60
  },
@@ -36,13 +36,13 @@ window.JARVIS_DATA = {
   },
   "Sito": {
    "tot": 128,
-   "done": 107,
-   "prog": 1,
-   "up": 7,
-   "future": 13,
+   "done": 110,
+   "prog": 0,
+   "up": 4,
+   "future": 14,
    "bloccato": 0,
    "scadute": 0,
-   "andrea": 8,
+   "andrea": 4,
    "debiti": 8
   },
   "Marketing": {
@@ -177,30 +177,6 @@ window.JARVIS_DATA = {
    "agg": "2026-10-02"
   },
   {
-   "t": "Allergeni — completare Crudi e piatti solo in degustazione (pagina pubblica + Dettagli piatti)",
-   "sub": "Sito",
-   "st": "up",
-   "s": "2026-09-30",
-   "e": null,
-   "own": "Andrea",
-   "az": "Menu-admin → Allergeni carta: spuntare gli allergeni dei 6 Crudi e pubblicare (poi Traduci e Pubblica della carta per EN/FR)",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-30"
-  },
-  {
-   "t": "Calcolo Food Cost ricette da ingredienti: anagrafica ingredienti in Setup + tab Calcolo Food Cost che valorizza Costo Ricetta in Costo piatti",
-   "sub": "Sito",
-   "st": "prog",
-   "s": "2026-09-26",
-   "e": null,
-   "own": "Andrea",
-   "az": "Usare il Calcolo Food Cost su qualche piatto reale e segnalare correzioni",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-26"
-  },
-  {
    "t": "Cambio completo del menu",
    "sub": "Sito",
    "st": "future",
@@ -211,18 +187,6 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
-  },
-  {
-   "t": "Inserire compleanni e anniversari degli ospiti in anagrafica (serve al promemoria del lunedì)",
-   "sub": "Sito",
-   "st": "up",
-   "s": "2026-10-01",
-   "e": null,
-   "own": "Andrea",
-   "az": "Dall'anagrafica (👤 nel gestionale o clienti.html) compilare compleanno/anniversario degli ospiti abituali: oggi nessun cliente ha date, quindi la mail del lunedì non parte",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-10-01"
   },
   {
    "t": "NoShowApp F6 — acquisire 10 beta tester (WhatsApp + demo dal vivo con carta test) e guida onboarding",
@@ -247,18 +211,6 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
-  },
-  {
-   "t": "Stampa dolci — provare la nuova preview (allergeni dal fondo, pesi) e fissare",
-   "sub": "Sito",
-   "st": "up",
-   "s": "2026-10-03",
-   "e": null,
-   "own": "Andrea",
-   "az": "Aprire la preview dei dolci, stampare, regolare «Allergeni dal fondo» se serve (come −13 della carta) e Fissa come default",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-10-03"
   },
   {
    "t": "Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)",
@@ -435,18 +387,6 @@ window.JARVIS_DATA = {
  ],
  "inCorso": [
   {
-   "t": "Calcolo Food Cost ricette da ingredienti: anagrafica ingredienti in Setup + tab Calcolo Food Cost che valorizza Costo Ricetta in Costo piatti",
-   "sub": "Sito",
-   "st": "prog",
-   "s": "2026-09-26",
-   "e": null,
-   "own": "Andrea",
-   "az": "Usare il Calcolo Food Cost su qualche piatto reale e segnalare correzioni",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-26"
-  },
-  {
    "t": "Calendario cene a tema (entro ago)",
    "sub": "Marketing",
    "st": "prog",
@@ -523,18 +463,6 @@ window.JARVIS_DATA = {
    "agg": "2026-10-02"
   },
   {
-   "t": "Allergeni — completare Crudi e piatti solo in degustazione (pagina pubblica + Dettagli piatti)",
-   "sub": "Sito",
-   "st": "up",
-   "s": "2026-09-30",
-   "e": null,
-   "own": "Andrea",
-   "az": "Menu-admin → Allergeni carta: spuntare gli allergeni dei 6 Crudi e pubblicare (poi Traduci e Pubblica della carta per EN/FR)",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-09-30"
-  },
-  {
    "t": "Dettagli piatti: la sync con Carta/Dolci non segnala quando un'intera sezione cambia nome — piatti orfani silenziosi (visto coi dolci 28/9)",
    "sub": "Sito",
    "st": "up",
@@ -545,30 +473,6 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": true,
    "agg": "2026-09-28"
-  },
-  {
-   "t": "Inserire compleanni e anniversari degli ospiti in anagrafica (serve al promemoria del lunedì)",
-   "sub": "Sito",
-   "st": "up",
-   "s": "2026-10-01",
-   "e": null,
-   "own": "Andrea",
-   "az": "Dall'anagrafica (👤 nel gestionale o clienti.html) compilare compleanno/anniversario degli ospiti abituali: oggi nessun cliente ha date, quindi la mail del lunedì non parte",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-10-01"
-  },
-  {
-   "t": "Stampa dolci — provare la nuova preview (allergeni dal fondo, pesi) e fissare",
-   "sub": "Sito",
-   "st": "up",
-   "s": "2026-10-03",
-   "e": null,
-   "own": "Andrea",
-   "az": "Aprire la preview dei dolci, stampare, regolare «Allergeni dal fondo» se serve (come −13 della carta) e Fissa come default",
-   "bl": null,
-   "deb": false,
-   "agg": "2026-10-03"
   },
   {
    "t": "Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)",

@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.04.01",
+  version: "2026.10.04.02",
   updated: "2026-10-04",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -32,7 +32,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Prenotazioni — garanzia carta mirata: gruppi da 6 persone e date speciali (idea 11)', s:'2026-09-30', e:'2026-09-30', st:'done'},
       {t:'Gestionale — note ospite dal CRM (tag, note, ricorrenze) e promemoria compleanni/anniversari (idea 12)', s:'2026-09-30', e:'2026-10-01', st:'done'},
       {t:'Food Cost — avviso sui rincari dei fornitori dai carichi di Tracciabilità (idea 1)', s:'2026-09-30', st:'future'},
-      {t:'Inserire compleanni e anniversari degli ospiti in anagrafica (serve al promemoria del lunedì)', s:'2026-10-01', st:'up'},
+      {t:'Inserire compleanni e anniversari degli ospiti in anagrafica (serve al promemoria del lunedì)', s:'2026-10-01', st:'future'},
       {t:'HACCP — registro temperature frigo/abbattitore e piano pulizie digitale (idea 7)', s:'2026-09-30', st:'future'},
       {t:'Voucher — buoni aziendali in blocco (idea 14)', s:'2026-09-30', st:'future'},
       {t:'Food Cost — registro scarti per spiegare il GAP (idea 2, step futuro)', s:'2026-09-30', st:'future'},
@@ -101,7 +101,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Food Cost — Costo piatti: prezzo vendita dalla carta pubblicata (carta + dolci)', s:'2026-09-26', e:'2026-09-26', st:'done'},
       {t:'Tracciabilità: il codice NN-MMAA prosegue senza ripartire ogni mese', s:'2026-10-02', e:'2026-10-02', st:'done'},
       {t:'Food Cost — redesign inventario da range Dal/Al a conteggio puntuale per data (fc_inventario_conteggi), niente più doppia digitazione tra periodi consecutivi', s:'2026-09-13', st:'done', ms:true},
-      {t:'Calcolo Food Cost ricette da ingredienti: anagrafica ingredienti in Setup + tab Calcolo Food Cost che valorizza Costo Ricetta in Costo piatti', s:'2026-09-26', st:'prog'},
+      {t:'Calcolo Food Cost ricette da ingredienti: anagrafica ingredienti in Setup + tab Calcolo Food Cost che valorizza Costo Ricetta in Costo piatti', s:'2026-09-26', st:'done'},
       {t:'Food Cost → Inventario: storico conteggi (heatmap) mostra anche l\'importo totale per ogni data, non solo il giorno', s:'2026-09-28', e:'2026-09-28', st:'done'},
       {t:'Food Cost: apertura della sezione va sempre alla scheda Dashboard, non più all\'ultima scheda usata nella sessione', s:'2026-09-28', e:'2026-09-28', st:'done'},
       {t:'Dolci: pulita la sezione "Dolci — Golosità" orfana in Dettagli piatti (duplicati in Calcolo Food Cost)', s:'2026-09-28', e:'2026-09-28', st:'done'},
@@ -128,7 +128,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Banner chiusura per vacanza 21-28 settembre', s:'2026-09-20', e:'2026-09-28', st:'done'},
       {t:'menu-admin — audit flussi 29/9: ricarica sicura dopo Pubblica, guida corretta, FC % e Menu Engineering su prezzo netto, avviso vendite mancanti', s:'2026-09-29', e:'2026-09-29', st:'done'},
       {t:'menu-admin — decisioni aperte dall\'audit: degustazione nel Food Cost, grafico Andamento, piatti tolti dalla carta', s:'2026-09-29', e:'2026-09-29', st:'done'},
-      {t:'Allergeni — completare Crudi e piatti solo in degustazione (pagina pubblica + Dettagli piatti)', s:'2026-09-30', st:'up'},
+      {t:'Allergeni — completare Crudi e piatti solo in degustazione (pagina pubblica + Dettagli piatti)', s:'2026-09-30', st:'done'},
       {t:'Menu online — filtro allergeni per l\'ospite (IT/EN/FR)', s:'2026-09-30', e:'2026-09-30', st:'done'},
       {t:'menu-admin — secondo audit: migliorie aperte (voucher degustazione, orari a tendina, allergeni in Dettagli piatti, pannello chiavi, pulizia codice)', s:'2026-09-30', e:'2026-09-30', st:'done'},
       {t:'Pubblicare FAQ orari il 1/10 (nuovo periodo: venerdì pranzo, domenica solo pranzo) — allinea FAQ, JSON-LD e foglio orario', s:'2026-10-01', e:'2026-09-30', st:'done'},
@@ -145,7 +145,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Degustazione con descrizioni — asterisco sullo stesso rigo del nome e interlinea come la carta', s:'2026-10-03', e:'2026-10-03', st:'done'},
       {t:'Menu degustazione — descrizione per ogni piatto del percorso (stampata e tradotta)', s:'2026-10-03', e:'2026-10-03', st:'done'},
       {t:'Pagina allergeni sovrascritta da un upload su GitHub: ripristinata la versione corretta', s:'2026-10-03', e:'2026-10-03', st:'done'},
-      {t:'Stampa dolci — provare la nuova preview (allergeni dal fondo, pesi) e fissare', s:'2026-10-03', st:'up'},
+      {t:'Stampa dolci — provare la nuova preview (allergeni dal fondo, pesi) e fissare', s:'2026-10-03', st:'done'},
     ]},
     { key:'seo', name:'SEO & GEO', badge:'progetto-seo', tasks:[
       {t:'Migrazione Cloudflare + fix Schema @type', s:'2026-05-25', e:'2026-05-31', st:'done'},

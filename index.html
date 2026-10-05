@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.10.05.03 — (1) P.IVA 02395420991 nel footer della home (prima solo su dove-siamo, privacy e cookie). (2) Banner della serata spostato dopo il footer: il primo testo del documento torna ad essere la definizione del ristorante. (3) alt della foto cucina-piatto.webp: descrive un piatto, non la sala. -->
 <!-- v 2026.10.05.02 — FAQ «C’è un menù degustazione?» (visibile + JSON-LD + translations.json IT/EN/FR): oggi si propone solo la degustazione a 6 portate (il percorso a 7 «a mano libera dello Chef» non è in offerta: richiesta di Andrea 5/10). Il voucher a 7 portate è già spento in voucher-config.json (attivo:false). -->
 <!-- v 2026.10.05.01 — (1) "Cucina ligure" tolta da meta/og/twitter/JSON-LD description/servesCuisine: nuova linea di cucina dal 1/10 = prodotti del territorio in ricette moderne, golose e leggibili (translations.json page_description IT/EN/FR allineato). (2) Hreflang en/fr rimossi (stessa URL, inefficaci). (3) JSON-LD Restaurant: +hasMenu (@id /menu#menu) e +ReserveAction verso /prenota; nuovo nodo WebPage con dateModified. -->
 <!-- v 2026.10.02.06 — Banner cena: il codice RESTA per le prossime serate (istruzioni qui sotto). v 2026.10.02.05 — Banner cena: foto di Anna e Riku (Château Puybarbe) in cima alla scheda. v 2026.10.02.04 — Banner cena: produttore Château Puybarbe, Bordeaux. v 2026.10.02.03 — Menu: nuova voce «Serate» (desktop e mobile) verso /cene-a-tema; chiave nav_serate in translations.json IT/EN/FR. v 2026.10.02.02 — Banner cena 16/10 rifatto come overlay in stile "Vacanzina" (richiesta Andrea). v 2026.10.02.01 — Banner temporaneo "cena a tema 16 ottobre" (Santamonica × Bellenda): overlay con scheda (stile "Vacanzina": una volta per sessione, si chiude dopo 8s/click/×), si spegne da solo dal 17/10/2026 (data nel script, BANNER_FINE). DA TENERE: il banner si riusa per ogni serata. PER LA PROSSIMA SERATA cambiare: (1) BANNER_FINE e la chiave KEY (bannerCena_AAAA-MM-GG) nello script «BANNER CENA»; (2) i testi in BANNER_T (it/en/fr) e quelli statici dentro div#banner-cena; (3) la foto img/sito/… e la didascalia; (4) il titolo/data della serata in menu-admin → Prenotazioni — Setup → Serate speciali; (5) in cene-a-tema.html il link «Prenota online» (?data=AAAA-MM-GG). Dopo la scadenza il banner non compare più da solo -->
@@ -643,19 +644,6 @@
 </head>
 <body>
 
-<div id="banner-cena" role="dialog" aria-label="Cena a tema del 16 ottobre">
-  <div class="bc-card">
-    <button type="button" class="bc-x" id="banner-cena-x" aria-label="Chiudi">&times;</button>
-    <figure class="bc-foto"><img src="/img/sito/cena-puybarbe-anna-riku.jpg" alt="Anna e Riku di Château Puybarbe" width="640" height="530"><figcaption>Anna e Riku &middot; Château Puybarbe</figcaption></figure>
-    <div class="bc-testo">
-    <div class="bc-eyebrow" data-i18n="banner_eyebrow">Cena a tema</div>
-    <div class="bc-date" data-i18n="banner_date">Venerdì 16 ottobre</div>
-    <div class="bc-title" data-i18n="banner_title">Con Bellenda, i vini di Château Puybarbe, Bordeaux</div>
-    <div class="bc-info" data-i18n="banner_info">Ore 20 · 60 € tutto compreso</div>
-    <a class="bc-cta" id="banner-cena-link" href="/cene-a-tema" data-i18n="banner_cena_cta">Scopri la serata</a>
-    </div>
-  </div>
-</div>
 
 <nav id="main-nav">
   <a href="#" class="nav-logo">Santamonica <span class="sub">sul mare</span></a>
@@ -729,7 +717,7 @@
         </div>
       </div>
       <div class="cucina-images reveal" style="transition-delay:0.15s">
-        <img src="img/sito/cucina-piatto.webp" data-img-key="cucina_piatto" alt="La sala di Santamonica affacciata sul mare di Genova" loading="lazy" decoding="async">
+        <img src="img/sito/cucina-piatto.webp" data-img-key="cucina_piatto" alt="Un piatto di Santamonica, pesce e prodotti del territorio, servito in sala" loading="lazy" decoding="async">
         <img src="img/sito/cucina-ingredienti.webp" data-img-key="cucina_ingredienti" alt="La veranda di Santamonica sulla spiaggia del Lungomare di Genova" loading="lazy" decoding="async">
       </div>
     </div>
@@ -918,7 +906,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.10.05.02</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; P.IVA 02395420991 &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.10.05.03</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>
@@ -926,6 +914,20 @@
     <button type="button" class="cc-manage-link" data-cc="show-preferencesModal" data-i18n="footer_cc_manage">Gestisci preferenze cookie</button>
   </div>
 </footer>
+<!-- v 2026.10.05.03: banner della serata spostato qui (era in cima al body). E' un overlay fixed: il layout non cambia, ma per i crawler il primo testo della pagina torna ad essere la definizione del ristorante e non «60 € tutto compreso». Lo script del banner (sotto) lo trova comunque per id. -->
+<div id="banner-cena" role="dialog" aria-label="Cena a tema del 16 ottobre">
+  <div class="bc-card">
+    <button type="button" class="bc-x" id="banner-cena-x" aria-label="Chiudi">&times;</button>
+    <figure class="bc-foto"><img src="/img/sito/cena-puybarbe-anna-riku.jpg" alt="Anna e Riku di Château Puybarbe" width="640" height="530"><figcaption>Anna e Riku &middot; Château Puybarbe</figcaption></figure>
+    <div class="bc-testo">
+    <div class="bc-eyebrow" data-i18n="banner_eyebrow">Cena a tema</div>
+    <div class="bc-date" data-i18n="banner_date">Venerdì 16 ottobre</div>
+    <div class="bc-title" data-i18n="banner_title">Con Bellenda, i vini di Château Puybarbe, Bordeaux</div>
+    <div class="bc-info" data-i18n="banner_info">Ore 20 · 60 € tutto compreso</div>
+    <a class="bc-cta" id="banner-cena-link" href="/cene-a-tema" data-i18n="banner_cena_cta">Scopri la serata</a>
+    </div>
+  </div>
+</div>
 
 <div id="lightbox">
   <button id="lightbox-close">&#x2715;</button>

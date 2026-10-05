@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.05.05",
+  version: "2026.10.05.06",
   updated: "2026-10-05",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -41,7 +41,7 @@ window.SANTAMONICA_GANTT = {
       {t:'menu-admin CSP + QR + controlli stampa', s:'2026-06-10', st:'done'},
       {t:'Sicurezza cauzioni RLS chiusa', s:'2026-06-11', st:'done', ms:true},
       {t:'Fix M1: ricevuta non conferma (v21)', s:'2026-06-12', st:'done', ms:true},
-      {t:'Menu pubblici leggibili senza JavaScript (pre-rendering nel pannello) — ripubblicare dal pannello', s:'2026-10-05', e:'2026-10-08', st:'prog'},
+      {t:'Menu pubblici leggibili senza JavaScript (pre-rendering nel pannello) — ripubblicare dal pannello', s:'2026-10-05', e:'2026-10-05', st:'done'},
       {t:'newsletter-confermata.html + DOI redirect (v22)', s:'2026-06-12', st:'done', ms:true},
       {t:'Ramo Voucher — acquisto automatico Stripe live (PDF+mail), IVA confermata commercialista (14/7)', s:'2026-06-10', e:'2026-07-20', st:'done', ms:true},
       {t:'Voucher — fase di test completata: rate limit ripristinato 5/ora, CTA home→/regala.html, testo validità/uso allineato ovunque (sito+PDF+termini+admin)', s:'2026-07-21', st:'done', ms:true},
@@ -186,6 +186,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Multilingua URL separate /en/ /fr/ (mini-progetto ≈3-4 sess, post-pillar)', s:'2027-01-07', e:'2027-02-28', st:'future'},
       {t:'Brevo automazioni email', s:'2026-08-01', e:'2026-09-25', st:'done'},
       {t:'Audit SEO-GEO-AEO completo con claude-seo 2.4.2 (5/10): 9 specialisti, ~77/100', s:'2026-10-05', e:'2026-10-05', st:'done'},
+      {t:'FAQ home — tipo di ristorante, stella Michelin, prezzo (65-90 €), «dal 2016», allergeni dolci (IT/EN/FR)', s:'2026-10-05', e:'2026-10-05', st:'done'},
       {t:'Nuova linea di cucina — tolto «cucina ligure» dai testi pubblici (home, dove-siamo, JSON-LD, traduzioni)', s:'2026-10-05', e:'2026-10-05', st:'done'},
     ]},
     { key:'mkt', name:'Marketing & Awareness', badge:'progetto-marketing', tasks:[

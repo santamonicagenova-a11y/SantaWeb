@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.10.05.04 — (1) FAQ: +3 domande in coda (9 «Che tipo di ristorante è», con «dal 2016»; 10 «Avete una stella Michelin?», con Good Cooking; 11 «Quanto si spende?», 65-90 € a persona, cifra del brand); FAQ allergeni: citati i dolci. Visibile + JSON-LD + translations.json IT/EN/FR; il ricostruttore JSON-LD ora legge fino a 11 domande. (2) foundingDate 2016 nel JSON-LD Restaurant. (3) Il numero di versione nel footer non è più un link a login.html (richiesta di Andrea). -->
 <!-- v 2026.10.05.03 — (1) P.IVA 02395420991 nel footer della home (prima solo su dove-siamo, privacy e cookie). (2) Banner della serata spostato dopo il footer: il primo testo del documento torna ad essere la definizione del ristorante. (3) alt della foto cucina-piatto.webp: descrive un piatto, non la sala. -->
 <!-- v 2026.10.05.02 — FAQ «C’è un menù degustazione?» (visibile + JSON-LD + translations.json IT/EN/FR): oggi si propone solo la degustazione a 6 portate (il percorso a 7 «a mano libera dello Chef» non è in offerta: richiesta di Andrea 5/10). Il voucher a 7 portate è già spento in voucher-config.json (attivo:false). -->
 <!-- v 2026.10.05.01 — (1) "Cucina ligure" tolta da meta/og/twitter/JSON-LD description/servesCuisine: nuova linea di cucina dal 1/10 = prodotti del territorio in ricette moderne, golose e leggibili (translations.json page_description IT/EN/FR allineato). (2) Hreflang en/fr rimossi (stessa URL, inefficaci). (3) JSON-LD Restaurant: +hasMenu (@id /menu#menu) e +ReserveAction verso /prenota; nuovo nodo WebPage con dateModified. -->
@@ -207,6 +208,7 @@
   "@id": "https://santamonicagenova.it/#restaurant",
   "name": "Ristorante Santamonica",
   "alternateName": "Santamonica",
+  "foundingDate": "2016",
   "description": "Ristorante di pesce fresco sul Lungomare Lombardo di Genova. Sommelier Monica Capurro. Segnalato dalla Guida Michelin. Prodotti del territorio in ricette moderne, cantina curata, vista mare.",
   "url": "https://santamonicagenova.it/",
   "logo": "https://santamonicagenova.it/img/logo-santamonica.png",
@@ -332,7 +334,7 @@
       "name": "Gestite allergie e intolleranze?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Sì: sul sito è pubblicata la tabella allergeni completa, piatto per piatto, e in sala il personale è preparato a consigliarvi."
+        "text": "Sì: sul sito è pubblicata la tabella allergeni completa, piatto per piatto, e gli allergeni dei dolci sono indicati nella pagina dei dolci. In sala il personale è preparato a consigliarvi."
       }
     },
     {
@@ -365,6 +367,30 @@
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Sì: proponiamo ostriche, scampi e gamberi viola nostrani a crudo, oltre a una selezione di pesce nostrano pescato ad amo e una degustazione di mare per chi desidera un assaggio più completo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Che tipo di ristorante è Santamonica?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Un ristorante di pesce sul Lungomare Lombardo, con la sala affacciata sul mare aperto. La cucina usa prodotti del territorio in ricette moderne, golose e leggibili. L'accoglienza è curata, senza formalità. Siamo sul Lungomare Lombardo dal 2016."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Avete una stella Michelin?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No, non abbiamo la stella. Siamo presenti nella Guida Michelin con la menzione Good Cooking e siamo citati anche dal Gambero Rosso e dal Golosario."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quanto si spende?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In media tra 65 e 90 € a persona."
       }
     }
   ]
@@ -875,7 +901,7 @@
       </details>
       <details class="faq-item">
         <summary><h3 class="faq-q" data-i18n="faq_q4">Gestite allergie e intolleranze?</h3></summary>
-        <div class="faq-answer" data-i18n="faq_a4"><p>S&igrave;: sul sito &egrave; pubblicata la <a href="/menu-allergeni.html" target="_blank" rel="noopener">tabella allergeni completa</a>, piatto per piatto, e in sala il personale &egrave; preparato a consigliarvi.</p></div>
+        <div class="faq-answer" data-i18n="faq_a4"><p>S&igrave;: sul sito &egrave; pubblicata la <a href="/menu-allergeni.html" target="_blank" rel="noopener">tabella allergeni completa</a>, piatto per piatto, e gli allergeni dei dolci sono indicati nella <a href="/menu-dolci" target="_blank" rel="noopener">pagina dei dolci</a>. In sala il personale &egrave; preparato a consigliarvi.</p></div>
       </details>
       <details class="faq-item">
         <summary><h3 class="faq-q" data-i18n="faq_q5">Come si prenota?</h3></summary>
@@ -893,6 +919,18 @@
         <summary><h3 class="faq-q" data-i18n="faq_q8">Avete un crudo di pesce?</h3></summary>
         <div class="faq-answer" data-i18n="faq_a8"><p>S&igrave;: proponiamo ostriche, scampi e gamberi viola nostrani a crudo, oltre a una selezione di pesce nostrano pescato ad amo e una degustazione di mare per chi desidera un assaggio pi&ugrave; completo.</p></div>
       </details>
+      <details class="faq-item">
+        <summary><h3 class="faq-q" data-i18n="faq_q9">Che tipo di ristorante &egrave; Santamonica?</h3></summary>
+        <div class="faq-answer" data-i18n="faq_a9"><p>Un ristorante di pesce sul Lungomare Lombardo, con la sala affacciata sul mare aperto. La cucina usa prodotti del territorio in ricette moderne, golose e leggibili. L&rsquo;accoglienza &egrave; curata, senza formalit&agrave;. Siamo sul Lungomare Lombardo dal 2016.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary><h3 class="faq-q" data-i18n="faq_q10">Avete una stella Michelin?</h3></summary>
+        <div class="faq-answer" data-i18n="faq_a10"><p>No, non abbiamo la stella. Siamo presenti nella Guida Michelin con la menzione Good Cooking e siamo citati anche dal Gambero Rosso e dal Golosario.</p></div>
+      </details>
+      <details class="faq-item">
+        <summary><h3 class="faq-q" data-i18n="faq_q11">Quanto si spende?</h3></summary>
+        <div class="faq-answer" data-i18n="faq_a11"><p>In media tra 65 e 90 &euro; a persona.</p></div>
+      </details>
     </div>
   </div>
 </section>
@@ -906,7 +944,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; P.IVA 02395420991 &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.10.05.03</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; P.IVA 02395420991 &mdash; <span class="footer-version">v 2026.10.05.04</span></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>
@@ -1037,7 +1075,7 @@
     var script = document.getElementById('faq-jsonld');
     if (!script || !t.faq_q1) return;
     var mainEntity = [];
-    for (var i = 1; i <= 8; i++) {
+    for (var i = 1; i <= 11; i++) {
       var qKey = 'faq_q' + i, aKey = 'faq_a' + i, ldKey = 'faqld_a' + i;
       if (t[qKey] === undefined || t[aKey] === undefined) continue;
       mainEntity.push({

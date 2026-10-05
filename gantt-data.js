@@ -5,11 +5,11 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.04.08",
-  updated: "2026-10-04",
+  version: "2026.10.05.01",
+  updated: "2026-10-05",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
-  today:     "2026-10-04",
+  today:     "2026-10-05",
 
   sections: [
     { key:'dec', name:'★ Decennale — serata 1 luglio 2026', badge:'evento trasversale', tasks:[
@@ -41,6 +41,7 @@ window.SANTAMONICA_GANTT = {
       {t:'menu-admin CSP + QR + controlli stampa', s:'2026-06-10', st:'done'},
       {t:'Sicurezza cauzioni RLS chiusa', s:'2026-06-11', st:'done', ms:true},
       {t:'Fix M1: ricevuta non conferma (v21)', s:'2026-06-12', st:'done', ms:true},
+      {t:'Menu pubblici leggibili senza JavaScript (pre-rendering nel pannello) — ripubblicare dal pannello', s:'2026-10-05', e:'2026-10-08', st:'prog'},
       {t:'newsletter-confermata.html + DOI redirect (v22)', s:'2026-06-12', st:'done', ms:true},
       {t:'Ramo Voucher — acquisto automatico Stripe live (PDF+mail), IVA confermata commercialista (14/7)', s:'2026-06-10', e:'2026-07-20', st:'done', ms:true},
       {t:'Voucher — fase di test completata: rate limit ripristinato 5/ora, CTA home→/regala.html, testo validità/uso allineato ovunque (sito+PDF+termini+admin)', s:'2026-07-21', st:'done', ms:true},
@@ -171,6 +172,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Piano recensioni (4,3★→4,6, leva GEO) + tentativo recupero TheFork Manager', s:'2026-10-06', e:'2026-11-30', st:'up'},
       {t:'Embriaco #8 profilato + backlink Vivarelli/I Cuochi chiusi (no dominio)', s:'2026-06-24', st:'done'},
       {t:'Audit pagine sitemap 27/9: immagini 404, H1, meta e canonical delle pagine generate', s:'2026-09-27', e:'2026-09-27', st:'done'},
+      {t:'Entrare nelle liste e negli aggregatori (TheFork, genovaturismo, GenovaToday, mentelocale) + voce Wikidata', s:'2026-10-05', st:'up'},
       {t:'Backlink competitor Etra/Coco/Xena (avanti; dietro solo ai 2 stellati)', s:'2026-06-19', st:'done'},
       {t:'PR decennale comunicato — ABBANDONATO (decisione Andrea 24/6)', s:'2026-06-19', e:'2026-06-24', st:'done'},
       {t:'Brief SEO pillar /cucina-di-pesce (spec pronta)', s:'2026-06-19', st:'done', ms:true},
@@ -183,6 +185,8 @@ window.SANTAMONICA_GANTT = {
       {t:'Content seriale IG + Brevo (2/mese)', s:'2026-11-01', e:'2027-03-31', st:'future'},
       {t:'Multilingua URL separate /en/ /fr/ (mini-progetto ≈3-4 sess, post-pillar)', s:'2027-01-07', e:'2027-02-28', st:'future'},
       {t:'Brevo automazioni email', s:'2026-08-01', e:'2026-09-25', st:'done'},
+      {t:'Audit SEO-GEO-AEO completo con claude-seo 2.4.2 (5/10): 9 specialisti, ~77/100', s:'2026-10-05', e:'2026-10-05', st:'done'},
+      {t:'Nuova linea di cucina — tolto «cucina ligure» dai testi pubblici (home, dove-siamo, JSON-LD, traduzioni)', s:'2026-10-05', e:'2026-10-05', st:'done'},
     ]},
     { key:'mkt', name:'Marketing & Awareness', badge:'progetto-marketing', tasks:[
       {t:'Apertura IG + strategia content', s:'2026-05-28', st:'done'},
@@ -218,6 +222,7 @@ window.SANTAMONICA_GANTT = {
       {t:'★ Obiettivo +20% infrasettimanale (mis. nov–gen)', s:'2026-11-01', e:'2027-01-31', st:'future', ms:true},
       {t:'Filone B — Picco strategico: adv Nord Italia + push concierge/PR alta stagione (se leading positivi)', s:'2027-03-01', e:'2027-08-31', st:'future'},
       {t:'Sponsorizzata Salone Nautico', s:'2026-09-25', e:'2026-10-04', st:'done'},
+      {t:'Boost IG cena 16/10: controlli dopo la pubblicazione (10/10 rifiuti, 12/10 efficacia)', s:'2026-10-05', e:'2026-10-14', st:'prog'},
     ]},
     { key:'nsa', name:'NoShowApp (prodotto SaaS)', badge:'progetto-nsa', tasks:[
       {t:'NoShowApp fasi 1-5 completate (MVP no-show condiviso, accesso a invito, admin, UI + dominio, garanzia carta Stripe in test)', s:'2026-03-20', e:'2026-05-03', st:'done'},
@@ -229,6 +234,9 @@ window.SANTAMONICA_GANTT = {
       {t:'NoShowApp F6b — Stripe Connect Express: ogni ristoratore collega il proprio IBAN, addebiti diretti', s:'2027-01-01', e:'2027-03-31', st:'future'},
       {t:'NoShowApp F7 — landing pubblica per ristorante (noshowapp.it/prenota/nome) con garanzia carta', s:'2027-02-01', e:'2027-06-30', st:'future'},
       {t:'NoShowApp F8 — app native, caller ID, reminder Twilio, statistiche, TheFork/OpenTable, punteggio, FR/ES/DE (dopo 20+ utenti)', s:'2027-06-01', e:'2027-12-31', st:'future'},
+    ]},
+    { key:'trasversale', name:'Trasversale', badge:'', tasks:[
+      {t:'Nuovo chef (savonese, dal 1/10) — nome e via libera alla pubblicazione', s:'2026-10-05', st:'up'},
     ]},
   ]
 };

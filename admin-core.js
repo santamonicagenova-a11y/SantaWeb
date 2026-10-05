@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.10.05.01 — Pre-rendering STATICO delle pagine menu pubbliche (menu, menu-en/fr, dolci, allergeni): il DOM generato viene scritto nel contenitore (tra <!--SSR--> e <!--/SSR-->) così anche i crawler senza JavaScript vedono piatti e prezzi; H1 per screen reader/crawler; JSON-LD Menu costruito dai dati veri (prima: 4 sezioni scritte a mano). Se il pre-rendering fallisce si pubblica comunque la pagina com'era.
 // v 2026.10.03.10 — Menu pubblico (IT/EN/FR): tolte davvero barra superiore e barra laterale dei controlli di stampa (la regex cercava solo `ctrl-bar` senza `adm` e non scattava piu).
 // v 2026.10.03.09 — Allergeni carta: i dolci restano nei dati (stampa dolci, filtro EN/FR) ma sono marcati nascosta e non compaiono nella pagina (IT ed EN/FR).
 // v 2026.10.03.08 — Degustazione: campo «Descrizione» per ogni piatto del percorso (d6d-*), letto da leggi() e tradotto in EN/FR.
@@ -276,7 +277,7 @@ function analizza(src) {
   dati = _parseDataBlock(js, 'MENU');
   datiOriginali = JSON.parse(JSON.stringify(dati)); // copia immutabile
 
-  tplBefore = src.slice(0, i1);
+  tplBefore = _ssrStrip(src.slice(0, i1));
   tplAfter  = src.slice(i2end);
 
 
@@ -1065,6 +1066,106 @@ function _accodaVoucherConfig(voucherDegu, files, proseguiCb) {
     .then(proseguiCb, proseguiCb);
 }
 
+// ── v 2026.10.05.01 — PRE-RENDERING STATICO delle pagine menu pubbliche ─────────────────────────
+// Problema (audit SEO 5/10/2026): /menu, /menu-en, /menu-fr, /menu-dolci e /menu-allergeni sono "app" JS:
+// piatti e prezzi stanno in `const MENU` e il contenitore parte vuoto, quindi i crawler che non eseguono
+// JavaScript (la maggior parte dei crawler AI) vedono 7-15 parole. A ogni pubblicazione la pagina generata
+// viene eseguita in un iframe nascosto e il DOM ottenuto viene scritto dentro il contenitore, tra i marcatori
+// <!--SSR--> e <!--/SSR-->. A runtime lo script della pagina svuota il contenitore e lo ricostruisce identico
+// (root.innerHTML = ''), quindi per chi ha JS non cambia nulla.
+// Sicurezza: se qualcosa non va (timeout, testo troppo corto) si pubblica la pagina SENZA pre-rendering:
+// la pubblicazione non si blocca mai. I marcatori si tolgono sempre prima di rigenerare (_ssrStrip) perche'
+// i template di allergeni e dolci derivano dal file LIVE e altrimenti si porterebbero dietro il vecchio contenuto.
+var _SSR_RE    = /<!--SSR-->[\s\S]*?<!--\/SSR-->/g;
+var _SSR_H1_RE = /<!--SSR-H1-->[\s\S]*?<!--\/SSR-H1-->\s*/g;
+function _ssrStrip(html) { return String(html).replace(_SSR_RE, '').replace(_SSR_H1_RE, ''); }
+var _SSR_PAGINE = { 'menu.html': 'layout-carta', 'menu-en.html': 'layout-carta', 'menu-fr.html': 'layout-carta', 'menu-dolci.html': 'layout-carta' };
+
+function prerenderStatico(html, containerId) {
+  return new Promise(function (resolve) {
+    var base = _ssrStrip(html);
+    var vuoto = '<div id="' + containerId + '"></div>';
+    if (base.indexOf(vuoto) < 0) { resolve(base); return; }
+    var fr = document.createElement('iframe');
+    fr.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+    fr.style.cssText = 'position:fixed;left:-10000px;top:0;width:1100px;height:900px;border:0;visibility:hidden';
+    var chiuso = false, tentativi = 0;
+    function fine(out) {
+      if (chiuso) return;
+      chiuso = true;
+      try { document.body.removeChild(fr); } catch (e) {}
+      resolve(out);
+    }
+    function sonda() {
+      try {
+        var d = fr.contentDocument, root = d && d.getElementById(containerId);
+        if (root && root.children.length > 0) {
+          var inner = root.innerHTML;
+          var testo = (root.textContent || '').replace(/\s+/g, ' ').trim();
+          if (testo.length < 80 || inner.indexOf('\u0000') >= 0) { fine(base); return; }
+          var out = base.replace(vuoto, function () { return '<div id="' + containerId + '"><!--SSR-->' + inner + '<!--/SSR--></div>'; });
+          if (!/<h1[\s>]/i.test(inner)) {
+            // H1 solo per screen reader e crawler (fuori dal contenitore, quindi non lo cancella lo script della pagina)
+            var t = (base.match(/<title>([^<]*)<\/title>/) || [])[1] || '';
+            if (t) out = out.replace('<div id="' + containerId + '">', function () {
+              return '<!--SSR-H1--><h1 style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">' + t + '</h1><!--/SSR-H1-->\n<div id="' + containerId + '">';
+            });
+          }
+          fine(out);
+          return;
+        }
+      } catch (e) {}
+      if (++tentativi > 30) { fine(base); return; }
+      setTimeout(sonda, 200);
+    }
+    fr.onload = function () { setTimeout(sonda, 300); };
+    document.body.appendChild(fr);
+    fr.srcdoc = base;
+  });
+}
+
+// JSON-LD "Menu" della pagina /menu costruito dai dati veri (prima: 4 sezioni scritte a mano e sbagliate).
+function _ssrTesto(x) {
+  var d = document.createElement('div');
+  d.innerHTML = String(x == null ? '' : x);
+  return (d.textContent || '').replace(/\s+/g, ' ').trim();
+}
+function _menuJsonLdStr(m) {
+  var sezioni = [];
+  try {
+    var v = calcolaVoucherDegustazione(m);
+    var opz = (m.degustazione && m.degustazione.opzioni) || [];
+    var itemsD = [];
+    [[v && v.sei, 6], [v && v.sette, 7]].forEach(function (c) {
+      var o = opz.find(function (x) { return x.portate === c[1]; });
+      if (c[0] && c[0].attivo && o && o.prezzo != null) {
+        itemsD.push({ '@type': 'MenuItem', name: 'Men\u00f9 degustazione ' + c[1] + ' portate', offers: { '@type': 'Offer', price: String(o.prezzo), priceCurrency: 'EUR' } });
+      }
+    });
+    if (itemsD.length) sezioni.push({ '@type': 'MenuSection', name: 'Men\u00f9 degustazione', hasMenuItem: itemsD });
+    (m.sezioni || []).forEach(function (s) {
+      if (!s || s.nascosta) return;
+      var items = (s.piatti || []).map(function (p) {
+        var nome = _ssrTesto(p && p.nome);
+        if (!nome) return null;
+        var it = { '@type': 'MenuItem', name: nome };
+        var desc = _ssrTesto(p.descrizione);
+        if (desc) it.description = desc;
+        if (p.prezzo != null && p.prezzo !== '' && !isNaN(parseFloat(p.prezzo))) {
+          it.offers = { '@type': 'Offer', price: String(parseFloat(p.prezzo)), priceCurrency: 'EUR' };
+        }
+        return it;
+      }).filter(Boolean);
+      var nomeS = _ssrTesto(s.titolo_display || s.titolo);
+      if (nomeS && items.length) sezioni.push({ '@type': 'MenuSection', name: nomeS, hasMenuItem: items });
+    });
+  } catch (e) { sezioni = []; }
+  if (!sezioni.length) sezioni = [{ '@type': 'MenuSection', name: 'Men\u00f9 degustazione' }, { '@type': 'MenuSection', name: 'Alla carta' }];
+  var obj = { '@context': 'https://schema.org', '@type': 'Menu', '@id': 'https://santamonicagenova.it/menu#menu', name: 'Menu Santamonica', url: 'https://santamonicagenova.it/menu', inLanguage: 'it', hasMenuSection: sezioni };
+  return JSON.stringify(obj, null, 2).replace(/<\//g, '<\\/');
+}
+// ── fine pre-rendering statico ──────────────────────────────────────────────────────────────────
+
 function eseguiPubblicazione(token) {
   // Guard: senza menu caricato (dati===null) leggi() crasherebbe su "dati.degustazione".
   // Puo' capitare dal percorso modale-token (confermaPubblica) dopo un refresh senza ricaricare il menu.
@@ -1089,21 +1190,7 @@ function eseguiPubblicazione(token) {
       '<meta property="og:description" content="Il menu di Santamonica sul Lungomare di Genova: degustazione e carta con prodotti del territorio e pescato del giorno, vini della sommelier Monica Capurro.">\n  ' +
       '<meta property="og:url" content="https://santamonicagenova.it/menu">\n  ' +
       '<meta property="og:image" content="https://santamonicagenova.it/img/hero.jpg">\n  ' +
-      '<script type="application/ld+json">\n' +
-      '  {\n' +
-      '    "@context": "https://schema.org",\n' +
-      '    "@type": "Menu",\n' +
-      '    "name": "Menu Santamonica",\n' +
-      '    "url": "https://santamonicagenova.it/menu",\n' +
-      '    "inLanguage": "it",\n' +
-      '    "hasMenuSection": [\n' +
-      '      { "@type": "MenuSection", "name": "Antipasti" },\n' +
-      '      { "@type": "MenuSection", "name": "Primi" },\n' +
-      '      { "@type": "MenuSection", "name": "Secondi di Mare" },\n' +
-      '      { "@type": "MenuSection", "name": "Contorni" }\n' +
-      '    ]\n' +
-      '  }\n' +
-      '  </script>\n  ';
+      '<script type="application/ld+json">\n' + _menuJsonLdStr(leggi()) + '\n  </script>\n  ';
     // Sostituisce title con SEO + title (in modo da posizionare i meta prima del title come da convenzione)
     return html.replace(/<title>([^<]*)<\/title>/, '<title>Menu degustazione e carta | Santamonica, Genova</title>\n  ' + SEO_HEAD);
   }
@@ -1261,6 +1348,17 @@ function eseguiPubblicazione(token) {
   }
 
   function pubblicaFiles() {
+    // v 2026.10.05.01: pre-rendering statico delle pagine menu pubbliche (se fallisce si pubblica comunque)
+    toast('⏳ Preparo le pagine…');
+    var pronti = files.map(function(f) {
+      var id = _SSR_PAGINE[f.path];
+      if (!id || typeof f.content !== 'string') return Promise.resolve();
+      return prerenderStatico(f.content, id).then(function(c) { f.content = c; });
+    });
+    Promise.all(pronti).then(_pubblicaCoda, _pubblicaCoda);
+  }
+
+  function _pubblicaCoda() {
     toast('⏳ Pubblicazione in corso…');
 
     var i = 0;
@@ -2033,7 +2131,7 @@ function analizzaAllergeni(src) {
   var js = src.slice(i1, i2).trim();
   datiAllergeni = _parseDataBlock(js, 'ALLERGENI_DATA');
 
-  tplAllBefore = src.slice(0, i1);
+  tplAllBefore = _ssrStrip(src.slice(0, i1));
   tplAllAfter  = src.slice(i2end);
 }
 
@@ -2268,7 +2366,9 @@ function pubblicaAllergeni(token) {
   };
   var apiBase = 'https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + ALLERGENI_PATH;
   toast('\u23f3 Pubblicazione allergeni...');
-  fetch(apiBase, { headers: headers })
+  // v 2026.10.05.01: pre-rendering statico (se fallisce si pubblica comunque senza)
+  prerenderStatico(html, 'layout-allergeni')
+    .then(function(h) { html = h; return fetch(apiBase, { headers: headers }); })
     .then(function(r) { return r.json(); })
     .then(function(d) {
       var body = {

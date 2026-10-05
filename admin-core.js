@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.10.05.02 — Pre-rendering: l'H1 per screen reader/crawler si aggiunge solo se la pagina non ne ha gia' uno (i dolci ne hanno uno proprio: prima ne usciva un secondo).
 // v 2026.10.05.01 — Pre-rendering STATICO delle pagine menu pubbliche (menu, menu-en/fr, dolci, allergeni): il DOM generato viene scritto nel contenitore (tra <!--SSR--> e <!--/SSR-->) così anche i crawler senza JavaScript vedono piatti e prezzi; H1 per screen reader/crawler; JSON-LD Menu costruito dai dati veri (prima: 4 sezioni scritte a mano). Se il pre-rendering fallisce si pubblica comunque la pagina com'era.
 // v 2026.10.03.10 — Menu pubblico (IT/EN/FR): tolte davvero barra superiore e barra laterale dei controlli di stampa (la regex cercava solo `ctrl-bar` senza `adm` e non scattava piu).
 // v 2026.10.03.09 — Allergeni carta: i dolci restano nei dati (stampa dolci, filtro EN/FR) ma sono marcati nascosta e non compaiono nella pagina (IT ed EN/FR).
@@ -1104,7 +1105,10 @@ function prerenderStatico(html, containerId) {
           var testo = (root.textContent || '').replace(/\s+/g, ' ').trim();
           if (testo.length < 80 || inner.indexOf('\u0000') >= 0) { fine(base); return; }
           var out = base.replace(vuoto, function () { return '<div id="' + containerId + '"><!--SSR-->' + inner + '<!--/SSR--></div>'; });
-          if (!/<h1[\s>]/i.test(inner)) {
+          // H1: solo se la pagina non ne ha gia' uno (i dolci hanno il proprio H1 sr-only fuori dal contenitore)
+          var h1Fuori = false;
+          try { h1Fuori = !!new DOMParser().parseFromString(base, 'text/html').querySelector('h1'); } catch (e) {}
+          if (!h1Fuori && !/<h1[\s>]/i.test(inner)) {
             // H1 solo per screen reader e crawler (fuori dal contenitore, quindi non lo cancella lo script della pagina)
             var t = (base.match(/<title>([^<]*)<\/title>/) || [])[1] || '';
             if (t) out = out.replace('<div id="' + containerId + '">', function () {

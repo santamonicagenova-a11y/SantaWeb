@@ -2,11 +2,12 @@
   ─────────────────────────────────────────────────────────────────────────
   dove-siamo.html — Dove siamo / Contatti
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.09.27.01
-  Ultimo aggiornamento: 2026-09-25
+  Versione: v 2026.10.05.01
+  Ultimo aggiornamento: 2026-10-05
   Lingua: IT (versione ufficiale)
   Stato: BOZZA INFORMATIVA · F0.12 chiusa (hotfix layout)
 
+  Modifiche v 2026.10.05.01: JSON-LD Restaurant allineato alla home (stesso @id = stesse proprietà: description, currenciesAccepted, paymentAccepted, menu/hasMenu, award completo, ReserveAction); servesCuisine senza "Ligurian" (nuova linea di cucina: prodotti del territorio, ricette moderne); rimossa la chiave non-schema _comment_orari (stantia: descriveva il periodo 11/9-30/9).
   Modifiche v 2026.09.27.01: og:image e JSON-LD image puntavano a img/og-home.jpg (404, mai esistito) → img/hero.jpg (1200x630 creato il 27/9).
   Modifiche v 2026.09.25.01: canonical/og:url/JSON-LD puntano agli URL puliti (senza .html): le .html fanno redirect 308 verso la versione senza estensione e Google segnalava "Pagina con reindirizzamento". Nessun cambio di contenuto.
 
@@ -148,14 +149,20 @@
     "@id": "https://santamonicagenova.it/#restaurant",
     "name": "Ristorante Santamonica",
     "alternateName": "Santamonica",
+    "description": "Ristorante di pesce fresco sul Lungomare Lombardo di Genova. Sommelier Monica Capurro. Segnalato dalla Guida Michelin. Prodotti del territorio in ricette moderne, cantina curata, vista mare.",
     "url": "https://santamonicagenova.it/",
     "logo": "https://santamonicagenova.it/img/logo-santamonica.png",
     "image": "https://santamonicagenova.it/img/hero.jpg",
     "telephone": "+390105533155",
     "email": "info@santamonicagenova.it",
     "priceRange": "€€€",
-    "servesCuisine": ["Italian", "Seafood", "Ligurian"],
+    "currenciesAccepted": "EUR",
+    "paymentAccepted": "Cash, Credit Card, Debit Card, Contactless",
+    "servesCuisine": ["Italian", "Seafood"],
+    "menu": "https://santamonicagenova.it/menu",
+    "hasMenu": { "@type": "Menu", "@id": "https://santamonicagenova.it/menu#menu", "url": "https://santamonicagenova.it/menu", "name": "Menù Degustazione e carta", "inLanguage": "it-IT" },
     "acceptsReservations": "True",
+    "potentialAction": { "@type": "ReserveAction", "target": { "@type": "EntryPoint", "urlTemplate": "https://santamonicagenova.it/prenota", "inLanguage": "it-IT", "actionPlatform": ["http://schema.org/DesktopWebPlatform", "http://schema.org/MobileWebPlatform"] }, "result": { "@type": "Reservation", "name": "Prenota un tavolo" } },
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "Lungomare Lombardo 27",
@@ -174,7 +181,6 @@
       { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Friday", "Saturday", "Sunday"], "opens": "12:30", "closes": "14:30" },
       { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], "opens": "19:30", "closes": "22:30" }
     ],
-    "_comment_orari": "openingHoursSpecification STATICO crawler-safe, allineato al periodo 11/9-30/9 in vigore (reservation_settings.opening_periods): pranzo sabato e domenica 12:30-14:30, cena da martedì a domenica 19:30-22:30 (lunedì chiuso, venerdì solo cena). /orari.js lo ri-inietta identico a runtime. Se cambi i periodi dal pannello Orari di Apertura, aggiorna qui col pulsante \\\"Pubblica FAQ\\\" (ora patcha anche questo blocco + index.html + il foglio menù stampabile, non serve più editarlo a mano).",
     "sameAs": [
       "https://www.instagram.com/ristorantesantamonica/",
       "https://www.facebook.com/santamonicage",
@@ -182,7 +188,7 @@
       "https://www.thefork.it/ristorante/santamonica-r561215",
       "https://www.tripadvisor.com/Restaurant_Review-g187823-d10480613-Reviews-Santamonica-Genoa_Italian_Riviera_Liguria.html"
     ],
-    "award": "Guida Michelin - Good Cooking",
+    "award": ["Guida Michelin - Good Cooking", "Gambero Rosso", "Golosario"],
     "employee": [
       {
         "@type": "Person",

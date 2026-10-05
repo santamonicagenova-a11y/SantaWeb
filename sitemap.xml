@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Santamonica Web — sitemap.xml — v 2026.07.03.01 -->
+<!-- Santamonica Web — sitemap.xml — v 2026.10.05.01 -->
+<!-- v 2026.10.05.01: +/prenota (indicizzabile, ora con canonical); lastmod home aggiornato. -->
 <!-- Host canonico: https://santamonicagenova.it (apex, no www) -->
 <!-- v 2026.07.03.01: URL PULITE senza .html — Cloudflare Pages applica i "pretty URLs"
      (/pagina.html -> 301 -> /pagina), quindi le voci .html erano diventate
@@ -13,7 +14,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://santamonicagenova.it/</loc>
-    <lastmod>2026-06-29</lastmod>
+    <lastmod>2026-10-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -74,6 +75,14 @@
     <lastmod>2026-06-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+
+  <!-- Prenota (wizard) -->
+  <url>
+    <loc>https://santamonicagenova.it/prenota</loc>
+    <lastmod>2026-10-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 
   <!-- Privacy policy (IT only) -->

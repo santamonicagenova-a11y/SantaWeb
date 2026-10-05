@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.10.05.02 — FAQ «C’è un menù degustazione?» (visibile + JSON-LD + translations.json IT/EN/FR): oggi si propone solo la degustazione a 6 portate (il percorso a 7 «a mano libera dello Chef» non è in offerta: richiesta di Andrea 5/10). Il voucher a 7 portate è già spento in voucher-config.json (attivo:false). -->
 <!-- v 2026.10.05.01 — (1) "Cucina ligure" tolta da meta/og/twitter/JSON-LD description/servesCuisine: nuova linea di cucina dal 1/10 = prodotti del territorio in ricette moderne, golose e leggibili (translations.json page_description IT/EN/FR allineato). (2) Hreflang en/fr rimossi (stessa URL, inefficaci). (3) JSON-LD Restaurant: +hasMenu (@id /menu#menu) e +ReserveAction verso /prenota; nuovo nodo WebPage con dateModified. -->
 <!-- v 2026.10.02.06 — Banner cena: il codice RESTA per le prossime serate (istruzioni qui sotto). v 2026.10.02.05 — Banner cena: foto di Anna e Riku (Château Puybarbe) in cima alla scheda. v 2026.10.02.04 — Banner cena: produttore Château Puybarbe, Bordeaux. v 2026.10.02.03 — Menu: nuova voce «Serate» (desktop e mobile) verso /cene-a-tema; chiave nav_serate in translations.json IT/EN/FR. v 2026.10.02.02 — Banner cena 16/10 rifatto come overlay in stile "Vacanzina" (richiesta Andrea). v 2026.10.02.01 — Banner temporaneo "cena a tema 16 ottobre" (Santamonica × Bellenda): overlay con scheda (stile "Vacanzina": una volta per sessione, si chiude dopo 8s/click/×), si spegne da solo dal 17/10/2026 (data nel script, BANNER_FINE). DA TENERE: il banner si riusa per ogni serata. PER LA PROSSIMA SERATA cambiare: (1) BANNER_FINE e la chiave KEY (bannerCena_AAAA-MM-GG) nello script «BANNER CENA»; (2) i testi in BANNER_T (it/en/fr) e quelli statici dentro div#banner-cena; (3) la foto img/sito/… e la didascalia; (4) il titolo/data della serata in menu-admin → Prenotazioni — Setup → Serate speciali; (5) in cene-a-tema.html il link «Prenota online» (?data=AAAA-MM-GG). Dopo la scadenza il banner non compare più da solo -->
 <!-- v 2026.09.28.01 — Rimosso il banner overlay "Vacanzina" (chiusura 21/09-28/09, introdotto
@@ -322,7 +323,7 @@
       "name": "C’è un menù degustazione?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Sì, accanto alla carta proponiamo due menù degustazione: un 6 portate ed uno di 7 a mano libera dello Chef. La versione aggiornata è sempre sul sito."
+        "text": "Sì, accanto alla carta proponiamo un menù degustazione di 6 portate. La versione aggiornata è sempre sul sito."
       }
     },
     {
@@ -882,7 +883,7 @@
       </details>
       <details class="faq-item">
         <summary><h3 class="faq-q" data-i18n="faq_q3">C&rsquo;&egrave; un men&ugrave; degustazione?</h3></summary>
-        <div class="faq-answer" data-i18n="faq_a3"><p>S&igrave;, accanto alla carta proponiamo due men&ugrave; degustazione: un 6 portate ed uno di 7 a mano libera dello Chef. La versione aggiornata &egrave; sempre sul sito.</p></div>
+        <div class="faq-answer" data-i18n="faq_a3"><p>S&igrave;, accanto alla carta proponiamo un men&ugrave; degustazione di 6 portate. La versione aggiornata &egrave; sempre sul sito.</p></div>
       </details>
       <details class="faq-item">
         <summary><h3 class="faq-q" data-i18n="faq_q4">Gestite allergie e intolleranze?</h3></summary>
@@ -917,7 +918,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.10.05.01</a></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; <a href="login.html" class="footer-version" target="_blank">v 2026.10.05.02</a></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>

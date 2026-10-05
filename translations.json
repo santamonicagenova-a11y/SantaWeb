@@ -1,13 +1,13 @@
 {
   "_meta": {
-    "version": "v 2026.10.05.01",
+    "version": "v 2026.10.05.02",
     "languages": [
       "it",
       "en",
       "fr"
     ],
     "last_updated": "2026-10-05",
-    "note": "v 2026.10.05.01 (page_description IT/EN/FR: tolto 'cucina ligure', nuova linea = prodotti del territorio in ricette moderne). v 2026.09.12.03 (FAQ orari, IT/EN/FR): tolto il riferimento all'orario estivo ormai superato ('Fino al 10 settembre...'), testo aggiornato allo schema in vigore dall'11/9 (pranzo ven/sab/dom, cena tutti i giorni tranne lunedì) + eccezione residua (venerdì 18/9 chiuso) + cambio già pianificato dal 1° ottobre (domenica solo pranzo). Allineato a mano su richiesta Andrea, coerente col nuovo pannello admin 'Orari di Apertura' — la FAQ resta testo libero non generato dai periodi. STORICO: v 2026.06.04.01 (4/6 — SEO home IT): riscritte 'page_title' e 'page_description' IT per intercettare i cluster non-brand reali (pesce / sul mare / Corso Italia) da GSC. Nuovo title 'Ristorante Pesce e Vista Mare a Genova | Santamonica'; meta senza CTA (rimosso 'Prenota online' per coerenza brand anti-hard-sell, sign-off Andrea post Revisione Oppositiva DeepSeek+Grok). EN/FR invariati (D3: IT-first). STORICO: v 2026.05.30.01 (sessione 13 del 30/5 — blocco prenotazioni online): aggiunte 4 chiavi in IT/EN/FR: 'prenota_closed_title' + 'prenota_closed_body' (banner mostrato quando le prenotazioni online sono globalmente chiuse), 'prenota_date_closed' (messaggio sotto l'orario quando il giorno scelto è chiuso dall'admin), 'prenota_error_closed' (risposta 403 dal backend). Tutte in Unicode diretto. STORICO: v 2026.05.27.06 (sessione 11 del 27/5 — F0.25 cablaggio form prenotazioni a Edge Function Supabase): aggiornata chiave 'prenota_contatto_hint' (era «almeno uno tra telefono ed email» → ora «entrambi obbligatori») in tutte e 3 le lingue per riflettere il nuovo requisito backend (telefono nel form ora `required`, decisione sessione 8 strategia errori Resend). Aggiunte 6 chiavi nuove in IT/EN/FR: 'prenota_f_marketing_consent' (label checkbox marketing opt-in), 'prenota_thankyou_title' + 'prenota_thankyou_body' (schermata di ringraziamento post-submit OK), 'prenota_error_validation' (errore 400 backend), 'prenota_error_rate_limit' (errore 429), 'prenota_error_generic' (errore connessione/500). Tutte in Unicode diretto per coerenza con la lezione del bug i18n FR setAttribute (memoria persistente). (Storico: v 2026.05.27.05 SYNC archivio↔live + chiavi optgroup orario; v 2026.05.26.01 fix FR Unicode 80 stringhe; v 2026.05.22.01 refactor FONTE UNICA orari.)"
+    "note": "v 2026.10.05.02 (FAQ faq_a3 IT/EN/FR: solo la degustazione a 6 portate; il percorso a 7 non è in offerta). v 2026.10.05.01 (page_description IT/EN/FR: tolto 'cucina ligure', nuova linea = prodotti del territorio in ricette moderne). v 2026.09.12.03 (FAQ orari, IT/EN/FR): tolto il riferimento all'orario estivo ormai superato ('Fino al 10 settembre...'), testo aggiornato allo schema in vigore dall'11/9 (pranzo ven/sab/dom, cena tutti i giorni tranne lunedì) + eccezione residua (venerdì 18/9 chiuso) + cambio già pianificato dal 1° ottobre (domenica solo pranzo). Allineato a mano su richiesta Andrea, coerente col nuovo pannello admin 'Orari di Apertura' — la FAQ resta testo libero non generato dai periodi. STORICO: v 2026.06.04.01 (4/6 — SEO home IT): riscritte 'page_title' e 'page_description' IT per intercettare i cluster non-brand reali (pesce / sul mare / Corso Italia) da GSC. Nuovo title 'Ristorante Pesce e Vista Mare a Genova | Santamonica'; meta senza CTA (rimosso 'Prenota online' per coerenza brand anti-hard-sell, sign-off Andrea post Revisione Oppositiva DeepSeek+Grok). EN/FR invariati (D3: IT-first). STORICO: v 2026.05.30.01 (sessione 13 del 30/5 — blocco prenotazioni online): aggiunte 4 chiavi in IT/EN/FR: 'prenota_closed_title' + 'prenota_closed_body' (banner mostrato quando le prenotazioni online sono globalmente chiuse), 'prenota_date_closed' (messaggio sotto l'orario quando il giorno scelto è chiuso dall'admin), 'prenota_error_closed' (risposta 403 dal backend). Tutte in Unicode diretto. STORICO: v 2026.05.27.06 (sessione 11 del 27/5 — F0.25 cablaggio form prenotazioni a Edge Function Supabase): aggiornata chiave 'prenota_contatto_hint' (era «almeno uno tra telefono ed email» → ora «entrambi obbligatori») in tutte e 3 le lingue per riflettere il nuovo requisito backend (telefono nel form ora `required`, decisione sessione 8 strategia errori Resend). Aggiunte 6 chiavi nuove in IT/EN/FR: 'prenota_f_marketing_consent' (label checkbox marketing opt-in), 'prenota_thankyou_title' + 'prenota_thankyou_body' (schermata di ringraziamento post-submit OK), 'prenota_error_validation' (errore 400 backend), 'prenota_error_rate_limit' (errore 429), 'prenota_error_generic' (errore connessione/500). Tutte in Unicode diretto per coerenza con la lezione del bug i18n FR setAttribute (memoria persistente). (Storico: v 2026.05.27.05 SYNC archivio↔live + chiavi optgroup orario; v 2026.05.26.01 fix FR Unicode 80 stringhe; v 2026.05.22.01 refactor FONTE UNICA orari.)"
   },
   "it": {
     "page_title": "Ristorante Pesce e Vista Mare a Genova | Santamonica",
@@ -118,7 +118,7 @@
     "faq_q2": "Quali sono gli orari?",
     "faq_a2": "<p>Il lunedì siamo chiusi. La cena è servita dal martedì al sabato, dalle 19:30 alle 22:30. Il pranzo il venerdì, il sabato e la domenica, dalle 12:30 alle 14:30. La domenica sera siamo chiusi. Gli orari aggiornati sono sempre su questa pagina.</p>",
     "faq_q3": "C'è un menù degustazione?",
-    "faq_a3": "<p>Sì, accanto alla carta proponiamo due menù degustazione: un 6 portate ed uno di 7 a mano libera dello Chef. La versione aggiornata è sempre sul sito.</p>",
+    "faq_a3": "<p>Sì, accanto alla carta proponiamo un menù degustazione di 6 portate. La versione aggiornata è sempre sul sito.</p>",
     "faq_q4": "Gestite allergie e intolleranze?",
     "faq_a4": "<p>Sì: sul sito è pubblicata la <a href=\"/menu-allergeni.html\" target=\"_blank\" rel=\"noopener\">tabella allergeni completa</a>, piatto per piatto, e in sala il personale è preparato a consigliarvi.</p>",
     "faq_q5": "Come si prenota?",
@@ -242,7 +242,7 @@
     "faq_q2": "What are your opening hours?",
     "faq_a2": "<p>We are closed on Mondays. Dinner is served from Tuesday to Saturday, from 7:30 to 10:30 pm. Lunch is served on Friday, Saturday and Sunday, from 12:30 to 2:30 pm. We are closed on Sunday evening. Updated hours are always on this page.</p>",
     "faq_q3": "Is there a tasting menu?",
-    "faq_a3": "<p>Yes, alongside the à la carte menu we offer two tasting menus: a 6-course one and a 7-course one, freely composed by the Chef. The current version is always on the website.</p>",
+    "faq_a3": "<p>Yes, alongside the à la carte menu we offer a 6-course tasting menu. The current version is always on the website.</p>",
     "faq_q4": "Do you cater for allergies and intolerances?",
     "faq_a4": "<p>Yes: the full allergen table is published on our website, dish by dish, and our staff is trained to advise you at the table.</p>",
     "faq_q5": "How do I book a table?",
@@ -366,7 +366,7 @@
     "faq_q2": "Quels sont vos horaires ?",
     "faq_a2": "<p>Nous sommes fermés le lundi. Le dîner est servi du mardi au samedi, de 19h30 à 22h30. Le déjeuner est servi le vendredi, le samedi et le dimanche, de 12h30 à 14h30. Le dimanche soir, nous sommes fermés. Les horaires à jour sont toujours sur cette page.</p>",
     "faq_q3": "Proposez-vous un menu dégustation ?",
-    "faq_a3": "<p>Oui, en plus de la carte, nous proposons deux menus dégustation : un de 6 plats et un de 7 plats, composé librement par le Chef. La version à jour est toujours sur le site.</p>",
+    "faq_a3": "<p>Oui, en plus de la carte, nous proposons un menu dégustation de 6 plats. La version à jour est toujours sur le site.</p>",
     "faq_q4": "Gérez-vous les allergies et intolérances ?",
     "faq_a4": "<p>Oui : le tableau complet des allergènes, plat par plat, est publié sur notre site, et notre personnel en salle est formé pour vous conseiller.</p>",
     "faq_q5": "Comment réserver ?",

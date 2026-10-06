@@ -2,7 +2,8 @@
 <!--
   prenota.html — Wizard prenotazioni con carta a garanzia obbligatoria
   Santamonica · Il Giuliano di Andrea Giachino e C. S.a.s.
-  Versione: v 2026.10.05.01
+  Versione: v 2026.10.06.01
+  v 2026.10.06.01 — Serate speciali con orario fisso: il passo «Orario» non compare (l'orario è quello della serata), lo stepper si rinumera, «Indietro» dal passo contatti torna a «Persone».
   v 2026.10.05.01 — Aggiunto <link rel="canonical"> (mancava; audit SEO 5/10): la pagina è indicizzabile ed entra in sitemap.
   v 2026.10.03.01 — Lettura del menù DISABILITATA per ora (decisione Andrea): costante LETTURA_MENU_OBBLIGATORIA = false, riquadro nascosto e "Continua" non controlla la casella. Il codice resta: true per riattivarla.
   v 2026.10.02.03 — LETTURA DEL MENÙ prima di prenotare (passo 4): riquadro "Prima di prenotare, leggi il menù" con pulsante che apre
@@ -572,8 +573,30 @@
       html = '<strong>Serata particolare</strong> — ' + escSp(sp.title) + '. A cena non c\'è il menù alla carta: si cena con il menù della serata. ' +
         '<a href="' + escSp(link) + '" target="_blank" rel="noopener">Scopri la serata</a>';
     }
+    updateStepperForSpecial();
     document.querySelectorAll('.special-notice').forEach(function(el){
       el.innerHTML = html; el.style.display = html ? '' : 'none';
+    });
+  }
+  // Serata speciale con orario fisso (v 2026.10.06.01): il passo «Orario» non compare, l'orario è quello della serata.
+  function fixedSpecialTime(dateStr) {
+    var sp = dateStr ? specialFor(dateStr) : null;
+    if (!sp || !sp.time) return null;
+    var slots = (typeof getSlotsForDate === 'function') ? getSlotsForDate(dateStr) : [];
+    return slots.some(function(x){ return x.time === sp.time; }) ? sp.time : null;
+  }
+  function updateStepperForSpecial() {
+    var fixed = !!fixedSpecialTime(state.selectedDate);
+    var item3 = document.querySelector('.stepper-item[data-step="3"]');
+    if (item3) item3.style.display = fixed ? 'none' : '';
+    [['4', fixed ? '3' : '4'], ['5', fixed ? '4' : '5']].forEach(function(p){
+      var d = document.querySelector('.stepper-item[data-step="' + p[0] + '"] .stepper-dot'); if (d) d.textContent = p[1];
+    });
+    var tot = fixed ? 4 : 5;
+    [1, 2, 3, 4, 5].forEach(function(n){
+      var lab = document.querySelector('#step-' + n + ' .step-label'); if (!lab) return;
+      var num = (fixed && n > 3) ? n - 1 : n;
+      lab.textContent = 'Passo ' + num + ' di ' + tot;
     });
   }
   function slotClosedFor(dateStr, time) { return state.slot_closures.some(function(s){ return s.date===dateStr && s.time===time; }); }
@@ -678,7 +701,11 @@
     if (n === 4 && window.aggiornaMenuGate) window.aggiornaMenuGate();
   }
   document.querySelectorAll('[data-back]').forEach(function(btn){
-    btn.addEventListener('click', function(){ goToStep(parseInt(btn.getAttribute('data-back'), 10)); });
+    btn.addEventListener('click', function(){
+      var t = parseInt(btn.getAttribute('data-back'), 10);
+      if (t === 3 && fixedSpecialTime(state.selectedDate)) t = 2;
+      goToStep(t);
+    });
   });
 
   /* ── STEP 1: calendario ── */
@@ -749,6 +776,8 @@
   function selectPersone(n) {
     state.selectedPersone = n;
     renderPersone();
+    var fixedT = fixedSpecialTime(state.selectedDate);
+    if (fixedT) { state.selectedOrario = fixedT; goToStep(4); return; }
     goToStep(3);
     renderOrario();
   }

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<!-- Santamonica · Cene a tema · v 2026.10.06.03 -->
-<!-- v2026.10.06.03: tolta la nota finale (posti / carta a garanzia). v2026.10.06.02: titolo «Santamonica … in Bordeaux», 20 posti, testo nuovo (cucina + vini presentati da Bellenda) e elenco piatti con abbinamenti, IT/EN/FR.
+<!-- Santamonica · Cene a tema · v 2026.10.06.04 -->
+<!-- v2026.10.06.04: primo paragrafo giustificato, menù e abbinamenti centrati, tolto il riquadro «Posti» e aggiunto «20 posti in totale.» in fondo al secondo paragrafo. v2026.10.06.03: tolta la nota finale (posti / carta a garanzia). v2026.10.06.02: titolo «Santamonica … in Bordeaux», 20 posti, testo nuovo (cucina + vini presentati da Bellenda) e elenco piatti con abbinamenti, IT/EN/FR.
      v2026.10.06.01: quota 70 € a persona (era 60 €) in IT/EN/FR. -->
 <!-- v2026.10.02.05: loghi Bellenda e Château Puybarbe in basso a destra della scheda (PNG leggeri ricavati dai PDF dei marchi, link ai siti).
      v2026.10.02.04: produttore Château Puybarbe (Côtes de Bourg, Bordeaux): link a Bellenda e al sito di Château Puybarbe.
@@ -72,8 +72,9 @@
   .note{font-size:.9rem;font-style:italic}
   .actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px;align-items:center}
   .past{color:var(--ink-soft);font-style:italic}
-  .menu-h{margin-top:34px}
-  .menu{list-style:none;margin:6px 0 10px;max-width:62ch}
+  p.k{text-align:justify}
+  .menu-h{margin-top:34px;text-align:center}
+  .menu{list-style:none;margin:6px auto 10px;max-width:62ch;text-align:center}
   .menu li{padding:14px 0;border-top:1px solid var(--line)}
   .menu li:last-child{border-bottom:1px solid var(--line)}
   .menu .dish{font-family:var(--serif);font-size:1.3rem;line-height:1.3;color:var(--ink)}
@@ -115,10 +116,9 @@
           <div><div class="lab" data-i18n="l_when">Quando</div><div class="val" data-i18n="v_when">Venerdì 16 ottobre 2026 · ore 20</div></div>
           <div><div class="lab" data-i18n="l_where">Dove</div><div class="val">Lungomare Lombardo 27 · Genova</div></div>
           <div><div class="lab" data-i18n="l_price">Quota</div><div class="val" data-i18n="v_price">70 € a persona, tutto compreso</div></div>
-          <div><div class="lab" data-i18n="l_seats">Posti</div><div class="val" data-i18n="v_seats">20 posti</div></div>
         </div>
         <p class="k" data-i18n="p1">La cucina del Santamonica accompagna i vini di <a href="https://www.chateaupuybarbe.com" target="_blank" rel="noopener">Château Puybarbe</a> (Bordeaux) presentati da <a href="https://www.bellenda.it" target="_blank" rel="noopener">Bellenda</a>.</p>
-        <p data-i18n="p2">Una serata conviviale a tavolo unico per condividere l&rsquo;esperienza.</p>
+        <p data-i18n="p2">Una serata conviviale a tavolo unico per condividere l&rsquo;esperienza. 20 posti in totale.</p>
         <h3 class="menu-h lab" data-i18n="menu_h">Il menù e gli abbinamenti</h3>
         <ul class="menu">
           <li><div class="dish">Ostriche in tempura, porcini, mele cotogna, cetrioli</div><div class="wine"><span data-i18n="w_rose">Rosato</span> &ldquo;Annabel&rdquo;</div></li>
@@ -152,7 +152,7 @@
   <div class="wrap">
     <div>Santamonica · Genova · <a href="mailto:info@santamonicagenova.it">info@santamonicagenova.it</a></div>
     <div><a href="/">Santamonica</a> · <a href="/privacy.html">Privacy</a> · <a href="/cookies.html">Cookie</a></div>
-    <div style="opacity:.6">v 2026.10.06.03</div>
+    <div style="opacity:.6">v 2026.10.06.04</div>
   </div>
 </footer>
 
@@ -165,9 +165,9 @@
       lede:'Ogni tanto la cucina si ferma ad ascoltare chi il vino lo fa o lo racconta.',
       next:'La prossima serata', t_title:'Santamonica &hellip; in Bordeaux',
       l_when:'Quando', v_when:'Venerdì 16 ottobre 2026 · ore 20', l_where:'Dove', l_price:'Quota', v_price:'70 € a persona, tutto compreso',
-      l_seats:'Posti', v_seats:'20 posti', menu_h:'Il menù e gli abbinamenti', w_rose:'Rosato', w_red:'Rosso',
+      menu_h:'Il menù e gli abbinamenti', w_rose:'Rosato', w_red:'Rosso',
       p1:'La cucina del Santamonica accompagna i vini di <a href="https://www.chateaupuybarbe.com" target="_blank" rel="noopener">Château Puybarbe</a> (Bordeaux) presentati da <a href="https://www.bellenda.it" target="_blank" rel="noopener">Bellenda</a>.',
-      p2:'Una serata conviviale a tavolo unico per condividere l&rsquo;esperienza.',
+      p2:'Una serata conviviale a tavolo unico per condividere l&rsquo;esperienza. 20 posti in totale.',
       cta_book:'Prenota online', cta_call:'Telefona: 010 5533155',
       h_next:'Le prossime serate', p_next:'Da qui a primavera, con &laquo;Mare d&rsquo;Inverno&raquo;, altre serate a tema. Le date le troverai in questa pagina.',
       h_past:'Le serate passate', p_past:'Questa è la prima.' },
@@ -175,9 +175,9 @@
       lede:'Now and then the kitchen stops to listen to those who make wine, or tell its story.',
       next:'The next evening', t_title:'Santamonica &hellip; in Bordeaux',
       l_when:'When', v_when:'Friday 16 October 2026 · 8 pm', l_where:'Where', l_price:'Price', v_price:'€70 per person, all inclusive',
-      l_seats:'Seats', v_seats:'20 seats', menu_h:'The menu and the pairings', w_rose:'Rosé', w_red:'Red',
+      menu_h:'The menu and the pairings', w_rose:'Rosé', w_red:'Red',
       p1:'Santamonica&rsquo;s kitchen accompanies the wines of <a href="https://www.chateaupuybarbe.com" target="_blank" rel="noopener">Château Puybarbe</a> (Bordeaux), presented by <a href="https://www.bellenda.it" target="_blank" rel="noopener">Bellenda</a>.',
-      p2:'A convivial evening at a single table, to share the experience.',
+      p2:'A convivial evening at a single table, to share the experience. 20 seats in all.',
       cta_book:'Book online', cta_call:'Call: +39 010 5533155',
       h_next:'Upcoming evenings', p_next:'Between now and spring, with &ldquo;Mare d&rsquo;Inverno&rdquo;, more themed evenings will follow. You will find the dates on this page.',
       h_past:'Past evenings', p_past:'This is the first one.' },
@@ -185,9 +185,9 @@
       lede:'De temps en temps, la cuisine s&rsquo;arrête pour écouter ceux qui font le vin, ou le racontent.',
       next:'La prochaine soirée', t_title:'Santamonica &hellip; in Bordeaux',
       l_when:'Quand', v_when:'Vendredi 16 octobre 2026 · 20h', l_where:'Où', l_price:'Tarif', v_price:'70 € par personne, tout compris',
-      l_seats:'Places', v_seats:'20 places', menu_h:'Le menu et les accords', w_rose:'Rosé', w_red:'Rouge',
+      menu_h:'Le menu et les accords', w_rose:'Rosé', w_red:'Rouge',
       p1:'La cuisine du Santamonica accompagne les vins du <a href="https://www.chateaupuybarbe.com" target="_blank" rel="noopener">Château Puybarbe</a> (Bordeaux), présentés par <a href="https://www.bellenda.it" target="_blank" rel="noopener">Bellenda</a>.',
-      p2:'Une soirée conviviale à table unique, pour partager l&rsquo;expérience.',
+      p2:'Une soirée conviviale à table unique, pour partager l&rsquo;expérience. 20 places au total.',
       cta_book:'Réserver en ligne', cta_call:'Appeler : +39 010 5533155',
       h_next:'Les prochaines soirées', p_next:'D&rsquo;ici le printemps, avec &laquo;Mare d&rsquo;Inverno&raquo;, d&rsquo;autres soirées à thème suivront. Vous trouverez les dates sur cette page.',
       h_past:'Les soirées passées', p_past:'C&rsquo;est la première.' }

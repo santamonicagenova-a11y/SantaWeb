@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v 2026.10.06.02 — Banner cena: tolta la riga «Ore 20 · 70 €»; titolo «Santamonica in Bordeaux» grande, oro chiaro (era «Con Bellenda…»). v 2026.10.06.01 — Banner cena: quota 70 € (era 60). v 2026.10.05.04 — (1) FAQ: +3 domande in coda (9 «Che tipo di ristorante è», con «dal 2016»; 10 «Avete una stella Michelin?», con Good Cooking; 11 «Quanto si spende?», 65-90 € a persona, cifra del brand); FAQ allergeni: citati i dolci. Visibile + JSON-LD + translations.json IT/EN/FR; il ricostruttore JSON-LD ora legge fino a 11 domande. (2) foundingDate 2016 nel JSON-LD Restaurant. (3) Il numero di versione nel footer non è più un link a login.html (richiesta di Andrea). -->
+<!-- v 2026.10.06.03 — Banner cena: titolo con i puntini «Santamonica … in Bordeaux». v 2026.10.06.02 — Banner cena: tolta la riga «Ore 20 · 70 €»; titolo «Santamonica in Bordeaux» grande, oro chiaro (era «Con Bellenda…»). v 2026.10.06.01 — Banner cena: quota 70 € (era 60). v 2026.10.05.04 — (1) FAQ: +3 domande in coda (9 «Che tipo di ristorante è», con «dal 2016»; 10 «Avete una stella Michelin?», con Good Cooking; 11 «Quanto si spende?», 65-90 € a persona, cifra del brand); FAQ allergeni: citati i dolci. Visibile + JSON-LD + translations.json IT/EN/FR; il ricostruttore JSON-LD ora legge fino a 11 domande. (2) foundingDate 2016 nel JSON-LD Restaurant. (3) Il numero di versione nel footer non è più un link a login.html (richiesta di Andrea). -->
 <!-- v 2026.10.05.03 — (1) P.IVA 02395420991 nel footer della home (prima solo su dove-siamo, privacy e cookie). (2) Banner della serata spostato dopo il footer: il primo testo del documento torna ad essere la definizione del ristorante. (3) alt della foto cucina-piatto.webp: descrive un piatto, non la sala. -->
 <!-- v 2026.10.05.02 — FAQ «C’è un menù degustazione?» (visibile + JSON-LD + translations.json IT/EN/FR): oggi si propone solo la degustazione a 6 portate (il percorso a 7 «a mano libera dello Chef» non è in offerta: richiesta di Andrea 5/10). Il voucher a 7 portate è già spento in voucher-config.json (attivo:false). -->
 <!-- v 2026.10.05.01 — (1) "Cucina ligure" tolta da meta/og/twitter/JSON-LD description/servesCuisine: nuova linea di cucina dal 1/10 = prodotti del territorio in ricette moderne, golose e leggibili (translations.json page_description IT/EN/FR allineato). (2) Hreflang en/fr rimossi (stessa URL, inefficaci). (3) JSON-LD Restaurant: +hasMenu (@id /menu#menu) e +ReserveAction verso /prenota; nuovo nodo WebPage con dateModified. -->
@@ -960,7 +960,7 @@
     <div class="bc-testo">
     <div class="bc-eyebrow" data-i18n="banner_eyebrow">Cena a tema</div>
     <div class="bc-date" data-i18n="banner_date">Venerdì 16 ottobre</div>
-    <div class="bc-title" data-i18n="banner_title">Santamonica in Bordeaux</div>
+    <div class="bc-title" data-i18n="banner_title">Santamonica &hellip; in Bordeaux</div>
     <a class="bc-cta" id="banner-cena-link" href="/cene-a-tema" data-i18n="banner_cena_cta">Scopri la serata</a>
     </div>
   </div>
@@ -980,9 +980,9 @@
   // ── BANNER CENA 16/10 (temporaneo): overlay una volta per sessione, chiusura dopo 8s, al click o con la × ──
   var BANNER_FINE = new Date('2026-10-17T00:00:00+02:00');
   var BANNER_T = {
-    it: { banner_eyebrow: 'Cena a tema', banner_date: 'Venerdì 16 ottobre', banner_title: 'Santamonica in Bordeaux', banner_cena_cta: 'Scopri la serata' },
-    en: { banner_eyebrow: 'Themed dinner', banner_date: 'Friday 16 October', banner_title: 'Santamonica in Bordeaux', banner_cena_cta: 'Discover the evening' },
-    fr: { banner_eyebrow: 'Dîner à thème', banner_date: 'Vendredi 16 octobre', banner_title: 'Santamonica à Bordeaux', banner_cena_cta: 'Découvrir la soirée' }
+    it: { banner_eyebrow: 'Cena a tema', banner_date: 'Venerdì 16 ottobre', banner_title: 'Santamonica &hellip; in Bordeaux', banner_cena_cta: 'Scopri la serata' },
+    en: { banner_eyebrow: 'Themed dinner', banner_date: 'Friday 16 October', banner_title: 'Santamonica &hellip; in Bordeaux', banner_cena_cta: 'Discover the evening' },
+    fr: { banner_eyebrow: 'Dîner à thème', banner_date: 'Vendredi 16 octobre', banner_title: 'Santamonica &hellip; à Bordeaux', banner_cena_cta: 'Découvrir la soirée' }
   };
   function BANNER_MERGE(data) { for (var l in BANNER_T) { if (data[l]) for (var k in BANNER_T[l]) data[l][k] = BANNER_T[l][k]; } }
   (function() {

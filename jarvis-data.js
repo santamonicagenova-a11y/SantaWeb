@@ -1,14 +1,14 @@
 /* jarvis-data.js · GENERATO da Jarvis (node Jarvis/_tools/jarvis.mjs build-pannello) — non modificare a mano. Renderer: jarvis.html */
 window.JARVIS_DATA = {
- "generato": "2026-10-05",
- "versione": "2026.10.05.06",
- "briefing": "**Briefing 5/10/2026 (notte, 2)** — **SEO / Sito**: i menu sono ora leggibili anche senza JavaScript (carta IT/EN/FR, dolci, allergeni): verificato dal vivo dopo la tua ripubblicazione. Home: tre nuove FAQ (tipo di ristorante, stella, quanto si spende: 65-90 €), «dal 2016», P.IVA nel footer, numero di versione non più un link. Audit disponibile come pagina HTML (punteggio 22/30 prima delle correzioni, atteso ~25/30). **Aspetta te**: nome del nuovo chef; orari della domenica sera su Michelin e RestaurantGuru; coordinate del pin Google; dire se cancellare `santamonica.html`; ok per correggere i refusi nella carta dei vini.\n**Briefing 5/10/2026 (notte)** — **SEO / Sito**: claude-seo aggiornato alla 2.4.2 e primo audit completo del sito (~77/100; tecnico 88, GEO 67, local 66). Fatto e live: tolto «cucina ligure» dai testi (nuova linea: prodotti del territorio, ricette moderne), hreflang inefficaci rimossi, schema allineato (menu, prenotazione, data di modifica), `/prenota` con canonical e in sitemap. Nel pannello menu-admin il **pre-rendering statico** dei menu: i piatti diventano leggibili anche senza JavaScript, ma **solo dopo che ripubblichi**. **Aspetta te**: ripubblicare Carta → Allergeni → Dolci; decidere la FAQ delle degustazioni (il percorso a 7 è vuoto); nome e via libera del nuovo chef; sitemap `www` vecchia in Search Console; orari domenica su Michelin e RestaurantGuru.\n**Briefing 5/10/2026 (sera)** — **Marketing**: boost Instagram della cena del 16/10 pubblicato da Andrea (100 € totali, 9–14/10, telefonate, pubblico P1); stato «in fase di elaborazione» presso Meta. Revisione Oppositiva saltata per tua scelta (debito). **Aspetta te**: controllo 10/10 (rifiuti) e 12/10 (efficacia, totale ~70–130 €); penale 25 € da verificare in menu-admin.\n**Briefing 4/10/2026 (notte)** — **Trasversale**: la Revisione Oppositiva (P3) ora si fa di norma con lo script a chiamate dirette alle API (Modalità B); il browser manuale resta solo come ripiego. Zapier non compare più nella skill del metodo. **Aspetta te**: nulla di nuovo; restano le scadenze del 5/10 (pillar pesce) e del 9/10 (cena 16/10, serate speciali).\n**Briefing 4/10/2026 (sera)** — **Trasversale**: la skill Jarvis ora ha una sola copia (nel repo) e funziona anche in Cowork; la chiusura è un solo comando (`chiudi`) e c'è un registro delle lezioni per non ripetere gli errori. Nulla di nuovo da fare per te: restano le scadenze del 5/10 (pillar pesce) e del 9/10 (cena 16/10, serate speciali).\n**Briefing 4/10/2026** — **Sito**: lo storico Food Cost → Tracciabilità mostra ora tutte le righe (non solo il periodo Dal/Al). Pulizia: chiuse allergeni carta, Crudi, Calcolo Food Cost, stampa dolci e Salone Nautico; superati il post orari IG e il cambio menu. **Aspetta te**: 11 attività, le più vicine intervista/foto/vini pillar pesce (5/10), cena 16/10 e prova serate speciali (9/10).\n**Briefing 3/10/2026 (tarda sera)** — **Sito**: i **dolci non compaiono più nella pagina Allergeni carta** (restano nei dati per la stampa dei dolci e il filtro EN/FR). Degustazione con descrizioni: asterisco sullo stesso rigo del nome e interlinea come la carta. **Aspetta te**: ricaricare menu-admin (Ctrl+F5), rifare «Allergeni carta», stampare allergeni e degustazione, compilare le descrizioni.\n**Briefing 3/10/2026 (sera)** — **Sito**: la pagina **Allergeni carta** ha la stessa preview con barre e controlli di stampa della carta e dei dolci; i piatti del percorso a 6 della **degustazione** hanno ora una descrizione (stampata e tradotta). Un upload web aveva sovrascritto la pagina allergeni con una versione vecchia (piatti non più in carta): ripristinata. **Aspetta te**: ricaricare menu-admin (Ctrl+F5) e rifare «Allergeni carta», compilare le descrizioni della degustazione, stampare. I menu si cambiano solo da menu-admin, mai da upload.\n**Briefing 3/10/2026** — **Sito** (live): stampa del menù rifatta. Note per l'ospite calibrate a −13 mm (sulla tua stampante erano 17 mm troppo in alto), indicatore di impaginazione che avvisa prima che una pagina sfori, nome piatto in lieve grassetto con peso regolabile anche per il prezzo, nuova preview con barra superiore (5 pulsanti) e barra laterale a sezioni colorate. «Fissa come default» ora pubblica da solo. Dolci allineati alla carta. La lettura obbligatoria del menù in prenotazione è **disattivata** (si riattiva con un flag). **Aspetta te**: stampare i dolci con la nuova preview e fissare. Sotto, i briefing di ieri.\n**Briefing 2/10/2026 (notte)** — **Sito** (live): filtro allergeni del menù più leggibile (testo +50%, piatto e allergene in due riquadri marrone), frecce ▲▼ per riordinare i piatti in menu-admin, stampa carta con le note sul fondo e dimensione caratteri per tipologia (con pt), e **lettura obbligatoria del menù** al passo 4 della prenotazione (finestra interna; header allentati solo per /menu e /prenota). **Aspetta te**: stampare la carta e provare i controlli per tipologia («Fissa come default» + Pubblica). Sotto, il briefing di prima sulle cene a tema.\n**Briefing 2/10/2026 (sera)** — **Sito** (live): nuove **cene a tema**. Pagina `/cene-a-tema` (IT/EN/FR) con voce «Serate» nel menu, banner overlay in home con la foto di Anna e Riku, loghi Bellenda e Château Puybarbe con link. In menu-admin → Prenotazioni — Setup nuovo box **Serate speciali** (data, orario, posti, titolo con tendina dei titoli già usati, carta a garanzia sì/no): il sito resta prenotabile solo all'orario della serata, con avviso nel wizard; Setup ora a riquadri colorati e con le eccezioni di date/orari spostate dagli Orari di Apertura. Cena del 16/10: ore 20, 60 € tutto compreso, 16 posti, carta a garanzia. Il codice del banner resta per le prossime serate. **Aspetta te**: provare dal pannello «Salva serata speciale» (non provato da Claude), mandare menù e abbinamenti dei vini; restano compleanni/anniversari e le altre voci di ieri. **Prossimo**: menù della serata in pagina, poi idee 1, 7 e 14.",
+ "generato": "2026-10-06",
+ "versione": "2026.10.06.01",
+ "briefing": "**Briefing 6/10/2026** — **Sito / Marketing**: cena del 16/10 aggiornata: quota **70 €**, **20 posti**, titolo «Santamonica … in Bordeaux», menù con i quattro piatti e i vini nella pagina `/cene-a-tema`, banner della home semplificato, loghi dei due partner più grandi. Nella prenotazione online il passo «Orario» non compare più per la serata (20:00 fisso). Il boost su Instagram ha la nuova immagine (quadrato Canva) e il prezzo corretto: è tornato in revisione Meta. Decisione di principio: **un solo account pubblicitario** Meta, scelta rimandata. **Aspetta te**: prova dal vivo della pagina, del banner e della prenotazione da telefono (entro il 9/10); controllo del boost il 10/10 (attivo, pulsante Chiama con il numero) e il 12/10; scegliere l'account unico; restano il nome del nuovo chef e il resto del 5/10.\n**Briefing 5/10/2026 (notte, 2)** — **SEO / Sito**: i menu sono ora leggibili anche senza JavaScript (carta IT/EN/FR, dolci, allergeni): verificato dal vivo dopo la tua ripubblicazione. Home: tre nuove FAQ (tipo di ristorante, stella, quanto si spende: 65-90 €), «dal 2016», P.IVA nel footer, numero di versione non più un link. Audit disponibile come pagina HTML (punteggio 22/30 prima delle correzioni, atteso ~25/30). **Aspetta te**: nome del nuovo chef; orari della domenica sera su Michelin e RestaurantGuru; coordinate del pin Google; dire se cancellare `santamonica.html`; ok per correggere i refusi nella carta dei vini.\n**Briefing 5/10/2026 (notte)** — **SEO / Sito**: claude-seo aggiornato alla 2.4.2 e primo audit completo del sito (~77/100; tecnico 88, GEO 67, local 66). Fatto e live: tolto «cucina ligure» dai testi (nuova linea: prodotti del territorio, ricette moderne), hreflang inefficaci rimossi, schema allineato (menu, prenotazione, data di modifica), `/prenota` con canonical e in sitemap. Nel pannello menu-admin il **pre-rendering statico** dei menu: i piatti diventano leggibili anche senza JavaScript, ma **solo dopo che ripubblichi**. **Aspetta te**: ripubblicare Carta → Allergeni → Dolci; decidere la FAQ delle degustazioni (il percorso a 7 è vuoto); nome e via libera del nuovo chef; sitemap `www` vecchia in Search Console; orari domenica su Michelin e RestaurantGuru.\n**Briefing 5/10/2026 (sera)** — **Marketing**: boost Instagram della cena del 16/10 pubblicato da Andrea (100 € totali, 9–14/10, telefonate, pubblico P1); stato «in fase di elaborazione» presso Meta. Revisione Oppositiva saltata per tua scelta (debito). **Aspetta te**: controllo 10/10 (rifiuti) e 12/10 (efficacia, totale ~70–130 €); penale 25 € da verificare in menu-admin.\n**Briefing 4/10/2026 (notte)** — **Trasversale**: la Revisione Oppositiva (P3) ora si fa di norma con lo script a chiamate dirette alle API (Modalità B); il browser manuale resta solo come ripiego. Zapier non compare più nella skill del metodo. **Aspetta te**: nulla di nuovo; restano le scadenze del 5/10 (pillar pesce) e del 9/10 (cena 16/10, serate speciali).\n**Briefing 4/10/2026 (sera)** — **Trasversale**: la skill Jarvis ora ha una sola copia (nel repo) e funziona anche in Cowork; la chiusura è un solo comando (`chiudi`) e c'è un registro delle lezioni per non ripetere gli errori. Nulla di nuovo da fare per te: restano le scadenze del 5/10 (pillar pesce) e del 9/10 (cena 16/10, serate speciali).\n**Briefing 4/10/2026** — **Sito**: lo storico Food Cost → Tracciabilità mostra ora tutte le righe (non solo il periodo Dal/Al). Pulizia: chiuse allergeni carta, Crudi, Calcolo Food Cost, stampa dolci e Salone Nautico; superati il post orari IG e il cambio menu. **Aspetta te**: 11 attività, le più vicine intervista/foto/vini pillar pesce (5/10), cena 16/10 e prova serate speciali (9/10).\n**Briefing 3/10/2026 (tarda sera)** — **Sito**: i **dolci non compaiono più nella pagina Allergeni carta** (restano nei dati per la stampa dei dolci e il filtro EN/FR). Degustazione con descrizioni: asterisco sullo stesso rigo del nome e interlinea come la carta. **Aspetta te**: ricaricare menu-admin (Ctrl+F5), rifare «Allergeni carta», stampare allergeni e degustazione, compilare le descrizioni.\n**Briefing 3/10/2026 (sera)** — **Sito**: la pagina **Allergeni carta** ha la stessa preview con barre e controlli di stampa della carta e dei dolci; i piatti del percorso a 6 della **degustazione** hanno ora una descrizione (stampata e tradotta). Un upload web aveva sovrascritto la pagina allergeni con una versione vecchia (piatti non più in carta): ripristinata. **Aspetta te**: ricaricare menu-admin (Ctrl+F5) e rifare «Allergeni carta», compilare le descrizioni della degustazione, stampare. I menu si cambiano solo da menu-admin, mai da upload.\n**Briefing 3/10/2026** — **Sito** (live): stampa del menù rifatta. Note per l'ospite calibrate a −13 mm (sulla tua stampante erano 17 mm troppo in alto), indicatore di impaginazione che avvisa prima che una pagina sfori, nome piatto in lieve grassetto con peso regolabile anche per il prezzo, nuova preview con barra superiore (5 pulsanti) e barra laterale a sezioni colorate. «Fissa come default» ora pubblica da solo. Dolci allineati alla carta. La lettura obbligatoria del menù in prenotazione è **disattivata** (si riattiva con un flag). **Aspetta te**: stampare i dolci con la nuova preview e fissare. Sotto, i briefing di ieri.\n**Briefing 2/10/2026 (notte)** — **Sito** (live): filtro allergeni del menù più leggibile (testo +50%, piatto e allergene in due riquadri marrone), frecce ▲▼ per riordinare i piatti in menu-admin, stampa carta con le note sul fondo e dimensione caratteri per tipologia (con pt), e **lettura obbligatoria del menù** al passo 4 della prenotazione (finestra interna; header allentati solo per /menu e /prenota). **Aspetta te**: stampare la carta e provare i controlli per tipologia («Fissa come default» + Pubblica). Sotto, il briefing di prima sulle cene a tema.\n**Briefing 2/10/2026 (sera)** — **Sito** (live): nuove **cene a tema**. Pagina `/cene-a-tema` (IT/EN/FR) con voce «Serate» nel menu, banner overlay in home con la foto di Anna e Riku, loghi Bellenda e Château Puybarbe con link. In menu-admin → Prenotazioni — Setup nuovo box **Serate speciali** (data, orario, posti, titolo con tendina dei titoli già usati, carta a garanzia sì/no): il sito resta prenotabile solo all'orario della serata, con avviso nel wizard; Setup ora a riquadri colorati e con le eccezioni di date/orari spostate dagli Orari di Apertura. Cena del 16/10: ore 20, 60 € tutto compreso, 16 posti, carta a garanzia. Il codice del banner resta per le prossime serate. **Aspetta te**: provare dal pannello «Salva serata speciale» (non provato da Claude), mandare menù e abbinamenti dei vini; restano compleanni/anniversari e le altre voci di ieri. **Prossimo**: menù della serata in pagina, poi idee 1, 7 e 14.",
  "kpi": {
-  "aperte": 52,
-  "scadute": 4,
+  "aperte": 53,
+  "scadute": 7,
   "bloccate": 1,
-  "andrea": 15,
-  "debiti": 4,
+  "andrea": 16,
+  "debiti": 5,
   "chiuse30": 77
  },
  "subs": {
@@ -19,7 +19,7 @@ window.JARVIS_DATA = {
    "up": 10,
    "future": 3,
    "bloccato": 0,
-   "scadute": 0,
+   "scadute": 3,
    "andrea": 4,
    "debiti": 0
   },
@@ -35,25 +35,25 @@ window.JARVIS_DATA = {
    "debiti": 0
   },
   "Sito": {
-   "tot": 130,
-   "done": 117,
+   "tot": 131,
+   "done": 118,
    "prog": 0,
    "up": 5,
    "future": 8,
    "bloccato": 0,
    "scadute": 0,
    "andrea": 4,
-   "debiti": 3
+   "debiti": 4
   },
   "Marketing": {
-   "tot": 35,
+   "tot": 36,
    "done": 19,
    "prog": 2,
-   "up": 2,
+   "up": 3,
    "future": 11,
    "bloccato": 1,
    "scadute": 4,
-   "andrea": 4,
+   "andrea": 5,
    "debiti": 1
   },
   "Trasversale": {
@@ -153,16 +153,16 @@ window.JARVIS_DATA = {
    "agg": "2026-09-27"
   },
   {
-   "t": "Cena 16/10: menu e vini in abbinamento da inserire nella pagina (orario e quota già confermati)",
+   "t": "Cena 16/10: prova dal vivo di pagina, banner e prenotazione (orario saltato)",
    "sub": "Sito",
    "st": "up",
-   "s": "2026-10-02",
+   "s": "2026-10-06",
    "e": "2026-10-09",
    "own": "Andrea",
-   "az": "Mandare a Claude il menù con i vini in abbinamento: lo aggiungo alla pagina /cene-a-tema",
+   "az": "Dalla pagina /cene-a-tema premere «Prenota online», scegliere le persone e controllare che si arrivi ai contatti senza il passo Orario (20:00 fisso); guardare pagina e banner da telefono",
    "bl": null,
-   "deb": false,
-   "agg": "2026-10-02"
+   "deb": true,
+   "agg": "2026-10-06"
   },
   {
    "t": "Serate speciali: provare dal pannello «Salva serata speciale» e «Modifica» sulla cena del 16/10",
@@ -183,10 +183,10 @@ window.JARVIS_DATA = {
    "s": "2026-10-05",
    "e": "2026-10-14",
    "own": "Andrea",
-   "az": "Verificare in Ads Manager che l'annuncio sia attivo (non rifiutato) il 10/10; il 12/10 valutare le chiamate e dire a Claude se portare il totale a ~70 o ~130 €",
+   "az": "Verificare in Ads Manager che l'annuncio (rimandato in revisione il 6/10 per nuova immagine e testo) sia attivo il 10/10 e che il pulsante Chiama abbia il numero; il 12/10 valutare le chiamate e dire a Claude se portare il totale a ~70 o ~130 €",
    "bl": null,
    "deb": true,
-   "agg": "2026-10-05"
+   "agg": "2026-10-06"
   },
   {
    "t": "Coordinate nel JSON-LD contro il pin del profilo Google (scarto ~40 m)",
@@ -249,6 +249,18 @@ window.JARVIS_DATA = {
    "agg": "2026-10-05"
   },
   {
+   "t": "Un solo account pubblicitario Meta: decidere quale tenere e come spostare le campagne",
+   "sub": "Marketing",
+   "st": "up",
+   "s": "2026-10-06",
+   "e": null,
+   "own": "Andrea",
+   "az": "Decidere quale account pubblicitario Meta tenere (70704519 o 1097441489401991) e quando spostare lì le campagne",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-10-06"
+  },
+  {
    "t": "Verificare dal vivo i flussi Food Cost (Tracciabilità, import Excel, IVA)",
    "sub": "Sito",
    "st": "up",
@@ -309,9 +321,7 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-25"
-  }
- ],
- "prossime": [
+  },
   {
    "t": "Pillar pesce §7 — 2-3 abbinamenti vino con pesce/crudo raccontati da Monica",
    "sub": "SEO",
@@ -347,18 +357,20 @@ window.JARVIS_DATA = {
    "bl": null,
    "deb": false,
    "agg": "2026-09-27"
-  },
+  }
+ ],
+ "prossime": [
   {
-   "t": "Cena 16/10: menu e vini in abbinamento da inserire nella pagina (orario e quota già confermati)",
+   "t": "Cena 16/10: prova dal vivo di pagina, banner e prenotazione (orario saltato)",
    "sub": "Sito",
    "st": "up",
-   "s": "2026-10-02",
+   "s": "2026-10-06",
    "e": "2026-10-09",
    "own": "Andrea",
-   "az": "Mandare a Claude il menù con i vini in abbinamento: lo aggiungo alla pagina /cene-a-tema",
+   "az": "Dalla pagina /cene-a-tema premere «Prenota online», scegliere le persone e controllare che si arrivi ai contatti senza il passo Orario (20:00 fisso); guardare pagina e banner da telefono",
    "bl": null,
-   "deb": false,
-   "agg": "2026-10-02"
+   "deb": true,
+   "agg": "2026-10-06"
   },
   {
    "t": "Serate speciali: provare dal pannello «Salva serata speciale» e «Modifica» sulla cena del 16/10",
@@ -403,10 +415,10 @@ window.JARVIS_DATA = {
    "s": "2026-10-05",
    "e": "2026-10-14",
    "own": "Andrea",
-   "az": "Verificare in Ads Manager che l'annuncio sia attivo (non rifiutato) il 10/10; il 12/10 valutare le chiamate e dire a Claude se portare il totale a ~70 o ~130 €",
+   "az": "Verificare in Ads Manager che l'annuncio (rimandato in revisione il 6/10 per nuova immagine e testo) sia attivo il 10/10 e che il pulsante Chiama abbia il numero; il 12/10 valutare le chiamate e dire a Claude se portare il totale a ~70 o ~130 €",
    "bl": null,
    "deb": true,
-   "agg": "2026-10-05"
+   "agg": "2026-10-06"
   },
   {
    "t": "Filone B — rinnovo iscrizione Genova Gourmet (annuale, ferma da mesi)",
@@ -441,10 +453,10 @@ window.JARVIS_DATA = {
    "s": "2026-10-05",
    "e": "2026-10-14",
    "own": "Andrea",
-   "az": "Verificare in Ads Manager che l'annuncio sia attivo (non rifiutato) il 10/10; il 12/10 valutare le chiamate e dire a Claude se portare il totale a ~70 o ~130 €",
+   "az": "Verificare in Ads Manager che l'annuncio (rimandato in revisione il 6/10 per nuova immagine e testo) sia attivo il 10/10 e che il pulsante Chiama abbia il numero; il 12/10 valutare le chiamate e dire a Claude se portare il totale a ~70 o ~130 €",
    "bl": null,
    "deb": true,
-   "agg": "2026-10-05"
+   "agg": "2026-10-06"
   },
   {
    "t": "Calendario cene a tema (entro ago)",
@@ -486,6 +498,18 @@ window.JARVIS_DATA = {
   }
  ],
  "senzaData": [
+  {
+   "t": "Un solo account pubblicitario Meta: decidere quale tenere e come spostare le campagne",
+   "sub": "Marketing",
+   "st": "up",
+   "s": "2026-10-06",
+   "e": null,
+   "own": "Andrea",
+   "az": "Decidere quale account pubblicitario Meta tenere (70704519 o 1097441489401991) e quando spostare lì le campagne",
+   "bl": null,
+   "deb": false,
+   "agg": "2026-10-06"
+  },
   {
    "t": "NoShowApp F6 — acquisire 10 beta tester (WhatsApp + demo dal vivo con carta test) e guida onboarding",
    "sub": "NoShowApp",
@@ -597,6 +621,11 @@ window.JARVIS_DATA = {
  ],
  "sessioni": [
   {
+   "d": "2026-10-06",
+   "sub": "Sito",
+   "t": "Cena a tema, pagina, banner, quadrato Canva e boost"
+  },
+  {
    "d": "2026-10-05",
    "sub": "Marketing",
    "t": "Boost IG cena 16 ottobre"
@@ -630,11 +659,6 @@ window.JARVIS_DATA = {
    "d": "2026-10-02",
    "sub": "Sito",
    "t": "Cena a tema 16 ottobre, pagina e banner"
-  },
-  {
-   "d": "2026-10-02",
-   "sub": "Sito",
-   "t": "Gestionale, accesso col token a vista giorno e ricerca"
   }
  ],
  "perWeek": [
@@ -684,7 +708,7 @@ window.JARVIS_DATA = {
   },
   {
    "w": "2026-10-05",
-   "n": 2
+   "n": 3
   }
  ],
  "perDay": [
@@ -694,7 +718,7 @@ window.JARVIS_DATA = {
   },
   {
    "g": "mar",
-   "n": 5
+   "n": 6
   },
   {
    "g": "mer",

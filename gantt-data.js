@@ -5,11 +5,11 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.05.06",
-  updated: "2026-10-05",
+  version: "2026.10.06.01",
+  updated: "2026-10-06",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
-  today:     "2026-10-05",
+  today:     "2026-10-06",
 
   sections: [
     { key:'dec', name:'★ Decennale — serata 1 luglio 2026', badge:'evento trasversale', tasks:[
@@ -129,7 +129,7 @@ window.SANTAMONICA_GANTT = {
       {t:'menu-admin — secondo audit: migliorie aperte (voucher degustazione, orari a tendina, allergeni in Dettagli piatti, pannello chiavi, pulizia codice)', s:'2026-09-30', e:'2026-09-30', st:'done'},
       {t:'Pubblicare FAQ orari il 1/10 (nuovo periodo: venerdì pranzo, domenica solo pranzo) — allinea FAQ, JSON-LD e foglio orario', s:'2026-10-01', e:'2026-09-30', st:'done'},
       {t:'Cena 16/10: impostare in menu-admin la data speciale con carta a garanzia e il limite di 16 posti', s:'2026-10-02', e:'2026-10-09', st:'done'},
-      {t:'Cena 16/10: menu e vini in abbinamento da inserire nella pagina (orario e quota già confermati)', s:'2026-10-02', e:'2026-10-09', st:'up'},
+      {t:'Cena 16/10: menu e vini in abbinamento da inserire nella pagina (orario e quota già confermati)', s:'2026-10-02', e:'2026-10-09', st:'done'},
       {t:'Cena a tema 16/10 (Santamonica × Bellenda, Château Puybarbe): pagina /cene-a-tema IT/EN/FR + banner temporaneo in home', s:'2026-10-02', e:'2026-10-02', st:'done'},
       {t:'Menu online — filtro allergeni leggibile (testo carta +50% a schermo, piatto e allergene in due riquadri marrone)', s:'2026-10-02', e:'2026-10-02', st:'done'},
       {t:'menu-admin — frecce ▲▼ per riordinare i piatti di ogni sezione (carta e dolci)', s:'2026-10-02', e:'2026-10-02', st:'done'},
@@ -143,6 +143,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Pagina allergeni sovrascritta da un upload su GitHub: ripristinata la versione corretta', s:'2026-10-03', e:'2026-10-03', st:'done'},
       {t:'Stampa dolci — provare la nuova preview (allergeni dal fondo, pesi) e fissare', s:'2026-10-03', st:'done'},
       {t:'Tracciabilità — lo storico mostra tutte le righe, senza filtro Dal/Al', s:'2026-10-04', e:'2026-10-04', st:'done'},
+      {t:'Cena 16/10: prova dal vivo di pagina, banner e prenotazione (orario saltato)', s:'2026-10-06', e:'2026-10-09', st:'up'},
     ]},
     { key:'seo', name:'SEO & GEO', badge:'progetto-seo', tasks:[
       {t:'Migrazione Cloudflare + fix Schema @type', s:'2026-05-25', e:'2026-05-31', st:'done'},
@@ -224,6 +225,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Filone B — Picco strategico: adv Nord Italia + push concierge/PR alta stagione (se leading positivi)', s:'2027-03-01', e:'2027-08-31', st:'future'},
       {t:'Sponsorizzata Salone Nautico', s:'2026-09-25', e:'2026-10-04', st:'done'},
       {t:'Boost IG cena 16/10: controlli dopo la pubblicazione (10/10 rifiuti, 12/10 efficacia)', s:'2026-10-05', e:'2026-10-14', st:'prog'},
+      {t:'Un solo account pubblicitario Meta: decidere quale tenere e come spostare le campagne', s:'2026-10-06', st:'up'},
     ]},
     { key:'nsa', name:'NoShowApp (prodotto SaaS)', badge:'progetto-nsa', tasks:[
       {t:'NoShowApp fasi 1-5 completate (MVP no-show condiviso, accesso a invito, admin, UI + dominio, garanzia carta Stripe in test)', s:'2026-03-20', e:'2026-05-03', st:'done'},

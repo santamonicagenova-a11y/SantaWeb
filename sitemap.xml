@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Santamonica Web — sitemap.xml — v 2026.10.05.01 -->
+<!-- Santamonica Web — sitemap.xml — v 2026.10.07.01 -->
+<!-- v 2026.10.07.01: +pagine /en/ e /fr/ (home, dove siamo, prenota) con coppie hreflang it/en/fr/x-default, generate da scripts/build_lang_pages.py. -->
 <!-- v 2026.10.05.01: +/prenota (indicizzabile, ora con canonical); lastmod home aggiornato. -->
 <!-- Host canonico: https://santamonicagenova.it (apex, no www) -->
 <!-- v 2026.07.03.01: URL PULITE senza .html — Cloudflare Pages applica i "pretty URLs"
@@ -17,6 +18,10 @@
     <lastmod>2026-10-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/en/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/fr/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/"/>
   </url>
 
   <!-- Menu principale — cluster hreflang IT/EN/FR -->
@@ -75,6 +80,10 @@
     <lastmod>2026-06-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/dove-siamo"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/en/where-we-are"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/fr/ou-nous-trouver"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/dove-siamo"/>
   </url>
 
   <!-- Prenota (wizard) -->
@@ -83,6 +92,10 @@
     <lastmod>2026-10-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/prenota"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/en/book"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/fr/reserver"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/prenota"/>
   </url>
 
   <!-- Privacy policy (IT only) -->
@@ -101,4 +114,58 @@
     <priority>0.3</priority>
   </url>
 
+  <url>
+    <loc>https://santamonicagenova.it/en/</loc>
+    <lastmod>2026-10-07</lastmod>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/en/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/fr/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/"/>
+  </url>
+  <url>
+    <loc>https://santamonicagenova.it/fr/</loc>
+    <lastmod>2026-10-07</lastmod>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/en/"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/fr/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/"/>
+  </url>
+  <url>
+    <loc>https://santamonicagenova.it/en/where-we-are</loc>
+    <lastmod>2026-10-07</lastmod>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/dove-siamo"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/en/where-we-are"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/fr/ou-nous-trouver"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/dove-siamo"/>
+  </url>
+  <url>
+    <loc>https://santamonicagenova.it/fr/ou-nous-trouver</loc>
+    <lastmod>2026-10-07</lastmod>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/dove-siamo"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/en/where-we-are"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/fr/ou-nous-trouver"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/dove-siamo"/>
+  </url>
+  <url>
+    <loc>https://santamonicagenova.it/en/book</loc>
+    <lastmod>2026-10-07</lastmod>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/prenota"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/en/book"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/fr/reserver"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/prenota"/>
+  </url>
+  <url>
+    <loc>https://santamonicagenova.it/fr/reserver</loc>
+    <lastmod>2026-10-07</lastmod>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/prenota"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/en/book"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/fr/reserver"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/prenota"/>
+  </url>
 </urlset>

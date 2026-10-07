@@ -157,7 +157,8 @@
   /* [v 2026.05.19.02 P3.8] Rileva lingua per i18n iframemanager.
      iframemanager ha proprie traduzioni separate da cookieconsent: ci assicuriamo
      che siano allineate alla lingua del browser. */
-  const browserLang = (navigator.language || 'it').slice(0, 2).toLowerCase();
+  // v 2026.10.07.01: prima la lingua della pagina (<html lang>: /en/, /fr/), poi quella del browser
+  const browserLang = (document.documentElement.lang || navigator.language || 'it').slice(0, 2).toLowerCase();
   const imLang = ['it', 'en', 'fr'].includes(browserLang) ? browserLang : 'it';
 
   /* ═══════════════════════════════════════════════════════════════════════

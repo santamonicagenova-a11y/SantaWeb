@@ -1,6 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════════
    orari.js — FONTE UNICA orari di apertura · Santamonica Web
-   v 2026.09.12.01
+   v 2026.10.07.01
+   v 2026.10.07.01 — lingua iniziale da <html lang> (pagine /en/ e /fr/); prima forzava 'it' al primo render.
    ───────────────────────────────────────────────────────────────────────
    v 2026.09.12.01 — CENTRALIZZAZIONE "Orari di Apertura": i periodi non sono più
    hardcoded qui. L'array PERIODS sotto resta come FALLBACK sincrono (per un primo
@@ -212,7 +213,8 @@
     return (list || []).map(mapDbPeriod).sort(function (a, b) { return a.from < b.from ? -1 : a.from > b.from ? 1 : 0; });
   }
 
-  var lastLang = 'it';
+  // v 2026.10.07.01: lingua della pagina da <html lang> (it/en/fr) — le pagine /en/ e /fr/ rendono orari nella propria lingua
+  var lastLang = (typeof document !== 'undefined' && /^(it|en|fr)$/.test(document.documentElement.lang)) ? document.documentElement.lang : 'it';
 
   // Chiamato una volta al caricamento della pagina: legge i periodi reali dal pannello
   // admin (get-opening-hours → reservation_settings.opening_periods) e, se la risposta è
@@ -397,8 +399,8 @@
 
   injectJsonLd();
   if (typeof document !== 'undefined') {
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { renderInfo('it'); renderTable('it'); });
-    else { renderInfo('it'); renderTable('it'); }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { renderInfo(lastLang); renderTable(lastLang); });
+    else { renderInfo(lastLang); renderTable(lastLang); }
   }
   loadPeriodsFromServer();
   if (typeof module !== 'undefined' && module.exports) {

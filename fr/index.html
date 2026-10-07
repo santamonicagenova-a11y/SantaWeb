@@ -321,7 +321,7 @@
   #banner-cena .bc-x { position: absolute; z-index: 2; top: .5rem; right: .6rem; background: rgba(0,0,0,.45); border-radius: 50%; width: 2rem; height: 2rem; padding: 0; text-align: center; border: 0; color: #f5f0e8; font-size: 1.3rem; line-height: 1; cursor: pointer; padding: .4rem .6rem; }
   nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 2rem; background: transparent; transition: background 0.4s, backdrop-filter 0.4s; }
   nav.scrolled { background: rgba(var(--warm-white-rgb),0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--divider); }
-  .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); text-decoration: none; }
+  .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); text-decoration: none; margin-right: 1.2rem; white-space: nowrap; }
   .nav-logo .sub { font-size: 1rem; letter-spacing: 0.12em; opacity: 0.55; font-weight: 300; text-transform: lowercase; }
   .nav-links { display: flex; gap: 1.5rem; list-style: none; align-items: center; }
   .nav-links a { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft); text-decoration: none; transition: color 0.2s; }
@@ -562,7 +562,7 @@
 <li><a data-i18n="nav_contatti" href="#info">Contact</a></li>
 </ul>
 <div class="nav-right">
-<nav aria-label="Lingua / Language / Langue" class="lang-switch"><a href="/" hreflang="it" lang="it">IT</a><a href="/en/" hreflang="en" lang="en">EN</a><a aria-current="true" href="/fr/" hreflang="fr" lang="fr">FR</a></nav>
+<div aria-label="Lingua / Language / Langue" class="lang-switch" role="group"><a href="/" hreflang="it" lang="it">IT</a><a href="/en/" hreflang="en" lang="en">EN</a><a aria-current="true" href="/fr/" hreflang="fr" lang="fr">FR</a></div>
 <a class="nav-cta" data-i18n="nav_prenota" href="/fr/reserver">Réserver</a>
 </div>
 <button aria-label="Menu" class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
@@ -575,7 +575,7 @@
 <a class="mobile-link" data-i18n="nav_galleria" href="#galleria">Galerie</a>
 <a class="mobile-link" data-i18n="nav_evento_mobile" href="/fr/reserver">Événement spécial</a>
 <a class="mobile-link" data-i18n="nav_contatti" href="#info">Contact</a>
-<nav aria-label="Lingua / Language / Langue" class="lang-switch"><a href="/" hreflang="it" lang="it">IT</a><a href="/en/" hreflang="en" lang="en">EN</a><a aria-current="true" href="/fr/" hreflang="fr" lang="fr">FR</a></nav>
+<div aria-label="Lingua / Language / Langue" class="lang-switch" role="group"><a href="/" hreflang="it" lang="it">IT</a><a href="/en/" hreflang="en" lang="en">EN</a><a aria-current="true" href="/fr/" hreflang="fr" lang="fr">FR</a></div>
 <a data-i18n="nav_prenota" href="/fr/reserver" style="font-family:'Jost',sans-serif;font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-style:normal;background:var(--ink);color:var(--warm-white);padding:0.9rem 2.5rem;border-radius:4px;">Réserver</a>
 </div>
 <main id="contenuto">
@@ -765,7 +765,7 @@
 <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
 <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
 </div>
-<p class="footer-copy">© 2026 Il Giuliano di Andrea Giachino e C sas — P.IVA 02395420991 — <span class="footer-version">v 2026.10.07.01</span></p>
+<p class="footer-copy">© 2026 Il Giuliano di Andrea Giachino e C sas — P.IVA 02395420991 — <span class="footer-version">v 2026.10.07.02</span></p>
 </div>
 <div class="footer-policy">
 <a data-i18n="footer_privacy" href="/privacy" rel="noopener noreferrer" target="_blank">Confidentialité</a>
@@ -832,6 +832,8 @@
 
   // v 2026.10.07.01 — le stringhe di translations.json contengono entity HTML (&rsquo; …): in innerHTML vanno bene,
   // in setAttribute/document.title no (comparivano letterali). decodeEnt() le converte prima.
+  // percorso assoluto e pulito (le pagine /en/ e /fr/ stanno in cartella: «menu-en.html» relativo darebbe 404)
+  function pagePath(l) { return '/' + String(l).replace(/^\//, '').replace(/\.html$/, ''); }
   function decodeEnt(v) { var ta = document.createElement('textarea'); ta.innerHTML = v; return ta.value; }
 
   function applyLang(lang) {
@@ -870,11 +872,11 @@
       if (twDesc) twDesc.setAttribute('content', pDesc);
     }
     var menuBtn = document.getElementById('menu-btn');
-    if (menuBtn && t.cucina_btn_link) menuBtn.href = t.cucina_btn_link;
+    if (menuBtn && t.cucina_btn_link) menuBtn.href = pagePath(t.cucina_btn_link);
     var dolciBtn = document.getElementById('dolci-btn');
     if (dolciBtn) {
       // F0.21-d: dolci accorpati nella carta per EN/FR -> bottone "Menù dolci" SOLO in IT
-      if (lang === 'it') { dolciBtn.style.display = ''; if (t.dolci_btn_link) dolciBtn.href = t.dolci_btn_link; }
+      if (lang === 'it') { dolciBtn.style.display = ''; if (t.dolci_btn_link) dolciBtn.href = pagePath(t.dolci_btn_link); }
       else { dolciBtn.style.display = 'none'; }
     }
     if (window.renderOrari) window.renderOrari(lang);

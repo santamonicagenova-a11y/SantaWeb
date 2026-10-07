@@ -136,7 +136,7 @@ def italian_leftovers(soup, page):
     return out
 
 def build_nav_current(soup, lang):
-    for nav in soup.select('nav.lang-switch'):
+    for nav in soup.select('.lang-switch'):
         for a in nav.find_all('a'):
             if a.get('lang') == lang:
                 a['aria-current'] = 'true'
@@ -267,7 +267,7 @@ def build(page, lang):
             v = el.get(a)
             if not v or el.name == 'link' and el.get('rel') == ['alternate']:
                 continue
-            if el.name == 'a' and el.parent and el.parent.name == 'nav' and 'lang-switch' in (el.parent.get('class') or []):
+            if el.name == 'a' and el.parent and 'lang-switch' in (el.parent.get('class') or []):
                 continue
             if el.name == 'link' and el.get('rel') in (['canonical'],):
                 continue

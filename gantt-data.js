@@ -5,11 +5,11 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.06.01",
-  updated: "2026-10-06",
+  version: "2026.10.07.01",
+  updated: "2026-10-07",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
-  today:     "2026-10-06",
+  today:     "2026-10-07",
 
   sections: [
     { key:'dec', name:'★ Decennale — serata 1 luglio 2026', badge:'evento trasversale', tasks:[
@@ -189,6 +189,9 @@ window.SANTAMONICA_GANTT = {
       {t:'Audit SEO-GEO-AEO completo con claude-seo 2.4.2 (5/10): 9 specialisti, ~77/100', s:'2026-10-05', e:'2026-10-05', st:'done'},
       {t:'FAQ home — tipo di ristorante, stella Michelin, prezzo (65-90 €), «dal 2016», allergeni dolci (IT/EN/FR)', s:'2026-10-05', e:'2026-10-05', st:'done'},
       {t:'Nuova linea di cucina — tolto «cucina ligure» dai testi pubblici (home, dove-siamo, JSON-LD, traduzioni)', s:'2026-10-05', e:'2026-10-05', st:'done'},
+      {t:'Multilingua a URL separate EN/FR (home, dove siamo, prenota)', s:'2026-10-07', e:'2026-10-07', st:'done'},
+      {t:'Multilingua EN/FR — richiesta di indicizzazione in Search Console', s:'2026-10-07', e:'2026-10-09', st:'up'},
+      {t:'Multilingua EN/FR — controllo Search Console a 14 giorni', s:'2026-10-21', e:'2026-10-21', st:'up'},
     ]},
     { key:'mkt', name:'Marketing & Awareness', badge:'progetto-marketing', tasks:[
       {t:'Apertura IG + strategia content', s:'2026-05-28', st:'done'},

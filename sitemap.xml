@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Santamonica Web — sitemap.xml — v 2026.10.07.01 -->
-<!-- v 2026.10.07.01: +pagine /en/ e /fr/ (home, dove siamo, prenota) con coppie hreflang it/en/fr/x-default, generate da scripts/build_lang_pages.py. -->
+<!-- Santamonica Web — sitemap.xml — v 2026.10.07.03 -->
+<!-- v 2026.10.07.03: +pagine /en/ e /fr/ (home, dove siamo, prenota) e la pagina weekend IT/EN/FR, con coppie hreflang it/en/fr/x-default, generate da scripts/build_lang_pages.py. -->
 <!-- v 2026.10.05.01: +/prenota (indicizzabile, ora con canonical); lastmod home aggiornato. -->
 <!-- Host canonico: https://santamonicagenova.it (apex, no www) -->
 <!-- v 2026.07.03.01: URL PULITE senza .html — Cloudflare Pages applica i "pretty URLs"
@@ -167,5 +167,32 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/en/book"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/fr/reserver"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/prenota"/>
+  </url>
+  <url>
+    <loc>https://santamonicagenova.it/weekend-a-genova</loc>
+    <lastmod>2026-10-07</lastmod>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/weekend-a-genova"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/en/weekend-in-genoa-seafood-dinner"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/fr/week-end-genes-diner-mer"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/weekend-a-genova"/>
+  </url>
+  <url>
+    <loc>https://santamonicagenova.it/en/weekend-in-genoa-seafood-dinner</loc>
+    <lastmod>2026-10-07</lastmod>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/weekend-a-genova"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/en/weekend-in-genoa-seafood-dinner"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/fr/week-end-genes-diner-mer"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/weekend-a-genova"/>
+  </url>
+  <url>
+    <loc>https://santamonicagenova.it/fr/week-end-genes-diner-mer</loc>
+    <lastmod>2026-10-07</lastmod>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="it" href="https://santamonicagenova.it/weekend-a-genova"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://santamonicagenova.it/en/weekend-in-genoa-seafood-dinner"/>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://santamonicagenova.it/fr/week-end-genes-diner-mer"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://santamonicagenova.it/weekend-a-genova"/>
   </url>
 </urlset>

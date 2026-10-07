@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.10.07.03 — «Good Cooking» tolto: la scheda ufficiale Michelin riporta solo «Guida MICHELIN Italia 2026» (award nel JSON-LD, FAQ «Avete una stella Michelin?» visibile e nel JSON-LD); geo del JSON-LD Restaurant allineato al pin di Google Maps (44.391452, 8.964674); nuovo link alla pagina /weekend-a-genova nel blocco #info (chiave info_weekend_link). -->
 <!-- v 2026.10.07.02 — Fix: selettore lingua in un div (il tag nav ereditava position:fixed e copriva il menu), pulsante «menu» con percorso assoluto (menu-en.html relativo dava 404 su /en/), logo con margine. v 2026.10.07.01 — Multilingua a URL separate: selettore lingua = link a /en/ e /fr/ (non più setLang), hreflang en/fr rimessi, fetch/immagini con percorsi assoluti, decodifica entity negli attributi (applyLang). Le pagine /en/ e /fr/ sono GENERATE da scripts/build_lang_pages.py: dopo ogni modifica a questo file rilanciarlo. v 2026.10.06.03 — Banner cena: titolo con i puntini «Santamonica … in Bordeaux». v 2026.10.06.02 — Banner cena: tolta la riga «Ore 20 · 70 €»; titolo «Santamonica in Bordeaux» grande, oro chiaro (era «Con Bellenda…»). v 2026.10.06.01 — Banner cena: quota 70 € (era 60). v 2026.10.05.04 — (1) FAQ: +3 domande in coda (9 «Che tipo di ristorante è», con «dal 2016»; 10 «Avete una stella Michelin?», con Good Cooking; 11 «Quanto si spende?», 65-90 € a persona, cifra del brand); FAQ allergeni: citati i dolci. Visibile + JSON-LD + translations.json IT/EN/FR; il ricostruttore JSON-LD ora legge fino a 11 domande. (2) foundingDate 2016 nel JSON-LD Restaurant. (3) Il numero di versione nel footer non è più un link a login.html (richiesta di Andrea). -->
 <!-- v 2026.10.05.03 — (1) P.IVA 02395420991 nel footer della home (prima solo su dove-siamo, privacy e cookie). (2) Banner della serata spostato dopo il footer: il primo testo del documento torna ad essere la definizione del ristorante. (3) alt della foto cucina-piatto.webp: descrive un piatto, non la sala. -->
 <!-- v 2026.10.05.02 — FAQ «C’è un menù degustazione?» (visibile + JSON-LD + translations.json IT/EN/FR): oggi si propone solo la degustazione a 6 portate (il percorso a 7 «a mano libera dello Chef» non è in offerta: richiesta di Andrea 5/10). Il voucher a 7 portate è già spento in voucher-config.json (attivo:false). -->
@@ -229,7 +230,7 @@
     { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Friday", "Saturday", "Sunday"], "opens": "12:30", "closes": "14:30" },
     { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], "opens": "19:30", "closes": "22:30" }
   ],
-  "award": ["Guida Michelin - Good Cooking", "Gambero Rosso", "Golosario"],
+  "award": ["Guida MICHELIN Italia 2026", "Gambero Rosso", "Golosario"],
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Lungomare Lombardo 27",
@@ -240,8 +241,8 @@
   },
   "geo": {
     "@type": "GeoCoordinates",
-    "latitude": 44.3913353,
-    "longitude": 8.9646575
+    "latitude": 44.391452,
+    "longitude": 8.964674
   },
   "hasMap": "https://www.google.com/maps/place/?q=place_id:ChIJGzMzZqlD0xIRKRomfkk1F2c",
   "employee": [
@@ -384,7 +385,7 @@
       "name": "Avete una stella Michelin?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "No, non abbiamo la stella. Siamo presenti nella Guida Michelin con la menzione Good Cooking e siamo citati anche dal Gambero Rosso e dal Golosario."
+        "text": "No, non abbiamo la stella. Siamo presenti nella Guida MICHELIN Italia 2026 e siamo citati anche dal Gambero Rosso e dal Golosario."
       }
     },
     {
@@ -827,6 +828,7 @@
         </div>
         <div class="info-btn-row">
           <a href="/dove-siamo.html" target="_blank" rel="noopener noreferrer" class="info-btn-pill" data-i18n="info_dettagli_link">Dettagli completi e indicazioni stradali</a>
+          <a href="/weekend-a-genova" class="info-btn-pill" data-i18n="info_weekend_link">Un weekend a Genova: pranzo o cena di pesce sul mare</a>
         </div>
       </div>
 
@@ -927,7 +929,7 @@
       </details>
       <details class="faq-item">
         <summary><h3 class="faq-q" data-i18n="faq_q10">Avete una stella Michelin?</h3></summary>
-        <div class="faq-answer" data-i18n="faq_a10"><p>No, non abbiamo la stella. Siamo presenti nella Guida Michelin con la menzione Good Cooking e siamo citati anche dal Gambero Rosso e dal Golosario.</p></div>
+        <div class="faq-answer" data-i18n="faq_a10"><p>No, non abbiamo la stella. Siamo presenti nella Guida MICHELIN Italia 2026 e siamo citati anche dal Gambero Rosso e dal Golosario.</p></div>
       </details>
       <details class="faq-item">
         <summary><h3 class="faq-q" data-i18n="faq_q11">Quanto si spende?</h3></summary>
@@ -946,7 +948,7 @@
       <a href="https://www.instagram.com/ristorantesantamonica/" target="_blank">Instagram</a>
       <a href="https://www.facebook.com/santamonicage" target="_blank">Facebook</a>
     </div>
-    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; P.IVA 02395420991 &mdash; <span class="footer-version">v 2026.10.07.02</span></p>
+    <p class="footer-copy">&copy; 2026 Il Giuliano di Andrea Giachino e C sas &mdash; P.IVA 02395420991 &mdash; <span class="footer-version">v 2026.10.07.03</span></p>
   </div>
   <div class="footer-policy">
     <a href="/privacy.html" target="_blank" rel="noopener noreferrer" data-i18n="footer_privacy">Privacy</a>

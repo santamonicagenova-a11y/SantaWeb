@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-check_lang_pages.py — verifica le pagine IT/EN/FR sull'HTML GREZZO (senza JS)  ·  v 2026.10.07.01
+check_lang_pages.py — verifica le pagine IT/EN/FR sull'HTML GREZZO (senza JS)  ·  v 2026.10.07.02
 
 Uso:  python scripts/check_lang_pages.py [BASE_URL]      (default https://santamonicagenova.it)
 Prova in locale:  node <server pretty-URL> poi  python scripts/check_lang_pages.py http://localhost:8765
 
-Controlla per le 9 pagine (home, dove siamo, prenota x it/en/fr): stato 200, <html lang>, canonical
+Controlla per le 12 pagine (home, dove siamo, prenota, weekend x it/en/fr): stato 200, <html lang>, canonical
 autoreferenziale, hreflang it/en/fr/x-default reciproci, title/description propri e diversi per lingua,
 niente "ItalianRestaurant", JSON-LD valido, testo nella lingua giusta nell'HTML grezzo, link interni
 (href che iniziano con "/") senza 404; poi sitemap.xml (XML valido, coppie xhtml:link reciproche).
@@ -21,11 +21,13 @@ PAGES = {
     'home':  {'it': '/', 'en': '/en/', 'fr': '/fr/'},
     'where': {'it': '/dove-siamo', 'en': '/en/where-we-are', 'fr': '/fr/ou-nous-trouver'},
     'book':  {'it': '/prenota', 'en': '/en/book', 'fr': '/fr/reserver'},
+    'weekend': {'it': '/weekend-a-genova', 'en': '/en/weekend-in-genoa-seafood-dinner', 'fr': '/fr/week-end-genes-diner-mer'},
 }
 # parole attese nel testo visibile del grezzo (spia di "testo davvero nell'HTML")
 EXPECT = {'home': {'en': 'Book a table', 'fr': 'Réserver une table', 'it': 'Prenota un tavolo'},
           'where': {'en': 'Getting here', 'fr': 'Comment venir', 'it': 'Come arrivare'},
-          'book': {'en': 'Five quick steps', 'fr': 'Cinq étapes rapides', 'it': 'Cinque passaggi rapidi'}}
+          'book': {'en': 'Five quick steps', 'fr': 'Cinq étapes rapides', 'it': 'Cinque passaggi rapidi'},
+          'weekend': {'en': 'When to come at the weekend', 'fr': 'Quand venir le week-end', 'it': 'Quando venire nel weekend'}}
 fails = []
 
 def fail(msg):
@@ -82,9 +84,23 @@ for page, langs in PAGES.items():
             try: json.loads(blk)
             except Exception as e: fail('%s: JSON-LD non valido (%s)' % (path, e))
         vis = ' '.join(' '.join(p.text).split())
+        if 'Good Cooking' in re.sub(r'<!--.*?-->', '', body, flags=re.S): fail('%s: «Good Cooking» presente' % path)
+        if page == 'weekend':
+            # FAQPage 1:1 con le domande visibili, WebPage presente, immagini con width/height/alt, una sola CTA di prenotazione
+            lds = [json.loads(b) for b in p.ld]
+            faq = [d for d in lds if d.get('@type') == 'FAQPage']
+            if len(faq) != 1 or len(faq[0]['mainEntity']) != len(re.findall(r'<h3>', body)):
+                fail('%s: FAQPage non 1:1 con le domande visibili' % path)
+            elif any(' '.join(e['acceptedAnswer']['text'].split()) not in vis for e in faq[0]['mainEntity']):
+                fail('%s: risposta FAQ nel JSON-LD diversa dal testo visibile' % path)
+            if not [d for d in lds if d.get('@type') == 'WebPage']: fail('%s: manca JSON-LD WebPage' % path)
+            for im in re.findall(r'<img [^>]*>', body):
+                if not all(a in im for a in ('width=', 'height=', 'alt="')): fail('%s: img senza width/height/alt: %s' % (path, im[:60]))
+            if len(re.findall(r'class="cta"', body)) != 1: fail('%s: la CTA deve essere una sola' % path)
+            if 'href="tel:' not in body or 'guide.michelin.com' not in body: fail('%s: manca tel: o link Michelin' % path)
         if EXPECT[page][lang] not in vis: fail('%s: nel grezzo manca il testo "%s"' % (path, EXPECT[page][lang]))
         if lang != 'it':
-            for it_only in ('Prenota un tavolo', 'Cinque passaggi', 'Come arrivare', 'Dove siamo'):
+            for it_only in ('Prenota un tavolo', 'Cinque passaggi', 'Come arrivare', 'Dove siamo', 'Quando venire'):
                 if it_only in vis: fail('%s: testo italiano nel grezzo: "%s"' % (path, it_only))
     # titoli/description distinti
     ts = [parsed[(page, l)].title.strip() for l in ('it', 'en', 'fr') if (page, l) in parsed]

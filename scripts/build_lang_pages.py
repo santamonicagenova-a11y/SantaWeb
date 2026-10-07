@@ -3,7 +3,7 @@
 """
 build_lang_pages.py — genera le pagine statiche EN/FR  ·  v 2026.10.07.01
 
-Genera da index.html, dove-siamo.html e prenota.html (le sorgenti italiane, uniche da modificare a mano):
+Genera (e, per il weekend, anche la versione italiana: weekend-a-genova.html, vedi scripts/weekend_page.py) da index.html, dove-siamo.html e prenota.html (le sorgenti italiane, uniche da modificare a mano):
   en/index.html  en/where-we-are.html  en/book.html
   fr/index.html  fr/ou-nous-trouver.html  fr/reserver.html
 con il testo GIÀ NELL'HTML (non iniettato da JS), html lang, title/meta propri, canonical autoreferenziale,
@@ -22,9 +22,10 @@ from bs4 import BeautifulSoup, Comment, NavigableString
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lang_pages_dict as D
+import weekend_page as W
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VERSION = 'v 2026.10.07.01'
+VERSION = 'v 2026.10.07.03'
 CHECK = '--check' in sys.argv
 problems = []
 
@@ -42,6 +43,7 @@ INTERNAL = {
     '/prenota.html': 'book', '/prenota': 'book', 'prenota.html': 'book',
     '/dove-siamo.html': 'where', '/dove-siamo': 'where', 'dove-siamo.html': 'where',
     '/': 'home', '/index.html': 'home',
+    '/weekend-a-genova': 'weekend', '/weekend-a-genova.html': 'weekend',
 }
 
 def localize_href(href, lang, T=None):
@@ -321,16 +323,38 @@ def update_sitemap():
         s = s[:m.start()] + m.group(1) + body.rstrip() + links + '\n  ' + m.group(3) + s[m.end():]
     # accoda i blocchi EN/FR prima di </urlset>
     add = ''.join(block(page, lang, lastmod, prio) for page, prio in (('home', '0.8'), ('where', '0.5'), ('book', '0.6')) for lang in ('en', 'fr'))
+    # pagina weekend: voce IT + EN + FR con le tre coppie (idempotente)
+    for lang in ('it', 'en', 'fr'):
+        s = re.sub(r'\n  <url>\s*<loc>%s</loc>.*?</url>' % re.escape(url('weekend', lang)), '', s, flags=re.S)
+    add += ''.join(block('weekend', lang, W.LASTMOD, '0.7' if lang == 'it' else '0.6') for lang in ('it', 'en', 'fr'))
     s = s.replace('\n</urlset>', add + '\n</urlset>')
     s = re.sub(r'<!-- v [\d.]+: \+pagine /en/ e /fr/[^\n]*-->\n', '', s)
-    s = re.sub(r'<!-- Santamonica Web — sitemap.xml — v [\d.]+ -->', '<!-- Santamonica Web — sitemap.xml — %s -->\n<!-- %s: +pagine /en/ e /fr/ (home, dove siamo, prenota) con coppie hreflang it/en/fr/x-default, generate da scripts/build_lang_pages.py. -->' % (VERSION, VERSION), s, count=1)
+    s = re.sub(r'<!-- Santamonica Web — sitemap.xml — v [\d.]+ -->', '<!-- Santamonica Web — sitemap.xml — %s -->\n<!-- %s: +pagine /en/ e /fr/ (home, dove siamo, prenota) e la pagina weekend IT/EN/FR, con coppie hreflang it/en/fr/x-default, generate da scripts/build_lang_pages.py. -->' % (VERSION, VERSION), s, count=1)
     return p, s
+
+def build_weekend():
+    """Pagina «Weekend a Genova» IT/EN/FR (generata per intero, orari dal pannello)."""
+    period, source = W.load_period(ROOT)
+    print('orari weekend da:', source, '· periodo dal', period.get('from'))
+    outs = {}
+    for lang in ('it', 'en', 'fr'):
+        h = W.render(lang, D, period, source)
+        outs[D.PAGES['weekend']['out'][lang]] = h
+        if lang != 'it':
+            for t in italian_leftovers(BeautifulSoup(h, 'html.parser'), 'weekend'):
+                problems.append('weekend/%s: testo ancora italiano? "%s"' % (lang, t))
+        if 'Good Cooking' in h:
+            problems.append('weekend/%s: «Good Cooking» presente' % lang)
+    return outs
 
 def main():
     outputs = {}
     for page, p in D.PAGES.items():
+        if page == 'weekend':
+            continue
         for lang in ('en', 'fr'):
             outputs[p['out'][lang]] = build(page, lang)
+    outputs.update(build_weekend())
     sm_path, sm = update_sitemap()
     outputs['sitemap.xml'] = sm
     stale = []

@@ -1,9 +1,32 @@
 # CHANGELOG — Santamonica Web
 
-**Versione documento:** v 2026.09.26.08
-**Aggiornato:** 2026-09-26
+**Versione documento:** v 2026.10.07.03
+**Aggiornato:** 2026-10-07
 
 > Voci ordinate dal più recente al più vecchio. Appendere in cima a ogni sessione.
+
+---
+
+### 2026-10-07 — Pagina «Weekend a Genova» IT/EN/FR (in locale, NON pubblicata) · «Good Cooking» tolto · geo allineato al pin Google
+
+**Versioni rilasciate (da pubblicare dopo l'ok di Andrea):**
+- `scripts/weekend_page.py` **v 2026.10.07.01** (nuovo: testi IT/EN/FR approvati, orari dal pannello, HTML della pagina)
+- `scripts/build_lang_pages.py` **v 2026.10.07.03**, `scripts/lang_pages_dict.py`, `scripts/check_lang_pages.py` **v 2026.10.07.02**
+- Pagine generate: `weekend-a-genova.html`, `en/weekend-in-genoa-seafood-dinner.html`, `fr/week-end-genes-diner-mer.html`; immagini in `img/weekend/` (5 foto)
+- `index.html` **v 2026.10.07.03**, `dove-siamo.html` **v 2026.10.07.02**, `translations.json` **v 2026.10.07.02**, `sitemap.xml` (+3 voci con coppie hreflang), `en/` e `fr/` rigenerati
+- `CHANGELOG_Santamonica_Web_v2026.10.07.03.md` (questo)
+
+**Sintesi:**
+- La pagina nasce dal generatore: URL, canonical, hreflang reciproci it/en/fr/x-default, sitemap con le tre coppie, JSON-LD `WebPage` (rimanda al nodo `Restaurant` per `@id`) e `FAQPage` identica alle sei domande visibili. Una sola CTA «Prenota un tavolo» (verso `/prenota` nella lingua), `tel:`, link Michelin, link a `/menu` e `/dove-siamo`; dalla home un nuovo pulsante nel blocco Info e un link in «Dove siamo».
+- Orari: blocco orari, frase sul weekend, risposta FAQ n. 2 e frase della meta description sono calcolati dai periodi del pannello (get-opening-hours; fallback `scripts/orari-2026-10-01.json`); `orari.js` li riscrive a runtime nella lingua della pagina. Quando i periodi cambiano nel pannello va rilanciato il generatore (`--check` segnala la pagina fuori allineamento). Il pulsante «Pubblica FAQ» del pannello NON conosce ancora queste pagine.
+- Foto: sala di giorno (1600×1064) e sala di sera (900×1200) ridimensionate; le tre foto di cibo restano a 490–640 px (bassa risoluzione, nessun upscaling), da sostituire con gli originali. Alt senza origine dei prodotti.
+- «Good Cooking» tolto da home (FAQ visibile, JSON-LD `award`, FAQ JSON-LD), dove-siamo, `translations.json` IT/EN/FR, dizionario EN/FR: la scheda ufficiale riporta «Guida MICHELIN Italia 2026».
+- `geo` del JSON-LD `Restaurant` in `index.html` e `dove-siamo.html` allineato al pin di Google Maps: 44.391452, 8.964674 (prima 44.3913353, 8.9646575).
+- Non fatto: link dalla pagina `/menu` (foglio da stampa generato dal pannello admin: servirebbe cambiare il template e ripubblicare i menu).
+
+**Verifiche:** `build_lang_pages.py` ok, `--check` allineato; `check_lang_pages.py` su server locale con URL pulite: 12 pagine OK (lang, canonical, hreflang, JSON-LD validi, FAQPage 1:1, immagini con width/height/alt, una sola CTA, nessun 404 sui link interni, sitemap); anteprima in browser desktop e mobile 375 px senza scroll orizzontale né errori in console.
+
+**Loop di revisione:** P1+P2 (Claude) eseguiti. P3 sul testo già fatta il 7/10 su Gemini + ChatGPT ospite (vedi HANDOVER SEO 7/10); P3 ulteriore saltata da Andrea. Nessuna P3 sulle modifiche tecniche (generatore, schema, link). EN/FR non riletti da madrelingua.
 
 ---
 

@@ -11,8 +11,8 @@ placeholder, content) usano lo stesso dizionario. HTML_BY_SELECTOR sostituisce l
 markup misto (grassetti, link) dove la frase non si può spezzare per nodi.
 Se in una pagina resta un testo italiano non tradotto, lo script lo segnala (non lo ignora in silenzio).
 
-Tono (regole del progetto): intimita, mestiere; niente hard-sell, niente superlativi; Michelin = menzione
-"Good Cooking", mai stelle; nessun nome di chef; cucina = prodotti del territorio, non "ligure tradizionale".
+Tono (regole del progetto): intimita, mestiere; niente hard-sell, niente superlativi; Michelin = «Guida MICHELIN Italia 2026»
+(mai «Good Cooking», mai stelle); nessun nome di chef; cucina = prodotti del territorio, non "ligure tradizionale".
 """
 
 # ── Pagine: slug, meta e URL ────────────────────────────────────────────────────────────────
@@ -24,6 +24,9 @@ PAGES = {
               'out': {'en': 'en/where-we-are.html', 'fr': 'fr/ou-nous-trouver.html'}},
     'book':  {'src': 'prenota.html',     'it': '/prenota',     'en': '/en/book',          'fr': '/fr/reserver',
               'out': {'en': 'en/book.html', 'fr': 'fr/reserver.html'}},
+    # pagina «Weekend a Genova»: generata per intero (anche l'italiana) da scripts/weekend_page.py, niente sorgente a mano
+    'weekend': {'src': None,             'it': '/weekend-a-genova', 'en': '/en/weekend-in-genoa-seafood-dinner', 'fr': '/fr/week-end-genes-diner-mer',
+              'out': {'it': 'weekend-a-genova.html', 'en': 'en/weekend-in-genoa-seafood-dinner.html', 'fr': 'fr/week-end-genes-diner-mer.html'}},
 }
 # URL dei menu (esistono già per lingua) e della pagina cene a tema (lingua da ?lang=)
 MENU_URL = {'it': '/menu', 'en': '/menu-en', 'fr': '/menu-fr'}
@@ -59,7 +62,7 @@ LD_TEXT = {
     'Menù Degustazione e carta': ('Tasting menu and à la carte menu', 'Menu dégustation et carte'),
     'Prenota un tavolo': ('Book a table', 'Réserver une table'),
     'Ristorante Santamonica': ('Santamonica Restaurant', 'Restaurant Santamonica'),
-    'Guida Michelin - Good Cooking': ('Michelin Guide - Good Cooking', 'Guide Michelin - Good Cooking'),
+    'Guida MICHELIN Italia 2026': ('MICHELIN Guide Italy 2026', 'Guide MICHELIN Italie 2026'),
     'Sommelier': ('Sommelier', 'Sommelière'),
 }
 
@@ -90,7 +93,12 @@ TEXT = {
         'La salle du restaurant Santamonica sur le Lungomare de Gênes'),
     'Chiudi': ('Close', 'Fermer'),
 
+    'Un weekend a Genova: pranzo o cena di pesce sul mare': (
+        'A weekend in Genoa: seafood lunch or dinner by the sea',
+        'Un week-end à Gênes : déjeuner ou dîner de poisson face à la mer'),
+
     # ----- dove-siamo -----
+    'Vieni da fuori Genova?': ('Coming from out of town?', 'Vous venez de loin ?'),
     'Dove siamo': ('Where we are', 'Où nous trouver'),
     'Lungomare Lombardo 27 · 16145 Genova · vista mare in zona Albaro': (
         'Lungomare Lombardo 27 · 16145 Genoa · sea view in the Albaro district',

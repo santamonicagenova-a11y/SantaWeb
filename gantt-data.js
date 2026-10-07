@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.07.09",
+  version: "2026.10.07.10",
   updated: "2026-10-07",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",

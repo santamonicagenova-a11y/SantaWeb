@@ -5,7 +5,7 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.07.01",
+  version: "2026.10.07.05",
   updated: "2026-10-07",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
@@ -169,6 +169,7 @@ window.SANTAMONICA_GANTT = {
       {t:'IndexNow/Crawler Hints Cloudflare attivato', s:'2026-07-03', st:'done', ms:true},
       {t:'Pretty URLs (email GSC): sitemap URL pulite + robots senza estensione LIVE — pending reinvio sitemap GSC', s:'2026-07-03', e:'2026-07-05', st:'done', ms:true},
       {t:'Canonical → URL pulite (debito pretty URLs, tocca template admin — col pacchetto pillar)', s:'2026-07-10', e:'2026-09-25', st:'done'},
+      {t:'Pagina «Weekend a Genova» IT/EN/FR — pubblicata (7/10)', s:'2026-10-07', e:'2026-10-14', st:'done'},
       {t:'Search Console collegata a Claude via API (service account claude-seo)', s:'2026-09-27', e:'2026-09-27', st:'done'},
       {t:'Piano recensioni (4,3★→4,6, leva GEO) + tentativo recupero TheFork Manager', s:'2026-10-06', e:'2026-11-30', st:'up'},
       {t:'Embriaco #8 profilato + backlink Vivarelli/I Cuochi chiusi (no dominio)', s:'2026-06-24', st:'done'},
@@ -190,7 +191,7 @@ window.SANTAMONICA_GANTT = {
       {t:'FAQ home — tipo di ristorante, stella Michelin, prezzo (65-90 €), «dal 2016», allergeni dolci (IT/EN/FR)', s:'2026-10-05', e:'2026-10-05', st:'done'},
       {t:'Nuova linea di cucina — tolto «cucina ligure» dai testi pubblici (home, dove-siamo, JSON-LD, traduzioni)', s:'2026-10-05', e:'2026-10-05', st:'done'},
       {t:'Multilingua a URL separate EN/FR (home, dove siamo, prenota)', s:'2026-10-07', e:'2026-10-07', st:'done'},
-      {t:'Multilingua EN/FR — richiesta di indicizzazione in Search Console', s:'2026-10-07', e:'2026-10-09', st:'up'},
+      {t:'Multilingua EN/FR — richiesta di indicizzazione in Search Console', s:'2026-10-07', e:'2026-10-09', st:'done'},
       {t:'Multilingua EN/FR — controllo Search Console a 14 giorni', s:'2026-10-21', e:'2026-10-21', st:'up'},
     ]},
     { key:'mkt', name:'Marketing & Awareness', badge:'progetto-marketing', tasks:[
@@ -214,7 +215,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Filone B — Costruzione: concierge Melia + Palazzo Grillo (2° tentativo, modello Capitolo Riviera)', s:'2026-09-01', e:'2026-11-30', st:'up'},
       {t:'Filone B — rinnovo iscrizione Genova Gourmet (annuale, ferma da mesi)', s:'2026-09-01', e:'2026-10-31', st:'up'},
       {t:'Filone B — re-invio press kit + lista 15/22 a stampa/guide di viaggio enogastronomico nazionale', s:'2026-09-01', e:'2026-11-30', st:'future'},
-      {t:'Filone B — contenuti sito "weekend gastronomico" (IT/EN/FR, sito già multilingua) + restyling foto GBP', s:'2026-09-15', e:'2026-11-30', st:'future'},
+      {t:'Filone B — contenuti sito "weekend gastronomico" (IT/EN/FR, sito già multilingua) + restyling foto GBP', s:'2026-09-15', e:'2026-11-30', st:'prog'},
       {t:'Filone B — 4 settimane di raccolta baseline (provenienza booking, debito tecnico)', s:'2026-09-01', e:'2026-11-30', st:'future'},
       {t:'Baseline misurazione geografica IG (4 sett, post 2/7)', s:'2026-07-03', e:'2026-07-31', st:'future'},
       {t:'Gate Nord: decisione budget paid', s:'2026-08-01', st:'up', ms:true},

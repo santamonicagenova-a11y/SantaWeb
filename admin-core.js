@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.10.08.02 — Dettagli piatti sempre sincronizzato: all'apertura del pannello i piatti dei menù pubblicati mancanti nel database vengono ricreati da soli; se la sincronizzazione alla pubblicazione non riesce ora avvisa.
 // v 2026.10.08.01 — Pubblicazione carta/dolci: la descrizione del piatto confluisce anche nel campo «Descrizione piatto» di Dettagli piatti (piatti nuovi, rinominati e già esistenti con descrizione diversa; passa dal riepilogo OK/Annulla).
 // v 2026.10.05.02 — Pre-rendering: l'H1 per screen reader/crawler si aggiunge solo se la pagina non ne ha gia' uno (i dolci ne hanno uno proprio: prima ne usciva un secondo).
 // v 2026.10.05.01 — Pre-rendering STATICO delle pagine menu pubbliche (menu, menu-en/fr, dolci, allergeni): il DOM generato viene scritto nel contenitore (tra <!--SSR--> e <!--/SSR-->) così anche i crawler senza JavaScript vedono piatti e prezzi; H1 per screen reader/crawler; JSON-LD Menu costruito dai dati veri (prima: 4 sezioni scritte a mano). Se il pre-rendering fallisce si pubblica comunque la pagina com'era.
@@ -2065,6 +2066,36 @@ function _pdEseguiPiano(piano, token, piattiAttualiCompleti, callback) {
   next();
 }
 
+// v 2026.10.08.02 — Sempre sincronizzato: all'apertura di Dettagli piatti ricrea (senza chiedere) i piatti
+// presenti nei menù PUBBLICATI (carta + dolci) e mancanti nel database. Non cancella né rinomina nulla.
+function _pdMenuPubblicato(url) {
+  return fetch(url + '?nocache=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.text() : Promise.reject(new Error('HTTP ' + r.status)); })
+    .then(function (src) {
+      var i = src.indexOf('const MENU = {');
+      var j = src.indexOf('\n};', i);
+      if (i < 0 || j < 0) return null;
+      return _parseDataBlock(src.slice(i, j + 3).trim(), 'MENU');
+    });
+}
+function _pdRicreaMancanti(righeAttuali, token) {
+  return Promise.all([_pdMenuPubblicato(MENU_URL), _pdMenuPubblicato(DOLCI_URL)])
+    .then(function (menus) {
+      var sezioni = [];
+      menus.forEach(function (m) { if (m && Array.isArray(m.sezioni)) sezioni = sezioni.concat(m.sezioni); });
+      if (!sezioni.length) return 0;
+      var piano = _pdCalcolaPiano(sezioni, righeAttuali || []);
+      var nuovi = piano.nuovi;
+      if (!nuovi.length) return 0;
+      return _pdAssicuraAllergeniCartaLive().then(function () {
+        return new Promise(function (ok) {
+          _pdEseguiPiano({ nuovi: nuovi, rimossi: [], rinominati: [], spostati: [], descrizioni: [] }, token, righeAttuali, function () { ok(nuovi.length); });
+        });
+      });
+    })
+    .catch(function (e) { console.warn('[Dettagli piatti] ricrea mancanti: ' + e.message); return 0; });
+}
+
 // Punto d'ingresso: mDaPubblicare = leggi() del menu (Carta o Dolci) che sta per essere
 // pubblicato. Chiama SEMPRE callback() alla fine (che pubblica il menù) — un errore di rete
 // verso Dettagli piatti non blocca mai la pubblicazione del menù stesso.
@@ -2077,7 +2108,10 @@ function _pdSincronizzaEProsegui(mDaPubblicare, token, callback) {
     _pdAssicuraAllergeniCartaLive()
   ]).then(function (results) {
     var res = results[0];
-    if (!res || !res.ok) { callback(); return; }
+    if (!res || !res.ok) {
+      alert('Dettagli piatti NON sincronizzato: ' + ((res && res.error) || 'database non raggiungibile o token senza permessi') + '.\n\nIl menù viene pubblicato lo stesso; riapri «Dettagli piatti» per riallineare.');
+      callback(); return;
+    }
     var piano = _pdCalcolaPiano(mDaPubblicare.sezioni, res.piatti || []);
     // Piatti "da tenere": se rispondi Annulla, i piatti da rimuovere si ricordano (in questo browser)
     // e non vengono più proposti finché non cambiano.

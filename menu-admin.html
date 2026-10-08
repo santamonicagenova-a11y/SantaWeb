@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.10.08.02 (bump ?v= admin-core.js a 2026.10.08.02 + footer-version) — Dettagli piatti: all'apertura ricrea i piatti dei menù pubblicati mancanti. -->
 <!-- v 2026.10.08.01 (bump ?v= admin-core.js a 2026.10.08.01 + footer-version) — Pulsante «Dettagli piatti» (tolto «(allergeni)»); la descrizione del piatto in carta/dolci confluisce in Dettagli piatti alla pubblicazione. -->
 <!-- v 2026.10.05.02 (bump ?v= admin-core.js a 2026.10.05.02 + footer-version) — Pre-rendering menu: niente secondo H1 nella pagina dolci. -->
 <!-- v 2026.10.05.01 (bump ?v= admin-core.js a 2026.10.05.01 + footer-version) — Pubblicazione menu: pre-rendering statico delle pagine pubbliche (piatti e prezzi leggibili senza JavaScript) + JSON-LD Menu dai dati veri. -->
@@ -2540,7 +2541,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.10.03.07"></script>
-<script src="admin-core.js?v=2026.10.08.01"></script>
+<script src="admin-core.js?v=2026.10.08.02"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
@@ -4085,7 +4086,18 @@ function _pdErr(e, fallback) {
 function loadPiattiDettagli() {
   _pdSetStatus('Caricamento…');
   _pdFetch({ action: 'list' })
-    .then(function (res) { _pdApply(res, ''); })
+    .then(function (res) {
+      _pdApply(res, '');
+      if (!(res.status === 200 && res.body && res.body.ok)) return;
+      // v 2026.10.08.02: sempre sincronizzato con i menù pubblicati (ricrea i piatti mancanti)
+      return _pdRicreaMancanti(res.body.piatti || [], _prenGhToken()).then(function (n) {
+        if (n > 0) {
+          return _pdFetch({ action: 'list' }).then(function (r2) {
+            _pdApply(r2, '✓ Ricreati dalla carta ' + n + ' piatti mancanti (da compilare: allergeni e info cucina).');
+          });
+        }
+      });
+    })
     .catch(function (e) { _pdErr(e, 'Errore di connessione.'); });
 }
 
@@ -8404,7 +8416,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.08.01</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.08.02</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

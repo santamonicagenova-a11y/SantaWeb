@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.10.08.08 (bump ?v= admin-core.js a 2026.10.08.08 + footer-version) — Dettagli piatti: tolta la sincronizzazione automatica delle descrizioni alla pubblicazione; nuovo pulsante Importa descrizioni (a mano, con conferma). -->
 <!-- v 2026.10.08.07 (footer-version) — Dettagli piatti: pulsanti Apri tutte / Chiudi tutte. -->
 <!-- v 2026.10.08.06 (footer-version) — Dettagli piatti: schede piatto chiuse di default, apribili con un clic sull intestazione. -->
 <!-- v 2026.10.08.05 (footer-version) — Preview, Traduci e Pubblica e chiave compaiono solo quando è aperto Menù alla carta, Menù dolci o Allergeni. -->
@@ -1478,6 +1479,7 @@
         <button class="btn btn-publish" onclick="stampaPiattiDettagli()">🖨 Stampa</button>
         <button class="btn btn-load" style="border:1px solid var(--rule);color:var(--ink);" onclick="pdApriChiudiTutte(true)">▾ Apri tutte</button>
         <button class="btn btn-load" style="border:1px solid var(--rule);color:var(--ink);" onclick="pdApriChiudiTutte(false)">▸ Chiudi tutte</button>
+        <button class="btn btn-load" style="border:1px solid var(--rust);color:var(--rust);" onclick="pdImportaDescrizioniClick()" title="Copia la descrizione dei piatti dalla carta pubblicata">⬇ Importa descrizioni</button>
         <button class="btn btn-load" style="border:1px solid var(--rule);color:var(--ink);" onclick="loadPiattiDettagli()">🔄 Ricarica</button>
       </div>
 
@@ -2549,7 +2551,7 @@
 
 <script src="admin-translations.js"></script>
 <script src="admin-templates-shared.js?v=2026.10.03.07"></script>
-<script src="admin-core.js?v=2026.10.08.02"></script>
+<script src="admin-core.js?v=2026.10.08.08"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.1/chart.umd.min.js"></script>
 <script>
 // ══ PRENOTAZIONI ONLINE (interruttore + chiusure) ════════════
@@ -4216,6 +4218,19 @@ function pdToggleScheda(ev, head) {
   if (chev) chev.textContent = apri ? '▾' : '▸';
   pdState.aperti = pdState.aperti || {};
   pdState.aperti[card.getAttribute('data-pid')] = apri;
+}
+
+function pdImportaDescrizioniClick() {
+  var token = _prenGhToken();
+  if (!token) { _pdSetStatus('Serve il token GitHub (tasto 🔑).', true); return; }
+  _pdSetStatus('Leggo le descrizioni dalla carta pubblicata…');
+  pdImportaDescrizioni(pdState.piatti, token).then(function (r) {
+    if (r.annullato) { _pdSetStatus('Importazione annullata.'); return; }
+    if (!r.tot) { _pdSetStatus('Nessuna descrizione da importare: sono già allineate.'); return; }
+    return _pdFetch({ action: 'list' }).then(function (res) {
+      _pdApply(res, '✓ Descrizioni importate: ' + r.n + '/' + r.tot + (r.ko && r.ko.length ? ' — non riuscite: ' + r.ko.join(', ') : '') + '.');
+    });
+  }).catch(function (e) { _pdSetStatus('Importazione non riuscita: ' + e.message, true); });
 }
 
 function pdApriChiudiTutte(apri) {
@@ -8447,7 +8462,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.08.07</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.08.08</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

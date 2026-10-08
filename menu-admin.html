@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.10.08.04 (footer-version) — Pulsante «Allergeni carta» rinominato «Allergeni». -->
 <!-- v 2026.10.08.03 (footer-version) — Stampa Dettagli piatti: @page A4 orizzontale fuori da @media print, così il foglio si apre in orizzontale di default. -->
 <!-- v 2026.10.08.02 (bump ?v= admin-core.js a 2026.10.08.02 + footer-version) — Dettagli piatti: all'apertura ricrea i piatti dei menù pubblicati mancanti. -->
 <!-- v 2026.10.08.01 (bump ?v= admin-core.js a 2026.10.08.01 + footer-version) — Pulsante «Dettagli piatti» (tolto «(allergeni)»); la descrizione del piatto in carta/dolci confluisce in Dettagli piatti alla pubblicazione. -->
@@ -1197,7 +1198,7 @@
   <div class="qa-group" data-group="menu">
     <button class="qa-btn qa-menu" onclick="caricaDalSito('carta')">Menù alla carta</button>
     <button class="qa-btn qa-menu" onclick="caricaDalSito('dolci')">Menù dolci</button>
-    <button class="qa-btn qa-menu" onclick="caricaDalSito('allergeni')">Allergeni carta</button>
+    <button class="qa-btn qa-menu" onclick="caricaDalSito('allergeni')">Allergeni</button>
     <button class="qa-btn qa-menu" onclick="apriSezionePiattiDettagli()">Dettagli piatti</button>
     <button class="qa-btn qa-menu" onclick="apriSezioneDocGenerico()">Documento generico</button>
     <button class="qa-btn qa-menu" onclick="location.href='cantina.html'">Gestionale Cantina</button>
@@ -8417,7 +8418,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.08.03</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.08.04</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

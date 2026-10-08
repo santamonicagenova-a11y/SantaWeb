@@ -1,4 +1,5 @@
 // Core functions per menu-admin Santamonica
+// v 2026.10.08.01 — Pubblicazione carta/dolci: la descrizione del piatto confluisce anche nel campo «Descrizione piatto» di Dettagli piatti (piatti nuovi, rinominati e già esistenti con descrizione diversa; passa dal riepilogo OK/Annulla).
 // v 2026.10.05.02 — Pre-rendering: l'H1 per screen reader/crawler si aggiunge solo se la pagina non ne ha gia' uno (i dolci ne hanno uno proprio: prima ne usciva un secondo).
 // v 2026.10.05.01 — Pre-rendering STATICO delle pagine menu pubbliche (menu, menu-en/fr, dolci, allergeni): il DOM generato viene scritto nel contenitore (tra <!--SSR--> e <!--/SSR-->) così anche i crawler senza JavaScript vedono piatti e prezzi; H1 per screen reader/crawler; JSON-LD Menu costruito dai dati veri (prima: 4 sezioni scritte a mano). Se il pre-rendering fallisce si pubblica comunque la pagina com'era.
 // v 2026.10.03.10 — Menu pubblico (IT/EN/FR): tolte davvero barra superiore e barra laterale dei controlli di stampa (la regex cercava solo `ctrl-bar` senza `adm` e non scattava piu).
@@ -1872,6 +1873,11 @@ function _pdSezioniRinominate(mSezioni) {
   return out;
 }
 
+// v 2026.10.08.01 — la descrizione del piatto in carta/dolci confluisce nel campo «Descrizione piatto» di Dettagli piatti.
+function _pdDescPulita(d) {
+  return String(d || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 function _pdCalcolaPiano(mSezioni, piattiDettagliAttuali) {
   var sezioniPubblicateNorm = {};
   var pubblicati = [];
@@ -1880,7 +1886,7 @@ function _pdCalcolaPiano(mSezioni, piattiDettagliAttuali) {
     if (!sezNome) return;
     sezioniPubblicateNorm[_pdNorm(sezNome)] = true;
     (sez.piatti || []).forEach(function (p) {
-      if (p && p.nome && String(p.nome).trim()) pubblicati.push({ sezione: sezNome, nome: String(p.nome).trim() });
+      if (p && p.nome && String(p.nome).trim()) pubblicati.push({ sezione: sezNome, nome: String(p.nome).trim(), descrizione: _pdDescPulita(p.descrizione) });
     });
   });
 
@@ -1914,7 +1920,7 @@ function _pdCalcolaPiano(mSezioni, piattiDettagliAttuali) {
       if (d < migliorDist) { migliorDist = d; miglior = old; }
     });
     if (miglior) {
-      rinominati.push({ vecchia: miglior, nuovoNome: pub.nome });
+      rinominati.push({ vecchia: miglior, nuovoNome: pub.nome, descrizione: pub.descrizione });
       pool = pool.filter(function (o) { return o !== miglior; });
     } else {
       nuovi.push(pub);
@@ -1926,7 +1932,12 @@ function _pdCalcolaPiano(mSezioni, piattiDettagliAttuali) {
   rinominati.forEach(function (r) { coinvolti[r.vecchia.id] = true; });
   pool.forEach(function (p) { coinvolti[p.id] = true; });
   attualiInUniverso.forEach(function (p) { if (p._sezioneVecchia && !coinvolti[p.id]) spostati.push(p); });
-  return { nuovi: nuovi, rimossi: pool, rinominati: rinominati, spostati: spostati };
+  var descrizioni = [];
+  attualiInUniverso.forEach(function (p) {
+    var pub = pubblicati.filter(function (x) { return chiave(x.sezione, x.nome) === chiave(p.sezione, p.piatto); })[0];
+    if (pub && pub.descrizione && pub.descrizione !== String(p.descrizione || '').trim()) descrizioni.push({ riga: p, descrizione: pub.descrizione });
+  });
+  return { nuovi: nuovi, rimossi: pool, rinominati: rinominati, spostati: spostati, descrizioni: descrizioni };
 }
 
 function _pdRiepilogoPiano(piano) {
@@ -1947,6 +1958,10 @@ function _pdRiepilogoPiano(piano) {
     righe.push('PROBABILE RINOMINA — dati di sicurezza alimentare mantenuti (' + piano.rinominati.length + '):');
     piano.rinominati.forEach(function (r) { righe.push('  ~ ' + r.vecchia.sezione + ' — "' + r.vecchia.piatto + '" → "' + r.nuovoNome + '"'); });
   }
+  if (piano.descrizioni && piano.descrizioni.length) {
+    righe.push('DESCRIZIONE dalla carta → Dettagli piatti (' + piano.descrizioni.length + '):');
+    piano.descrizioni.forEach(function (d) { righe.push('  ✎ ' + d.riga.sezione + ' — ' + d.riga.piatto); });
+  }
   return righe.join('\n');
 }
 
@@ -1961,7 +1976,7 @@ function _pdEseguiPiano(piano, token, piattiAttualiCompleti, callback) {
     var old = r.vecchia;
     azioni.push({
       tipo: 'update', id: old.id, sezione: old.sezione, piatto: r.nuovoNome,
-      descrizione: old.descrizione, allergeni: old.allergeni,
+      descrizione: r.descrizione || old.descrizione, allergeni: old.allergeni,
       allergeni_contaminazione: old.allergeni_contaminazione,
       allergeni_eliminabili: old.allergeni_eliminabili,
       gravidanza: old.gravidanza, modifiche: old.modifiche,
@@ -1978,7 +1993,21 @@ function _pdEseguiPiano(piano, token, piattiAttualiCompleti, callback) {
       stato: p.stato, fonte: p.fonte, escludi_stampa: p.escludi_stampa
     });
   });
-  piano.nuovi.forEach(function (p) { azioni.push({ tipo: 'create', sezione: p.sezione, piatto: p.nome }); });
+  var giaTocc = {};
+  azioni.forEach(function (a) { if (a.id) giaTocc[a.id] = true; });
+  (piano.descrizioni || []).forEach(function (d) {
+    var p = d.riga;
+    if (giaTocc[p.id]) return;
+    azioni.push({
+      tipo: 'update', id: p.id, sezione: p.sezione, piatto: p.piatto,
+      descrizione: d.descrizione, allergeni: p.allergeni,
+      allergeni_contaminazione: p.allergeni_contaminazione,
+      allergeni_eliminabili: p.allergeni_eliminabili,
+      gravidanza: p.gravidanza, modifiche: p.modifiche,
+      stato: p.stato, fonte: p.fonte, escludi_stampa: p.escludi_stampa
+    });
+  });
+  piano.nuovi.forEach(function (p) { azioni.push({ tipo: 'create', sezione: p.sezione, piatto: p.nome, descrizione: p.descrizione }); });
 
   var i = 0;
   var falliti = [];
@@ -2007,6 +2036,7 @@ function _pdEseguiPiano(piano, token, piattiAttualiCompleti, callback) {
       var lastSameSez = null, sezN = _pdNorm(a.sezione);
       working.forEach(function (w) { if (_pdNorm(w.sezione) === sezN) lastSameSez = w; });
       payload = { action: 'create', sezione: a.sezione, piatto: a.piatto };
+      if (a.descrizione) payload.descrizione = a.descrizione;
       var pref = _pdAllergeniDaCartaPerNome(a.piatto);
       if (pref) payload.allergeni = pref;
       if (lastSameSez) payload.after_id = lastSameSez.id;
@@ -2015,7 +2045,18 @@ function _pdEseguiPiano(piano, token, piattiAttualiCompleti, callback) {
     fetch(PD_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
       .then(function (r) { return r.json(); })
       .then(function (res) {
-        if (res && res.ok && Array.isArray(res.piatti)) working = res.piatti;
+        if (res && res.ok && Array.isArray(res.piatti)) {
+          working = res.piatti;
+          if (a.tipo === 'create' && a.descrizione) {
+            var cr = working.filter(function (w) { return _pdNorm(w.sezione) === _pdNorm(a.sezione) && _pdNorm(w.piatto) === _pdNorm(a.piatto); })[0];
+            if (cr && String(cr.descrizione || '').trim() !== a.descrizione) {
+              azioni.push({ tipo: 'update', id: cr.id, sezione: cr.sezione, piatto: cr.piatto, descrizione: a.descrizione,
+                allergeni: cr.allergeni, allergeni_contaminazione: cr.allergeni_contaminazione,
+                allergeni_eliminabili: cr.allergeni_eliminabili, gravidanza: cr.gravidanza, modifiche: cr.modifiche,
+                stato: cr.stato, fonte: cr.fonte, escludi_stampa: cr.escludi_stampa });
+            }
+          }
+        }
         else falliti.push('• ' + a.tipo + ' — ' + (a.piatto || a.id) + ((res && res.error) ? ' (' + res.error + ')' : ''));
       })
       .catch(function (e) { falliti.push('• ' + a.tipo + ' — ' + (a.piatto || a.id) + ' (' + e.message + ')'); console.warn('[Dettagli piatti sync] azione fallita: ' + e.message); })
@@ -2044,7 +2085,7 @@ function _pdSincronizzaEProsegui(mDaPubblicare, token, callback) {
     try { tenuti = JSON.parse(localStorage.getItem('pd_rimossi_tenuti') || '[]'); } catch (e) { tenuti = []; }
     var chiaveRim = function (p) { return _pdNorm(p.sezione) + '|' + _pdNorm(p.piatto); };
     piano.rimossi = piano.rimossi.filter(function (p) { return tenuti.indexOf(chiaveRim(p)) < 0; });
-    if (!(piano.nuovi.length || piano.rimossi.length || piano.rinominati.length || (piano.spostati || []).length)) { callback(); return; }
+    if (!(piano.nuovi.length || piano.rimossi.length || piano.rinominati.length || (piano.spostati || []).length || (piano.descrizioni || []).length)) { callback(); return; }
     var msg = 'Dettagli piatti (allergeni) — la pubblicazione porta questi cambiamenti:\n\n' +
       _pdRiepilogoPiano(piano) +
       '\n\nApplicarli anche al database Dettagli piatti?\nOK = applica e pubblica — Annulla = pubblica solo il menù, Dettagli piatti resta invariato.';

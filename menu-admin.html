@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.10.08.06 (footer-version) — Dettagli piatti: schede piatto chiuse di default, apribili con un clic sull intestazione. -->
 <!-- v 2026.10.08.05 (footer-version) — Preview, Traduci e Pubblica e chiave compaiono solo quando è aperto Menù alla carta, Menù dolci o Allergeni. -->
 <!-- v 2026.10.08.04 (footer-version) — Pulsante «Allergeni carta» rinominato «Allergeni». -->
 <!-- v 2026.10.08.03 (footer-version) — Stampa Dettagli piatti: @page A4 orizzontale fuori da @media print, così il foglio si apre in orizzontale di default. -->
@@ -4203,6 +4204,17 @@ function _pdFieldCheckbox(label, id, field, checked) {
     label + '</label></div>';
 }
 
+// v 2026.10.08.06 — schede piatto chiuse di default (tendina): clic sull'intestazione per aprire/chiudere; lo stato sopravvive ai salvataggi.
+function pdToggleScheda(ev, head) {
+  if (ev && ev.target && ev.target.closest && ev.target.closest('button')) return;
+  var card = head.parentNode, body = card.querySelector('.fs-body'), chev = card.querySelector('.pd-chev');
+  var apri = body.style.display === 'none';
+  body.style.display = apri ? '' : 'none';
+  if (chev) chev.textContent = apri ? '▾' : '▸';
+  pdState.aperti = pdState.aperti || {};
+  pdState.aperti[card.getAttribute('data-pid')] = apri;
+}
+
 function renderPiattiDettagli() {
   _pdPopolaSezioniDatalist();
   var list = document.getElementById('pd-list');
@@ -4219,16 +4231,18 @@ function renderPiattiDettagli() {
     var statoLabel = PD_STATI_MAP[p.stato] || p.stato;
     var statoColor = PD_STATI_COLOR[p.stato] || 'var(--stone)';
     var escluso = !!p.escludi_stampa;
-    html += '<div class="fs" style="margin-bottom:.8rem;">' +
-      '<div class="fs-head" style="display:flex;justify-content:space-between;align-items:center;gap:.6rem;">' +
-      '<span>' + _pdEsc(p.piatto) + (escluso ? ' <span title="Escluso dalla stampa" style="color:var(--rust);font-size:.68rem;letter-spacing:.04em;">🚫 non in stampa</span>' : '') + '</span>' +
+    pdState.aperti = pdState.aperti || {};
+    var aperto = !!pdState.aperti[p.id];
+    html += '<div class="fs" data-pid="' + p.id + '" style="margin-bottom:.8rem;">' +
+      '<div class="fs-head" style="display:flex;justify-content:space-between;align-items:center;gap:.6rem;cursor:pointer;" onclick="pdToggleScheda(event,this)">' +
+      '<span><span class="pd-chev" style="display:inline-block;width:1rem;font-size:.7rem;">' + (aperto ? '▾' : '▸') + '</span>' + _pdEsc(p.piatto) + (escluso ? ' <span title="Escluso dalla stampa" style="color:var(--rust);font-size:.68rem;letter-spacing:.04em;">🚫 non in stampa</span>' : '') + '</span>' +
       '<span style="display:flex;gap:.3rem;align-items:center;">' +
       '<span style="color:' + statoColor + ';font-size:.65rem;letter-spacing:.06em;">' + _pdEsc(statoLabel) + '</span>' +
       '<button class="btn btn-load" title="Sposta su" style="padding:.15rem .5rem;font-size:.7rem;" onclick="spostaPiattoDettaglio(\'' + p.id + '\',\'up\')">↑</button>' +
       '<button class="btn btn-load" title="Sposta giù" style="padding:.15rem .5rem;font-size:.7rem;" onclick="spostaPiattoDettaglio(\'' + p.id + '\',\'down\')">↓</button>' +
       '</span>' +
       '</div>' +
-      '<div class="fs-body">' +
+      '<div class="fs-body"' + (aperto ? '' : ' style="display:none;"') + '>' +
       '<div style="display:flex;flex-wrap:wrap;gap:.6rem;">' +
       _pdFieldRow('Sezione', p.id, 'sezione', p.sezione, false) +
       _pdFieldRow('Nome piatto', p.id, 'piatto', p.piatto, false) +
@@ -8420,7 +8434,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.08.05</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.08.06</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

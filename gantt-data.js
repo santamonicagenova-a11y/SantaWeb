@@ -5,11 +5,11 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.07.10",
-  updated: "2026-10-07",
+  version: "2026.10.08.01",
+  updated: "2026-10-08",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
-  today:     "2026-10-07",
+  today:     "2026-10-08",
 
   sections: [
     { key:'dec', name:'★ Decennale — serata 1 luglio 2026', badge:'evento trasversale', tasks:[
@@ -144,6 +144,7 @@ window.SANTAMONICA_GANTT = {
       {t:'Stampa dolci — provare la nuova preview (allergeni dal fondo, pesi) e fissare', s:'2026-10-03', st:'done'},
       {t:'Tracciabilità — lo storico mostra tutte le righe, senza filtro Dal/Al', s:'2026-10-04', e:'2026-10-04', st:'done'},
       {t:'Cena 16/10: prova dal vivo di pagina, banner e prenotazione (orario saltato)', s:'2026-10-06', e:'2026-10-09', st:'up'},
+      {t:'Dettagli piatti: ricrea da solo i piatti mancanti, schede a tendina, Importa descrizioni a mano, stampa una pagina per sezione', s:'2026-10-08', e:'2026-10-08', st:'done'},
     ]},
     { key:'seo', name:'SEO & GEO', badge:'progetto-seo', tasks:[
       {t:'Migrazione Cloudflare + fix Schema @type', s:'2026-05-25', e:'2026-05-31', st:'done'},

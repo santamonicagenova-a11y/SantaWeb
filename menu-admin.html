@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v 2026.10.10.01 (footer-version) — Food Cost: Incassi mostra tutti i giorni del periodo riga per riga (anche senza incasso); Inventario: clic su un giorno dello storico (giallo o verde) apre il dettaglio del conteggio. -->
 <!-- v 2026.10.08.12 (footer-version) — Stampa Dettagli piatti: margini 1 cm sui lati, titolo sezione grande e centrato. -->
 <!-- v 2026.10.08.11 (footer-version) — Stampa Dettagli piatti: una pagina per sezione, tabella alta quanto la pagina, celle centrate. -->
 <!-- v 2026.10.08.10 (footer-version) — Stampa Dettagli piatti: tabella centrata verticalmente nella pagina (come in Excel); celle di nuovo allineate in alto. -->
@@ -5154,8 +5155,14 @@ function fcLoadIncassi() {
     var perData = {};
     (risultati[0].body.incassi || []).forEach(function (row) { perData[row.data] = perData[row.data] || {}; perData[row.data].food = row; });
     (risultati[1].body.incassi || []).forEach(function (row) { perData[row.data] = perData[row.data] || {}; perData[row.data].beverage = row; });
-    fcState.incassi = Object.keys(perData).sort()  /* v 2026.09.26.06: più vecchia in alto */.map(function (d) {
-      return { data: d, food: perData[d].food || null, beverage: perData[d].beverage || null };
+    // v 2026.10.10.01 — una riga per OGNI giorno del periodo (anche senza incasso), più vecchia in alto
+    var giorni = [];
+    for (var t = Date.parse(r.da + 'T00:00:00Z'), fine = Date.parse(r.a + 'T00:00:00Z'); t <= fine && giorni.length < 800; t += 86400000) giorni.push(new Date(t).toISOString().slice(0, 10));
+    Object.keys(perData).forEach(function (d) { if (giorni.indexOf(d) < 0) giorni.push(d); });
+    giorni.sort();
+    fcState.incassi = giorni.map(function (d) {
+      var p = perData[d] || {};
+      return { data: d, food: p.food || null, beverage: p.beverage || null };
     });
     fcRenderIncassi();
     _fcSetStatus('');
@@ -5165,13 +5172,14 @@ function fcLoadIncassi() {
 function fcRenderIncassi() {
   var list = document.getElementById('fc-incassi-list');
   if (!list) return;
-  if (!fcState.incassi.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun incasso in questo periodo.</p>'; return; }
+  if (!fcState.incassi.length) { list.innerHTML = '<p style="color:var(--stone);font-size:.82rem;">Nessun giorno in questo periodo.</p>'; return; }
   var totFood = fcState.incassi.reduce(function (a, r) { return a + (r.food ? Number(r.food.importo) : 0); }, 0);
   var totBev = fcState.incassi.reduce(function (a, r) { return a + (r.beverage ? Number(r.beverage.importo) : 0); }, 0);
   list.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:.82rem;">' +
     '<tr style="text-align:left;color:var(--stone);font-size:.7rem;text-transform:uppercase;"><th>Data</th><th>Food</th><th>Beverage</th><th></th></tr>' +
     fcState.incassi.map(function (r) {
-      return '<tr style="border-top:1px solid var(--rule);">' +
+      var vuoto = !r.food && !r.beverage;
+      return '<tr style="border-top:1px solid var(--rule);' + (vuoto ? 'color:var(--stone);' : '') + '">' +
         '<td style="padding:.35rem 0;">' + r.data + '</td>' +
         '<td>' + (r.food ? _fcEur(r.food.importo) : '—') + '</td>' +
         '<td>' + (r.beverage ? _fcEur(r.beverage.importo) : '—') + '</td>' +
@@ -5417,7 +5425,7 @@ function fcRenderPeriodiDisponibili(payload) {
       var colore = completo ? '#199e70' : '#eab308';
       var giorno = d.data.slice(8, 10);
       var valore = _fcEur(d.valore_totale);
-      return '<div title="' + _fcEsc(d.data) + ': ' + d.contati + '/' + d.totale + ' reparti contati · ' + valore + '" style="width:2.9rem;height:2.15rem;border-radius:4px;background:' + colore + ';color:#fff;font-size:.62rem;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:600;line-height:1.15;">' +
+      return '<div onclick="fcApriConteggio(\'' + _fcEsc(d.data) + '\')" title="' + _fcEsc(d.data) + ': ' + d.contati + '/' + d.totale + ' reparti contati · ' + valore + '" style="width:2.9rem;height:2.15rem;border-radius:4px;background:' + colore + ';color:#fff;cursor:pointer;font-size:.62rem;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:600;line-height:1.15;">' +
         '<span>' + _fcEsc(giorno) + '</span>' +
         '<span style="font-size:.55rem;font-weight:500;opacity:.92;">' + _fcEsc(valore) + '</span>' +
         '</div>';
@@ -5435,8 +5443,19 @@ function fcRenderPeriodiDisponibili(payload) {
       }).join('') + '</div>'
     : '<p style="font-size:.75rem;color:var(--stone);margin-top:.5rem;">Nessun periodo chiuso ancora — servono almeno due date con conteggio completo (verde) su tutti i reparti.</p>';
   el.innerHTML =
-    '<p style="font-size:.7rem;color:var(--stone);text-transform:uppercase;margin-bottom:.3rem;">Storico conteggi — verde = tutti i reparti contati, giallo = parziale</p>' +
+    '<p style="font-size:.7rem;color:var(--stone);text-transform:uppercase;margin-bottom:.3rem;">Storico conteggi — verde = tutti i reparti contati, giallo = parziale · clicca un giorno per aprirne il dettaglio</p>' +
     heatmap + periodiHtml;
+}
+
+// v 2026.10.10.01 — clic su un giorno dello storico: imposta la data, carica il conteggio e apre il dettaglio per reparto.
+function fcApriConteggio(data_) {
+  var dataEl = document.getElementById('fc-inv-data');
+  if (!dataEl) return;
+  dataEl.value = data_;
+  var det = document.getElementById('fc-inv-details');
+  if (det) det.open = true;
+  fcLoadInventario();
+  if (det && det.scrollIntoView) det.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function fcUsaPeriodo(da, a) {
@@ -8470,7 +8489,7 @@ async function _eseguiPubblicaFotoSito(token) {
 })();
 </script>
 
-<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.08.12</div>
+<div style="text-align:center;padding:6px 0;font-family:'Inter',sans-serif;font-size:.55rem;color:var(--stone);letter-spacing:.1em;">v 2026.10.10.01</div>
 <!-- v 2026.06.05.01 — rimosso blocco duplicato di <script> (admin-translations.js, admin-templates-shared.js, admin-core.js gia' caricati a inizio body) -->
 <!-- Cursor follower v2026.09.05.01 — variante admin (tema scuro/ambra) del "cursore strano" da HANDOVER_cursorfollower_v2026.06.05.01.md, mai deployato sul sito pubblico. Applicato SOLO qui, non sulle pagine vetrina. A11y-safe (no-touch, prefers-reduced-motion). -->
 <script defer src="/cursor-follower-admin.js"></script>

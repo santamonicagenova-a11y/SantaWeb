@@ -5,11 +5,11 @@
    Fonte: note Obsidian in Jarvis/Task/ → node Jarvis/_tools/jarvis.mjs build-gantt
    ============================================================================ */
 window.SANTAMONICA_GANTT = {
-  version: "2026.10.08.01",
-  updated: "2026-10-08",
+  version: "2026.10.10.01",
+  updated: "2026-10-10",
   axisStart: "2026-05-01",
   axisEnd:   "2027-09-01",
-  today:     "2026-10-08",
+  today:     "2026-10-10",
 
   sections: [
     { key:'dec', name:'★ Decennale — serata 1 luglio 2026', badge:'evento trasversale', tasks:[
@@ -133,7 +133,6 @@ window.SANTAMONICA_GANTT = {
       {t:'Cena a tema 16/10 (Santamonica × Bellenda, Château Puybarbe): pagina /cene-a-tema IT/EN/FR + banner temporaneo in home', s:'2026-10-02', e:'2026-10-02', st:'done'},
       {t:'Menu online — filtro allergeni leggibile (testo carta +50% a schermo, piatto e allergene in due riquadri marrone)', s:'2026-10-02', e:'2026-10-02', st:'done'},
       {t:'menu-admin — frecce ▲▼ per riordinare i piatti di ogni sezione (carta e dolci)', s:'2026-10-02', e:'2026-10-02', st:'done'},
-      {t:'Serate speciali: provare dal pannello «Salva serata speciale» e «Modifica» sulla cena del 16/10', s:'2026-10-02', e:'2026-10-09', st:'up'},
       {t:'Serate speciali (cene a tema): setup in menu-admin e avviso nel wizard di prenotazione', s:'2026-10-02', e:'2026-10-02', st:'done'},
       {t:'Stampa carta — note per l\'ospite sul fondo pagina e dimensione caratteri per tipologia (con pt)', s:'2026-10-02', e:'2026-10-02', st:'done'},
       {t:'Allergeni carta — i dolci non compaiono nella pagina allergeni (restano nei dati)', s:'2026-10-03', e:'2026-10-03', st:'done'},
@@ -143,7 +142,6 @@ window.SANTAMONICA_GANTT = {
       {t:'Pagina allergeni sovrascritta da un upload su GitHub: ripristinata la versione corretta', s:'2026-10-03', e:'2026-10-03', st:'done'},
       {t:'Stampa dolci — provare la nuova preview (allergeni dal fondo, pesi) e fissare', s:'2026-10-03', st:'done'},
       {t:'Tracciabilità — lo storico mostra tutte le righe, senza filtro Dal/Al', s:'2026-10-04', e:'2026-10-04', st:'done'},
-      {t:'Cena 16/10: prova dal vivo di pagina, banner e prenotazione (orario saltato)', s:'2026-10-06', e:'2026-10-09', st:'up'},
       {t:'Dettagli piatti: ricrea da solo i piatti mancanti, schede a tendina, Importa descrizioni a mano, stampa una pagina per sezione', s:'2026-10-08', e:'2026-10-08', st:'done'},
     ]},
     { key:'seo', name:'SEO & GEO', badge:'progetto-seo', tasks:[
@@ -221,7 +219,8 @@ window.SANTAMONICA_GANTT = {
       {t:'Baseline misurazione geografica IG (4 sett, post 2/7)', s:'2026-07-03', e:'2026-07-31', st:'future'},
       {t:'Gate Nord: decisione budget paid', s:'2026-08-01', st:'up', ms:true},
       {t:'Calendario cene a tema (entro ago)', s:'2026-07-01', e:'2026-08-31', st:'prog'},
-      {t:'Mailing Brevo — lancio (entro 15 set)', s:'2026-08-15', e:'2026-09-15', st:'future'},
+      {t:'Mailing Brevo — lancio (entro 15 set)', s:'2026-10-10', e:'2026-10-12', st:'prog'},
+      {t:'Newsletter cena 16/10: controllo risultati dopo l\'invio (aperture, clic, nome mittente)', s:'2026-10-12', e:'2026-10-14', st:'up'},
       {t:'Meta budget teaser (set, 300€)', s:'2026-09-01', e:'2026-09-30', st:'future'},
       {t:'Cene a tema «Mare d\'Inverno» (8 serate) — appiglio anche per Filone B turismo', s:'2026-09-01', e:'2027-04-30', st:'future'},
       {t:'Meta budget inverno — picco (700€)', s:'2026-11-01', e:'2027-04-30', st:'future'},
